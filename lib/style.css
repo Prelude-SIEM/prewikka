@@ -1,6 +1,7 @@
 /*
  * global
  */
+
 body {
         margin-left: 0px;
         margin-top: 0px;
@@ -14,8 +15,12 @@ body {
 
 
 a {
-        color: black;
+	color: #6865a6;
         text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
 }
 
 
@@ -31,7 +36,6 @@ h1 {
 }
 
 h2 {
-    font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 16px;
     margin: 0px;
 }
@@ -40,8 +44,9 @@ table {
 	border-spacing: 3px 2px;
 }
 
+
 input {
-        border: 1px solid black;
+/*        border: 1px solid black; */
         padding:0px;
         font-size: inherit;
         font-family: inherit;
@@ -53,9 +58,8 @@ select {
 }
 
 form {
-        display: inline;
+	display: inline;
 }
-
 
 thead {
         font-weight: bold;
@@ -66,7 +70,6 @@ thead {
         font-family: Courier;
         font-weight: bold;
 }
-
 
 /*
  * banner
@@ -239,7 +242,7 @@ thead {
 
 /* menu timeline control */
 #timeline {
-        background: #999999; /* #E2EBF5; */
+        background: #999999; 
         font-size: 10px;
         width: 160px;
         bottom: 50px;
@@ -249,7 +252,6 @@ thead {
 
 .timeline_control_prev, .timeline_control_cur, .timeline_control_next {
         background: #E2EBF5;
-        color: black;
         width: 53px;
         height: 20px;
         padding: 0px;
@@ -261,15 +263,15 @@ thead {
 }
 
 .timeline_control_prev a:link, .timeline_control_prev a:visited, .timeline_control_prev a:hover,
-.timeline_control_cur a:link, .timeline_control_cur a:visited, .timeline_control_cur a:hover
+.timeline_control_cur a:link, .timeline_control_cur a:visited, .timeline_control_cur a:hover,
 .timeline_control_next a:link, .timeline_control_next a:visited, .timeline_control_next a:hover {
         color:black;
 }
 
 #filter_control_label, #timezone_control_label, #timeline_limit_label, #timeline_submit, #timeline_step_label {
-        font-style: verdana;
         font-weight: bold;
 }
+
 
 .filter_control_select, .timezone_control_select {
 	width: 107px;
@@ -315,22 +317,27 @@ thead {
  */
 #main {
         padding: 10px;
-        font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 100%;
         position: absolute;
         left: 160px;
         top: 80px;
 	right: 0px;
+	bottom: 0px;
 }
 
+/*
 #main a {
         color: #333333;
+ 	color: #635f68;
         text-decoration: none;
 }
 
+
 #main a:hover {
+	color: black;
         text-decoration: underline;
 }
+*/
 
 
 /*
@@ -379,17 +386,18 @@ thead {
 
 .impact_severity_high, .impact_completion_succeeded {
 	text-decoration: none;
-	color: red;
+	font-weight: bold;
+	color: #d02a2a;
 }
 
 .impact_severity_medium {
 	text-decoration: none;
-	color: orange;
+	color: #ff8e33;
 }
 
 .impact_severity_low, .impact_completion_failed {
 	text-decoration: none;
-	color: green;
+	color: #418c3d;
 }
 
 .impact_severity_info {
@@ -397,10 +405,6 @@ thead {
         color: blue;
 }
 
-
-.impact_severity_high:hover, .impact_severity_medium:hover, .impact_severity_low:hover, .impact_severity_info:hover {
-	text-decoration: none;
-}
 
 .alert_field_value {
 	text-decoration: none;
@@ -613,7 +617,7 @@ ul#popup_block li:hover > ul {
 }
 
 .popup_title span {
-	text-decoration: underline;
+	color: #6865a6;
 }
 
 .popup_title:hover span {
@@ -676,10 +680,22 @@ ul#popup_block > li:hover > ul {
 /*
  * misc
  */ 
- 
- .box {
-        border: 1px solid black;
-        margin-bottom: 10px;
-        padding: 5px;
-        width: -1px;;
+
+#about {
+	display: table;
+	height: 100%;
+	min-height: 100%;
+	text-align: justify;
+	margin: 0px;
+	padding: 0px;
+}
+
+#about_contact {
+	vertical-align: bottom; 
+	border-spacing: 0px; 
+	text-align: center; 
+	width: 80%; 
+	background: #999999; 
+	color: white; 
+	border: 1px solid #D2312A;
 }
