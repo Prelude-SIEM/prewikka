@@ -1,8 +1,8 @@
 import sys
 import urllib
 
-import PyTpl
-from templates import Table
+from prewikka import PyTpl
+from prewikka.templates import Table
 
 
 class MessageList(PyTpl.Template):

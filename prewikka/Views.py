@@ -1,7 +1,6 @@
 import sys
 
 from templates.layouts.normal import Normal, Menu, TopMenu
-import Core
 
 
 class View:

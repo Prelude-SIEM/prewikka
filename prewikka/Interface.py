@@ -81,6 +81,7 @@ class Interface:
             registered = self._actions[action_name]
         else:
             registered = self._default_action
+
         action = registered["action"]
         parameters = registered["parameters"]()
         parameters.populate(query)

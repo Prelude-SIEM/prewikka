@@ -1,4 +1,4 @@
-from modules.main import ActionParameters, Actions, View
+from prewikka.modules.main import ActionParameters, Actions, View
 
 def load(core, config):
     # Alerts

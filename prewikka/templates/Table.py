@@ -1,6 +1,7 @@
 import sys
 
-import PyTpl
+from prewikka import PyTpl
+
 
 class Table(PyTpl.Template):
     def __init__(self):

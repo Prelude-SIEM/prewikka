@@ -1,9 +1,9 @@
 import time
 import copy
 
-import Interface
+from prewikka import Interface
+from prewikka.modules.main import View, ActionParameters
 
-from modules.main import View, ActionParameters
 
 class _MyTime:
     def __init__(self, t=None):

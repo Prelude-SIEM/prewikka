@@ -2,18 +2,18 @@ import sys
 import time
 import copy
 
-import Views
-from modules.main import ActionParameters
-from inc.templates import Table
-from modules.main.templates import MessageList, MessageSummary, MessageDetails
+from prewikka import Views
+from prewikka.modules.main import ActionParameters
+from prewikka.templates import Table
+from prewikka.modules.main.templates import MessageList, MessageSummary, MessageDetails
 
 def Actions():
     # workaround: we cannot do a simple "from modules.main import Actions" statement
     # because Actions imports View, which means that we would have an indirect recursive
     # module import (View -> Actions -> View -> ...)
     # TODO: find a cleaner way to solve this problem
-    import modules.main.Actions
-    return modules.main.Actions
+    import prewikka.modules.main.Actions
+    return prewikka.modules.main.Actions
 
 
 

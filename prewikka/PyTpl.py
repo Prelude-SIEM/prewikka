@@ -102,6 +102,4 @@ class PyTpl(PYTPL_block):
 class Template(PyTpl):
     def __init__(self):
         template_file = self.__module__.replace(".", "/") + ".tpl"
-        if template_file.find("inc/") != 0:
-            template_file = "inc/" + template_file
         PyTpl.__init__(self, template_file)

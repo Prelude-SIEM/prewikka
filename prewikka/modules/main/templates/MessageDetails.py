@@ -1,9 +1,8 @@
 import sys
 
-from templates import Hideable
-from modules.main.templates import MessageDetailsEntries
-import PyTpl
-
+from prewikka.templates import Hideable
+from prewikka.modules.main.templates import MessageDetailsEntries
+from prewikka import PyTpl
 
 
 class _Element:

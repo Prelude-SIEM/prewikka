@@ -1,4 +1,4 @@
-import Interface
+from prewikka import Interface
 
 class Message(Interface.ActionParameters):
     def register(self):

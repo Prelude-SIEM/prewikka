@@ -1,4 +1,5 @@
-import PyTpl
+from prewikka import PyTpl
+
 
 class AlertDetailsEntries(PyTpl.Template):
     def newEntry(self, name, value):

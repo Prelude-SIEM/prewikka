@@ -1,4 +1,5 @@
-import PyTpl
+from prewikka import PyTpl
+
 
 class Normal(PyTpl.Template):
     def setHelp(self, help):

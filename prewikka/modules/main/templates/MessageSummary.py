@@ -1,5 +1,6 @@
-import PyTpl
-from templates import Table
+from prewikka import PyTpl
+from prewikka.templates import Table
+
 
 class Node:
     ID = 0

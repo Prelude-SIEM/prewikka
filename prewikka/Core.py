@@ -1,10 +1,8 @@
 import sys
 import os, os.path
 
-import Config
-import Log
-import Prelude
-import Interface
+from prewikka import Config, Log, Prelude, Interface
+
 
 class Core:
     def __init__(self):
@@ -17,8 +15,7 @@ class Core:
         self._initModules()
 
     def _initModules(self):
-        sys.path.append(".")
-        base_dir = "inc/modules/"
+        base_dir = "prewikka/modules/"
         files = os.listdir(base_dir)
         for file in files:
             if os.path.isdir(base_dir + file):

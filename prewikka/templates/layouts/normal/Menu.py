@@ -1,4 +1,5 @@
-import PyTpl
+from prewikka import PyTpl
+
 
 class Menu(PyTpl.Template):
     def setActiveItem(self, name):

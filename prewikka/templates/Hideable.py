@@ -1,4 +1,4 @@
-import PyTpl
+from prewikka import PyTpl
 
 class Hideable(PyTpl.Template):
     id = 0
