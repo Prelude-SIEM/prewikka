@@ -8,4 +8,6 @@ include conf/*.conf
 include doc/*
 include *.py
 include NEWS
+include AUTHORS
+include README
 recursive-include prewikka *.py *.tmpl

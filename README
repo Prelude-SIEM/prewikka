@@ -1,9 +1,76 @@
 Prewikka: The Prelude-IDS console.
+Prewikka is brought to you by PreludeIDS Technologies (http://www.prelude-ids.com).
 
-Originally written by Markus Alkio and Miika Keskinen, today written by Nicolas Delon, 
-it was rapidly adopted as the new Prelude frontend.
-Prewikka is a professional looking application providing advanced feature like contextual filtering,
-aggregation, etc.
-Prewikka is a large step forward compared to Piwi.
-As of now, Prewikka use advanced CSS features and won't work under Internet Explorer. We'll be working
-on fixing this ASAP (and any help would be appreciated).
+
+Prewikka Overview
+=================
+
+Originally written by Markus Alkio and Miika Keskinen, re-written and maintained by 
+Nicolas Delon with the help of Yoann Vandoorselaere and Audrey Girard, on behalf of 
+PreludeIDS Technologies, it was rapidly adopted as the new Prelude frontend. 
+
+Prewikka is a professional looking application providing advanced feature like 
+contextual filtering, aggregation, etc.
+
+
+
+Functionality Enhencement
+=========================
+
+Prewikka functionality enhencement are available from the PreludeIDS Technologies company:
+	http://www.prelude-ids.com, info@prelude-ids.com
+
+
+
+IRC
+===
+
+If there's something you just can't find out elsewhere, you want to
+give feedback directly to the authors or you're just bored, visit
+#prelude on irc.freenode.net
+
+
+Get Support
+===========
+
+
+Prelude-user mailing list archives can be accessed at:
+        http://www.prelude-ids.org/mailman/listinfo
+
+
+Commercial Support is available through the PreludeIDS Technologies company:
+        http://www.prelude-ids.com, info@prelude-ids.com
+
+
+
+Help development
+================
+
+1. SUBMITTING PATCHES
+
+The Prelude source is constantly changing. If you want to submit a patch,
+please do so from the most recent CVS source tree, subscribe to the
+prelude-devel mailing list by sending a mail to:
+
+        prelude-devel-subscribe@prelude-ids.org
+
+and post your patch with a description of functionality.
+You can also attach patches to bugs on
+
+        http://trac.prelude-ids.org
+
+
+2. BUGS
+
+If you find any bugs, please report them to:
+
+        http://trac.prelude-ids.org
+
+Please make sure that what you're reporting is actually a BUG and not
+a problem on your side.
+
+
+3. SUGGESTIONS
+
+Subscribe to prelude-devel and give us your suggestions.
+
