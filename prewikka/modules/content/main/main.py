@@ -355,7 +355,11 @@ class MessageListingAction:
             dataset["nav.last"] = self._createLink(self.listing_action, dict(parameters.items() + [("offset", offset)]))
         else:
             dataset["nav.next"] = None
-        
+
+    def _copyMessageFields(self, dst, src):
+        for name, object, filter  in self.fields:
+            dst[name] = src[object]
+
     def _fetchMessages(self, parameters, prelude, criteria):
         messages = [ ]
         
@@ -363,8 +367,7 @@ class MessageListingAction:
             message = { "analyzerid": analyzerid, "ident": ident }
             messages.append(message)
             tmp = self.getMessage(prelude, analyzerid, ident)
-            for name, object, filter  in self.fields:
-                message[name] = tmp[object]
+            self._copyMessageFields(message, tmp)
             message["time"] = self.getMessageTime(tmp)
         
         messages.sort(lambda x, y: int(y["time"]) - int(x["time"]))
@@ -517,16 +520,44 @@ class AlertListingAction(MessageListingAction, AlertsView):
     def getMessageTime(self, message):
         return message["alert.create_time"] or 0
 
+    def _copyMessageFields(self, dst, src):
+        MessageListingAction._copyMessageFields(self, dst, src)
+        
+        urls = [ ]
+        cnt = 0
+
+        while True:
+            name = src["alert.classification.reference(%d).name" % cnt]
+            if not name:
+                break
+
+            url = src["alert.classification.reference(%d).url" % cnt]
+            if not url:
+                continue
+            
+            urls.append("<a href='%s'>%s</a>" % (url, name))
+
+        if urls:
+            dst["classification_references"] = "(" + ", ".join(urls) + ")"
+        else:
+            dst["classification_references"] = ""
+        
     def _addMessageFields(self, request, fields, alert):
         fields["severity"] = { "value": alert["severity"] or "low" }
+        
         for name in ("analyzerid", "ident",
                      "sport", "suser_name", "suser_uid", "sprocess_name", "sprocess_pid",
                      "tport", "tuser_name", "tuser_uid", "tprocess_name", "tprocess_pid"):
             fields[name] = { "value": alert[name] }
+        
         for name in "classification", "sensor":
             fields[name] = self._createMessageField(request.parameters, name, alert[name])
+
+        fields["classification_references"] = alert["classification_references"]
+        
         for name in  "source", "target",:
             fields[name] = self._createMessageHostField(request, name, alert[name])
+        
         fields["time"] = self._createMessageTimeField(alert["time"], request.parameters["timezone"])
 
     def getFilters(self, storage, login):
