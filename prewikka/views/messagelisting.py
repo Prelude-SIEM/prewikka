@@ -1076,7 +1076,7 @@ class HeartbeatListing(MessageListing, view.View):
 
     def _applyInlineFilters(self, criteria):
         filter_found = False
-        for column, path in (("name", "hearbeat.analyzer(-1).name"),
+        for column, path in (("name", "heartbeat.analyzer(-1).name"),
                              ("model", "heartbeat.analyzer(-1).model"),
                              ("address", "heartbeat.analyzer(-1).node.address.address"),
                              ("node_name", "heartbeat.analyzer(-1).node.name")):
