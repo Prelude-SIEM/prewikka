@@ -49,16 +49,16 @@
 			</tr>
 			#set $cnt += 1
 		#end for
-                <tr>
-                  <td colspan="0" style="text-align: right"><b>Alerts</b> <input type="checkbox" name="alerts"></td>
-                </tr>
-                <tr>
-                  <td colspan="0" style="text-align: right"><b>Heartbeats</b> <input type="checkbox" name="heartbeats"></td>
-                </tr>
-                <tr>
-                  <td colspan="0" style="text-align: right"><input type="submit" value="delete"></td>
-                </tr>
 	</tbody>
 </table>
+
+<br/>
+
+<div style="text-align: right; vertical-align: bottom;">
+ <input type="checkbox" name="alerts"><b>Alerts</b></input>
+ <input type="checkbox" name="heartbeats"><b>Heartbeats</b></input>
+ &nbsp;<input type="submit" value="delete" />
+</div>
+
 </form>
 #end block main_content
