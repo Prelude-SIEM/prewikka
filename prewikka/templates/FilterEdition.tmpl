@@ -1,6 +1,85 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
+<script>
+function newFilterElement(name, object, operator, object_value) {
+	objects = new Array($objects)
+	operators = new Array($operators)
+
+	table = document.getElementById("elements")
+
+	if ( ! name ) {
+		child = table.lastChild.firstChild.firstChild
+		name = new String(child.nodeValue)
+		if ( name.charAt(name.length - 1) == "Z" ) {
+			name = name.concat("A")
+		} else {
+			name = name.substr(0, name.length - 1) +
+			       String.fromCharCode(name.charCodeAt(name.length - 1) + 1)
+		}
+	}
+
+	row = document.createElement("tr")
+	table.appendChild(row)
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	value = document.createTextNode(name)
+	field.appendChild(value)
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	select = document.createElement("select")
+	field.appendChild(select)
+	select.setAttribute("name", "object_" + name)
+	for ( var i = 0; i < objects.length; i++ ) {
+		option = document.createElement("option")
+		if ( object == objects[i] ) {
+			option.setAttribute("selected", "true")
+		}
+		option.setAttribute("value", objects[i])
+		select.appendChild(option)
+		value = document.createTextNode(objects[i])
+		option.appendChild(value)
+	}
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	select = document.createElement("select")
+	field.appendChild(select)
+	select.setAttribute("name", "operator_" + name)
+	for ( var i = 0; i < operators.length; i++ ) {
+		/* NB: setting selected to true before adding option to select is mandatory,
+                   if it is done after, it won't work  */
+		option = document.createElement("option")
+		if ( operator == operators[i] ) {
+			option.setAttribute("selected", "true")
+		}
+		select.appendChild(option)
+		option.setAttribute("value", operators[i])
+		value = document.createTextNode(operators[i])
+		option.appendChild(value)
+	}
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	input = document.createElement("input")
+	field.appendChild(input)
+	/* NB: if type=text is set before value=something, the value won't be displayed */
+	/*input.setAttribute("type", "text")*/
+	input.setAttribute("name", "value_" + name)
+	input.setAttribute("value", object_value)
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	link = document.createElement("a")
+	field.appendChild(link)
+	link.setAttribute("onclick", "javascript:this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)")
+	value = document.createTextNode("del")
+	link.appendChild(value)
+}
+</script>
+
 <div class='box'>
 <h1>Load</h1>
 <form action="?" method="POST">
@@ -22,47 +101,23 @@
 <div class='box'>
 <h1>Edition</h1>
 <form action="?" method="POST">
-<input type='hidden' name='view' value='alert_filter_edition'/>
-<table>
-#for $element in $elements
-<tr>
-  <td>$element.name</td>
-  <td>
-    <select name='object_$element.name'>
-    #for $object in $objects
-      #if $object == $element.object
-        #set $selected = "selected"
-      #else
-        #set $selected = ""
-      #end if
-      <option value='$object' $selected/>$object</option>
-    #end for
-    </select>
-  </td>
-  <td>
-    <select name='operator_$element.name'>
-    #for $operator in $operators
-      #if operator == $element.operator
-        #set $selected = "selected"
-      #else
-        #set $selected = ""
-      #end if
-      <option value='$operator' $selected/>$operator</option>
-    #end for
-    </select>
-  </td>
-  <td>
-    <input type='text' name='value_$element.name' value='$element.value'/>
-  </td>
-</tr>
-#end for
-<tr>
-  <td><input type='submit' name='new_element' value='more'/></td>
-  <td></td>
-  <td></td>
-  <td></td>
-</tr>
+<input type='hidden' name="view" value="alert_filter_save"/>
+<table id="elements">
 </table>
+<script>
+#for $element in $elements
+	newFilterElement("$element.name", "$element.object", "$element.operator", "$element.value");
+#end for
+</script>
+<table>
+  <tr>
+    <td><a href="javascript:newFilterElement('', '', '', '')">more</a></td>
+    <td></td>
+    <td></td>
+    <td></td>
+  </tr>
+</table>
+
 Formula: <input type='text' name='formula' value='$formula'/> <b>Example:</b> <i>(A AND B) OR (C AND D)</i>
 </div>
 

@@ -503,7 +503,7 @@ class AlertListing(MessageListing, view.View):
 
     def _adjustCriteria(self, criteria):
         if self.parameters.has_key("filter"):
-            filter = self.getFilter(self.storage, self.user.login, self.parameters["filter"])
+            filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter"])
             criteria.append("(%s)" % str(filter))
 
     def render(self):

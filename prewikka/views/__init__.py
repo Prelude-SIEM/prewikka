@@ -46,7 +46,7 @@ objects = messagelisting.AlertListing(), \
 
 sections = [("Events", (("Alerts", ["alert_listing", "alert_delete"]),
                         ("Heartbeats", ["heartbeat_listing", "heartbeat_delete"]),
-                        ("Filters", ["alert_filter_edition", "alert_filter_load"]))),
+                        ("Filters", ["alert_filter_load", "alert_filter_save"]))),
             ("Agents", (("Agents", ["sensor_listing", "heartbeat_analyze",
                                     "sensor_alert_listing", "sensor_heartbeat_listing",
                                     "sensor_alert_delete", "sensor_heartbeat_delete",

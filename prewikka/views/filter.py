@@ -21,53 +21,41 @@
 from prewikka import view, Filter
 
 
-def get_next_filter_element_name(name):
-    return chr(ord(name) + 1)
-
-
-
 class FilterLoadParameters(view.Parameters):
     def register(self):
-        self.mandatory("filter_name", str)
+        self.optional("filter_name", str)
 
 
 
-class FilterEditionParameters(view.Parameters):
+class FilterSaveParameters(view.Parameters):
     allow_extra_parameters = True
 
     def register(self):
-        self.optional("filter_name", str)
-        self.optional("filter_comment", str)
-        self.optional("formula", str)
+        self.mandatory("filter_name", str)
+        self.optional("filter_comment", str, default="")
+        self.optional("formula", str, default="")
         
     def normalize(self):
         view.Parameters.normalize(self)
         
         self["elements"] = [ ]
-        name = "A"
-        while True:
-            if not self.has_key("object_%s" % name):
-                break
+        for parameter in self.keys():
+            idx = parameter.find("object_")
+            if idx == -1:
+                continue
+            name = parameter.replace("object_", "", 1)
             self["elements"].append((name,
                                      self["object_%s" % name],
                                      self["operator_%s" % name],
                                      self.get("value_%s" % name, "")))
-            name = get_next_filter_element_name(name)
-
-
-
-class FilterSaveParameters(FilterEditionParameters):
-    def register(self):
-        FilterEditParameters.register(self)
-        self.mandatory("filter_name", str)
 
 
 
 class AlertFilterEdition(view.Views):
     view_slots = {
-        "alert_filter_edition": { "parameters": FilterEditionParameters,
-                                  "permissions": [ ],
-                                  "template": "FilterEdition" },
+        "alert_filter_save": { "parameters": FilterSaveParameters,
+                               "permissions": [ ],
+                               "template": "FilterEdition" },
         "alert_filter_load": { "parameters": FilterLoadParameters,
                                "permissions": [ ],
                                "template": "FilterEdition" }
@@ -75,8 +63,8 @@ class AlertFilterEdition(view.Views):
 
     def _setCommon(self):
         self.dataset["filters"] = self.env.storage.getAlertFilters(self.user.login)
-        self.dataset["objects"] = Filter.ALERT_OBJECTS
-        self.dataset["operators"] = ("==", "!=", "<", "<=", ">", ">=")
+        self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.ALERT_OBJECTS))
+        self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("==", "!=", "<", "<=", ">", ">=")))
         self.dataset["elements"] = [ ]
         self.dataset["fltr.name"] = ""
         self.dataset["fltr.comment"] = ""
@@ -90,50 +78,25 @@ class AlertFilterEdition(view.Views):
             "value": value
             }
 
-    def _addEmptyElement(self, elements):
-        if elements:
-            name = get_next_filter_element_name(elements[-1]["name"])
-        else:
-            name = "A"
-
-        elements.append(self._element(name))
-
-    def _reloadForm(self):
-        self._setCommon()
-        
-        name = "A"
-        for name, obj, operator, value in self.parameters["elements"]:
-            self.dataset["elements"].append(self._element(name, obj, operator, value))
-            name = get_next_filter_element_name(name)
-
-        if not self.dataset["elements"]:
-            self._addEmptyElement(self.dataset["elements"])
-
-        self.dataset["fltr.name"] = self.parameters.get("filter_name", "")
-        self.dataset["fltr.comment"] = self.parameters.get("filter_comment", "")
-
-    def render_alert_filter_edition(self):
-        self._reloadForm()
-        
-        parameters = self.parameters.keys()
-        if "save" in parameters:
-            self.save()
-        elif "new_element" in parameters:
-            self._addEmptyElement(self.dataset["elements"])
-
     def render_alert_filter_load(self):
         self._setCommon()
-        filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter_name"])
-        self.dataset["fltr.name"] = filter.name
-        self.dataset["fltr.comment"] = filter.comment
-        self.dataset["formula"] = filter.formula
-        names = filter.elements.keys()
-        names.sort()
-        for name in names:
-            obj, operator, value = filter.elements[name]
-            self.dataset["elements"].append(self._element(name, obj, operator, value))
+        
+        if self.parameters.has_key("filter_name"):
+            filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter_name"])
+            self.dataset["fltr.name"] = filter.name
+            self.dataset["fltr.comment"] = filter.comment
+            self.dataset["formula"] = filter.formula
+            names = filter.elements.keys()
+            names.sort()
+            for name in names:
+                obj, operator, value = filter.elements[name]
+                self.dataset["elements"].append(self._element(name, obj, operator, value))
+        else:
+            self.dataset["elements"].append(self._element("A"))
+            self.dataset["fltr.name"] = ""
+            self.dataset["fltr.comment"] = ""
 
-    def save(self):
+    def render_alert_filter_save(self):
         elements = { }
         for name, obj, operator, value in self.parameters["elements"]:
             elements[name] = (obj, operator, value)
@@ -144,3 +107,11 @@ class AlertFilterEdition(view.Views):
                                     self.parameters["formula"])
 
         self.env.storage.setFilter(self.user.login, filter)
+
+        self._setCommon()
+        
+        for name, obj, operator, value in self.parameters["elements"]:
+            self.dataset["elements"].append(self._element(name, obj, operator, value))
+
+        self.dataset["fltr.name"] = self.parameters.get("filter_name", "")
+        self.dataset["fltr.comment"] = self.parameters.get("filter_comment", "")
