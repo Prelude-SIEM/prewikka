@@ -104,10 +104,10 @@ class MessageListingView:
         if not t:
             return "n/a"
         
-        t = time.localtime(t)
+        tmp = time.localtime(t)
         current = time.localtime()
         
-        if t[:3] == current[:3]: # message time is today
+        if tmp[:3] == current[:3]: # message time is today
             return utils.time_to_hms(t)
         
         return utils.time_to_ymdhms(t)
