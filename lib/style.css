@@ -7,7 +7,7 @@
 	width: 160px;
 }
 
-.menu_item_active, .menu_item_inactive {
+.menu_item_active, .menu_item_inactive, .menu_item_special {
 	margin-top: 0;
 	margin-bottom: 0;
 	border-left: 0;
@@ -64,10 +64,10 @@
 	padding: 0;
 }
 
-#topmenu li {
+#topmenu li, #topmenu div {
  	height: 25px;
 	width: 80px;
-	float: left;
+	/*float: left;*/
 	list-style: none;
 	border: 0px;
 	border-right: 1px;
@@ -75,6 +75,10 @@
 	border-style: solid;
 	font-size: 15px;
 	text-align: center;
+}
+
+.topmenu_item_active, .topmenu_item_inactive {
+	float: left;
 }
 
 .topmenu_item_inactive {
@@ -91,6 +95,11 @@
 .topmenu_item_active {
 	background: white;
 	text-decoration: none;
+}
+ 
+.topmenu_item_special {
+	float: right;
+	background-color: #2a7dd2;
 }
 
 /* END TopMenu Style */
@@ -179,6 +188,15 @@ tfoot tr td {
 
 table {
 	border-spacing: 3px;
+	border-width: 10px;
+}
+
+.properties_change_table td {
+	text-align: center;
+}
+
+.user_list_table td {
+	text-align: center;
 }
 
 .table_row_even {
@@ -187,6 +205,19 @@ table {
 
 .table_row_odd {
 	background-color: #eeeeee;
+}
+
+td {
+	/*border-top: 2px;
+	border-bottom: 2px;
+	border-right: 3px;
+	border-left: 3px;
+	border-style: solid;*/
+	padding-top: 2px;
+	padding-bottom: 2px;
+	padding-right: 3px;
+	padding-left: 3px;
+	/*border-color: transparent;*/
 }
 
 .impact_severity_high {
@@ -389,4 +420,9 @@ tr.even {background:#ffffff}
 input {
 	border: 1px solid black;
 	padding:2px;
+	font-size: inherit;
+}
+
+form {
+	display: inline;
 }

@@ -1,7 +1,7 @@
 <div class="login_password">
 	<table>
 		<form action='?' method='POST'>
-			<input type='hidden' name='action' value='login'/>
+			<input type='hidden' name='action' value='{ACTION}'/>
 			<tr>
 				<td>Login:</td>
 				<td><input type='text' name='login'/></td>

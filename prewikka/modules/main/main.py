@@ -19,32 +19,37 @@
 
 
 from prewikka import Interface
+from prewikka.UserManagement import CAPABILITY_READ_MESSAGE, CAPABILITY_DELETE_MESSAGE, \
+     CAPABILITY_USER_MANAGEMENT
 from prewikka.modules.main import ActionParameters, Actions
 
+
 def load(core, config):
+    i = core.interface
+    
     # Alerts
-    core.interface.registerSection("Alerts", Actions.AlertListing())
-    core.interface.registerAction(Actions.AlertListing(), ActionParameters.MessageListing, default=True)
-    core.interface.registerAction(Actions.AlertSummary(), ActionParameters.Message)
-    core.interface.registerAction(Actions.AlertDetails(), ActionParameters.Message)
-    core.interface.registerAction(Actions.DeleteAlerts(), ActionParameters.MessageListingDelete)
+    i.registerSection("Alerts", Actions.AlertListing())
+    i.registerAction(Actions.AlertListing(), ActionParameters.MessageListing, [ CAPABILITY_READ_MESSAGE ], default=True)
+    i.registerAction(Actions.AlertSummary(), ActionParameters.Message, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.AlertDetails(), ActionParameters.Message, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.DeleteAlerts(), ActionParameters.MessageListingDelete, [ CAPABILITY_DELETE_MESSAGE ])
     
     # Heartbeats
-    core.interface.registerSection("Heartbeats", Actions.HeartbeatsAnalyze())
-    core.interface.registerAction(Actions.HeartbeatListing(), ActionParameters.MessageListing)
-    core.interface.registerAction(Actions.HeartbeatsAnalyze(), Interface.ActionParameters)
-    core.interface.registerAction(Actions.HeartbeatSummary(), ActionParameters.Message)
-    core.interface.registerAction(Actions.HeartbeatDetails(), ActionParameters.Message)
-    core.interface.registerAction(Actions.DeleteHeartbeats(), ActionParameters.MessageListingDelete)
+    i.registerSection("Heartbeats", Actions.HeartbeatsAnalyze())
+    i.registerAction(Actions.HeartbeatListing(), ActionParameters.MessageListing, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.HeartbeatsAnalyze(), Interface.ActionParameters, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.HeartbeatSummary(), ActionParameters.Message, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.HeartbeatDetails(), ActionParameters.Message, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.DeleteHeartbeats(), ActionParameters.MessageListingDelete, [ CAPABILITY_DELETE_MESSAGE ])
 
     # Sensors
-    core.interface.registerSection("Sensors", Actions.SensorListing())
-    core.interface.registerAction(Actions.SensorListing(), Interface.ActionParameters)
-    core.interface.registerAction(Actions.SensorDeleteAlerts(), ActionParameters.SensorMessageListingDelete)
-    core.interface.registerAction(Actions.SensorDeleteHeartbeats(), ActionParameters.SensorMessageListingDelete)
-    core.interface.registerAction(Actions.SensorAlertListing(), ActionParameters.SensorMessageListing)
-    core.interface.registerAction(Actions.SensorHeartbeatListing(), ActionParameters.SensorMessageListing)
-    core.interface.registerAction(Actions.SensorAlertSummary(), ActionParameters.Message)
-    core.interface.registerAction(Actions.SensorAlertDetails(), ActionParameters.Message)
-    core.interface.registerAction(Actions.SensorHeartbeatSummary(), ActionParameters.Message)
-    core.interface.registerAction(Actions.SensorHeartbeatDetails(), ActionParameters.Message)
+    i.registerSection("Sensors", Actions.SensorListing())
+    i.registerAction(Actions.SensorListing(), Interface.ActionParameters, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.SensorDeleteAlerts(), ActionParameters.SensorMessageListingDelete, [ CAPABILITY_DELETE_MESSAGE ])
+    i.registerAction(Actions.SensorDeleteHeartbeats(), ActionParameters.SensorMessageListingDelete, [ CAPABILITY_DELETE_MESSAGE ])
+    i.registerAction(Actions.SensorAlertListing(), ActionParameters.SensorMessageListing, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.SensorHeartbeatListing(), ActionParameters.SensorMessageListing, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.SensorAlertSummary(), ActionParameters.Message, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.SensorAlertDetails(), ActionParameters.Message, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.SensorHeartbeatSummary(), ActionParameters.Message, [ CAPABILITY_READ_MESSAGE ])
+    i.registerAction(Actions.SensorHeartbeatDetails(), ActionParameters.Message, [ CAPABILITY_READ_MESSAGE ])

@@ -14,8 +14,8 @@ from prewikka import Core, Request
 
 
 class CGIRequest(Request.Request):
-    def __init__(self):
-        Request.Request.__init__(self)
+    def init(self):
+        Request.Request.init(self)
         fs = cgi.FieldStorage()
         for key in fs.keys():
             self.arguments[key] = fs.getvalue(key)
@@ -58,6 +58,11 @@ class CGIRequest(Request.Request):
 
 
 request = CGIRequest()
+request.init()
 
 core = Core.Core()
-core.process(request)
+
+try:
+    core.process(request)
+finally:
+    core.shutdown()

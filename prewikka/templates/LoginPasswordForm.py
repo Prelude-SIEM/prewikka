@@ -1,6 +1,6 @@
 from prewikka import PyTpl
 
 class LoginPasswordForm(PyTpl.Template):
-    def __str__(self):
-        self.parse(touch=True)
-        return PyTpl.Template.__str__(self)
+    def __init__(self, action):
+        PyTpl.Template.__init__(self)
+        self.ACTION = action

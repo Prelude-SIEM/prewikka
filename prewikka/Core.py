@@ -23,7 +23,7 @@ import os, os.path
 
 import copy
 
-from prewikka import Config, Log, Prelude, Interface, Auth
+from prewikka import Config, Log, Prelude, Interface
 
 
 class Core:
@@ -34,8 +34,21 @@ class Core:
         self.interface = Interface.Interface(self, self._config.get("interface", { }))
         self.log = Log.Log()
         self.prelude = Prelude.Prelude(self._config["prelude"])
-        self.auth = Auth.DefaultAuth(self)
+        self.auth = None
         self._initModules()
+        
+    def shutdown(self):
+        # Core references objects that themself reference Core, those circular
+        # references mean that garbage collector won't destroy those objects.
+        # Thus, code that use Core must call the shutdown method (that remove
+        # Core references) so that cleanup code (__del__ object methods) will be called
+        self.content_modules = None
+        self._content_module_names = None
+        self._config = None
+        self.interface = None
+        self.log = None
+        self.prelude = None
+        self.auth = None
         
     def registerAuth(self, auth):
         self.auth = auth
@@ -49,6 +62,7 @@ class Core:
                 module.load(self, self._config.modules.get(mod_name, { }))
             except ImportError:
                 print >> sys.stderr, "cannot load module named %s (%s)" % (mod_name, file)
+                raise
         
     def process(self, request):
         view = self.interface.process(request)

@@ -7,8 +7,11 @@
                 <!-- BEGIN inactive -->
                 <li class="topmenu_item_inactive"><a href="{LINK}">{NAME}</a></li>
                 <!-- END inactive -->
-        <!-- END tab_entry -->
+	<!-- END tab_entry -->
         </ul>
+		<!-- BEGIN special -->
+		<div class="topmenu_item_special"><a href="{LINK}">{NAME}</a></div>
+		<!-- END special -->
 </div>
 
 <div id='menu'>

@@ -19,91 +19,166 @@
 
 
 import sys
+import os.path
 
 import time
 import random
 import md5
+import shelve
 
-from prewikka import Auth
-
-
-class PasswordDatabase(dict):
-    def __init__(self, filename):
-        dict.__init__(self)
-        self._filename = filename
-
-    def load(self):
-        file = open(self._filename, "r")
-        for line in file.readlines():
-            login, password = line.rstrip().split()
-            self[login] = password
-        file.close()
-
-    def save(self):
-        file = open(self._filename, "w")
-        for login, password in self.items():
-            print >> file, login, passwd
-        file.close()
+from prewikka import UserManagement
 
 
-
-class SessionDatabase(dict):
-    def __init__(self, filename):
-        dict.__init__(self)
-        self._filename = filename
+class User(UserManagement.User):
+    def __init__(self, db, data):
+        self.db = db
+        self.data = data
         
-    def load(self):
-        file = open(self._filename, "r")
-        for line in file.readlines():
-            sessionid, login, expiration = line.rstrip().split()
-            self[sessionid] = [ login, expiration ]
-        file.close()
+    def getID(self):
+        return self.data["id"]
 
-    def save(self):
-        file = open(self._filename, "w")
-        for sessionid in self.keys():
-            login, expiration = self[sessionid]
-            print >> file, sessionid, login, expiration
-        file.close()
-        
-    def add(self, sessionid, login, t):
-        self[sessionid] = login, t
+    def setID(self, id):
+        self.data["id"] = id
 
+    def setLogin(self, login):
+        self.data["login"] = login
 
+    def getLogin(self):
+        return self.data["login"]
 
-class BasicAuth(Auth.LoginPasswordAuth):
-    def __init__(self, core, config):
-        Auth.LoginPasswordAuth.__init__(self, core)
-        self._sessions_file = config.get("session_file", "basic_sessions")
-        self._passwd_file = config.get("password_file", "basic_passwords")
+    def setPassword(self, password):
+        self.data["password"] = self._hashPassword(password)
+
+    def _hashPassword(self, password):
+        return md5.new(password).hexdigest()
+
+    def checkPassword(self, password):
+        if self._hashPassword(password) != self.data["password"]:
+            raise UserManagement.LoginError
         
-    def getSessionData(self, sessionid):
-        sessions = SessionDatabase(self._sessions_file)
-        sessions.load()
+    def addSession(self, sessionid, t):
+        self.data["sessions"][sessionid] = t
         
-        if not sessionid in sessions.keys():
-            raise Auth.SessionError
+    def getSessionTime(self, sessionid):
+        return self.data["sessions"][sessionid]
         
-        name, t = sessions[sessionid]
+    def removeSession(self, sessionid):
+        del self.data["sessions"][sessionid]
         
-        return name, int(t)
+    def getSessions(self):
+        return self.data["sessions"]
     
-    def checkLoginPassword(self, login, password):
-        passwords = PasswordDatabase(self._passwd_file)
-        passwords.load()
-        if login in passwords and passwords[login] == password:
-            t = int(time.time())
-            sessionid = md5.new(str(t * random.random())).hexdigest()
-            sessions = SessionDatabase(self._sessions_file)
-            sessions.load()
-            sessions.add(sessionid, login, t)
-            sessions.save()
-            return sessionid
+    def setCapabilities(self, capabilities):
+        self.data["capabilities"] = capabilities
 
-        raise Auth.AuthError
+    def getCapabilities(self):
+        return self.data["capabilities"]
+    
+    def hasCapability(self, capability):
+        return capability in self.data["capabilities"]
+
+    def save(self):
+        self.db[str(self.getID())] = self.data
+
+
+
+class BasicUserManagement(UserManagement.UserManagement):
+    def __init__(self, core, config):
+        UserManagement.UserManagement.__init__(self, core, config)
         
+        self.db = shelve.open("prewikka_users.db", "c")
+        if not self.db:
+            user = self.newUser()
+            user.setLogin("admin")
+            user.setPassword("admin")
+            user.setCapabilities(UserManagement.CAPABILITIES_ADMIN)
+            user.save()
+        
+    def __del__(self):
+        self.db.close()
+        
+    def _getNextID(self):
+        if not self.db:
+            return 0
+        
+        maxid = 0
+        for id in self.db.keys():
+            id = int(id)
+            if id > maxid:
+                maxid = id
+        
+        return maxid + 1
+
+    def newUser(self):
+        data = { }
+        id = self._getNextID()
+        data["id"] = id
+        data["login"] = None
+        data["password"] = None
+        data["capabilities"] = [ ]
+        data["sessions"] = { }
+        
+        self.db[str(id)] = data
+        
+        return User(self.db, data)
+    
+    def getUserBySessionID(self, sessionid):
+        for data in self.db.values():
+            sessions = data["sessions"]
+            keys = sessions.keys()
+            keys.sort(lambda x, y: sessions[x] - sessions[y])
+            if sessionid in data["sessions"].keys():
+                return User(self.db, data)
+        
+        raise UserManagement.SessionError
+    
+    def getUserByLogin(self, login):
+        for data in self.db.values():
+            if login == data["login"]:
+                return User(self.db, data)
+            
+        raise Exception
+    
+    def getUserByID(self, id):
+        return User(self.db, self.db[str(id)])
+    
+    def getUsers(self):
+        return map(lambda id: int(id), self.db.keys())
+    
+    def getUserSessionIDFromLoginPassword(self, login, password):
+        user = None
+        for tmp in self.db.values():
+            if login == tmp.login:
+                user = tmp
+                break
+        
+        if user is None:
+            raise UserManagement.LoginError
+        
+        password = self._hashPassword(password)
+        if password != user.password:
+            raise UserManagement.LoginError
+        
+        t = int(time.time())
+        sessionid = md5.new(str(t * random.random())).hexdigest()
+        user.sessions[sessionid] = t
+
+        self.db[str(user.id)] = user
+        
+        return sessionid
+    
+    def addUser(self, user):
+        user.password = self._hashPassword(user.password)
+        user.id = self._getNextID()
+        self.db[str(user.id)] = user
+        
+    def modifyUser(self, user):
+        self.db[str(user.id)] = user
+        
+    def removeUser(self, id):
+        del self.db[str(id)]
 
 
 def load(core, config):
-    auth = BasicAuth(core, config)
+    auth = BasicUserManagement(core, config)
     core.registerAuth(auth)

@@ -44,7 +44,9 @@ class View:
         self._content = content
         
     def createLink(self, action, parameters=None):
-        link = "?action=%s" % action.getName()
+        from prewikka import Interface
+        
+        link = "?action=%s" % Interface.get_action_name(action)
         if parameters:
             link += "&%s" % str(parameters)
         return link
@@ -121,7 +123,10 @@ class NormalView(TopView):
                 normal.addActiveMenuEntry(section)
             else:
                 normal.addInactiveMenuEntry(section, self.createLink(action))
-        
+
+        for name, action, parameters in self.core.interface.getSpecialActions():
+            normal.addSpecialAction(name, self.createLink(action, parameters))
+            
         for tab, action in self._tabs:
             if tab == self._active_tab:
                 set_tab = normal.addActiveTabEntry
@@ -130,5 +135,5 @@ class NormalView(TopView):
             set_tab(tab, self.createLink(action))
 
         normal.setContent(self.buildMainContent(data))
-
+        
         return TopView.build(self, str(normal))

@@ -7,6 +7,7 @@ class NormalLayout(PyTpl.Template):
         PyTpl.Template.__init__(self)
         self._tab_entries = [ ]
         self._menu_entries = [ ]
+        self._special_actions = [ ]
         self._content = ""
 
     def addInactiveTabEntry(self, name, link):
@@ -20,7 +21,10 @@ class NormalLayout(PyTpl.Template):
         
     def addActiveMenuEntry(self, name):
         self._menu_entries.append({ "type": "active", "name": name })
-
+        
+    def addSpecialAction(self, name, link):
+        self._special_actions.append((name, link))
+        
     def setContent(self, content):
         self._content = content
         
@@ -31,6 +35,11 @@ class NormalLayout(PyTpl.Template):
             self["tab_entry"][type].LINK = entry["link"]
             self["tab_entry"][type].parse()
             self["tab_entry"].parse()
+
+        for name, link in self._special_actions:
+            self["special"].LINK = link
+            self["special"].NAME = name
+            self["special"].parse()
             
         for entry in self._menu_entries:
             type = entry["type"]

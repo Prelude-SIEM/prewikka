@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 # Copyright (C) 2004 Nicolas Delon <nicolas@prelude-ids.org>
 # All Rights Reserved
 #
@@ -37,15 +39,14 @@ class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
         apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
         self.core = Core.Core()
 
+    def __del__(self):
+        self.core.shutdown()
+
 
 
 class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        Request.Request.__init__(self)
-        apply(BaseHTTPServer.BaseHTTPRequestHandler.__init__, (self,) + args, kwargs)
-
     def getCookieString(self):
-        return None
+        return self.headers.get("Cookie")
     
     def write(self, data):
         self.wfile.write(data)
@@ -66,11 +67,15 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
             self.arguments[name] = (len(value) == 1) and value[0] or value
             
         self.server.core.process(self)
-
+        
     def sendResponse(self):
         self.send_response(200)
         for name, value in self.output_headers.items():
             self.send_header(name, value)
+
+        if self.output_cookie:
+            self.wfile.write(self.output_cookie.output())
+            
         self.end_headers()
         self.wfile.write(self.content)
 
@@ -92,15 +97,15 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         mtype, enc = mimetypes.guess_type(filename)
         stat = os.fstat(f.fileno())
         content_length = stat[6]
-        last_modified = time.strftime("%a, %d %b %Y %H:%M:%S GMT",
-                                      time.gmtime(stat[8]))
+        last_modified = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8]))
         self.send_header('Content-Type', mtype)
         self.send_header('Content-Length', str(content_length))
         self.send_header('Last-Modified', last_modified)
         self.end_headers()
         shutil.copyfileobj(f, self.wfile)
-    
+        
     def do_GET(self):
+        self.init()
         if self.path == "/":
             self._processDynamic({ })
         elif self.path.find("?") == 1:
@@ -112,8 +117,8 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         self.do_GET()
 
     def do_POST(self):
+        self.init()
         self._processDynamic(cgi.parse_qs(self.rfile.read(int(self.headers["Content-Length"]))))
-
 
 
 server = PrewikkaServer(("127.0.0.1", 8000), PrewikkaRequestHandler)

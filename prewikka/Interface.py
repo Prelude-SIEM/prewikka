@@ -41,6 +41,9 @@ class ActionParameterError(Error):
     pass
 
 
+class ActionDeniedError(Error):
+    pass
+
 
 class ActionParameterInvalidError(ActionParameterError):
     def __init__(self, name):
@@ -81,16 +84,40 @@ class ActionParameterAlreadyRegisteredError(ActionParameterError):
 
 
 
+def get_action_name(action):
+    if isinstance(action, Action):
+        return action.getName()
+    return "%s.%s.%s" % (action.im_func.__module__, action.im_class.__name__, action.im_func.__name__)
+
+
+
+class OnlineConfigView(Views.NormalView):
+    def __init__(self, core):
+        Views.NormalView.__init__(self, core)
+        self.setActiveSection("Configuration")
+        self.setTabs(core.interface._configuration)
+    
+
+
 class Interface:
     def __init__(self, core, config):
         self._sections = [ ]
+        self._special_actions = [ ]
         self._actions = { }
         self._default_action = None
+        self._login_action = None
         self._core = core
         self._software = config.get("software", "Prewikka")
         self._place = config.get("place", "")
         self._title = config.get("title", "Prelude management")
+        self._configuration = [ ]
         
+    def registerSpecialAction(self, name, action, parameters):
+        self._special_actions.append((name, action, parameters))
+        
+    def getSpecialActions(self):
+        return self._special_actions
+    
     def getSections(self):
         return self._sections
     
@@ -108,72 +135,123 @@ class Interface:
     
     def registerSection(self, name, action):
         self._sections.append((name, action))
-
-    def registerAction(self, action, parameters, default=False):
-        name = action.getName()
-        self._actions[name] = { "action": action, "parameters": parameters }
+        
+    def registerConfigurationSection(self, name, action):
+        if not self._configuration:
+            self.registerSection("Configuration", action)
+        self._configuration.append((name, action))
+        
+    def registerAction(self, action, parameters, capabilities, default=False):
+        name = get_action_name(action)
+        
+        self._actions[name] = { "action": action, "parameters": parameters, "capabilities": capabilities }
         if default:
             self._default_action = name
+        
+        return name
+        
+    def registerLoginAction(self, action, parameters):
+        name = self.registerAction(action, parameters, [ ])
+        self._login_action = name
+        
+    def callAction(self, action, core, parameters, request):
+        if isinstance(action, Action):
+            return action.process(core, parameters, request)
+        return action(core, parameters, request)
+    
+    def forwardToAction(self, action, core, parameters, request):
+        try:
+            self.checkActionCapability(request.user, self._actions[get_action_name(action)]["capabilities"])
+        except ActionDeniedError:
+            return Views.ErrorView, "Permission Denied."
+        
+        return self.callAction(action, core, parameters, request)
+    
+    def forwardToDefaultAction(self, core, request):
+        registered = self._actions[self._default_action]
+        action = registered["action"]
+        parameters = registered["parameters"]()
+        
+        return self.forwardToAction(action, core, parameters, request)
+
+    def _buildView(self, view_class, data):
+        view = view_class(self._core)
+        view.build(data)
+        
+        return str(view)
+    
+    def checkActionCapability(self, user, required):
+        if filter(lambda cap: user.hasCapability(cap), required) != required:
+            raise ActionDeniedError
         
     def processAction(self, name, arguments, request):
         try:
             registered = self._actions[name]
-            action = registered["action"]
-            parameters = registered["parameters"]()
+        except KeyError:
+            self._core.log.invalidQuery(request, data)
+            return self._buildView(Views.ErrorView, "unknown action name %s" % name)
+        
+        if request.user:
+            try:
+                self.checkActionCapability(request.user, registered["capabilities"])
+            except ActionDeniedError:
+                return self._buildView(Views.ErrorView, "Permission Denied.")
+        
+        action = registered["action"]
+        parameters = registered["parameters"]()
+        
+        try:
             parameters.populate(arguments)
             parameters.check()
-        except KeyError:
-            data = "unknown action name %s" % name
-            self._core.log.invalidQuery(request, data)
-            view_class = Views.ErrorView
         except ActionParameterError, e:
             self._core.log.invalidQuery(request, str(e))
-            view_class = Views.ErrorView
-            data = cgi.escape(str(e))
-        else:
-            view_class, data = action.process(self._core, parameters, request)
+            return self._buildView(Views.ErrorView, cgi.escape(str(e)))
         
-        view = view_class(self._core)
-        view.build(data)
-
-        return str(view)
-
+        view_class, data = self.callAction(action, self._core, parameters, request)
+        
+        return self._buildView(view_class, data)
+    
+##         try:
+##             registered = self._actions[name]
+##             action = registered["action"]
+##             parameters = registered["parameters"]()
+##             parameters.populate(arguments)
+##             parameters.check()
+##         except KeyError:
+##             data = "unknown action name %s" % name
+##             self._core.log.invalidQuery(request, data)
+##             view_class = Views.ErrorView
+##         except ActionParameterError, e:
+##             self._core.log.invalidQuery(request, str(e))
+##             view_class = Views.ErrorView
+##             data = cgi.escape(str(e))
+##         else:
+##             view_class, data = self.callAction(action, self._core, parameters, request)
+             
+##         view = view_class(self._core)
+##         view.build(data)
+        
+##         return str(view)
+    
     def processDefaultAction(self, arguments, request):
         return self.processAction(self._default_action, arguments, request)
-    
-    def processLogin(self, arguments, request):
-        import Auth
-        
-        auth = self._core.auth
-        login = arguments["login"]
-        password = arguments["password"]
-        try:
-            auth.login(login, password, request)
-        except (Auth.LoginError, Auth.AuthError):
-            return auth.getLoginScreen(request)
-        
-        return self.processDefaultAction({ }, request)
 
     def process(self, request):
-        from prewikka import Auth
-        
         arguments = copy.copy(request.arguments)
         if arguments.has_key("action"):
             action = arguments["action"]
             del arguments["action"]
         else:
-            action = None
+            action = self._default_action
+            
+        if action == self._login_action:
+            return self.processAction(action, arguments, request)
         
-        auth = self._core.auth
-        
-        if action == "login":
-            return self.processLogin(arguments, request)
-        
-        try:
-            name = auth.check(request)
-        except Auth.AuthError:
-            return auth.getLoginScreen(request)
-        
+        if self._core.auth:        
+            view = self._core.auth.check(request)
+            if view:
+                return view
+            
         if action is None:
             return self.processDefaultAction(arguments, request)
         
@@ -187,9 +265,6 @@ class Action(object):
     
     def getName(self):
         return self.__module__ + "." + self.__class__.__name__
-
-    def test(self):
-        return self.getId()
 
 
 
@@ -211,7 +286,7 @@ class ActionParameters:
             raise ActionParameterAlreadyRegisteredError(name)
         
         self._parameters[name] = type
-
+        
     def __setitem__(self, name, value):
         try:
             parameter_type = self._parameters[name]
@@ -249,6 +324,16 @@ class ActionParameters:
 
     def getNames(self, ignore=[]):
         return filter(lambda name: not name in ignore, self._values.keys())
+
+    def items(self):
+        return self._values.items()
+
+    def debug(self):
+        content = ""
+        for key, value in self._values.items():
+            content += "%s: %s\n" % (key, value)
+        
+        return content
 
     def __str__(self):
         return urllib.urlencode(self._values)

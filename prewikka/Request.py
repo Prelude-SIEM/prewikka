@@ -27,15 +27,21 @@ import Cookie
 
 
 class Request:
-    def __init__(self):
+    def init(self):
+        # all of this should be done in constructor __init__, but the way
+        # BaseHTTPServer.BaseHTTPRequestHandler is designed forbid us to do so
         self.arguments = { }
         self.input_headers = { }
         self.output_headers = { }
         self.output_headers = { }
-        self.input_cookie = Cookie.SimpleCookie(self.getCookieString())
+        cookie = Cookie.SimpleCookie(self.getCookieString())
+        self.input_cookie = { }
+        for key, value in cookie.items():
+            self.input_cookie[key] = value
         self.output_cookie = Cookie.SimpleCookie()
         self.content = None
-
+        self.user = None
+        
     def read(self, *args):
         pass
 
