@@ -1,24 +1,26 @@
 <table cellpadding="3">
-    <tr bgcolor="#E2EBF5">
-        <td>Alert Ident</td>
-        <td>Time</td>
-        <td>Description</td>
-        <td>Source IP</td>
-        <td>Dest IP</td>
-        <td>Sensor Name</td>
-        <td>Severity</td>
-        <td>Type</td>
-    </tr>
+	<tr bgcolor="#E2EBF5">
+		<td>Classification</td>
+		<td>Source</td>
+		<td>Target</td>
+		<td>Sensor</td>
+		<td>Time</td>
+		<td></td>
+	</tr>
 
-    <!-- BEGIN alert -->
-    <tr bgcolor="{COLOR}">
-        <td><a href="index.py?mod=alert&amp;section=Alert%20view&amp;Alert%20view.alert_ident={ALERT_IDENT}"><font color="#d2312a">{ALERT_IDENT}</font></a></td>
-        <td>{TIME}</td>
-        <td><a href="{URL}"><font color="#d2312a">{DESCRIPTION}</font></a></td>
-        <td>{SIP}</td>
-        <td>{DIP}</td>
-        <td>{SENSORID}</td>
-        <td>{SEVERITY}</td>
-        <td>{TYPE}</td>
-    </tr>
-    <!-- END alert -->
+	<!-- BEGIN alert -->
+	<tr bgcolor="{COLOR}">
+		<td><font color="{SEVERITY}">{CLASSIFICATION}</font></td>
+		<td>{SOURCE}</td>
+		<td>{TARGET}</td>
+		<td>{SENSOR}</td>
+		<td>{TIME}</td>
+		<td>
+		<div id="style7">
+		    	<a href="index.py?mod=mod_alert&amp;section=Alert%20view&amp;Alert%20view.analyzerid={ANALYZERID}&amp;Alert%20view.alert_ident={ALERT_IDENT}">
+				view
+			</a>
+		</div>
+		</td>
+	</tr>
+	<!-- END alert -->

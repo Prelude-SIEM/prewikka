@@ -5,25 +5,15 @@ class AlertList(PyTpl.Template):
         PyTpl.Template.__init__(self)
         self.alert_count = 0
     
-    def addAlert(self,
-                 alert_ident,
-                 time,
-                 description,
-                 url,
-                 source_ip,
-                 destination_ip,
-                 sensor_id,
-                 severity,
-                 type):
-        self["alert"].ALERT_IDENT = alert_ident
-        self["alert"].TIME = time
-        self["alert"].DESCRIPTION = description
-        self["alert"].URL = url
-        self["alert"].SIP = source_ip
-        self["alert"].DIP = destination_ip
-        self["alert"].SENSORID = sensor_id
-        self["alert"].SEVERITY = severity
-        self["alert"].TYPE = type
+    def addAlert(self, alert):
+        self["alert"].ANALYZERID = alert["alert.analyzer.analyzerid"]
+        self["alert"].ALERT_IDENT = alert["alert.ident"]
+        self["alert"].CLASSIFICATION = alert["alert.classification(0).name"]
+        self["alert"].SEVERITY = { "low": "green", "medium": "orange", "high": "red" }[alert["alert.assessment.impact.severity"]]
+        self["alert"].SOURCE = alert["alert.source(0).node.address(0).address"] or "n/a"
+        self["alert"].TARGET = alert["alert.target(0).node.address(0).address"] or "n/a"
+        self["alert"].SENSOR = alert["alert.analyzer.model"]
+        self["alert"].TIME = alert["alert.detect_time"]
         self["alert"].COLOR = ("#ffffff", "#eeeeee")[self.alert_count%2]
         self["alert"].parse()
         self.alert_count += 1

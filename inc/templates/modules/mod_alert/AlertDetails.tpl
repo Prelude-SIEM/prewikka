@@ -1,44 +1,62 @@
 <table>
-<tr bgcolor="#ffffff">
-<td>Time</td>
-<td>{TIME}</td>
-</tr>
-<tr bgcolor="#eeeeee">
-<td>Description</td>
-<td>
-<a href="{URL}"><font color="#d2312a">{DESCRIPTION}</font></a></td>
-</tr>
-<tr bgcolor="#ffffff">
-<td>Source IP</td>
-<td>{SIP}</td>
-</tr>
-<tr bgcolor="#eeeeee">
-<td>Destination IP</td>
-<td>{DIP}</td>
-</tr>
-<tr bgcolor="#ffffff">
-<td>Sensor name</td>
-<td>{SENSORID}</td>
-</tr>
-<tr bgcolor="#eeeeee">
-<td>Severity</td>
-<td>{SEVERITY}</td>
-</tr>
-<tr bgcolor="#ffffff">
-<td>Type</td>
-<td>{TYPE}</td>
-</tr>
+	<tr bgcolor="#ffffff">
+		<td>Create time</td>
+		<td>{CREATE_TIME}</td>
+	</tr>
+	<tr bgcolor="#eeeeee">
+		<td >Detect Time</td>
+		<td>{DETECT_TIME}</td>
+	</tr>
+	<tr bgcolor="#ffffff">
+		<td>Analyzer Time</td>
+		<td>{ANALYZER_TIME}</td>
+	</tr>
 </table>
+
+<p><h2>Classification</h2></p>
 <table>
-<tr bgcolor="#E2EBF5">
-<td>Type</td>
-<td>Data</td>
-</tr>
-<br/><br/>
-<!-- BEGIN additional_data -->
-<tr bgcolor="{COLOR}">
-<td valign="top">{TYPE}</td>
-<td valign="top"><pre style="margin:0px">{DATA}</pre></td>
-</tr>
-<!-- END additional_data -->
+	<tr>
+		<td>Name</td>
+		<td>Origin</td>
+	</tr>
+	<tr>
+		<!-- BEGIN classification -->
+		<!-- BEGIN normal -->
+		<td>{NAME}</td>
+		<!-- END normal -->
+		<!-- BEGIN linked -->
+		<td><a href="{URL}">{NAME}</a></td>
+		<!-- END linked -->
+		<td>{ORIGIN}</td>
+		<!-- END classification -->
+	</tr>
+</table>
+
+<p><h2>Impact</h2></p>
+<table>
+	<!-- BEGIN impact -->
+	<tr>
+		<td>Severity</td>
+		<td>{SEVERITY}</td>
+	</tr>
+	<tr>
+		<td>Completion</td>
+		<td>{COMPLETION}</td>
+	</tr>
+	<tr>
+		<td>Type</td>
+		<td>{TYPE}</td>
+	</tr>
+	<tr>
+		<td>Description</td>
+		<td>{DESCRIPTION}</td>
+	</tr>
+	<!-- END impact -->
+</table>
+
+<p><h2>Source</h2></p>
+<table>
+	<tr>
+		<td></td>
+	</tr>
 </table>
