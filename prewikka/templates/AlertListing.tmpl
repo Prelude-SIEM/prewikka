@@ -409,11 +409,7 @@ function ${name}_add_entry(object, value, num) {
       #if $direction.addresses
         <br/>
         #for $address in $direction.addresses
-          #if $address.category
-            $address.category:$address.value
-          #else
             $address.value
-          #end if
         #end for
       #end if
       #if $direction.users

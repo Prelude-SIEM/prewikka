@@ -411,13 +411,15 @@ class AlertListing(MessageListing, view.View):
 
         idx = 1
         while True:
-            if message["alert.%s(0).node.address(%d).address" % (direction, idx)] is None:
+            address = message["alert.%s(0).node.address(%d).address" % (direction, idx)]
+            if address is None:
                 break
 
-            dataset["addresses"].append({ "value": message["alert.%s(0).node.address(%d).address" %
-                                                           (direction, idx)],
-                                          "category": message["alert.%s(0).node.address(%d).category" %
-                                                              (direction, idx)]})
+            category = message["alert.%s(0).node.address(%d).category" % (direction, idx)]
+            if category != "unknown":
+                address = "%s:%s" % (category, address)
+
+            dataset["addresses"].append({ "value": address })
             idx += 1
 
         if idx > 1:
@@ -432,9 +434,13 @@ class AlertListing(MessageListing, view.View):
                                   "alert.%s(0).service.name" % direction)
         
         if message["alert.%s(0).node.address(0).address" % direction]:
+            address = message["alert.%s(0).node.address(0).address" % direction]
+            category = message["alert.%s(0).node.address(0).category" % direction]
+            if category != "unknown":
+                address = "%s:%s" % (category, address)
+            
             dataset["address"] = self._createHostField("alert.%s.node.address.address" % direction,
-                                                       message["alert.%s(0).node.address(0).address" % direction],
-                                                       type=direction)
+                                                       address, type=direction)
             dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction] }
         else:
             dataset["address"] = self._createHostField("alert.%s.node.name" % direction,
