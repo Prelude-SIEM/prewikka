@@ -495,12 +495,14 @@ class AlertListingAction(MessageListingAction, AlertsView):
                ("completion", "alert.assessment.impact.completion", "alert.assessment.impact.completion"),
                ("classification", "alert.classification.text", "alert.classification.text"),
                ("source", "alert.source(0).node.address(0).address", "alert.source.node.address.address"),
+	       ("sinterface", "alert.source(0).interface", "alert.source.interface"),
                ("sport", "alert.source(0).service.port", "alert.source.node.service.port"),
                ("suser_name", "alert.source(0).user.user_id(0).name", "alert.source.user.user_id.name"),
                ("suser_uid", "alert.source(0).user.user_id(0).number", "alert.source.user.user_id.number"),
                ("sprocess_name", "alert.source(0).process.name", "alert.source.process.name"),
                ("sprocess_pid", "alert.source(0).process.pid", "alert.source.process.pid"),
                ("target", "alert.target(0).node.address(0).address", "alert.target.node.address.address"),
+	       ("tinterface", "alert.target(0).interface", "alert.target.interface"),
                ("tport", "alert.target(0).service.port", "alert.target.node.service.port"),
                ("tuser_name", "alert.target(0).user.user_id(0).name", "alert.target.user.user_id.name"),
                ("tuser_uid", "alert.target(0).user.user_id(0).number", "alert.target.user.user_id.number"),
@@ -554,8 +556,8 @@ class AlertListingAction(MessageListingAction, AlertsView):
         fields["completion"] = { "value": alert["completion"] }
         
         for name in ("analyzerid", "ident", "sensor_node_name",
-                     "sport", "suser_name", "suser_uid", "sprocess_name", "sprocess_pid",
-                     "tport", "tuser_name", "tuser_uid", "tprocess_name", "tprocess_pid"):
+                     "sinterface", "sport", "suser_name", "suser_uid", "sprocess_name", "sprocess_pid",
+                     "tinterface", "tport", "tuser_name", "tuser_uid", "tprocess_name", "tprocess_pid"):
             fields[name] = { "value": alert[name] }
         
         for name in "classification", "sensor":

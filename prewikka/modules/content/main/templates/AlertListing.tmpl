@@ -47,6 +47,9 @@
 	  ($message.sprocess_pid.value)
 	#end if
       #end if
+     #if $message.sinterface.value
+        <br/>interface: $message.sinterface.value
+     #end if
       <ul>
         <li><a href="$message.source.inline_filter">Group by source</a></li>
         #for $name, $link in $message.source.host_commands
@@ -77,6 +80,9 @@
 	  ($message.tprocess_pid.value)
 	#end if
       #end if
+     #if $message.tinterface.value
+        <br/>interface: $message.tinterface.value
+     #end if
       <ul>
         <li><a href="$message.target.inline_filter">Group by target</a></li>
         #for $name, $link in $message.target.host_commands
