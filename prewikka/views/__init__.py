@@ -20,7 +20,7 @@
 
 from prewikka.views import \
      messagelisting, messagesummary, messagedetails, sensor, admin, \
-     commands, filter, usermanagement, settings, misc
+     commands, filter, usermanagement, settings, stats, misc
 
 
 
@@ -39,7 +39,7 @@ objects = messagelisting.AlertListing(), \
           usermanagement.PasswordChangeForm(), usermanagement.PasswordChange(), \
           usermanagement.PermissionsChangeForm(), usermanagement.PermissionsChange(), \
           settings.SettingsDisplay(), settings.PasswordChange(), \
-          misc.About()
+          misc.About(), stats.Stats()
 
 
 
@@ -54,4 +54,5 @@ sections = [("Events", (("Alerts", ["alert_listing"]),
                                   "user_password_change_form", "user_password_change",
                                   "user_permissions_change_form", "user_permissions_change"]), )),
             ("Settings", (("Settings", ["settings_display", "settings_password_change"]), )),
+            ("Stats", (("Stats", ["stats"]), )),
             ("About", (("About", ["about"]), )) ]
