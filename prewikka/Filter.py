@@ -24,7 +24,7 @@ class Error(Exception):
     pass
 
 
-ALERT_OBJECTS = ("alert.ident",
+ALERT_OBJECTS = ("alert.messageid",
                  "alert.assessment.impact.severity",
                  "alert.assessment.impact.completion",
                  "alert.assessment.impact.type",
@@ -185,7 +185,7 @@ ALERT_OBJECTS = ("alert.ident",
                  "alert.overflow_alert.size",
                  "alert.overflow_alert.buffer")
 
-HEARTBEAT_OBJECTS = ("heartbeat.ident",
+HEARTBEAT_OBJECTS = ("heartbeat.messageid",
                      "heartbeat.analyzer.analyzerid",
                      "heartbeat.analyzer.manufacturer",
                      "heartbeat.analyzer.model",

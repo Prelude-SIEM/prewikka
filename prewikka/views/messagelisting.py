@@ -454,7 +454,7 @@ class AlertListing(MessageListing, view.View):
             dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction] }
         else:
             dataset["address"] = self._createHostField("alert.%s.node.name" % direction,
-                                                       message["alert.%s(0).node.name" % direction], "unknown",
+                                                       message["alert.%s(0).node.name" % direction],
                                                        type=direction)
             dataset["address_extra"] = { "value": None }
 
@@ -728,7 +728,10 @@ class AlertListing(MessageListing, view.View):
             aggregated_target_values = values[len(self.parameters["aggregated_source"]):-3]
             time_max, time_min, aggregated_count = values[-3:]
 
-            criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(aggregated_on, values[:-3]) ]
+            criteria2 = criteria[:]
+            for path, value in zip(aggregated_on, values[:-3]):
+                if value:
+                    criteria2.append("%s == '%s'" % (path, value))
 
             for ident in self.env.prelude.getAlertIdents(criteria2, limit=1):
                 message = self._fetchMessage(ident)
@@ -815,19 +818,22 @@ class AlertListing(MessageListing, view.View):
         self.dataset["aggregated_source_values"] = self.parameters["aggregated_source_values"]
         self.dataset["aggregated_target"] = self.parameters["aggregated_target"] or [ "none" ]
         self.dataset["aggregated_target_values"] = self.parameters["aggregated_target_values"]
-
-        if not self.parameters.has_key("aggregated_classification_value"):
+        
+        if self.parameters["aggregated_source"] + self.parameters["aggregated_target"] and \
+               not self.parameters.has_key("aggregated_classification_value"):
             self.dataset["delete_enabled"] = False
             return self._setAggregatedMessages(criteria)
 
         self.dataset["delete_enabled"] = True
 
-        criteria = criteria[:]
-        for p, v in zip(self.parameters["aggregated_source"] + self.parameters["aggregated_target"] + [ "alert.classification.text" ],
-                        self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"] +
-                        [ self.parameters["aggregated_classification_value"] ]):
-            criteria += [ "%s == '%s'" % (p, v) ]
-
+        if self.parameters.has_key("aggregated_classification_value"):
+            criteria = criteria[:]
+            for p, v in zip(self.parameters["aggregated_source"] + self.parameters["aggregated_target"] +
+                            [ "alert.classification.text" ],
+                            self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"] +
+                            [ self.parameters["aggregated_classification_value"] ]):
+                criteria += [ "%s == '%s'" % (p, v) ]
+ 
         for ident in self.env.prelude.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
             message = self.env.prelude.getAlert(ident)
             dataset = self._setMessage(message, ident)
