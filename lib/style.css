@@ -160,6 +160,13 @@ thead {
 	background-color: #E2EBF5;
 }
 
+tfoot tr td {
+	border: 0px;
+	border-top: 1px;
+	border-style: solid;
+	border-color: black;
+}
+
 table {
 	border-spacing: 3px;
 }

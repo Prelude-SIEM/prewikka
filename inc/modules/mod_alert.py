@@ -76,7 +76,7 @@ class ModuleInterface(interface.NormalInterface):
 
 
 class ListInterface(ModuleInterface):
-    def _createLinkTag(self, request, name, class_):
+    def _createLinkTag(self, request, name, class_=""):
         return "<a class='%s' href='%s'>%s</a>" % (class_, self.createLink(request), name)
 
     def _createAlertLink(self, alert, action):
@@ -94,7 +94,7 @@ class ListInterface(ModuleInterface):
         
         value = alert[field]
         if value:
-            request = self._request
+            request = copy.copy(self._request)
             request.filter_name = filter_name
             request.filter_value = value
             field = self._createLinkTag(request, value, class_)
@@ -111,7 +111,7 @@ class ListInterface(ModuleInterface):
         self._addAlertField(row, alert, "alert.source(0).node.address(0).address", "alert.source.node.address.address")
         self._addAlertField(row, alert, "alert.target(0).node.address(0).address", "alert.target.node.address.address")
         self._addAlertField(row, alert, "alert.analyzer.model")
-        row.append(alert["alert.detect_time"])
+        row.append(str(MyTime(int(alert["alert.detect_time"]))))
         row.append(self._createAlertLink(alert, "summary"))
         row.append(self._createAlertLink(alert, "details"))
 
@@ -149,6 +149,20 @@ class ListInterface(ModuleInterface):
         table.setHeader(("Classification", "Source", "Target", "Sensor", "Time", "", ""))
         for alert in alerts:
             self._addAlert(table, alert)
+
+        print >> sys.stderr, "###", str(self._request)
+
+        if self._request.filter_name:
+            #print >> sys.stderr, "###", self._request.filter_name
+            filters = [ "alert.classification.name", "alert.source.node.address.address", "alert.target.node.address.address", \
+                        "alert.analyzer.model" ]
+            footer = [ "" ] * 7
+            request = copy.copy(self._request)
+            filter_name = request["filter_name"]
+            del request["filter_name"]
+            del request["filter_value"]
+            footer[filters.index(filter_name)] = self._createLinkTag(request, "del filter")
+            table.setFooter(footer)
 
         template.setAlertList(str(table))
 
@@ -225,27 +239,7 @@ class AlertModule(module.ContentModule):
 
         result["start"], result["end"] = start, end
 
-        tmp = "alert.detect_time >= '%s' && alert.detect_time < '%s'" % (str(start), str(end))
-            
-##         if request.timeline_end:
-##             end = time.localtime(request.timeline_end)
-##         else:
-##             t = time.time()
-##             request.timeline_end = t - (t % 3600)
-##             end = time.localtime(t)
-
-##         start = list(end)
-##         start[["year", "month", "day", "hour", "min", "sec"].index(request.timeline_unit)] -= request.timeline_value
-##         start = time.localtime(time.mktime(start))
-            
-##         result["start"] = start
-##         result["end"] = end
-        
-##         tmp = "alert.detect_time >= '%s' && alert.detect_time < '%s'" % \
-##               (time.strftime("%Y-%m-%d %H:%M:%S", start),
-##                time.strftime("%Y-%m-%d %H:%M:%S", end))
-            
-        criteria.append(tmp)
+        criteria.append("alert.detect_time >= '%s' && alert.detect_time < '%s'" % (str(start), str(end)))
             
         idents = prelude.getAlertIdents(" && ".join(criteria))
         alerts = [ ]

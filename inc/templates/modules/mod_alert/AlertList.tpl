@@ -4,7 +4,7 @@
 		<!-- BEGIN hidden -->
 		<input type="hidden" name="{NAME}" value="{VALUE}"/>
 		<!-- END hidden -->
-			<div id="timeline_label">Step</div>
+			<div id="timeline_label">Step:</div>
 			<div id="timeline_value">
 				<input name="timeline_value" type="text" size="8" value="{TIMELINE_VALUE}"/>
 			</div>

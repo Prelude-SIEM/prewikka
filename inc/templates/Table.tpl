@@ -32,4 +32,16 @@
 		<!-- END row -->
 	</tbody>
 	<!-- END body -->
+	
+	<!-- BEGIN footer -->
+	<tfoot>
+		<!-- BEGIN row -->
+		<tr>
+			<!-- BEGIN cell -->
+			<td>{CONTENT}</td>
+			<!-- END cell -->
+		</tr>
+		<!-- END row -->
+	</tfoot>
+	<!-- END footer -->
 </table>

@@ -6,10 +6,14 @@ class Table(PyTpl.Template):
     def __init__(self):
         PyTpl.Template.__init__(self)
         self._header = None
+        self._footer = None
         self._rows = [ ]
 
     def setHeader(self, header):
         self._header = header
+
+    def setFooter(self, footer):
+        self._footer = footer
 
     def addRows(self, rows):
         self._rows += rows
@@ -35,5 +39,12 @@ class Table(PyTpl.Template):
             self["body"]["row"].parse()
             i += 1
         self["body"].parse()
+
+        if self._footer:
+            for cell in self._footer:
+                self["footer"]["row"]["cell"].CONTENT = cell
+                self["footer"]["row"]["cell"].parse()
+            self["footer"]["row"].parse()
+            self["footer"].parse()
 
         return PyTpl.Template.__str__(self)
