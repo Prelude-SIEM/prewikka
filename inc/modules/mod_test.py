@@ -2,49 +2,34 @@ import sys
 from templates.modules.mod_test import Form
 from templates import Table
 import module
-import interface
+import Interface
 import core
 import Request
 
 
-class ModuleInterface(interface.NormalInterface):
+class TestInterface(Interface.NormalInterface):
     def init(self):
-        interface.NormalInterface.init(self)
-        self.setModuleName("Test")
+        Interface.NormalInterface.init(self)
+        self.setActiveModule("Test")
+
+
+
+class TestSection(TestInterface):
+    def init(self):
+        TestInterface.init(self)
+        self.setActiveSection("Test")
         self.setTabs([ ("fetch", "fetch_data"), ("empty", "empty"), ("third", "third") ])
 
+        
 
-
-class DataInterface(ModuleInterface):
+class DataView(TestSection):
     def init(self):
-        ModuleInterface.init(self)
+        TestSection.init(self)
         self.setActiveTab("fetch")
 
 
 
-class EmptyInterface(ModuleInterface):
-    def init(self):
-        ModuleInterface.init(self)
-        self.setActiveTab("empty")
-
-
-
-class ThirdInterface(ModuleInterface):
-    def init(self):
-        ModuleInterface.init(self)
-        self.setActiveTab("third")
-
-    def build(self):
-        table = Table.Table()
-        table.setHeader(("Character", "Numeric"))
-        for char, num in self._data:
-            table.addRow((char, num))
-
-        self.setMainContent(str(table))
-
-
-
-class DisplayDataInterface(DataInterface):
+class DisplayDataViewInstance(DataView):
     def build(self):
         foo, bar = self._data
         content = ""
@@ -54,7 +39,7 @@ class DisplayDataInterface(DataInterface):
 
 
 
-class FetchDataInterface(DataInterface):
+class FetchDataViewInstance(DataView):
     def build(self):
         form = Form.Form()
         request = DataRequest()
@@ -65,6 +50,36 @@ class FetchDataInterface(DataInterface):
         form.setInteractiveField("foo", "foo")
         form.setInteractiveField("bar", "bar")
         self.setMainContent(str(form))
+
+
+
+class EmptyView(TestSection):
+    def init(self):
+        TestSection.init(self)
+        self.setActiveTab("empty")
+
+
+
+class EmptyViewInstance(EmptyView):
+    pass
+
+
+
+class ThirdView(TestSection):
+    def init(self):
+        TestSection.init(self)
+        self.setActiveTab("third")
+
+
+
+class ThirdViewInstance(ThirdView):
+    def build(self):
+        table = Table.Table()
+        table.setHeader(("Character", "Numeric"))
+        for char, num in self._data:
+            table.addRow((char, num))
+        
+        self.setMainContent(str(table))
 
 
 
@@ -80,22 +95,23 @@ class TestModule(module.ContentModule):
     def __init__(self, _core):
         module.ContentModule.__init__(self, _core)
         self.setName("Test")
+        self.addSection("Test", "fetch_data")
         self.registerAction("fetch_data", core.CoreRequest, default=True)
         self.registerAction("display_data", DataRequest)
         self.registerAction("empty", core.CoreRequest)
         self.registerAction("third", core.CoreRequest)
 
     def handle_fetch_data(self, request):
-        return FetchDataInterface, None
+        return FetchDataViewInstance, None
 
     def handle_display_data(self, request):
-        return DisplayDataInterface, (request["foo"], request["bar"])
+        return DisplayDataViewInstance, (request["foo"], request["bar"])
 
     def handle_empty(self, request):
-        return EmptyInterface, None
+        return EmptyViewInstance, None
 
     def handle_third(self, request):
-        return ThirdInterface, (("one", 1), ("two", 2), ("three", 3), ("four", 4))
+        return ThirdViewInstance, (("one", 1), ("two", 2), ("three", 3), ("four", 4))
 
 
 

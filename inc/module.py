@@ -1,3 +1,6 @@
+import Interface
+import Request
+
 class Module:
     def __init__(self):
         self._name = None
@@ -14,6 +17,7 @@ class ContentModule(Module):
     def __init__(self, core):
         Module.__init__(self)
         self._core = core
+        self._sections = [ ]
         self._actions = { }
         self._default_action = None
     
@@ -21,6 +25,12 @@ class ContentModule(Module):
         self._actions[action] = request
         if default:
             self._default_action = { "name": action, "request": request }
+        
+    def addSection(self, name, action):
+        self._sections.append((name, action))
+
+    def getSections(self):
+        return self._sections
     
     def process(self, interface_config, query):
         if query.has_key("action"):
@@ -32,10 +42,22 @@ class ContentModule(Module):
             
         handler = getattr(self, "handle_" + action)
         request = request_class()
-        request.populate(query)
-        interface_class, data = handler(request)
+        try:
+            request.populate(query)
+        except Request.Error:
+            self._core.log.invalidQuery(query)
+            interface_class = Interface.ErrorInterface
+            data = "Query error"
+        else:
+            interface_class, data = handler(request)
         interface = interface_class(self._core, interface_config, request, data)
         interface.init()
         interface.build()
 
         return str(interface)
+
+
+
+class LogModule(Module):
+    def invalidQuery(self, query):
+        pass

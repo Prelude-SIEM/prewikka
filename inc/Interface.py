@@ -29,20 +29,28 @@ class Interface:
         return content + "\r\n"
 
 
+class ErrorInterface(Interface):
+    def __str__(self):
+        return Interface.__str__(self) + "<h1>%s</h1>" % self._data
+
+
 
 class NormalInterface(Interface):
     def init(self):
-        self._module_names = self._core.getContentModuleNames()
         self._software = self._config.get("software", "Prewikka")
         self._place = self._config.get("place", "")
         self._title = self._config.get("title", "Prelude management")
-        self._module_name = None
+        self._active_module = None
+        self._active_section = None
         self._tabs = [ ]
         self._active_tab = None
         self._main_content = ""
 
-    def setModuleName(self, name):
-        self._module_name = name
+    def setActiveModule(self, module):
+        self._active_module = module
+
+    def setActiveSection(self, section):
+        self._active_section = section
 
     def setTabs(self, tabs):
         self._tabs = tabs
@@ -62,18 +70,20 @@ class NormalInterface(Interface):
         normal.setSoftware(self._software)
         normal.setTitle(self._title)
         normal.setPlace(self._place)
-        
+
         menu = Menu.Menu()
-        for module in self._module_names:
-            if module == self._module_name:
-                menu.setActiveItem(module)
-            else:
-                request.module = module
-                menu.setInactiveItem(module, self.createLink(request))
+        for module in self._core.getContentModuleNames():
+            for section, action in self._core.content_modules[module].getSections():
+                if section == self._active_section:
+                    menu.setActiveItem(section)
+                else:
+                    request.module = module
+                    request.action = action
+                    menu.setInactiveItem(section, self.createLink(request))
         normal.setMenu(str(menu))
 
         topmenu = TopMenu.TopMenu()
-        request.module = self._module_name
+        request.module = self._active_module
         for name, action in self._tabs:
             if name == self._active_tab:
                 topmenu.setActiveItem(name)

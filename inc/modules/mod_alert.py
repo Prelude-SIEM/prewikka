@@ -7,7 +7,7 @@ import re
 from templates.modules.mod_alert import AlertList, AlertSummary, AlertDetails
 from templates import Table
 import module
-import interface
+import Interface
 import core
 
 
@@ -65,18 +65,31 @@ class MyTime:
     def __int__(self):
         return self._t
 
-    
-        
-class ModuleInterface(interface.NormalInterface):
+
+
+class AlertsInterface(Interface.NormalInterface):
     def init(self):
-        interface.NormalInterface.init(self)
-        self.setModuleName("Alerts")
+        Interface.NormalInterface.init(self)
+        self.setActiveModule("Alerts")
+
+
+
+class AlertsSection(AlertsInterface):
+    def init(self):
+        AlertsInterface.init(self)
+        self.setActiveSection("Alerts")
         self.setTabs([ ("alert list", "list") ])
+
+
+
+class AlertListView(AlertsSection):
+    def init(self):
+        AlertsSection.init(self)
         self.setActiveTab("alert list")
 
 
 
-class ListInterface(ModuleInterface):
+class ListViewInstance(AlertListView):
     def _createLinkTag(self, request, name, class_=""):
         return "<a class='%s' href='%s'>%s</a>" % (class_, self.createLink(request), name)
 
@@ -195,17 +208,15 @@ class ListInterface(ModuleInterface):
         self._buildAlertList(template)
         self.setMainContent(str(template))
 
-        
 
 
-
-class SummaryInterface(ModuleInterface):
+class SummaryViewInstance(AlertListView):
     def build(self):
         self.setMainContent(AlertSummary.AlertSummary(self._data))
 
 
 
-class DetailsInterface(ModuleInterface):
+class DetailsViewInstance(AlertListView):
     def build(self):
         self.setMainContent(AlertDetails.AlertDetails(self._data))
 
@@ -245,6 +256,7 @@ class AlertModule(module.ContentModule):
     def __init__(self, _core, config):
         module.ContentModule.__init__(self, _core)
         self.setName("Alerts")
+        self.addSection("Alerts", "list")
         self.registerAction("list", ListRequest, default=True)
         self.registerAction("summary", AlertRequest)
         self.registerAction("details", AlertRequest)
@@ -299,7 +311,7 @@ class AlertModule(module.ContentModule):
 
         result["alerts"] = alerts
         
-        return ListInterface, result
+        return ListViewInstance, result
 
     def handle_default(self, request):
         return self.handle_list(request)
@@ -308,10 +320,10 @@ class AlertModule(module.ContentModule):
         return self._core.prelude.getAlert(request.analyzerid, request.alert_ident)
 
     def handle_summary(self, request):
-        return SummaryInterface, self._getAlert(request)
+        return SummaryViewInstance, self._getAlert(request)
 
     def handle_details(self, request):
-        return DetailsInterface, self._getAlert(request)
+        return DetailsViewInstance, self._getAlert(request)
 
     def handle_delete(self, request):
         self._core.prelude.deleteAlert(request.analyzerid, request.alert_ident)
