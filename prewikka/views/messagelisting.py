@@ -767,14 +767,15 @@ class AlertListing(MessageListing, view.View):
                         if aggregated_count == 1:
                             self._setMessageClassificationReferences(infos, message)
                         
-                        criteria2 = criteria[:]
+                        criteria3 = criteria2[:]
+                        
                         for path, value in (("alert.classification.text", classification),
                                      ("alert.assessment.impact.severity", severity),
                                      ("alert.assessment.impact.completion", completion)):
                             if value:
-                                criteria2 += [ "%s == '%s'" % (path, value) ]
+                                criteria3 += [ "%s == '%s'" % (path, value) ]
                         
-                        ident = self.env.prelude.getAlertIdents(criteria2, limit=1)[0]
+                        ident = self.env.prelude.getAlertIdents(criteria3, limit=1)[0]
 
                         display = self._createMessageLink(ident, "alert_summary")
                     else:
