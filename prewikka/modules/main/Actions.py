@@ -100,7 +100,7 @@ class MessageListing(Action.Action):
         pass
 
     def getFilter(self, wanted):
-        for name, filter in self.fields:
+        for name, object, filter in self.fields:
             if name == wanted:
                 return filter
 
@@ -158,8 +158,8 @@ class MessageListing(Action.Action):
             message = { "analyzerid": analyzerid, "ident": ident }
             messages.append(message)
             tmp = self.getMessage(prelude, analyzerid, ident)
-            for name, field in self.fields:
-                message[name] = tmp[field]
+            for name, object, filter  in self.fields:
+                message[name] = tmp[object]
                 
         view.setRange(parameters.getOffset() + 1, parameters.getOffset() + len(messages), parameters.getLimit(), count)
 
@@ -179,12 +179,12 @@ class AlertListing(MessageListing):
     view_name = "AlertListingView"
     time_criteria_format = "alert.detect_time >= '%s' && alert.detect_time < '%s'"
     message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.ident == '%d'"
-    fields = [ ("severity", "alert.assessment.impact.severity"),
-               ("classification", "alert.classification(0).name"),
-               ("source", "alert.source(0).node.address(0).address"),
-               ("target", "alert.target(0).node.address(0).address"),
-               ("sensor", "alert.analyzer.model"),
-               ("time", "alert.detect_time") ]
+    fields = [ ("severity", "alert.assessment.impact.severity", "alert.assessment.impact.severity"),
+               ("classification", "alert.classification(0).name", "alert.classification.name"),
+               ("source", "alert.source(0).node.address(0).address", "alert.source.node.address.address"),
+               ("target", "alert.target(0).node.address(0).address", "alert.target.node.address.address"),
+               ("sensor", "alert.analyzer.model", "alert.analyzer.model"),
+               ("time", "alert.detect_time", "alert.detect_time") ]
 
     def countMessages(self, prelude, criteria):
         return prelude.countAlerts(criteria)
@@ -201,10 +201,10 @@ class HeartbeatListing(MessageListing):
     view_name = "HeartbeatListingView"
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
     message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.ident == '%d'"
-    fields = [ ("address", "heartbeat.analyzer.node.address(0).address"),
-               ("name", "heartbeat.analyzer.node.name"),
-               ("type", "heartbeat.analyzer.model"),
-               ("time", "heartbeat.analyzer_time") ]
+    fields = [ ("address", "heartbeat.analyzer.node.address(0).address", "heartbeat.analyzer.node.address.address"),
+               ("name", "heartbeat.analyzer.node.name", "heartbeat.analyzer.node.name"),
+               ("type", "heartbeat.analyzer.model", "heartbeat.analyzer.model"),
+               ("time", "heartbeat.analyzer_time", "heartbeat.analyzer_time") ]
 
     def countMessages(self, prelude, criteria):
         return prelude.countHeartbeats(criteria)
