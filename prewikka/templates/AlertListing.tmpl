@@ -354,8 +354,8 @@ function ${name}_add_entry(object, value, num) {
 </td>
 <td>
   $message.time.value
-  #if $message.detect_time.value
-    (detected at $message.detect_time.value)
+  #if $message.analyzer_time.value
+    (sent at $message.analyzer_time.value)
   #end if
 </td>
 #end block message_fields

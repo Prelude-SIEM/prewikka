@@ -527,12 +527,13 @@ class AlertListing(MessageListing, view.View):
         dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
         
         dataset["time"] = self._createTimeField(message["alert.create_time"], self.parameters["timezone"])
-        if (message["alert.detect_time"] != None and
-            abs(int(message["alert.create_time"]) - int(message["alert.detect_time"])) > 60):
-            dataset["detect_time"] = self._createTimeField(message["alert.detect_time"], self.parameters["timezone"])
-        else:
-            dataset["detect_time"] = { "value": None }
-        
+	if (message["alert.analyzer_time"] != None and
+	    abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
+	    dataset["analyzer_time"] = self._createTimeField(message["alert.analyzer_time"], self.parameters["timezone"])
+	else:
+	    dataset["analyzer_time"] = { "value": None }
+	    
+	
         self._setMessageSource(dataset, message)
         self._setMessageTarget(dataset, message)
         self._setMessageSensor(dataset, message)
