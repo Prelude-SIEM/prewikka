@@ -948,9 +948,8 @@ class Reference(_Element):
 
 class Classification(_Element):
     name = "classification"
-    fields = "ident", "text"
+    fields = "ident", "text", Reference
     check_field = "ident"
-    fields = Reference,
 
 
 
