@@ -1,8 +1,7 @@
-#from layout import layoutManager
 import sys
 
 from templates.layouts.normal import Normal, Menu, TopMenu
-import core
+import Core
 
 
 class View:
@@ -66,24 +65,11 @@ class NormalView(View):
     def __str__(self):
         headers = View.__str__(self)
         
-##         request = core.CoreRequest()
-        
         normal = Normal.Normal()
         normal.setSoftware(self._software)
         normal.setTitle(self._title)
         normal.setPlace(self._place)
-
-##         menu = Menu.Menu()
-##         for module in self._core.getContentModuleNames():
-##             for section, action in self._core.content_modules[module].getSections():
-##                 if section == self._active_section:
-##                     menu.setActiveItem(section)
-##                 else:
-##                     request.setModule(module)
-##                     request.setAction(action)
-##                     menu.setInactiveItem(section, self.createLink(request))
-##         normal.setMenu(str(menu))
-
+        
         menu = Menu.Menu()
         for section, action in self._core.interface.getSections():
             if section == self._active_section:
@@ -91,17 +77,7 @@ class NormalView(View):
             else:
                 menu.setInactiveItem(section, self.createLink(action))
         normal.setMenu(str(menu))
-
-##         topmenu = TopMenu.TopMenu()
-##         request.setModule(self._active_module)
-##         for name, action in self._tabs:
-##             if name == self._active_tab:
-##                 topmenu.setActiveItem(name)
-##             else:
-##                 request.setAction(action)
-##                 topmenu.setInactiveItem(name, self.createLink(request))
-##         normal.setTopMenu(str(topmenu))
-
+        
         topmenu = TopMenu.TopMenu()
         for name, action in self._tabs:
             if name == self._active_tab:
@@ -111,5 +87,5 @@ class NormalView(View):
         normal.setTopMenu(str(topmenu))
         
         normal.setPage(self._main_content)
-
+        
         return headers + str(normal)

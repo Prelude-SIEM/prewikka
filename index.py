@@ -14,7 +14,7 @@ import cgi, sys, os
 for path in "inc/", "inc/modules":
     sys.path.append(os.path.abspath(path))
 
-from core import Core
+from Core import Core
 
 
 class Response:
