@@ -84,7 +84,6 @@ class Interface:
         action = registered["action"]
         parameters = registered["parameters"]()
         parameters.populate(query)
-        print >> sys.stderr, "###", action
         view_class, data = action.process(self._core, parameters)
         view = view_class(self._core, data)
         view.init()
