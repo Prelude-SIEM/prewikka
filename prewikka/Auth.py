@@ -120,7 +120,7 @@ class LoginPasswordAuth(Auth, Session):
                 self.checkPassword(login, password)
             except AuthError, e:
                 e.dataset["arguments"] = request.arguments.items()
-                raise e
+                raise AuthError("authentication error")
             self.createSession(request, login)
         else:
             login = self.checkSession(request)
