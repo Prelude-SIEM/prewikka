@@ -300,7 +300,23 @@ class HeartbeatsAnalyzeView(HeartbeatsAnalyzeTab):
 
 
 
-class SensorAlertListingView(SensorsSection, AlertListingView):
+class SensorMessageListingView(SensorsSection):
+    def buildAnalyzerHeader(self, analyzer):
+        table = Table.Table()
+        table.setHeader(("Analyzerid", "Type", "OS", "Name", "Location", "Address"))
+        table.addRow((analyzer["analyzerid"],
+                      "%s %s" % (analyzer["model"], analyzer["version"]),
+                      "%s %s" % (analyzer["ostype"], analyzer["osversion"]),
+                      analyzer["name"],
+                      analyzer["location"],
+                      analyzer["address"]))
+        
+        return str(table)
+        
+        
+
+
+class SensorAlertListingView(SensorMessageListingView, AlertListingView):
     def _getMessageListingAction(self):
         return Actions().SensorAlertListing()
 
@@ -314,21 +330,11 @@ class SensorAlertListingView(SensorsSection, AlertListingView):
         return Actions().SensorAlertDetails()
     
     def buildMainContent(self, data):
-        analyzer = data["analyzer"]
-        table = Table.Table()
-        table.setHeader(("Analyzerid", "Type", "OS", "Name", "Location", "Address"))
-        table.addRow((analyzer["analyzerid"],
-                      "%s %s" % (analyzer["model"], analyzer["version"]),
-                      "%s %s" % (analyzer["ostype"], analyzer["osversion"]),
-                      analyzer["name"],
-                      analyzer["location"],
-                      analyzer["address"]))
-        
-        return str(table) + "<br/>" + AlertListingView.buildMainContent(self, data["alerts"])
+        return self.buildAnalyzerHeader(data["analyzer"]) + "<br/>" + AlertListingView.buildMainContent(self, data["alerts"])
 
 
 
-class SensorHeartbeatListingView(SensorsSection, HeartbeatListingView):
+class SensorHeartbeatListingView(SensorMessageListingView, HeartbeatListingView):
     def _getMessageListingAction(self):
         return Actions().SensorHeartbeatListing()
 
@@ -342,7 +348,7 @@ class SensorHeartbeatListingView(SensorsSection, HeartbeatListingView):
         return Actions().SensorHeartbeatDetails()
     
     def buildMainContent(self, data):
-        return HeartbeatListingView.buildMainContent(self, data["heartbeats"])
+        return self.buildAnalyzerHeader(data["analyzer"]) + "<br/>" + HeartbeatListingView.buildMainContent(self, data["heartbeats"])
 
 
 
