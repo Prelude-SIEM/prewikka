@@ -39,7 +39,7 @@
         <span>$message.source.value</span>
       #end if
       #if $message.source_extra.value
-        <br/>hostname: $message.source_extra.value
+        <br/>($message.source_extra.value)
       #end if
       #if $message.suser_name.value
         <br/>user: $message.suser_name.value
@@ -78,7 +78,7 @@
         <span>$message.target.value</span>
       #end if
       #if $message.target_extra.value
-        <br/>hostname: $message.target_extra.value
+        <br/>($message.target_extra.value)
       #end if
       #if $message.tuser_name.value
         <br/>user: $message.tuser_name.value
