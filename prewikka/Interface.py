@@ -229,7 +229,7 @@ class Interface:
         if self._core.auth:        
             view = self._core.auth.check(request)
             if view:
-                return view
+                return str(view)
             
         if action is None:
             return self.processDefaultAction(arguments, request)
