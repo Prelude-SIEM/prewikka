@@ -19,6 +19,7 @@
 
 
 import sys
+import time
 import os, os.path
 
 import copy
@@ -108,13 +109,15 @@ class Core:
         dataset["prewikka.place"] = self._config.interface.getOptionValue("place", "company ltd.")
         dataset["prewikka.url.referer"] = request.getReferer()
         dataset["prewikka.url.current"] = request.getQueryString()
+        dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
         
         dataset["interface.sections"] = [ ]
         for name in self._content_names:
             content = self._contents[name]
             if content.has_key("sections"):
                 for section, slot in content["sections"]:
-                    dataset["interface.sections"].append((section, utils.create_link("%s.%s" % (name, slot))))
+                    dataset["interface.sections"].append((section,
+                                                          utils.create_link("%s.%s" % (name, slot))))
 
         dataset["prewikka.user.login"] = request.user and request.user.login
         if self.env.auth.canLogout():
