@@ -1,9 +1,8 @@
 from database import getDB
-from string import strip
 import time
+import util
 import re
-from PyTpl import PyTpl
-
+from templates.modules.mod_alert import AlertList, AlertDetails
 
 class SectionAlertList:
     def __init__(self, query):
@@ -37,7 +36,7 @@ class SectionAlertList:
         LIMIT 30
         """ % ti)
         results = db.fetchall()
-        self.__data = []
+        self.__alerts = []
         query = "SELECT parent_ident, data FROM Prelude_AdditionalData WHERE meaning='Ip header' AND parent_ident in ("
         first = True
         for result in results:
@@ -63,35 +62,31 @@ class SectionAlertList:
                 src = ipdata[result[0]][0]
                 dst = ipdata[result[0]][1]
 
-            self.__data.append({"alert_ident": result[0],
-                                "description": result[1],
-                                "severity": result[2],
-                                "type": result[3],
-                                "time": result[4],
-                                "url": result[5],
-                                "sip": src,
-                                "dip": dst,
-                                "sensorid": result[6]})
+            self.__alerts.append({"alert_ident": result[0],
+                                  "description": result[1],
+                                  "severity": result[2],
+                                  "type": result[3],
+                                  "time": result[4],
+                                  "url": result[5],
+                                  "sip": src,
+                                  "dip": dst,
+                                  "sensorid": result[6]})
 
         DB.close()
         
     def __str__(self):
-        tpl = PyTpl("tpl/alerts.tpl")
-        i = 0
-        colors = ["#ffffff", "#eeeeee"]
-        for param in self.__data:
-            for var in param: 
-                tpl['alert'].setVar(var.upper(), param[var])
-            tpl['alert'].COLOR = colors[i%2]
-            tpl['alert'].parse()
-            i += 1
-        return str(tpl)
+        alert_list = AlertList.AlertList()
+        for alert in self.__alerts:
+            alert_list.addAlert(alert["alert_ident"], alert["time"], alert["description"],
+                                alert["url"], alert["sip"], alert["dip"],
+                                alert["sensorid"], alert["severity"], alert["type"])
+        return str(alert_list)
 
 
 
 class SectionAlertView:
     def __init__(self, query):
-        db, DB = getDB()
+        DB, db = getDB()
         """
         return alert details by given alert_ident
         """
@@ -115,7 +110,7 @@ class SectionAlertView:
             a.alert_ident=c.alert_ident AND 
             a.alert_ident=e.parent_ident
         ORDER BY c.time DESC
-        """ % query.input()["ident"])
+        """ % query["alert_ident"])
         result = db.fetchall()[0]
         sname = result[6]
         try:
@@ -141,7 +136,7 @@ class SectionAlertView:
             WHERE
                 parent_ident='%s' AND
                 meaning="Ip header"
-            """ % (alert_ident))
+            """ % query["alert_ident"])
             data = db.fetchone()[0]
             src, dst = re.match(r"\s*([0-9]*[.][0-9]*[.][0-9]*[.][0-9]*)\s*->\s*([0-9]*[.][0-9]*[.][0-9]*[.][0-9]*).*", data).groups()
         except:
@@ -164,33 +159,30 @@ class SectionAlertView:
         FROM 
             Prelude_AdditionalData 
         WHERE 
-            parent_ident='%s'"""%(alert_ident))
+            parent_ident='%s'""" % query["alert_ident"])
 
         results = db.fetchall()
         output = []
         for result in results:
-            output.append({"type":result[0],"data":result[1]})
+            output.append((result[0], result[1]))
         
-        self.__data = {"header": output2, "data": output}
+        self.__alert = {"header": output2, "data": output}
 
     def __str__(self):
-        tpl = PyTpl("tpl/viewalert.tpl")
+        alert = AlertDetails.AlertDetails()
+        alert.setTime(self.__alert["header"]["time"])
+        alert.setDescription(self.__alert["header"]["description"], self.__alert["header"]["url"])
+        alert.setSourceIP(self.__alert["header"]["sip"])
+        alert.setDestinationIP(self.__alert["header"]["dip"])
+        alert.setSensorID(self.__alert["header"]["sensorid"])
+        alert.setSeverity(self.__alert["header"]["severity"])
+        alert.setType(self.__alert["header"]["type"])
 
-        i = 0
-        colors = ["#ffffff", "#eeeeee"]
+        for type, data in self.__alert["data"]:
+            alert.setData(type, util.webify(data))
 
-        for var in self.__data["header"]:
-            tpl.setVar(var.upper(), util.webify(self.__data["header"][var]))
+        return str(alert)
 
-        for var in params["data"]:
-            for value in var:
-                tpl['alert'].setVar(value.upper(), util.webify(var[value].strip()))
-
-            self.tpl['alert'].COLOR = colors[i%2]
-            self.tpl['alert'].parse()
-            i += 1
-
-        return str(tpl)
 
 
 def load(module):

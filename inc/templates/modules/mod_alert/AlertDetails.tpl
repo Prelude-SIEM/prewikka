@@ -35,10 +35,10 @@
 <td>Data</td>
 </tr>
 <br/><br/>
-<!-- BEGIN alert -->
+<!-- BEGIN additional_data -->
 <tr bgcolor="{COLOR}">
 <td valign="top">{TYPE}</td>
 <td valign="top"><pre style="margin:0px">{DATA}</pre></td>
 </tr>
-<!-- END alert -->
+<!-- END additional_data -->
 </table>

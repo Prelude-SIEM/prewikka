@@ -61,6 +61,8 @@ class Module:
         except KeyError:
             section_name = self.default_section_name
 
+        sys.stderr.write("### section name: %s\n" % section_name)
+
         try:
             section_query = query[section_name]
         except KeyError:

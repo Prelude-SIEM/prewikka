@@ -1,5 +1,5 @@
 import sys
-from templates import Form
+from templates.modules.mod_test import Form
 
 class Display:
     def __init__(self, query):
