@@ -220,6 +220,10 @@ td {
 	/*border-color: transparent;*/
 }
 
+.static_content_column {
+	text-align: center;
+}
+
 .impact_severity_high {
 	text-decoration: none;
 	color: red;
@@ -248,11 +252,11 @@ td {
 	text-decoration: underline;
 }
 
-#alert_list_result table {
+#message_list_result table {
 	width: 100%;
 }
 
-#alert_list_edition {
+#message_list_edition {
 	border: 1px;
 	border-style: solid;
 	border-color: #4D535C;
@@ -322,11 +326,11 @@ td {
 	font-weight: bold;
 }
 
-.hideable {
+.message_details {
 	padding-left: 0px;
 }
 
-.hideable_title {
+.message_details_title {
 	background-color: #E2EBF5;
 	font-weight: bold;
 	/*border: 0px;
@@ -338,24 +342,24 @@ td {
 	border-style: solid;
 }
 
-.hideable_title a {
+.message_details_title a {
 	text-decoration: none;
 	color: #333333;
 }
 
-.hideable_content {
+.message_details_content {
 	padding-left: 40px;
 }
 
-.alert_details_entries {
+.message_details_entries {
 	padding-top: 1px;
 }
 
-.alert_details_entry {
+.message_details_entry {
 	padding-bottom: 2px;
 }
 
-.alert_details_entry_name {
+.message_details_entry_name {
 	float: left;
 	width: 15%;
 	margin-right: 5px;
@@ -365,7 +369,7 @@ td {
 	border-style: solid;
 }
 
-.alert_details_entry_value {
+.message_details_entry_value {
 	padding-left: 10px;
 	/*border: 0px;
 	border-bottom: 1px;

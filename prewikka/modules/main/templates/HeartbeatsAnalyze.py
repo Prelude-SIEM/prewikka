@@ -22,7 +22,7 @@ from prewikka import PyTpl
 from prewikka import utils
 
 
-class HeartbeatsAnalyze(PyTpl.Template):
+class HeartbeatsAnalyze(PyTpl.Template_):
     def __init__(self, number, value, error_tolerance):
         PyTpl.Template.__init__(self)
         self._number = number

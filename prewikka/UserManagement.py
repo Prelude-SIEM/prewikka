@@ -135,84 +135,82 @@ class ChangeCapabilitiesActionParameters(UserActionParameters, CapabilityActionP
     def check(self):
         UserActionParameters.check(self)
         CapabilityActionParameters.check(self)
-        
-
-
-class LoginPasswordPromptView(Views.TopView):
-    def build(self, action):
-        action_name = Interface.get_action_name(action)
-        Views.TopView.build(self, str(LoginPasswordForm.LoginPasswordForm(action_name)))
 
 
 
-class UsersView(Interface.OnlineConfigView):
-    def __init__(self, core):
-        Interface.OnlineConfigView.__init__(self, core)
-        self.setActiveTab("Users")
+def template(name):
+    return getattr(__import__("prewikka/templates/" + name), name)
 
 
 
-class UserListingView(UsersView):
-    def createButton(self, name, action, id):
-        return \
-               """<form action='?' method='POST'><input type='hidden' name='action' value='%s'/><input type='hidden' name='id' value='%d'/><input type='submit' value='%s'/></form>""" % (Interface.get_action_name(action), id, name)
-    
-    def buildMainContent(self, user_management):
-        table = Table.Table()
-        table.setHeader(["Id", "Login"] + CAPABILITIES + [ "" ] * 3)
-        ids = user_management.getUsers()
-        ids.sort()
-        for id in ids:
-            user = user_management.getUserByID(id)
-            row = [ user.getID(), user.getLogin() ]
-            row += map(lambda cap: ("", "x")[user.hasCapability(cap)], CAPABILITIES)
-            row.append(self.createButton("delete", user_management.handle_user_delete, user.getID()))
-            row.append(self.createButton("password", user_management.handle_change_password_form, user.getID()))
-            row.append(self.createButton("capabilities", user_management.handle_change_capabilities_form, user.getID()))
-            table.addRow(row)
-            
-        return str(UserListing.UserListing(str(table), Interface.get_action_name(user_management.handle_user_add_form)))
+class LoginPasswordPromptView(template("LoginPasswordForm")):
+    def __init__(self, core, login_action):
+        template("LoginPasswordForm").__init__(self, core)
+        self.login_action = Interface.get_action_name(login_action)
 
 
 
-class UserAddForm(UsersView):
-    def buildMainContent(self, action):
-        template = PropertiesChange.PropertiesChange()
-        template.addHiddenEntry("action", Interface.get_action_name(action))
-        template.addTextEntry("Login", "login")
-        template.addPasswordEntry("Password", "password1")
-        template.addPasswordEntry("Password confirmation", "password2")
+class UsersView(Interface.ConfigView):
+    active_tab = "Users"
+
+
+
+class UserListingView(UsersView, template("UserListing")):
+    def __init__(self, core, add_user_action, delete_user_action, change_password_action, change_capabilities_action):
+        UsersView.__init__(self, core)
+        template("UserListing").__init__(self, core)
+        self.users = [ ]
+        self.add_form_hiddens = self.createAccess(add_user_action)
+        self._delete_user_action = delete_user_action
+        self._change_password_action = change_password_action
+        self._change_capabilities_action = change_capabilities_action
+        self.capabilities = CAPABILITIES
+
+    def createAccess(self, action, parameters=[]):
+        return [("action", Interface.get_action_name(action))] + parameters
+
+    def addUser(self, user):
+        parameters = [("id", user.getID())]
+        new = { }
+        new["id"] = user.getID()
+        new["login"] = user.getLogin()
+        new["capabilities"] = map(lambda cap: user.hasCapability(cap), CAPABILITIES)
+        new["delete_form_hiddens"] = self.createAccess(self._delete_user_action, parameters)
+        new["password_form_hiddens"] = self.createAccess(self._change_password_action, parameters)
+        new["capabilities_form_hiddens"] = self.createAccess(self._change_capabilities_action, parameters)
+        self.users.append(new)
+
+
+
+class UserAddForm(UsersView, Views.PropertiesChangeView):
+    def __init__(self, core, action):
+        UsersView.__init__(self, core)
+        Views.PropertiesChangeView.__init__(self, core, "add", action)
+        self.addTextProperty("Login", "login")
+        self.addPasswordProperty("Password", "password1")
+        self.addPasswordProperty("Password confirmation", "password2")
         for capability in CAPABILITIES:
-            template.addCheckboxEntry(capability, capability)
-        template.setButtonLabel("add")
+            self.addBooleanProperty(capability, capability)
         
-        return str(template)
+
+
+class ChangePasswordForm(UsersView, Views.PropertiesChangeView):
+    def __init__(self, core, id, action):
+        UsersView.__init__(self, core)
+        Views.PropertiesChangeView.__init__(self, core, "change", action)
+        self.addHidden("id", id)
+        self.addPasswordProperty("Password", "password1")
+        self.addPasswordProperty("Password confirmation", "password2")
 
 
 
-class ChangePasswordForm(UsersView):
-    def buildMainContent(self, data):
-        template = PropertiesChange.PropertiesChange()
-        template.addHiddenEntry("action", Interface.get_action_name(data["action"]))
-        template.addHiddenEntry("id", data["id"])
-        template.addPasswordEntry("Password", "password1")
-        template.addPasswordEntry("Password confirmation", "password2")
-        template.setButtonLabel("change")
-
-        return str(template)
-
-
-class ChangeCapabilitiesForm(UsersView):
-    def buildMainContent(self, data):
-        template = PropertiesChange.PropertiesChange()
-        template.addHiddenEntry("action", Interface.get_action_name(data["action"]))
-        user = data["user"]
-        template.addHiddenEntry("id", user.getID())
-        for capability in CAPABILITIES:
-            template.addCheckboxEntry(capability, capability, user.hasCapability(capability))
-        template.setButtonLabel("change")
-        
-        return str(template)
+class ChangeCapabilitiesForm(UsersView, Views.PropertiesChangeView):
+    def __init__(self, core, user, action):
+        UsersView.__init__(self, core)
+        Views.PropertiesChangeView.__init__(self, core, "change", action)
+        self.addHidden("id", user.getID())
+        for cap in CAPABILITIES:
+            self.addBooleanProperty(cap, cap, user.hasCapability(cap))
 
 
 
@@ -273,9 +271,7 @@ class UserManagement:
         pass # TODO
     
     def redirectToLogin(self):
-        view = LoginPasswordPromptView(self.core)
-        view.build(self.login)
-        return str(view)
+        return LoginPasswordPromptView(self.core, self.login)
     
     def _checkSession(self, request):
         if request.input_cookie.has_key("sessionid"):
@@ -329,10 +325,22 @@ class UserManagement:
         return self.core.interface.forwardToDefaultAction(core, request)
     
     def handle_user_listing(self, core, parameters, request):
-        return UserListingView, self
+        ids = self.getUsers()
+        ids.sort()
+        view = UserListingView(core,
+                               self.handle_user_add_form,
+                               self.handle_user_delete,
+                               self.handle_change_password_form,
+                               self.handle_change_capabilities_form)
+        for id in ids:
+            user = self.getUserByID(id)
+            view.addUser(user)
+
+        return view
+        
     
     def handle_user_add_form(self, core, parameters, request):
-        return UserAddForm, self.handle_user_add
+        return UserAddForm(core, self.handle_user_add)
     
     def handle_user_add(self, core, parameters, request):
         user = self.newUser()
@@ -349,7 +357,7 @@ class UserManagement:
         return self.handle_user_listing(core, Interface.ActionParameters(), request)
     
     def handle_change_password_form(self, core, parameters, request):
-        return ChangePasswordForm, { "action": self.handle_change_password, "id": parameters.getID() }
+        return ChangePasswordForm(core, parameters.getID(), self.handle_change_password)
     
     def handle_change_password(self, core, parameters, request):
         user = self.getUserByID(parameters.getID())
@@ -359,7 +367,7 @@ class UserManagement:
         return self.handle_user_listing(core, Interface.ActionParameters(), request)
     
     def handle_change_capabilities_form(self, core, parameters, request):
-        return ChangeCapabilitiesForm, { "action": self.handle_change_capabilities, "user": self.getUserByID(parameters.getID()) }
+        return ChangeCapabilitiesForm(core, self.getUserByID(parameters.getID()), self.handle_change_capabilities)
     
     def handle_change_capabilities(self, core, parameters, request):
         user = self.getUserByID(parameters.getID())
@@ -374,4 +382,4 @@ class UserManagement:
 
         core.log.event(Log.EVENT_LOGOUT, request, request.user)
         
-        return LoginPasswordPromptView, self.login
+        return LoginPasswordPromptView(core, self.login)

@@ -1,0 +1,24 @@
+#def display_analyzer(analyzer)
+	<table>
+		<thead>
+			<tr>
+				<td>Analyzerid</td>
+				<td>Type</td>
+				<td>OS</td>
+				<td>Name</td>
+				<td>Location</td>
+				<td>Address</td>
+			</td>
+		</thead>
+		<tbody>
+			<tr class='table_row_even'>
+				<td>$analyzer.analyzerid</td>
+				<td>$analyzer.model $analyzer.version</td>
+				<td>$analyzer.ostype $analyzer.osversion</td>
+				<td>$analyzer.name</td>
+				<td>$analyzer.location</td>
+				<td>$analyzer.address</td>
+			</tr>
+		</tbody>
+	</table>
+#end def

@@ -1,0 +1,23 @@
+#from prewikka.Views import NormalLayoutView
+#extends NormalLayoutView
+
+#block main_content
+#for $section in $sections
+	<div class="section_alert">
+		<div class="section_alert_title">$section.title</div>
+		
+		<table class="section_alert_entries">
+			#set $row_classes = ("table_row_even", "table_row_odd")
+			#set $entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_value_emphasis")
+			#set $cnt = 0
+			#for $entry in $section.entries
+				<tr class="section_alert_entry $row_classes[$cnt%2]">
+					<td class="section_alert_entry_name">$entry.name</td>
+					<td class="$entry_value_classes[$entry.emphase]">$entry.value</td>
+				</tr>
+				#set $cnt += 1
+			#end for
+		</table>
+	</div>
+#end for
+#end block main_content

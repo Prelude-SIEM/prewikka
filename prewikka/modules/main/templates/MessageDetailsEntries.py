@@ -21,7 +21,7 @@
 from prewikka import PyTpl
 
 
-class AlertDetailsEntries(PyTpl.Template):
+class AlertDetailsEntries(PyTpl.Template_):
     def newEntry(self, name, value):
         self["entry"]["normal"].NAME = name
         self["entry"]["normal"].VALUE = value

@@ -24,9 +24,16 @@ import time
 import copy
 
 from prewikka import Interface
-from prewikka.modules.main import Views, ActionParameters
+#from prewikka.modules.main import Views, ActionParameters
+from prewikka.modules.main import ActionParameters
 from prewikka import utils
 
+
+def View(name):
+    from prewikka.modules.main import Views
+    
+    return getattr(Views, name)
+    
 
 class _MyTime:
     def __init__(self, t=None):
@@ -89,7 +96,8 @@ class MessageListing(Interface.Action):
         pass
     
     def process(self, core, parameters, request):
-        result = { "parameters": parameters }
+        view = self._getView()(core)
+        view.setParameters(parameters)
         prelude = core.prelude
         criteria = [ ]
         
@@ -108,18 +116,20 @@ class MessageListing(Interface.Action):
                 end.round(parameters.getTimelineUnit())
         
         start = end[parameters.getTimelineUnit()] - parameters.getTimelineValue()
-        
-        result["start"], result["end"] = start, end
-        
+
+        view.setTimeline(parameters.getTimelineValue(), parameters.getTimelineUnit())
+        view.setTimelineStart(start)
+        view.setTimelineEnd(end)
+
         if not parameters.getTimelineEnd() and parameters.getTimelineUnit() in ("min", "hour"):
             tmp = copy.copy(end)
             tmp.round(parameters.getTimelineUnit())
             tmp = tmp[parameters.getTimelineUnit()] - 1
-            result["next"] = tmp[parameters.getTimelineUnit()] + parameters.getTimelineValue()
-            result["prev"] = tmp[parameters.getTimelineUnit()] - (parameters.getTimelineValue() - 1)
+            view.setTimelineNext(tmp[parameters.getTimelineUnit()] + parameters.getTimelineValue())
+            view.setTimelinePrev(tmp[parameters.getTimelineUnit()] - (parameters.getTimelineValue() - 1))
         else:
-            result["next"] = end[parameters.getTimelineUnit()] + parameters.getTimelineValue()
-            result["prev"] = end[parameters.getTimelineUnit()] - parameters.getTimelineValue()
+            view.setTimelineNext(end[parameters.getTimelineUnit()] + parameters.getTimelineValue())
+            view.setTimelinePrev(end[parameters.getTimelineUnit()] - parameters.getTimelineValue())
         
         criteria.append(self._createTimeCriteria(start, end))
         self._adjustCriteria(core, parameters, criteria)
@@ -133,10 +143,10 @@ class MessageListing(Interface.Action):
                 messages.append(message)
         
         self._sortMessages(messages)
+
+        view.setMessages(messages)
         
-        result["messages"] = messages
-        
-        return self._getView(), result
+        return view
 
 
 
@@ -154,7 +164,7 @@ class AlertListing(MessageListing):
         alerts.sort(lambda a1, a2: int(a2["detect_time"]) - int(a1["detect_time"]))
 
     def _getView(self):
-        return Views.AlertListingView
+        return View("AlertListingView")
 
 
 
@@ -172,43 +182,41 @@ class HeartbeatListing(MessageListing):
         heartbeats.sort(lambda hb1, hb2: int(hb2["create_time"]) - int(hb1["create_time"]))
         
     def _getView(self):
-        return Views.HeartbeatListingView
+        return View("HeartbeatListingView")
 
 
 
 class AlertAction(Interface.Action):
-    def _getAlert(self, core, parameters):
-        return core.prelude.getAlert(parameters.getAnalyzerid(), parameters.getMessageIdent())
+    def process(self, core, parameters, request):
+        alert = core.prelude.getAlert(parameters.getAnalyzerid(), parameters.getMessageIdent())
+        return View(self.view_name)(core, alert)
 
 
 
 class HeartbeatAction(Interface.Action):
-    def _getHeartbeat(self, core, parameters):
-        return core.prelude.getHeartbeat(parameters.getAnalyzerid(), parameters.getMessageIdent())
+    def process(self, core, parameters, request):
+        alert = core.prelude.getHeartbeat(parameters.getAnalyzerid(), parameters.getMessageIdent())
+        return View(self.view_name)(core, alert)
 
 
 
 class AlertSummary(AlertAction):
-    def process(self, core, parameters, request):
-        return Views.AlertSummaryView, self._getAlert(core, parameters)
+    view_name = "AlertSummaryView"
 
 
 
 class HeartbeatSummary(HeartbeatAction):
-    def process(self, core, parameters, request):
-        return Views.HeartbeatSummaryView, self._getHeartbeat(core, parameters)
+    view_name = "HeartbeatSummaryView"
 
 
 
 class AlertDetails(AlertAction):
-    def process(self, core, parameters, request):
-        return Views.AlertDetailsView, self._getAlert(core, parameters)
+    view_name = "AlertDetailsView"
 
 
 
 class HeartbeatDetails(HeartbeatAction):
-    def process(self, core, parameters, request):
-        return Views.HeartbeatDetailsView, self._getHeartbeat(core, parameters)
+    view_name = "HeartbeatDetailsView"
 
 
 
@@ -273,7 +281,7 @@ class HeartbeatsAnalyze(Interface.Action):
                     analyzer["last_heartbeat"] = date
                 previous_date = date
         
-        return Views.HeartbeatsAnalyzeView, data
+        return View("HeartbeatsAnalyzeView"), data
 
 
 
@@ -282,13 +290,13 @@ class SensorAlertListing(AlertListing):
         criteria.append("alert.analyzer.analyzerid == %d" % parameters.getAnalyzerid())
 
     def _getView(self):
-        return Views.SensorAlertListingView
+        return View("SensorAlertListingView")
 
     def process(self, core, parameters, request):
-        result = { }
-        result["analyzer"] = core.prelude.getAnalyzer(parameters.getAnalyzerid())
-        view, result["alerts"] = AlertListing.process(self, core, parameters, request)
-        return view, result
+        view = AlertListing.process(self, core, parameters, request)
+        view.setAnalyzer(core.prelude.getAnalyzer(parameters.getAnalyzerid()))
+        
+        return view
 
 
 
@@ -308,13 +316,13 @@ class SensorHeartbeatListing(HeartbeatListing):
         criteria.append("heartbeat.analyzer.analyzerid == %d" % parameters.getAnalyzerid())
 
     def _getView(self):
-        return Views.SensorHeartbeatListingView
+        return View("SensorHeartbeatListingView")
 
     def process(self, core, parameters, request):
-        result = { }
-        result["analyzer"] = core.prelude.getAnalyzer(parameters.getAnalyzerid())
-        view, result["heartbeats"] = HeartbeatListing.process(self, core, parameters, request)
-        return view, result
+        view = HeartbeatListing.process(self, core, parameters, request)
+        view.setAnalyzer(core.prelude.getAnalyzer(parameters.getAnalyzerid()))
+
+        return view
 
 
 
@@ -330,36 +338,32 @@ class SensorDeleteHeartbeats(SensorHeartbeatListing):
 
 
 class SensorAlertSummary(AlertSummary):
-    def process(self, core, parameters, request):
-        return Views.SensorAlertSummaryView, AlertSummary.process(self,core, parameters, request)[1]
+    view_name = "SensorAlertSummaryView"
 
 
 
 class SensorAlertDetails(AlertDetails):
-    def process(self, core, parameters, request):
-        return Views.SensorAlertDetailsView, AlertDetails.process(self, core, parameters, request)[1]
+    view_name = "SensorAlertDetailsView"
 
 
 
 class SensorHeartbeatSummary(HeartbeatSummary):
-    def process(self, core, parameters, request):
-        return Views.SensorHeartbeatSummaryView, HeartbeatSummary.process(self,core, parameters, request)[1]
+    view_name = "SensorHeartbeatSummaryView"
 
 
 
 class SensorHeartbeatDetails(HeartbeatDetails):
-    def process(self, core, parameters, request):
-        return Views.SensorHeartbeatDetailsView, HeartbeatDetails.process(self, core, parameters, request)[1]
+    view_name = "SensorHeartbeatDetailsView"
 
 
 
 class SensorListing(Interface.Action):
     def process(self, core, parameters, request):
-        analyzers = [ ]
+        view = View("SensorListingView")(core)
         
         prelude = core.prelude
         for analyzerid in prelude.getAnalyzerids():
             analyzer = prelude.getAnalyzer(analyzerid)
-            analyzers.append(analyzer)
+            view.addAnalyzer(analyzer)
             
-        return Views.SensorListingView, analyzers
+        return view

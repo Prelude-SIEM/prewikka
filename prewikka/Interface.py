@@ -91,12 +91,11 @@ def get_action_name(action):
 
 
 
-class OnlineConfigView(Views.NormalView):
+class ConfigView:
     def __init__(self, core):
-        Views.NormalView.__init__(self, core)
-        self.setActiveSection("Configuration")
-        self.setTabs(core.interface._configuration)
-    
+        self.active_section = "Configuration"
+        self.tabs = core.interface._configuration
+
 
 
 class Interface:
@@ -209,9 +208,9 @@ class Interface:
             self._core.log.event(Log.EVENT_INVALID_ACTION_PARAMETERS, request, str(e))
             return self._buildView(Views.ErrorView, cgi.escape(str(e)))
         
-        view_class, data = self.callAction(action, self._core, parameters, request)
-        
-        return self._buildView(view_class, data)
+        view = self.callAction(action, self._core, parameters, request)
+
+        return str(view)
     
     def processDefaultAction(self, arguments, request):
         return self.processAction(self._default_action, arguments, request)

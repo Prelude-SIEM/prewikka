@@ -1,0 +1,18 @@
+#from prewikka.modules.main.Views import MessageListingView
+#extends MessageListingView
+
+#block message_fields_header
+<td>Analyzerid</td>
+<td>Address</td>
+<td>Name</td>
+<td>Type</td>
+<td>Time</td>
+#end block message_fields_header
+
+#block message_fields
+<td><a href='$message.analyzerid.filter'>$message.analyzerid.value</a></td>
+<td><a href='$message.address.filter'>$message.address.value</a></td>
+<td><a href='$message.name.filter'>$message.name.value</a></td>
+<td><a href='$message.type.filter'>$message.type.value</a></td>
+<td>$message.time</td>
+#end block message_fields

@@ -1,0 +1,19 @@
+#from prewikka.modules.main.Views import MessageListingView
+#extends MessageListingView
+
+#block message_fields_header
+<td>Classification</td>
+<td>Source</td>
+<td>Target</td>
+<td>Sensor</td>
+<td>Time</td>
+#end block message_fields_header
+
+#block message_fields
+#set $class_ = "impact_severity_" + $message.severity
+<td><a href='$message.classification.filter' class='$class_'>$message.classification.value</a></td>
+<td><a href='$message.source.filter'>$message.source.value</a></td>
+<td><a href='$message.target.filter'>$message.target.value</a></td>
+<td><a href='$message.sensor.filter'>$message.sensor.value</a></td>
+<td>$message.time</td>
+#end block message_fields

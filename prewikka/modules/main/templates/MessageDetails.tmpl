@@ -1,0 +1,26 @@
+#from prewikka.Views import NormalLayoutView
+#extends NormalLayoutView
+
+#block main_content
+#def display_node($node)
+#set $display = ("block", "none")[$node.hidden]
+<div class="message_details">
+	<div class="message_details_title"><a href="javascript:toggleVisibility('section_$node.id')">$node.name</a></div>
+	<div class="message_details_content" id="section_$node.id" style="display: $display">
+		#for $entry in $node.entries
+			#if isinstance($entry.value, dict)
+				$display_node($entry.value)
+			#else
+				<div class="message_details_entry">
+					<div class="message_details_entry_name">$entry.name</div>
+					<div class="message_details_entry_value">$entry.value</div>
+				</div>
+			#end if
+		#end for
+	</div>
+</div>
+#end def
+
+$display_node($node)
+
+#end block main_content

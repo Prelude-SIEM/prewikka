@@ -1,0 +1,87 @@
+#from prewikka.Views import NormalLayoutView
+#extends NormalLayoutView
+
+#block main_content
+#def message_listing_header
+#end def
+$message_listing_header
+<div id="message_list_edition">
+	<div id="timeline">
+	<form action="?" method="post">
+		#for $name, $value in $timeline.form_hiddens
+			<input type="hidden" name="$name" value="$value"/>
+		#end for
+		<div id="timeline_label">Step:</div>
+		<div id="timeline_value">
+			<input name="timeline_value" type="text" size="8" value="$timeline.value"/>
+		</div>
+			<div id="timeline_unit">
+				<select name="timeline_unit">
+					<option value="sec" $timeline.sec_selected>Seconds
+					<option value="min" $timeline.min_selected>Minutes
+					<option value="hour" $timeline.hour_selected>Hours
+					<option value="day" $timeline.day_selected>Days
+					<option value="month" $timeline.month_selected>Months
+					<option value="year" $timeline.year_selected>Years
+				</select>
+			</div>
+			<div id="timeline_submit">
+				<input type="submit"  value="apply">
+			</div>
+	</form>
+	</div>
+	<div id="timeline_range">
+		<div id="timeline_start">From $timeline.start</div>
+		<div id="timeline_end">To $timeline.end</div>
+	</div>
+	<div id="timeline_navigation">
+		<div id="timeline_prev"><a href="$timeline.prev">prev</a></div>
+		<div id="timeline_current"><a href="$timeline.current">current</a></div>
+		<div id="timeline_next"><a href="$timeline.next">next</a></div>
+	</div>
+</div>
+
+<div id="message_list_result">
+<form action="?" method="post">
+#for $name, $value in $delete_form_hiddens
+	<input type="hidden" name="{NAME}" value="{VALUE}"/>
+#end for
+<table>
+	<thead>
+		<tr>
+			$message_fields_header
+		</tr>
+	</thead>
+	<tbody>
+		#set $row_classes = ("table_row_even", "table_row_odd")
+		#set $cnt = 0
+		#for $message in $messages
+			#set global $message = $message
+			<tr class='$row_classes[$cnt%2]'>
+				$message_fields
+				<td class='static_content_column'><a href='$message.summary'>summary</a></td>
+				<td class='static_content_column'><a href='$message.details'>details</a></td>
+				<td class='static_content_column'><input type='checkbox' name='idents' value='$message.analyzerid:$message.ident'/></td>
+			</tr>
+			#set $cnt += 1
+		#end for
+	</tbody>
+	<tfoot>
+	#def del_filter(name)
+		#if $active_filter == $name
+			<a href='$remove_active_filter'>del filter</a>
+		#end if
+	#end def
+	<td>$del_filter("alert.classification.name")</td>
+	<td>$del_filter("alert.source.node.address.address")</td>
+	<td>$del_filter("alert.target.node.address.address")</td>
+	<td>$del_filter("alert.analyzer.model")</td>
+	<td></td>
+	<td></td>
+	<td></td>
+	<td class='static_content_column'><input type='submit' value='delete'/></td>
+	</tfoot>
+</table>
+</form>
+</div>
+#end block main_content
