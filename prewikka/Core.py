@@ -50,7 +50,7 @@ class Core:
         class Env: pass
         self._env = Env()
         self._env.config = Config.Config(siteconfig.conf + "prewikka.conf")
-        self._env.db = Database.Database(self._env.config.database)
+        self._initDatabase()
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
         self._env.auth = Auth.AnonymousAuth()
         self._env.log = Log.Log()
@@ -59,6 +59,13 @@ class Core:
         self._loadModules()
         self._initAuth()
 
+    def _initDatabase(self):
+        config = { }
+        for key in self._env.config.database.keys():
+            config[key] = self._env.config.database.getOptionValue(key)
+
+        self._env.db = Database.Database(config)
+        
     def _initHostCommands(self):
         self._env.host_commands = { }
         for command in "whois", "traceroute":

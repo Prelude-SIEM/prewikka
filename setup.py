@@ -81,7 +81,7 @@ setup(name="Prewikka",
                    ("share/prewikka/site/js", glob.glob("js/*.js")),
                    ("share/prewikka/database", glob.glob("*.sql")),
                    ("share/prewikka/conf", glob.glob("*.conf")) ],
-      scripts=[ "prewikka-httpd.py" ],
+      scripts=[ "prewikka-database-create.py", "prewikka-httpd.py" ],
       cmdclass={ 'build_py': my_build_py,
                  'install': my_install })
       

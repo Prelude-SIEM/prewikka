@@ -58,30 +58,27 @@ class Database:
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
         for name, default in (("host", "localhost"),
-                               ("port", None),
-                               ("name", "prewikka"),
-                               ("user", "prewikka"),
-                               ("password", "prewikka")):
-            value = config.getOptionValue(name, default)
+                              ("port", None),
+                              ("name", "prewikka"),
+                              ("user", "prewikka"),
+                              ("password", "prewikka")):
+            value = config.get(name, default)
             if value:
                 preludedb_sql_settings_set(settings, name, value)
 
-        db_type = config.getOptionValue("type", "mysql")
+        db_type = config.get("type", "mysql")
 
         self._sql = preludedb_sql_new(db_type, settings)
 
-        if config.getOptionValue("log"):
-            preludedb_sql_enable_query_logging(self._sql, config.getOptionValue("log"))
+        if config.has_key("log"):
+            preludedb_sql_enable_query_logging(self._sql, config["log"])
 
-        try:
-            results = self.query("SELECT version FROM Prewikka_Version")
-        except PreludeDBError:
-            print >> sys.stderr, "create Prewikka database"
-            content = open(siteconfig.database + db_type + ".sql").read()
-            for query in content.split(";"):
-                query = query.strip()
-                if len(query) > 0:
-                    self.query(query)
+    def queries_from_file(self, filename):
+        content = open(filename).read()
+        for query in content.split(";"):
+            query = query.strip()
+            if len(query) > 0:
+                self.query(query)
         
     def query(self, query):
         try:
