@@ -27,8 +27,8 @@ import copy
 
 import prelude, preludedb
 
-from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer, User, \
-     DataSet, Error, utils
+from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer, \
+     User, Auth, DataSet, Error, utils
 
 
 
@@ -52,7 +52,7 @@ class Core:
         self._env.config = Config.Config()
         self._env.db = Database.Database(self._env.config.database)
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
-        self._env.auth = None
+        self._env.auth = Auth.AnonymousAuth()
         self._env.log = Log.Log()
         self._initHostCommands()
         self._loadViews()
@@ -67,7 +67,7 @@ class Core:
                 self._env.host_commands[command] = path
             
     def _initAuth(self):
-        if self._env.auth and self._env.auth.canLogout():
+        if self._env.auth.canLogout():
             from prewikka import view
 
             class Logout(view.View):
@@ -83,10 +83,9 @@ class Core:
     def _loadViews(self):
         import prewikka.views
         
-        self._sections = prewikka.views.sections
-        
         self._views_position = { }
-        for section, tabs in self._sections:
+        for section, tabs in (prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.users_section,
+                              prewikka.views.settings_section, prewikka.views.about_section):
             for tab, views in tabs:
                 for view in views:
                     self._views_position[view] = section, tabs, tab
@@ -129,6 +128,8 @@ class Core:
         del object.env
         
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
+        import prewikka.views
+        
         interface = self._env.config.interface
         dataset["document.title"] = "[PREWIKKA]"
         dataset["document.css_files"] = [ "lib/style.css" ]
@@ -140,14 +141,20 @@ class Core:
         dataset["prewikka.url.current"] = request.getQueryString()
         dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
 
+        if isinstance(self._env.auth, Auth.AnonymousAuth):
+            sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.about_section
+        else:
+            sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.users_section, \
+                       prewikka.views.settings_section, prewikka.views.about_section
+
         dataset["interface.sections"] = [ ]
         if user:
-            for section_name, tabs in self._sections:
+            for section_name, tabs in sections:
                 viewable_tabs = 0
                 for tab_name, views in tabs:
                     default_view = views[0]
                     if user.has(self._views[default_view]["permissions"]):
-                        viewable_tabs += 1                            
+                        viewable_tabs += 1
 
                 if viewable_tabs > 0:
                     dataset["interface.sections"].append((section_name,
@@ -175,9 +182,7 @@ class Core:
 
         if user:
             dataset["prewikka.user.login"] = user and user.login or None
-            dataset["prewikka.user.logout"] = (self._env.auth and self._env.auth.canLogout()) and \
-                                              utils.create_link("logout") or \
-                                              None
+            dataset["prewikka.user.logout"] = self._env.auth.canLogout() and utils.create_link("logout") or None
 
     def _printDataSet(self, dataset, level=0):
         for key, value in dataset.items():
@@ -226,14 +231,7 @@ class Core:
             raise InvalidQueryError(request.getQueryString())
 
     def checkAuth(self, request):
-        if self._env.auth:
-            login = self._env.auth.getLogin(request)
-            permissions = self._env.db.getPermissions(login)
-        else:
-            login = "anonymous"
-            permissions = User.ALL_PERMISSIONS
-
-        return User.User(login, permissions)
+        return self._env.auth.getUser(request)
     
     def process(self, request):
         self._env.log(Log.EVENT_QUERY, request)

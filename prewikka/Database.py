@@ -153,6 +153,9 @@ class Database:
     def getPermissions(self, login):
         return map(lambda r: r[0], self.query("SELECT permission FROM Prewikka_Permission WHERE login = %s" % self.escape(login)))
 
+    def getUser(self, login):
+        return User.User(login, self.getPermissions(login))
+
     def createSession(self, sessionid, login, time):
         self.query("INSERT INTO Prewikka_Session VALUES(%s,%s,%s)" %
                    (self.escape(sessionid), self.escape(login), self.datetime(time)))

@@ -107,7 +107,7 @@ class LoginPasswordAuth(Auth, Session):
         Auth.__init__(self, env)
         Session.__init__(self, session_expiration)
 
-    def getLogin(self, request):
+    def getUser(self, request):
         if request.arguments.has_key("login") and request.arguments.has_key("password"):
             login = request.arguments["login"]
             del request.arguments["login"]
@@ -119,10 +119,20 @@ class LoginPasswordAuth(Auth, Session):
                 e.dataset["arguments"] = request.arguments.items()
                 raise e
             self.createSession(request, login)
-            return login
+        else:
+            login = self.checkSession(request)
 
-        return self.checkSession(request)
+        return self.db.getUser(login)
 
     def logout(self, request):
         self.deleteSession(request)
         raise AuthError()
+
+
+
+class AnonymousAuth(Auth):
+    def __init__(self):
+        pass
+    
+    def getUser(self, request):
+        return User.User("anonymous", User.ALL_PERMISSIONS)
