@@ -107,28 +107,15 @@ class Stats(view.View):
         self._render_distribution("sensor_distribution.png", "Sensor Distribution", "alert.analyzer.name", -1)
 
     def render_top10_attackers(self):
-        chart = Chart("top10_attackers.png")
-        chart.setTitle("Top 10 attackers")
-        for address, count in self.env.prelude.getValues(["alert.source.node.address.address/group_by",
-                                                          "count(alert.messageid)/order_desc"],
-                                                         limit=10):
-            
-            chart.addLabelValuePair(address, count)
-        chart.renderPie()
+        self._render_distribution("top10_attackers.png", "Top 10 attackers",
+                                  "alert.source.node.address.address", 10)
 
-        self.dataset["charts"].append(chart.getFilename())
-
+    def render_top10_targets(self):
+        self._render_distribution("top10_targets.png", "Top 10 targets",
+                                  "alert.target.node.address.address", 10)
+        
     def render_top10_classifications(self):
-        chart = Chart("top10_classifications.png")
-        chart.setTitle("Top 10 classifications")
-        for classification, count in self.env.prelude.getValues(["alert.classification.text/group_by",
-                                                                 "count(alert.messageid)/order_desc"],
-                                                                limit=10):
-            
-            chart.addLabelValuePair(classification, count)
-        chart.renderPie()
-
-        self.dataset["charts"].append(chart.getFilename())
+        self._render_distribution("top10_classifications.png", "Top 10 classifications", "alert.classification.text", 10)
 
     def render_timeline(self):
         chart = Chart("timeline.png")
@@ -147,6 +134,7 @@ class Stats(view.View):
     def render(self):
         self.dataset["charts"] = [ ]
         self.render_top10_attackers()
+        self.render_top10_targets()
         self.render_top10_classifications()
         self.render_sensor_distribution()
         self.render_timeline()
