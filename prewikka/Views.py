@@ -44,7 +44,7 @@ class View:
         self._content = content
         
     def createLink(self, action, parameters=None):
-        link = "index.py?action=%s" % action.getName()
+        link = "?action=%s" % action.getName()
         if parameters:
             link += "&%s" % str(parameters)
         return link
