@@ -162,6 +162,7 @@ class Core:
                 self.auth.check(request)
 
             parameters = slot.parameters()
+            
             try:
                 parameters.populate(arguments)
                 parameters.check()

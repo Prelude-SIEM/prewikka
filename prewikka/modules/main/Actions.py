@@ -271,7 +271,7 @@ class DeleteMessages:
 
     
 
-class DeleteAlerts(AlertListing, DeleteMessages):
+class DeleteAlerts(DeleteMessages, AlertListing):
     
     def process(self, request):
         for analyzerid, alert_ident in request.parameters.getIdents():
@@ -283,7 +283,7 @@ class DeleteAlerts(AlertListing, DeleteMessages):
 
 
 
-class DeleteHeartbeats(HeartbeatListing, DeleteMessages):
+class DeleteHeartbeats(DeleteMessages, HeartbeatListing):
     def process(self, request):
         for analyzerid, heartbeat_ident in request.parameters.getIdents():
             request.prelude.deleteHeartbeat(analyzerid, heartbeat_ident)
