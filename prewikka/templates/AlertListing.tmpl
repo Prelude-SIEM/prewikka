@@ -385,7 +385,10 @@ function ${name}_add_entry(object, value, num) {
     <br/>
   #end if
   #for $info in $message.infos
-    $info.count x <a class="impact_severity_$info.severity.value" href="$info.display">$info.classification.value</a>
+    #if $message.aggregated
+      $info.count x
+    #end if
+     <a class="impact_severity_$info.severity.value" href="$info.display">$info.classification.value</a>
     #if $info.completion.value
       (<span class="impact_completion_$info.completion.value">$info.completion.value</span>)
     #end if
