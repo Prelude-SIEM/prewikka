@@ -210,7 +210,7 @@ thead {
 	text-decoration: none;
 }
 
-.menu_item_inactive a:link, a:visited {
+.menu_item_inactive a:link, .menu_item_inactive a:visited {
 	text-decoration: none;
 	color: white;
 	font-weight: bold;
@@ -530,6 +530,7 @@ thead {
 	font-size: 16px;
 }
 
+
 /*
  * popup
  */
@@ -563,7 +564,7 @@ ul#popup_block li:hover > ul {
 }
 
 
-ul#popup_block li a:link, li a:visited {
+ul#popup_block li a:link, ul#popup_block li a:visited {
 	color: grey;
 	list-style-type: circle;
 	white-space: nowrap;
