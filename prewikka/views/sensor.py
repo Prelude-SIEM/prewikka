@@ -30,6 +30,14 @@ class HeartbeatAnalyzeParameters(view.Parameters):
 
 
 
+class SensorMessagesDelete(view.Parameters):
+    def register(self):
+        self.optional("analyzerid", list, default=[])
+        self.optional("alerts", str, default=None)
+        self.optional("heartbeats", str, default=None)
+    
+
+
 def get_analyzer_status_from_latest_heartbeat(heartbeat_status, heartbeat_time,
                                               heartbeat_interval, error_margin):
     if heartbeat_status == "exiting":
@@ -53,7 +61,7 @@ class SensorListing(view.View):
         for analyzer_path in self.env.prelude.getAnalyzerPaths():
             analyzerid = analyzer_path[-1]
             analyzer = self.env.prelude.getAnalyzer(analyzerid)
-            parameters = self.parameters + { "analyzerid": analyzer["analyzerid"] }
+            parameters = { "analyzerid": analyzer["analyzerid"] }
             analyzer["alert_listing"] = utils.create_link("sensor_alert_listing", parameters)
             analyzer["heartbeat_listing"] = utils.create_link("sensor_heartbeat_listing", parameters)
             analyzer["heartbeat_analyze"] = utils.create_link("heartbeat_analyze", parameters)
@@ -80,6 +88,27 @@ class SensorListing(view.View):
                 self.dataset["analyzers"].append(analyzer)
             else:
                 self.dataset["analyzers"].insert(0, analyzer)
+
+
+
+class SensorMessagesDelete(SensorListing):
+    view_name = "sensor_messages_delete"
+    view_parameters = SensorMessagesDelete
+    view_permissions = [ User.PERM_IDMEF_VIEW, User.PERM_IDMEF_ALTER ]
+
+    def render(self):
+        for analyzerid in self.parameters["analyzerid"]:
+            if self.parameters.has_key("alerts"):
+                criteria = "alert.analyzer.analyzerid == %d || alert.analyzer.analyzer.analyzerid == %d" % \
+                           (long(analyzerid), long(analyzerid))
+                for ident in self.env.prelude.getAlertIdents(criteria):
+                    self.env.prelude.deleteAlert(ident)
+            if self.parameters.has_key("heartbeats"):
+                criteria = "heartbeat.analyzer.analyzerid == %d" % long(analyzerid)
+                for ident in self.env.prelude.getHeartbeatIdents(criteria):
+                    self.env.prelude.deleteHeartbeat(ident)
+            
+        SensorListing.render(self)
 
 
 
