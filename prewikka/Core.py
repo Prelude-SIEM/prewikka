@@ -26,7 +26,7 @@ import distutils.spawn
 import copy
 
 from prewikka import Config, Log, Prelude, ParametersNormalizer, User, \
-    UserManagement, DataSet, Error, utils
+     DataSet, Error, utils
 
 
 class InvalidQueryError(Error.SimpleError):
