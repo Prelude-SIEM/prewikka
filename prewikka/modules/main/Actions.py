@@ -161,7 +161,7 @@ class MessageListing(Action.Action):
             for name, object, filter  in self.fields:
                 message[name] = tmp[object]
             message["time"] = self.getMessageTime(tmp)
-        
+
         view.setRange(parameters.getOffset() + 1, parameters.getOffset() + len(messages), parameters.getLimit(), count)
 
         if count > parameters.getOffset() + parameters.getLimit():
