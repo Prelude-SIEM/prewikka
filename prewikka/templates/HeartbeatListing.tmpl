@@ -2,26 +2,52 @@
 
 #block message_fields_header
 <thead>
-<td>Agent</td>
-<td>Node Address</td>
-<td>Node Name</td>
-<td>Type</td>
+
+<td class="filtered_column">
+  <div>Agent</div>
+  #if $heartbeat.analyzer.name_filtered
+    <span>*</span>
+  #end if 
+</td>
+
+<td class="filtered_column">
+  <div>Node Address</div>
+  #if $heartbeat.analyzer.node.address.address_filtered
+    <span>*</span>
+  #end if 
+</td>
+
+<td class="filtered_column">
+  <div>Node Name</div>
+  #if $heartbeat.analyzer.name_filtered
+    <span>*</span>
+  #end if 
+</td>
+
+<td class="filtered_column">
+  <div>Type</div>
+  #if $heartbeat.analyzer.model_filtered
+    <span>*</span>
+  #end if 
+</td>
+
 <td>Time</td>
+
 </thead>
 #end block message_fields_header
 
 #block message_fields
 
 <td>
- <ul id="popup_block">
-  <li class="popup_title">$message.agent.value
-   <ul>
-    <li><a href="$message.details">Heartbeat detail</a></li>
-    <li><a href="$message.summary">Heartbeat summary</a></li>
-    <li><a href="$message.agent.inline_filter">Group by agent</a></li>
-   </ul>
-  </li>
- </ul>
+  <ul id="popup_block">
+    <li class="popup_title">$message.agent.value
+      <ul>
+        <li><a href="$message.details">Heartbeat detail</a></li>
+        <li><a href="$message.summary">Heartbeat summary</a></li>
+        <li><a href="$message.agent.inline_filter">Group by agent</a></li>
+      </ul>
+    </li>
+  </ul>
 </td>
 
 <td>
@@ -37,8 +63,13 @@
  </ul>
 </td>
 
-<td><a href='$message.node_name.inline_filter'>$message.node_name.value</a></td>
-<td><a href='$message.model.inline_filter'>$message.model.value</a></td>
+<td>
+  <a href='$message.node_name.inline_filter'>$message.node_name.value</a>
+</td>
+
+<td>
+  <a href='$message.model.inline_filter'>$message.model.value</a>
+</td>
 
 <td>$message.time.value</td>
 #end block message_fields

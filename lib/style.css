@@ -679,6 +679,15 @@ ul#popup_block > li:hover > ul {
 	z-index: 1;
 }
 
+.filtered_column div {
+	float: left;
+}
+
+.filtered_column span {
+	float: right;
+	display: inline;
+}
+
 
 /*
  * misc

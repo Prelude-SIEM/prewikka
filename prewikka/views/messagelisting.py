@@ -180,7 +180,12 @@ class AlertListingParameters(MessageListingParameters):
 
 
 class HeartbeatListingParameters(MessageListingParameters):
-    pass
+    def register(self):
+        MessageListingParameters.register(self)
+        self.optional("heartbeat.analyzer.name", str)
+        self.optional("heartbeat.analyzer.node.address.address", str)
+        self.optional("heartbeat.analyzer.node.name", str)
+        self.optional("heartbeat.analyzer.model", str)
 
 
 
@@ -927,6 +932,17 @@ class HeartbeatListing(MessageListing, view.View):
 
         return dataset
 
+    def _applyInlineFilters(self, criteria):
+        filter_found = False
+        for path in ("hearbeat.analyzer.name", "heartbeat.analyzer.model", \
+                     "heartbeat.analyzer.node.address.address", "heartbeat.analyzer.node.name"):
+            self.dataset[path + "_filtered"] = False
+            if not filter_found:
+                if self.parameters.has_key(path):
+                    criteria.append("%s == '%s'" % (path, self.parameters[path]))
+                    self.dataset[path + "_filtered"] = True
+                    filter_found = True
+        
     def _deleteMessage(self, analyzerid, messageid):
         self.env.prelude.deleteHeartbeat(analyzerid, messageid)
 
@@ -938,6 +954,7 @@ class HeartbeatListing(MessageListing, view.View):
         start, end = self._getTimelineRange()
         
         criteria = [ "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'" % (str(start), str(end)) ]
+        self._applyInlineFilters(criteria)
 
         self._setInlineFilter()
         self._setTimeline(start, end)
