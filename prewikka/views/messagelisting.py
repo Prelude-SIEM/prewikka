@@ -415,7 +415,9 @@ class AlertListing(MessageListing, view.View):
                 break
 
             dataset["addresses"].append({ "value": message["alert.%s(0).node.address(%d).address" %
-                                                           (direction, idx)]})
+                                                           (direction, idx)],
+                                          "category": message["alert.%s(0).node.address(%d).category" %
+                                                              (direction, idx)]})
             idx += 1
 
         if idx > 1:

@@ -408,18 +408,12 @@ function ${name}_add_entry(object, value, num) {
       #end if
       #if $direction.addresses
         <br/>
-        #set $cnt = 0
-        #if len($direction.addresses) > 1
-          addresses:
-        #else
-          address:
-        #end if
         #for $address in $direction.addresses
-          #if $cnt > 0
-            ,&nbsp;
+          #if $address.category
+            $address.category:$address.value
+          #else
+            $address.value
           #end if
-          $address.value
-          #set $cnt = $cnt + 1
         #end for
       #end if
       #if $direction.users
