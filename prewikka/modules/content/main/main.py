@@ -493,6 +493,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
     time_criteria_format = "alert.create_time >= '%s' && alert.create_time < '%s'"
     message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.messageid == '%d'"
     fields = [ ("severity", "alert.assessment.impact.severity", "alert.assessment.impact.severity"),
+               ("completion", "alert.assessment.impact.completion", "alert.assessment.impact.completion"),
                ("classification", "alert.classification.text", "alert.classification.text"),
                ("source", "alert.source(0).node.address(0).address", "alert.source.node.address.address"),
                ("sport", "alert.source(0).service.port", "alert.source.node.service.port"),
@@ -551,6 +552,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
         
     def _addMessageFields(self, request, fields, alert):
         fields["severity"] = { "value": alert["severity"] or "low" }
+        fields["completion"] = { "value": alert["completion"] }
         
         for name in ("analyzerid", "ident", "sensor_node_name",
                      "sport", "suser_name", "suser_uid", "sprocess_name", "sprocess_pid",
@@ -1167,10 +1169,10 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
     
     def _getAnalyzer(self, dataset, prelude, analyzerid):
         analyzer = prelude.getAnalyzer(analyzerid)
+        analyzer["last_heartbeat_time"] = str(analyzer["last_heartbeat_time"])
         analyzer["events"] = [ ]
-        analyzer["latest_time"] = "n/a"
-        analyzer["latest_status_class"] = "abnormal_offline"
-        analyzer["latest_status"] = "abnormal offline"
+        analyzer["status"] = "abnormal_offline"
+        analyzer["status_meaning"] = "abnormal offline"
         
         start = time.time()
         rows = prelude.getValues(selection=["heartbeat.messageid", "heartbeat.create_time/order_desc"],
@@ -1191,21 +1193,19 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
 
             if latest:
                 latest = False
-                analyzer["latest_time"] = str(older_time)
-                if older_status == "exiting":
-                    analyzer["latest_status_class"] = "normal_offline"
-                    analyzer["latest_status"] = "normal offline"
-                # FIXME: workaround a current bug of libpreludedb that returns time in UTC instead of GMT+n
-                #elif time.mktime(time.gmtime(time.time())) - int(older_time) > int(older_interval) + self._heartbeat_error_margin:
-                elif time.time() - int(older_time) > int(older_interval) + self._heartbeat_error_margin:
-                    analyzer["latest_status_class"] = "abnormal_offline"
-                    analyzer["latest_status"] = "abnormal offline"
+                analyzer["status"] = _get_analyzer_status_from_latest_heartbeat(older_status,
+                                                                                older_time,
+                                                                                older_interval,
+                                                                                self._heartbeat_error_margin)
+                if analyzer["status"] == "normal_offline":
+                    analyzer["status_meaning"] = "normal offline"
+                elif analyzer["status"] == "abnormal_offline":
+                    analyzer["status_meaning"] = "abnormal offline"
                     analyzer["events"].append({ "value": "sensor is down since %s" % older_time,
                                                 "type": "down"})
-                else:
-                    analyzer["latest_status_class"] = "online"
-                    analyzer["latest_status"] = "online"
-                
+                else: # online
+                    analyzer["status_meaning"] = "online"
+                    
             if newer:
                 event = None
                 
@@ -1331,6 +1331,17 @@ class SensorHeartbeatDetailsAction(SensorsView, HeartbeatDetailsAction):
 
 
 
+def _get_analyzer_status_from_latest_heartbeat(heartbeat_status, heartbeat_time, heartbeat_interval,
+                                               error_margin):
+    if heartbeat_status == "exiting":
+        return "normal_offline"
+    if time.time() - int(heartbeat_time) > int(heartbeat_interval) + error_margin:
+        return "abnormal_offline"
+    return "online"
+
+    
+
+
 class SensorListingAction(SensorsView):
     def process(self, request):
         dataset = request.dataset
@@ -1346,13 +1357,10 @@ class SensorListingAction(SensorsView):
             analyzer["heartbeat_listing"] = utils.create_link("main.sensor_heartbeat_listing", parameters)
             analyzer["heartbeat_analyze"] = utils.create_link("main.heartbeat_analyze", parameters)
 
-            if analyzer["last_status"] == "exiting":
-                analyzer["status"] = "ok"
-            elif time.time() - int(analyzer["last_heartbeat_time"]) > \
-                     int(analyzer["last_heartbeat_interval"]) - 3:
-                analyzer["status"] = "ko"
-            else:
-                analyzer["status"] = "ok"
+            analyzer["status"] = _get_analyzer_status_from_latest_heartbeat(analyzer["last_heartbeat_status"],
+                                                                            analyzer["last_heartbeat_time"],
+                                                                            analyzer["last_heartbeat_interval"],
+                                                                            3)
 
             analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(analyzer["last_heartbeat_time"])) + \
                                               " %+.2d:%.2d" % utils.get_gmt_offset()

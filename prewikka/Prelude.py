@@ -171,6 +171,6 @@ class Prelude(PreludeDB):
         analyzer["node_address"] = heartbeat.get("heartbeat.analyzer.node.address(0).address", "n/a")
         analyzer["last_heartbeat_time"] = heartbeat.get("heartbeat.create_time")
         analyzer["last_heartbeat_interval"] = heartbeat.getAdditionalData("Analyzer heartbeat interval")
-        analyzer["last_status"] = heartbeat.getAdditionalData("Analyzer status")
+        analyzer["last_heartbeat_status"] = heartbeat.getAdditionalData("Analyzer status")
         
         return analyzer

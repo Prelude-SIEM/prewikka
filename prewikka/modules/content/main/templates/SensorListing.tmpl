@@ -17,10 +17,10 @@
 		#set $row_classes = ("table_row_even", "table_row_odd")
 		#set $cnt = 0
 		#for $analyzer in $analyzers
-		  #if $analyzer["status"] == "ok"
+		  #if $analyzer["status"] == "online"
 		    #set $row_class = $row_classes[$cnt%2]
 		  #else
-		    #set $row_class = "sensor_ko"
+		    #set $row_class = "sensor_status_" + $analyzer["status"]
 		  #end if
 			<tr class='$row_class'>
 			        <td>
