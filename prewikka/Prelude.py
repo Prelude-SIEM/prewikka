@@ -77,6 +77,22 @@ class Prelude(PreludeDB):
             criteria = prelude.IDMEFCriteria(criteria)
         return self.get_heartbeat_ident_list(criteria, limit, offset) or [ ]
 
+    def _getLastMessageIdent(self, type, analyzerid):
+        criteria = None
+        if analyzerid:
+            criteria = "%s.analyzer.analyzerid == %d" % (type, analyzerid)
+
+        rows = self.getValues(selection=("%s.create_time/order_desc" % type, "%s.ident" % type),
+                              criteria=criteria, limit=1)
+
+        return rows[0][1]
+
+    def getLastAlertIdent(self, analyzer=None):
+        return self._getLastMessageIdent("alert", analyzer)
+
+    def getLastHeartbeatIdent(self, analyzer=None):
+        return self._getLastMessageIdent("heartbeat", analyzer)
+
     def getAlert(self, analyzerid, alert_ident):
         return Alert(self.get_alert(analyzerid, alert_ident))
 
@@ -114,11 +130,7 @@ class Prelude(PreludeDB):
         return analyzerids
 
     def getAnalyzer(self, analyzerid):
-        rows = self.getValues(selection=["max(heartbeat.ident)"],
-                              criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid)
-        row = rows[0]
-        ident = row[0]
-        
+        ident = self.getLastHeartbeatIdent(analyzerid)
         heartbeat = self.getHeartbeat(analyzerid, ident)
         
         analyzer = { }
