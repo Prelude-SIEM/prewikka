@@ -571,19 +571,25 @@ class MessageSummaryAction:
         if self._current_section["entries"]:
             dataset["sections"].append(self._current_section)
 
-    def buildAnalyzer(self, dataset, alert):
+    def buildAnalyzer(self, dataset, alert, root=""):
+        if alert[root + "analyzer.analyzerid"] == None:
+            return
+        
         self.beginSection("Analyzer")
-        self.newSectionEntry("Analyzerid", alert["analyzer.analyzerid"])
-        self.newSectionEntry("Manufacturer", alert["analyzer.manufacturer"])
-        self.newSectionEntry("Model", alert["analyzer.model"], emphase=True)
-        self.newSectionEntry("Version", alert["analyzer.version"])
-        self.newSectionEntry("Class", alert["analyzer.class"])
-        self.newSectionEntry("Operating System", "%s %s" % (alert["analyzer.ostype"], alert["analyzer.osversion"]))
-        self.newSectionEntry("Node name", alert["analyzer.node.name"])
-        self.newSectionEntry("Address", alert["analyzer.node.address(0).address"])
-        self.newSectionEntry("Process", alert["analyzer.process.name"])
-        self.newSectionEntry("Pid", alert["analyzer.process.pid"])
+        self.newSectionEntry("Analyzerid", alert[root + "analyzer.analyzerid"])
+        self.newSectionEntry("Manufacturer", alert[root + "analyzer.manufacturer"])
+        self.newSectionEntry("Model", alert[root + "analyzer.model"], emphase=True)
+        self.newSectionEntry("Version", alert[root + "analyzer.version"])
+        self.newSectionEntry("Class", alert[root + "analyzer.class"])
+        self.newSectionEntry("Operating System", "%s %s" %
+                             (alert[root + "analyzer.ostype"], alert[root + "analyzer.osversion"]))
+        self.newSectionEntry("Node name", alert[root + "analyzer.node.name"])
+        self.newSectionEntry("Address", alert[root + "analyzer.node.address(0).address"])
+        self.newSectionEntry("Process", alert[root + "analyzer.process.name"])
+        self.newSectionEntry("Pid", alert[root + "analyzer.process.pid"])
         self.endSection(dataset)
+
+        self.buildAnalyzer(dataset, alert, root + "analyzer.")
 
     def buildAdditionalData(self, dataset, alert):
         self.beginSection("Additional Data")
