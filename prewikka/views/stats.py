@@ -54,9 +54,13 @@ class Chart:
     
     def renderPie(self):
         total = float(reduce(lambda x, y: x + y, self._values))
-        patches, texts, autotexts = pie(self._values, labels=self._labels, autopct=lambda x: "%f" % x)
-        for autotext, value in zip(autotexts, self._values):
-            autotext.set_text("%d (%.1f%%)" % (value, value / total * 100))
+        patches, texts, autotexts = pie(self._values, labels=self._labels, autopct=lambda x: "")
+##         for autotext, value in zip(autotexts, self._values):
+##             autotext.set_text("%d (%.1f%%)" % (value, value / total * 100))
+        for text in texts:
+            text.set_text("")
+        legend([ "%s: %d (%.1f%%)" % (label, value, value / total * 100) for label, value in zip(self._labels, self._values) ],
+               loc=(0,0))
         self._render()
 
     def renderPlot(self):
