@@ -158,7 +158,11 @@ class Interface:
         from prewikka import Auth
         
         arguments = copy.copy(request.arguments)
-        action = arguments.pop("action", None)
+        if arguments.has_key("action"):
+            action = arguments["action"]
+            del arguments["action"]
+        else:
+            action = None
         auth = self._core.auth
         
         if action == "login":
