@@ -87,7 +87,7 @@ function newFilterElement(name, object, operator, object_value) {
 <div class='box'>
 <h1>Load</h1>
 <form action="?" method="POST">
-  <input type="hidden" name="view" value="alert_filter_load"/>
+  <input type="hidden" name="view" value="filter_edition"/>
   <select name="filter_name">
   #for $f in $filters
     #if $f == $fltr.name
@@ -98,14 +98,15 @@ function newFilterElement(name, object, operator, object_value) {
     <option value="$f" $selected>$f
   #end for
   </select>
-  <input type='submit' value='load'/>
-</form>
+  <input type='submit' name="mode" value='load'/>
+  <input type='submit' name="mode" value='delete'/>
 </div>
+</form>
 
+<form action="?" method="POST">
+<input type="hidden" name="view" value="filter_edition"/>
 <div class='box'>
 <h1>Edition</h1>
-<form action="?" method="POST">
-<input type='hidden' name="view" value="alert_filter_save"/>
 <table id="elements">
 </table>
 <script>
@@ -130,14 +131,14 @@ Formula: <input type='text' name='formula' value='$formula'/> <b>Example:</b> <i
   <table>
     <tr>
       <td>name</td>
-      <td><input type='text' name='filter_name' value='$fltr.name'/></td>
+      <td><input type='text' name='save_as' value='$fltr.name'/></td>
     </tr>
     <tr>
       <td>comment</td>
       <td><textarea type='textarea' name='filter_comment'>$fltr.comment</textarea></td>
     </tr>
   </table>
-  <input type='submit' name='save' value='save'/>
+  <input type='submit' name='mode' value='save'/>
 </form>
 </div>
 #end block main_content

@@ -21,19 +21,15 @@
 from prewikka import view, Filter
 
 
-class FilterLoadParameters(view.Parameters):
-    def register(self):
-        self.optional("filter_name", str)
-
-
-
-class FilterSaveParameters(view.Parameters):
+class AlertFilterEditionParameters(view.Parameters):
     allow_extra_parameters = True
 
     def register(self):
-        self.mandatory("filter_name", str)
+        self.optional("mode", str)
+        self.optional("filter_name", str)
         self.optional("filter_comment", str, default="")
         self.optional("formula", str, default="")
+        self.optional("save_as", str)
         
     def normalize(self):
         view.Parameters.normalize(self)
@@ -51,16 +47,11 @@ class FilterSaveParameters(view.Parameters):
 
 
 
-class AlertFilterEdition(view.Views):
-    view_slots = {
-        "alert_filter_save": { "parameters": FilterSaveParameters,
-                               "permissions": [ ],
-                               "template": "FilterEdition" },
-        "alert_filter_load": { "parameters": FilterLoadParameters,
-                               "permissions": [ ],
-                               "template": "FilterEdition" }
-        }
-
+class AlertFilterEdition(view.View):
+    view_name = "filter_edition"
+    view_parameters = AlertFilterEditionParameters
+    view_template = "FilterEdition"
+    
     def _setCommon(self):
         self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
         self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.ALERT_OBJECTS))
@@ -69,6 +60,13 @@ class AlertFilterEdition(view.Views):
         self.dataset["fltr.name"] = ""
         self.dataset["fltr.comment"] = ""
         self.dataset["formula"] = ""
+
+    def _reload(self):
+        for name, obj, operator, value in self.parameters.get("elements", [ ]):
+            self.dataset["elements"].append(self._element(name, obj, operator, value))
+
+        self.dataset["fltr.name"] = self.parameters.get("filter_name", "")
+        self.dataset["fltr.comment"] = self.parameters.get("filter_comment", "")
         
     def _element(self, name, obj="", operator="", value=""):
         return {
@@ -96,12 +94,20 @@ class AlertFilterEdition(view.Views):
             self.dataset["fltr.name"] = ""
             self.dataset["fltr.comment"] = ""
 
+    def render_alert_filter_delete(self):
+        if self.parameters.has_key("filter_name"):
+            self.env.db.deleteFilter(self.user.login, self.parameters["filter_name"])
+        self._setCommon()
+        self.dataset["elements"].append(self._element("A"))
+        self.dataset["fltr.name"] = ""
+        self.dataset["fltr.comment"] = ""
+        
     def render_alert_filter_save(self):
         elements = { }
         for name, obj, operator, value in self.parameters["elements"]:
             elements[name] = (obj, operator, value)
 
-        filter = Filter.AlertFilter(self.parameters["filter_name"],
+        filter = Filter.AlertFilter(self.parameters["save_as"],
                                     self.parameters.get("filter_comment", ""),
                                     elements,
                                     self.parameters["formula"])
@@ -109,9 +115,12 @@ class AlertFilterEdition(view.Views):
         self.env.db.setFilter(self.user.login, filter)
 
         self._setCommon()
-        
-        for name, obj, operator, value in self.parameters["elements"]:
-            self.dataset["elements"].append(self._element(name, obj, operator, value))
+        self._reload()
 
-        self.dataset["fltr.name"] = self.parameters.get("filter_name", "")
-        self.dataset["fltr.comment"] = self.parameters.get("filter_comment", "")
+    def render(self):
+        if self.parameters.get("mode", "load") == "load":
+            self.render_alert_filter_load()
+        elif self.parameters["mode"] == "save":
+            self.render_alert_filter_save()
+        elif self.parameters["mode"] == "delete":
+            self.render_alert_filter_delete()
