@@ -176,6 +176,9 @@ class AlertListingParameters(MessageListingParameters):
             for path in self["aggregated_%s" % category]:
                 if path == "none":
                     del self["aggregated_%s" % category][i]
+                if path[0] == "!":
+                    self["aggregated_%s" % category][i] = path[1:]
+                    self["aggregated_%s_values" % category].insert(i, None)
                 i += 1
 
 
@@ -630,39 +633,6 @@ class AlertListing(MessageListing, view.View):
         self._applyCheckboxFilters(criteria, "target")
         self._applyCheckboxFilters(criteria, "analyzer")
 
-    def _setAggregatedMessage(self, criteria, source_values, target_values, time_max, time_min, count):
-        criteria = criteria[:]
-        for p, v in zip(self.parameters["aggregated_source"] + self.parameters["aggregated_target"],
-                        source_values + target_values):
-            criteria += [ "%s == '%s'" % (p, v) ]
-
-        results = self.env.prelude.getValues(["alert.classification.text/group_by",
-                                              "alert.assessment.impact.severity/group_by",
-                                              "alert.assessment.impact.completion/group_by",
-                                              "count(alert.messageid)"], criteria)
-
-        def cmp_severities(x, y):
-            d = { None: 0, "low": 1, "medium": 2, "high": 3 }
-
-            return d[y] - d[x]
-
-        results.sort(lambda x, y: cmp_severities(x[1], y[1]))
-
-        message["aggregated_classifications_total"] = count
-        message["aggregated_classifications_hidden"] = count
-        message["aggregated_classifications_hidden_expand"] = expand
-
-        for classification, severity, completion, count in results[:self._max_aggregated_classifications]:
-            message["aggregated_classifications_hidden"] -= count
-            message["infos"].append({
-                "count": count,
-                "classification": self._createInlineFilteredField("alert.classification.text", classification),
-                "classification_references": "",
-                "severity": { "value": severity or "low" },
-                "completion": { "value": completion },
-                "display": expand
-                })
-
     def _setAggregatedMessagesValues(self, criteria):
         def cmp_severities(x, y):
             d = { None: 0, "low": 1, "medium": 2, "high": 3 }
@@ -672,7 +642,12 @@ class AlertListing(MessageListing, view.View):
         aggregate_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
         aggregated_values = self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]
 
-        criteria += [ "%s == '%s'" % (p, v) for p, v in zip(aggregate_on, aggregated_values) ]
+        criteria = criteria[:]
+        for path, value in zip(aggregate_on, aggregated_values):
+            if value:
+                criteria.append("%s == '%s'" % (path, value))
+            else:
+                criteria.append("! %s" % path)
         
         results = self.env.prelude.getValues(["alert.classification.text/group_by",
                                               "alert.assessment.impact.severity/group_by",
@@ -714,6 +689,29 @@ class AlertListing(MessageListing, view.View):
 
         return len(results)
 
+    def _createAggregationParameters(self, aggregated_source_values, aggregated_target_values):
+        parameters = { }
+
+        parameters["aggregated_source"] = self.parameters["aggregated_source"][:]
+        parameters["aggregated_source_values"] = aggregated_source_values
+        i = 0
+        for value in parameters["aggregated_source_values"]:
+            if not value:
+                parameters["aggregated_source"][i] = "!" + parameters["aggregated_source"][i]
+                del parameters["aggregated_source_values"][i]
+            i += 1
+
+        parameters["aggregated_target"] = self.parameters["aggregated_target"][:]
+        parameters["aggregated_target_values"] = aggregated_target_values
+        i = 0
+        for value in parameters["aggregated_target_values"]:
+            if not value:
+                parameters["aggregated_target"][i] = "!" + parameters["aggregated_target"][i]
+                del parameters["aggregated_target_values"][i]
+            i += 1
+
+        return parameters
+    
     def _setAggregatedMessagesNoValues(self, criteria):
         aggregated_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
 
@@ -732,6 +730,8 @@ class AlertListing(MessageListing, view.View):
             for path, value in zip(aggregated_on, values[:-3]):
                 if value:
                     criteria2.append("%s == '%s'" % (path, value))
+                else:
+                    criteria2.append("! %s" % path)
 
             for ident in self.env.prelude.getAlertIdents(criteria2, limit=1):
                 message = self._fetchMessage(ident)
@@ -760,12 +760,15 @@ class AlertListing(MessageListing, view.View):
 
                 results.sort(lambda x, y: cmp_severities(x[1], y[1]))
 
+                parameters = self._createAggregationParameters(aggregated_source_values, aggregated_target_values)
+
                 dataset["aggregated_classifications_total"] = aggregated_count
                 dataset["aggregated_classifications_hidden"] = aggregated_count
                 dataset["aggregated_classifications_hidden_expand"] = utils.create_link("alert_listing",
-                                                                                        self.parameters - [ "offset" ] +
-                                                                                        { "aggregated_source_values": aggregated_source_values,
-                                                                                          "aggregated_target_values": aggregated_target_values })
+                                                                                        self.parameters - [ "offset",
+                                                                                                            "aggregated_source",
+                                                                                                            "aggregated_target" ] +
+                                                                                        parameters)
                 
                 for classification, severity, completion, count in results[:self._max_aggregated_classifications]:
                     dataset["aggregated_classifications_hidden"] -= count
@@ -783,17 +786,18 @@ class AlertListing(MessageListing, view.View):
                                      ("alert.assessment.impact.severity", severity),
                                      ("alert.assessment.impact.completion", completion)):
                             if value:
-                                criteria3 += [ "%s == '%s'" % (path, value) ]
+                                criteria3.append("%s == '%s'" % (path, value))
+                            else:
+                                criteria3.append("! %s" % path)
                         
                         ident = self.env.prelude.getAlertIdents(criteria3, limit=1)[0]
 
                         display = self._createMessageLink(ident, "alert_summary")
                     else:
+                        parameters["aggregated_classification_value"] = classification
                         display = utils.create_link("alert_listing",
-                                                    self.parameters - [ "offset" ] +
-                                                    { "aggregated_source_values": aggregated_source_values,
-                                                      "aggregated_target_values": aggregated_target_values,
-                                                      "aggregated_classification_value": classification })
+                                                    self.parameters - [ "offset", "aggregated_source", "aggregated_target" ] +
+                                                    parameters)
 
                     infos.update({
                         "count": count,
@@ -823,17 +827,20 @@ class AlertListing(MessageListing, view.View):
                not self.parameters.has_key("aggregated_classification_value"):
             self.dataset["delete_enabled"] = False
             return self._setAggregatedMessages(criteria)
-
+        
         self.dataset["delete_enabled"] = True
 
         if self.parameters.has_key("aggregated_classification_value"):
             criteria = criteria[:]
-            for p, v in zip(self.parameters["aggregated_source"] + self.parameters["aggregated_target"] +
-                            [ "alert.classification.text" ],
-                            self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"] +
-                            [ self.parameters["aggregated_classification_value"] ]):
-                criteria += [ "%s == '%s'" % (p, v) ]
- 
+            for path, value in zip(self.parameters["aggregated_source"] + self.parameters["aggregated_target"] +
+                                   [ "alert.classification.text" ],
+                                   self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"] +
+                                   [ self.parameters["aggregated_classification_value"] ]):
+                if value:
+                    criteria.append("%s == '%s'" % (path, value))
+                else:
+                    criteria.append("! %s" % path)
+
         for ident in self.env.prelude.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
             message = self.env.prelude.getAlert(ident)
             dataset = self._setMessage(message, ident)
