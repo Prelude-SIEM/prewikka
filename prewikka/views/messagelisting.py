@@ -659,19 +659,19 @@ class AlertListing(MessageListing, view.View):
                         "completion": { "value": completion }
                         }
 
+                    infos["display"] = expand
+
                     if count == 1:
-                        criteria3 = criteria2
+                        criteria3 = criteria2[:]
                         if classification:
                             criteria3.append("alert.classification.text == '%s'" % classification)
                         if severity:
                             criteria3.append("alert.assessment.impact.severity == '%s'" % severity)
                         if completion:
                             criteria3.append("alert.assessment.impact.completion == '%s'" % completion)
-                        
+
                         for ident in self.env.prelude.getAlertIdents(criteria3, limit=1):
                             infos["display"] = self._createMessageLink(ident, "alert_summary")
-                    else:
-                        infos["display"] = expand
                         
                     dataset["infos"].append(infos)
 
