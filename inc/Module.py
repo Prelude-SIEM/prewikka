@@ -66,8 +66,6 @@ class Module:
         except KeyError:
             section_query = query[section_name] = { }
 
-        sys.stderr.write("section query: %s\n" % str(section_query))
-
         tmp = self.sections[section_name]
         
         section = self.sections[section_name]["class"](section_query)
@@ -77,6 +75,5 @@ class Module:
         views["views"] = { }
         views["views"]["main"] = section
         views["views"]["active"] = section_name
-        sys.stderr.write(section_name + "\n")
         views["views"]["pages"] = filter(lambda name: self.sections[name]["visible"], self.section_names)
         return views

@@ -98,6 +98,6 @@ class PyTpl(PYTPL_block):
 
 
 
-class TemplateBase(PyTpl):
+class Template(PyTpl):
     def __init__(self):
-        PyTpl.__init__(self, "")
+        PyTpl.__init__(self, "inc/templates/resources/%s.tpl" % self.__class__.__name__)

@@ -1,20 +1,5 @@
 import sys
-from PyTpl import PyTpl
-
-class Form(PyTpl):
-    def __init__(self):
-        PyTpl.__init__(self, "tpl/form.tpl")
-
-    def setFixedField(self, key, value):
-        self["fixed"].KEY = key
-        self["fixed"].VALUE = value
-        self["fixed"].parse()
-
-    def setInteractiveField(self, key, name):
-        self["interactive"].NAME = name
-        self["interactive"].KEY = key
-        self["interactive"].parse()
-
+from templates import Form
 
 class Display:
     def __init__(self, query):
@@ -32,14 +17,12 @@ class Fetch:
         self.query = query
 
     def __str__(self):
-        form = Form()
+        form = Form.Form()
         form.setFixedField("mod", "test")
         form.setFixedField("section", "display")
         form.setInteractiveField("display.foo", "foo")
         form.setInteractiveField("display.bar", "bar")
-        ret = str(form)
-        sys.stderr.write(">>>" + ret + "\n")
-        return ret
+        return str(form)
 
 
 

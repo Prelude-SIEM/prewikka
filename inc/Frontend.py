@@ -21,7 +21,6 @@ class Frontend:
         except KeyError:
             modname = "alert"
 
-        sys.stderr.write(str(modname) + "\n")
         mod = self.modules["mod_" + modname]
         views = mod.build(query)
         
