@@ -224,7 +224,8 @@ class Prelude:
     def _getLastMessageIdent(self, type, get_message_idents, analyzerid):
         criteria = None
         if analyzerid != None:
-            criteria = "%s.analyzer.analyzerid == %d" % (type, analyzerid)
+            criteria = "%s.analyzer.analyzerid == '%s'" % (type, str(analyzerid))
+            print criteria
 
         idents = get_message_idents(criteria, limit=1)
 
