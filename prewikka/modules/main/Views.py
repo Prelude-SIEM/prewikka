@@ -85,7 +85,7 @@ class MessageListingView:
         return "<a class='%s' href='%s'>%s</a>" % (class_, self.createLink(action, parameters), name)
     
     def _createMessageLink(self, message, name, action):
-        parameters = ActionParameters.Message()
+        parameters = ActionParameters.Message(self.core.log)
         parameters.setAnalyzerid(message["analyzer.analyzerid"])
         parameters.setMessageIdent(message["ident"])
         
@@ -379,7 +379,7 @@ class SensorListingView(MessageListingView, SensorsSection):
         table.setHeader(("Analyzerid", "Type", "OS", "Name", "Location", "Address", "", ""))
         
         for analyzer in analyzers:
-            parameters = ActionParameters.SensorMessageListing()
+            parameters = ActionParameters.SensorMessageListing(self.core.log)
             parameters.setAnalyzerid(analyzer["analyzerid"])
             table.addRow((analyzer["analyzerid"],
                           "%s %s" % (analyzer["model"], analyzer["version"]),

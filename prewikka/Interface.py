@@ -19,9 +19,13 @@
 
 
 import sys
+import os
 
 import copy
 import urllib
+import cgi
+
+from prewikka import Views
 
 class Error(Exception):
     pass
@@ -38,26 +42,37 @@ class ActionParameterError(Error):
 
 
 
-class InvalidActionParameterError(ActionParameterError):
+class ActionParameterInvalidError(ActionParameterError):
     def __init__(self, name):
         self._name = name
-
+        
     def __str__(self):
         return "invalid parameter '%s'" % self._name
 
 
 
-class InvalidTypeActionParameterError(ActionParameterError):
-    def __init__(self, parameter, expected_type):
-        self._parameter = parameter
-        self._expected_type = expected_type
-
+class ActionParameterInvalidTypeError(ActionParameterError):
+    def __init__(self, name, value, required_type):
+        self._name = name
+        self._value = value
+        self._required_type = required_type
+        
     def __str__(self):
-        return "invalid type '%s' for parameter '%s', '%s' expected" % (type(self._parameter), self._parameter, self.expected_type)
+        return "invalid type %s for parameter '%s', %s required" % \
+               (cgi.escape(str(type(self._value))), self._name, cgi.escape(str(self._required_type)))
 
 
 
-class AlreadyRegisteredActionParameterError(ActionParameterError):
+class ActionParameterMissingError(ActionParameterError):
+    def __init__(self, name):
+        self._name = name
+        
+    def __str__(self):
+        return "parameter '%s' is missing" % self._name
+
+
+
+class ActionParameterAlreadyRegisteredError(ActionParameterError):
     def __init__(self, name):
         self._name = name
 
@@ -95,22 +110,29 @@ class Interface:
         registered = self._actions[action.getId()] = { "action": action, "parameters": parameters }
         if default:
             self._default_action = registered
-
+        
     def process(self, action_name, query):
         if action_name:
             registered = self._actions[action_name]
         else:
             registered = self._default_action
-
+        
         action = registered["action"]
-        parameters = registered["parameters"]()
-        parameters.populate(query)
-        view_class, data = action.process(self._core, parameters)
+        parameters = registered["parameters"](self._core.log)
+        
+        try:
+            parameters.populate(query)
+            parameters.check()
+        except Error, e:
+            view_class = Views.ErrorView
+            data = str(e)
+        else:
+            view_class, data = action.process(self._core, parameters)
         view = view_class(self._core)
         view.build(data)
         
         return str(view)
-                
+
 
 
 class Action(object):
@@ -123,7 +145,8 @@ class Action(object):
 
 
 class ActionParameters:
-    def __init__(self, parameters=None):
+    def __init__(self, log, parameters=None):
+        self.log = log
         self._parameters = { }
         self._values = { }
         self.register()
@@ -134,14 +157,18 @@ class ActionParameters:
         
     def register(self):
         pass
-
+    
     def registerParameter(self, name, type):
         if self._parameters.has_key(name):
-            raise AlreadyRegisteredActionParameterError(name)
+            raise ActionParameterAlreadyRegisteredError(name)
+        
         self._parameters[name] = type
 
     def __setitem__(self, name, value):
-        parameter_type = self._parameters[name]
+        try:
+            parameter_type = self._parameters[name]
+        except KeyError:
+            raise ActionParameterInvalidError(name)
         
         if parameter_type is list and not type(value) is list:
             value = [ value ]
@@ -149,7 +176,7 @@ class ActionParameters:
         try:
             value = parameter_type(value)
         except ValueError:
-            raise InvalidTypeActionParameterError(name, parameter_type)
+            raise ActionParameterInvalidTypeError(name, value, parameter_type)
         
         self._values[name] = value
         
@@ -167,8 +194,12 @@ class ActionParameters:
 
     def populate(self, query):
         for name, value in query.items():
-            self[name] = value
-
+            try:
+                self[name] = value
+            except ActionParameterError, e:
+                self.log.invalidQuery(str(e))
+                raise e
+        
     def check(self):
         return True
 
@@ -179,8 +210,8 @@ class ActionParameters:
         return urllib.urlencode(self._values)
 
     def __copy__(self):
-        new = self.__class__()
+        new = self.__class__(self.log)
         new._parameters = copy.copy(self._parameters)
         new._values = copy.copy(self._values)
-
+        
         return new

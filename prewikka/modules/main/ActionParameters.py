@@ -26,6 +26,11 @@ class Message(Interface.ActionParameters):
         self.registerParameter("analyzerid", long)
         self.registerParameter("message_ident", long)
 
+    def check(self):
+        for parameter in "analyzerid", "message_ident":
+            if not self.hasParameter(parameter):
+                raise Interface.ActionParameterMissingError(parameter)
+        
     def setAnalyzerid(self, analyzerid):
         self["analyzerid"] = analyzerid
 
@@ -47,6 +52,13 @@ class MessageListing(Interface.ActionParameters):
         self.registerParameter("timeline_value", int)
         self.registerParameter("timeline_unit", str)
         self.registerParameter("timeline_end", int)
+
+    def check(self):
+        if self.hasParameter("filter_name") ^ self.hasParameter("filter_value"):
+            raise Interface.ActionParameterMissingError(self.hasParameter("filter_name") and "filter_name" or "filter_value")
+
+        if self.hasParameter("timeline_value") ^ self.hasParameter("timeline_unit"):
+            raise Interface.ActionParameterMissingError(self.hasParameter("timeline_value") and "timeline_value" or "timeline_unit")
         
     def setFilterName(self, name):
         self["filter_name"] = name
@@ -106,6 +118,11 @@ class SensorMessageListing(MessageListing):
     def register(self):
         MessageListing.register(self)
         self.registerParameter("analyzerid", long)
+        
+    def check(self):
+        MessageListing.check(self)
+        if not self.hasParameter("analyzerid"):
+            raise Interface.ActionParameterMissingError("analyzerid")
         
     def setAnalyzerid(self, analyzerid):
         self["analyzerid"] = analyzerid

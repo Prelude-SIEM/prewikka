@@ -25,15 +25,16 @@ class Log:
     def registerBackend(self, backend):
         self._backends.append(backend)
 
-    def _applyOnBackends(self, handler, request):
+    def _applyOnBackends(self, handler, *args, **kwargs):
         for backend in self._backends:
-            getattr(backend, handler)(request)
+            apply(getattr(backend, handler), args, kwargs)
 
-    def invalidQuery(self, query):
-        self._applyOnBackends("invalidQuery", query)
+    def invalidQuery(self, error):
+        self._applyOnBackends("invalidQuery", error)
 
 
 
 class LogBackend:
-    def invalidQuery(self, query):
+    def invalidQuery(self, query, reason):
         pass
+    
