@@ -807,10 +807,18 @@ class AlertListing(MessageListing, view.View):
             message.setMessageCommon(idmef)
             message.setTime(time_min, time_max)
             message.setCriteriaForDeletion(delete_criteria)
-            infos = message.setInfos(ident, idmef, count, classification, severity, completion)
+            message["aggregated_classifications_hidden"] = 0
+            
+            results = self.env.idmef_db.getValues(["alert.analyzer(-1).name/group_by",
+                                                   "alert.analyzer(-1).node.name/group_by"],
+                                                  criteria2)
+            for analyzer_name, analyzer_node_name in results:
+                message.addSensor(analyzer_name, analyzer_node_name)
+                
+            infos = message.setInfos(count, classification, severity, completion)
             if count == 1:
                 infos["display"] = message.createMessageLink(ident, "alert_summary")
-                self.setMessageClassificationReferences(infos, message)
+                message.setMessageClassificationReferences(infos, idmef)
             else:
                 infos["display"] = utils.create_link("alert_listing",
                                                      self.parameters + { "aggregated_classification_value": classification } - [ "offset" ])
