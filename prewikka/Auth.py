@@ -30,9 +30,10 @@ from prewikka import User
 
 
 class AuthError(PrewikkaError):
-    def __init__(self, message=""):
+    def __init__(self, message="", arguments={}):
         self.dataset = DataSet.DataSet()
         self.dataset["message"] = message
+        self.dataset["arguments"] = arguments.items()
         self.template = "LoginPasswordForm"
 
 
@@ -71,7 +72,7 @@ class Session:
     
     def checkSession(self, request):
         if not request.input_cookie.has_key("sessionid"):
-            raise AuthError()
+            raise AuthError(arguments=request.arguments)
         
         sessionid = request.input_cookie["sessionid"].value
 
@@ -79,12 +80,12 @@ class Session:
             login, t = self.storage.getSession(sessionid)
         except Storage.StorageError:
             self.log(Log.EVENT_INVALID_SESSIONID, request)
-            raise AuthError("invalid sessionid")
+            raise AuthError("invalid sessionid", request.arguments)
 
         if time.time() > t + self._expiration:
             self.storage.deleteSession(sessionid)
             self.log(Log.EVENT_SESSION_EXPIRED, request)
-            raise AuthError("session expired")
+            raise AuthError("session expired", request.arguments)
 
         return login
 
@@ -107,12 +108,17 @@ class LoginPasswordAuth(Auth, Session):
         Session.__init__(self, session_expiration)
 
     def getLogin(self, request):
-        if request.arguments.keys() == ["login", "password"]:
+        if request.arguments.has_key("login") and request.arguments.has_key("password"):
             login = request.arguments["login"]
+            del request.arguments["login"]
             password = request.arguments["password"]
-            self.checkPassword(login, password)
+            del request.arguments["password"]
+            try:
+                self.checkPassword(login, password)
+            except AuthError, e:
+                e.dataset["arguments"] = request.arguments.items()
+                raise e
             self.createSession(request, login)
-            request.arguments = { }
             return login
 
         return self.checkSession(request)
