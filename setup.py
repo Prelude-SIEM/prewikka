@@ -95,7 +95,7 @@ class my_install(install):
         install.run(self)
         if not self.dry_run:
             for filename in self.get_outputs():
-                if filename.find(".conf"):
+                if filename.find(".conf") != -1:
                     continue
                 mode = os.stat(filename)[stat.ST_MODE]
                 mode |= 044
