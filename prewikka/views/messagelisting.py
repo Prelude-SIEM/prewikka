@@ -270,7 +270,7 @@ class ListedHeartbeat(ListedMessage):
         self["node_address"] = self.createHostField("heartbeat.analyzer.node.address.address",
                                                     message["heartbeat.analyzer(%d).node.address(0).address" % index],
                                                     "unknown")
-        self["time"] = self.createTimeField(message["heartbeat.create_time"])
+        self["time"] = self.createTimeField(message["heartbeat.create_time"], self.parameters["timezone"])
 
 
 
@@ -448,10 +448,10 @@ class ListedAlert(ListedMessage):
         self["sensor_node_name"] = { "value": message["alert.analyzer(0).node.name"] }
 
     def setMessageTime(self, message):
-        self["time"] = self.createTimeField(message["alert.create_time"])
+        self["time"] = self.createTimeField(message["alert.create_time"], self.parameters["timezone"])
 	if (message["alert.analyzer_time"] != None and
 	    abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
-	    self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"])
+	    self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"], self.parameters["timezone"])
 	else:
 	    self["analyzer_time"] = { "value": None }
 
@@ -475,8 +475,8 @@ class ListedAggregatedAlert(ListedAlert):
         self["infos"] = [ ]
         
     def setTime(self, time_min, time_max):
-        self["time_min"] = self.createTimeField(time_min)
-        self["time_max"] = self.createTimeField(time_max)
+        self["time_min"] = self.createTimeField(time_min, self.parameters["timezone"])
+        self["time_max"] = self.createTimeField(time_max, self.parameters["timezone"])
 
     def setCriteriaForDeletion(self, delete_criteria):
         self["delete"] = urllib.quote_plus(" && ".join(delete_criteria))
@@ -687,10 +687,10 @@ class AlertListing(MessageListing, view.View):
         self._setMessageSensor(dataset, message)
 
     def _setMessageTime(self, dataset, message):
-        dataset["time"] = self.createTimeField(message["alert.create_time"])
+        dataset["time"] = self.createTimeField(message["alert.create_time"], self.parameters["timezone"])
 	if (message["alert.analyzer_time"] != None and
 	    abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
-	    dataset["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"])
+	    dataset["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"], self.parameters["timezone"])
 	else:
 	    dataset["analyzer_time"] = { "value": None }
 
