@@ -8,7 +8,7 @@
   #end for
 
   <td class="filter_popup">
-    <a onclick="javascript:toggleVisibility('classification')">Classification</a>
+    <a onclick="javascript:toggleFilteredColumnVisibility('classification')">Classification</a>
     <div id="classification">
       Text <input type="text" name="alert.classification.text" value="$alert.classification.text"/>
     </div>
@@ -18,7 +18,7 @@
   </td>
 
   <td class="filter_popup">
-    <a onclick="javascript:toggleVisibility('source')">Source</a>
+    <a onclick="javascript:toggleFilteredColumnVisibility('source')">Source</a>
     <div id="source">
       <table>
         <tr>
@@ -41,7 +41,7 @@
   </td>
 
   <td class="filter_popup">
-    <a onclick="javascript:toggleVisibility('target')">Target</a>
+    <a onclick="javascript:toggleFilteredColumnVisibility('target')">Target</a>
     <div id="target">
       <table>
         <tr>
@@ -64,7 +64,7 @@
   </td>
   
   <td class="filter_popup">
-    <a onclick="javascript:toggleVisibility('sensor')">Sensor</a>
+    <a onclick="javascript:toggleFilteredColumnVisibility('sensor')">Sensor</a>
     <div id="sensor">
       Name <input type="text" name="alert.analyzer.name" value="$alert.analyzer.name"/>
     </div>
