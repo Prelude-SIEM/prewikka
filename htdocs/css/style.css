@@ -324,6 +324,9 @@ thead {
         border-style: solid;
 }
 
+.message_list_nav_button_empty {
+	background: #d6d6d6;
+}
 
 /*
  * main screen
