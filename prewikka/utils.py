@@ -47,8 +47,8 @@ def text_property(name, parameter, value=None):
     return property("text", name, parameter, value)
 
 
-def password_property(name, parameter, value):
-    return property("password", name, parameter, value)
+def password_property(name, parameter):
+    return property("password", name, parameter)
 
 
 def boolean_property(name, parameter, value=False):

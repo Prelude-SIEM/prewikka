@@ -106,73 +106,6 @@ class ChangePermissionsActionParameters(UserActionParameters, PermissionActionPa
 
 
 
-class UsersDataSet(DataSet.ConfigDataSet):
-    active_tab = "Users"
-
-
-
-class UserListingView(UsersDataSet, UserListing.UserListing):
-    def __init__(self, user_management):
-        UsersDataSet.__init__(self)
-        UserListing.UserListing.__init__(self)
-        self._user_management = user_management
-        self.users = [ ]
-        self.add_form_hiddens = self.createAccess(user_management.slots["user_add_form"].path)
-        self.permissions = User.ALL_PERMISSIONS
-        self.can_set_password = self._user_management.core.auth.canSetPassword()
-
-    def createAccess(self, action_name, parameters=[]):
-        return [("action", action_name)] + parameters
-
-    def addUser(self, user):
-        parameters = [("login", user.login)]
-        new = { }
-        new["login"] = user.login
-        new["permissions"] = map(lambda perm: user.has(perm), User.ALL_PERMISSIONS)
-        new["delete_form_hiddens"] = self.createAccess(self._user_management.slots["user_delete"].path, parameters)
-        new["password_form_hiddens"] = self.createAccess(self._user_management.slots["change_password_form"].path, parameters)
-        new["permissions_form_hiddens"] = self.createAccess(self._user_management.slots["change_permissions_form"].path, parameters)
-        self.users.append(new)
-
-
-
-
-class UserAddForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
-    def __init__(self, user_management):
-        UsersDataSet.__init__(self)
-        DataSet.PropertiesChangeDataSet.__init__(self, "add", user_management.slots["user_add"].path)
-        PropertiesChangeForm.PropertiesChangeForm.__init__(self)
-        self.addTextProperty("Login", "login")
-        if user_management.core.auth.canSetPassword():
-            self.addPasswordProperty("Password", "password1")
-            self.addPasswordProperty("Password confirmation", "password2")
-        for perm in User.ALL_PERMISSIONS:
-            self.addBooleanProperty(perm, perm)
-
-
-
-class ChangePasswordForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
-    def __init__(self, login, user_management):
-        UsersDataSet.__init__(self)
-        DataSet.PropertiesChangeDataSet.__init__(self, "change", user_management.slots["change_password"].path)
-        PropertiesChangeForm.PropertiesChangeForm.__init__(self)
-        self.addHidden("login", login)
-        self.addPasswordProperty("Password", "password1")
-        self.addPasswordProperty("Password confirmation", "password2")
-
-
-
-class ChangePermissionsForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
-    def __init__(self, user, user_management):
-        UsersDataSet.__init__(self)
-        DataSet.PropertiesChangeDataSet.__init__(self, "change", user_management.slots["change_permissions"].path)
-        PropertiesChangeForm.PropertiesChangeForm.__init__(self)
-        self.addHidden("login", user.login)
-        for perm in User.ALL_PERMISSIONS:
-            self.addBooleanProperty(perm, perm, user.has(perm))
-    
-
-
 class UserManagement(Action.ActionGroup):
     def __init__(self, core):
         Action.ActionGroup.__init__(self, "user_management")
@@ -197,12 +130,13 @@ class UserManagement(Action.ActionGroup):
         
     def handle_user_listing(self, request):
         dataset = request.dataset
-        dataset["add_form_hiddens"] = self._createUserActionHiddens(self.slots["user_add_form"])
+        dataset["add_form_hiddens"] = self._createUserActionHiddens(self.slots["user_add_form"].path)
         dataset["permissions"] = User.ALL_PERMISSIONS
         dataset["can_set_password"] = self.core.auth and self.core.auth.canSetPassword()
         dataset["users"] = [ ]
 
         users = self.core.storage.getUsers()
+        users.sort()
         for login in users:
             user = self.core.storage.getUser(login)
             parameters = [("login", user.login)]
@@ -223,7 +157,7 @@ class UserManagement(Action.ActionGroup):
         dataset["submit"] = "add"
         dataset["hiddens"] = [ ("action", self.slots["user_add"].path) ]
         dataset["properties"] = [ utils.text_property("Login", "login") ]
-        if request.core.auth.canSetPassword():
+        if self.core.auth.canSetPassword():
             dataset["properties"].extend((utils.password_property("Password", "password1"),
                                           utils.password_property("Password confirmation", "password2")))
         for perm in User.ALL_PERMISSIONS:

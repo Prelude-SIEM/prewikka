@@ -129,16 +129,6 @@ class Core:
                                                    interface.getQuickAccessors())
         dataset["interface.sections"] = interface.getSections()
         
-        
-##         view.setInfoTitle(interface.getTitle())
-##         view.setInfoSoftware(interface.getSoftware())
-##         view.setInfoPlace(interface.getPlace())
-##         view.addSections(interface.getSections())
-##         view.setConfiguration(interface.getConfiguration())
-##         view.addQuickAccessors(interface.getQuickAccessors())
-##         view.referer = request.getReferer()
-##         view.current = request.getQueryString()
-
     def _setupTemplate(self, template_class, dataset):
         template = template_class()
         for key, value in dataset.items():

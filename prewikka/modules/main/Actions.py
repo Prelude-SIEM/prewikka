@@ -32,13 +32,8 @@ from prewikka.modules.main.templates import \
      AlertListing, HeartbeatListing, MessageDetails, MessageListing, \
      MessageSummary, SensorAlertListing, SensorHeartbeatListing, \
      SensorListing
-     
 
-def View(name):
-    import prewikka.modules.main.Views
-    
-    return getattr(prewikka.modules.main.Views, name)
-    
+
 
 class _MyTime:
     def __init__(self, t=None):
