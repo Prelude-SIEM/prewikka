@@ -28,9 +28,9 @@
 		<div id="timeline_end">To {TIMELINE_END}</div>
 	</div>
 	<div id="timeline_navigation">
-		<div id="timeline_prev"><a href="index.py?{PREV_QUERY}">prev</a></div>
-		<div id="timeline_current"><a href="index.py?{CURRENT_QUERY}">current</a></div>
-		<div id="timeline_next"><a href="index.py?{NEXT_QUERY}">next</a></div>
+		<div id="timeline_prev"><a href="{PREV}">prev</a></div>
+		<div id="timeline_current"><a href="{CURRENT}">current</a></div>
+		<div id="timeline_next"><a href="{NEXT}">next</a></div>
 	</div>
 </div>
 

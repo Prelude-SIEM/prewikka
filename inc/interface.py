@@ -1,4 +1,6 @@
 #from layout import layoutManager
+import sys
+
 from templates.layouts.normal import Normal, Menu, TopMenu
 import core
 
@@ -16,6 +18,9 @@ class Interface:
 
     def build(self):
         pass
+
+    def createLink(self, request):
+        return "index.py?%s" % str(request)
 
     def __str__(self):
         content = ""
@@ -64,7 +69,7 @@ class NormalInterface(Interface):
                 menu.setActiveItem(module)
             else:
                 request.module = module
-                menu.setInactiveItem(module, str(request))
+                menu.setInactiveItem(module, self.createLink(request))
         normal.setMenu(str(menu))
 
         topmenu = TopMenu.TopMenu()
@@ -74,7 +79,7 @@ class NormalInterface(Interface):
                 topmenu.setActiveItem(name)
             else:
                 request.action = action
-                topmenu.setInactiveItem(name, str(request))
+                topmenu.setInactiveItem(name, self.createLink(request))
         normal.setTopMenu(str(topmenu))
 
         normal.setPage(self._main_content)

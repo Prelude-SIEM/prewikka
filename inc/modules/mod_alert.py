@@ -76,8 +76,8 @@ class ModuleInterface(interface.NormalInterface):
 
 
 class ListInterface(ModuleInterface):
-    def _createLink(self, request, name, class_):
-        return "<a class='%s' href='index.py?%s'>%s</a>" % (class_, str(request), name)
+    def _createLinkTag(self, request, name, class_):
+        return "<a class='%s' href='%s'>%s</a>" % (class_, self.createLink(request), name)
 
     def _createAlertLink(self, alert, action):
         request = AlertRequest()
@@ -86,7 +86,7 @@ class ListInterface(ModuleInterface):
         request.analyzerid = alert["alert.analyzer.analyzerid"]
         request.alert_ident = alert["alert.ident"]
         
-        return "<a href='index.py?%s'>%s</a>" % (str(request), action)
+        return "<a href='%s'>%s</a>" % (self.createLink(request), action)
 
     def _addAlertField(self, row, alert, field, filter_name=None, class_="alert_field_value"):
         if filter_name is None:
@@ -97,7 +97,7 @@ class ListInterface(ModuleInterface):
             request = self._request
             request.filter_name = filter_name
             request.filter_value = value
-            field = self._createLink(request, value, class_)
+            field = self._createLinkTag(request, value, class_)
         else:
             field = "n/a"
 
@@ -130,15 +130,15 @@ class ListInterface(ModuleInterface):
 
         if request.timeline_end:
             del request["timeline_end"]
-        template.setCurrentQuery(str(request))
+        template.setCurrent(self.createLink(request))
 
         request = copy.copy(self._request)
         
         request.timeline_end = int(self._data["end"][self._request.timeline_unit] + self._request.timeline_value)
-        template.setNextQuery(str(request))
+        template.setNext(self.createLink(request))
 
         request.timeline_end = int(self._data["end"][self._request.timeline_unit] - self._request.timeline_value)
-        template.setPrevQuery(str(request))
+        template.setPrev(self.createLink(request))
         
         template.setTimelineValue(self._request.timeline_value or 1)
         template.setTimelineUnit(self._request.timeline_unit or "hour")

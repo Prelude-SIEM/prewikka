@@ -21,14 +21,14 @@ class AlertList(PyTpl.Template):
     def setTimelineEnd(self, end):
         self.TIMELINE_END = end
 
-    def setPrevQuery(self, query):
-        self.PREV_QUERY = query
+    def setPrev(self, prev):
+        self.PREV = prev
 
-    def setNextQuery(self, query):
-        self.NEXT_QUERY = query
+    def setNext(self, next):
+        self.NEXT = next
 
-    def setCurrentQuery(self, query):
-        self.CURRENT_QUERY = query
+    def setCurrent(self, current):
+        self.CURRENT = current
 
     def addHidden(self, name, value):
         self["hidden"].NAME = name

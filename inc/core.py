@@ -5,10 +5,13 @@ import Prelude
 import Request
 
 class CoreRequest(Request.Request):
-    def __init__(self):
+    def __init__(self, request=None):
         Request.Request.__init__(self)
         self.registerField("module", str, hidden=True)
         self.registerField("action", str, hidden=True)
+        if request:
+            self.module = request.module
+            self.action = request.action
 
 
 
