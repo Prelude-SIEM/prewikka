@@ -287,7 +287,7 @@ class Prelude:
         return rows
 
     def _countMessages(self, root, criteria):
-        return self.getValues(["count(%s.messageid)" % root], criteria)[0][0]
+        return self.getValues(["count(%s.create_time)" % root], criteria)[0][0]
 
     def countAlerts(self, criteria=None):
         return self._countMessages("alert", criteria)
