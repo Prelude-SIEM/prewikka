@@ -2,7 +2,7 @@
 	<ul>
 	<!-- BEGIN menu -->
 		<!-- BEGIN active -->
-		<li class="topmenu_item_active">{NAME}</li>
+		<li class="topmenu_item_active"><a href="{LINK}">{NAME}</a></li>
 		<!-- END active -->
 		<!-- BEGIN inactive -->
 		<li class="topmenu_item_inactive"><a href="{LINK}">{NAME}</a></li>

@@ -100,9 +100,11 @@ class NormalView(View):
         topmenu = TopMenu.TopMenu()
         for name, action in self._tabs:
             if name == self._active_tab:
-                topmenu.setActiveItem(name)
+                set_item = topmenu.setActiveItem
             else:
-                topmenu.setInactiveItem(name, self.createLink(action))
+                set_item = topmenu.setInactiveItem
+            set_item(name, self.createLink(action))
+        
         normal.setTopMenu(str(topmenu))
         
         normal.setPage(self._main_content)
