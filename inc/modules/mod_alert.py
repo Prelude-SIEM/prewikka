@@ -104,6 +104,21 @@ class ListInterface(ModuleInterface):
 
         row.append(field)
 
+    def _createAlertTime(self, alert):
+        t = alert["alert.detect_time"] or alert["alert.create_time"]
+        if not t:
+            return "n/a"
+
+        t = time.localtime(t)
+        current = time.localtime()
+
+        if t[:3] == current[:3]: # alert time is today
+            format = "%H:%M:%S"
+        else:
+            format = "%Y-%m-%d %H:%M:%S"
+
+        return time.strftime(format, t)
+
     def _addAlert(self, table, alert):
         row = [ ]
 
@@ -112,7 +127,7 @@ class ListInterface(ModuleInterface):
         self._addAlertField(row, alert, "alert.source(0).node.address(0).address", "alert.source.node.address.address")
         self._addAlertField(row, alert, "alert.target(0).node.address(0).address", "alert.target.node.address.address")
         self._addAlertField(row, alert, "alert.analyzer.model")
-        row.append(str(MyTime(int(alert["alert.detect_time"]))))
+        row.append(self._createAlertTime(alert))
         row.append(self._createAlertLink(alert, "summary"))
         row.append(self._createAlertLink(alert, "details"))
 
