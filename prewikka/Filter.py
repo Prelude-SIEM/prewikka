@@ -231,8 +231,10 @@ class _Filter:
 
     def _replace(self, element):
         element = element.group(1)
-        if element in ("and", "AND", "or", "OR"):
-            return element
+        if element in ("and", "AND", "&&"):
+            return "&&"
+        if element in ("or", "OR", "||"):
+            return "||"
         return "%s %s '%s'" % tuple(self.elements[element])
 
     def __str__(self):
