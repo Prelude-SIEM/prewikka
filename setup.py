@@ -70,7 +70,7 @@ class my_install(install):
 
 
 setup(name="Prewikka",
-      version="0.9.0",
+      version="0.9.0-rc1",
       packages=[ 'prewikka', 'prewikka.views', 'prewikka.templates',
                  'prewikka.modules',
                  'prewikka.modules.log', 'prewikka.modules.log.stderr',
