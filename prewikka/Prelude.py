@@ -126,6 +126,9 @@ class Prelude(PreludeDB):
         return self.get_alert_idents(criteria, limit, offset) or [ ]
 
     def getHeartbeatIdents(self, criteria=None, limit=-1, offset=-1):
+        if type(criteria) is list:
+            criteria = " && ".join(criteria)
+        
         if criteria:
             criteria = prelude.IDMEFCriteria(criteria)
         return self.get_heartbeat_idents(criteria, limit, offset) or [ ]
