@@ -103,6 +103,9 @@ class Message:
     def __init__(self, res):
         self._res = res
 
+    def __del__(self):
+        idmef_message_destroy(self._res)
+
     def _get_raw_value(self, key):
         path = idmef_path_new_fast(key)
         idmef_value = idmef_path_get(path, self._res)
