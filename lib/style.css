@@ -11,10 +11,12 @@ body {
         color: #333333;
 }
 
+
 a {
         color: black;
         text-decoration: none;
 }
+
 
 img {
     border:0;
@@ -280,7 +282,7 @@ thead {
         width: 160px;
 }
 
-#message_list_nav a:visited, #menu a:link, #menu a:hover {
+#message_list_nav a:visited, #message_list_nav a:link, #message_list_nav a:hover {
         color: black;
         text-decoraction: none;
 }
@@ -600,3 +602,4 @@ ul#popup_block > li:hover > ul {
 	white-space: nowrap;
 	width: 120px;
 }
+
