@@ -1,9 +1,9 @@
 #extends prewikka.modules.content.main.templates.MessageListing
 
 #block message_fields_header
-<td>Analyzerid</td>
-<td>Address</td>
-<td>Name</td>
+<td>Agent</td>
+<td>Node Address</td>
+<td>Node Name</td>
 <td>Type</td>
 <td>Time</td>
 #end block message_fields_header
@@ -12,11 +12,11 @@
 
 <td>
  <ul id="popup_block">
-  <li class="popup_title">$message.analyzerid.value
+  <li class="popup_title">$message.agent.value
    <ul>
     <li><a href="$message.details">Heartbeat detail</a></li>
     <li><a href="$message.summary">Heartbeat summary</a></li>
-    <li><a href="$message.analyzerid.inline_filter">Group by analyzerid</a></li>
+    <li><a href="$message.agent.inline_filter">Group by agent</a></li>
    </ul>
   </li>
  </ul>
@@ -24,10 +24,10 @@
 
 <td>
  <ul id="popup_block">
-  <li class="popup_title">$message.address.value
+  <li class="popup_title">$message.node_address.value
    <ul>
-    <li><a href="$message.address.inline_filter">Group by address</a></li>
-    #for $name, $link in $message.address.host_commands
+    <li><a href="$message.node_address.inline_filter">Group by address</a></li>
+    #for $name, $link in $message.node_address.host_commands
      <li><a href="$link">$name</a></li>
     #end for
    </ul>
@@ -35,7 +35,7 @@
  </ul>
 </td>
 
-<td><a href='$message.name.inline_filter'>$message.name.value</a></td>
+<td><a href='$message.node_name.inline_filter'>$message.node_name.value</a></td>
 <td><a href='$message.type.inline_filter'>$message.type.value</a></td>
 
 <td>$message.time.value</td>

@@ -150,7 +150,7 @@ class DeletePM:
 
 class HeartbeatAnalyzePM(ParametersNormalizer.ParametersNormalizer):
     def register(self):
-        self.optional("analyzerid", long)
+        self.mandatory("analyzerid", long)
 
 
 
@@ -226,40 +226,39 @@ class FilterSavePM(FilterEditPM):
 
 class View:
     def _setView(self, dataset):
-        dataset["interface.active_section"] = self._active_section
-        dataset["interface.tabs"] = [ (name, utils.create_link(slot)) for name, slot in self._tabs ]
-        dataset["interface.active_tab"] = self._active_tab
-    
-
-
-class AlertsView(View):
-    _active_section = "Alerts"
-    _tabs = [("Alerts", "main.alert_listing"), ("Filters", "main.alert_filter_edition")]
-    _active_tab = "Alerts"
+        dataset["interface.active_section"] = self.active_section
+        dataset["interface.tabs"] = [ (name, utils.create_link(slot)) for name, slot in self.tabs ]
+        dataset["interface.active_tab"] = self.active_tab
 
 
 
-class AlertFilterEditionView(AlertsView):
-    _active_tab = "Filters"
+class EventsView(View):
+    active_section = "Events"
+    tabs = [("Alerts", "main.alert_listing"),
+            ("Heartbeats", "main.heartbeat_listing"),
+            ("Filters", "main.alert_filter_edition")]
 
 
 
-class HeartbeatsView(View):
-    _active_section = "Heartbeats"
-    _tabs = [("Analyze", "main.heartbeat_analyze"), ("Listing", "main.heartbeat_listing")]
-    _active_tab = "Listing"
+class AlertsView(EventsView):
+    active_tab = "Alerts"
 
 
 
-class HeartbeatAnalyzeView(HeartbeatsView):
-    _active_tab = "Analyze"
+class HeartbeatsView(EventsView):
+    active_tab = "Heartbeats"
+
+
+
+class AlertFilterEditionView(EventsView):
+    active_tab = "Filters"
 
 
 
 class SensorsView(View):
-    _active_section = "Agents"
-    _tabs = [("Agents", "main.sensor_listing")]
-    _active_tab = "Agents"
+    active_section = "Agents"
+    tabs = [("Agents", "main.sensor_listing")]
+    active_tab = "Agents"
 
 
 
@@ -596,8 +595,9 @@ class HeartbeatListingAction(MessageListingAction, HeartbeatsView):
     traceroute_action = "heartbeat_traceroute"
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
     message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.messageid == '%d'"
-    fields = [ ("address", "heartbeat.analyzer.node.address(0).address", "heartbeat.analyzer.node.address.address"),
-               ("name", "heartbeat.analyzer.node.name", "heartbeat.analyzer.node.name"),
+    fields = [ ("agent", "heartbeat.analyzer.name", "heartbeat.analyzer.name"),
+               ("node_address", "heartbeat.analyzer.node.address(0).address", "heartbeat.analyzer.node.address.address"),
+               ("node_name", "heartbeat.analyzer.node.name", "heartbeat.analyzer.node.name"),
                ("type", "heartbeat.analyzer.model", "heartbeat.analyzer.model") ]
 
     def countMessages(self, prelude, criteria):
@@ -613,9 +613,9 @@ class HeartbeatListingAction(MessageListingAction, HeartbeatsView):
         return message["heartbeat.create_time"]
 
     def _addMessageFields(self, request, fields, heartbeat):
-        for name in "ident", "analyzerid", "name", "type":
+        for name in "ident", "analyzerid", "agent", "node_name", "type":
             fields[name] = self._createMessageField(request.parameters, name, heartbeat[name])
-        fields["address"] = self._createMessageHostField(request, "address", heartbeat["address"])
+        fields["node_address"] = self._createMessageHostField(request, "address", heartbeat["node_address"])
         fields["time"] = self._createMessageTimeField(heartbeat["time"], request.parameters["timezone"])
 
 
@@ -771,7 +771,7 @@ class HeartbeatSummaryAction(MessageSummaryAction, HeartbeatsView):
         self.endSection(dataset)
 
     def process(self, request):
-        heartbeat = request.env.prelude.getHeartbeat(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
+        heartbeat = request.env.prelude.getHeartbeat(request.parameters["analyzerid"], request.parameters["ident"])
         dataset = request.dataset
         dataset["sections"] = [ ]
         self.buildAnalyzer(dataset, heartbeat)
@@ -1162,12 +1162,17 @@ class HeartbeatTracerouteAction(HostCommandAction, HeartbeatsView):
 
 
 
-class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
+class HeartbeatAnalyzeAction(SensorsView):
     def __init__(self, config):
         self._heartbeat_count = config.getOptionValue("heartbeat_count", 30)
         self._heartbeat_error_margin = config.getOptionValue("heartbeat_error_margin", 3)
     
-    def _getAnalyzer(self, dataset, prelude, analyzerid):
+    def process(self, request):
+        dataset = request.dataset
+        prelude = request.prelude
+        analyzerid = request.parameters["analyzerid"]
+        self._setView(dataset)
+        
         analyzer = prelude.getAnalyzer(analyzerid)
         analyzer["last_heartbeat_time"] = str(analyzer["last_heartbeat_time"])
         analyzer["events"] = [ ]
@@ -1233,19 +1238,7 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
                                         (self._heartbeat_count, total_interval / self._heartbeat_count),
                                         "type": "no_anomaly" })
 
-        return analyzer
-    
-    def process(self, request):
-        self._setView(request.dataset)
-        
-        if request.parameters.has_key("analyzerid"):
-            request.dataset["analyzers"] = [ self._getAnalyzer(request.dataset, request.env.prelude,
-                                                               request.parameters["analyzerid"]) ]
-        else:
-            request.dataset["analyzers"] = [ self._getAnalyzer(request.dataset, request.env.prelude,
-                                                               analyzerid) \
-                                             for analyzerid in request.env.prelude.getAnalyzerids() ]
-
+        dataset["analyzer"] = analyzer
 
 
 
@@ -1455,8 +1448,7 @@ class AlertFilterEdition(AlertFilterEditionView):
 
 def load(env, config):
     return {
-        "sections": [("Alerts", "alert_listing"),
-                     ("Heartbeats", "heartbeat_analyze"),
+        "sections": [("Events", "alert_listing"),
                      ("Agents", "sensor_listing")],
 
         "default_slot": "alert_listing",

@@ -36,13 +36,13 @@
         <span>$message.source.value</span>
       #end if
       #if $message.suser_name.value
-        <br/>$message.suser_name.value
+        <br/>user: $message.suser_name.value
 	#if $message.suser_uid.value != None
 	  ($message.suser_uid.value)
 	#end if
       #end if
       #if $message.sprocess_name.value
-        <br/>$message.sprocess_name.value
+        <br/>process: $message.sprocess_name.value
 	#if $message.sprocess_pid.value != None
 	  ($message.sprocess_pid.value)
 	#end if
@@ -66,13 +66,13 @@
         <span>$message.target.value</span>
       #end if
       #if $message.tuser_name.value
-        <br/>$message.tuser_name.value
+        <br/>user: $message.tuser_name.value
 	#if $message.tuser_uid.value != None
 	  ($message.tuser_uid.value)
 	#end if
       #end if
       #if $message.tprocess_name.value
-        <br/>$message.tprocess_name.value
+        <br/>process: $message.tprocess_name.value
 	#if $message.tprocess_pid.value != None
 	  ($message.tprocess_pid.value)
 	#end if
@@ -91,7 +91,7 @@
 <td>
   <a href='$message.sensor.inline_filter'>$message.sensor.value</a>
   #if $message.sensor_node_name.value
-    ($message.sensor_node_name.value)
+    (on $message.sensor_node_name.value)
   #end if
 </td>
 <td>$message.time.value</td>

@@ -49,12 +49,14 @@ $message_listing_header
 
 <table id="timeline">
  <form action="?" method="get">
+
   #def timeline_extra_content
   #end def
   $timeline_extra_content
   #for $name, $value in $timeline.hidden_parameters.items()
    <input type="hidden" name="$name" value="$value"/>
   #end for
+
   
   <tr>
    <td id="timeline_step_label">Step:</td>
@@ -72,6 +74,7 @@ $message_listing_header
     </select>
    </td>
   </tr>
+
 
   <tr>
     <td id="timezone_control_label">Tz:</td>
@@ -94,12 +97,14 @@ $message_listing_header
     <input type="submit" value="apply">
    </td>
   </tr>
- 
+
+  
  </form>
+
 
  <tr><td colspan="3" class="timeline_range">$timeline.start</td></tr>
  <tr><td colspan="3" class="timeline_range">$timeline.end</td></tr>
- <tr><td colspan="3" class="timeline_range">$timeline.range_timezone</td>/<tr>
+ <tr><td colspan="3" class="timeline_range">$timeline.range_timezone</td><tr>
 
  <tr>
   <td colspan=3 style="text-align: center;">
@@ -112,6 +117,7 @@ $message_listing_header
  </tr>
 
  </table>
+
 
 <table id="message_list_nav">
 	<tr>
