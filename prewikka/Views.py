@@ -24,15 +24,11 @@ from templates.layouts.normal import Normal, Menu, TopMenu
 
 
 class View:
-    def __init__(self, core, data):
-        self._core = core
-        self._data = data
+    def __init__(self, core):
+        self.core = core
         self.headers = { "Content-type": "text/html" }
 
-    def init(self):
-        pass
-
-    def build(self):
+    def build(self, data):
         pass
 
     def createLink(self, action, parameters=None):
@@ -50,21 +46,25 @@ class View:
 
 
 class ErrorView(View):
+    def build(self, message):
+        self._message = message
+    
     def __str__(self):
-        return View.__str__(self) + "<h1>%s</h1>" % self._data
+        return View.__str__(self) + "<h1>%s</h1>" % self._message
 
 
 
 class NormalView(View):
-    def init(self):
-        self._software = self._core.interface.getSoftware()
-        self._place = self._core.interface.getPlace()
-        self._title = self._core.interface.getTitle()
+    def __init__(self, core):
+        View.__init__(self, core)
+        self._software = core.interface.getSoftware()
+        self._place = core.interface.getPlace()
+        self._title = core.interface.getTitle()
         self._active_module = None
         self._active_section = None
         self._tabs = [ ]
         self._active_tab = None
-        self._main_content = ""
+        self._main_content = None
 
     def setActiveModule(self, module):
         self._active_module = module
@@ -77,10 +77,10 @@ class NormalView(View):
 
     def setActiveTab(self, tab):
         self._active_tab = tab
-
-    def setMainContent(self, content):
-        self._main_content = content
-
+    
+    def build(self, data):
+        self._main_content = self.buildMainContent(data)
+        
     def __str__(self):
         headers = View.__str__(self)
         
@@ -90,7 +90,7 @@ class NormalView(View):
         normal.setPlace(self._place)
         
         menu = Menu.Menu()
-        for section, action in self._core.interface.getSections():
+        for section, action in self.core.interface.getSections():
             if section == self._active_section:
                 menu.setActiveItem(section)
             else:

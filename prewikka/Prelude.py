@@ -90,3 +90,32 @@ class Prelude(PreludeDB):
             criteria = prelude.IDMEFCriteria(criteria)
         
         return self.get_values(selection, criteria, distinct, limit, offset)
+
+    def getAnalyzerids(self):
+        analyzerids = [ ]
+        rows = self.getValues(selection=[ "alert.analyzer.analyzerid/group_by" ])
+        for row in rows:
+            analyzerid = row[0]
+            analyzerids.append(analyzerid)
+
+        return analyzerids
+
+    def getAnalyzer(self, analyzerid):
+        rows = self.getValues(selection=["max(alert.ident)"],
+                              criteria="alert.analyzer.analyzerid == %d" % analyzerid)
+        row = rows[0]
+        ident = row[0]
+        
+        alert = self.getAlert(analyzerid, ident)
+        
+        analyzer = { }
+        analyzer["analyzerid"] = analyzerid
+        analyzer["model"] = alert.get("alert.analyzer.model", "n/a") 
+        analyzer["version"] = alert.get("alert.analyzer.version", "n/a")
+        analyzer["ostype"] = alert.get("alert.analyzer.ostype", "n/a")
+        analyzer["osversion"] = alert.get("alert.analyzer.osversion", "n/a")
+        analyzer["name"] = alert.get("alert.analyzer.node.name", "n/a")
+        analyzer["location"] = alert.get("alert.analyzer.node.location", "n/a")
+        analyzer["address"] = alert.get("alert.analyzer.node.address(0).address", "n/a")
+        
+        return analyzer

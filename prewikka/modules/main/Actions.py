@@ -85,6 +85,9 @@ class _MyTime:
 
 
 class MessageListing(Interface.Action):
+    def _adjustCriteria(self, core, parameters, criteria):
+        pass
+    
     def process(self, core, parameters):
         result = { "parameters": parameters }
         prelude = core.prelude
@@ -119,6 +122,7 @@ class MessageListing(Interface.Action):
             result["prev"] = end[parameters.getTimelineUnit()] - parameters.getTimelineValue()
         
         criteria.append(self._createTimeCriteria(start, end))
+        self._adjustCriteria(core, parameters, criteria)
         criteria = " && ".join(criteria)
         
         idents = self._getMessageIdents(prelude, criteria)
@@ -212,7 +216,7 @@ class DeleteAlerts(AlertListing):
         for analyzerid, alert_ident in parameters.getIdents():
             core.prelude.deleteAlert(analyzerid, alert_ident)
         
-        parameters = ActionParamaters.Listing(parameters)
+        parameters = ActionParameters.MessageListing(parameters)
         
         return AlertListing.process(self, core, parameters)
 
@@ -223,7 +227,7 @@ class DeleteHeartbeats(HeartbeatListing):
         for analyzerid, heartbeat_ident in parameters.getIdents():
             core.prelude.deleteHeartbeat(analyzerid, heartbeat_ident)
         
-        parameters = ActionParameters.Listing(parameters)
+        parameters = ActionParameters.MessageListing(parameters)
         
         return HeartbeatListing.process(self, core, parameters)
 
@@ -244,28 +248,11 @@ class HeartbeatsAnalyze(Interface.Action):
         data["heartbeat_error_tolerance"] = heartbeat_error_tolerance
         
         analyzers = data["analyzers"]
-        
-        rows = prelude.getValues(selection=[ "heartbeat.analyzer.analyzerid/group_by" ])
-        for row in rows:
-            analyzerid = row[0]
-            analyzer = { }
-            analyzers.append(analyzer)
-            analyzer["analyzerid"] = analyzerid
-            
-            rows = prelude.getValues(selection=["max(heartbeat.ident)"],
-                                     criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid)
-            row = rows[0]
-            last_heartbeat_ident = row[0]
-            
-            heartbeat = prelude.getHeartbeat(analyzerid, last_heartbeat_ident) 
-            analyzer["model"] = heartbeat.get("heartbeat.analyzer.model", "n/a") 
-            analyzer["version"] = heartbeat.get("heartbeat.analyzer.version", "n/a")
-            analyzer["ostype"] = heartbeat.get("heartbeat.analyzer.ostype", "n/a")
-            analyzer["osversion"] = heartbeat.get("heartbeat.analyzer.osversion", "n/a")
-            analyzer["name"] = heartbeat.get("heartbeat.analyzer.node.name", "n/a")
-            analyzer["location"] = heartbeat.get("heartbeat.analyzer.node.location", "n/a")
-            analyzer["address"] = heartbeat.get("heartbeat.analyzer.node.address(0).address", "n/a")
+
+        for analyzerid in prelude.getAnalyzerids():
+            analyzer = prelude.getAnalyzer(analyzerid)
             analyzer["errors"] = [ ]
+            analyzers.append(analyzer)
             
             previous_date = 0
             
@@ -286,3 +273,92 @@ class HeartbeatsAnalyze(Interface.Action):
                 previous_date = date
         
         return Views.HeartbeatsAnalyzeView, data
+
+
+
+class SensorAlertListing(AlertListing):
+    def _adjustCriteria(self, core, parameters, criteria):
+        criteria.append("alert.analyzer.analyzerid == %d" % parameters.getAnalyzerid())
+
+    def _getView(self):
+        return Views.SensorAlertListingView
+
+    def process(self, core, parameters):
+        result = { }
+        result["analyzer"] = core.prelude.getAnalyzer(parameters.getAnalyzerid())
+        view, result["alerts"] = AlertListing.process(self, core, parameters)
+        return view, result
+
+
+
+class SensorDeleteAlerts(SensorAlertListing):
+    def process(self, core, parameters):
+        for analyzerid, alert_ident in parameters.getIdents():
+            core.prelude.deleteAlert(analyzerid, alert_ident)
+
+        parameters = ActionParameters.SensorMessageListing(parameters)
+
+        return SensorAlertListing.process(self, core, parameters)
+
+
+
+class SensorHeartbeatListing(HeartbeatListing):
+    def _adjustCriteria(self, core, parameters, criteria):
+        criteria.append("heartbeat.analyzer.analyzerid == %d" % parameters.getAnalyzerid())
+
+    def _getView(self):
+        return Views.SensorHeartbeatListingView
+
+    def process(self, core, parameters):
+        result = { }
+        result["analyzer"] = core.prelude.getAnalyzer(parameters.getAnalyzerid())
+        view, result["heartbeats"] = HeartbeatListing.process(self, core, parameters)
+        return view, result
+
+
+
+class SensorDeleteHeartbeats(SensorHeartbeatListing):
+    def process(self, core, parameters):
+        for analyzerid, alert_ident in parameters.getIdents():
+            core.prelude.deleteHeartbeat(analyzerid, alert_ident)
+
+        parameters = ActionParameters.SensorMessageListing(parameters)
+
+        return SensorHeartbeatListing.process(self, core, parameters)
+
+
+
+class SensorAlertSummary(AlertSummary):
+    def process(self, core, parameters):
+        return Views.SensorAlertSummaryView, AlertSummary.process(self,core, parameters)[1]
+
+
+
+class SensorAlertDetails(AlertDetails):
+    def process(self, core, parameters):
+        return Views.SensorAlertDetailsView, AlertDetails.process(self, core, parameters)[1]
+
+
+
+class SensorHeartbeatSummary(HeartbeatSummary):
+    def process(self, core, parameters):
+        return Views.SensorHeartbeatSummaryView, HeartbeatSummary.process(self,core, parameters)[1]
+
+
+
+class SensorHeartbeatDetails(HeartbeatDetails):
+    def process(self, core, parameters):
+        return Views.SensorHeartbeatDetailsView, HeartbeatDetails.process(self, core, parameters)[1]
+
+
+
+class SensorListing(Interface.Action):
+    def process(self, core, parameters):
+        analyzers = [ ]
+        
+        prelude = core.prelude
+        for analyzerid in prelude.getAnalyzerids():
+            analyzer = prelude.getAnalyzer(analyzerid)
+            analyzers.append(analyzer)
+            
+        return Views.SensorListingView, analyzers

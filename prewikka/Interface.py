@@ -106,9 +106,8 @@ class Interface:
         parameters = registered["parameters"]()
         parameters.populate(query)
         view_class, data = action.process(self._core, parameters)
-        view = view_class(self._core, data)
-        view.init()
-        view.build()
+        view = view_class(self._core)
+        view.build(data)
         
         return str(view)
                 
@@ -138,7 +137,7 @@ class ActionParameters:
 
     def registerParameter(self, name, type):
         if self._parameters.has_key(name):
-            raise AlreadyRegisteredActionParameterError
+            raise AlreadyRegisteredActionParameterError(name)
         self._parameters[name] = type
 
     def __setitem__(self, name, value):

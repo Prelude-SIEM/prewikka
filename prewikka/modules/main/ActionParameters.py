@@ -40,7 +40,7 @@ class Message(Interface.ActionParameters):
 
 
 
-class Listing(Interface.ActionParameters):
+class MessageListing(Interface.ActionParameters):
     def register(self):
         self.registerParameter("filter_name", str)
         self.registerParameter("filter_value", str)
@@ -80,9 +80,8 @@ class Listing(Interface.ActionParameters):
 
 
 
-class Delete(Listing):
+class Delete:
     def register(self):
-        Listing.register(self)
         self.registerParameter("idents", list)
         
     def getIdents(self):
@@ -96,5 +95,27 @@ class Delete(Listing):
 
 
 
-class HeartbeatsAnalyze(Interface.ActionParameters):
-    pass
+class MessageListingDelete(MessageListing, Delete):
+    def register(self):
+        MessageListing.register(self)
+        Delete.register(self)
+    
+
+
+class SensorMessageListing(MessageListing):
+    def register(self):
+        MessageListing.register(self)
+        self.registerParameter("analyzerid", long)
+        
+    def setAnalyzerid(self, analyzerid):
+        self["analyzerid"] = analyzerid
+        
+    def getAnalyzerid(self):
+        return self["analyzerid"]
+
+
+
+class SensorMessageListingDelete(SensorMessageListing, Delete):
+    def register(self):
+        SensorMessageListing.register(self)
+        Delete.register(self)

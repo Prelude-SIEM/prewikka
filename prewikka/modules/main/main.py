@@ -18,20 +18,33 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+from prewikka import Interface
 from prewikka.modules.main import ActionParameters, Actions
 
 def load(core, config):
     # Alerts
     core.interface.registerSection("Alerts", Actions.AlertListing())
-    core.interface.registerAction(Actions.AlertListing(), ActionParameters.Listing, default=True)
+    core.interface.registerAction(Actions.AlertListing(), ActionParameters.MessageListing, default=True)
     core.interface.registerAction(Actions.AlertSummary(), ActionParameters.Message)
     core.interface.registerAction(Actions.AlertDetails(), ActionParameters.Message)
-    core.interface.registerAction(Actions.DeleteAlerts(), ActionParameters.Delete)
+    core.interface.registerAction(Actions.DeleteAlerts(), ActionParameters.MessageListingDelete)
     
     # Heartbeats
     core.interface.registerSection("Heartbeats", Actions.HeartbeatsAnalyze())
-    core.interface.registerAction(Actions.HeartbeatListing(), ActionParameters.Listing)
-    core.interface.registerAction(Actions.HeartbeatsAnalyze(), ActionParameters.HeartbeatsAnalyze)
+    core.interface.registerAction(Actions.HeartbeatListing(), ActionParameters.MessageListing)
+    core.interface.registerAction(Actions.HeartbeatsAnalyze(), Interface.ActionParameters)
     core.interface.registerAction(Actions.HeartbeatSummary(), ActionParameters.Message)
     core.interface.registerAction(Actions.HeartbeatDetails(), ActionParameters.Message)
-    core.interface.registerAction(Actions.DeleteHeartbeats(), ActionParameters.Delete)
+    core.interface.registerAction(Actions.DeleteHeartbeats(), ActionParameters.MessageListingDelete)
+
+    # Sensors
+    core.interface.registerSection("Sensors", Actions.SensorListing())
+    core.interface.registerAction(Actions.SensorListing(), Interface.ActionParameters)
+    core.interface.registerAction(Actions.SensorDeleteAlerts(), ActionParameters.SensorMessageListingDelete)
+    core.interface.registerAction(Actions.SensorDeleteHeartbeats(), ActionParameters.SensorMessageListingDelete)
+    core.interface.registerAction(Actions.SensorAlertListing(), ActionParameters.SensorMessageListing)
+    core.interface.registerAction(Actions.SensorHeartbeatListing(), ActionParameters.SensorMessageListing)
+    core.interface.registerAction(Actions.SensorAlertSummary(), ActionParameters.Message)
+    core.interface.registerAction(Actions.SensorAlertDetails(), ActionParameters.Message)
+    core.interface.registerAction(Actions.SensorHeartbeatSummary(), ActionParameters.Message)
+    core.interface.registerAction(Actions.SensorHeartbeatDetails(), ActionParameters.Message)
