@@ -532,6 +532,7 @@ class AlertListing(MessageListing, view.View):
         dataset["sensor_node_name"] = { "value": message["alert.analyzer.node.name"] }
         
     def _setMessageCommon(self, dataset, message):
+
         self._setMessageSource(dataset, message)
         self._setMessageTarget(dataset, message)
         self._setMessageSensor(dataset, message)

@@ -11,11 +11,13 @@
       </td>
     </tr>
     #end if
+    #if $section.options
     <tr>
       <td>Name</td>
       <td>Description</td>
       <td>Value</td>
     </tr>
+    #end if
   </thead>
   <tbody>
     #set $row_classes = ("table_row_even", "table_row_odd")

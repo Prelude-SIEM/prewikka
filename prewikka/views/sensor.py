@@ -50,7 +50,6 @@ class SensorListing(view.View):
         analyzers = [ ]
         
         self.dataset["admin_enabled"] = bool(self.env.config.admin)
-        
         for analyzer_path in self.env.prelude.getAnalyzerPaths():
             analyzerid = analyzer_path[-1]
             analyzer = self.env.prelude.getAnalyzer(analyzerid)
@@ -70,7 +69,7 @@ class SensorListing(view.View):
                                                                           analyzer["last_heartbeat_interval"],
                                                                           3)
 
-            analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(analyzer["last_heartbeat_time"])) + \
+            analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(int(analyzer["last_heartbeat_time"]))) + \
                                               " %+.2d:%.2d" % utils.get_gmt_offset()
             
             analyzers.append(analyzer)
@@ -104,9 +103,6 @@ class HeartbeatAnalyze(view.View):
         analyzer["status_meaning"] = "abnormal offline"
         
         start = time.time()
-##         rows = self.env.prelude.getValues(selection=["heartbeat.messageid", "heartbeat.create_time/order_desc"],
-##                                           criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
-##                                           limit=self._heartbeat_count)
         idents = self.env.prelude.getHeartbeatIdents(criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
                                                      limit=self._heartbeat_count)
         newer = None
@@ -142,12 +138,12 @@ class HeartbeatAnalyze(view.View):
 
                 if newer_status == "running":
                     if abs(int(newer_time) - int(older_time) - int(older_interval)) > self._heartbeat_error_margin:
-                        event = { "value": "abnormal heartbeat interval between %s and %s" %  (older_time, newer_time),
+                        event = { "value": "abnormal heartbeat interval between %s and %s" % (str(older_time), str(newer_time)),
                                   "type": "abnormal_heartbeat_interval" }
                                   
 
                 if newer_status == "exiting":
-                    event = { "value": "normal sensor stop at %s" % str(newer_status),
+                    event = { "value": "normal sensor stop at %s" % str(newer_time),
                               "type": "normal_stop" }
 
                 if event:

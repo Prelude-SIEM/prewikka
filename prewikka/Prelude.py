@@ -18,14 +18,11 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import prelude
-import preludedb
-from preludedb import PreludeDB
+from prelude import *
+from preludedb import *
 
 from prewikka.utils import escape_html_string
 
-
-Error = (prelude.Error, preludedb.Error)
 
 
 def escape_value(value):
@@ -35,15 +32,96 @@ def escape_value(value):
 
 
 
+class IDMEFTime(object):
+    def __init__(self, res):
+        self._res = res
+
+    def __del__(self):
+        idmef_time_destroy(self._res)
+
+    def __str__(self):
+        return idmef_time_to_string(self._res)
+
+    def __int__(self):
+        return idmef_time_get_sec(self._res)
+
+    def __float__(self):
+        return float(idmef_time_get_sec(self._res)) + float(idmef_time_get_usec(self._res)) / 10 ** 6
+
+    def __getattribute__(self, name):
+        if name is "sec":
+            return idmef_time_get_sec(self.res)
+
+        if name is "usec":
+            return idmef_time_get_usec(self.res)
+
+        if name is "gmt_offset":
+            return idmef_time_get_gmt_offset(self.res)
+
+        return object.__getattribute__(self, name)
+
+
+
+def convert_idmef_value(value):
+    def get_time(value):
+        time = idmef_value_get_time(value)
+        if not time:
+            return None
+
+        return IDMEFTime(idmef_time_clone(time))
+
+    def get_enum(value):
+        return idmef_type_enum_to_string(idmef_value_get_object_type(value), idmef_value_get_enum(value))
+
+    try:
+        return {
+            IDMEF_VALUE_TYPE_INT8:          idmef_value_get_int8,
+            IDMEF_VALUE_TYPE_UINT8:         idmef_value_get_uint8,
+            IDMEF_VALUE_TYPE_INT16:         idmef_value_get_int16,
+            IDMEF_VALUE_TYPE_UINT16:        idmef_value_get_uint16,
+            IDMEF_VALUE_TYPE_INT32:         idmef_value_get_int32,
+            IDMEF_VALUE_TYPE_UINT32:        idmef_value_get_uint32,
+            IDMEF_VALUE_TYPE_INT64:         idmef_value_get_int64,
+            IDMEF_VALUE_TYPE_UINT64:        idmef_value_get_uint64,
+            IDMEF_VALUE_TYPE_FLOAT:         idmef_value_get_float,
+            IDMEF_VALUE_TYPE_DOUBLE:        idmef_value_get_double,
+            IDMEF_VALUE_TYPE_STRING:        idmef_value_get_string,
+            IDMEF_VALUE_TYPE_DATA:          idmef_value_get_data,
+            IDMEF_VALUE_TYPE_ENUM:          get_enum,
+            IDMEF_VALUE_TYPE_TIME:          get_time
+            }[idmef_value_get_type(value)](value)
+    except KeyError:
+        return None
+
+
+
 class Message:
-    def __init__(self, message):
-        self._message = message
+    def __init__(self, res):
+        self._res = res
+
+    def _get_raw_value(self, key):
+        path = idmef_path_new_fast(key)
+        idmef_value = idmef_path_get(path, self._res)
+        if idmef_value is None:
+            value = None
+        else:
+            value = convert_idmef_value(idmef_value)
+            idmef_value_destroy(idmef_value)
+        idmef_path_destroy(path)
+
+        return value
 
     def __getitem__(self, key):
-        return escape_value(self._message[key])
-    
+        if key.find("%s." % self._root) != 0:
+            key = "%s." % self._root + key
+        
+        return escape_value(self._get_raw_value(key))
+        
     def get(self, key, default=None, escape=True):
-        value = self[key]
+        if key.find("%s." % self._root) != 0:
+            key = "%s." % self._root + key
+        
+        value = self._get_raw_value(key)
         if value is None:
             value = default
         
@@ -61,9 +139,7 @@ class Message:
                 break
             
             if meaning == searched:
-                value = self["%s.additional_data(%d).data" % (self._root, i)]
-                if escape:
-                    value = escape_value(value)
+                value = self.get("%s.additional_data(%d).data" % (self._root, i))
                 
                 if not many_values:
                     return value
@@ -72,7 +148,10 @@ class Message:
 
             i += 1
 
-        return many_values and [ ] or None
+        if many_values:
+            return values
+
+        return None
 
     def getMessageID(self):
         return self["%s.messageid" % self._root]
@@ -80,65 +159,70 @@ class Message:
     def getAnalyzerID(self):
         return self["%s.analyzer.analyzerid" % self._root]
 
-    def __str__(self):
-        return str(self._message)
-
 
 
 class Alert(Message):
     _root = "alert"
-    
-    def __getitem__(self, key):
-        if key.find("alert.") != 0:
-            key = "alert." + key
-        return Message.__getitem__(self, key)
 
 
 
 class Heartbeat(Message):
     _root = "heartbeat"
-    
-    def __getitem__(self, key):
-        if key.find("heartbeat.") != 0:
-            key = "heartbeat." + key
-        return Message.__getitem__(self, key)
 
 
 
-class Prelude(PreludeDB):
+class Prelude:
     def __init__(self, config):
-        PreludeDB.init()
-        PreludeDB.__init__(self,
-                           type=config.getOptionValue("type", "mysql"),
-                           host=config.getOptionValue("host", "127.0.0.1"),
-                           port=config.getOptionValue("port", 0),
-                           name=config.getOptionValue("name", "prelude"),
-                           user=config.getOptionValue("user", "prelude"),
-                           password=config.getOptionValue("password", "prelude"),
-                           log=config.getOptionValue("log", None))
+        settings = preludedb_sql_settings_new()
+        for param in "host", "port", "name", "user", "password":
+            if config.getOptionValue(param):
+                preludedb_sql_settings_set(settings, param, config.getOptionValue(param))
+
+        sql = preludedb_sql_new(config.getOptionValue("type", "mysql"), settings)
+        if config.getOptionValue("log"):
+            preludedb_sql_enable_query_logging(sql, config.getOptionValue("log"))
+
+        self._db = preludedb_new(sql, None)
+
+    def _getMessageIdents(self, get_message_idents, criteria, limit, offset):
+        if type(criteria) is list:
+            criteria = " && ".join(criteria)
+        
+        if criteria:
+            criteria = idmef_criteria_new_string(criteria)
+
+        idents = [ ]
+        
+        result = get_message_idents(self._db, criteria, limit, offset,
+                                    PRELUDEDB_RESULT_IDENTS_ORDER_BY_CREATE_TIME_DESC)
+        if result:
+            while True:
+                ident = preludedb_result_idents_get_next(result)
+                if ident is None:
+                    break
+                idents.append(ident)
+            preludedb_result_idents_destroy(result)
+
+        if type(criteria) is list:
+            criteria = " && ".join(criteria)
+        
+        if criteria:
+            idmef_criteria_destroy(criteria)
+
+        return idents        
 
     def getAlertIdents(self, criteria=None, limit=-1, offset=-1):
-        if type(criteria) is list:
-            criteria = " && ".join(criteria)
-        
-        if criteria:
-            criteria = prelude.IDMEFCriteria(criteria)
-        return self.get_alert_idents(criteria, limit, offset) or [ ]
+        return self._getMessageIdents(preludedb_get_alert_idents, criteria, limit, offset)
 
     def getHeartbeatIdents(self, criteria=None, limit=-1, offset=-1):
-        if type(criteria) is list:
-            criteria = " && ".join(criteria)
-        
-        if criteria:
-            criteria = prelude.IDMEFCriteria(criteria)
-        return self.get_heartbeat_idents(criteria, limit, offset) or [ ]
+        return self._getMessageIdents(preludedb_get_heartbeat_idents, criteria, limit, offset)
 
-    def _getLastMessageIdent(self, type, get_message_ident, analyzerid):
+    def _getLastMessageIdent(self, type, get_message_idents, analyzerid):
         criteria = None
         if analyzerid != None:
             criteria = "%s.analyzer.analyzerid == %d" % (type, analyzerid)
 
-        idents = get_message_ident(criteria, limit=1)
+        idents = get_message_idents(criteria, limit=1)
 
         return idents[0]
 
@@ -149,25 +233,54 @@ class Prelude(PreludeDB):
         return self._getLastMessageIdent("heartbeat", self.getHeartbeatIdents, analyzer)
 
     def getAlert(self, ident):
-        return Alert(self.get_alert(ident))
+        return Alert(preludedb_get_alert(self._db, ident))
 
     def deleteAlert(self, ident):
-        return self.delete_alert(ident)
+        preludedb_delete_alert(self._db, ident)
 
     def getHeartbeat(self, ident):
-        return Heartbeat(self.get_heartbeat(ident))
+        return Heartbeat(preludedb_get_heartbeat(self._db, ident))
 
     def deleteHeartbeat(self, ident):
-        return self.delete_heartbeat(ident)
+        preludedb_delete_heartbeat(self._db, ident)
 
     def getValues(self, selection, criteria=None, distinct=0, limit=-1, offset=-1):
         if type(criteria) is list:
             criteria = " && ".join(criteria)
         
         if criteria:
-            criteria = prelude.IDMEFCriteria(criteria)
+            criteria = idmef_criteria_new_string(criteria)
+
+        my_selection = preludedb_path_selection_new()
+        for selected in selection:
+            my_selected = preludedb_selected_path_new_string(selected)
+            preludedb_path_selection_add(my_selection, my_selected)
+
+        rows = [ ]
+
+        result = preludedb_get_values(self._db, my_selection, criteria, distinct, limit, offset)
+        if result != None:
+            while True:
+                values = preludedb_result_values_get_next(result)
+                if values is None:
+                    break
+
+                row = [ ]
+                rows.append(row)
+                for value in values:
+                    if value is None:
+                        row.append(None)
+                    else:
+                        row.append(convert_idmef_value(value))
+                        idmef_value_destroy(value)
+            preludedb_result_values_destroy(result)
+
+        if criteria:
+            idmef_criteria_destroy(criteria)
         
-        return self.get_values(selection, criteria, distinct, limit, offset) or [ ]
+        preludedb_path_selection_destroy(my_selection)
+
+        return rows
 
     def _countMessages(self, root, criteria):
         return self.getValues(["count(%s.messageid)" % root], criteria)[0][0]
@@ -180,7 +293,8 @@ class Prelude(PreludeDB):
 
     def getAnalyzerids(self):
         analyzerids = [ ]
-        rows = self.getValues(selection=[ "heartbeat.analyzer.analyzerid/group_by" ])
+        rows = self.getValues(selection=[ "heartbeat.analyzer.analyzerid/group_by" ],
+                              criteria="heartbeat.analyzer.analyzerid != 0")
         for row in rows:
             analyzerid = row[0]
             analyzerids.append(analyzerid)

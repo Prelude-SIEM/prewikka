@@ -255,10 +255,10 @@ class Core:
 
             self._env.log(Log.EVENT_RENDER_VIEW, request, view, user)
 
-            try:
-                getattr(view["object"], view["handler"])()
-            except Prelude.Error, e:
-                raise Error.SimpleError("prelude internal error", str(e))
+            #try:
+            getattr(view["object"], view["handler"])()
+            #except (Prelude.PreludeError, Prelude.PreludeDBError), e:
+            #raise Error.SimpleError("prelude internal error", str(e))
 
             dataset = view["object"].dataset
             template_name = view["template"]
