@@ -123,6 +123,16 @@ class Message:
             key = "%s." % self._root + key
         
         return escape_value(self._get_raw_value(key))
+
+    def match(self, criteria):
+        if type(criteria) is list:
+            criteria = " && ".join(criteria)
+
+        criteria = idmef_criteria_new_from_string(criteria)
+        ret = idmef_criteria_match(criteria, self._res)
+        idmef_criteria_destroy(criteria)
+
+        return ret
         
     def get(self, key, default=None, escape=True):
         if key.find("%s." % self._root) != 0:
@@ -298,9 +308,9 @@ class IDMEFDatabase:
     def countHeartbeats(self, criteria=None):
         return self._countMessages("heartbeat", criteria)
 
-    def getAnalyzerids(self, criteria=None):
+    def getAnalyzerids(self):
         analyzerids = [ ]
-        rows = self.getValues([ "heartbeat.analyzer(-1).analyzerid/group_by" ], criteria)
+        rows = self.getValues([ "heartbeat.analyzer(-1).analyzerid/group_by" ])
         for row in rows:
             analyzerid = row[0]
             analyzerids.append(analyzerid)
@@ -309,9 +319,11 @@ class IDMEFDatabase:
 
     def getAnalyzerPaths(self, criteria=None):
         analyzer_paths = [ ]
-        for analyzerid in self.getAnalyzerids(criteria):
+        for analyzerid in self.getAnalyzerids():
             ident = self.getLastHeartbeatIdent(analyzerid)
             heartbeat = self.getHeartbeat(ident)
+            if criteria and not heartbeat.match(criteria):
+                continue
             path = [ ]
             index = 0
             while True:
