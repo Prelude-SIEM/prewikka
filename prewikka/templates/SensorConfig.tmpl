@@ -39,9 +39,9 @@
               #else
                 #set $checked = ""
 	      #end if
-	      <input type='checkbox' name='values' $checked/>
+	      <input type='checkbox' name='value_$option.index' $checked/>
 	    #else
-	      <input type='text' name='values' value='$option.value'/>
+	      <input type='text' name='value_$option.index' value='$option.value'/>
 	    #end if
 	</td>
 	#if not $is_instance
