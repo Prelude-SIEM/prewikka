@@ -9,13 +9,17 @@ function newFilterElement(name, object, operator, object_value) {
 	table = document.getElementById("elements")
 
 	if ( ! name ) {
-		child = table.lastChild.firstChild.firstChild
-		name = new String(child.nodeValue)
-		if ( name.charAt(name.length - 1) == "Z" ) {
-			name = name.concat("A")
+		if ( table.lastChild.nodeName == "TR" ) {
+			child = table.lastChild.firstChild.firstChild
+			name = new String(child.nodeValue)
+			if ( name.charAt(name.length - 1) == "Z" ) {
+				name = name.concat("A")
+			} else {
+				name = name.substr(0, name.length - 1) +
+						   String.fromCharCode(name.charCodeAt(name.length - 1) + 1)
+			}
 		} else {
-			name = name.substr(0, name.length - 1) +
-			       String.fromCharCode(name.charCodeAt(name.length - 1) + 1)
+			name = "A"
 		}
 	}
 
