@@ -1,6 +1,6 @@
 include database/*.sql
 include cgi-bin/*.cgi
-include scripts/*.py
+include scripts/*
 include htdocs/images/*
 include htdocs/css/*.css
 include htdocs/js/*.js
