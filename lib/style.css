@@ -463,6 +463,7 @@ td {
 .error_name {
 	font-size:60px;
 	color: red;
+	margin-top: 150px;
 }
 
 .error_message {
