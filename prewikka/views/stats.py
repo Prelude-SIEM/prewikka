@@ -17,6 +17,7 @@
 # along with this program; see the file COPYING.  If not, write to
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
+import time
 
 from prewikka import User, view
 
@@ -116,7 +117,7 @@ class Chart:
         locs, labels = yticks()
         step = int(locs[1] / 2)
         ymin, ymax = ylim()
-        r = range(int(ymin), int(ymax + step), step)
+        r = range(int(ymin), int(ymax + step), step or 1)
         yticks(r, r)
 
     def _setXticks(self):
@@ -190,3 +191,31 @@ class Stats(view.View):
         self.render_top10_classifications()
         self.render_sensor_distribution()
         self.render_timeline()
+
+
+
+class LastHourTimeline(view.View):
+    view_name = "last_hour_timeline"
+    view_template = "Stats"
+    view_permission = [ User.PERM_IDMEF_VIEW ]
+    view_parameters = view.Parameters
+
+    def render(self):
+        t = time.time()
+        chart = Chart("last_hour_timeline.png")
+        chart.setTitle("Last hour timeline")
+        chart.setLabelsTitle("Minutes")
+        chart.setValuesTitle("Alerts count")
+        t -= 3600
+        for i in range(60):
+            tm = time.localtime(t + i * 60)
+            criteria = "alert.create_time >= '%d-%d-%d %d:%d:00' && alert.create_time <= '%d-%d-%d %d:%d:59'" % \
+                       (tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min, tm.tm_year, tm.tm_mon, tm.tm_mday, tm.tm_hour, tm.tm_min)
+
+            count = self.env.prelude.countAlerts(criteria)
+
+            chart.addLabelValuePair("", count)
+
+        chart.renderBar()
+
+        self.dataset["charts"] = [ chart.getFilename() ]
