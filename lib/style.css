@@ -546,6 +546,10 @@ thead {
 	background-color: #e77070;
 }
 
+.heartbeat_analyze_sensor_status_unknown {
+	background-color: #E4E4E4;
+}
+
 .heartbeat_analyze_sensor_status_online {
 	background-color: #b5cba0;
 }
