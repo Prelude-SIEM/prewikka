@@ -124,6 +124,15 @@ class Core:
             dataset["prewikka.user.logout"] = utils.create_link("logout.logout")
         else:
             dataset["prewikka.user.logout"] = None
+
+    def _printDataSet(self, dataset, level=0):
+        for key, value in dataset.items():
+            print " " * level * 8,
+            if isinstance(value, DataSet.DataSet):
+                print key + ":"
+                self._printDataSet(value, level + 1)
+            else:
+                print "%s: %s" % (key, value)
             
     def _setupTemplate(self, template_class, dataset):
         template = template_class()
@@ -202,6 +211,7 @@ class Core:
             dataset = e.dataset
             self._setupDataSet(dataset, request)
 
+        #self._printDataSet(dataset)
         template = self._setupTemplate(template_class, dataset)
 
         request.content = str(template)

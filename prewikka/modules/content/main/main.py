@@ -23,13 +23,13 @@ import sys
 import time
 import copy
 
-from prewikka import User, ParametersNormalizer, utils
+from prewikka import User, Filter, ParametersNormalizer, utils
 
 
 from prewikka.modules.content.main.templates import \
      AlertListing, HeartbeatListing, MessageDetails, MessageListing, \
      MessageSummary, SensorAlertListing, SensorHeartbeatListing, \
-     SensorListing
+     SensorListing, FilterEdition
 
 
 
@@ -98,8 +98,9 @@ class MessagePM(ParametersNormalizer.ParametersNormalizer):
 
 class MessageListingPM(ParametersNormalizer.ParametersNormalizer):
     def register(self):
-        self.optional("filter_name", str)
-        self.optional("filter_value", str)
+        self.optional("inline_filter_name", str)
+        self.optional("inline_filter_value", str)
+        self.optional("filter", str)
         self.optional("timeline_value", int, default=1)
         self.optional("timeline_unit", str, default="hour")
         self.optional("timeline_end", int)
@@ -109,7 +110,7 @@ class MessageListingPM(ParametersNormalizer.ParametersNormalizer):
     def normalize(self, parameters):
         ParametersNormalizer.ParametersNormalizer.normalize(self, parameters)
 
-        for p1, p2 in ("filter_name", "filter_value"), ("timeline_value", "timeline_unit"):
+        for p1, p2 in ("inline_filter_name", "inline_filter_value"), ("timeline_value", "timeline_unit"):
             if parameters.has_key(p1) ^ parameters.has_key(p2):
                 raise ParametersNormalizer.MissingParameterError(parameters.has_key(p1) and p1 or p2)
 
@@ -165,30 +166,77 @@ class SensorMessageListingDeletePM(SensorMessageListingPM, DeletePM):
 
 
 
+def get_next_filter_element_name(name):
+    return chr(ord(name) + 1)
+
+
+class FilterLoadPM(ParametersNormalizer.ParametersNormalizer):
+    def register(self):
+        self.mandatory("filter_name", str)
+
+
+
+class FilterEditPM(ParametersNormalizer.ParametersNormalizer):
+    allow_extra_parameters = True
+
+    def register(self):
+        self.optional("filter_name", str)
+        self.optional("filter_comment", str)
+        self.optional("formula", str)
+        
+    def normalize(self, parameters):
+        ParametersNormalizer.ParametersNormalizer.normalize(self, parameters)
+        
+        parameters["elements"] = [ ]
+        name = "A"
+        while True:
+            if not parameters.has_key("object_%s" % name):
+                break
+            parameters["elements"].append((name,
+                                           parameters["object_%s" % name],
+                                           parameters["operator_%s" % name],
+                                           parameters.get("value_%s" % name, "")))
+            name = get_next_filter_element_name(name)
+
+
+
+class FilterSavePM(FilterEditPM):
+    def register(self):
+        FilterEditPM.register(self)
+        self.mandatory("filter_name", str)
+
+
+
 class View:
     def _setView(self, dataset):
         dataset["interface.active_section"] = self._active_section
-        dataset["interface.tabs"] = self._tabs
+        dataset["interface.tabs"] = [ (name, utils.create_link(slot)) for name, slot in self._tabs ]
         dataset["interface.active_tab"] = self._active_tab
     
 
+
 class AlertsView(View):
     _active_section = "Alerts"
-    _tabs = [("Alerts", utils.create_link("main.alert_listing"))]
+    _tabs = [("Alerts", "main.alert_listing"), ("Filters", "main.alert_filter_edition")]
     _active_tab = "Alerts"
+
+
+
+class AlertFilterEditionView(AlertsView):
+    _active_tab = "Filters"
 
 
 
 class HeartbeatsView(View):
     _active_section = "Heartbeats"
-    _tabs = [("Heartbeats", utils.create_link("main.heartbeat_listing"))]
+    _tabs = [("Heartbeats", "main.heartbeat_listing")]
     _active_tab = "Heartbeats"
 
 
 
 class SensorsView(View):
     _active_section = "Sensors"
-    _tabs = [("Sensors", utils.create_link("main.sensor_listing"))]
+    _tabs = [("Sensors", "main.sensor_listing")]
     _active_tab = "Sensors"
 
 
@@ -197,7 +245,7 @@ class MessageListingAction:
     def _adjustCriteria(self, request, criteria):
         pass
 
-    def _getFilter(self, wanted):
+    def _getInlineFilter(self, wanted):
         for name, object, filter in self.fields:
             if name == wanted:
                 return filter
@@ -208,10 +256,13 @@ class MessageListingAction:
         return utils.create_link("main.%s" % action,
                                  dict([(k, v) for k, v in parameters.items() if not k in ignore]))
 
-    def _setFilter(self, dataset, parameters):
-        dataset["active_filter"] = parameters.get("filter_name", "")
-        dataset["remove_active_filter"] = self._createLink(self.listing_action,
-                                                           parameters, ["filter_name", "filter_value", "offset"])
+    def _setInlineFilter(self, dataset, parameters):
+        dataset["active_inline_filter"] = parameters.get("inline_filter_name", "")
+        dataset["remove_active_inline_filter"] = self._createLink(self.listing_action,
+                                                                  parameters,
+                                                                  [ "inline_filter_name",
+                                                                    "inline_filter_value",
+                                                                    "offset"])
 
     def _setTimelineNext(self, dataset, parameters, next):
         dataset["timeline.next"] = self._createLink(self.listing_action,
@@ -240,7 +291,7 @@ class MessageListingAction:
         dataset["timeline.%s_selected" % parameters["timeline_unit"]] = "selected"
         dataset["timeline.hidden_parameters"] = { "content": "main.%s" % self.listing_action }
         for name in parameters.keys():
-            if not name in ("timeline_value", "timeline_unit", "limit"):
+            if not name in ("timeline_value", "timeline_unit", "limit", "filter"):
                 dataset["timeline.hidden_parameters"][name] = parameters[name]
         dataset["timeline.start"] = str(start)
         dataset["timeline.end"] = str(end)
@@ -305,11 +356,11 @@ class MessageListingAction:
 
     def _createMessageField(self, parameters, name, value):
         if not value:
-            return { "value": "n/a", "filter": None }
+            return { "value": "n/a", "inline_filter": None }
 
-        parameters = dict(parameters.items() + [("filter_name", name), ("filter_value", value)])
+        parameters = dict(parameters.items() + [("inline_filter_name", name), ("inline_filter_value", value)])
         
-        return { "value": value, "filter": self._createLink(self.listing_action, parameters) }
+        return { "value": value, "inline_filter": self._createLink(self.listing_action, parameters) }
 
     def _createMessageLink(self, message, action):
         return self._createLink(action, { "analyzerid": message["analyzerid"], "ident": message["ident"] })
@@ -342,14 +393,15 @@ class MessageListingAction:
         start, end = self._getTimelineRange(parameters)
 
         criteria = [ ]
-        if parameters.has_key("filter_name") and parameters.has_key("filter_value"):
-            criteria.append("%s == '%s'" % (self._getFilter(parameters["filter_name"]), parameters["filter_value"]))
+        if parameters.has_key("inline_filter_name") and parameters.has_key("inline_filter_value"):
+            criteria.append("%s == '%s'" % (self._getInlineFilter(parameters["inline_filter_name"]),
+                                            parameters["inline_filter_value"]))
         criteria.append(self.time_criteria_format % (str(start), str(end)))
         self._adjustCriteria(request, criteria)
         criteria = " && ".join(criteria)
 
         self._setView(dataset)
-        self._setFilter(dataset, parameters)
+        self._setInlineFilter(dataset, parameters)
         self._setTimeline(dataset, parameters, start, end)
         self._setNavPrev(dataset, parameters, offset)
 
@@ -398,6 +450,22 @@ class AlertListingAction(MessageListingAction, AlertsView):
         for name in "classification", "source", "target", "sensor":
             fields[name] = self._createMessageField(parameters, name, alert[name])
         fields["time"] = self._createMessageTimeField(alert["time"])
+
+    def getFilters(self, storage, login):
+        return storage.getAlertFilters(login)
+
+    def getFilter(self, storage, login, name):
+        return storage.getAlertFilter(login, name)
+
+    def _adjustCriteria(self, request, criteria):
+        if request.parameters.has_key("filter"):
+            filter = self.getFilter(request.env.storage, request.user.login, request.parameters["filter"])
+            criteria.append(str(filter))
+
+    def process(self, request):
+        MessageListingAction.process(self, request)
+        request.dataset["filters"] = self.getFilters(request.env.storage, request.user.login)
+        request.dataset["current_filter"] = request.parameters.get("filter", "")
 
 
 
@@ -546,8 +614,6 @@ class AlertSummaryAction(MessageSummaryAction, AlertsView):
         self.buildAdditionalData(dataset, alert)
         self._setView(dataset)
 
-        return MessageSummary.MessageSummary
-
 
 
 class HeartbeatSummaryAction(MessageSummaryAction, HeartbeatsView):
@@ -565,8 +631,6 @@ class HeartbeatSummaryAction(MessageSummaryAction, HeartbeatsView):
         self.buildTime(dataset, heartbeat)
         self.buildAdditionalData(dataset, heartbeat)
         self._setView(dataset)
-
-        return MessageSummary.MessageSummary
 
 
 
@@ -1019,6 +1083,88 @@ class SensorListingAction(SensorsView):
 
 
 
+class AlertFilterEdition(AlertFilterEditionView):
+    def _setCommon(self, request):
+        self._setView(request.dataset)
+        request.dataset["filters"] = request.env.storage.getAlertFilters(request.user.login)
+        request.dataset["objects"] = Filter.ALERT_OBJECTS
+        request.dataset["operators"] = ("==", "!=", "<", "<=", ">", ">=")
+        request.dataset["elements"] = [ ]
+        request.dataset["fltr.name"] = ""
+        request.dataset["fltr.comment"] = ""
+        request.dataset["formula"] = ""
+        
+    def _element(self, name, obj="", operator="", value=""):
+        return {
+            "name": name,
+            "object": obj,
+            "operator": operator,
+            "value": value
+            }
+
+    def _addEmptyElement(self, elements):
+        if elements:
+            name = get_next_filter_element_name(elements[-1]["name"])
+        else:
+            name = "A"
+
+        elements.append(self._element(name))
+
+    def _reloadForm(self, request):
+        self._setCommon(request)
+        parameters = request.parameters
+        dataset = request.dataset
+        
+        name = "A"
+        for name, obj, operator, value in parameters["elements"]:
+            dataset["elements"].append(self._element(name, obj, operator, value))
+            name = get_next_filter_element_name(name)
+
+        if not dataset["elements"]:
+            self._addEmptyElement(dataset["elements"])
+
+        dataset["fltr.name"] = parameters.get("filter_name", "")
+        dataset["fltr.comment"] = parameters.get("filter_comment", "")
+
+    def edition(self, request):
+        self._setCommon(request)
+        self._reloadForm(request)
+        
+        parameters = request.parameters.keys()
+        if "save" in parameters:
+            self.save(request)
+        elif "new_element" in parameters:
+            self.newElement(request)
+        
+    def newElement(self, request):
+        self._addEmptyElement(request.dataset["elements"])
+
+    def load(self, request):
+        self._setCommon(request)
+        filter = request.env.storage.getAlertFilter(request.user.login, request.parameters["filter_name"])
+        dataset = request.dataset
+        dataset["fltr.name"] = filter.name
+        dataset["fltr.comment"] = filter.comment
+        dataset["formula"] = filter.formula
+        names = filter.elements.keys()
+        names.sort()
+        for name in names:
+            obj, operator, value = filter.elements[name]
+            dataset["elements"].append(self._element(name, obj, operator, value))
+
+    def save(self, request):
+        parameters = request.parameters
+        elements = { }
+        for name, obj, operator, value in parameters["elements"]:
+            elements[name] = (obj, operator, value)
+
+        filter = Filter.AlertFilter(parameters["filter_name"], parameters.get("filter_comment", ""),
+                                    elements, parameters["formula"])
+
+        request.env.storage.setFilter(request.user.login, filter)
+        
+
+
 def load(env, config):
     return {
         "sections": [("Alerts", "alert_listing"),
@@ -1030,90 +1176,112 @@ def load(env, config):
         "slots": { # Alerts section
                    "alert_listing": { "handler": AlertListingAction().process,
                                       "parameters": MessageListingPM(),
-                                      "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                      "permissions": [ User.PERM_IDMEF_VIEW ],
                                       "template": AlertListing.AlertListing },
 
                    "alert_summary": { "handler": AlertSummaryAction().process,
                                       "parameters": MessagePM(),
-                                      "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                      "permissions": [ User.PERM_IDMEF_VIEW ],
                                       "template": MessageSummary.MessageSummary },
 
                    "alert_details": { "handler": AlertDetailsAction().process,
                                       "parameters": MessagePM(),
-                                      "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                      "permissions": [ User.PERM_IDMEF_VIEW ],
                                       "template": MessageDetails.MessageDetails },
 
                    "alert_delete": { "handler": AlertDeleteAction().process,
                                      "parameters": MessageListingDeletePM(),
-                                     "permissions": [ User.PERM_MESSAGE_VIEW, User.PERM_MESSAGE_ALTER ],
+                                     "permissions": [ User.PERM_IDMEF_VIEW, User.PERM_IDMEF_ALTER ],
                                      "template": AlertListing.AlertListing },
 
+                   "alert_filter_edition": { "handler": AlertFilterEdition().edition,
+                                             "parameters": FilterEditPM(),
+                                             "permissions": [ User.PERM_IDMEF_VIEW ],
+                                             "template": FilterEdition.FilterEdition },
+
+
+                   "alert_filter_load": { "handler": AlertFilterEdition().load,
+                                          "parameters": FilterLoadPM(),
+                                          "permissions": [ User.PERM_IDMEF_VIEW ],
+                                          "template": FilterEdition.FilterEdition },
+
+
+##                    "alert_filter_new_element": { "handler": AlertFilterEdition().newElement,
+##                                                  "parameters": FilterEditPM(),
+##                                                  "permissions": [ User.PERM_IDMEF_VIEW ],
+##                                                  "template": FilterEdition.FilterEdition },
+
+##                    "alert_filter_save": { "handler": AlertFilterEdition().save,
+##                                           "parameters": FilterEditPM(),
+##                                           "permissions": [ User.PERM_IDMEF_VIEW ],
+##                                           "template": FilterEdition.FilterEdition },
+                   
                    # Hearbeats section
 
                    "heartbeat_listing": { "handler": HeartbeatListingAction().process,
                                           "parameters": MessageListingPM(),
-                                          "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                          "permissions": [ User.PERM_IDMEF_VIEW ],
                                           "template": HeartbeatListing.HeartbeatListing },
 
                    "heartbeat_summary": { "handler": HeartbeatSummaryAction().process,
                                           "parameters": MessagePM(),
-                                          "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                          "permissions": [ User.PERM_IDMEF_VIEW ],
                                           "template": MessageSummary.MessageSummary },
 
                    "heartbeat_details": { "handler": HeartbeatDetailsAction().process,
                                           "parameters": MessagePM(),
-                                          "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                          "permissions": [ User.PERM_IDMEF_VIEW ],
                                           "template": MessageDetails.MessageDetails },
 
                    "heartbeat_delete": { "handler": HeartbeatDeleteAction().process,
                                          "parameters": MessageListingDeletePM(),
-                                         "permissions": [ User.PERM_MESSAGE_VIEW, User.PERM_MESSAGE_ALTER ],
+                                         "permissions": [ User.PERM_IDMEF_VIEW, User.PERM_IDMEF_ALTER ],
                                          "template": HeartbeatListing.HeartbeatListing },
 
                    # Sensors section
 
                    "sensor_listing": { "handler": SensorListingAction().process,
-                                       "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                       "permissions": [ User.PERM_IDMEF_VIEW ],
                                        "template": SensorListing.SensorListing },
 
                    "sensor_alert_listing": { "handler": SensorAlertListingAction().process,
                                              "parameters": SensorMessageListingPM(),
-                                             "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                             "permissions": [ User.PERM_IDMEF_VIEW ],
                                              "template": SensorAlertListing.SensorAlertListing },
 
                    "sensor_alert_summary": { "handler": SensorAlertSummaryAction().process,
                                              "parameters": MessagePM(),
-                                             "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                             "permissions": [ User.PERM_IDMEF_VIEW ],
                                              "template": MessageSummary.MessageSummary },
 
                    "sensor_alert_details": { "handler": SensorAlertDetailsAction().process,
                                              "parameters": MessagePM(),
-                                             "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                             "permissions": [ User.PERM_IDMEF_VIEW ],
                                              "template": MessageDetails.MessageDetails },
 
                    "sensor_alert_delete": { "handler": SensorAlertDeleteAction().process,
                                             "parameters": SensorMessageListingDeletePM(),
-                                            "permissions": [ User.PERM_MESSAGE_VIEW, User.PERM_MESSAGE_ALTER ],
+                                            "permissions": [ User.PERM_IDMEF_VIEW, User.PERM_IDMEF_ALTER ],
                                             "template": SensorAlertListing.SensorAlertListing },
 
                    "sensor_heartbeat_listing": { "handler": SensorHeartbeatListingAction().process,
                                                  "parameters": SensorMessageListingPM(),
-                                                 "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                                 "permissions": [ User.PERM_IDMEF_VIEW ],
                                                  "template": SensorHeartbeatListing.SensorHeartbeatListing },
 
                    "sensor_heartbeat_summary": { "handler": SensorHeartbeatSummaryAction().process,
                                                  "parameters": MessagePM(),
-                                                 "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                                 "permissions": [ User.PERM_IDMEF_VIEW ],
                                                  "template": MessageSummary.MessageSummary },
 
                    "sensor_heartbeat_details": { "handler": HeartbeatDetailsAction().process,
                                                  "parameters": MessagePM(),
-                                                 "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                                 "permissions": [ User.PERM_IDMEF_VIEW ],
                                                  "template": MessageDetails.MessageDetails },
 
                    "sensor_heartbeat_delete": { "handler": HeartbeatDeleteAction().process,
                                                 "parameters": SensorMessageListingDeletePM(),
-                                                "permissions": [ User.PERM_MESSAGE_VIEW, User.PERM_MESSAGE_ALTER ],
+                                                "permissions": [ User.PERM_IDMEF_VIEW, User.PERM_IDMEF_ALTER ],
                                                 "template": SensorHeartbeatListing.SensorHeartbeatListing },
                    }
         }

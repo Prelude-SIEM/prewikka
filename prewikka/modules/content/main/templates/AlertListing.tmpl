@@ -17,7 +17,7 @@
    <ul>
     <li><a href="$message.details">Alert detail</a></li>
     <li><a href="$message.summary">Alert summary</a></li>
-    <li><a href="$message.classification.filter">Group by classification</a></li>
+    <li><a href="$message.classification.inline_filter">Group by classification</a></li>
    </ul>
   </li>
  </ul>
@@ -27,7 +27,7 @@
  <ul id="popup_block">
   <li class="popup_title">$message.source.value
    <ul>
-    <li><a href="$message.source.filter">Group by source</a></li>
+    <li><a href="$message.source.inline_filter">Group by source</a></li>
     <li><a href="scan">Scan source</a></li>
     <li><a href="traceroute">Traceroute source</a></li>
     <li><a href="whois">Whois</a></li>
@@ -40,7 +40,7 @@
  <ul id="popup_block">
   <li class="popup_title">$message.target.value
    <ul>
-    <li><a href="$message.target.filter">Group by target</a></li>
+    <li><a href="$message.target.inline_filter">Group by target</a></li>
     <li><a href="scan">Scan target</a></li>
     <li><a href="traceroute">Traceroute target</a></li>
     <li><a href="whois">Whois target</a></li>
@@ -50,6 +50,26 @@
 </td>
 
 
-<td><a href='$message.sensor.filter'>$message.sensor.value</a></td>
+<td><a href='$message.sensor.inline_filter'>$message.sensor.value</a></td>
 <td>$message.time</td>
 #end block message_fields
+
+#block timeline_extra_content
+<tr>
+  <td>Filter</td>
+  <td colspan='2'>
+  <select name='filter'>
+  #for $key, $value in $timeline.hidden_parameters.items()
+    <input type='hidden' name='$key' value='$value'/>
+  #end for
+  <option value=""/>
+  #for $fltr in $filters
+    #if $fltr == $current_filter
+      #set $selected = "selected"
+    #else
+      #set $selected = ""
+    #end if
+    <option value='$fltr' $selected/>$fltr
+  #end for
+  </td>
+#end block

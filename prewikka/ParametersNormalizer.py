@@ -38,6 +38,8 @@ class MissingParameterError(Error):
     
 
 class ParametersNormalizer:
+    allow_extra_parameters = False
+    
     def __init__(self):
         self._parameters = { }
         self.register()
@@ -56,7 +58,10 @@ class ParametersNormalizer:
             try:
                 parameter_type = self._parameters[name]["type"]
             except KeyError:
-                raise InvalidParameterError(name)
+                if self.allow_extra_parameters:
+                    continue
+                else:
+                    raise InvalidParameterError(name)
         
             if parameter_type is list and not type(value) is list:
                 value = [ value ]

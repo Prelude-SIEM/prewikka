@@ -21,7 +21,7 @@ import os, os.path
 import errno
 import shutil
 
-from prewikka import Storage, Auth, User
+from prewikka import Storage, Filter, Auth, User
 
 
 class DirectoryStorage(Storage.Storage):
@@ -43,9 +43,12 @@ class DirectoryStorage(Storage.Storage):
     def _getUserFilePath(self, login, file):
         return "%s/%s" % (self._getUserPath(login), file)
 
+    def _getUserFilterPath(self, login, type="", name=""):
+        return self._getUserFilePath(login, "filters/%s/%s" % (type, name))
+
     def _openUserFile(self, login, file, mode="r"):
         try:
-            return open(self._getUserFilePath(login, file), mode)
+            return open(file, mode)
         except IOError, e:
             if e.errno == errno.ENOENT and not os.path.exists(self._getUserPath(login)):
                 raise Storage.StorageError("unknown user '%s'" % login)
@@ -59,7 +62,10 @@ class DirectoryStorage(Storage.Storage):
 
     def createUser(self, login):
         os.mkdir(self._getUserPath(login))
-        self._openUserFile(login, "permissions", "w")
+        os.mkdir(self._getUserFilterPath(login))
+        os.mkdir(self._getUserFilterPath(login, "alert"))
+        os.mkdir(self._getUserFilterPath(login, "heartbeat"))
+        self._openUserFile(login, self._getUserFilePath(login, "permissions"), "w")
 
     def deleteUser(self, login):
         shutil.rmtree(self._getUserPath(login))
@@ -68,12 +74,12 @@ class DirectoryStorage(Storage.Storage):
         return os.listdir(self._users_dir)
 
     def setPassword(self, login, password):
-        file = self._openUserFile(login, "password", "w")
+        file = self._openUserFile(login, self._getUserFilePath(login, "password"), "w")
         file.write(password)
         file.close()
 
     def getPassword(self, login):
-        file = self._openUserFile(login, "password")
+        file = self._openUserFile(login, self._getUserFilePath(login, "password"))
         password = file.read()
         file.close()
         return password
@@ -86,14 +92,14 @@ class DirectoryStorage(Storage.Storage):
         return True
 
     def setPermissions(self, login, permissions):
-        file = self._openUserFile(login, "permissions", "w")
+        file = self._openUserFile(login, self._getUserPath("permissions"), "w")
         for perm in permissions:
             print >> file, perm
         file.close()
 
     def getPermissions(self, login):
         permissions = [ ]
-        file = self._openUserFile(login, "permissions")
+        file = self._openUserFile(login, self._getUserFilePath(login, "permissions"))
         for perm in file.xreadlines():
             perm = perm.rstrip()
             if not perm in User.ALL_PERMISSIONS:
@@ -128,6 +134,42 @@ class DirectoryStorage(Storage.Storage):
         if not os.path.exists(self._sessions_dir):
             return [ ]
         return os.listdir(self._sessions_dir)
+
+    def getAlertFilters(self, login):
+        return os.listdir(self._getUserFilterPath(login, "alert"))
+
+    def getHeartbeatFilters(self, login):
+        return os.listdir(self._getUserFilterPath(login, "heartbeat"))
+
+    def setFilter(self, login, filter):
+        filename = self._getUserFilterPath(login, filter.type, filter.name)
+        file = self._openUserFile(login, filename, mode='w')
+        
+        print >> file, filter.comment
+        print >> file, filter.formula
+        for name, element in filter.elements.items():
+            print >> file, "%s=%s" % (name, ",".join(element))
+        file.close()
+
+    def _getFilter(self, login, name, filter_class):
+        filename = self._getUserFilterPath(login, filter_class.type, name)
+        file = self._openUserFile(login, filename)
+        
+        comment = file.readline().rstrip()
+        formula = file.readline().rstrip()
+        elements = { }
+        for line in file.xreadlines():
+            element_name, element = line.rstrip().split("=", 1)
+            element = element.split(",", 2)
+            elements[element_name] = element
+
+        return filter_class(name, comment, elements, formula)
+
+    def getAlertFilter(self, login, name):
+        return self._getFilter(login, name, Filter.AlertFilter)
+
+    def getHeartbeatFilter(self, login, name):
+        return self._getFilter(login, name, Filter.HeartbeatFilter)
 
 
 

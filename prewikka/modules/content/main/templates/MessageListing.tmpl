@@ -30,15 +30,15 @@ $message_listing_header
 		#end for
 	</tbody>
 	<tfoot>
-	#def del_filter(name)
-		#if $active_filter == $name
-			<a href='$remove_active_filter'>del filter</a>
+	#def del_inline_filter(name)
+		#if $active_inline_filter == $name
+			<a href='$remove_active_inline_filter'>del filter</a>
 		#end if
 	#end def
-	<td>$del_filter("classification")</td>
-	<td>$del_filter("source")</td>
-	<td>$del_filter("target")</td>
-	<td>$del_filter("sensor")</td>
+	<td>$del_inline_filter("classification")</td>
+	<td>$del_inline_filter("source")</td>
+	<td>$del_inline_filter("target")</td>
+	<td>$del_inline_filter("sensor")</td>
 	<td></td>
 	<td class='static_content_column'><input type='submit' value='delete'/></td>
 	</tfoot>
@@ -50,6 +50,9 @@ $message_listing_header
 
 <table id="timeline">
  <form action="?" method="get">
+  #def timeline_extra_content
+  #end def
+  $timeline_extra_content
   #for $name, $value in $timeline.hidden_parameters.items()
    <input type="hidden" name="$name" value="$value"/>
   #end for

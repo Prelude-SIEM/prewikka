@@ -1,0 +1,84 @@
+#extends prewikka.templates.ClassicLayout
+
+#block main_content
+<div class='box'>
+<h1>Load</h1>
+<form action="?" method="POST">
+  <input type="hidden" name="content" value="main.alert_filter_load"/>
+  <select name="filter_name">
+  #for $f in $filters
+    #if $f == $fltr.name
+      #set $selected = "selected"
+    #else
+      #set $selected =""
+    #end if
+    <option value="$f" $selected>$f
+  #end for
+  </select>
+  <input type='submit' value='load'/>
+</form>
+</div>
+
+<div class='box'>
+<h1>Edition</h1>
+<form action="?" method="POST">
+<input type='hidden' name='content' value='main.alert_filter_edition'/>
+<table>
+#for $element in $elements
+<tr>
+  <td>$element.name</td>
+  <td>
+    <select name='object_$element.name'>
+    #for $object in $objects
+      #if $object == $element.object
+        #set $selected = "selected"
+      #else
+        #set $selected = ""
+      #end if
+      <option value='$object' $selected/>$object</option>
+    #end for
+    </select>
+  </td>
+  <td>
+    <select name='operator_$element.name'>
+    #for $operator in $operators
+      #if operator == $element.operator
+        #set $selected = "selected"
+      #else
+        #set $selected = ""
+      #end if
+      <option value='$operator' $selected/>$operator</option>
+    #end for
+    </select>
+  </td>
+  <td>
+    <input type='text' name='value_$element.name' value='$element.value'/>
+  </td>
+</tr>
+#end for
+<tr>
+  <td><input type='submit' name='new_element' value='more'/></td>
+  <td></td>
+  <td></td>
+  <td></td>
+</tr>
+</table>
+Formula: <input type='text' name='formula' value='$formula'/>
+</div>
+
+<div class='box'>
+  <h1>Save</h1>
+  <table>
+    <tr>
+      <td>name</td>
+      <td><input type='text' name='filter_name' value='$fltr.name'/></td>
+    </tr>
+    <tr>
+      <td>comment</td>
+      <td><textarea type='textarea' name='filter_comment'>$fltr.comment</textarea></td>
+    </tr>
+  </table>
+  <input type='submit' name='save' value='save'/>
+</form>
+</div>
+#end block main_content
