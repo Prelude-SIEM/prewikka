@@ -396,20 +396,20 @@ function ${name}_add_entry(object, value, num) {
   <ul id="popup_block">
     <li class="popup_title">
       #if $direction.service.value
-       <span>$direction.address.value</span>:$direction.service.value
+       $direction.address.category<span>$direction.address.value</span>:$direction.service.value
 	#if $direction.service_extra.value
           ($direction.service_extra.value)
         #end if
       #else
-        <span>$direction.address.value</span>
+          <span>$direction.address.value</span>
       #end if
       #if $direction.address_extra.value
-        <br/>($direction.address_extra.value)
+        <br/>($direction.address_extra.category $direction.address_extra.value)
       #end if
       #if $direction.addresses
         <br/>
         #for $address in $direction.addresses
-            $address.value
+            $address.category<span>$address.value</span>
         #end for
       #end if
       #if $direction.users

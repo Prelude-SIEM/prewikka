@@ -298,13 +298,13 @@ class MessageListing:
         return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
 
     def _createHostField(self, object, value, category, type=None):
-        if category:
-            value_with_category = "%s:%s" % (category, value)
+        field = self._createInlineFilteredField(object, value, type)
+        if category != "unknown":
+            field["category"] = category + ":"
         else:
-            value_with_category = value
-
-        field = self._createInlineFilteredField(object, value_with_category, type)
+            field["category"] = ""
         field["host_commands"] = [ ]
+        
         if not value:
             return field
 
@@ -422,9 +422,11 @@ class AlertListing(MessageListing, view.View):
 
             category = message["alert.%s(0).node.address(%d).category" % (direction, idx)]
             if category != "unknown":
-                address = "%s:%s" % (category, address)
+                category = ":" + category
+            else:
+                category = ""
 
-            dataset["addresses"].append({ "value": address })
+            dataset["addresses"].append({ "value": address, "category": category })
             idx += 1
 
         if idx > 1:
@@ -444,10 +446,10 @@ class AlertListing(MessageListing, view.View):
             
             dataset["address"] = self._createHostField("alert.%s.node.address.address" % direction,
                                                        address, category, type=direction)
-            dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction] }
+            dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction], "category": "unknown" }
         else:
             dataset["address"] = self._createHostField("alert.%s.node.name" % direction,
-                                                       message["alert.%s(0).node.name" % direction], None,
+                                                       message["alert.%s(0).node.name" % direction], "unknown",
                                                        type=direction)
             dataset["address_extra"] = { "value": None }
 
@@ -821,7 +823,7 @@ class HeartbeatListing(MessageListing, view.View):
         dataset["node_name"] = self._createInlineFilteredField("heartbeat.analyzer.node.name",
                                                                message["heartbeat.analyzer.node.name"])
         dataset["node_address"] = self._createHostField("heartbeat.analyzer.node.address.address",
-                                                        message["heartbeat.analyzer.node.address(0).address"], None)
+                                                        message["heartbeat.analyzer.node.address(0).address"], "unknown")
         dataset["time"] = self._createTimeField(message["heartbeat.create_time"])
 
         return dataset
