@@ -656,10 +656,9 @@ class AlertListing(MessageListing, view.View):
                         "classification": self._createInlineFilteredField("alert.classification.text", classification),
                         "classification_references": "",
                         "severity": { "value": severity or "low" },
-                        "completion": { "value": completion }
+                        "completion": { "value": completion },
+                        "display": expand
                         }
-
-                    infos["display"] = expand
 
                     if count == 1:
                         criteria3 = criteria2[:]
@@ -672,6 +671,19 @@ class AlertListing(MessageListing, view.View):
 
                         for ident in self.env.prelude.getAlertIdents(criteria3, limit=1):
                             infos["display"] = self._createMessageLink(ident, "alert_summary")
+
+                        urls = [ ]
+
+                        for origin, name, url in self.env.prelude.getValues(["alert.classification.reference.origin",
+                                                                             "alert.classification.reference.name",
+                                                                             "alert.classification.reference.url"],
+                                                                            criteria3):
+                            if origin and name and url:
+                                urls.append("<a href='%s'>%s:%s</a>" % (url, origin, name))
+
+                        if urls:
+                            infos["classification_references"] = "(" + ", ".join(urls) + ")"
+                            
                         
                     dataset["infos"].append(infos)
 
