@@ -352,7 +352,12 @@ function ${name}_add_entry(object, value, num) {
     (on $message.sensor_node_name.value)
   #end if
 </td>
-<td>$message.time.value</td>
+<td>
+  $message.time.value
+  #if $message.detect_time.value
+    (detected at $message.detect_time.value)
+  #end if
+</td>
 #end block message_fields
 
 #block timeline_extra_content

@@ -340,10 +340,13 @@ class MessageListing:
         for analyzerid, messageid in self.parameters["idents"]:
             self._deleteMessage(analyzerid, messageid)
 
-    def render(self, criteria=[]):
+    def render(self, criteria=None):
         self._deleteMessages()
         
         start, end = self._getTimelineRange()
+
+        if criteria is None:
+            criteria = [ ]
         
         criteria.append(self.time_criteria_format % (str(start), str(end)))
         criteria = " && ".join(criteria)
@@ -436,7 +439,7 @@ class AlertListing(MessageListing, view.View):
                                                            (direction, idx)]})
             idx += 1
 
-        if idx:
+        if idx > 1:
             empty = False            
 
         set_main_and_extra_values(dataset, message, "process",
@@ -502,14 +505,19 @@ class AlertListing(MessageListing, view.View):
         
     def _setMessageSensor(self, dataset, message):
         def get_analyzer_names(alert, root):
-            analyzerid = alert[root + ".analyzerid"]
+            analyzerid = alert[root + ".name"]
             if analyzerid != None:
                 return [ alert[root + ".name"] ] + get_analyzer_names(alert, root + ".analyzer")
             return [ ]
 
         analyzers = get_analyzer_names(message, "alert.analyzer")
 
-        dataset["sensor"] = self._createInlineFilteredField("alert.analyzer.name", analyzers[0], type="analyzer")
+        if len(analyzers) > 0:
+            analyzer_name = analyzers[0]
+        else:
+            analyzer_name = "n/a"
+
+        dataset["sensor"] = self._createInlineFilteredField("alert.analyzer.name", analyzer_name, type="analyzer")
         dataset["sensor"]["value"] = "/".join(analyzers[:-1])
 
         dataset["sensor_node_name"] = { "value": message["alert.analyzer.node.name"] }
@@ -517,7 +525,14 @@ class AlertListing(MessageListing, view.View):
     def _setMessage(self, dataset, message):
         dataset["severity"] = { "value": message.get("alert.assessment.impact.severity", "low") }
         dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
+        
         dataset["time"] = self._createTimeField(message["alert.create_time"], self.parameters["timezone"])
+        if (message["alert.detect_time"] != None and
+            abs(int(message["alert.create_time"]) - int(message["alert.detect_time"])) > 60):
+            dataset["detect_time"] = self._createTimeField(message["alert.detect_time"], self.parameters["timezone"])
+        else:
+            dataset["detect_time"] = { "value": None }
+        
         self._setMessageSource(dataset, message)
         self._setMessageTarget(dataset, message)
         self._setMessageSensor(dataset, message)
