@@ -713,7 +713,7 @@ class AlertListing(MessageListing, view.View):
         self.dataset["messages"] = [ ]
         total = self._setMessages(criteria)
 
-        self.dataset["hidden_parameters"] = [ [ "current_view", self.view_name ] ]
+        self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
         if self.parameters.has_key("timeline_end"):
             self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
         self.dataset["nav.from"] = self.parameters["offset"] + 1
@@ -778,7 +778,7 @@ class HeartbeatListing(MessageListing, view.View):
         self.dataset["messages"] = [ ]
         self._setMessages(criteria)
 
-        self.dataset["hidden_parameters"] = [ [ "current_view", self.view_name ] ]
+        self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
         if self.parameters.has_key("timeline_end"):
             self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
         self.dataset["nav.from"] = self.parameters["offset"] + 1
