@@ -6,7 +6,6 @@ import util
 import re
 from templates.modules.mod_alert import MessageList, MessageSummary, MessageDetails
 from templates import Table
-import module
 import Interface
 import Views
 
@@ -490,96 +489,8 @@ class DeleteHeartbeatsAction(HeartbeatListAction):
         parameters = ListActionParameters(parameters)
         
         return HeartbeatListAction.process(self, core, parameters)
-        
 
 
-
-## class AlertModule(module.ContentModule):
-##     def __init__(self, _core, config):
-##         module.ContentModule.__init__(self, _core)
-##         self.setName("Alerts")
-##         self.addSection("Alerts", "alert_list")
-##         self.addSection("Heartbeats", "heartbeat_list")
-##         self.registerAction("alert_list", ListRequest, default=True)
-##         self.registerAction("alert_summary", AlertRequest)
-##         self.registerAction("alert_details", AlertRequest)
-##         self.registerAction("alert_delete", DeleteRequest)
-
-##     def handle_alert_list(self, request):
-##         result = { "request": request }
-##         prelude = self._core.prelude
-##         criteria = [ ]
-        
-##         if request.getFilterName() and request.getFilterValue():
-##             criteria.append("%s == '%s'" % (request.getFilterName(), request.getFilterValue()))
-
-##         if not request.getTimelineValue() or not request.getTimelineUnit():
-##             request.setTimelineValue(1)
-##             request.setTimelineUnit("hour")
-
-##         if request.getTimelineEnd():
-##             end = MyTime(request.getTimelineEnd())
-##         else:
-##             end = MyTime()
-##             if not request.getTimelineUnit() in ("min", "hour"):
-##                 end.round(request.getTimelineUnit())
-        
-##         start = end[request.getTimelineUnit()] - request.getTimelineValue()
-        
-##         result["start"], result["end"] = start, end
-
-##         if not request.getTimelineEnd() and request.getTimelineUnit() in ("min", "hour"):
-##             tmp = copy.copy(end)
-##             tmp.round(request.getTimelineUnit())
-##             tmp = tmp[request.getTimelineUnit()] - 1
-##             result["next"] = tmp[request.getTimelineUnit()] + request.getTimelineValue()
-##             result["prev"] = tmp[request.getTimelineUnit()] - (request.getTimelineValue() - 1)
-##         else:
-##             result["next"] = end[request.getTimelineUnit()] + request.getTimelineValue()
-##             result["prev"] = end[request.getTimelineUnit()] - request.getTimelineValue()
-        
-##         criteria.append("alert.detect_time >= '%s' && alert.detect_time < '%s'" % (str(start), str(end)))
-        
-##         idents = prelude.getAlertIdents(" && ".join(criteria))
-##         alerts = [ ]
-##         if idents:
-##             for analyzerid, alert_ident in idents:
-##                 alert = prelude.getAlert(analyzerid, alert_ident)
-##                 alerts.append(alert)
-        
-##         alerts.sort(lambda alert1, alert2: (int(alert2["detect_time"] or alert2["create_time"]) -
-##                                             int(alert1["detect_time"] or alert1["create_time"])))
-
-##         result["messages"] = alerts
-        
-##         return AlertListViewInstance, result
-
-##     def handle_default(self, request):
-##         return self.handle_list(request)
-
-##     def _getAlert(self, request):
-##         return self._core.prelude.getAlert(request.getAnalyzerid(), request.getAlertIdent())
-
-##     def handle_alert_summary(self, request):
-##         return SummaryViewInstance, self._getAlert(request)
-
-##     def handle_alert_details(self, request):
-##         return DetailsViewInstance, self._getAlert(request)
-
-##     def handle_alert_delete(self, request):
-##         for analyzerid, alert_ident in request.getIdents():
-##             self._core.prelude.deleteAlert(analyzerid, alert_ident)
-
-##         request = ListRequest(request)
-##         request.setAction("alert_list")
-        
-##         return self.handle_alert_list(request)
-
-
-
-## def load(_core, config):
-##     module = AlertModule(_core, config)
-##     _core.registerContentModule(module)
 
 def load(_core, config):
     # Alerts

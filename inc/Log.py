@@ -1,13 +1,19 @@
 class Log:
     def __init__(self):
-        self._modules = [ ]
+        self._backends = [ ]
 
-    def registerModule(self, module):
-        self._modules.append(module)
+    def registerBackend(self, backend):
+        self._backends.append(backend)
 
-    def _applyOnModules(self, handler, request):
-        for module in self._modules:
-            getattr(module, handler)(request)
+    def _applyOnBackends(self, handler, request):
+        for backend in self._backends:
+            getattr(backend, handler)(request)
 
     def invalidQuery(self, query):
-        self._applyOnModules("invalidQuery", query)
+        self._applyOnBackends("invalidQuery", query)
+
+
+
+class LogBackend:
+    def invalidQuery(self, query):
+        pass
