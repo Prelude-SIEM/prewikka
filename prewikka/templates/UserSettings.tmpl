@@ -10,19 +10,19 @@
   <input type="hidden" name="user_management_mode" value="yes"/>
 #end if
 
-<fieldset>
+<fieldset id="fieldset_heading">
   <legend>Account informations</legend>
 
   <table>
     <tr>
       <th>Login:</th>
-      <td>$user.login</td>
+      <td style="text-align: center;">$user.login</td>
     </tr>
   </table>
 
   <table>
-    <tr>
-      <td><b>Permissions:</b></td>
+     <tr class="nodash">  
+       <th>Permissions:</th>  
     </tr>
     <tr>
       <td>
