@@ -613,7 +613,7 @@ class HeartbeatListingAction(MessageListingAction, HeartbeatsView):
         for name in "ident", "analyzerid", "name", "type":
             fields[name] = self._createMessageField(request.parameters, name, heartbeat[name])
         fields["address"] = self._createMessageHostField(request, "address", heartbeat["address"])
-        fields["time"] = self._createMessageTimeField(heartbeat["time"])
+        fields["time"] = self._createMessageTimeField(heartbeat["time"], request.parameters["timezone"])
 
 
 
