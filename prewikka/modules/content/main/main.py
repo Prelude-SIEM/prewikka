@@ -527,15 +527,19 @@ class AlertListingAction(MessageListingAction, AlertsView):
         cnt = 0
 
         while True:
+            orgin = src["alert.classification.reference(%d).origin" % cnt]
+            if origin is None:
+                break
+            
             name = src["alert.classification.reference(%d).name" % cnt]
             if not name:
-                break
+                continue
 
             url = src["alert.classification.reference(%d).url" % cnt]
             if not url:
                 continue
             
-            urls.append("<a href='%s'>%s</a>" % (url, name))
+            urls.append("<a href='%s'>%s:%s</a>" % (url, orgin, name))
 
             cnt += 1
 
