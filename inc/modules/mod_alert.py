@@ -15,7 +15,7 @@ class SectionAlertList:
     def __str__(self):
         display = AlertList.AlertList()
         preludedb.PreludeDB.init()
-        db = preludedb.PreludeDB()
+        db = preludedb.PreludeDB(name="test")
         db.connect()
         criteria = prelude.IDMEFCriteria("alert.detect_time >= 'month:current-1'")
         results = db.get_alert_ident_list(criteria)
@@ -30,7 +30,7 @@ class SectionAlertList:
 class SectionAlert:
     def __init__(self, query):
         preludedb.PreludeDB.init()
-        db = preludedb.PreludeDB()
+        db = preludedb.PreludeDB(name="test")
         db.connect()
         self._alert = db.get_alert(query["analyzerid"], query["alert_ident"])
         

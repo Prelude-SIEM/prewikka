@@ -31,6 +31,7 @@
 	text-decoration: none;
 	color: white;
 	font-weight: bold;
+	display: block;
 }
 
 .menu_item_active {
@@ -84,6 +85,7 @@
 .topmenu_item_inactive a {
 	text-decoration: none;
 	color: white;
+	display: block;
 }
 
 .topmenu_item_active {
@@ -149,10 +151,9 @@ body {
 	position: absolute;
 	left: 160px;
 	top: 85px;
-	right: -0;
-	bottom: -0;
+	right: 0px;
+	bottom: 0px;
 	background-image: url(../img/bg_content.gif);
-	background-color: black;
 }
 
 thead {
@@ -222,12 +223,49 @@ table {
 
 .hideable_title {
 	background-color: #E2EBF5;
-	font-size: 120%;
+	font-weight: bold;
+	/*border: 0px;
+	border-right: 2px;
+	border-bottom: 2px;
+	border-style: solid;*/
+	border: 0px;
+	border-bottom: 1px;
+	border-style: solid;
+}
+
+.hideable_title a {
+	text-decoration: none;
+	color: #333333;
 }
 
 .hideable_content {
-	background-color: #ffffff;
-	padding-left: 20px;
+	padding-left: 40px;
+}
+
+.alert_details_entries {
+	padding-top: 1px;
+}
+
+.alert_details_entry {
+	padding-bottom: 2px;
+}
+
+.alert_details_entry_name {
+	float: left;
+	width: 15%;
+	margin-right: 5px;
+	background-color: #E2EBF5;
+	border: 0px;
+	border-bottom: 1px;
+	border-style: solid;
+}
+
+.alert_details_entry_value {
+	padding-left: 10px;
+	/*border: 0px;
+	border-bottom: 1px;
+	border-style: solid;*/
+	background-color: white;
 }
 
 a:link.tlink {

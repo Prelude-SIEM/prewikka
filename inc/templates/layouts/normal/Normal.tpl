@@ -4,7 +4,7 @@
 		<title>PREWIKKA</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1" />
 		<link rel="stylesheet" href="lib/style.css" type="text/css"/>
-		<script src="lib/functions.js" type="text/javascript"/>
+		<script src="lib/functions.js" type="text/javascript"></script>
 	</head>
 	<body>
 	   	<div id="top_view">

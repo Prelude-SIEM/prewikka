@@ -88,25 +88,35 @@ class AlertSummary(PyTpl.Template):
         self.createSection(title, str(table))
 
     def beginSection(self, title):
-        self._row = 0
-        self["section"].TITLE = title
+        self._section_title = title
+        self._section_entries = [ ]
 
     def newSectionEntry(self, name, value, emphasis=False):
         if value is None or value == "":
             return
         
-        entry_type = ("even", "odd")[self._row % 2]
-        value_type = ("normal", "emphasis")[emphasis]
-        self["section"]["entry"][entry_type]["name"].CONTENT = name
-        self["section"]["entry"][entry_type]["name"].parse()
-        self["section"]["entry"][entry_type]["value"][value_type].CONTENT = value
-        self["section"]["entry"][entry_type]["value"][value_type].parse()
-        self["section"]["entry"][entry_type]["value"].parse()
-        self["section"]["entry"][entry_type].parse()
-        self["section"]["entry"].parse()
-        self._row += 1
+        self._section_entries.append((name, value, emphasis))
 
     def endSection(self):
+        if not self._section_entries:
+            return
+
+        row = 0
+
+        self["section"].TITLE = self._section_title
+
+        for name, value, emphasis in self._section_entries:
+            entry_type = ("even", "odd")[row % 2]
+            value_type = ("normal", "emphasis")[emphasis]
+            self["section"]["entry"][entry_type]["name"].CONTENT = name
+            self["section"]["entry"][entry_type]["name"].parse()
+            self["section"]["entry"][entry_type]["value"][value_type].CONTENT = value
+            self["section"]["entry"][entry_type]["value"][value_type].parse()
+            self["section"]["entry"][entry_type]["value"].parse()
+            self["section"]["entry"][entry_type].parse()
+            self["section"]["entry"].parse()
+            row += 1
+
         self["section"].parse()
 
     def buildTime(self, alert):
