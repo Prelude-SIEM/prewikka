@@ -736,10 +736,15 @@ ul#popup_block > li:hover > ul {
 
 
 /*
- * ticket
+ * misc
  */
+
 #fieldset_page { max-width: 700px; }
 #fieldset_page textarea { border: 1px outset black; }
 #fieldset_page input { border: 1px outset black; }
 #fieldset_page fieldset { border: 1px outset black; padding: 1em }
 #fieldset_page legend { font-size: 13px; font-weight: bold; }
+
+.not_available {
+        background-color: #e0e0e0;
+};

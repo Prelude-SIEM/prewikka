@@ -134,9 +134,9 @@ class Core:
         dataset["document.title"] = "[PREWIKKA]"
         dataset["document.css_files"] = [ "lib/style.css" ]
         dataset["document.js_files"] = [ "lib/functions.js" ]
-        dataset["prewikka.title"] = interface.getOptionValue("title", "Prelude management")
-        dataset["prewikka.software"] = interface.getOptionValue("software", "Prewikka")
-        dataset["prewikka.place"] = interface.getOptionValue("place", "company ltd.")
+        dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
+        dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
+        dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
         dataset["prewikka.url.referer"] = request.getReferer()
         dataset["prewikka.url.current"] = request.getQueryString()
         dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
