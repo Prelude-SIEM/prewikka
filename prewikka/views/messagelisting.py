@@ -437,7 +437,8 @@ class AlertListing(MessageListing, view.View):
 
         idx = 0
         while True:
-            if message["alert.%s(0).user.user_id(%d).ident" % (direction, idx)] is None:
+            if (message["alert.%s(0).user.user_id(%d).name" % (direction, idx)] is None and
+                message["alert.%s(0).user.user_id(%d).number" % (direction, idx)] is None):
                 break
 
             user = { }
