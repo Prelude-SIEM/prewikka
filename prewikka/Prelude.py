@@ -306,17 +306,18 @@ class Prelude:
         return analyzerids
 
     def getAnalyzerPaths(self):
-        def get_analyzer_path(heartbeat, root):
-            analyzerid = heartbeat[root + ".analyzerid"]
-            if analyzerid:
-                return get_analyzer_path(heartbeat, root + ".analyzer") + [ analyzerid ]
-            return [ ]
-        
         analyzer_paths = [ ]
         for analyzerid in self.getAnalyzerids():
             ident = self.getLastHeartbeatIdent(analyzerid)
             heartbeat = self.getHeartbeat(ident)
-            path = get_analyzer_path(heartbeat, "heartbeat.analyzer")
+            path = [ ]
+            index = 0
+            while True:
+                analyzerid = heartbeat["heartbeat.analyzer(%d).analyzerid" % index]
+                if not analyzerid:
+                    break
+                path.append(analyzerid)
+                index += 1
             analyzer_paths.append(path)
 
         return analyzer_paths            
@@ -324,17 +325,23 @@ class Prelude:
     def getAnalyzer(self, analyzerid):
         ident = self.getLastHeartbeatIdent(analyzerid)
         heartbeat = self.getHeartbeat(ident)
+
+        index = 0
+        while True:
+            if not heartbeat["heartbeat.analyzer(%d).name" % (index + 1)]:
+                break
+            index += 1
         
         analyzer = { }
         analyzer["analyzerid"] = analyzerid
-        analyzer["name"] = heartbeat.get("heartbeat.analyzer.name", "n/a")
-        analyzer["model"] = heartbeat.get("heartbeat.analyzer.model", "n/a") 
-        analyzer["version"] = heartbeat.get("heartbeat.analyzer.version", "n/a")
-        analyzer["ostype"] = heartbeat.get("heartbeat.analyzer.ostype", "n/a")
-        analyzer["osversion"] = heartbeat.get("heartbeat.analyzer.osversion", "n/a")
-        analyzer["node_name"] = heartbeat.get("heartbeat.analyzer.node.name", "n/a")
-        analyzer["node_location"] = heartbeat.get("heartbeat.analyzer.node.location", "n/a")
-        analyzer["node_address"] = heartbeat.get("heartbeat.analyzer.node.address(0).address", "n/a")
+        analyzer["name"] = heartbeat.get("heartbeat.analyzer(%d).name" % index, "n/a")
+        analyzer["model"] = heartbeat.get("heartbeat.analyzer(%d).model" % index, "n/a") 
+        analyzer["version"] = heartbeat.get("heartbeat.analyzer(%d).version" % index, "n/a")
+        analyzer["ostype"] = heartbeat.get("heartbeat.analyzer(%d).ostype" % index, "n/a")
+        analyzer["osversion"] = heartbeat.get("heartbeat.analyzer(%d).osversion" % index, "n/a")
+        analyzer["node_name"] = heartbeat.get("heartbeat.analyzer(%d).node.name" % index, "n/a")
+        analyzer["node_location"] = heartbeat.get("heartbeat.analyzer(%d).node.location" % index, "n/a")
+        analyzer["node_address"] = heartbeat.get("heartbeat.analyzer(%d).node.address(0).address" % index, "n/a")
         analyzer["last_heartbeat_time"] = heartbeat.get("heartbeat.create_time")
         analyzer["last_heartbeat_interval"] = heartbeat["heartbeat.heartbeat_interval"]
         analyzer["last_heartbeat_status"] = heartbeat.getAdditionalData("Analyzer status")

@@ -175,10 +175,10 @@ class AlertListingParameters(MessageListingParameters):
 class HeartbeatListingParameters(MessageListingParameters):
     def register(self):
         MessageListingParameters.register(self)
-        self.optional("heartbeat.analyzer.name", str)
-        self.optional("heartbeat.analyzer.node.address.address", str)
-        self.optional("heartbeat.analyzer.node.name", str)
-        self.optional("heartbeat.analyzer.model", str)
+        self.optional("heartbeat.analyzer(0).name", str)
+        self.optional("heartbeat.analyzer(0).node.address.address", str)
+        self.optional("heartbeat.analyzer(0).node.name", str)
+        self.optional("heartbeat.analyzer(0).model", str)
 
 
 
@@ -542,23 +542,24 @@ class AlertListing(MessageListing, view.View):
         self._setMessageClassification(dataset, message)
         
     def _setMessageSensor(self, dataset, message):
-        def get_analyzer_names(alert, root):
-            analyzerid = alert[root + ".name"]
-            if analyzerid != None:
-                return [ alert[root + ".name"] ] + get_analyzer_names(alert, root + ".analyzer")
-            return [ ]
-
-        analyzers = get_analyzer_names(message, "alert.analyzer")
-
-        if len(analyzers) > 0:
-            analyzer_name = analyzers[0]
+        analyzer_names = [ ]
+        index = 0
+        while True:
+            name = message["alert.analyzer(%d).name" % index]
+            if not name:
+                break
+            analyzer_names.append(name)
+            index += 1
+            
+        if len(analyzer_names) > 0:
+            analyzer_name = analyzer_names[0]
         else:
             analyzer_name = "n/a"
 
         dataset["sensor"] = self._createInlineFilteredField("alert.analyzer.name", analyzer_name, type="analyzer")
-        dataset["sensor"]["value"] = "/".join(analyzers[:-1])
+        dataset["sensor"]["value"] = "/".join(analyzer_names[1:])
 
-        dataset["sensor_node_name"] = { "value": message["alert.analyzer.node.name"] }
+        dataset["sensor_node_name"] = { "value": message["alert.analyzer(0).node.name"] }
         
     def _setMessageCommon(self, dataset, message):
         self._setMessageSource(dataset, message)
@@ -974,18 +975,25 @@ class HeartbeatListing(MessageListing, view.View):
 
     def _setMessage(self, message, ident):
         dataset = { }
-        
+
+        index = 0
+        while True:
+            if not message["heartbeat.analyzer(%d).name" % (index + 1)]:
+                break
+            index += 1
+
         dataset["delete"] = ident
         dataset["summary"] = self._createMessageLink(ident, "heartbeat_summary")
         dataset["details"] = self._createMessageLink(ident, "heartbeat_details")
         dataset["agent"] = self._createInlineFilteredField("heartbeat.analyzer.name",
-                                                           message["heartbeat.analyzer.name"])
+                                                           message["heartbeat.analyzer(%d).name" % index])
         dataset["model"] = self._createInlineFilteredField("heartbeat.analyzer.model",
-                                                           message["heartbeat.analyzer.model"])
+                                                           message["heartbeat.analyzer(%d).model" % index])
         dataset["node_name"] = self._createInlineFilteredField("heartbeat.analyzer.node.name",
-                                                               message["heartbeat.analyzer.node.name"])
+                                                               message["heartbeat.analyzer(%d).node.name" % index])
         dataset["node_address"] = self._createHostField("heartbeat.analyzer.node.address.address",
-                                                        message["heartbeat.analyzer.node.address(0).address"], "unknown")
+                                                        message["heartbeat.analyzer(%d).node.address(0).address" % index],
+                                                        "unknown")
         dataset["time"] = self._createTimeField(message["heartbeat.create_time"])
 
         return dataset
@@ -1042,8 +1050,7 @@ class SensorAlertListing(AlertListing, view.View):
     view_template = "SensorAlertListing"
 
     def _adjustCriteria(self, criteria):
-        criteria.append("(alert.analyzer.analyzerid == %d || alert.analyzer.analyzer.analyzerid == %d)" %
-                        (self.parameters["analyzerid"], self.parameters["analyzerid"]))
+        criteria.append("alert.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
 
     def _setHiddenParameters(self):
         AlertListing._setHiddenParameters(self)

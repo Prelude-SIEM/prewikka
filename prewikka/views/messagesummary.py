@@ -50,25 +50,28 @@ class MessageSummary:
         if self._current_section["entries"]:
             self.dataset["sections"].append(self._current_section)
 
-    def buildAnalyzer(self, alert, root=""):
-        if alert[root + "analyzer.analyzerid"] == None:
-            return
+    def buildAnalyzer(self, alert):
+        index = 0
         
-        self.beginSection("Analyzer")
-        self.newSectionEntry("Analyzerid", alert[root + "analyzer.analyzerid"])
-        self.newSectionEntry("Manufacturer", alert[root + "analyzer.manufacturer"])
-        self.newSectionEntry("Model", alert[root + "analyzer.model"], emphase=True)
-        self.newSectionEntry("Version", alert[root + "analyzer.version"])
-        self.newSectionEntry("Class", alert[root + "analyzer.class"])
-        self.newSectionEntry("Operating System", "%s %s" %
-                             (alert[root + "analyzer.ostype"], alert[root + "analyzer.osversion"]))
-        self.newSectionEntry("Node name", alert[root + "analyzer.node.name"])
-        self.newSectionEntry("Address", alert[root + "analyzer.node.address(0).address"])
-        self.newSectionEntry("Process", alert[root + "analyzer.process.name"])
-        self.newSectionEntry("Pid", alert[root + "analyzer.process.pid"])
-        self.endSection()
+        while True:
+            if not alert["analyzer(%d).analyzerid" % index]:
+                break
+        
+            self.beginSection("Analyzer")
+            self.newSectionEntry("Analyzerid", alert["analyzer(%d).analyzerid" % index])
+            self.newSectionEntry("Manufacturer", alert["analyzer(%d).manufacturer" % index])
+            self.newSectionEntry("Model", alert["analyzer(%d).model" % index], emphase=True)
+            self.newSectionEntry("Version", alert["analyzer(%d).version" % index])
+            self.newSectionEntry("Class", alert["analyzer(%d).class" % index])
+            self.newSectionEntry("Operating System", "%s %s" %
+                                 (alert["analyzer(%d).ostype" % index], alert["analyzer(%d).osversion" % index]))
+            self.newSectionEntry("Node name", alert["analyzer(%d).node.name" % index])
+            self.newSectionEntry("Address", alert["analyzer(%d).node.address(0).address" % index])
+            self.newSectionEntry("Process", alert["analyzer(%d).process.name" % index])
+            self.newSectionEntry("Pid", alert["analyzer(%d).process.pid" % index])
+            self.endSection()
 
-        self.buildAnalyzer(alert, root + "analyzer.")
+            index += 1
 
     def buildAdditionalData(self, alert):
         self.beginSection("Additional Data")
