@@ -1,50 +1,16 @@
-## class Module:
-##     def __init__(self, name, section_name, query):
-##         self.__query = query
-##         self.__section_name = section_name
-##         self.__module = __import__("mod_%s" % name)
-##         self.__main = getattr(self.__module, "Main")
-##         if section_name:
-##             self.__section = getattr(self.__module, "Section%s" % section_name)
-##         else:
-##             self.__section = self.__main.default_section
-
-##     def build(self):
-##         main = self.__main(self.__query)
-##         section = self.__section(self.__query)
-##         views = main.build(section)
-##         views["views"]["active"] = self.__section_name
-##         views["views"]["pages"] = [ ]
-##         syms = { }
-##         for sym_name in dir(self.__module):
-##             if re.compile("^Section").match(sym_name):
-##                 sym = getattr(self.__module, sym_name)
-##                 if hasattr(sym, "name"):
-##                     syms[sym_name] = sym
-
-##         names = syms.keys()
-##         names.sort(lambda x, y: syms[y].index - syms[x].index)
-                
-##         for name in names:
-##             tmp = (re.sub("^Section", "", name), syms[name].name)
-##             sys.stderr.write("%s %s\n" % tmp)
-##             views["views"]["pages"].append(tmp)
-            
-##         return views
-
 import sys
 from Query import Query
 
 sys.path.append("inc/modules")
 
 class Module:
-    def __init__(self, name):
+    def __init__(self, name, config):
         self.name = name
         self.sections = { }
         self.section_names = [ ]
         self.default_section_name = None
         module = __import__(self.name)
-        module.load(self)
+        module.load(self, config)
 
     def setName(self, name):
         self.name = name

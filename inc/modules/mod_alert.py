@@ -1,11 +1,28 @@
 import sys
 from database import getDB
 import prelude
-import preludedb
+from preludedb import PreludeDB
 import time
 import util
 import re
 from templates.modules.mod_alert import AlertList, AlertSummary, AlertDetails
+
+
+PRELUDE = None
+
+
+class Prelude(PreludeDB):
+    def __init__(self, config):
+        PreludeDB.init()
+        PreludeDB.__init__(self,
+                           type=config.get("type", "mysql"),
+                           host=config.get("host", "127.0.0.1"),
+                           port=config.get("port", 0),
+                           name=config.get("name", "prelude"),
+                           user=config.get("user", "prelude"),
+                           password=config.get("password", "prelude"))
+        self.connect()
+
 
 
 class SectionAlertList:
@@ -14,14 +31,11 @@ class SectionAlertList:
 
     def __str__(self):
         display = AlertList.AlertList()
-        preludedb.PreludeDB.init()
-        db = preludedb.PreludeDB(name="test")
-        db.connect()
         criteria = prelude.IDMEFCriteria("alert.detect_time >= 'month:current-1'")
-        results = db.get_alert_ident_list(criteria)
+        results = PRELUDE.get_alert_ident_list(criteria)
         if results:
             for analyzerid, alert_ident in results:
-                alert = db.get_alert(analyzerid, alert_ident)
+                alert = PRELUDE.get_alert(analyzerid, alert_ident)
                 display.addAlert(alert)
         return str(display)
 
@@ -29,10 +43,7 @@ class SectionAlertList:
 
 class SectionAlert:
     def __init__(self, query):
-        preludedb.PreludeDB.init()
-        db = preludedb.PreludeDB(name="test")
-        db.connect()
-        self._alert = db.get_alert(query["analyzerid"], query["alert_ident"])
+        self._alert = PRELUDE.get_alert(query["analyzerid"], query["alert_ident"])
         
 
 
@@ -48,7 +59,9 @@ class SectionAlertDetails(SectionAlert):
 
 
 
-def load(module):
+def load(module, config):
+    global PRELUDE
+    PRELUDE = Prelude(config)
     module.setName("Alert")
     module.registerSection("Alert list", SectionAlertList, default=True)
     module.registerSection("Alert summary", SectionAlertSummary, parent="Alert list")

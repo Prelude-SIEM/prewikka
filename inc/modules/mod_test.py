@@ -46,7 +46,7 @@ class Third(Empty):
 
 
 
-def load(module):
+def load(module, config):
     module.setName("Test")
     module.registerSection("fetch", Fetch, default=True)
     module.registerSection("display", Display, parent="fetch")
