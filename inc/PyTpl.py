@@ -48,6 +48,9 @@ class PYTPL_block:
         self._haveContent = False
         return output
 
+    def __str__(self):
+        return self.get()
+
     def __getitem__(self, blockname):
         """
         """
@@ -93,3 +96,8 @@ class PyTpl(PYTPL_block):
         """
         PYTPL_block.__init__(self, file(filename).read())
 
+
+
+class TemplateBase(PyTpl):
+    def __init__(self):
+        PyTpl.__init__(self, "")

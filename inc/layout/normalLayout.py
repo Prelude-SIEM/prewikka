@@ -8,8 +8,9 @@ from genericLayout import genericLayout
 
 class normalLayout(genericLayout):
 
-    def __init__(self, views):
+    def __init__(self, views, query):
         self._views = views
+        self._query = query
         tpl = PyTpl("tpl/normalLayout.tpl")
 
         if "help" in self._views: 
@@ -35,21 +36,19 @@ class normalLayout(genericLayout):
 
         self._output = tpl.get()
 
-    def getPage(self):
+    def __str__(self):
         return self._output
 
     def _getPageMenu(self, pages, active, module, sid):
         tpl = PyTpl("tpl/topmenu.tpl")
         tpl.SID = sid
-        for page, name in pages:
-            if page==active:
-                tpl['menu']['active'].NAME = name
+        for page in pages:
+            if page == active:
+                tpl['menu']['active'].NAME = page
                 tpl['menu']['active'].parse()
             else:
-                tpl['menu']['inactive'].NAME = name
-                tpl['menu']['inactive'].LINK = page
-                tpl['menu']['inactive'].MODULE = module
-                tpl['menu']['inactive'].SID = sid
+                tpl['menu']['inactive'].NAME = page
+                tpl['menu']['inactive'].QUERY = str(self._query)
                 tpl['menu']['inactive'].parse()
 
             tpl['menu'].parse()
@@ -69,4 +68,3 @@ class normalLayout(genericLayout):
                 tpl['menu']['inactive'].parse()
             tpl['menu'].parse()
         return tpl.get()
-

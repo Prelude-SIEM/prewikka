@@ -14,7 +14,7 @@ General configuration
 config = {
     "database":"prelude",
     "dbuser":"prelude",
-    "dbpasswd":"xxxxxx",
+    "dbpasswd":"prelude",
     "software":"Prewikka",
     "company":"company ltd.",
     "title":"Prelude management",
