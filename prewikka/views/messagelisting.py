@@ -688,7 +688,8 @@ class AlertListing(MessageListing, view.View):
             if count == 1:
                 display = self._createMessageLink(ident, "alert_summary")
             else:
-                display = utils.create_link("alert_listing", self.parameters + { "aggregated_classification_value": classification })
+                display = utils.create_link("alert_listing",
+                                            self.parameters + { "aggregated_classification_value": classification } - [ "offset" ])
                 
             message["infos"] = [ {
                 "count": count,
@@ -747,7 +748,7 @@ class AlertListing(MessageListing, view.View):
                 dataset["aggregated_classifications_total"] = aggregated_count
                 dataset["aggregated_classifications_hidden"] = aggregated_count
                 dataset["aggregated_classifications_hidden_expand"] = utils.create_link("alert_listing",
-                                                                                        self.parameters +
+                                                                                        self.parameters - [ "offset" ] +
                                                                                         { "aggregated_source_values": aggregated_source_values,
                                                                                           "aggregated_target_values": aggregated_target_values })
                 
@@ -767,7 +768,7 @@ class AlertListing(MessageListing, view.View):
                         display = self._createMessageLink(ident, "alert_summary")
                     else:
                         display = utils.create_link("alert_listing",
-                                                    self.parameters +
+                                                    self.parameters - [ "offset" ] +
                                                     { "aggregated_source_values": aggregated_source_values,
                                                       "aggregated_target_values": aggregated_target_values,
                                                       "aggregated_classification_value": classification })
