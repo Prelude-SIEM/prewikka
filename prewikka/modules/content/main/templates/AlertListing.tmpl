@@ -1,0 +1,109 @@
+#extends prewikka.modules.content.main.templates.MessageListing
+
+#block message_fields_header
+<td>Classification</td>
+<td>Source</td>
+<td>Target</td>
+<td>Sensor</td>
+<td>Time</td>
+#end block message_fields_header
+
+#block message_fields
+#set $class_ = "impact_severity_" + $message.severity.value
+
+<td>
+ <ul id="popup_block">
+  <li class="$class_">$message.classification.value
+   <ul>
+    <li><a href="$message.details">Alert detail</a></li>
+    <li><a href="$message.summary">Alert summary</a></li>
+    <li><a href="$message.classification.inline_filter">Group by classification</a></li>
+   </ul>
+  </li>
+ </ul>
+</td>
+
+<td>
+  <ul id="popup_block">
+    <li class="popup_title">
+      #if $message.sport.value
+        <span>$message.source.value</span>:$message.sport.value
+      #else
+        <span>$message.source.value</span>
+      #end if
+      #if $message.suser_name.value
+        <br/>$message.suser_name.value
+	#if $message.suser_uid.value != None
+	  ($message.suser_uid.value)
+	#end if
+      #end if
+      #if $message.sprocess_name.value
+        <br/>$message.sprocess_name.value
+	#if $message.sprocess_pid.value != None
+	  ($message.sprocess_pid.value)
+	#end if
+      #end if
+      <ul>
+        <li><a href="$message.source.inline_filter">Group by source</a></li>
+        #for $name, $link in $message.source.host_commands
+          <li><a href="$link">$name</a></li>
+        #end for
+      </ul>
+    </li>
+  </ul>
+</td>
+
+<td>
+  <ul id="popup_block">
+    <li class="popup_title">
+      #if $message.tport.value
+        <span>$message.target.value</span>:$message.tport.value
+      #else
+        <span>$message.target.value</span>
+      #end if
+      #if $message.tuser_name.value
+        <br/>$message.tuser_name.value
+	#if $message.tuser_uid.value != None
+	  ($message.tuser_uid.value)
+	#end if
+      #end if
+      #if $message.tprocess_name.value
+        <br/>$message.tprocess_name.value
+	#if $message.tprocess_pid.value != None
+	  ($message.tprocess_pid.value)
+	#end if
+      #end if
+      <ul>
+        <li><a href="$message.target.inline_filter">Group by target</a></li>
+        #for $name, $link in $message.target.host_commands
+          <li><a href="$link">$name</a></li>
+        #end for
+      </ul>
+    </li>
+  </ul>
+</td>
+
+
+<td><a href='$message.sensor.inline_filter'>$message.sensor.value</a></td>
+<td>$message.time.value</td>
+#end block message_fields
+
+#block timeline_extra_content
+<tr>
+  <td id="filter_control_label">Filter: </td>
+  <td colspan='2'>
+  <select name='filter' size="1" class="filter_control_select">
+  #for $key, $value in $timeline.hidden_parameters.items()
+    <input type='hidden' name='$key' value='$value'/>
+  #end for
+  <option value=""/>
+  #for $fltr in $filters
+    #if $fltr == $current_filter
+      #set $selected = "selected"
+    #else
+      #set $selected = ""
+    #end if
+    <option value='$fltr' $selected/>$fltr
+  #end for
+  </td>
+#end block

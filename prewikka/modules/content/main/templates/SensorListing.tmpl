@@ -1,0 +1,42 @@
+#extends prewikka.templates.ClassicLayout
+
+#block main_content
+<table>
+	<thead>
+		<tr>
+			<td>Analyzerid</td>
+			<td>Type</td>
+			<td>OS</td>
+			<td>Name</td>
+			<td>Location</td>
+			<td>Address</td>
+		</tr>
+	</thead>
+	<tbody>
+		#set $row_classes = ("table_row_even", "table_row_odd")
+		#set $cnt = 0
+		#for $analyzer in $analyzers
+			<tr class='$row_classes[$cnt%2]'>
+
+			        <td>
+ 			         <ul id="popup_block">
+  			          <li class="popup_title">$analyzer.analyzerid
+   			           <ul>
+    			            <li><a href="$analyzer.alerts">Alert listing</a></li>
+                                    <li><a href="$analyzer.heartbeats">Heartbeat listing</a></li>
+                                   </ul>
+                                  </li>
+                                 </ul>
+                                </td>
+
+				<td>$analyzer.model $analyzer.version</td>
+				<td>$analyzer.ostype $analyzer.osversion</td>
+				<td>$analyzer.name</td>
+				<td>$analyzer.location</td>
+				<td>$analyzer.address</td>
+			</tr>
+			#set $cnt += 1
+		#end for
+	</tbody>
+</table>
+#end block main_content

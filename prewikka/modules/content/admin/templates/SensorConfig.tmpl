@@ -1,0 +1,124 @@
+#extends prewikka.templates.ClassicLayout
+
+#block main_content
+<table>
+	<thead>
+		<tr>
+			<td>Name</td>
+			<td>Description</td>
+			<td>Value</td>
+		</tr>
+	</thead>
+	<tbody>
+		#set $row_classes = ("table_row_even", "table_row_odd")
+		#set $cnt = 0
+		#if $is_instance
+			<form action='?' method='get'>
+			#for $name, $value in $hiddens.items()
+				<input type='hidden' name='$name' value='$value'/>
+			#end for
+			<input type='hidden' name='content' value='$change_option'/>
+		#end if
+		#for $option in $simple_options
+			<tr class='$row_classes[$cnt%2]'>
+				<td>$option.name</td>
+				<td>$option.description</td>
+				<td>
+					#if not $is_instance
+						<form action='?' method='get'>
+						#for $name, $value in $hiddens.items()
+							<input type='hidden' name='$name' value='$value'/>
+						#end for
+						<input type='hidden' name='content' value='$change_option'/>
+					#end if
+					<input type='hidden' name='paths' value='$option.path'/>
+					#if $option.boolean
+						#if $option.value
+							#set $checked = "checked"
+						#else
+							#set $checked = ""
+						#end if
+						<input type='checkbox' name='values' $checked/>
+					#else
+						<input type='text' name='values' value='$option.value'/>
+					#end if
+				</td>
+				#if not $is_instance
+					<td>
+						<input type='submit' value='change'/>
+					</td>
+					</form>
+				#end if
+				
+				#if $option.destroyable
+					<form action='?' method='get'>
+						#for $name, $value in $hiddens.items()
+							<input type='hidden' name='$name' value='$value'/>
+						#end for
+						<input type='hidden' name='content' value='$destroy'/>
+						<input type='hidden' name='path' value='$option.path'/>
+						<td><input type='submit' value='destroy'/></td>
+					</form>
+				#end if
+
+						
+			</tr>
+			#set $cnt += 1
+		#end for
+		#if $is_instance
+			<tr>
+				<td></td>
+				<td></td>
+				<td>
+					<input type='submit' value='change'>
+				</td>
+			</tr>
+			</form>
+		#end if
+	</tbody>
+</table>
+<br/>
+#for $instantiable in $instantiables
+	<table>
+		<thead>
+			<tr>
+				<td colspan='2'>$instantiable.name</td>
+			</tr>
+		</thead>
+		<tbody>
+			#set $row_classes = ("table_row_even", "table_row_odd")
+			#set $cnt = 0
+			#for $instance in $instantiable.instances
+				<tr class="$row_classes[$cnt%2]">
+					<td>$instance.name</td>
+					<td><a href='$instance.view'>view</a></td>
+					<form action='?' method='get'>
+						#for $name, $value in $hiddens.items()
+							<input type='hidden' name='$name' value='$value'/>
+						#end for
+						<input type='hidden' name='content' value='$destroy'/>
+						<input type='hidden' name='path' value='$instance.path'/>
+						<td><input type='submit' value='destroy'/></td>
+					</form>
+					
+				</tr>
+				#set $cnt += 1
+			#end for
+		</tbody>
+		<tfoot>
+			<form action='?' method='get'>
+				#for $name, $value in $hiddens.items()
+					<input type='hidden' name='$name' value='$value'/>
+				#end for
+				<input type='hidden' name='content' value='$create_instance'/>
+				<input type='hidden' name='instantiable_name' value='$instantiable.name'/>
+				<tr>
+					<td><input type='text'  name='name'/></td>
+					<td><input type='submit' value='create'/></td>
+				</tr>
+			</form>
+		</tfoot>
+	</table>
+	<br/>
+#end for
+#end block main_content

@@ -1,0 +1,31 @@
+#extends prewikka.templates.ClassicLayout
+
+#block main_content
+<form action='?' method='get'>
+#for $name, $value in $hiddens
+	<input type='hidden' name='$name' value='$value'/>
+#end for
+        <table class="properties_change_table">
+	#set $row_classes = ("table_row_even", "table_row_odd")
+	#set $cnt = 0
+	#for $property in $properties
+		<tr class="$row_classes[$cnt%2]">
+			<td>$property.name</td>
+			#if $property.value
+				#if $property.type == 'checkbox'
+					#set $value = 'checked'
+				#else
+					#set $value = "value=" + $property.value
+				#end if
+			#else
+				#set $value = ""
+			#end if
+			<td><input type='$property.type' name='$property.parameter' $value/></td>
+		</tr>
+		#set $cnt += 1
+	#end for
+	</table>
+	<br/>
+	<input type='submit' value='$submit'/>
+</form>
+#end block main_content

@@ -5,15 +5,63 @@
 # Licensed under GPL
 # 
 
-"""
-Main module
-"""
+import sys, os
 
-import cgi, sys, os 
-sys.path.append(os.path.abspath("inc"))
+import copy
+import cgi
 
-from main import Main
-from OwnFS import OwnFS
+from prewikka import Core, Request
 
-print (Main(OwnFS(cgi.FieldStorage()).get()).get())
 
+class CGIRequest(Request.Request):
+    def init(self):
+        Request.Request.init(self)
+        fs = cgi.FieldStorage()
+        for key in fs.keys():
+            self.arguments[key] = fs.getvalue(key)
+        for key in fs.headers.keys():
+            self.input_headers[key] = fs.headers.get(key)
+        
+    def read(self, *args):
+        return apply(sys.stdin.read, args)
+    
+    def write(self, data):
+        sys.stdout.write(data)
+        
+    def getQueryString(self):
+        return os.getenv("QUERY_STRING")
+
+    def getClientAddr(self):
+        return os.getenv("REMOTE_ADDR")
+
+    def getClientPort(self):
+        return os.getenv("REMOTE_PORT")
+
+    def getServerAddr(self):
+        return os.getenv("SERVER_ADDR")
+
+    def getServerPort(self):
+        return os.getenv("SERVER_PORT")
+
+    def getUserAgent(self):
+        return os.getenv("USER_AGENT")
+
+    def getMethod(self):
+        return os.getenv("REQUEST_METHOD")
+
+    def getURI(self):
+        return os.getenv("REQUEST_URI")
+    
+    def getCookieString(self):
+        return os.getenv("HTTP_COOKIE")
+
+    def getReferer(self):
+        return os.getenv("HTTP_REFERER", "")
+
+
+
+request = CGIRequest()
+request.init()
+
+core = Core.Core()
+core.process(request)

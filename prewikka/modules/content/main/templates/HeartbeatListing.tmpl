@@ -1,0 +1,42 @@
+#extends prewikka.modules.content.main.templates.MessageListing
+
+#block message_fields_header
+<td>Analyzerid</td>
+<td>Address</td>
+<td>Name</td>
+<td>Type</td>
+<td>Time</td>
+#end block message_fields_header
+
+#block message_fields
+
+<td>
+ <ul id="popup_block">
+  <li class="popup_title">$message.analyzerid.value
+   <ul>
+    <li><a href="$message.details">Heartbeat detail</a></li>
+    <li><a href="$message.summary">Heartbeat summary</a></li>
+    <li><a href="$message.analyzerid.inline_filter">Group by analyzerid</a></li>
+   </ul>
+  </li>
+ </ul>
+</td>
+
+<td>
+ <ul id="popup_block">
+  <li class="popup_title">$message.address.value
+   <ul>
+    <li><a href="$message.address.inline_filter">Group by address</a></li>
+    #for $name, $link in $message.address.host_commands
+     <li><a href="$link">$name</a></li>
+    #end for
+   </ul>
+  </li>
+ </ul>
+</td>
+
+<td><a href='$message.name.inline_filter'>$message.name.value</a></td>
+<td><a href='$message.type.inline_filter'>$message.type.value</a></td>
+
+<td>$message.time.value</td>
+#end block message_fields
