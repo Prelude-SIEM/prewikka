@@ -633,7 +633,7 @@ class AlertListing(MessageListing, view.View):
         for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
             aggregated_source_values = values[:len(self.parameters["aggregated_source"])]
             aggregated_target_values = values[len(self.parameters["aggregated_source"]):-3]
-            time_max, time_min, count = values[-3:]
+            time_max, time_min, aggregated_count = values[-3:]
 
             criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(aggregated_on, values[:-3]) ]
 
@@ -648,7 +648,7 @@ class AlertListing(MessageListing, view.View):
                 
                 dataset = {
                     "aggregated": True,
-                    "count": values[-1],
+                    "count": aggregated_count
                     }
                 self.dataset["messages"].append(dataset)
                 
@@ -685,18 +685,18 @@ class AlertListing(MessageListing, view.View):
                         for ident in self.env.prelude.getAlertIdents(criteria3, limit=1):
                             infos["display"] = self._createMessageLink(ident, "alert_summary")
 
-                        urls = [ ]
+                        if aggregated_count == 1:
+                            urls = [ ]
 
-                        for origin, name, url in self.env.prelude.getValues(["alert.classification.reference.origin",
-                                                                             "alert.classification.reference.name",
-                                                                             "alert.classification.reference.url"],
-                                                                            criteria3):
-                            if origin and name and url:
-                                urls.append("<a href='%s'>%s:%s</a>" % (url, origin, name))
+                            for origin, name, url in self.env.prelude.getValues(["alert.classification.reference.origin",
+                                                                                 "alert.classification.reference.name",
+                                                                                 "alert.classification.reference.url"],
+                                                                                criteria3):
+                                if origin and name and url:
+                                    urls.append("<a href='%s'>%s:%s</a>" % (url, origin, name))
 
-                        if urls:
-                            infos["classification_references"] = "(" + ", ".join(urls) + ")"
-                            
+                            if urls:
+                                infos["classification_references"] = "(" + ", ".join(urls) + ")"
                         
                     dataset["infos"].append(infos)
 
