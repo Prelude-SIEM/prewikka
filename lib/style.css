@@ -290,12 +290,14 @@ td {
 #message_list_nav td {
 	width: 50px;
 	height: 15px;
-	border-width: 2px;
-	border-style: solid;
 	text-align: center;
 	font-size: 14px;
 	/*font-weight: bold;*/
-	
+}
+
+.message_list_nav_button, .message_list_nav_infos {
+	border-width: 2px;
+	border-style: solid;
 }
 
 #message_list_edition {

@@ -90,22 +90,22 @@ $message_listing_header
 <table id="message_list_nav">
 	<tr>
 		#if $offset_prev
-			<td><a href='$offset_first'>&lt;&lt;</a></td>
-			<td><a href='$offset_prev'>&lt;</a></td>
+			<td class="message_list_nav_button"><a href='$offset_first'>&lt;&lt;</a></td>
+			<td class="message_list_nav_button"><a href='$offset_prev'>&lt;</a></td>
 		#else
-			<td></td>
-			<td></td>
+			<td class="message_list_nav_button_empty"></td>
+			<td class="message_list_nav_button_empty"></td>
 		#end if
 		#if $offset_next
-			<td><a href='$offset_next'>&gt;</a></td>
-			<td><a href='$offset_last'>&gt;&gt;</a></td>
+			<td class="message_list_nav_button"><a href='$offset_next'>&gt;</a></td>
+			<td class="message_list_nav_button"><a href='$offset_last'>&gt;&gt;</a></td>
 		#else
-			<td></td>
-			<td></td>
+			<td class="message_list_nav_button_empty"></td>
+			<td class="message_list_nav_button_empty"></td>
 		#end if
 	</tr>
 	<tr>
-		<td colspan="0">
+		<td class="message_list_nav_infos" colspan="0">
 			$range_from ... $range_to (total:$total)
 		</td>
 	</tr>
