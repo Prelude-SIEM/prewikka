@@ -21,7 +21,7 @@
 	border-style: solid;
 	text-align: center;
 	font-weight: bold;
-	height: 30px;
+	height: 25px;
 	font-size: 13px;
 }
 
@@ -54,7 +54,7 @@
 	position: fixed;
 	top: 58px;
 	left: 160px;
-	right: -0px;
+	right: 0px;
 	float: left;
 	border: 1px;
 	border-color: white;
@@ -215,11 +215,6 @@ tfoot tr td {
 	border-color: black;
 }
 
-table {
-	border-spacing: 3px;
-	border-width: 10px;
-}
-
 .properties_change_table td {
 	text-align: center;
 }
@@ -236,12 +231,12 @@ table {
 	background-color: #eeeeee;
 }
 
-td {
-	/*border-top: 2px;
+.main td {
+	border-top: 2px;
 	border-bottom: 2px;
 	border-right: 3px;
 	border-left: 3px;
-	border-style: solid;*/
+	border-style: solid;
 	padding-top: 2px;
 	padding-bottom: 2px;
 	padding-right: 3px;
@@ -331,17 +326,26 @@ td {
 }
 
 #timeline {
+	background: #E2EBF5; /*#f2f3c0; */
 	float: left;
 	font-size: 10px;
+	border: 1px black solid;
+	width: 155px;
+	padding: 0px 0px 0px;
+	margin-left: 2px;
+	bottom: 50px;
+	left: 0px;
+	position: fixed;
 }
 
+/*
 #timeline div {
 	float: left;
 	margin-left: 5px;
 }
-
+*/
 #timeline_limit_label, #timeline_submit, #timeline_step_label {
-	padding-left: 10px;
+/*	padding-left: 10px; */
 	font-style: verdana;
 	font-weight: bold;
 }
@@ -516,7 +520,7 @@ tr.even {background:#ffffff}
 
 input {
 	border: 1px solid black;
-	padding:2px;
+	padding:0px;
 	font-size: inherit;
 	font-family: inherit;
 }
