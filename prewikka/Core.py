@@ -179,7 +179,7 @@ class Core:
 
         if user:
             dataset["prewikka.user.login"] = user and user.login or None
-            dataset["prewikka.user.logout"] = self._env.auth.canLogout() and \
+            dataset["prewikka.user.logout"] = (self._env.auth and self._env.auth.canLogout()) and \
                                               utils.create_link("logout") or \
                                               None
 
@@ -204,7 +204,7 @@ class Core:
         if user and view.has_key("permissions"):
             if not user.has(view["permissions"]):
                 self._env.log(Log.EVENT_VIEW_FORBIDDEN, request, view, user)
-                raise PermissionDeniedError(user.login, view["name"])
+                raise User.PermissionDeniedError(user.login, view["name"])
 
     def _getParameters(self, request, view, user):
         from prewikka.view import ParameterError
@@ -250,7 +250,7 @@ class Core:
             view = self._getView(request, user)
             self._checkPermissions(request, view, user)
             parameters = self._getParameters(request, view, user)
-                    
+            
             self._setupView(view, request, parameters, user)
 
             self._env.log(Log.EVENT_RENDER_VIEW, request, view, user)

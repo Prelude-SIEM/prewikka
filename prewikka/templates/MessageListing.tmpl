@@ -1,24 +1,30 @@
 #extends prewikka.templates.ClassicLayout
 
+#block layout_hook_start
+<form>
+<input type="hidden" name="view" value="$current_view"/>
+#end block
+
+
+
+#block layout_hook_end
+</form>
+#end block
+
+
+
 #block main_content
 #def message_listing_header
 #end def
 $message_listing_header
 
 <table id="message_list_result">
-  <thead>
-    <tr>$message_fields_header</tr>
-  </thead>
+  $message_fields_header
   <tbody>
     #set $row_classes = ("table_row_even", "table_row_odd")
     #set $cnt = 0
-    <form action="?" method="get">
-      <input type="hidden" name="view" value="$delete_view"/>
-      #for $name, $value in $delete_hidden_parameters.items()
-        <input type="hidden" name="$name" value="$value"/>
-      #end for
-      #for $message in $messages
-        #set global $message = $message
+    #for $message in $messages
+      #set global $message = $message
         <tr class='$row_classes[$cnt%2]'>
           $message_fields
           <td class='static_content_column'>
@@ -32,21 +38,17 @@ $message_listing_header
     </tfoot>
   </table>
   <div align="right"><input type='submit' value='delete'/></div>
-</form>
 #end block main_content
 
+
+
+
 #block menu_extra_content
-
+<input type="hidden" name="view" value="$current_view"/>
 <table id="timeline">
- <form action="?" method="get">
-
   #def timeline_extra_content
   #end def
   $timeline_extra_content
-  #for $name, $value in $timeline.hidden_parameters.items()
-   <input type="hidden" name="$name" value="$value"/>
-  #end for
-
   
   <tr>
    <td id="timeline_step_label">Step:</td>
@@ -64,7 +66,6 @@ $message_listing_header
     </select>
    </td>
   </tr>
-
 
   <tr>
     <td id="timezone_control_label">Tz:</td>
@@ -87,10 +88,6 @@ $message_listing_header
     <input type="submit" value="apply">
    </td>
   </tr>
-
-  
- </form>
-
 
  <tr><td colspan="3" class="timeline_range">$timeline.start</td></tr>
  <tr><td colspan="3" class="timeline_range">$timeline.end</td></tr>

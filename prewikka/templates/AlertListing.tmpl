@@ -1,17 +1,134 @@
 #extends prewikka.templates.MessageListing
 
 #block message_fields_header
-<form action="?" method='GET'>
-  <input type="hidden" name="view" value="$current_view"/>
-  #for $name, $value in $filter_hidden_parameters.items()
-    <input type="hidden" name="$name" value="$value"/>
-  #end for
 
+<thead>
+<script>
+function del_entry(link) {
+	row = link.parentNode.parentNode
+	table = row.parentNode
+	if ( ! row.nextSibling ) {
+                row.previousSibling.lastChild.appendChild(row.lastChild.firstChild)
+	}
+
+	table.removeChild(row)	
+}
+
+function simple_add_entry(name, object, value) {
+	table = document.getElementById(name)
+
+	if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
+		table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
+	}
+
+	row = document.createElement("tr")
+	table.appendChild(row)
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	input = document.createElement("input")
+	field.appendChild(input)
+	input.setAttribute("name", object)
+	input.setAttribute("value", value)
+	
+	field = document.createElement("td")
+	row.appendChild(field)
+
+	if ( table.firstChild != table.lastChild ) {
+		link = document.createElement("a")
+		link.setAttribute("onclick", "del_entry(this)")
+		content = document.createTextNode("-")
+		link.appendChild(content)
+		field.appendChild(link)		
+	} else {
+		content = document.createTextNode(" ")
+		field.appendChild(content)
+	}
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	link = document.createElement("a")
+	link.setAttribute("onclick", "simple_add_entry('" + name + "', '" + object + "', '')")
+	content = document.createTextNode("+")
+	link.appendChild(content)
+	field.appendChild(link)
+}
+
+function direction_add_entry(direction_type, node_type, value, num) {
+	table = document.getElementById(direction_type)
+
+	if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
+		table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
+	}
+
+	row = document.createElement("tr")
+	table.appendChild(row)
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	select = document.createElement("select")
+	field.appendChild(select)
+	select.setAttribute("name", direction_type + "_type_" + num)
+
+	option = document.createElement("option")
+	option.setAttribute("value", "alert." + direction_type + ".node.address.address")
+	if ( node_type == "alert." + direction_type + ".node.address.address" ) {
+		option.setAttribute("selected", "true")
+	}
+	option_value = document.createTextNode("address")
+	option.appendChild(option_value)
+	select.appendChild(option)
+
+	option = document.createElement("option")
+	option.setAttribute("value", "alert." + direction_type + ".node.name")
+	if ( node_type == "alert." + direction_type + ".node.name" ) {
+		option.setAttribute("selected", "true")
+	}
+	option_value = document.createTextNode("hostname")
+	option.appendChild(option_value)
+	select.appendChild(option)
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	input = document.createElement("input")
+	field.appendChild(input)
+	input.setAttribute("name", "alert." + direction_type  + ".node_" + num)
+	input.setAttribute("value", value)
+
+	field = document.createElement("td")
+	row.appendChild(field)
+
+	if ( table.firstChild != table.lastChild ) {
+		link = document.createElement("a")
+		link.setAttribute("onclick", "del_entry(this)")
+		content = document.createTextNode("-")
+		link.appendChild(content)
+		field.appendChild(link)		
+	} else {
+		content = document.createTextNode(" ")
+		field.appendChild(content)
+	}
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	link = document.createElement("a")
+	link.setAttribute("onclick",
+                          "direction_add_entry('" + direction_type + "', '" + node_type + "', '', '" + (num + 1) + "')")
+	content = document.createTextNode("+")
+	link.appendChild(content)
+	field.appendChild(link)
+}
+
+</script>
+<tr>
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('classification')">Classification</a>
-    <div id="classification">
-      Text <input type="text" name="alert.classification.text" value="$alert.classification.text"/>
-    </div>
+    <table id="classification"></table>
+    <script>
+      #for $classification in $alert.classification.text
+        simple_add_entry('classification', 'alert.classification.text', '$classification')
+      #end for
+    </script>
     #if $classification_filtered
       <span>*</span>
     #end if
@@ -19,22 +136,14 @@
 
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('source')">Source</a>
-    <div id="source">
-      <table>
-        <tr>
-          <td>Address</td>
-          <td><input type="text"
-                     name="alert.source.node.address.address"
-                     value="$alert.source.node.address.address"/></td>
-        </tr>
-        <tr>
-          <td>Hostname</td>
-          <td><input type="text"
-                     name="alert.source.node.name"
-                     value="$alert.source.node.name"/></td>
-        </tr>
-      </table>
-    </div>
+    <table id="source"></table>
+    <script>
+      #set $cnt = 0
+      #for $type, $value in $alert.source.node
+        direction_add_entry('source', '$type', '$value', $cnt)
+	#set $cnt = $cnt + 1
+      #end for
+    </script>
     #if $source_filtered
       <span>*</span>
     #end if
@@ -42,32 +151,27 @@
 
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('target')">Target</a>
-    <div id="target">
-      <table>
-        <tr>
-          <td>Address</td>
-          <td><input type="text"
-                     name="alert.target.node.address.address"
-                     value="$alert.target.node.address.address"/></td>
-        </tr>
-        <tr>
-          <td>Hostname</td>
-          <td><input type="text"
-                     name="alert.target.node.name"
-                     value="$alert.target.node.name"/></td>
-        </tr>
-      </table>
-    </div>
+    <table id="target"></table>
+    <script>
+      #set $cnt = 0
+      #for $type, $value in $alert.target.node
+        direction_add_entry('target', '$type', '$value', $cnt)
+	#set $cnt = $cnt + 1
+      #end for
+    </script>
     #if $target_filtered
       <span>*</span>
     #end if
   </td>
   
   <td class="filter_popup">
-    <a onclick="javascript:toggleFilteredColumnVisibility('sensor')">Sensor</a>
-    <div id="sensor">
-      Name <input type="text" name="alert.analyzer.name" value="$alert.analyzer.name"/>
-    </div>
+    <a onclick="javascript:toggleFilteredColumnVisibility('analyzer')">Sensor</a>
+    <table id="analyzer"></table>
+    <script>
+      #for $analyzer in $alert.analyzer.name
+        simple_add_entry('analyzer', 'alert.analyzer.name', '$analyzer')
+      #end for
+    </script>
     #if $analyzer_filtered
       <span>*</span>
     #end if
@@ -78,8 +182,8 @@
   <td>
     <input src="img/search.png" type="image" style="border: 0"/>
   </td>
-
-</form>
+</tr>
+</thead>
 #end block message_fields_header
 
 #block message_fields
@@ -179,7 +283,6 @@
   </ul>
 </td>
 
-
 <td>
   <a href='$message.sensor.inline_filter'>$message.sensor.value</a>
   #if $message.sensor_node_name.value
@@ -194,9 +297,6 @@
   <td id="filter_control_label">Filter: </td>
   <td colspan='2'>
   <select name='filter' size="1" class="filter_control_select">
-  #for $key, $value in $timeline.hidden_parameters.items()
-    <input type='hidden' name='$key' value='$value'/>
-  #end for
   <option value=""/>
   #for $fltr in $filters
     #if $fltr == $current_filter

@@ -28,8 +28,6 @@ objects = messagelisting.AlertListing(), \
           messagelisting.HeartbeatListing(), \
           messagelisting.SensorAlertListing(), \
           messagelisting.SensorHeartbeatListing(), \
-          messagelisting.AlertDelete(), messagelisting.HeartbeatDelete(), \
-          messagelisting.SensorAlertDelete(), messagelisting.SensorHeartbeatDelete(), \
           sensor.SensorListing(), sensor.HeartbeatAnalyze(), admin.Admin(), \
           messagesummary.AlertSummary(), messagesummary.HeartbeatSummary(), \
           messagedetails.AlertDetails(), messagedetails.HeartbeatDetails(), \
@@ -44,12 +42,11 @@ objects = messagelisting.AlertListing(), \
 
 
 
-sections = [("Events", (("Alerts", ["alert_listing", "alert_delete"]),
-                        ("Heartbeats", ["heartbeat_listing", "heartbeat_delete"]),
+sections = [("Events", (("Alerts", ["alert_listing"]),
+                        ("Heartbeats", ["heartbeat_listing"]),
                         ("Filters", ["alert_filter_load", "alert_filter_save"]))),
             ("Agents", (("Agents", ["sensor_listing", "heartbeat_analyze",
                                     "sensor_alert_listing", "sensor_heartbeat_listing",
-                                    "sensor_alert_delete", "sensor_heartbeat_delete",
                                     "admin_config_display", "admin_option_change",
                                     "admin_instance_create", "admin_destroy"]),)),
             ("Users", (("Users", ["user_listing", "user_add_form", "user_add", "user_delete",

@@ -82,23 +82,18 @@ class _MyTime:
 
 class MessageListingParameters(view.Parameters):
     def register(self):
-        self.optional("alert.classification.text", str)
-        self.optional("alert.source.node.address.address", str)
-        self.optional("alert.target.node.address.address", str)
-        self.optional("alert.analyzer.name", str)
-        self.optional("filter", str)
         self.optional("timeline_value", int, default=1)
         self.optional("timeline_unit", str, default="hour")
         self.optional("timeline_end", int)
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50)
         self.optional("timezone", str, "frontend_localtime")
+        self.optional("idents", list, [])
         # submit with an image passes the x and y coordinate values
         # where the image was clicked
         self.optional("x", int)
         self.optional("y", int)
         
-
     def normalize(self):
         view.Parameters.normalize(self)
         
@@ -108,30 +103,6 @@ class MessageListingParameters(view.Parameters):
             
         if not self["timezone"] in ("frontend_localtime", "sensor_localtime", "utc"):
             raise view.InvalidValueError("timezone", self["timezone"])
-
-        # remove the bulshit
-        try:
-            del self["x"]
-            del self["y"]
-        except KeyError:
-            pass
-
-
-
-class SensorMessageListingParameters(MessageListingParameters):
-    def register(self):
-        MessageListingParameters.register(self)
-        self.mandatory("analyzerid", long)
-
-
-
-class DeleteParameters:
-    def register(self):
-        self.optional("idents", list, default=[])
-
-    def normalize(self):
-        if not self.has_key("idents"):
-            return
         
         idents = [ ]
         for ident in self["idents"]:
@@ -144,34 +115,61 @@ class DeleteParameters:
 
         self["idents"] = idents
 
+        # remove the bulshit
+        try:
+            del self["x"]
+            del self["y"]
+        except KeyError:
+            pass
 
 
-class MessageListingDeleteParameters(MessageListingParameters, DeleteParameters):
+
+class AlertListingParameters(MessageListingParameters):
+    allow_extra_parameters = True
+
     def register(self):
         MessageListingParameters.register(self)
-        DeleteParameters.register(self)
+        self.optional("filter", str)
+        self.optional("alert.classification.text", list)
+        self.optional("alert.analyzer.name", list)
 
     def normalize(self):
         MessageListingParameters.normalize(self)
-        DeleteParameters.normalize(self)
+
+        for direction in "source", "target":
+            self["alert.%s.node" % direction] = [ ]
+            for parameter, value in self.items():
+                idx = parameter.find("%s_type_" % direction)
+                if idx == -1:
+                    continue
+                num = parameter.replace("%s_type_" % direction, "", 1)
+
+                if self.has_key("alert.%s.node_%s" % (direction, num)):
+                    self["alert.%s.node" % direction].append((value,
+                                                              self["alert.%s.node_%s" % (direction, num)]))
 
 
 
-class SensorMessageListingDeleteParameters(SensorMessageListingParameters, DeleteParameters):
+class HeartbeatListingParameters(MessageListingParameters):
+    pass
+
+
+
+class SensorAlertListingParameters(AlertListingParameters):
     def register(self):
-        SensorMessageListingParameters.register(self)
-        DeleteParameters.register(self)
+        AlertListingParameters.register(self)
+        self.mandatory("analyzerid", long)
 
-    def normalize(self):
-        SensorMessageListingParameters.normalize(self)
-        DeleteParameters.normalize(self)
+
+
+class SensorHeartbeatListingParameters(HeartbeatListingParameters):
+    def register(self):
+        HeartbeatListingParameters.register(self)
+        self.mandatory("analyzerid", long)
 
 
 
 class MessageListing:
-    def _adjustCriteria(self, criteria):
-        pass
-
     def _setInlineFilter(self):
         if self.parameters.has_key("inline_filter_object"):
             self.dataset["active_inline_filter"] = self.inline_filters[self.parameters["inline_filter_object"]]
@@ -208,10 +206,6 @@ class MessageListing:
 
         self.dataset["timeline.value"] = self.parameters["timeline_value"]
         self.dataset["timeline.%s_selected" % self.parameters["timeline_unit"]] = "selected"
-        self.dataset["timeline.hidden_parameters"] = { "view": self.view_name }
-        for name in self.parameters.keys():
-            if not name in ("timeline_value", "timeline_unit", "limit", "filter", "timezone"):
-                self.dataset["timeline.hidden_parameters"][name] = self.parameters[name]
 
         if self.parameters["timezone"] == "utc":
             self.dataset["timeline.start"] = utils.time_to_ymdhms(time.gmtime(int(start)))
@@ -325,25 +319,26 @@ class MessageListing:
                 self.dataset["timeline.%s_selected" % timezone] = "selected"
             else:
                 self.dataset["timeline.%s_selected" % timezone] = ""
+
+    def _getInlineFilter(self, name):
+        return name, self.parameters.get(name)
+
+    def _deleteMessages(self):
+        if len(self.parameters["idents"]) == 0:
+            return
         
-    def render(self):
+        if not self.user.has(User.PERM_IDMEF_ALTER):
+            raise User.PermissionDeniedError(user.login, self.current_view)
+
+        for analyzerid, messageid in self.parameters["idents"]:
+            self._deleteMessage(analyzerid, messageid)
+
+    def render(self, criteria=[]):
+        self._deleteMessages()
+        
         start, end = self._getTimelineRange()
-
-        for column in self.filters.values():
-            self.dataset[column + "_filtered"] = False
-
-        criteria = [ ]
-        for filter in self.filters:
-            if self.parameters.has_key(filter):
-                value = self.parameters[filter]
-                criteria.append("%s substr '%s'" % (filter, value))
-                self.dataset[filter] = value
-                self.dataset[self.filters[filter] + "_filtered"] = True
-            else:
-                self.dataset[filter] = ""
         
         criteria.append(self.time_criteria_format % (str(start), str(end)))
-        self._adjustCriteria(criteria)
         criteria = " && ".join(criteria)
 
         self._setInlineFilter()
@@ -355,9 +350,6 @@ class MessageListing:
         self._setMessages(criteria)
 
         self.dataset["current_view"] = self.view_name
-        self.dataset["delete_hidden_parameters"] = self.parameters - [ "view" ]
-        self.dataset["delete_view"] = self.delete_view
-        self.dataset["filter_hidden_parameters"] = self.parameters - [ "view" ] - self.filters.keys()
         self.dataset["nav.from"] = self.parameters["offset"] + 1
         self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
         self.dataset["limit"] = self.parameters["limit"]
@@ -370,20 +362,13 @@ class MessageListing:
 
 class AlertListing(MessageListing, view.View):
     view_name = "alert_listing"
-    view_parameters = MessageListingParameters
+    view_parameters = AlertListingParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "AlertListing"
 
     root = "alert"
-    filters = { "alert.classification.text": "classification",
-                "alert.source.node.address.address": "source",
-                "alert.source.node.name": "source",
-                "alert.target.node.address.address": "target",
-                "alert.target.node.name": "target",
-                "alert.analyzer.name": "analyzer" }
     messageid_object = "alert.messageid"
     analyzerid_object = "alert.analyzer.analyzerid"
-    delete_view = "alert_delete"
     summary_view = "alert_summary"
     details_view = "alert_details"
     time_criteria_format = "alert.create_time >= '%s' && alert.create_time < '%s'"
@@ -501,13 +486,55 @@ class AlertListing(MessageListing, view.View):
     def _getFilter(self, storage, login, name):
         return storage.getAlertFilter(login, name)
 
-    def _adjustCriteria(self, criteria):
+    def _getInlineFilterObject(self, filter):
+        try:
+            return self.parameters({"alert.source.node": "source_type",
+                                    "alert.target.node": "target_type"}[filter])
+        except:
+            return filter
+
+    def _deleteMessage(self, analyzerid, messageid):
+        self.env.prelude.deleteAlert(analyzerid, messageid)
+        
+    def render(self):
+        criteria = [ ]
+
         if self.parameters.has_key("filter"):
             filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter"])
             criteria.append("(%s)" % str(filter))
 
-    def render(self):
-        MessageListing.render(self)
+        if self.parameters.has_key("alert.classification.text") and \
+           len(self.parameters["alert.classification.text"]) > 0:
+            criteria.append(" || ".join(map(lambda x: "alert.classification.text substr '%s'" % x,
+                                            self.parameters["alert.classification.text"])))
+            self.dataset["alert.classification.text"] = self.parameters["alert.classification.text"]
+            self.dataset["classification_filtered"] = True
+        else:
+            self.dataset["alert.classification.text"] = [ "" ]
+            self.dataset["classification_filtered"] = False
+
+        for direction in "source", "target":
+            if self.parameters["alert.%s.node" % direction]:
+                criteria.append(" || ".join(map(lambda (o,v): "%s substr '%s'" % (o, v),
+                                                self.parameters["alert.%s.node" % direction])))
+                self.dataset["alert.%s.node" % direction] = self.parameters["alert.%s.node" % direction]
+                self.dataset["%s_filtered" % direction] = True
+            else:
+                self.dataset["alert.%s.node" % direction] = [ ("alert.%s.node.address.address" % direction, "") ]
+                self.dataset["%s_filtered" % direction] = False
+
+        if self.parameters.has_key("alert.analyzer.name") and \
+           len(self.parameters["alert.analyzer.name"]) > 0:
+            criteria.append(" || ".join(map(lambda x: "alert.analyzer.name substr '%s'" % x,
+                                            self.parameters["alert.analyzer.name"])))
+            self.dataset["alert.analyzer.name"] = self.parameters["alert.analyzer.name"]
+            self.dataset["analyzer_filtered"] = True
+        else:
+            self.dataset["alert.analyzer.name"] = [ "" ]
+            self.dataset["analyzer_filtered"] = False
+
+        MessageListing.render(self, criteria)
+        
         self.dataset["filters"] = self.env.storage.getAlertFilters(self.user.login)
         self.dataset["current_filter"] = self.parameters.get("filter", "")
 
@@ -515,13 +542,12 @@ class AlertListing(MessageListing, view.View):
 
 class HeartbeatListing(MessageListing, view.View):
     view_name = "heartbeat_listing"
-    view_parameters = MessageListingParameters
+    view_parameters = HeartbeatListingParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "HeartbeatListing"
 
     root = "heartbeat"
     filters = { }
-    delete_view = "heartbeat_delete"
     summary_view = "heartbeat_summary"
     details_view = "heartbeat_details"
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
@@ -544,19 +570,20 @@ class HeartbeatListing(MessageListing, view.View):
                                                     src["heartbeat.analyzer.node.address(0).address"])
         dst["time"] = self._createTimeField(src["heartbeat.create_time"], self.parameters["timezone"])
 
+    def _deleteMessage(self, analyzerid, messageid):
+        self.env.prelude.deleteHeartbeat(analyzerid, messageid)
+
 
 
 class SensorAlertListing(AlertListing, view.View):
     view_name = "sensor_alert_listing"
-    view_parameters = SensorMessageListingParameters
+    view_parameters = SensorAlertListingParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "SensorAlertListing"
-    
-    delete_view = "sensor_alert_delete"
 
     def _adjustCriteria(self, criteria):
         criteria.append("alert.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
-        
+
     def render(self):
         AlertListing.render(self)
         self.dataset["analyzer"] = self.env.prelude.getAnalyzer(self.parameters["analyzerid"])
@@ -565,74 +592,13 @@ class SensorAlertListing(AlertListing, view.View):
 
 class SensorHeartbeatListing(HeartbeatListing, view.View):
     view_name = "sensor_heartbeat_listing"
-    view_parameters = SensorMessageListingParameters
+    view_parameters = SensorHeartbeatListingParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "SensorHeartbeatListing"
-    
-    delete_view = "sensor_heartbeat_delete"
-    
+
     def _adjustCriteria(self, criteria):
         criteria.append("heartbeat.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
-    
+
     def render(self):
         HeartbeatListing.render(self)
         self.dataset["analyzer"] = self.env.prelude.getAnalyzer(self.parameters["analyzerid"])
-
-
-
-class _AlertDelete:
-    view_parameters = MessageListingDeleteParameters
-    view_permissions = [ User.PERM_IDMEF_ALTER ]
-
-    def _delete_message(self, analyzerid, messageid):
-        self.env.prelude.deleteAlert(analyzerid, messageid)
-    
-    def _delete(self):
-        for analyzerid, messageid in self.parameters["idents"]:
-            self._delete_message(analyzerid, messageid)
-        
-        del self.parameters["idents"]
-
-
-
-class _HeartbeatDelete(_AlertDelete):
-    def _delete_message(self, analyzerid, messageid):
-        self.env.prelude.deleteHeartbeat(analyzerid, messageid)
-
-
-
-class AlertDelete(_AlertDelete, AlertListing):
-    view_name = "alert_delete"
-
-    def render(self):
-        self._delete()
-        AlertListing.render(self)
-
-
-
-class HeartbeatDelete(_HeartbeatDelete, HeartbeatListing):
-    view_name = "heartbeat_delete"
-
-    def render(self):
-        self._delete()
-        HeartbeatListing.render(self)
-
-
-
-class SensorAlertDelete(_AlertDelete, SensorAlertListing):
-    view_name = "sensor_alert_delete"
-    view_parameters = SensorMessageListingDeleteParameters
-
-    def render(self):
-        self._delete()
-        SensorAlertListing.render(self)
-
-
-
-class SensorHeartbeatDelete(_HeartbeatDelete, SensorHeartbeatListing):
-    view_name = "sensor_heartbeat_delete"
-    view_parameters = SensorMessageListingDeleteParameters
-
-    def render(self):
-        self._delete()
-        SensorHeartbeatListing.render(self)

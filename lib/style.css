@@ -659,7 +659,7 @@ ul#popup_block > li:hover > ul {
 	display: inline;
 }
 
-.filter_popup div {
+.filter_popup table {
 	display: none;
 	margin-top: 15px;
 	padding: 3px;

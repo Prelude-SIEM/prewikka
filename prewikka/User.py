@@ -18,6 +18,9 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+from prewikka import Error
+
+
 PERM_IDMEF_VIEW = "IDMEF_VIEW"
 PERM_IDMEF_ALTER = "IDMEF_ALTER"
 PERM_ADMIN_CONSOLE = "ADMIN_CONSOLE"
@@ -33,6 +36,13 @@ ALL_PERMISSIONS = [ PERM_IDMEF_VIEW,
                     PERM_INTRUSIVE_COMMAND ]
 
 ADMIN_LOGIN = "admin"
+
+
+class PermissionDeniedError(Error.SimpleError):
+    def __init__(self, user, action_name):
+        Error.SimpleError.__init__(self, "permission denied",
+                                   "user %s cannot access action %s" % (user, action_name))
+
 
 
 class User:

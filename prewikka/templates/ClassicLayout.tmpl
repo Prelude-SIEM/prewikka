@@ -27,6 +27,12 @@ classic_body
                 <div class="topmenu_item_info">&nbsp;<p style='vertical-align: inherit; display: inline;'><b>$prewikka.user.login</b>, on $prewikka.date</p></div>
        #end if
 </div>
+
+#block layout_start_hook
+#end block
+$layout_start_hook
+
+<form action="?" method="get">
 	
 <div id="menu">
 	#for $name, $link in $interface.sections
@@ -44,4 +50,9 @@ classic_body
 </div>
 		
 <div id='main'>$main_content</div>
+
+#block layout_end_hook
+#end block
+$layout_end_hook
+
 #end block toplayout_content
