@@ -108,11 +108,15 @@ class LoginPasswordAuth(Auth, Session):
         Session.__init__(self, session_expiration)
 
     def getUser(self, request):
-        if request.arguments.has_key("login") and request.arguments.has_key("password"):
+        if not request.arguments.has_key("view") and request.arguments.has_key("login"):
             login = request.arguments["login"]
             del request.arguments["login"]
-            password = request.arguments["password"]
-            del request.arguments["password"]
+            password = request.arguments.get("password")
+            try:
+                del request.arguments["password"]
+            except KeyError:
+                pass
+
             try:
                 self.checkPassword(login, password)
             except AuthError, e:
