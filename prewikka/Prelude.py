@@ -105,7 +105,7 @@ class Prelude(PreludeDB):
 
     def _getLastMessageIdent(self, type, analyzerid):
         criteria = None
-        if analyzerid:
+        if analyzerid != None:
             criteria = "%s.analyzer.analyzerid == %d" % (type, analyzerid)
 
         rows = self.getValues(selection=("%s.create_time/order_desc" % type, "%s.messageid" % type),

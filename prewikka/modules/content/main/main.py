@@ -709,7 +709,7 @@ class _Element:
         name = self._humanizeField(field)
         field = "%s.%s" % (root, field)
         value = self._alert[field]
-        if not value:
+        if value is None:
             return None
         
         value = str(value)
@@ -948,8 +948,13 @@ class Assessment(_Element):
 
 class Analyzer(_Element):
     name = "analyzer"
-    fields = "analyzerid", "manufacturer", "model", "version", "class", "ostype", "osversion", \
-             Node, Process
+    fields = [ "analyzerid", "manufacturer", "model", "version", "class", "ostype", "osversion", \
+               Node, Process ]
+    check_field = "analyzerid"
+
+    def __init__(self):
+        if not Analyzer in Analyzer.fields:
+            Analyzer.fields.append(Analyzer)
 
 
 
@@ -1081,6 +1086,10 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
     def _getAnalyzer(self, dataset, prelude, analyzerid):
         analyzer = prelude.getAnalyzer(analyzerid)
         analyzer["events"] = [ ]
+        analyzer["latest_time"] = "n/a"
+        analyzer["latest_status_class"] = "abnormal_offline"
+        analyzer["latest_status"] = "abnormal offline"
+        
         start = time.time()
         rows = prelude.getValues(selection=["heartbeat.messageid", "heartbeat.create_time/order_desc"],
                                  criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
@@ -1093,6 +1102,8 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
             older = prelude.getHeartbeat(analyzerid, ident)
             older_status = older.getAdditionalData("Analyzer status")
             older_interval = older.getAdditionalData("Analyzer heartbeat interval")
+            if not older_status or not older_interval:
+                continue
             older_time = t
             total_interval += int(older_interval)
 
