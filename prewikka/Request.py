@@ -48,17 +48,23 @@ class Request:
     def write(self, data):
         pass
 
+    def sendHeader(self, name, value):
+        self.write("%s: %s\r\n" % (name, value))
+
+    def endHeaders(self):
+        self.write("\r\n")
+
     def sendResponse(self):
         if not self.output_headers:
             self.output_headers = { "Content-type": "text/html" }
         
         for name, value in self.output_headers.items():
-            self.write("%s: %s\r\n" % (name, value))
-        
+            self.sendHeader(name, value)
+            
         if self.output_cookie:
             self.write(self.output_cookie.output() + "\r\n")
             
-        self.write("\r\n")
+        self.endHeaders()
         
         if self.content:
             self.write(self.content)

@@ -73,14 +73,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         
     def sendResponse(self):
         self.send_response(200)
-        for name, value in self.output_headers.items():
-            self.send_header(name, value)
-
-        if self.output_cookie:
-            self.wfile.write(self.output_cookie.output())
-            
-        self.end_headers()
-        self.wfile.write(self.content)
+        Request.Request.sendResponse(self)
 
     def _processStatic(self):
         filename = os.path.abspath(urllib.unquote(self.path[1:]))
