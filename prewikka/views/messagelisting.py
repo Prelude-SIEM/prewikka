@@ -464,8 +464,8 @@ class AlertListing(MessageListing, view.View):
     def _setMessageTarget(self, dataset, message):
         dataset["target"] = { }
         self._setMessageDirection("target", dataset["target"], message)
-        
-    def _setMessageClassification(self, dataset, message):
+
+    def _setMessageClassificationReferences(self, dataset, message):
         urls = [ ]
         cnt = 0
 
@@ -490,7 +490,9 @@ class AlertListing(MessageListing, view.View):
             dataset["classification_references"] = "(" + ", ".join(urls) + ")"
         else:
             dataset["classification_references"] = ""
-
+        
+    def _setMessageClassification(self, dataset, message):
+        datasetself._setMessageClassificationReferences(dataset, message)
         dataset["classification"] = self._createInlineFilteredField("alert.classification.text",
                                                                     message["alert.classification.text"])
 
@@ -685,20 +687,23 @@ class AlertListing(MessageListing, view.View):
             self.dataset["messages"].append(message)
             self._setMessageCommon(message, idmef)
 
+            infos = { "classification_references": "" }
+            message["infos"] = [ infos ]
+            
             if count == 1:
                 display = self._createMessageLink(ident, "alert_summary")
+                self._setMessageClassificationReferences(infos, idmef)
             else:
                 display = utils.create_link("alert_listing",
                                             self.parameters + { "aggregated_classification_value": classification } - [ "offset" ])
                 
-            message["infos"] = [ {
+            infos.update({
                 "count": count,
                 "classification": self._createInlineFilteredField("alert.classification.text", classification),
-                "classification_references": "",
                 "severity": { "value": severity or "low" },
                 "completion": { "value": completion },
                 "display": display
-                } ]
+                })
 
         return len(results)
 
@@ -754,8 +759,14 @@ class AlertListing(MessageListing, view.View):
                 
                 for classification, severity, completion, count in results[:self._max_aggregated_classifications]:
                     dataset["aggregated_classifications_hidden"] -= count
+                    
+                    infos = { "classification_references": "" }
+                    dataset["infos"].append(infos)
 
                     if count == 1:
+                        if aggregated_count == 1:
+                            self._setMessageClassificationReferences(infos, message)
+                        
                         criteria2 = criteria[:]
                         for path, value in (("alert.classification.text", classification),
                                      ("alert.assessment.impact.severity", severity),
@@ -773,10 +784,9 @@ class AlertListing(MessageListing, view.View):
                                                       "aggregated_target_values": aggregated_target_values,
                                                       "aggregated_classification_value": classification })
 
-                    dataset["infos"].append({
+                    infos.update({
                         "count": count,
                         "classification": self._createInlineFilteredField("alert.classification.text", classification),
-                        "classification_references": "",
                         "severity": { "value": severity or "low" },
                         "completion": { "value": completion },
                         "display": display
