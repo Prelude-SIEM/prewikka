@@ -31,6 +31,30 @@ def time_to_ymdhms(t):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
 
 
+def create_link(action_name, parameters=None):
+    link = "?action=%s" % action_name
+    if parameters:
+        link += "&%s" % str(parameters)
+        
+    return link
+
+
+def property(type, name, parameter, value=None):
+    return { "type": type, "name": name, "parameter": parameter, "value": value }
+
+
+def text_property(name, parameter, value=None):
+    return property("text", name, parameter, value)
+
+
+def password_property(name, parameter, value):
+    return property("password", name, parameter, value)
+
+
+def boolean_property(name, parameter, value=False):
+    return property("checkbox", name, parameter, value)
+
+
 def mixin(*bases):
     class Dummy:
         def __init__(self):

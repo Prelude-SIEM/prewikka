@@ -130,3 +130,25 @@ class ConfigDataSet(BaseDataSet):
     
     def setConfiguration(self, configuration):
         self.addTabs(configuration)
+
+
+
+class DataSet(dict):
+    def __setitem__(self, key, value):
+        keys = key.split(".", 1)
+        if len(keys) == 1:
+            dict.__setitem__(self, key, value)
+        else:
+            key1, key2 = keys
+            if not self.has_key(key1):
+                dict.__setitem__(self, key1, DataSet())
+            dict.__getitem__(self, key1)[key2] = value
+    
+    def __getitem__(self, key):
+        try:
+            keys = key.split(".", 1)
+            if len(keys) == 1:
+                return dict.__getitem__(self, key)
+            return dict.__getitem__(self, keys[0])[keys[1]]
+        except KeyError:
+            return ""

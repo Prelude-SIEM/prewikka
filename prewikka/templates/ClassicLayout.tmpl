@@ -7,30 +7,29 @@ classic_body
 #block toplayout_content
 <div id="topmenu">
 	<ul>
-		#for $item in $topmenu_items
-			#if $item.type == 'active'
+		#for $name, $link in $interface.tabs
+			#if $name == $interface.active_tab
 				#set $class_ = 'topmenu_item_active'
 			#else
 				#set $class_ = 'topmenu_item_inactive'
 			#end if
-		<li class='$class_'><a href="$item.link">$item.name</a></li>
+		<li class='$class_'><a href="$link">$name</a></li>
 		#end for
 	</ul>
 	<ul>
-		#for $item in $topmenu_quick_accessors
-			<li class='topmenu_item_special'><a href="$item.link">$item.name</a></li>
+		#for $name, $link in $interface.quick_accessors
+			<li class='topmenu_item_special'><a href="$link">$name</a></li>
 		#end for
 	</ul>
 </div>
 	
 <div id="menu">
-	#for $item in $menu_items
-		#if $item.type == 'active'
+	#for $name, $link in $interface.sections
+		#if $name == $interface.active_section
 			#set $class_ = 'menu_item_active'
-			#set $name = $item.name
 		#else
 			#set $class_ = 'menu_item_inactive'
-			#set $name = "<a href='%s'>%s</a>" % ($item.link, $item.name)
+			#set $name = "<a href='%s'>%s</a>" % ($link, $name)
 		#end if
 	<p class='$class_'>$name</p>
 	#end for

@@ -23,7 +23,8 @@ import os, os.path
 
 import copy
 
-from prewikka import Config, Log, Prelude, Action, Interface, User, UserManagement, Error
+from prewikka import Config, Log, Prelude, Action, Interface, User, \
+    UserManagement, DataSet, Error, utils
 
 
 class InvalidQueryError(Error.SimpleError):
@@ -53,7 +54,7 @@ class Core:
         self.auth = None
         self._initModules()
 
-        if self.storage:        
+        if self.storage:
             user_management = UserManagement.UserManagement(self)
             self.registerActionGroup(user_management)
         
@@ -111,17 +112,39 @@ class Core:
     def _setupRequest(self, request, parameters):
         request.prelude = self.prelude
         request.parameters = parameters
+        request.dataset = DataSet.DataSet()
+        self._setupDataSet(request.dataset, request)
         
-    def _setupView(self, view, request):
+    def _setupDataSet(self, dataset, request):
         interface = self.interface
-        view.setInfoTitle(interface.getTitle())
-        view.setInfoSoftware(interface.getSoftware())
-        view.setInfoPlace(interface.getPlace())
-        view.addSections(interface.getSections())
-        view.setConfiguration(interface.getConfiguration())
-        view.addQuickAccessors(interface.getQuickAccessors())
-        view.referer = request.getReferer()
-        view.current = request.getQueryString()
+        dataset["document.title"] = "[PREWIKKA]"
+        dataset["document.css_files"] = [ "lib/style.css" ]
+        dataset["document.js_files"] = [ "lib/functions.js" ]
+        dataset["prewikka.title"] = interface.getTitle()
+        dataset["prewikka.software"] = interface.getSoftware()
+        dataset["prewikka.place"] = interface.getPlace()
+        dataset["prewikka.url.referer"] = request.getReferer()
+        dataset["prewikka.url.current"] = request.getQueryString()
+        dataset["interface.quick_accessors"] = map(lambda qa: (qa[0], utils.create_link(qa[1], qa[2])),
+                                                   interface.getQuickAccessors())
+        dataset["interface.sections"] = interface.getSections()
+        
+        
+##         view.setInfoTitle(interface.getTitle())
+##         view.setInfoSoftware(interface.getSoftware())
+##         view.setInfoPlace(interface.getPlace())
+##         view.addSections(interface.getSections())
+##         view.setConfiguration(interface.getConfiguration())
+##         view.addQuickAccessors(interface.getQuickAccessors())
+##         view.referer = request.getReferer()
+##         view.current = request.getQueryString()
+
+    def _setupTemplate(self, template_class, dataset):
+        template = template_class()
+        for key, value in dataset.items():
+            setattr(template, key, value)
+
+        return template
         
     def _getActionNameAndArguments(self, request):
         arguments = copy.copy(request.arguments)
@@ -193,15 +216,18 @@ class Core:
             self._setupRequest(request, parameters)
 
             try:
-                view = self.processAction(slot, request)
+                template_class = self.processAction(slot, request)
             except Prelude.Error, e:
                 raise Error.SimpleError("prelude internal error", str(e))
-                
+
+            dataset = request.dataset
             
-        except Error.PrewikkaError, view:
-            pass
+        except Error.PrewikkaError, e:
+            template_class = e.template_class
+            dataset = e.dataset
+            self._setupDataSet(dataset, request)
 
-        self._setupView(view, request)
+        template = self._setupTemplate(template_class, dataset)
 
-        request.content = str(view)
+        request.content = str(template)
         request.sendResponse()

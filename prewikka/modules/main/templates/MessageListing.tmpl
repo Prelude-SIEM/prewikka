@@ -7,7 +7,7 @@ $message_listing_header
 <div id="message_list_edition">
 	<div id="timeline">
 	<form action="?" method="get">
-		#for $name, $value in $timeline.form_hiddens
+		#for $name, $value in $timeline.hidden_parameters
 			<input type="hidden" name="$name" value="$value"/>
 		#end for
 		<div id="timeline_step_label">Step:</div>
@@ -92,16 +92,16 @@ $message_listing_header
 #block menu_extra_content
 <table id="message_list_nav">
 	<tr>
-		#if $offset_prev
-			<td class="message_list_nav_button"><a href='$offset_first'>&lt;&lt;</a></td>
-			<td class="message_list_nav_button"><a href='$offset_prev'>&lt;</a></td>
+		#if $nav.prev
+			<td class="message_list_nav_button"><a href='$nav.first'>&lt;&lt;</a></td>
+			<td class="message_list_nav_button"><a href='$nav.prev'>&lt;</a></td>
 		#else
 			<td class="message_list_nav_button_empty"></td>
 			<td class="message_list_nav_button_empty"></td>
 		#end if
-		#if $offset_next
-			<td class="message_list_nav_button"><a href='$offset_next'>&gt;</a></td>
-			<td class="message_list_nav_button"><a href='$offset_last'>&gt;&gt;</a></td>
+		#if $nav.next
+			<td class="message_list_nav_button"><a href='$nav.next'>&gt;</a></td>
+			<td class="message_list_nav_button"><a href='$nav.last'>&gt;&gt;</a></td>
 		#else
 			<td class="message_list_nav_button_empty"></td>
 			<td class="message_list_nav_button_empty"></td>
@@ -109,7 +109,7 @@ $message_listing_header
 	</tr>
 	<tr>
 		<td class="message_list_nav_infos" colspan="0">
-			$range_from ... $range_to (total:$total)
+			$nav.from ... $nav.to (total:$total)
 		</td>
 	</tr>
 </table>

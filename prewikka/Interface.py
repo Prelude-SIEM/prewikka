@@ -25,6 +25,7 @@ import copy
 import urllib
 import cgi
 
+from prewikka import utils
 
 class ConfigView:
     def __init__(self, core):
@@ -64,7 +65,7 @@ class Interface:
         return self._title
 
     def registerSection(self, name, action):
-        self._sections.append((name, action))
+        self._sections.append((name, utils.create_link(action)))
 
     def registerConfigurationSection(self, name, action):
         if not self._configuration:

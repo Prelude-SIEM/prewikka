@@ -32,9 +32,9 @@ from prewikka.templates import LoginPasswordForm
 
 class AuthError(DataSet.BaseDataSet, LoginPasswordForm.LoginPasswordForm, PrewikkaError):
     def __init__(self, message=""):
-        LoginPasswordForm.LoginPasswordForm.__init__(self)
-        DataSet.BaseDataSet.__init__(self)
-        self.message = message
+        self.dataset = DataSet.DataSet()
+        self.dataset["message"] = message
+        self.template_class = LoginPasswordForm.LoginPasswordForm
 
 
 
