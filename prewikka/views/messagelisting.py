@@ -321,7 +321,7 @@ class MessageListing:
         for filter in self.filters:
             if self.parameters.has_key(filter):
                 value = self.parameters[filter]
-                criteria.append("%s == '%s'" % (filter, value))
+                criteria.append("%s substr '%s'" % (filter, value))
                 self.dataset[filter] = value
             else:
                 self.dataset[filter] = ""
