@@ -462,7 +462,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
     details_action = "alert_details"
     whois_action = "alert_whois"
     traceroute_action = "alert_traceroute"
-    time_criteria_format = "alert.detect_time >= '%s' && alert.detect_time < '%s'"
+    time_criteria_format = "alert.create_time >= '%s' && alert.create_time < '%s'"
     message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.messageid == '%d'"
     fields = [ ("severity", "alert.assessment.impact.severity", "alert.assessment.impact.severity"),
                ("classification", "alert.classification.text", "alert.classification.text"),
@@ -490,7 +490,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
         return prelude.getAlert(analyzerid, ident)
 
     def getMessageTime(self, message):
-        return message["alert.detect_time"] or message["alert.create_time"] or 0
+        return message["alert.create_time"] or 0
 
     def _addMessageFields(self, request, fields, alert):
         fields["severity"] = { "value": alert["severity"] or "low" }
