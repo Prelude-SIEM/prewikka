@@ -72,9 +72,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         for name, value in arguments.items():
             self.arguments[name] = (len(value) == 1) and value[0] or value
 
-        start = time.time()
         self.server.core.process(self)
-        print "process time:", time.time() - start
         
     def sendResponse(self):
         self.send_response(200)
