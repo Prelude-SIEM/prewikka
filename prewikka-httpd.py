@@ -53,7 +53,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
 
     def getReferer(self):
         try:
-            return self.input_header["referer"]
+            return self.input_headers["referer"]
         except KeyError:
             return ""
 

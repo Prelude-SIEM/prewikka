@@ -165,10 +165,6 @@ class Core:
     def process(self, request):
         self.log(Log.EVENT_QUERY, request, request.getQueryString())
 
-        for key, value in request.input_headers.items():
-            print >> sys.stderr, "%s: %s" % (key, value)
-        print >> sys.stderr
-
         try:
             action_name, arguments = self._getActionAndArguments(request)
             registered_action = self._getRegisteredActionFromName(request, action_name)
