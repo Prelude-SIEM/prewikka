@@ -464,7 +464,7 @@ function ${name}_add_entry(object, value, num) {
   #for $sensor in $message.sensors
     <a href='$sensor.name.inline_filter'>$sensor.name.value</a>
     #if $sensor.node_name.value
-      (on $sensor.node_name.value)
+      ($sensor.node_name.value)
     #end if
     <br/>
   #end for
