@@ -67,7 +67,7 @@ class _Element:
 class Web(_Element):
     name = "web"
     fields = "url", "cgi", "http_method"#, "arg("
-    check_field = True
+    check_field = "url"
 
 
 
