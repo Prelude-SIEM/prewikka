@@ -125,7 +125,7 @@ class Core:
                 for section, slot in content["sections"]:
                     dataset["interface.sections"].append((section, utils.create_link("%s.%s" % (name, slot))))
 
-        dataset["prewikka.user.login"] = request.user.login
+        dataset["prewikka.user.login"] = request.user and request.user.login
         if self.env.auth.canLogout():
             dataset["prewikka.user.logout"] = utils.create_link("logout.logout")
         else:
