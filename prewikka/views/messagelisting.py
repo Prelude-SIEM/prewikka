@@ -313,10 +313,6 @@ class MessageListing:
     def _createHostField(self, object, value, type=None):
         field = self._createInlineFilteredField(object, value, type)
         field["host_commands"] = [ ]
-        
-        if not value:
-            return field
-
         for command in "whois", "traceroute":
             if self.env.host_commands.has_key(command):
                 field["host_commands"].append((command.capitalize(),
@@ -370,7 +366,6 @@ class MessageListing:
 
 
 
-
 class AlertListing(MessageListing, view.View):
     view_name = "alert_listing"
     view_parameters = AlertListingParameters
@@ -394,6 +389,33 @@ class AlertListing(MessageListing, view.View):
 
     def _fetchMessage(self, ident):
         return self.env.prelude.getAlert(ident)
+
+    def _createHostField(self, object, value, type=None):
+        field = { "value": value }
+
+        if not value:
+            return field
+
+        parameters = self.parameters - [ "source", "target", "analyzer" ]
+        i = 0
+        while True:
+            if not parameters.has_key("%s_object_%d" % (type, i)):
+                break
+            del parameters["%s_object_%d" % (type, i)]
+            if self.parameters.has_key("%s_value_%d" % (type, i)):
+                del parameters["%s_value_%d" % (type, i)]
+        parameters["%s_object_0" % type] = object
+        parameters["%s_value_0" % type] = value
+        field["inline_filter"] = utils.create_link(self.view_name, parameters)
+        
+        field["host_commands"] = [ ]
+        for command in "whois", "traceroute":
+            if self.env.host_commands.has_key(command):
+                field["host_commands"].append((command.capitalize(),
+                                               utils.create_link(command,
+                                                                 { "origin": self.view_name, "host": value })))
+
+        return field
 
     def _setMessageDirection(self, direction, dataset, message):
         empty = True

@@ -396,7 +396,7 @@ function ${name}_add_entry(object, value, num) {
   #end for
 </td>
 
-#for $name, $direction in ("source", $message.source), ("target", $message.target)
+#for $name, $separator, $direction in ("source", "from", $message.source), ("target", "to", $message.target)
 <td>
   <ul id="popup_block">
     <li class="popup_title">
@@ -448,9 +448,7 @@ function ${name}_add_entry(object, value, num) {
        n/a
      #end if
       <ul>
-        #if not $message.aggregated
-          <li><a href="$direction.address.inline_filter">Group by $name</a></li>
-        #end if
+        <li><a href="$direction.address.inline_filter">See all alerts $separator this $name</a></li>
         #for $name, $link in $direction.address.host_commands
           <li><a href="$link">$name</a></li>
         #end for
