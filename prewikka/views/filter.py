@@ -29,7 +29,7 @@ class AlertFilterEditionParameters(view.Parameters):
         self.optional("filter_name", str)
         self.optional("filter_comment", str, default="")
         self.optional("formula", str, default="")
-        self.mandatory("save_as", str)
+        self.optional("save_as", str)
         
     def normalize(self):
         view.Parameters.normalize(self)

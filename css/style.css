@@ -74,6 +74,15 @@ thead {
 /*
  * banner
  */
+
+#top_view_header_picture {
+	float: left;  
+	display: inline;  
+	width: 30px;  
+	border: 1px solid black;  
+	vertical-align: middle;  
+}
+
 #top_view_header {
         z-index: 1;
         position: fixed;
@@ -98,6 +107,7 @@ thead {
         font-weight: bold;
         color: #ffffff;
         display: inline;
+	vertical-align: middle;
 }
 
 #top_view_header_title {
@@ -739,11 +749,19 @@ ul#popup_block > li:hover > ul {
  * misc
  */
 
-#fieldset_page { max-width: 700px; }
-#fieldset_page textarea { border: 1px outset black; }
-#fieldset_page input { border: 1px outset black; }
-#fieldset_page fieldset { border: 1px outset black; padding: 1em }
-#fieldset_page legend { font-size: 13px; font-weight: bold; }
+#fieldset_heading h1, #fieldset_heading h2 { margin: 0 }  
+	#fieldset_heading h2 { font-weight: normal; font-size: 150%; margin-bottom: 1em }
+	#fieldset_heading .date { color: #996; font-size: 130%; float: right; position: relative }  
+  	
+	#fieldset_heading table { border-collapse: collapse; width: 100%; }
+	#fieldset_heading tr { border-bottom: 1px dashed white; }  
+	#fieldset_heading .nodash { border-bottom: 0px; }  
+
+	#fieldset_heading td, #fieldset_heading th { font-size: 90%; padding: .5em 1em; vertical-align: top }
+	#fieldset_heading th { color: #950; font-weight: normal; text-align: left; }  
+	#fieldset_heading hr { color: #dd9; border-color: black; border-width: 1px 0 0; height: 1px; margin: .5em 0 0 }
+}
+
 
 .not_available {
         background-color: #e0e0e0;
