@@ -72,6 +72,9 @@ class ConfigParserSection(OrderedDict):
         OrderedDict.__init__(self)
         self.name = name
 
+    def __nonzero__(self):
+        return True
+
     def getOption(self, name):
         return self[name]
 

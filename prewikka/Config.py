@@ -26,11 +26,11 @@ class Config:
         self.general = MyConfigParser.ConfigParserSection("general")
         self.interface = MyConfigParser.ConfigParserSection("interface")
         self.prelude = MyConfigParser.ConfigParserSection("prelude")
-        self.admin = MyConfigParser.ConfigParserSection("admin")
+        self.admin = None
         self.auth = None
         self.storage = None
         self.logs = [ ]
-        self.contents = [ ]
+        self.views = [ ]
 
         file = MyConfigParser.MyConfigParser(filename)
         file.load()
@@ -66,5 +66,5 @@ class Config:
     def _set_log(self, log):
         self.logs.append(log)
 
-    def _set_content(self, content):
-        self.contents.append(content)
+    def _set_view(self, view):
+        self.views.append(view)

@@ -99,10 +99,10 @@ class Core:
     def _loadModules(self):
         config = self._env.config
 
-        if config.storage != None:
+        if config.storage:
             self._env.storage = self._loadModule("storage", config.storage.name, config.storage)
 
-        if config.auth != None:
+        if config.auth:
             self._env.auth = self._loadModule("auth", config.auth.name, config.auth)
         
         for backend in config.logs:
