@@ -84,7 +84,12 @@
 </td>
 
 
-<td><a href='$message.sensor.inline_filter'>$message.sensor.value</a></td>
+<td>
+  <a href='$message.sensor.inline_filter'>$message.sensor.value</a>
+  #if $message.sensor_node_name.value
+    <br/>($message.sensor_node_name.value)
+  #end if
+</td>
 <td>$message.time.value</td>
 #end block message_fields
 

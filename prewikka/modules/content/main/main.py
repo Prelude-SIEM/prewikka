@@ -506,7 +506,8 @@ class AlertListingAction(MessageListingAction, AlertsView):
                ("tuser_uid", "alert.target(0).user.user_id(0).number", "alert.target.user.user_id.number"),
                ("tprocess_name", "alert.target(0).process.name", "alert.target.process.name"),
                ("tprocess_pid", "alert.target(0).process.pid", "alert.target.process.pid"),
-               ("sensor", "alert.analyzer.model", "alert.analyzer.model") ]
+               ("sensor", "alert.analyzer.name", "alert.analyzer.name"),
+               ("sensor_node_name", "alert.analyzer.node.name", "alert.analyzer.node.name") ]
 
     def countMessages(self, prelude, criteria):
         return prelude.countAlerts(criteria)
@@ -551,7 +552,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
     def _addMessageFields(self, request, fields, alert):
         fields["severity"] = { "value": alert["severity"] or "low" }
         
-        for name in ("analyzerid", "ident",
+        for name in ("analyzerid", "ident", "sensor_node_name",
                      "sport", "suser_name", "suser_uid", "sprocess_name", "sprocess_pid",
                      "tport", "tuser_name", "tuser_uid", "tprocess_name", "tprocess_pid"):
             fields[name] = { "value": alert[name] }
