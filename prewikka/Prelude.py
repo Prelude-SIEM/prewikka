@@ -128,21 +128,30 @@ class Prelude(PreludeDB):
             criteria = prelude.IDMEFCriteria(criteria)
         return self.get_heartbeat_idents(criteria, limit, offset) or [ ]
 
-    def _getLastMessageIdent(self, type, analyzerid):
+##     def _getLastMessageIdent(self, type, analyzerid):
+##         criteria = None
+##         if analyzerid != None:
+##             criteria = "%s.analyzer.analyzerid == %d" % (type, analyzerid)
+
+##         rows = self.getValues(selection=("%s.create_time/order_desc" % type, "%s.messageid" % type),
+##                               criteria=criteria, limit=1)
+
+##         return rows[0][1]
+
+    def _getLastMessageIdent(self, type, get_message_ident, analyzerid):
         criteria = None
         if analyzerid != None:
             criteria = "%s.analyzer.analyzerid == %d" % (type, analyzerid)
 
-        rows = self.getValues(selection=("%s.create_time/order_desc" % type, "%s.messageid" % type),
-                              criteria=criteria, limit=1)
+        idents = get_message_ident(criteria, limit=1)
 
-        return rows[0][1]
+        return idents[0]
 
     def getLastAlertIdent(self, analyzer=None):
-        return self._getLastMessageIdent("alert", analyzer)
+        return self._getLastMessageIdent("alert", self.getAlertIdents, analyzer)
 
     def getLastHeartbeatIdent(self, analyzer=None):
-        return self._getLastMessageIdent("heartbeat", analyzer)
+        return self._getLastMessageIdent("heartbeat", self.getHeartbeatIdents, analyzer)
 
     def getAlert(self, ident):
         return Alert(self.get_alert(ident))
@@ -190,7 +199,7 @@ class Prelude(PreludeDB):
         analyzer_paths = [ ]
         for analyzerid in self.getAnalyzerids():
             ident = self.getLastHeartbeatIdent(analyzerid)
-            heartbeat = self.getHeartbeat(analyzerid, ident)
+            heartbeat = self.getHeartbeat(ident)
             path = get_analyzer_path(heartbeat, "heartbeat.analyzer")
             analyzer_paths.append(path)
 
@@ -198,7 +207,7 @@ class Prelude(PreludeDB):
 
     def getAnalyzer(self, analyzerid):
         ident = self.getLastHeartbeatIdent(analyzerid)
-        heartbeat = self.getHeartbeat(analyzerid, ident)
+        heartbeat = self.getHeartbeat(ident)
         
         analyzer = { }
         analyzer["analyzerid"] = analyzerid

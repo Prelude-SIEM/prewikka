@@ -104,20 +104,22 @@ class HeartbeatAnalyze(view.View):
         analyzer["status_meaning"] = "abnormal offline"
         
         start = time.time()
-        rows = self.env.prelude.getValues(selection=["heartbeat.messageid", "heartbeat.create_time/order_desc"],
-                                          criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
-                                          limit=self._heartbeat_count)
+##         rows = self.env.prelude.getValues(selection=["heartbeat.messageid", "heartbeat.create_time/order_desc"],
+##                                           criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
+##                                           limit=self._heartbeat_count)
+        idents = self.env.prelude.getHeartbeatIdents(criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
+                                                     limit=self._heartbeat_count)
         newer = None
         latest = True
         total_interval = 0
         
-        for ident, t in rows:
-            older = self.env.prelude.getHeartbeat(analyzerid, ident)
+        for ident in idents:
+            older = self.env.prelude.getHeartbeat(ident)
             older_status = older.getAdditionalData("Analyzer status")
             older_interval = older.getAdditionalData("Analyzer heartbeat interval")
             if not older_status or not older_interval:
                 continue
-            older_time = t
+            older_time = older["heartbeat.create_time"]
             total_interval += int(older_interval)
 
             if latest:
