@@ -23,6 +23,7 @@
 import sys
 import getopt
 
+from prewikka import siteconfig
 from prewikka.Database import Database
 
 
@@ -59,7 +60,7 @@ if len(args) > 0:
 
 db = Database(config)
 
-content = open(config["type"] + ".sql").read()
+content = open(siteconfig.database + "/" + config["type"] + ".sql").read()
 for query in content.split(";"):
     query = query.strip()
     if len(query) > 0:
