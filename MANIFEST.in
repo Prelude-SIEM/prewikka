@@ -4,6 +4,7 @@ include scripts/*
 include htdocs/images/*
 include htdocs/css/*.css
 include htdocs/js/*.js
-include prewikka.conf
+include conf/*.conf
+include doc/*
 include *.py
 recursive-include prewikka *.py *.tmpl
