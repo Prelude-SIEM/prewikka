@@ -492,7 +492,7 @@ class AlertListing(MessageListing, view.View):
             dataset["classification_references"] = ""
         
     def _setMessageClassification(self, dataset, message):
-        datasetself._setMessageClassificationReferences(dataset, message)
+        self._setMessageClassificationReferences(dataset, message)
         dataset["classification"] = self._createInlineFilteredField("alert.classification.text",
                                                                     message["alert.classification.text"])
 
