@@ -51,7 +51,7 @@ class DirectoryStorage(Storage.Storage):
             return open(file, mode)
         except IOError, e:
             if e.errno == errno.ENOENT and not os.path.exists(self._getUserPath(login)):
-                raise Storage.StorageError("unknown user '%s'" % login)
+                raise Storage.StorageInvalidUserError(login)
             raise
 
     def _getSessionFile(self, sessionid):
@@ -68,6 +68,11 @@ class DirectoryStorage(Storage.Storage):
         self._openUserFile(login, self._getUserFilePath(login, "permissions"), "w")
 
     def deleteUser(self, login):
+        for sessionid in self.getSessions():
+            session_login, t = self.getSession(sessionid)
+            if session_login == login:
+                self.deleteSession(sessionid)
+        
         shutil.rmtree(self._getUserPath(login))
 
     def getUsers(self):
@@ -120,7 +125,7 @@ class DirectoryStorage(Storage.Storage):
             file = open(self._getSessionFile(sessionid))
         except IOError, e:
             if e.errno == errno.ENOENT:
-                raise Storage.StorageError("invalid sessionid '%s'" % sessionid)
+                raise Storage.StorageInvalidSessionError(sessionid)
             raise
 
         user, t = file.read().split()

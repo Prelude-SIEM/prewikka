@@ -24,8 +24,35 @@ from prewikka import User
 class StorageError(Exception):
     pass
 
+
+
 class StorageBackendError(Exception):
     pass
+
+
+
+class StorageInvalidError(StorageError):
+    def __init__(self, resource):
+        self._resource = resource
+    
+    def __str__(self):
+        return "invalid %s '%s'" % (self.type, self._resource)
+
+
+
+class StorageInvalidUserError(StorageInvalidError):
+    type = "user"
+
+
+
+class StorageInvalidSessionError(StorageInvalidError):
+    type = "session"
+
+
+
+class StorageInvalidFilterError(StorageInvalidError):
+    type = "filter"
+
 
 
 class Storage:

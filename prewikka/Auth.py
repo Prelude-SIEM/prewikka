@@ -43,11 +43,20 @@ class Auth:
             raise Exception("You must have a storage backend in order to use authentication.")
         self.storage = env.storage
         self.log = env.log
-        login = User.ADMIN_LOGIN
-        if not self.storage.hasUser(login):
-            self.storage.createUser(login)
-            self.storage.setPermissions(login, User.ALL_PERMISSIONS)
-
+        
+        users = self.storage.getUsers()
+        
+        has_user_manager = False
+        for login in users:
+            user = self.storage.getUser(login)
+            if User.PERM_USER_MANAGEMENT in user.permissions:
+                has_user_manager = True
+                break
+            
+        if not has_user_manager:
+            self.storage.createUser(User.ADMIN_LOGIN)
+            self.storage.setPermissions(User.ADMIN_LOGIN, User.ALL_PERMISSIONS)
+        
     def canSetPassword(self):
         return hasattr(self, "setPassword")
 

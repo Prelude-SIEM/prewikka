@@ -28,7 +28,8 @@ class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
         Auth.LoginPasswordAuth.__init__(self, env,
                                         int(config.getOptionValue("expiration", 60)) * 60)
         
-        if not self.storage.hasPassword(User.ADMIN_LOGIN):
+        if (self.storage.hasUser(User.ADMIN_LOGIN) and
+            not self.storage.hasPassword(User.ADMIN_LOGIN)):
             self.setPassword(User.ADMIN_LOGIN, User.ADMIN_LOGIN)
             
     def _hash(self, data):
