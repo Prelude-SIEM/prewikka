@@ -140,7 +140,6 @@ class AlertListingParameters(MessageListingParameters):
         self.optional("alert.assessment.impact.severity", list, [ ])
         self.optional("alert.assessment.impact.completion", list, [ ])
         
-
     def normalize(self):
         MessageListingParameters.normalize(self)
         
@@ -208,6 +207,11 @@ class SensorHeartbeatListingParameters(HeartbeatListingParameters):
 
 
 class MessageListing:
+    def _setHiddenParameters(self):
+        self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
+        if self.parameters.has_key("timeline_end"):
+            self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
+        
     def _setInlineFilter(self):
         if self.parameters.has_key("inline_filter_object"):
             self.dataset["active_inline_filter"] = self.inline_filters[self.parameters["inline_filter_object"]]
@@ -368,6 +372,7 @@ class MessageListing:
 
 
 
+
 class AlertListing(MessageListing, view.View):
     view_name = "alert_listing"
     view_parameters = AlertListingParameters
@@ -382,6 +387,9 @@ class AlertListing(MessageListing, view.View):
 
     def init(self, env):
         self._max_aggregated_classifications = int(env.config.general.getOptionValue("max_aggregated_classifications", 10))
+
+    def _adjustCriteria(self, criteria):
+        pass
 
     def _getMessageIdents(self, criteria, limit, offset):
         return self.env.prelude.getAlertIdents(criteria, limit, offset)
@@ -769,7 +777,7 @@ class AlertListing(MessageListing, view.View):
                                                                                                             "aggregated_source",
                                                                                                             "aggregated_target" ] +
                                                                                         parameters)
-                
+
                 for classification, severity, completion, count in results[:self._max_aggregated_classifications]:
                     dataset["aggregated_classifications_hidden"] -= count
                     
@@ -781,7 +789,7 @@ class AlertListing(MessageListing, view.View):
                             self._setMessageClassificationReferences(infos, message)
                         
                         criteria3 = criteria2[:]
-                        
+
                         for path, value in (("alert.classification.text", classification),
                                      ("alert.assessment.impact.severity", severity),
                                      ("alert.assessment.impact.completion", completion)):
@@ -881,16 +889,17 @@ class AlertListing(MessageListing, view.View):
         
         criteria.append("alert.create_time >= '%s' && alert.create_time < '%s'" % (str(start), str(end)))
 
+        self._adjustCriteria(criteria)
+
         self._setInlineFilter()
         self._setTimeline(start, end)
         self._setNavPrev(self.parameters["offset"])
 
+        self._setHiddenParameters()
+
         self.dataset["messages"] = [ ]
         total = self._setMessages(criteria)
 
-        self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
-        if self.parameters.has_key("timeline_end"):
-            self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
         self.dataset["nav.from"] = self.parameters["offset"] + 1
         self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
         self.dataset["limit"] = self.parameters["limit"]
@@ -970,6 +979,7 @@ class HeartbeatListing(MessageListing, view.View):
         
         criteria = [ "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'" % (str(start), str(end)) ]
         self._applyInlineFilters(criteria)
+        self._adjustCriteria(criteria)
 
         self._setInlineFilter()
         self._setTimeline(start, end)
@@ -979,9 +989,8 @@ class HeartbeatListing(MessageListing, view.View):
 
         self._setMessages(criteria)
 
-        self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
-        if self.parameters.has_key("timeline_end"):
-            self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
+        self._setHiddenParameters()
+        
         self.dataset["nav.from"] = self.parameters["offset"] + 1
         self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
         self.dataset["limit"] = self.parameters["limit"]
@@ -999,7 +1008,12 @@ class SensorAlertListing(AlertListing, view.View):
     view_template = "SensorAlertListing"
 
     def _adjustCriteria(self, criteria):
-        criteria.append("alert.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
+        criteria.append("(alert.analyzer.analyzerid == %d || alert.analyzer.analyzer.analyzerid == %d)" %
+                        (self.parameters["analyzerid"], self.parameters["analyzerid"]))
+
+    def _setHiddenParameters(self):
+        AlertListing._setHiddenParameters(self)
+        self.dataset["hidden_parameters"].append(("analyzerid", self.parameters["analyzerid"]))
 
     def render(self):
         AlertListing.render(self)
@@ -1014,7 +1028,12 @@ class SensorHeartbeatListing(HeartbeatListing, view.View):
     view_template = "SensorHeartbeatListing"
 
     def _adjustCriteria(self, criteria):
-        criteria.append("heartbeat.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
+        criteria.append("(heartbeat.analyzer.analyzerid == %d || heartbeat.analyzer.analyzer.analyzerid == %d)" %
+                        (self.parameters["analyzerid"], self.parameters["analyzerid"]))
+
+    def _setHiddenParameters(self):
+        HeartbeatListing._setHiddenParameters(self)
+        self.dataset["hidden_parameters"].append(("analyzerid", self.parameters["analyzerid"]))
 
     def render(self):
         HeartbeatListing.render(self)
