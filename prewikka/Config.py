@@ -21,31 +21,36 @@
 from prewikka import MyConfigParser
 
 
-class Config(dict):
+class Config:
     def __init__(self, filename="prewikka.conf"):
-        dict.__init__(self)
-        self.modules = { }
-        self._module_names = [ ]
-        input = MyConfigParser.MyConfigParser(filename)
-        input.load()
-        for section in input.getSections():
-            name = section.name
-            if name.find("module ") == 0:
-                mod_name = name.replace("module ", "")
-                self._module_names.append(mod_name)
-                self.modules[mod_name] = section
+        self.prelude = None
+        self.interface = None
+        self.auth = None
+        self.storage = None
+        self.logs = [ ]
+        self.contents = [ ]
+
+        file = MyConfigParser.MyConfigParser(filename)
+        file.load()
+
+        for section in file.getSections():
+            if " " in section.name:
+                type, name = section.name.split(" ")
+                section.name = name
+                handler = "_set_" + type
+                if hasattr(self, handler):
+                    getattr(self, handler)(section)
             else:
-                self[name] = section
-        
-    def getModuleNames(self):
-        return self._module_names
-    
-    def __str__(self):
-        content = dict.__str__(self)
-        for name, value in self.modules.items():
-            content += "\n%s: %s" % (name, value)
-        return content
+                setattr(self, section.name, section)
 
+    def _set_auth(self, auth):
+        self.auth = auth
 
-if __name__ == "__main__":
-    print Config()
+    def _set_storage(self, storage):
+        self.storage = storage
+
+    def _set_log(self, log):
+        self.logs.append(log)
+
+    def _set_content(self, content):
+        self.contents.append(content)

@@ -130,6 +130,21 @@ body {
 	font-weight: bold;
 }
 
+.popup div {
+	display: none;
+}
+
+.popup:hover div {
+	display: block;
+	position: relative;
+	float: both;
+	top: -20px;
+	z-index: 3;
+	width: 200px;
+	height: 50px;
+	background: yellow;
+}
+
 .classic_body {
 	background-image: url(../img/bg2.gif);
 }
@@ -533,3 +548,5 @@ select {
 form {
 	display: inline;
 }
+
+

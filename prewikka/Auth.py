@@ -69,12 +69,12 @@ class Session:
         try:
             login, t = self.storage.getSession(sessionid)
         except Storage.StorageError:
-            request.log(Log.EVENT_INVALID_SESSIONID, request, sessionid)
+            request.env.log(Log.EVENT_INVALID_SESSIONID, request, sessionid)
             raise AuthError("invalid sessionid")
 
         if time.time() > t + self._expiration:
             self.storage.deleteSession(sessionid)
-            request.log(Log.EVENT_SESSION_EXPIRED, request, sessionid)
+            request.env.log(Log.EVENT_SESSION_EXPIRED, request, sessionid)
             raise AuthError("session expired")
 
         return login

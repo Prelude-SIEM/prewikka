@@ -78,6 +78,5 @@ class LogStderr(Log.LogBackend):
 
 
 
-def load(core, config):
-    backend = LogStderr(config)
-    core.log.registerBackend(backend)
+def load(env, config):
+    return LogStderr(config)

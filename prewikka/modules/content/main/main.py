@@ -23,12 +23,10 @@ import sys
 import time
 import copy
 
-from prewikka import Action
-from prewikka import utils
-import prewikka.User
+from prewikka import User, ParametersNormalizer, utils
 
-from prewikka.modules.main import ActionParameters
-from prewikka.modules.main.templates import \
+
+from prewikka.modules.content.main.templates import \
      AlertListing, HeartbeatListing, MessageDetails, MessageListing, \
      MessageSummary, SensorAlertListing, SensorHeartbeatListing, \
      SensorListing
@@ -44,7 +42,7 @@ class _MyTime:
         try:
             self._index = [ "year", "month", "day", "hour", "min", "sec" ].index(key)
         except ValueError:
-            raise KeyError
+            raise KeyError(key)
         
         return self
 
@@ -87,158 +85,201 @@ class _MyTime:
         return utils.time_to_ymdhms(self._t)
     
     def __int__(self):
-        return self._t
+        return int(self._t)
 
 
 
-def get_action_handler_name(name):
-    import prewikka.modules.main.Actions
-    action_class = getattr(prewikka.modules.main.Actions, name)
-    object = action_class()
+class MessagePM(ParametersNormalizer.ParametersNormalizer):
+    def register(self):
+        self.mandatory("analyzerid", long)
+        self.mandatory("ident", long)
 
-    return object.path
+
+
+class MessageListingPM(ParametersNormalizer.ParametersNormalizer):
+    def register(self):
+        self.optional("filter_name", str)
+        self.optional("filter_value", str)
+        self.optional("timeline_value", int, default=1)
+        self.optional("timeline_unit", str, default="hour")
+        self.optional("timeline_end", int)
+        self.optional("offset", int, default=0)
+        self.optional("limit", int, default=50)
+
+    def normalize(self, parameters):
+        ParametersNormalizer.ParametersNormalizer.normalize(self, parameters)
+
+        for p1, p2 in ("filter_name", "filter_value"), ("timeline_value", "timeline_unit"):
+            if parameters.has_key(p1) ^ parameters.has_key(p2):
+                raise ParametersNormalizer.MissingParameterError(parameters.has_key(p1) and p1 or p2)
+
+
+
+class DeletePM:
+    def register(self):
+        self.optional("idents", list, default=[])
+
+    def normalize(self, parameters):
+        if not parameters.has_key("idents"):
+            return
+        
+        idents = [ ]
+        for ident in parameters["idents"]:
+            try:
+                analyzerid, message_ident = map(lambda x: long(x), ident.split(":"))
+            except ValueError:
+                raise ParametersNormalizer.InvalidValueError("idents", parameters["idents"])
+            
+            idents.append((analyzerid, message_ident))
+
+        parameters["idents"] = idents
+
+
+
+class MessageListingDeletePM(MessageListingPM, DeletePM):
+    def register(self):
+        MessageListingPM.register(self)
+        DeletePM.register(self)
+
+    def normalize(self, parameters):
+        MessageListingPM.normalize(self, parameters)
+        DeletePM.normalize(self, parameters)
+
+
+
+class SensorMessageListingPM(MessageListingPM):
+    def register(self):
+        MessageListingPM.register(self)
+        self.mandatory("analyzerid", long)
+        
+
+
+class SensorMessageListingDeletePM(SensorMessageListingPM, DeletePM):
+    def register(self):
+        SensorMessageListingPM.register(self)
+        DeletePM.register(self)
+
+    def normalize(self, parameters):
+        SensorMessageListingPM.normalize(self, parameters)
+        DeletePM.normalize(self, parameters)
+
+
+
+class View:
+    def _setView(self, dataset):
+        dataset["interface.active_section"] = self._active_section
+        dataset["interface.tabs"] = self._tabs
+        dataset["interface.active_tab"] = self._active_tab
     
-    
 
-class AlertsView:
-    def _setView(self, dataset):
-        dataset["interface.active_section"] = "Alerts"
-        dataset["interface.active_tab"] = "Alerts"
-        dataset["interface.tabs"] = [("Alerts", \
-                                      utils.create_link(get_action_handler_name("AlertListingAction")))]
-                                  
-
-
-class HeartbeatsView:
-    def _setView(self, dataset):
-        dataset["interface.active_section"] = "Heartbeats"
-        dataset["interface.tabs"] = [("List", \
-                                      utils.create_link(get_action_handler_name("HeartbeatListingAction")))]
+class AlertsView(View):
+    _active_section = "Alerts"
+    _tabs = [("Alerts", utils.create_link("main.alert_listing"))]
+    _active_tab = "Alerts"
 
 
 
-class HeartbeatsAnalyzeView(HeartbeatsView):
-    def _setView(self, dataset):
-        HeartbeatsView._setView(self, dataset)
-        dataset["interface.active_tab"] = "Analyze"
+class HeartbeatsView(View):
+    _active_section = "Heartbeats"
+    _tabs = [("Heartbeats", utils.create_link("main.heartbeat_listing"))]
+    _active_tab = "Heartbeats"
 
 
 
-class HeartbeatListingView(HeartbeatsView):
-    def _setView(self, dataset):
-        HeartbeatsView._setView(self, dataset)
-        dataset["interface.active_tab"] = "List"
+class SensorsView(View):
+    _active_section = "Sensors"
+    _tabs = [("Sensors", utils.create_link("main.sensor_listing"))]
+    _active_tab = "Sensors"
 
 
 
-class SensorsView:
-    def _setView(self, dataset):
-        dataset["interface.active_section"] = "Sensors"
-        dataset["interface.active_tab"] = "Sensors"
-        dataset["interface.tabs"] = [("Sensors", \
-                                     utils.create_link(get_action_handler_name("SensorListingAction")))]
-
-
-
-class MessageListingAction(Action.Action):
-    parameters = ActionParameters.MessageListing
-    permissions = [ prewikka.User.PERM_MESSAGE_VIEW ]
-
+class MessageListingAction:
     def _adjustCriteria(self, request, criteria):
         pass
 
-    def getFilter(self, wanted):
+    def _getFilter(self, wanted):
         for name, object, filter in self.fields:
             if name == wanted:
                 return filter
 
-        raise Action.ActionParameterInvalidError(wanted)
+        raise ParametersNormalizer.InvalidParameterError(wanted)
 
     def _createLink(self, action, parameters, ignore=()):
-        action = get_action_handler_name(action)
-        action_parameters = copy.copy(parameters)
-        for parameter in ignore:
-            try:
-                del action_parameters[parameter]
-            except KeyError:
-                pass
-        
-        return utils.create_link(action, action_parameters)
+        return utils.create_link("main.%s" % action,
+                                 dict([(k, v) for k, v in parameters.items() if not k in ignore]))
 
     def _setFilter(self, dataset, parameters):
-        dataset["active_filter"] = parameters.getFilterName()
+        dataset["active_filter"] = parameters.get("filter_name", "")
         dataset["remove_active_filter"] = self._createLink(self.listing_action,
-                                                           parameters, ("filter_name", "filter_value", "offset"))
+                                                           parameters, ["filter_name", "filter_value", "offset"])
 
     def _setTimelineNext(self, dataset, parameters, next):
-        tmp = copy.copy(parameters)
-        tmp.setTimelineEnd(int(next))
-        dataset["timeline.next"] = self._createLink(self.listing_action, tmp)
+        dataset["timeline.next"] = self._createLink(self.listing_action,
+                                                    dict(parameters.items() + [("timeline_end", int(next))]))
 
     def _setTimelinePrev(self, dataset, parameters, prev):
-        tmp = copy.copy(parameters)
-        tmp.setTimelineEnd(int(prev))
-        dataset["timeline.prev"] = self._createLink(self.listing_action, tmp)
+        dataset["timeline.prev"] = self._createLink(self.listing_action,
+                                                    dict(parameters.items() + [("timeline_end", int(prev))]))
 
     def _getTimelineRange(self, parameters):
-        if parameters.getTimelineEnd():
-            end = _MyTime(parameters.getTimelineEnd())
+        if parameters.has_key("timeline_end"):
+            end = _MyTime(parameters["timeline_end"])
         else:
             end = _MyTime()
-            if not parameters.getTimelineUnit() in ("min", "hour"):
-                end.round(parameters.getTimelineUnit())
-        start = end[parameters.getTimelineUnit()] - parameters.getTimelineValue()
+            if not parameters["timeline_unit"] in ("min", "hour"):
+                end.round(parameters["timeline_unit"])
+        
+        start = end[parameters["timeline_unit"]] - parameters["timeline_value"]
 
-        return start, end        
+        return start, end
         
     def _setTimeline(self, dataset, parameters, start, end):
-        dataset["timeline.current"] = self._createLink(self.listing_action, parameters, ("timeline_end", ))
+        dataset["timeline.current"] = self._createLink(self.listing_action, parameters, ["timeline_end"])
 
-        dataset["timeline.value"] = parameters.getTimelineValue()
-        dataset["timeline.%s_selected" % parameters.getTimelineUnit()] = "selected"
-        dataset["timeline.hidden_parameters"] = [ ("action", get_action_handler_name(self.listing_action)) ]
-        for name in parameters.getNames(ignore=("timeline_value", "timeline_unit", "limit")):
-            dataset["timeline.hidden_parameters"].append((name, parameters[name]))
+        dataset["timeline.value"] = parameters["timeline_value"]
+        dataset["timeline.%s_selected" % parameters["timeline_unit"]] = "selected"
+        dataset["timeline.hidden_parameters"] = { "content": "main.%s" % self.listing_action }
+        for name in parameters.keys():
+            if not name in ("timeline_value", "timeline_unit", "limit"):
+                dataset["timeline.hidden_parameters"][name] = parameters[name]
         dataset["timeline.start"] = str(start)
         dataset["timeline.end"] = str(end)
 
-        if not parameters.getTimelineEnd() and parameters.getTimelineUnit() in ("min", "hour"):
+        if not parameters.has_key("timeline_end") and parameters["timeline_unit"] in ("min", "hour"):
             tmp = copy.copy(end)
-            tmp.round(parameters.getTimelineUnit())
-            tmp = tmp[parameters.getTimelineUnit()] - 1
+            tmp.round(parameters["timeline_unit"])
+            tmp = tmp[parameters["timeline_unit"]] - 1
             self._setTimelineNext(dataset, parameters,
-                                  tmp[parameters.getTimelineUnit()] + parameters.getTimelineValue())
+                                  tmp[parameters["timeline_unit"]] + parameters["timeline_value"])
             self._setTimelinePrev(dataset, parameters,
-                                  tmp[parameters.getTimelineUnit()] - (parameters.getTimelineValue() - 1))
+                                  tmp[parameters["timeline_unit"]] - (parameters["timeline_value"] - 1))
         else:
             self._setTimelineNext(dataset, parameters,
-                                  end[parameters.getTimelineUnit()] + parameters.getTimelineValue())
+                                  end[parameters["timeline_unit"]] + parameters["timeline_value"])
             self._setTimelinePrev(dataset, parameters,
-                                  end[parameters.getTimelineUnit()] - parameters.getTimelineValue())
+                                  end[parameters["timeline_unit"]] - parameters["timeline_value"])
 
     def _setNavPrev(self, dataset, parameters, offset):
         if offset:
             dataset["nav.first"] = self._createLink(self.listing_action, parameters)
-            tmp = copy.copy(parameters)
-            tmp.setOffset(offset - parameters.getLimit())
-            dataset["nav.prev"] = self._createLink(self.listing_action, tmp)
+            offset -= parameters["limit"]
+            dataset["nav.prev"] = self._createLink(self.listing_action, dict(parameters.items() + [("offset", offset)]))
         else:
             dataset["nav.prev"] = None
             
-    def _setNavNext(self, dataset, parameters, count):
-        if count > parameters.getOffset() + parameters.getLimit():
-            tmp = copy.copy(parameters)
-            tmp.setOffset(parameters.getOffset() + parameters.getLimit())
-            dataset["nav.next"] = self._createLink(self.listing_action, tmp)
-            tmp.setOffset(count - ((count % parameters.getLimit()) or parameters.getLimit()))
-            dataset["nav.last"] = self._createLink(self.listing_action, tmp)
+    def _setNavNext(self, dataset, parameters, offset, count):
+        if count > offset + parameters["limit"]:
+            offset = offset + parameters["limit"]
+            dataset["nav.next"] = self._createLink(self.listing_action, dict(parameters.items() + [("offset", offset)]))
+            offset = count - ((count % parameters["limit"]) or parameters["limit"])
+            dataset["nav.last"] = self._createLink(self.listing_action, dict(parameters.items() + [("offset", offset)]))
         else:
             dataset["nav.next"] = None
         
     def _fetchMessages(self, parameters, prelude, criteria):
         messages = [ ]
         
-        for analyzerid, ident in self.getMessageIdents(prelude, criteria, parameters.getLimit(), parameters.getOffset()):
+        for analyzerid, ident in self.getMessageIdents(prelude, criteria, parameters["limit"], parameters["offset"]):
             message = { "analyzerid": analyzerid, "ident": ident }
             messages.append(message)
             tmp = self.getMessage(prelude, analyzerid, ident)
@@ -265,19 +306,13 @@ class MessageListingAction(Action.Action):
     def _createMessageField(self, parameters, name, value):
         if not value:
             return { "value": "n/a", "filter": None }
-        
-        parameters = copy.copy(parameters)
-        parameters.setFilterName(name)
-        parameters.setFilterValue(value)
+
+        parameters = dict(parameters.items() + [("filter_name", name), ("filter_value", value)])
         
         return { "value": value, "filter": self._createLink(self.listing_action, parameters) }
 
     def _createMessageLink(self, message, action):
-        parameters = ActionParameters.Message()
-        parameters.setAnalyzerid(message["analyzerid"])
-        parameters.setMessageIdent(message["ident"])
-        
-        return self._createLink(action, parameters)
+        return self._createLink(action, { "analyzerid": message["analyzerid"], "ident": message["ident"] })
 
     def _addMessage(self, parameters, fields, message):
         fields["summary"] = self._createMessageLink(message, self.summary_action)
@@ -293,29 +328,22 @@ class MessageListingAction(Action.Action):
             dataset["messages"].append(fields)
             self._addMessage(parameters, fields, message)
 
-        dataset["delete_form_hiddens"] = [("action", get_action_handler_name(self.delete_action))]
-        for name in parameters.getNames():
-            dataset["delete_form_hiddens"].append((name, parameters[name]))
+        dataset["delete_form_hiddens"] = { "content": "main.%s" % self.delete_action }
+        dataset["delete_form_hiddens"].update(parameters)
 
     def process(self, request):
         dataset = request.dataset
 
-        parameters = copy.copy(request.parameters)
-        offset = parameters.getOffset()
-        try:
-            del parameters["offset"]
-        except KeyError:
-            pass
+        self._setView(dataset)
 
-        if not parameters.getTimelineValue() or not parameters.getTimelineUnit():
-            parameters.setTimelineValue(1)
-            parameters.setTimelineUnit("hour")
+        parameters = copy.copy(request.parameters)
+        offset = parameters.pop("offset")
 
         start, end = self._getTimelineRange(parameters)
 
         criteria = [ ]
-        if parameters.getFilterName() and parameters.getFilterValue():
-            criteria.append("%s == '%s'" % (self.getFilter(parameters.getFilterName()), parameters.getFilterValue()))
+        if parameters.has_key("filter_name") and parameters.has_key("filter_value"):
+            criteria.append("%s == '%s'" % (self._getFilter(parameters["filter_name"]), parameters["filter_value"]))
         criteria.append(self.time_criteria_format % (str(start), str(end)))
         self._adjustCriteria(request, criteria)
         criteria = " && ".join(criteria)
@@ -325,28 +353,24 @@ class MessageListingAction(Action.Action):
         self._setTimeline(dataset, parameters, start, end)
         self._setNavPrev(dataset, parameters, offset)
 
-        count = self.countMessages(request.prelude, criteria)
-        messages = self._fetchMessages(request.parameters, request.prelude, criteria)
+        count = self.countMessages(request.env.prelude, criteria)
+        messages = self._fetchMessages(request.parameters, request.env.prelude, criteria)
 
-        dataset["nav.from"] = parameters.getOffset() + 1
-        dataset["nav.to"] = parameters.getOffset() + len(messages)
-        dataset["limit"] = parameters.getLimit()
+        dataset["nav.from"] = offset + 1
+        dataset["nav.to"] = offset + len(messages)
+        dataset["limit"] = parameters["limit"]
         dataset["total"] = count
 
-        self._setNavNext(dataset, parameters, count)
-
+        self._setNavNext(dataset, parameters, offset, count)
         self._setMessages(dataset, parameters, messages)
-
-        return self.template_class
 
 
 
 class AlertListingAction(MessageListingAction, AlertsView):
-    template_class = AlertListing.AlertListing
-    listing_action = "AlertListingAction"
-    delete_action = "DeleteAlertsAction"
-    summary_action = "AlertSummaryAction"
-    details_action = "AlertDetailsAction"
+    listing_action = "alert_listing"
+    delete_action = "alert_delete"
+    summary_action = "alert_summary"
+    details_action = "alert_details"
     time_criteria_format = "alert.detect_time >= '%s' && alert.detect_time < '%s'"
     message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.ident == '%d'"
     fields = [ ("severity", "alert.assessment.impact.severity", "alert.assessment.impact.severity"),
@@ -377,12 +401,11 @@ class AlertListingAction(MessageListingAction, AlertsView):
 
 
 
-class HeartbeatListingAction(MessageListingAction, HeartbeatListingView):
-    template_class = HeartbeatListing.HeartbeatListing
-    listing_action = "HeartbeatListingAction"
-    delete_action = "DeleteHeartbeatsAction"
-    summary_action = "HeartbeatSummaryAction"
-    details_action = "HeartbeatDetailsAction"
+class HeartbeatListingAction(MessageListingAction, HeartbeatsView):
+    listing_action = "heartbeat_listing"
+    delete_action = "hearbeat_delete"
+    summary_action = "heartbeat_summary"
+    details_action = "heartbeat_details"
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
     message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.ident == '%d'"
     fields = [ ("address", "heartbeat.analyzer.node.address(0).address", "heartbeat.analyzer.node.address.address"),
@@ -408,10 +431,7 @@ class HeartbeatListingAction(MessageListingAction, HeartbeatListingView):
 
 
 
-class MessageSummaryAction(Action.Action):
-    parameters = ActionParameters.Message
-    permissions = [ prewikka.User.PERM_MESSAGE_VIEW ]
-
+class MessageSummaryAction:
     def beginSection(self, title):
         self._current_section = { }
         self._current_section["title"] = title
@@ -514,7 +534,7 @@ class AlertSummaryAction(MessageSummaryAction, AlertsView):
         self.endSection(dataset)
 
     def process(self, request):
-        alert = request.prelude.getAlert(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
+        alert = request.env.prelude.getAlert(request.parameters["analyzerid"], request.parameters["ident"])
         dataset = request.dataset
         dataset["sections"] = [ ]
         self.buildTime(dataset, alert)
@@ -538,7 +558,7 @@ class HeartbeatSummaryAction(MessageSummaryAction, HeartbeatsView):
         self.endSection(dataset)
 
     def process(self, request):
-        hearbeat = request.prelude.getHeartbeat(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
+        hearbeat = request.env.prelude.getHeartbeat(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
         dataset = request.dataset
         dataset["sections"] = [ ]
         self.buildAnalyzer(dataset, heartbeat)
@@ -649,7 +669,7 @@ class UserID(_Element):
 
 
 
-class User(_Element):
+class User_(_Element):
     name = "user"
     fields = "ident", "category", UserID
     check_field = "ident"
@@ -701,7 +721,7 @@ class Files(File):
 
 class Target(_Element):
     name = "target"
-    fields = "ident", "decoy", "interface", Node, User, Process, Service, Files
+    fields = "ident", "decoy", "interface", Node, User_, Process, Service, Files
     check_field = "ident"
     is_list = True
 
@@ -709,7 +729,7 @@ class Target(_Element):
 
 class Source(_Element):
     name = "source"
-    fields = "ident", "spoofed", "interface", Node, User, Process, Service
+    fields = "ident", "spoofed", "interface", Node, User_, Process, Service
     check_field = "ident"
     is_list = True
 
@@ -803,13 +823,7 @@ class OverflowAlert(_Element):
 
 
 
-class MessageDetailsAction(Action.Action):
-    parameters = ActionParameters.Message
-    permissions = [ prewikka.User.PERM_MESSAGE_VIEW ]
-
-
-
-class AlertDetailsAction(_Element, MessageDetailsAction, AlertsView):
+class AlertDetailsAction(_Element, AlertsView):
     name = "alert"
     fields = "ident", Assessment, Analyzer, "create_time", "detect_time", "analyzer_time", \
              Source, Target, Classification, AdditionalData, ToolAlert, CorrelationAlert, \
@@ -821,17 +835,15 @@ class AlertDetailsAction(_Element, MessageDetailsAction, AlertsView):
         return { "name": "Alert", "id": 0, "hidden": False, "entries": entries }
 
     def process(self, request):
-        self._alert = request.prelude.getAlert(request.parameters.getAnalyzerid(),
-                                               request.parameters.getMessageIdent())
+        self._alert = request.env.prelude.getAlert(request.parameters["analyzerid"],
+                                                   request.parameters["ident"])
         request.dataset["node"] = self.render()
-
+        
         self._setView(request.dataset)
 
-        return MessageDetails.MessageDetails
 
 
-
-class HeartbeatDetailsAction(_Element, MessageDetailsAction, HeartbeatsView):
+class HeartbeatDetailsAction(_Element, HeartbeatsView):
     name = "heartbeat"
     fields = "ident", Analyzer, "create_time", "analyzer_time", AdditionalData
     top_element = True
@@ -841,41 +853,33 @@ class HeartbeatDetailsAction(_Element, MessageDetailsAction, HeartbeatsView):
         return { "name": "Heartbeat", "id": 0, "hidden": False, "entries": entries }
 
     def process(self, request):
-        self._alert = request.prelude.getHeartbeat(request.parameters.getAnalyzerid(),
+        self._alert = request.env.prelude.getHeartbeat(request.parameters.getAnalyzerid(),
                                                    request.parameters.getMessageIdent())
         request.dataset["node"] = self.render()
 
         self._setView(request.dataset)
 
-        return MessageDetails.MessageDetails
 
 
-
-class DeleteMessagesAction:
-    parameters = ActionParameters.MessageListingDelete
-    permissions = [ prewikka.User.PERM_MESSAGE_ALTER ]
-
-    
-
-class DeleteAlertsAction(DeleteMessagesAction, AlertListingAction):
+class AlertDeleteAction(AlertListingAction):
     def process(self, request):
-        for analyzerid, alert_ident in request.parameters.getIdents():
-            request.prelude.deleteAlert(analyzerid, alert_ident)
+        for analyzerid, alert_ident in request.parameters["idents"]:
+            request.env.prelude.deleteAlert(analyzerid, alert_ident)
+
+        del request.parameters["idents"]
         
-        request.parameters = ActionParameters.MessageListing(request.parameters)
-        
-        return AlertListing.process(self, request)
+        AlertListingAction.process(self, request)
 
 
 
-class DeleteHeartbeatsAction(DeleteMessagesAction, HeartbeatListingAction):
+class HeartbeatDeleteAction(HeartbeatListingAction):
     def process(self, request):
-        for analyzerid, heartbeat_ident in request.parameters.getIdents():
-            request.prelude.deleteHeartbeat(analyzerid, heartbeat_ident)
+        for analyzerid, heartbeat_ident in request.parameters["idents"]:
+            request.env.prelude.deleteHeartbeat(analyzerid, heartbeat_ident)
+
+        del request.parameters["idents"]
         
-        request.parameters = ActionParameters.MessageListing(request.parameters)
-        
-        return HeartbeatListing.process(self, request)
+        HeartbeatListingAction.process(self, request)
 
 
 
@@ -922,111 +926,194 @@ class DeleteHeartbeatsAction(DeleteMessagesAction, HeartbeatListingAction):
 
 
 
-class SensorMessageListingAction:
-    parameters = ActionParameters.SensorMessageListing
-
-
-
 class SensorAlertListingAction(SensorsView,
-                               SensorMessageListingAction,
                                AlertListingAction):
-    listing_action = "SensorAlertListingAction"
-    delete_action = "SensorDeleteAlertsAction"
-    summary_action = "SensorAlertSummaryAction"
-    details_action = "SensorAlertDetailsAction"
+    listing_action = "sensor_alert_listing"
+    delete_action = "sensor_alert_delete"
+    summary_action = "sensor_alert_summary"
+    details_action = "sensor_alert_details"
 
     def _adjustCriteria(self, request, criteria):
-        criteria.append("alert.analyzer.analyzerid == %d" % request.parameters.getAnalyzerid())
+        criteria.append("alert.analyzer.analyzerid == %d" % request.parameters["analyzerid"])
         
     def process(self, request):
         AlertListingAction.process(self, request)
-        request.dataset["analyzer"] = request.prelude.getAnalyzer(request.parameters.getAnalyzerid())
-        
-        return SensorAlertListing.SensorAlertListing
+        request.dataset["analyzer"] = request.env.prelude.getAnalyzer(request.parameters["analyzerid"])
 
 
 
-class SensorDeleteAlertsAction(SensorAlertListingAction):
+class SensorAlertDeleteAction(SensorAlertListingAction):
     def process(self, request):
-        for analyzerid, alert_ident in request.parameters.getIdents():
-            request.prelude.deleteAlert(analyzerid, alert_ident)
+        for analyzerid, alert_ident in request.parameters["idents"]:
+            request.env.prelude.deleteAlert(analyzerid, alert_ident)
 
-        request.parameters = ActionParameters.SensorMessageListing(request.parameters)
+        del request.parameters["idents"]
 
-        return SensorAlertListing.process(self, request)
+        SensorAlertListing.process(self, request)
 
 
 
 class SensorHeartbeatListingAction(SensorsView,
-                                   SensorMessageListingAction,
                                    HeartbeatListingAction):
-    listing_action = "SensorHeartbeatListingAction"
-    delete_action = "SensorDeleteHeartbeatsAction"
-    summary_action = "SensorHeartbeatSummaryAction"
-    details_action = "SensorHeartbeatDetailsAction"
+    listing_action = "sensor_heartbeat_listing"
+    delete_action = "sensor_heartbeat_delete"
+    summary_action = "sensor_heartbeat_summary"
+    details_action = "sensor_heartbeat_details"
     
     def _adjustCriteria(self, request, criteria):
-        criteria.append("heartbeat.analyzer.analyzerid == %d" % request.parameters.getAnalyzerid())
+        criteria.append("heartbeat.analyzer.analyzerid == %d" % request.parameters["analyzerid"])
     
     def process(self, request):
         HeartbeatListingAction.process(self, request)
-        request.dataset["analyzer"] = request.prelude.getAnalyzer(request.parameters.getAnalyzerid())
-
-        return SensorHeartbeatListing.SensorHeartbeatListing
+        request.dataset["analyzer"] = request.env.prelude.getAnalyzer(request.parameters["analyzerid"])
 
 
 
-class SensorDeleteHeartbeatsAction(SensorHeartbeatListingAction):
+class SensorHeartbeatDeleteAction(SensorHeartbeatListingAction):
     def process(self, request):
-        for analyzerid, alert_ident in request.parameters.getIdents():
-            request.prelude.deleteHeartbeat(analyzerid, alert_ident)
+        for analyzerid, alert_ident in request.parameters["idents"]:
+            request.env.prelude.deleteHeartbeat(analyzerid, alert_ident)
 
-        request.parameters = ActionParameters.SensorMessageListing(request.parameters)
+        del request.parameters["idents"]
 
-        return SensorHeartbeatListing.process(self, request)
+        SensorHeartbeatListing.process(self, request)
 
 
 
 class SensorAlertSummaryAction(SensorsView, AlertSummaryAction):
-    template_class = MessageSummary.MessageSummary
+    pass
 
 
 
 class SensorAlertDetailsAction(SensorsView, AlertDetailsAction):
-    template_class = MessageDetails.MessageDetails
+    pass
 
 
 
 class SensorHeartbeatSummaryAction(SensorsView, HeartbeatSummaryAction):
-    template_class = MessageSummary.MessageSummary
+    pass
 
 
 
 class SensorHeartbeatDetailsAction(SensorsView, HeartbeatDetailsAction):
-    template_class = MessageDetails.MessageDetails
+    pass
 
 
 
-class SensorListingAction(Action.Action, SensorsView):
-    permissions = [ prewikka.User.PERM_MESSAGE_VIEW ]
-    
+class SensorListingAction(SensorsView):
     def process(self, request):
         dataset = request.dataset
-        prelude = request.prelude
+        prelude = request.env.prelude
 
         dataset["analyzers"] = [ ]
         
         analyzerids = prelude.getAnalyzerids()
         for analyzerid in analyzerids:
             analyzer = prelude.getAnalyzer(analyzerid)
-            parameters = ActionParameters.SensorMessageListing()
-            parameters.setAnalyzerid(analyzer["analyzerid"])
-            analyzer["alerts"] = utils.create_link(get_action_handler_name("SensorAlertListingAction"),
-                                                   parameters)
-            analyzer["heartbeats"] = utils.create_link(get_action_handler_name("SensorHeartbeatListingAction"),
-                                                       parameters)
+            parameters = dict(request.parameters.items() + [("analyzerid", analyzer["analyzerid"])])
+            analyzer["alerts"] = utils.create_link("main.sensor_alert_listing", parameters)
+            analyzer["heartbeats"] = utils.create_link("main.sensor_heartbeat_listing", parameters)
             dataset["analyzers"].append(analyzer)
 
         self._setView(dataset)
-            
-        return SensorListing.SensorListing
+
+
+
+def load(env, config):
+    return {
+        "sections": [("Alerts", "alert_listing"),
+                     ("Heartbeats", "heartbeat_listing"),
+                     ("Sensors", "sensor_listing")],
+
+        "default_slot": "alert_listing",
+
+        "slots": { # Alerts section
+                   "alert_listing": { "handler": AlertListingAction().process,
+                                      "parameters": MessageListingPM(),
+                                      "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                      "template": AlertListing.AlertListing },
+
+                   "alert_summary": { "handler": AlertSummaryAction().process,
+                                      "parameters": MessagePM(),
+                                      "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                      "template": MessageSummary.MessageSummary },
+
+                   "alert_details": { "handler": AlertDetailsAction().process,
+                                      "parameters": MessagePM(),
+                                      "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                      "template": MessageDetails.MessageDetails },
+
+                   "alert_delete": { "handler": AlertDeleteAction().process,
+                                     "parameters": MessageListingDeletePM(),
+                                     "permissions": [ User.PERM_MESSAGE_VIEW, User.PERM_MESSAGE_ALTER ],
+                                     "template": AlertListing.AlertListing },
+
+                   # Hearbeats section
+
+                   "heartbeat_listing": { "handler": HeartbeatListingAction().process,
+                                          "parameters": MessageListingPM(),
+                                          "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                          "template": HeartbeatListing.HeartbeatListing },
+
+                   "heartbeat_summary": { "handler": HeartbeatSummaryAction().process,
+                                          "parameters": MessagePM(),
+                                          "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                          "template": MessageSummary.MessageSummary },
+
+                   "heartbeat_details": { "handler": HeartbeatDetailsAction().process,
+                                          "parameters": MessagePM(),
+                                          "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                          "template": MessageDetails.MessageDetails },
+
+                   "heartbeat_delete": { "handler": HeartbeatDeleteAction().process,
+                                         "parameters": MessageListingDeletePM(),
+                                         "permissions": [ User.PERM_MESSAGE_VIEW, User.PERM_MESSAGE_ALTER ],
+                                         "template": HeartbeatListing.HeartbeatListing },
+
+                   # Sensors section
+
+                   "sensor_listing": { "handler": SensorListingAction().process,
+                                       "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                       "template": SensorListing.SensorListing },
+
+                   "sensor_alert_listing": { "handler": SensorAlertListingAction().process,
+                                             "parameters": SensorMessageListingPM(),
+                                             "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                             "template": SensorAlertListing.SensorAlertListing },
+
+                   "sensor_alert_summary": { "handler": SensorAlertSummaryAction().process,
+                                             "parameters": MessagePM(),
+                                             "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                             "template": MessageSummary.MessageSummary },
+
+                   "sensor_alert_details": { "handler": SensorAlertDetailsAction().process,
+                                             "parameters": MessagePM(),
+                                             "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                             "template": MessageDetails.MessageDetails },
+
+                   "sensor_alert_delete": { "handler": SensorAlertDeleteAction().process,
+                                            "parameters": SensorMessageListingDeletePM(),
+                                            "permissions": [ User.PERM_MESSAGE_VIEW, User.PERM_MESSAGE_ALTER ],
+                                            "template": SensorAlertListing.SensorAlertListing },
+
+                   "sensor_heartbeat_listing": { "handler": SensorHeartbeatListingAction().process,
+                                                 "parameters": SensorMessageListingPM(),
+                                                 "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                                 "template": SensorHeartbeatListing.SensorHeartbeatListing },
+
+                   "sensor_heartbeat_summary": { "handler": SensorHeartbeatSummaryAction().process,
+                                                 "parameters": MessagePM(),
+                                                 "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                                 "template": MessageSummary.MessageSummary },
+
+                   "sensor_heartbeat_details": { "handler": HeartbeatDetailsAction().process,
+                                                 "parameters": MessagePM(),
+                                                 "permissions": [ User.PERM_MESSAGE_VIEW ],
+                                                 "template": MessageDetails.MessageDetails },
+
+                   "sensor_heartbeat_delete": { "handler": HeartbeatDeleteAction().process,
+                                                "parameters": SensorMessageListingDeletePM(),
+                                                "permissions": [ User.PERM_MESSAGE_VIEW, User.PERM_MESSAGE_ALTER ],
+                                                "template": SensorHeartbeatListing.SensorHeartbeatListing },
+                   }
+        }

@@ -17,9 +17,11 @@ classic_body
 		#end for
 	</ul>
 	<ul>
-		#for $name, $link in $interface.quick_accessors
-			<li class='topmenu_item_special'><a href="$link">$name</a></li>
-		#end for
+		#if $prewikka.user.logout
+			<li class='topmenu_item_special'>
+				<a href="$prewikka.user.logout">logout</a>
+			</li>
+		#end if
 	</ul>
 </div>
 	

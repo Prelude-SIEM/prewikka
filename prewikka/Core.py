@@ -23,7 +23,7 @@ import os, os.path
 
 import copy
 
-from prewikka import Config, Log, Prelude, Action, Interface, User, \
+from prewikka import Config, Log, Prelude, ParametersNormalizer, Interface, User, \
     UserManagement, DataSet, Error, utils
 
 
@@ -39,96 +39,98 @@ class PermissionDeniedError(Error.SimpleError):
                                    "user %s cannot access action %s" % (user, action_name))
 
 
+
+class Environnement:
+    def __init__(self, prelude_config):
+        self.prelude = Prelude.Prelude(prelude_config)
+        self.auth = None
+        self.storage = None
+        self.log = Log.Log()
+
+
+
 class Core:
     def __init__(self):
-        self.content_modules = { }
-        self._content_module_names = [ ]
-        self._actions = { }
-        self._default_action = None
-        self._login_action = None
+        self._contents = { }
         self._config = Config.Config()
-        self.log = Log.Log()
-        self.interface = Interface.Interface(self, self._config.get("interface", { }))
-        self.prelude = Prelude.Prelude(self._config["prelude"])
-        self.storage = None
-        self.auth = None
-        self._initModules()
+        self.env = Environnement(self._config.prelude)
+        self._loadModules()
+        self._initUserManagement()
+        self._initAuth()
 
-        if self.storage:
-            user_management = UserManagement.UserManagement(self)
-            self.registerActionGroup(user_management)
-        
-        if self.auth and self.auth.canLogout():
-            class LogoutAction(Action.Action):
-                def __init__(self, auth):
-                    Action.Action.__init__(self, "logout")
-                    self._auth = auth
+##         if self.env.auth and self.env.auth.canLogout():
+##             class LogoutAction(Action.Action):
+##                 def __init__(self, auth):
+##                     Action.Action.__init__(self, "logout")
+##                     self._auth = auth
                 
-                def process(self, request):
-                    self._auth.logout(request)
+##                 def process(self, request):
+##                     self._auth.logout(request)
 
-            action = LogoutAction(self.auth)
-            self.registerActionGroup(action)
-            self.interface.registerQuickAccessor("logout", action.slots["process"].path, Action.ActionParameters())
+##             action = LogoutAction(self.env.auth)
+##             self.registerActionGroup(action)
+##             self.interface.registerQuickAccessor("logout", action.slots["process"].path, Action.ActionParameters())
 
-    def registerActionGroup(self, action_group):
-        self._actions[action_group.name] = action_group
+    def _initUserManagement(self):
+        user_management = UserManagement.UserManagement(self.env)
+        slots = user_management.slots
+        for name, slot in slots.items():
+            slot["permissions"] = [ User.PERM_USER_MANAGEMENT ]
+            slot["handler"] = getattr(user_management, "handle_%s" % name)
+            
+        self._contents["configuration"] = { "sections": [("Configuration", user_management.default)],
+                                            "default_slot": user_management.default,
+                                            "slots": slots }
+        
+    def _initAuth(self):
+        if self.env.auth and self.env.auth.canLogout():
+            self._contents["logout"] = { "slots": { "logout": { "handler": self.env.auth.logout } } }
+        
+    def _loadModule(self, type, name, config):
+        return __import__("prewikka/modules/%s/%s/%s" % (type, name, name)).load(self.env, config)
 
-    def registerAction(self, action):
-        self.registerActionGroup(action)
+    def _loadModules(self):
+        config = self._config
 
-    def shutdown(self):
-        # Core references objects that themself reference Core, those circular
-        # references mean that garbage collector won't destroy those objects.
-        # Thus, code that use Core must call the shutdown method (that remove
-        # Core references) so that cleanup code (__del__ object methods) will be called
-        self.content_modules = None
-        self._content_module_names = None
-        self._config = None
-        self.interface = None
-        self.prelude = None
-        self.auth = None
+        if config.storage != None:
+            self.env.storage = self._loadModule("storage", config.storage.name, config.storage)
 
-    def setDefaultAction(self, action):
-        self._default_action = action
+        if config.auth != None:
+            self.env.auth = self._loadModule("auth", config.auth.name, config.auth)
+        
+        for backend in config.logs:
+            self.env.log.registerBackend(self._loadModule("log", backend.name, backend))
 
-    def registerAuth(self, auth):
-        self.auth = auth
-
-    def registerStorage(self, storage):
-        self.storage = storage
-
-    def _initModules(self):
-        base_dir = "prewikka/modules/"
-        for mod_name in self._config.getModuleNames():
-            try:
-                file = base_dir + mod_name + "/" + mod_name
-                module = __import__(file)
-                module.load(self, self._config.modules.get(mod_name, { }))
-            except ImportError:
-                print >> sys.stderr, "cannot load module named %s (%s)" % (mod_name, file)
-                raise
+        for content in config.contents:
+            self._contents[content.name] = self._loadModule("content", content.name, content)
 
     def _setupRequest(self, request, parameters):
-        request.prelude = self.prelude
         request.parameters = parameters
         request.dataset = DataSet.DataSet()
         self._setupDataSet(request.dataset, request)
         
     def _setupDataSet(self, dataset, request):
-        interface = self.interface
         dataset["document.title"] = "[PREWIKKA]"
         dataset["document.css_files"] = [ "lib/style.css" ]
         dataset["document.js_files"] = [ "lib/functions.js" ]
-        dataset["prewikka.title"] = interface.getTitle()
-        dataset["prewikka.software"] = interface.getSoftware()
-        dataset["prewikka.place"] = interface.getPlace()
+        dataset["prewikka.title"] = self._config.interface.getOptionValue("title", "Prelude management")
+        dataset["prewikka.software"] = self._config.interface.getOptionValue("software", "Prewikka")
+        dataset["prewikka.place"] = self._config.interface.getOptionValue("place", "company ltd.")
         dataset["prewikka.url.referer"] = request.getReferer()
         dataset["prewikka.url.current"] = request.getQueryString()
-        dataset["interface.quick_accessors"] = map(lambda qa: (qa[0], utils.create_link(qa[1], qa[2])),
-                                                   interface.getQuickAccessors())
-        dataset["interface.sections"] = interface.getSections()
         
+        dataset["interface.sections"] = [ ]
+        for name, content in self._contents.items():
+            if content.has_key("sections"):
+                for section, slot in content["sections"]:
+                    dataset["interface.sections"].append((section, utils.create_link("%s.%s" % (name, slot))))
+
+        dataset["prewikka.user.login"] = request.user.login
+        if self.env.auth.canLogout():
+            dataset["prewikka.user.logout"] = utils.create_link("logout.logout")
+        else:
+            dataset["prewikka.user.logout"] = None
+            
     def _setupTemplate(self, template_class, dataset):
         template = template_class()
         for key, value in dataset.items():
@@ -136,48 +138,45 @@ class Core:
 
         return template
         
-    def _getActionNameAndArguments(self, request):
-        arguments = copy.copy(request.arguments)
-        if arguments.has_key("action"):
-            action_name = arguments["action"]
-            del arguments["action"]
-        else:
-            action_name = None
-
-        return action_name, arguments
-
-    def _getActionSlot(self, request, action_name):
-        if not action_name:
-            return self._default_action
-        
-        try:
-            group_name, slot_name = Action.ActionGroup.getGroupAndSlot(action_name)
-            return self._actions[group_name].slots[slot_name]
-        except ValueError, KeyError:
-            self.log(Log.EVENT_INVALID_ACTION, request, action_name)
-            raise InvalidQueryError(request.getQueryString())
-        
-    def _checkPermissions(self, slot, request):
-        if request.user:
-            required = slot.permissions
+    def _checkPermissions(self, request, slot):
+        if request.user and slot.has_key("permissions"):
+            required = slot["permissions"]
             if filter(lambda perm: request.user.has(perm), required) != required:
-                self.log(Log.EVENT_ACTION_DENIED, request, slot.path)
-                raise PermissionDeniedError(request.user.login, slot.path)
-        
-    def processAction(self, slot, request):
-        self._checkPermissions(slot, request)
-        
-        return slot.handler(request)
+                self.env.log(Log.EVENT_ACTION_DENIED, request, request.handler_name)
+                raise PermissionDeniedError(request.user.login, request.handler_name)
 
-    def processDefaultAction(self, request):
-        request.parameters = self._default_action.parameters()
+    def _normalizeParameters(self, request, slot):
+        request.parameters = copy.copy(request.arguments)
         
-        return self.processAction(self._default_action, request)
+        if slot.has_key("parameters"):
+            try:
+                slot["parameters"].normalize(request.parameters)
+            except ParametersNormalizer.Error, e:
+                self.env.log(Log.EVENT_INVALID_ACTION_PARAMETERS, request, str(e))
+                raise InvalidQueryError(request.getQueryString())
+        
+    def _getContentSlot(self, request):
+        content = request.arguments.pop("content", "main")
+
+        try:
+            if "." in content:
+                content_name, slot_name = content.split(".")
+            else:
+                content_name = content
+                slot_name = self._contents[content_name]["default_slot"]
+
+            request.handler_name = "%s.%s" % (content_name, slot_name)
+
+            return self._contents[content_name]["slots"][slot_name]
+
+        except KeyError:
+            self.env.log(Log.EVENT_INVALID_ACTION, request, content)
+            raise InvalidQueryError(request.getQueryString())
 
     def checkAuth(self, request):
-        if self.auth:
-            login = self.auth.getLogin(request)
-            permissions = self.storage and self.storage.getPermissions(login) or User.ALL_PERMISSIONS
+        if self.env.auth:
+            login = self.env.auth.getLogin(request)
+            permissions = self.env.storage and self.env.storage.getPermissions(login) or User.ALL_PERMISSIONS
         else:
             login = "anonymous"
             permissions = User.ALL_PERMISSIONS
@@ -185,32 +184,24 @@ class Core:
         request.user = User.User(login, permissions)
     
     def process(self, request):
-        self.log(Log.EVENT_QUERY, request, request.getQueryString())
-
-        request.log = self.log
+        self.env.log(Log.EVENT_QUERY, request, request.getQueryString())
+        request.env = self.env
 
         try:
             self.checkAuth(request)
-            
-            action_name, arguments = self._getActionNameAndArguments(request)
-            slot = self._getActionSlot(request, action_name)
-            parameters = slot.parameters()
-            
-            try:
-                parameters.populate(arguments)
-                parameters.check()
-            except Action.ActionParameterError, e:
-                self.log(Log.EVENT_INVALID_ACTION_PARAMETERS, request, str(e))
-                raise InvalidQueryError(request.getQueryString())
+            slot = self._getContentSlot(request)
+            self._checkPermissions(request, slot)
+            self._normalizeParameters(request, slot)
                     
-            self._setupRequest(request, parameters)
+            self._setupRequest(request, request.parameters)
 
             try:
-                template_class = self.processAction(slot, request)
+                slot["handler"](request)
             except Prelude.Error, e:
                 raise Error.SimpleError("prelude internal error", str(e))
 
             dataset = request.dataset
+            template_class = slot["template"]
             
         except Error.PrewikkaError, e:
             template_class = e.template_class

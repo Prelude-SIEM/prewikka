@@ -20,9 +20,11 @@
 
 import time
 import struct
+import urllib
 
 from prewikka import DataSet
 from prewikka.templates import ErrorTemplate
+
 
 def time_to_hms(t):
     return time.strftime("%H:%M:%S", time.localtime(t))
@@ -33,9 +35,9 @@ def time_to_ymdhms(t):
 
 
 def create_link(action_name, parameters=None):
-    link = "?action=%s" % action_name
+    link = "?content=%s" % action_name
     if parameters:
-        link += "&%s" % str(parameters)
+        link += "&%s" % urllib.urlencode(parameters)
         
     return link
 

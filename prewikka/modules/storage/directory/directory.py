@@ -131,6 +131,5 @@ class DirectoryStorage(Storage.Storage):
 
 
 
-def load(core, config):
-    storage = DirectoryStorage(config)
-    core.registerStorage(storage)
+def load(env, config):
+    return DirectoryStorage(config)
