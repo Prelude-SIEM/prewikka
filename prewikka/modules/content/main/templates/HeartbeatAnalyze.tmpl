@@ -19,36 +19,34 @@
   #set $row_classes = ("table_row_even", "table_row_odd")
   #set $cnt = 0 
   
-  #for $analyzer in $analyzers
-    <tr class='$row_classes[$cnt%2]'>
-      <td>$analyzer.name</td>
-      <td>$analyzer.model $analyzer.version</td>
-      <td>$analyzer.ostype $analyzer.osversion</td>
-      <td>$analyzer.node_name</td>
-      <td>$analyzer.node_location</td>
-      <td>$analyzer.node_address</td>
-      <td>$analyzer.last_heartbeat_time</td>
-      <td class='heartbeat_analyze_sensor_status_$analyzer.status'>
-        $analyzer.status_meaning
-      </td>
-    </tr>
-    #set $cnt += 1
-   </tbody>
-  </table>
+  <tr class='$row_classes[$cnt%2]'>
+    <td>$analyzer.name</td>
+    <td>$analyzer.model $analyzer.version</td>
+    <td>$analyzer.ostype $analyzer.osversion</td>
+    <td>$analyzer.node_name</td>
+    <td>$analyzer.node_location</td>
+    <td>$analyzer.node_address</td>
+    <td>$analyzer.last_heartbeat_time</td>
+    <td class='heartbeat_analyze_sensor_status_$analyzer.status'>
+      $analyzer.status_meaning
+    </td>
+  </tr>
+  #set $cnt += 1
+ </tbody>
+</table>
   
-  <table class='heartbeat_analyze'>
-   <thead>
+<table class='heartbeat_analyze'>
+  <thead>
     <tr class='heartbeat_analyze_header'><td class=''>Events</td></tr>
-   </thead>
+  </thead>
 
-   <tbody>
+  <tbody>
     #set $row_classes = ("table_row_even", "table_row_odd")
     #set $cnt = 0
     #for $event in $analyzer.events
       <tr class='$row_classes[$cnt%2]'><td colspan="8" class='heartbeat_analyzer_event_$event.type'>$event.value</td></tr>
       #set $cnt += 1
     #end for
-  #end for
   </tbody>
 </table>
 #end block

@@ -1169,7 +1169,7 @@ class HeartbeatAnalyzeAction(SensorsView):
     
     def process(self, request):
         dataset = request.dataset
-        prelude = request.prelude
+        prelude = request.env.prelude
         analyzerid = request.parameters["analyzerid"]
         self._setView(dataset)
         
