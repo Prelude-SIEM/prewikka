@@ -665,7 +665,7 @@ class MessageSummaryAction:
             if not meaning:
                 break
             value = alert["additional_data(%d).data" % i]
-            if alert["additional_data(%d).type" % i] == "byte":
+            if alert["additional_data(%d).type" % i] == "byte-string":
                 value = utils.hexdump(value)
             emphase = (alert["analyzer.model"] == "Prelude LML" and alert["additional_data(%d).meaning" % i] == "Original Log")
             self.newSectionEntry(meaning, value, emphase)
@@ -1016,7 +1016,7 @@ class AdditionalData(_Element):
     def render(self, root):
         entries = _Element.render(self, root)
         value = self._alert["%s.data" % root]
-        if self._alert["%s.type" % root] == "byte":
+        if self._alert["%s.type" % root] == "byte-string":
             value = utils.hexdump(value)
         entries.append({"name": "Data", "value": value})
 
