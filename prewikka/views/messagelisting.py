@@ -129,9 +129,9 @@ class AlertListingParameters(MessageListingParameters):
 
     def register(self):
         MessageListingParameters.register(self)
-        self.optional("aggregated_source", list, [ "alert.source.node.address.address" ])
+        self.optional("aggregated_source", list, [ ])
         self.optional("aggregated_source_values", list, [ ])
-        self.optional("aggregated_target", list, [ "alert.target.node.address.address" ])
+        self.optional("aggregated_target", list, [ ])
         self.optional("aggregated_target_values", list, [ ])
         self.optional("filter", str)
         self.optional("alert.classification.text", list, [ ])
@@ -163,12 +163,18 @@ class AlertListingParameters(MessageListingParameters):
                 except KeyError:
                     pass # ignore empty inputs
 
-            for category in "source", "target":
-                i = 0
-                for path in self["aggregated_%s" % category]:
-                    if path == "none":
-                        del self["aggregated_%s" % category][i]
-                    i += 1
+        if not self["aggregated_source_values"] and not self["aggregated_target_values"]:
+            if not self["aggregated_source"]:
+                self["aggregated_source"] = [ "alert.source.node.address.address" ]
+            if not self["aggregated_target"]:
+                self["aggregated_target"] = [ "alert.target.node.address.address" ]
+            
+        for category in "source", "target":
+            i = 0
+            for path in self["aggregated_%s" % category]:
+                if path == "none":
+                    del self["aggregated_%s" % category][i]
+                i += 1
 
 
 
@@ -367,6 +373,9 @@ class AlertListing(MessageListing, view.View):
     analyzerid_object = "alert.analyzer.analyzerid"
     summary_view = "alert_summary"
     details_view = "alert_details"
+
+    def init(self, env):
+        self._max_aggregated_classifications = int(env.config.general.getOptionValue("max_aggregated_classifications", 10))
 
     def _getMessageIdents(self, criteria, limit, offset):
         return self.env.prelude.getAlertIdents(criteria, limit, offset)
@@ -644,8 +653,7 @@ class AlertListing(MessageListing, view.View):
                                            self.parameters +
                                            { "aggregated_source_values": aggregated_source_values,
                                              "aggregated_target_values": aggregated_target_values })
-                
-                
+
                 dataset = {
                     "aggregated": True,
                     "count": aggregated_count
@@ -659,11 +667,25 @@ class AlertListing(MessageListing, view.View):
                 dataset["time_max"] = self._createTimeField(time_max)
                 dataset["time_min"] = self._createTimeField(time_min)
 
-                for classification, severity, completion, count in \
-                        self.env.prelude.getValues(["alert.classification.text/group_by",
-                                                    "alert.assessment.impact.severity/group_by",
-                                                    "alert.assessment.impact.completion/group_by",
-                                                    "count(alert.messageid)"], criteria2):
+                results = self.env.prelude.getValues(["alert.classification.text/group_by",
+                                                      "alert.assessment.impact.severity/group_by",
+                                                      "alert.assessment.impact.completion/group_by",
+                                                      "count(alert.messageid)"], criteria2)
+
+                def cmp_severities(x, y):
+                    d = { None: 0, "low": 1, "medium": 2, "high": 3 }
+
+                    return d[y] - d[x]
+
+                results.sort(lambda x, y: cmp_severities(x[1], y[1]))
+
+                dataset["aggregated_classifications_total"] = aggregated_count
+                dataset["aggregated_classifications_hidden"] = aggregated_count
+                dataset["aggregated_classifications_hidden_expand"] = expand
+
+                for classification, severity, completion, count in results[:self._max_aggregated_classifications]:
+                    dataset["aggregated_classifications_hidden"] -= count
+                    
                     infos = {
                         "count": count,
                         "classification": self._createInlineFilteredField("alert.classification.text", classification),

@@ -389,6 +389,10 @@ function ${name}_add_entry(object, value, num) {
     #end if
       <br/>$info.classification_references
   #end for
+  #if $message.aggregated and $message.aggregated_classifications_hidden > 0
+    ($message.aggregated_classifications_hidden/$message.aggregated_classifications_total alerts not shown...
+    <a href="$message.aggregated_classifications_hidden_expand">expand</a>)
+  #end if
 </td>
 
 #for $name, $direction in ("source", $message.source), ("target", $message.target)

@@ -99,6 +99,12 @@ class Parameters(dict):
                 pass
         return new
 
+    def copy(self):
+        new = self.__class__()
+        new.update(self)
+        
+        return new
+
 
 
 class RelativeViewParameters(Parameters):
