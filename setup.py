@@ -93,6 +93,14 @@ class my_install(install):
         self.install_conf()
         self.init_siteconfig()
         install.run(self)
+        
+        for dir in ("share/prewikka",
+                    "share/prewikka/htdocs",
+                    "share/prewikka/htdocs/images", "share/prewikka/htdocs/js", "share/prewikka/htdocs/css",
+                    "share/prewikka/database", "share/prewikka/cgi-bin"):
+            os.chmod(self.prefix + "/" + dir, 0755)
+        os.chmod(self.conf_prefix, 0755)
+        
         if not self.dry_run:
             for filename in self.get_outputs():
                 if filename.find(".conf") != -1:
