@@ -58,6 +58,17 @@ def boolean_property(name, parameter, value=False):
     return property("checkbox", name, parameter, value)
 
 
+def escape_html_char(c):
+    try:
+        return {
+            ">": "&gt;",
+            "<": "&lt;",
+            "&": "&amp"
+            }[c]
+    except KeyError:
+        return c
+
+
 def hexdump(content):
     decoded = struct.unpack("B" * len(content), content)
     content = ""
@@ -65,8 +76,17 @@ def hexdump(content):
 
     while i < len(decoded):
         chunk = decoded[i:i+16]
-        content += " ".join(map(lambda b: "%02x" % b, chunk)) + " " + \
-                   "".join(map(lambda b: (b >= 32 and b < 127) and chr(b) or ".", chunk)) + "<br/>"
+        
+        content += " ".join(map(lambda b: "%02x" % b, chunk)) + " "
+        
+        for b in chunk:
+            if b >= 32 and b < 127:
+                content += escape_html_char(chr(b))
+            else:
+                content += "."
+
+        content += "<br/>"
+
         i += 16
 
     return "<div class='fixed'>" + content + "</div>"
