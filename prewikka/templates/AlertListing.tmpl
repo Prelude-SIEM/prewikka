@@ -1,11 +1,80 @@
 #extends prewikka.templates.MessageListing
 
 #block message_fields_header
-<td>Classification</td>
-<td>Source</td>
-<td>Target</td>
-<td>Sensor</td>
-<td>Time</td>
+<form action="?" method='GET'>
+  <input type="hidden" name="view" value="$current_view"/>
+  #for $name, $value in $filter_hidden_parameters.items()
+    <input type="hidden" name="$name" value="$value"/>
+  #end for
+
+  <td>
+    <a onclick="javascript:toggleVisibility('classification')">Classification</a>
+    <div class="filter_popup" id="classification" style="display: none">
+      Text <input type="text" name="alert.classification.text" value="$alert.classification.text"/>
+      <input type="submit" value="apply"/>
+    </div>
+  </td>
+
+  <td>
+    <a onclick="javascript:toggleVisibility('source')">Source</a>
+    <div class="filter_popup" id="source" style="display: none">
+      <table>
+        <tr>
+          <td>Address</td>
+          <td><input type="text"
+                     name="alert.source.node.address.address"
+                     value="$alert.source.node.address.address"/></td>
+        </tr>
+        <tr>
+          <td>Hostname</td>
+          <td><input type="text"
+                     name="alert.source.node.name"
+                     value="$alert.source.node.name"/></td>
+        </tr>
+        <tr>
+          <td colspan="2" align="right">
+            <input type="submit" value="apply"/>
+           </td>
+        </tr>
+      </table>
+    </div>
+  </td>
+
+  <td>
+    <a onclick="javascript:toggleVisibility('target')">Target</a>
+    <div class="filter_popup" id="target" style="display: none">
+      <table>
+        <tr>
+          <td>Address</td>
+          <td><input type="text"
+                     name="alert.target.node.address.address"
+                     value="$alert.target.node.address.address"/></td>
+        </tr>
+        <tr>
+          <td>Hostname</td>
+          <td><input type="text"
+                     name="alert.target.node.name"
+                     value="$alert.target.node.name"/></td>
+        </tr>
+        <tr>
+          <td colspan="2" align="right">
+            <input type="submit" value="apply"/>
+           </td>
+        </tr>
+      </table>
+    </div>
+  </td>
+  
+  <td>
+    <a onclick="javascript:toggleVisibility('sensor')">Sensor</a>
+    <div class="filter_popup" id="sensor" style="display: none">
+      Name <input type="text" name="alert.analyzer.name" value="$alert.analyzer.name"/>
+      <input type="submit" value="apply"/>
+    </div>
+  </td>
+
+  <td>Time</td>
+</form>
 #end block message_fields_header
 
 #block message_fields

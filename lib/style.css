@@ -646,6 +646,21 @@ ul#popup_block > li:hover > ul {
 	width: 120px;
 }
 
+/*
+ * Filter popup
+ */
+
+.filter_popup {
+	padding: 3px;
+        border: dotted black;
+        border-width: 1px 1px 1px 1px;
+	background: #E2EBF5;
+	text-align: left;
+	white-space: nowrap;
+	position: absolute;
+	z-index: 1;
+}
+
 
 /*
  * misc

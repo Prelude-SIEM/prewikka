@@ -82,8 +82,10 @@ class _MyTime:
 
 class MessageListingParameters(view.Parameters):
     def register(self):
-        self.optional("inline_filter_object", str)
-        self.optional("inline_filter_value", str)
+        self.optional("alert.classification.text", str)
+        self.optional("alert.source.node.address.address", str)
+        self.optional("alert.target.node.address.address", str)
+        self.optional("alert.analyzer.name", str)
         self.optional("filter", str)
         self.optional("timeline_value", int, default=1)
         self.optional("timeline_unit", str, default="hour")
@@ -95,7 +97,7 @@ class MessageListingParameters(view.Parameters):
     def normalize(self):
         view.Parameters.normalize(self)
         
-        for p1, p2 in ("inline_filter_object", "inline_filter_value"), ("timeline_value", "timeline_unit"):
+        for p1, p2 in [ ("timeline_value", "timeline_unit") ]:
             if self.has_key(p1) ^ self.has_key(p2):
                 raise view.MissingParameterError(self.has_key(p1) and p1 or p2)
             
@@ -260,8 +262,7 @@ class MessageListing:
         if not value:
             return { "value": "n/a", "inline_filter": None }
 
-        parameters = self.parameters + { "inline_filter_object": object,
-                                         "inline_filter_value": value }
+        parameters = self.parameters + { object: value }
 
         return { "value": value, "inline_filter": utils.create_link(self.view_name, parameters) }
 
@@ -317,9 +318,14 @@ class MessageListing:
         start, end = self._getTimelineRange()
 
         criteria = [ ]
-        if self.parameters.has_key("inline_filter_object"):
-            criteria.append("%s == '%s'" % (self.parameters["inline_filter_object"],
-                                            self.parameters["inline_filter_value"]))
+        for filter in self.filters:
+            if self.parameters.has_key(filter):
+                value = self.parameters[filter]
+                criteria.append("%s == '%s'" % (filter, value))
+                self.dataset[filter] = value
+            else:
+                self.dataset[filter] = ""
+        
         criteria.append(self.time_criteria_format % (str(start), str(end)))
         self._adjustCriteria(criteria)
         criteria = " && ".join(criteria)
@@ -332,7 +338,10 @@ class MessageListing:
 
         self._setMessages(criteria)
 
-        self.dataset["delete_form_hiddens"] = self.parameters + { "view": self.delete_view }
+        self.dataset["current_view"] = self.view_name
+        self.dataset["delete_hidden_parameters"] = self.parameters - [ "view" ]
+        self.dataset["delete_view"] = self.delete_view
+        self.dataset["filter_hidden_parameters"] = self.parameters - [ "view" ] - self.filters
         self.dataset["nav.from"] = self.parameters["offset"] + 1
         self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
         self.dataset["limit"] = self.parameters["limit"]
@@ -350,14 +359,10 @@ class AlertListing(MessageListing, view.View):
     view_template = "AlertListing"
 
     root = "alert"
-    inline_filters = {
-        "alert.classification.text": "classification",
-        "alert.source.node.address.address": "source",
-        "alert.source.node.name": "source",
-        "alert.target.node.address.address": "target",
-        "alert.target.node.name": "target",
-        "alert.analyzer.name": "sensor"
-        }
+    filters = [ "alert.classification.text",
+                "alert.source.node.address.address", "alert.source.node.name",
+                "alert.target.node.address.address", "alert.target.node.name",
+                "alert.analyzer.name" ]
     messageid_object = "alert.messageid"
     analyzerid_object = "alert.analyzer.analyzerid"
     delete_view = "alert_delete"
@@ -497,12 +502,7 @@ class HeartbeatListing(MessageListing, view.View):
     view_template = "HeartbeatListing"
 
     root = "heartbeat"
-    inline_filters = {
-        "heartbeat.analyzer.name": "agent",
-        "heartbeat.analyzer.model": "model",
-        "heartbeat.analyzer.node.name": "node_name",
-        "heartbeat.analyzer.node.address.address": "node_address"
-        }
+    filters = [ ]
     delete_view = "heartbeat_delete"
     summary_view = "heartbeat_summary"
     details_view = "heartbeat_details"
