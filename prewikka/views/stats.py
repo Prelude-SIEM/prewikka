@@ -67,9 +67,10 @@ class Chart:
         clf()
     
     def renderPie(self):
+        figure(figsize=(7,7))
         total = float(reduce(lambda x, y: x + y, self._values))
         explode = map(lambda x: (0,0.05)[x / total > 0.2], self._values)
-        patches, texts, autotexts = pie(self._values, explode=explode, labels=self._labels, autopct=lambda x: "", shadow=True)
+        patches, texts, autotexts = pie(self._values, labels=self._labels, autopct=lambda x: "", shadow=True)
 ##         for autotext, value in zip(autotexts, self._values):
 ##             autotext.set_text("%d (%.1f%%)" % (value, value / total * 100))
         for text in texts:
