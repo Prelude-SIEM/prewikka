@@ -155,6 +155,22 @@ class Prelude(PreludeDB):
 
         return analyzerids
 
+    def getAnalyzerPaths(self):
+        def get_analyzer_path(alert, root):
+            analyzerid = heartbeat[root + ".analyzerid"]
+            if analyzerid:
+                return get_analyzer_path(alert, root + ".analyzer") + [ analyzerid ]
+            return [ ]
+        
+        analyzer_paths = [ ]
+        for analyzerid in self.getAnalyzerids():
+            ident = self.getLastHeartbeatIdent(analyzerid)
+            heartbeat = self.getHeartbeat(analyzerid, ident)
+            path = get_analyzer_path(heartbeat, "heartbeat.analyzer")
+            analyzer_paths.append(path)
+
+        return analyzer_paths            
+
     def getAnalyzer(self, analyzerid):
         ident = self.getLastHeartbeatIdent(analyzerid)
         heartbeat = self.getHeartbeat(analyzerid, ident)
