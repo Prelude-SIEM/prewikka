@@ -79,8 +79,8 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         Request.Request.sendResponse(self)
 
     def _processStatic(self):
-        filename = os.path.abspath(siteconfig.site + urllib.unquote(self.path[1:]))
-        if filename.find(os.path.abspath(siteconfig.site)) != 0:
+        filename = os.path.abspath(siteconfig.htdocs + urllib.unquote(self.path[len("prewikka/"):]))
+        if filename.find(os.path.abspath(siteconfig.htdocs)) != 0:
             self.send_error(403, filename)
             return
         
