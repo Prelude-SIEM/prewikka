@@ -92,7 +92,7 @@ class DirectoryStorage(Storage.Storage):
         return True
 
     def setPermissions(self, login, permissions):
-        file = self._openUserFile(login, self._getUserPath("permissions"), "w")
+        file = self._openUserFile(login, self._getUserFilePath(login, "permissions"), "w")
         for perm in permissions:
             print >> file, perm
         file.close()

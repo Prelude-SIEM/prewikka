@@ -388,7 +388,9 @@ class MessageListingAction:
         self._setView(dataset)
 
         parameters = copy.copy(request.parameters)
-        offset = parameters.pop("offset")
+        if parameters.has_key("offset"):
+            offset = parameters["offset"]
+            del parameters["offset"]
 
         start, end = self._getTimelineRange(parameters)
 

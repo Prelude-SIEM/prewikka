@@ -159,7 +159,11 @@ class Core:
                 raise InvalidQueryError(request.getQueryString())
         
     def _getContentSlot(self, request):
-        content = request.arguments.pop("content", "main")
+        if request.arguments.has_key("content"):
+            content = request.arguments["content"]
+            del request.arguments["content"]
+        else:
+            content = "main"
 
         try:
             if "." in content:
