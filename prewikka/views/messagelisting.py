@@ -226,7 +226,8 @@ class MessageListing:
         if offset:
             self.dataset["nav.first"] = utils.create_link(self.view_name, self.parameters - [ "offset" ])
             self.dataset["nav.prev"] = utils.create_link(self.view_name,
-                                                         self.parameters + { "offset": offset - parameters["limit"] })
+                                                         self.parameters +
+                                                         { "offset": offset - self.parameters["limit"] })
         else:
             self.dataset["nav.prev"] = None
             
