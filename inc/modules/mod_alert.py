@@ -265,6 +265,9 @@ class AlertModule(module.ContentModule):
                 alerts.append(alert)
 
         result["alerts"] = alerts
+
+        alerts.sort(lambda alert1, alert2: (int(alert2["alert.detect_time"] or alert2["alert.create_time"]) -
+                                            int(alert1["alert.detect_time"] or alert1["alert.create_time"])))
         
         return ListInterface, result
 
