@@ -297,8 +297,13 @@ class MessageListing:
 
         return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
 
-    def _createHostField(self, object, value, type=None):
-        field = self._createInlineFilteredField(object, value, type)
+    def _createHostField(self, object, value, category, type=None):
+        if category:
+            value_with_category = "%s:%s" % (category, value)
+        else:
+            value_with_category = value
+
+        field = self._createInlineFilteredField(object, value_with_category, type)
         field["host_commands"] = [ ]
         if not value:
             return field
@@ -436,15 +441,13 @@ class AlertListing(MessageListing, view.View):
         if message["alert.%s(0).node.address(0).address" % direction]:
             address = message["alert.%s(0).node.address(0).address" % direction]
             category = message["alert.%s(0).node.address(0).category" % direction]
-            if category != "unknown":
-                address = "%s:%s" % (category, address)
             
             dataset["address"] = self._createHostField("alert.%s.node.address.address" % direction,
-                                                       address, type=direction)
+                                                       address, category, type=direction)
             dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction] }
         else:
             dataset["address"] = self._createHostField("alert.%s.node.name" % direction,
-                                                       message["alert.%s(0).node.name" % direction],
+                                                       message["alert.%s(0).node.name" % direction], None,
                                                        type=direction)
             dataset["address_extra"] = { "value": None }
 
@@ -818,7 +821,7 @@ class HeartbeatListing(MessageListing, view.View):
         dataset["node_name"] = self._createInlineFilteredField("heartbeat.analyzer.node.name",
                                                                message["heartbeat.analyzer.node.name"])
         dataset["node_address"] = self._createHostField("heartbeat.analyzer.node.address.address",
-                                                        message["heartbeat.analyzer.node.address(0).address"])
+                                                        message["heartbeat.analyzer.node.address(0).address"], None)
         dataset["time"] = self._createTimeField(message["heartbeat.create_time"])
 
         return dataset

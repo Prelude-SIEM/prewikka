@@ -443,7 +443,9 @@ function ${name}_add_entry(object, value, num) {
        n/a
      #end if
       <ul>
-        <li><a href="$direction.address.inline_filter">Group by $name</a></li>
+        #if not $message.aggregated
+          <li><a href="$direction.address.inline_filter">Group by $name</a></li>
+        #end if
         #for $name, $link in $direction.address.host_commands
           <li><a href="$link">$name</a></li>
         #end for
