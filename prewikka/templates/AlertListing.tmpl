@@ -379,29 +379,17 @@ function ${name}_add_entry(object, value, num) {
 #block message_fields
 
 <td>
- <ul id="popup_block">
-  <li>
   #for $info in $message.infos
-    #if $info.count > 0
-      $info.count x 
+    #if $message.has_key("expand")
+      $info.count x <a class="impact_severity_$info.severity.value" href="$message.expand">$info.classification.value</a>
+    #else
+      <a class="impact_severity_$info.severity.value" href="$message.summary">$info.classification.value</a>
     #end if
-    <span class="impact_severity_$info.severity.value"> $info.classification.value</span>
     #if $info.completion.value
       (<span class="impact_completion_$info.completion.value">$info.completion.value</span>)
     #end if
       <br/>$info.classification_references
   #end for
-   <ul>
-    #if $message.has_key("expand")
-      <li><a href="$message.expand">Expand the aggregated alert</a></li>
-    #else
-      <li><a href="$message.details">Alert detail</a></li>
-      <li><a href="$message.summary">Alert summary</a></li>
-    #end if
-      <!--<li><a href="message.classification.inline_filter">Group by classification</a></li>-->
-   </ul>
-  </li>
- </ul>
 </td>
 
 #for $name, $direction in ("source", $message.source), ("target", $message.target)
