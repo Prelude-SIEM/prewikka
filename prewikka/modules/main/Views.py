@@ -314,7 +314,17 @@ class SensorAlertListingView(SensorsSection, AlertListingView):
         return Actions().SensorAlertDetails()
     
     def buildMainContent(self, data):
-        return AlertListingView.buildMainContent(self, data["alerts"])
+        analyzer = data["analyzer"]
+        table = Table.Table()
+        table.setHeader(("Analyzerid", "Type", "OS", "Name", "Location", "Address"))
+        table.addRow((analyzer["analyzerid"],
+                      "%s %s" % (analyzer["model"], analyzer["version"]),
+                      "%s %s" % (analyzer["ostype"], analyzer["osversion"]),
+                      analyzer["name"],
+                      analyzer["location"],
+                      analyzer["address"]))
+        
+        return str(table) + "<br/>" + AlertListingView.buildMainContent(self, data["alerts"])
 
 
 
