@@ -548,7 +548,7 @@ class HeartbeatListingAction(MessageListingAction, HeartbeatsView):
         return message["heartbeat.create_time"]
 
     def _addMessageFields(self, request, fields, heartbeat):
-        for name in "analyzerid", "name", "type":
+        for name in "ident", "analyzerid", "name", "type":
             fields[name] = self._createMessageField(request.parameters, name, heartbeat[name])
         fields["address"] = self._createMessageHostField(request, "address", heartbeat["address"])
         fields["time"] = self._createMessageTimeField(heartbeat["time"])
