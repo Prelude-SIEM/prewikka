@@ -242,8 +242,8 @@ class User:
 class UserManagement:
     def __init__(self, core, config):
         self.core = core
-        self._use_ssl = config.get("use_ssl", "") in ("yes", "true", "on")
-        self._expiration = int(config.get("expiration", 30))
+        self._use_ssl = config.getOptionValue("use_ssl", "") in ("yes", "true", "on")
+        self._expiration = int(config.getOptionValue("expiration", 30))
         self.core.interface.registerLoginAction(self.login, LoginPasswordActionParameters)
         self.core.interface.registerConfigurationSection("Users", self.handle_user_listing)
         self.core.interface.registerAction(self.handle_user_listing, Interface.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])

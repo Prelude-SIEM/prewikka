@@ -21,58 +21,60 @@
 import sys
 import os
 
-import prewikka.Log
-from prewikka import Interface
+from prewikka import Log, Interface
 
 
-class LogStderr(prewikka.Log.LogBackend):
-    def _log(self, type, event, message):
-        print >> sys.stderr, "[prewikka %s] %s" % (type, message)
+class LogStderr(Log.LogBackend):
+    def _log(self, message):
+        type = { Log.TYPE_DEBUG: "debug",
+                 Log.TYPE_INFO: "info",
+                 Log.TYPE_ERROR: "error" }[self.current_event_type]
+        print >> sys.stderr, "[prewikka:%s] %s" % (type, message)
         
-    def handle_query(self, type, event, request, query):
-        self._log(type, event, "query '%s'" % query)
+    def handle_query(self, request, query):
+        self._log("query '%s'" % query)
 
-    def handle_action(self, type, event, request, action):
-        self._log(type, event, "action %s" % Interface.get_action_name(action))
-
-    def handle_login_successful(self, type, event, request, user):
-        self._log(type, event, "user '%s' logged in" % user.getLogin())
+    def handle_action(self, request, action_name):
+        self._log("action %s" % action_name)
         
-    def handle_logout(self, type, event, request, user):
-        self._log(type, event, "user '%s' logout" % user.getLogin())
+    def handle_login_successful(self, request, user):
+        self._log("user '%s' logged in" % user.getLogin())
         
-    def handle_session_expired(self, type, event, request, sessionid):
-        self._log(type, event, "session '%s' for user '%s' has expired" % (sessionid, request.user.getLogin()))
+    def handle_logout(self, request, user):
+        self._log("user '%s' logout" % user.getLogin())
+        
+    def handle_session_expired(self, request, sessionid):
+        self._log("session '%s' for user '%s' has expired" % (sessionid, request.user.getLogin()))
 
-    def handle_invalid_sessionid(self, type, event, request, sessionid):
-        self._log(type, event, "sessionid '%s' is invalid" % sessionid)
+    def handle_invalid_sessionid(self, request, sessionid):
+        self._log("sessionid '%s' is invalid" % sessionid)
 
-    def handle_bad_login(self, type, event, request, login):
-        self._log(type, event, "bad login '%s'" % login)
+    def handle_bad_login(self, request, login):
+        self._log("bad login '%s'" % login)
 
-    def handle_bad_password(self, type, event, request, login, password):
-        self._log(type, event, "bad password '%s' for '%s'" % (login, password))
+    def handle_bad_password(self, request, login, password):
+        self._log("bad password '%s' for '%s'" % (login, password))
 
-    def handle_invalid_userid(self, type, event, request, userid):
-        self._log(type, event, "invalid userid %d" % userid)
+    def handle_invalid_userid(self, request, userid):
+        self._log("invalid userid %d" % userid)
 
-    def handle_invalid_action(self, type, event, request, action_name):
-        self._log(type, event, "invalid action %s" % action_name)
+    def handle_invalid_action(self, request, action_name):
+        self._log("invalid action %s" % action_name)
 
-    def handle_invalid_action_parameters(self, type, event, request, reason):
-        self._log(type, event, "invalid action parameters, " + reason)
+    def handle_invalid_action_parameters(self, request, reason):
+        self._log("invalid action parameters, " + reason)
 
-    def handle_action_denied(self, type, event, request, action):
-        self._log(type, event, "action '%s' forbidden for user '%s'" % Interface.get_action_name(action), request.user.getLogin())
+    def handle_action_denied(self, request, action):
+        self._log("action '%s' forbidden for user '%s'" % Interface.get_action_name(action), request.user.getLogin())
 
-    def handle_debug(self, type, event, message):
-        self._log(type, event, message)
+    def handle_debug(self, message):
+        self._log(message)
 
-    def handle_info(self, type, event, message):
-        self._log(type, event, message)
+    def handle_info(self, message):
+        self._log(message)
 
-    def handle_error(self, type, event, message):
-        self._log(type, event, message)
+    def handle_error(self, message):
+        self._log(message)
 
 
 

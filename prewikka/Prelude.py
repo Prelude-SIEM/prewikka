@@ -55,12 +55,12 @@ class Prelude(PreludeDB):
     def __init__(self, config):
         PreludeDB.init()
         PreludeDB.__init__(self,
-                           type=config.get("type", "mysql"),
-                           host=config.get("host", "127.0.0.1"),
-                           port=config.get("port", 0),
-                           name=config.get("name", "prelude"),
-                           user=config.get("user", "prelude"),
-                           password=config.get("password", "prelude"))
+                           type=config.getOptionValue("type", "mysql"),
+                           host=config.getOptionValue("host", "127.0.0.1"),
+                           port=config.getOptionValue("port", 0),
+                           name=config.getOptionValue("name", "prelude"),
+                           user=config.getOptionValue("user", "prelude"),
+                           password=config.getOptionValue("password", "prelude"))
         self.connect()
 
     def getAlertIdents(self, criteria=None):

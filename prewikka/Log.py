@@ -83,17 +83,17 @@ class Log:
 class LogBackend:
     def __init__(self, config):
         classifications = copy.copy(CLASSIFICATIONS)
-        for key, value in config.items():
-            if key.find("TYPE_") == 0:
-                type = key
-                if value == "enable":
+        for option in config.getOptions():
+            if option.name.find("TYPE_") == 0:
+                type = option.name
+                if option.value == "enable":
                     classifications[type] = CLASSIFICATIONS[type]
                 else:
                     del classifications[type]
-            elif key.find("EVENT_") == 0:
-                event = key
+            elif option.name.find("EVENT_") == 0:
+                event = option.name
                 type = get_event_type(event)
-                if value == "enable":
+                if option.value == "enable":
                     try:
                         if not event in classifications[type]:
                             classifications[type].append(event)
@@ -111,51 +111,53 @@ class LogBackend:
             return
         
         handler = event.lower().replace("event", "handle", 1)
-        apply(getattr(self, handler), (get_event_type(event), event) + args, kwargs)
+        self.current_event = event
+        self.current_event_type = get_event_type(event)
+        apply(getattr(self, handler), args, kwargs)
         
-    def handle_query(self, type, event, request, query):
+    def handle_query(self, request, query):
         pass
 
-    def handle_action(self, type, event, request, action):
+    def handle_action(self, request, action_name):
         pass
 
-    def handle_login_successful(self, type, event, request, user):
+    def handle_login_successful(self, request, user):
         pass
 
-    def handle_logout(self, type, event, request, user):
+    def handle_logout(self, request, user):
         pass
 
-    def handle_session_expired(self, type, event, request, sessionid):
+    def handle_session_expired(self, request, sessionid):
         pass
 
-    def handle_invalid_sessionid(self, type, event, request, sessionid):
+    def handle_invalid_sessionid(self, request, sessionid):
         pass
 
-    def handle_bad_login(self, type, event, request, login):
+    def handle_bad_login(self, request, login):
         pass
 
-    def handle_bad_password(self, type, event, request, user, password):
+    def handle_bad_password(self, request, user, password):
         pass
 
-    def handle_invalid_userid(self, type, event, request, userid):
+    def handle_invalid_userid(self, request, userid):
         pass
 
-    def handle_invalid_action(self, type, event, request, action_name):
+    def handle_invalid_action(self, request, action_name):
         pass
 
-    def handle_invalid_action_parameters(self, type, event, request, reason):
+    def handle_invalid_action_parameters(self, request, reason):
         pass
 
-    def handle_action_denied(self, type, event, request, action):
+    def handle_action_denied(self, request, action):
         pass
 
-    def handle_debug(self, type, event, message):
+    def handle_debug(self, message):
         pass
 
-    def handle_info(self, type, event, message):
+    def handle_info(self, message):
         pass
 
-    def handle_error(self, type, event, message):
+    def handle_error(self, message):
         pass
 
 

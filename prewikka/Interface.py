@@ -25,7 +25,7 @@ import copy
 import urllib
 import cgi
 
-from prewikka import Views
+from prewikka import Views, Log
 
 class Error(Exception):
     pass
@@ -107,9 +107,9 @@ class Interface:
         self._default_action = None
         self._login_action = None
         self._core = core
-        self._software = config.get("software", "Prewikka")
-        self._place = config.get("place", "")
-        self._title = config.get("title", "Prelude management")
+        self._software = config.getOptionValue("software", "Prewikka")
+        self._place = config.getOptionValue("place", "")
+        self._title = config.getOptionValue("title", "Prelude management")
         self._configuration = [ ]
         
     def registerSpecialAction(self, name, action, parameters):
@@ -185,6 +185,8 @@ class Interface:
             raise ActionDeniedError
         
     def processAction(self, name, arguments, request):
+        self._core.log.event(Log.EVENT_ACTION, request, name)
+        
         try:
             registered = self._actions[name]
         except KeyError:

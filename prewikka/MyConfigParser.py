@@ -74,6 +74,12 @@ class ConfigParserSection(OrderedDict):
 
     def getOption(self, name):
         return self[name]
+
+    def getOptionValue(self, key, value=None):
+        try:
+            return self[key].value
+        except KeyError:
+            return value
     
     def getOptions(self):
         return self.values()
@@ -86,18 +92,6 @@ class ConfigParserOption:
         self.value = value
         self.lineno = lineno
         self.line = line
-
-    def getName(self):
-        return self.name
-
-    def getValue(self):
-        return self.value
-
-    def getLineno(self):
-        return self.lineno
-
-    def getLine(self):
-        return self.line
 
 
 
@@ -142,7 +136,7 @@ class MyConfigParser:
                         self._current_section[name] = ConfigParserOption(name, value, lineno, line)
                     else:
                         raise ParseError(file.name, lineno, line)
-
+    
     def getSection(self, name):
         return self._sections[name]
 
@@ -154,18 +148,7 @@ class MyConfigParser:
         for section in self.getSections():
             content += "[%s]\n" % section.name
             for option in section.getOptions():
-                content += "%s: %s\n" % (option.getName(), option.getValue())
+                content += "%s: %s\n" % (option.name, option.value)
             content += "\n"
             
         return content
-        
-    
-
-
-if __name__ == "__main__":
-    conf = ConfigParser()
-    conf.readfp(open("prelude-fic.conf"))
-    for section in conf.sections():
-        print "[%s]" % section
-        for option in conf.options(section):
-            print option, conf.get(section, option)
