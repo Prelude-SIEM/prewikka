@@ -110,8 +110,21 @@ class Stats(view.View):
 
         self.dataset["charts"].append(chart.getFilename())
 
+    def render_timeline(self):
+        chart = Chart("timeline.png")
+        chart.setTitle("Timeline")
+        
+        for hour in range(24):
+            count = self.env.prelude.getValues(["count(alert.messageid)"],
+                                               criteria="alert.create_time == 'hour:%d'" % hour)
+            chart.addLabelValuePair("%dh" % hour, count)
+        chart.renderPlot()
+
+        self.dataset["charts"].append(chart.getFilename())
+
     def render(self):
         self.dataset["charts"] = [ ]
         self.render_top10_attackers()
         self.render_top10_classifications()
         self.render_sensor_distribution()
+        self.render_timeline()
