@@ -63,7 +63,7 @@ def escape_html_char(c):
         return {
             ">": "&gt;",
             "<": "&lt;",
-            "&": "&amp"
+            "&": "&amp;"
             }[c]
     except KeyError:
         return c
