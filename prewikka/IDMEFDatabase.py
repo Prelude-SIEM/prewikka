@@ -224,7 +224,7 @@ class IDMEFDatabase:
     def _getLastMessageIdent(self, type, get_message_idents, analyzerid):
         criteria = None
         if analyzerid != None:
-            criteria = "%s.analyzer.analyzerid == '%s'" % (type, str(analyzerid))
+            criteria = "%s.analyzer(-1).analyzerid == '%s'" % (type, str(analyzerid))
 
         idents = get_message_idents(criteria, limit=1)
 
@@ -297,8 +297,8 @@ class IDMEFDatabase:
 
     def getAnalyzerids(self):
         analyzerids = [ ]
-        rows = self.getValues(selection=[ "heartbeat.analyzer.analyzerid/group_by" ],
-                              criteria="heartbeat.analyzer.analyzerid != 0")
+        rows = self.getValues(selection=[ "heartbeat.analyzer(-1).analyzerid/group_by" ],
+                              criteria="heartbeat.analyzer(-1).analyzerid != 0")
         for row in rows:
             analyzerid = row[0]
             analyzerids.append(analyzerid)

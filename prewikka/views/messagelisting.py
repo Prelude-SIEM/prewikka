@@ -156,9 +156,9 @@ class AlertListingParameters(MessageListingParameters):
 
         if not self["aggregated_source_values"] and not self["aggregated_target_values"]:
             if not self["aggregated_source"]:
-                self["aggregated_source"] = [ "alert.source.node.address.address" ]
+                self["aggregated_source"] = [ "alert.source(0).node.address(0).address" ]
             if not self["aggregated_target"]:
-                self["aggregated_target"] = [ "alert.target.node.address.address" ]
+                self["aggregated_target"] = [ "alert.target(0).node.address(0).address" ]
             
         for category in "source", "target":
             i = 0
@@ -822,8 +822,8 @@ class AlertListing(MessageListing, view.View):
                         criteria3 = criteria2[:]
 
                         for path, value in (("alert.classification.text", classification),
-                                     ("alert.assessment.impact.severity", severity),
-                                     ("alert.assessment.impact.completion", completion)):
+                                            ("alert.assessment.impact.severity", severity),
+                                            ("alert.assessment.impact.completion", completion)):
                             if value:
                                 criteria3.append("%s == '%s'" % (path, value))
                             else:
@@ -861,7 +861,7 @@ class AlertListing(MessageListing, view.View):
         self.dataset["aggregated_source_values"] = self.parameters["aggregated_source_values"]
         self.dataset["aggregated_target"] = self.parameters["aggregated_target"] or [ "none" ]
         self.dataset["aggregated_target_values"] = self.parameters["aggregated_target_values"]
-        
+
         if self.parameters["aggregated_source"] + self.parameters["aggregated_target"] and \
                not self.parameters.has_key("aggregated_classification_value"):
             self.dataset["delete_enabled"] = False
@@ -891,14 +891,14 @@ class AlertListing(MessageListing, view.View):
         self.dataset["available_aggregations"] = { }
         for category in "source", "target":
             tmp = (("", "none"),
-                   ("address", "alert.%s.node.address.address" % category),
-                   ("name", "alert.%s.node.name" % category),
-                   ("user", "alert.%s.user.user_id.name" % category),
-                   ("process", "alert.%s.process.name" % category),
-                   ("service", "alert.%s.service.name" % category),
-                   ("port", "alert.%s.service.port" % category),
-                   ("name", "alert.%s.node.name" % category),
-                   ("interface", "alert.%s.interface" % category))
+                   ("address", "alert.%s(0).node.address(0).address" % category),
+                   ("name", "alert.%s(0).node.name" % category),
+                   ("user", "alert.%s(0).user.user_id(0).name" % category),
+                   ("process", "alert.%s(0).process.name" % category),
+                   ("service", "alert.%s(0).service.name" % category),
+                   ("port", "alert.%s(0).service.port" % category),
+                   ("name", "alert.%s(0).node.name" % category),
+                   ("interface", "alert.%s(0).interface" % category))
             self.dataset["available_aggregations"][category] = tmp
             
     def render(self):
@@ -1046,7 +1046,7 @@ class SensorAlertListing(AlertListing, view.View):
     view_template = "SensorAlertListing"
 
     def _adjustCriteria(self, criteria):
-        criteria.append("alert.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
+        criteria.append("alert.analyzer(-1).analyzerid == %d" % self.parameters["analyzerid"])
 
     def _setHiddenParameters(self):
         AlertListing._setHiddenParameters(self)
@@ -1065,7 +1065,7 @@ class SensorHeartbeatListing(HeartbeatListing, view.View):
     view_template = "SensorHeartbeatListing"
 
     def _adjustCriteria(self, criteria):
-        criteria.append("heartbeat.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
+        criteria.append("heartbeat.analyzer(-1).analyzerid == %d" % self.parameters["analyzerid"])
 
     def _setHiddenParameters(self):
         HeartbeatListing._setHiddenParameters(self)
