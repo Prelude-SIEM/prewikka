@@ -280,7 +280,10 @@ td {
 }
 
 #message_list_nav {
-	margin: 0px auto;
+	position:fixed;
+	bottom: 0px;
+	left: 0px;
+	width: 160px;
 }
 
 #message_list_nav_limit_input {
