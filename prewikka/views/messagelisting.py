@@ -638,6 +638,7 @@ class AlertListing(MessageListing, view.View):
                     [ "max(alert.create_time)/order_desc", "min(alert.create_time)", "count(alert.messageid)" ]
         
         results = self.env.prelude.getValues(selection, criteria)
+        total_results = len(results)
 
         for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
             aggregated_source_values = values[:len(self.parameters["aggregated_source"])]
@@ -722,7 +723,7 @@ class AlertListing(MessageListing, view.View):
                         
                     dataset["infos"].append(infos)
 
-        return len(results)        
+        return total_results
 
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
