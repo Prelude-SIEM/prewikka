@@ -56,6 +56,12 @@ class Message:
 
         return many_values and [ ] or None
 
+    def getMessageID(self):
+        return self["%s.messageid" % self._root]
+
+    def getAnalyzerID(self):
+        return self["%s.analyzer.analyzerid" % self._root]
+
     def __str__(self):
         return str(self._message)
 
@@ -156,10 +162,10 @@ class Prelude(PreludeDB):
         return analyzerids
 
     def getAnalyzerPaths(self):
-        def get_analyzer_path(alert, root):
+        def get_analyzer_path(heartbeat, root):
             analyzerid = heartbeat[root + ".analyzerid"]
             if analyzerid:
-                return get_analyzer_path(alert, root + ".analyzer") + [ analyzerid ]
+                return get_analyzer_path(heartbeat, root + ".analyzer") + [ analyzerid ]
             return [ ]
         
         analyzer_paths = [ ]

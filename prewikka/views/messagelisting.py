@@ -158,13 +158,6 @@ class MessageListing:
     def _adjustCriteria(self, criteria):
         pass
 
-    def _getInlineFilter(self, wanted):
-        for name, object, filter in self.fields:
-            if name == wanted:
-                return filter
-
-        raise view.InvalidParameterValueError("inline_filter_name", wanted)
-
     def _setInlineFilter(self):
         self.dataset["active_inline_filter"] = self.parameters.get("inline_filter_name", "")
         self.dataset["remove_active_inline_filter"] = utils.create_link(self.view_name,
@@ -240,32 +233,7 @@ class MessageListing:
         else:
             self.dataset["nav.next"] = None
 
-    def _copyMessageFields(self, dst, src):
-        for name, object, filter  in self.fields:
-            dst[name] = src[object]
-
-    def _fetchMessages(self, criteria):
-        messages = [ ]
-
-        objects = [ self.root + ".analyzer.analyzerid",
-                    self.root + ".messageid",
-                    self.root + ".create_time/order_desc" ]
-        
-        for analyzerid, ident, ctime in self.env.prelude.getValues(objects,
-                                                                   distinct=1,
-                                                                   limit=self.parameters["limit"],
-                                                                   offset=self.parameters["offset"]):
-            message = { "analyzerid": analyzerid, "ident": ident }
-            messages.append(message)
-            tmp = self.getMessage(analyzerid, ident)
-            self._copyMessageFields(message, tmp)
-            message["time"] = self.getMessageTime(tmp)
-        
-        messages.sort(lambda x, y: int(y["time"]) - int(x["time"]))
-
-        return messages
-
-    def _createMessageTimeField(self, t, timezone):
+    def _createTimeField(self, t, timezone):
         if t:
             if timezone == "utc":
                 t = time.gmtime(t)
@@ -285,7 +253,7 @@ class MessageListing:
 
         return { "value": t }
 
-    def _createMessageField(self, name, value):
+    def _createInlineFilteredField(self, name, value):
         if not value:
             return { "value": "n/a", "inline_filter": None }
 
@@ -293,8 +261,8 @@ class MessageListing:
 
         return { "value": value, "inline_filter": utils.create_link(self.view_name, parameters) }
 
-    def _createMessageHostField(self, name, value):
-        field = self._createMessageField(name, value)
+    def _createHostField(self, name, value):
+        field = self._createInlineFilteredField(name, value)
         field["host_commands"] = [ ]
         if not value:
             return field
@@ -308,23 +276,31 @@ class MessageListing:
         return field
     
     def _createMessageLink(self, message, view):
-        return utils.create_link(view, { "origin": self.view_name, "analyzerid": message["analyzerid"], "ident": message["ident"] })
+        return utils.create_link(view, { "origin": self.view_name,
+                                         "analyzerid": message.getAnalyzerID(),
+                                         "ident": message.getMessageID() })
 
-    def _addMessage(self, fields, message):
-        fields["summary"] = self._createMessageLink(message, self.summary_view)
-        fields["details"] = self._createMessageLink(message, self.details_view)
-        fields["ident"] = message["ident"]
-        fields["analyzerid"] = message["analyzerid"]
-        self._addMessageFields(fields, message)
-
-    def _setMessages(self, messages):
+    def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
-        for message in messages:
-            fields = { }
-            self.dataset["messages"].append(fields)
-            self._addMessage(fields, message)
 
-        self.dataset["delete_form_hiddens"] = self.parameters + { "view": self.delete_view }
+        objects = [ self.root + ".analyzer.analyzerid",
+                    self.root + ".messageid",
+                    self.root + ".create_time/order_desc" ]
+        
+        for analyzerid, ident, ctime in self.env.prelude.getValues(objects,
+                                                                   criteria=criteria,
+                                                                   distinct=1,
+                                                                   limit=self.parameters["limit"],
+                                                                   offset=self.parameters["offset"]):
+            src = self._fetchMessage(analyzerid, ident)
+            dst = {
+                "summary": self._createMessageLink(src, self.summary_view),
+                "details": self._createMessageLink(src, self.details_view),
+                "analyzerid": { "value": src.getAnalyzerID() },
+                "ident": { "value": src.getMessageID() }
+                }
+            self._setMessage(dst, src)
+            self.dataset["messages"].append(dst)
 
     def _setTimezone(self):
         for timezone in "utc", "sensor_localtime", "frontend_localtime":
@@ -338,7 +314,7 @@ class MessageListing:
 
         criteria = [ ]
         if self.parameters.has_key("inline_filter_name") and self.parameters.has_key("inline_filter_value"):
-            criteria.append("%s == '%s'" % (self._getInlineFilter(self.parameters["inline_filter_name"]),
+            criteria.append("%s == '%s'" % (self.inline_filters[self.parameters["inline_filter_name"]],
                                             self.parameters["inline_filter_value"]))
         criteria.append(self.time_criteria_format % (str(start), str(end)))
         self._adjustCriteria(criteria)
@@ -348,16 +324,17 @@ class MessageListing:
         self._setTimeline(start, end)
         self._setNavPrev(self.parameters["offset"])
 
-        count = self.countMessages(criteria)
-        messages = self._fetchMessages(criteria)
+        count = self._countMessages(criteria)
 
+        self._setMessages(criteria)
+
+        self.dataset["delete_form_hiddens"] = self.parameters + { "view": self.delete_view }
         self.dataset["nav.from"] = self.parameters["offset"] + 1
-        self.dataset["nav.to"] = self.parameters["offset"] + len(messages)
+        self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
         self.dataset["limit"] = self.parameters["limit"]
         self.dataset["total"] = count
 
         self._setNavNext(self.parameters["offset"], count)
-        self._setMessages(messages)
         self._setTimezone()
 
 
@@ -369,6 +346,12 @@ class AlertListing(MessageListing, view.View):
     view_template = "AlertListing"
 
     root = "alert"
+    inline_filters = {
+        "classification": "alert.classification.text",
+        "source": "alert.source.node.address.address",
+        "target": "alert.target.node.address.address",
+        "sensor": "alert.analyzer.name"
+        }
     messageid_object = "alert.messageid"
     analyzerid_object = "alert.analyzer.analyzerid"
     delete_view = "alert_delete"
@@ -376,38 +359,36 @@ class AlertListing(MessageListing, view.View):
     details_view = "alert_details"
     time_criteria_format = "alert.create_time >= '%s' && alert.create_time < '%s'"
     message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.messageid == '%d'"
-    fields = [ ("severity", "alert.assessment.impact.severity", "alert.assessment.impact.severity"),
-               ("completion", "alert.assessment.impact.completion", "alert.assessment.impact.completion"),
-               ("classification", "alert.classification.text", "alert.classification.text"),
-               ("source", "alert.source(0).node.address(0).address", "alert.source.node.address.address"),
-               ("sinterface", "alert.source(0).interface", "alert.source.interface"),
-               ("sport", "alert.source(0).service.port", "alert.source.node.service.port"),
-               ("suser_name", "alert.source(0).user.user_id(0).name", "alert.source.user.user_id.name"),
-               ("suser_uid", "alert.source(0).user.user_id(0).number", "alert.source.user.user_id.number"),
-               ("sprocess_name", "alert.source(0).process.name", "alert.source.process.name"),
-               ("sprocess_pid", "alert.source(0).process.pid", "alert.source.process.pid"),
-               ("target", "alert.target(0).node.address(0).address", "alert.target.node.address.address"),
-               ("tinterface", "alert.target(0).interface", "alert.target.interface"),
-               ("tport", "alert.target(0).service.port", "alert.target.node.service.port"),
-               ("tuser_name", "alert.target(0).user.user_id(0).name", "alert.target.user.user_id.name"),
-               ("tuser_uid", "alert.target(0).user.user_id(0).number", "alert.target.user.user_id.number"),
-               ("tprocess_name", "alert.target(0).process.name", "alert.target.process.name"),
-               ("tprocess_pid", "alert.target(0).process.pid", "alert.target.process.pid"),
-               ("sensor", "alert.analyzer.name", "alert.analyzer.name"),
-               ("sensor_node_name", "alert.analyzer.node.name", "alert.analyzer.node.name") ]
 
-    def countMessages(self, criteria):
+    def _countMessages(self, criteria):
         return self.env.prelude.countAlerts(criteria)
 
-    def getMessage(self, analyzerid, ident):
+    def _fetchMessage(self, analyzerid, ident):
         return self.env.prelude.getAlert(analyzerid, ident)
 
-    def getMessageTime(self, message):
-        return message["alert.create_time"] or 0
+    def _setMessageSource(self, dst, src):
+        dst["sinterface"] = { "value": src["alert.source(0).interface"] }
+        dst["sport"] = { "value": src["alert.source(0).service.port"] }
+        dst["suser_name"] = { "value": src["alert.source(0).user.user_id(0).name"] }
+        dst["suser_uid"] = { "value": src["alert.source(0).user.user_id(0).number"] }
+        dst["sprocess_name"] = { "value": src["alert.source(0).process.name"] }
+        dst["sprocess_pid"] = { "value": src["alert.source(0).process.pid"] }
+        dst["source"] = self._createHostField("source", src["alert.source(0).node.address(0).address"])
 
-    def _copyMessageFields(self, dst, src):
-        MessageListing._copyMessageFields(self, dst, src)
-        
+    def _setMessageTarget(self, dst, src):
+        dst["tinterface"] = { "value": src["alert.target(0).interface"] }
+        dst["tport"] = { "value": src["alert.target(0).service.port"] }
+        dst["tuser_name"] = { "value": src["alert.target(0).user.user_id(0).name"] }
+        dst["tuser_uid"] = { "value": src["alert.target(0).user.user_id(0).number"] }
+        dst["tprocess_name"] = { "value": src["alert.target(0).process.name"] }
+        dst["tprocess_pid"] = { "value": src["alert.target(0).process.pid"] }
+        dst["target"] = self._createHostField("target", src["alert.target(0).node.address(0).address"])
+
+    def _setMessageSensor(self, dst, src):
+        dst["sensor_node_name"] = { "value": alert["alert.analyzer.node.name"] }
+        dst["sensor"] = self._createInlineFilteredField("sensor", src["alert.analyzer.name"])
+
+    def _setMessageClassification(self, dst, src):
         urls = [ ]
         cnt = 0
 
@@ -432,30 +413,38 @@ class AlertListing(MessageListing, view.View):
             dst["classification_references"] = "(" + ", ".join(urls) + ")"
         else:
             dst["classification_references"] = ""
-        
-    def _addMessageFields(self, fields, alert):
-        fields["severity"] = { "value": alert["severity"] or "low" }
-        fields["completion"] = { "value": alert["completion"] }
-        
-        for name in ("analyzerid", "ident", "sensor_node_name",
-                     "sinterface", "sport", "suser_name", "suser_uid", "sprocess_name", "sprocess_pid",
-                     "tinterface", "tport", "tuser_name", "tuser_uid", "tprocess_name", "tprocess_pid"):
-            fields[name] = { "value": alert[name] }
-        
-        for name in "classification", "sensor":
-            fields[name] = self._createMessageField(name, alert[name])
 
-        fields["classification_references"] = alert["classification_references"]
-        
-        for name in  "source", "target",:
-            fields[name] = self._createMessageHostField(name, alert[name])
-        
-        fields["time"] = self._createMessageTimeField(alert["time"], self.parameters["timezone"])
+        dst["classification"] = self._createInlineFilteredField("classification",
+                                                                src["alert.classification.text"])
 
-    def getFilters(self, storage, login):
+    def _setMessageSensor(self, dst, src):
+        def get_analyzer_names(alert, root):
+            analyzerid = alert[root + ".analyzerid"]
+            if analyzerid != None:
+                return [ alert[root + ".name"] ] + get_analyzer_names(alert, root + ".analyzer")
+            return [ ]
+
+        analyzers = get_analyzer_names(src, "alert.analyzer")
+
+        dst["sensor"] = self._createInlineFilteredField("sensor", analyzers[0])
+        dst["sensor"]["value"] = "/".join(analyzers[:-1])
+
+        dst["sensor_node_name"] = { "value": src["alert.analyzer.node.name"] }
+        
+    def _setMessage(self, dst, src):
+        dst["severity"] = { "value": src.get("alert.assessment.impact.severity", "low") }
+        dst["completion"] = { "value": src["alert.assessment.impact.completion"] }
+        dst["time"] = self._createTimeField(src["alert.create_time"], self.parameters["timezone"])
+        self._setMessageSource(dst, src)
+        self._setMessageTarget(dst, src)
+        self._setMessageSensor(dst, src)
+        self._setMessageClassification(dst, src)
+        self._setMessageSensor(dst, src)
+
+    def _getFilters(self, storage, login):
         return storage.getAlertFilters(login)
 
-    def getFilter(self, storage, login, name):
+    def _getFilter(self, storage, login, name):
         return storage.getAlertFilter(login, name)
 
     def _adjustCriteria(self, criteria):
@@ -477,30 +466,30 @@ class HeartbeatListing(MessageListing, view.View):
     view_template = "HeartbeatListing"
 
     root = "heartbeat"
+    inline_filters = {
+        "agent": "heartbeat.analyzer.name",
+        "node_address": "heartbeat.analyzer.node.address.address",
+        "node_name": "heartbeat.analyzer.node.name",
+        "model": "heartbeat.analyzer.model"
+        }
     delete_view = "heartbeat_delete"
     summary_view = "heartbeat_summary"
     details_view = "heartbeat_details"
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
     message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.messageid == '%d'"
-    fields = [ ("agent", "heartbeat.analyzer.name", "heartbeat.analyzer.name"),
-               ("node_address", "heartbeat.analyzer.node.address(0).address", "heartbeat.analyzer.node.address.address"),
-               ("node_name", "heartbeat.analyzer.node.name", "heartbeat.analyzer.node.name"),
-               ("type", "heartbeat.analyzer.model", "heartbeat.analyzer.model") ]
 
-    def countMessages(self, criteria):
+    def _countMessages(self, criteria):
         return self.env.prelude.countHeartbeats(criteria)
 
-    def getMessage(self, analyzerid, ident):
+    def _fetchMessage(self, analyzerid, ident):
         return self.env.prelude.getHeartbeat(analyzerid, ident)
 
-    def getMessageTime(self, message):
-        return message["heartbeat.create_time"]
-
-    def _addMessageFields(self, fields, heartbeat):
-        for name in "ident", "analyzerid", "agent", "node_name", "type":
-            fields[name] = self._createMessageField(name, heartbeat[name])
-        fields["node_address"] = self._createMessageHostField("address", heartbeat["node_address"])
-        fields["time"] = self._createMessageTimeField(heartbeat["time"], self.parameters["timezone"])
+    def _setMessage(self, dst, src):
+        dst["agent"] = self._createInlineFilteredField("agent", src["heartbeat.analyzer.name"])
+        dst["model"] = self._createInlineFilteredField("model", src["heartbeat.analyzer.model"])
+        dst["node_name"] = self._createInlineFilteredField("node_name", src["heartbeat.analyzer.node.name"])
+        dst["node_address"] = self._createHostField("node_address", src["heartbeat.analyzer.node.address(0).address"])
+        dst["time"] = self._createTimeField(src["heartbeat.create_time"], self.parameters["timezone"])
 
 
 
