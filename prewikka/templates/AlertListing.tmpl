@@ -11,7 +11,6 @@
     <a onclick="javascript:toggleVisibility('classification')">Classification</a>
     <div class="filter_popup" id="classification" style="display: none">
       Text <input type="text" name="alert.classification.text" value="$alert.classification.text"/>
-      <input type="submit" value="apply"/>
     </div>
   </td>
 
@@ -30,11 +29,6 @@
           <td><input type="text"
                      name="alert.source.node.name"
                      value="$alert.source.node.name"/></td>
-        </tr>
-        <tr>
-          <td colspan="2" align="right">
-            <input type="submit" value="apply"/>
-           </td>
         </tr>
       </table>
     </div>
@@ -56,11 +50,6 @@
                      name="alert.target.node.name"
                      value="$alert.target.node.name"/></td>
         </tr>
-        <tr>
-          <td colspan="2" align="right">
-            <input type="submit" value="apply"/>
-           </td>
-        </tr>
       </table>
     </div>
   </td>
@@ -69,11 +58,15 @@
     <a onclick="javascript:toggleVisibility('sensor')">Sensor</a>
     <div class="filter_popup" id="sensor" style="display: none">
       Name <input type="text" name="alert.analyzer.name" value="$alert.analyzer.name"/>
-      <input type="submit" value="apply"/>
     </div>
   </td>
 
   <td>Time</td>
+
+  <td>
+    <input src="img/search.png" type="image" style="border: 0"/>
+  </td>
+
 </form>
 #end block message_fields_header
 

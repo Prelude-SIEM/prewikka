@@ -93,6 +93,11 @@ class MessageListingParameters(view.Parameters):
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50)
         self.optional("timezone", str, "frontend_localtime")
+        # submit with an image passes the x and y coordinate values
+        # where the image was clicked
+        self.optional("x", int)
+        self.optional("y", int)
+        
 
     def normalize(self):
         view.Parameters.normalize(self)
