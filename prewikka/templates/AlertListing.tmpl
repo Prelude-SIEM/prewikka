@@ -7,16 +7,19 @@
     <input type="hidden" name="$name" value="$value"/>
   #end for
 
-  <td>
+  <td class="filter_popup">
     <a onclick="javascript:toggleVisibility('classification')">Classification</a>
-    <div class="filter_popup" id="classification" style="display: none">
+    <div id="classification">
       Text <input type="text" name="alert.classification.text" value="$alert.classification.text"/>
     </div>
+    #if $classification_filtered
+      <span>*</span>
+    #end if
   </td>
 
-  <td>
+  <td class="filter_popup">
     <a onclick="javascript:toggleVisibility('source')">Source</a>
-    <div class="filter_popup" id="source" style="display: none">
+    <div id="source">
       <table>
         <tr>
           <td>Address</td>
@@ -32,11 +35,14 @@
         </tr>
       </table>
     </div>
+    #if $source_filtered
+      <span>*</span>
+    #end if
   </td>
 
-  <td>
+  <td class="filter_popup">
     <a onclick="javascript:toggleVisibility('target')">Target</a>
-    <div class="filter_popup" id="target" style="display: none">
+    <div id="target">
       <table>
         <tr>
           <td>Address</td>
@@ -52,13 +58,19 @@
         </tr>
       </table>
     </div>
+    #if $target_filtered
+      <span>*</span>
+    #end if
   </td>
   
-  <td>
+  <td class="filter_popup">
     <a onclick="javascript:toggleVisibility('sensor')">Sensor</a>
-    <div class="filter_popup" id="sensor" style="display: none">
+    <div id="sensor">
       Name <input type="text" name="alert.analyzer.name" value="$alert.analyzer.name"/>
     </div>
+    #if $analyzer_filtered
+      <span>*</span>
+    #end if
   </td>
 
   <td>Time</td>

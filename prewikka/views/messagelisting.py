@@ -329,12 +329,16 @@ class MessageListing:
     def render(self):
         start, end = self._getTimelineRange()
 
+        for column in self.filters.values():
+            self.dataset[column + "_filtered"] = False
+
         criteria = [ ]
         for filter in self.filters:
             if self.parameters.has_key(filter):
                 value = self.parameters[filter]
                 criteria.append("%s substr '%s'" % (filter, value))
                 self.dataset[filter] = value
+                self.dataset[self.filters[filter] + "_filtered"] = True
             else:
                 self.dataset[filter] = ""
         
@@ -353,7 +357,7 @@ class MessageListing:
         self.dataset["current_view"] = self.view_name
         self.dataset["delete_hidden_parameters"] = self.parameters - [ "view" ]
         self.dataset["delete_view"] = self.delete_view
-        self.dataset["filter_hidden_parameters"] = self.parameters - [ "view" ] - self.filters
+        self.dataset["filter_hidden_parameters"] = self.parameters - [ "view" ] - self.filters.keys()
         self.dataset["nav.from"] = self.parameters["offset"] + 1
         self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
         self.dataset["limit"] = self.parameters["limit"]
@@ -371,10 +375,12 @@ class AlertListing(MessageListing, view.View):
     view_template = "AlertListing"
 
     root = "alert"
-    filters = [ "alert.classification.text",
-                "alert.source.node.address.address", "alert.source.node.name",
-                "alert.target.node.address.address", "alert.target.node.name",
-                "alert.analyzer.name" ]
+    filters = { "alert.classification.text": "classification",
+                "alert.source.node.address.address": "source",
+                "alert.source.node.name": "source",
+                "alert.target.node.address.address": "target",
+                "alert.target.node.name": "target",
+                "alert.analyzer.name": "analyzer" }
     messageid_object = "alert.messageid"
     analyzerid_object = "alert.analyzer.analyzerid"
     delete_view = "alert_delete"
@@ -514,7 +520,7 @@ class HeartbeatListing(MessageListing, view.View):
     view_template = "HeartbeatListing"
 
     root = "heartbeat"
-    filters = [ ]
+    filters = { }
     delete_view = "heartbeat_delete"
     summary_view = "heartbeat_summary"
     details_view = "heartbeat_details"
