@@ -175,10 +175,10 @@ class AlertListingParameters(MessageListingParameters):
 class HeartbeatListingParameters(MessageListingParameters):
     def register(self):
         MessageListingParameters.register(self)
-        self.optional("heartbeat.analyzer(0).name", str)
-        self.optional("heartbeat.analyzer(0).node.address.address", str)
-        self.optional("heartbeat.analyzer(0).node.name", str)
-        self.optional("heartbeat.analyzer(0).model", str)
+        self.optional("heartbeat.analyzer(-1).name", str)
+        self.optional("heartbeat.analyzer(-1).node.address.address", str)
+        self.optional("heartbeat.analyzer(-1).node.name", str)
+        self.optional("heartbeat.analyzer(-1).model", str)
 
 
 
@@ -261,13 +261,13 @@ class ListedHeartbeat(ListedMessage):
         self["delete"] = ident
         self["summary"] = self.createMessageLink(ident, "heartbeat_summary")
         self["details"] = self.createMessageLink(ident, "heartbeat_details")
-        self["agent"] = self.createInlineFilteredField("heartbeat.analyzer.name",
+        self["agent"] = self.createInlineFilteredField("heartbeat.analyzer(-1).name",
                                                        message["heartbeat.analyzer(%d).name" % index])
-        self["model"] = self.createInlineFilteredField("heartbeat.analyzer.model",
+        self["model"] = self.createInlineFilteredField("heartbeat.analyzer(-1).model",
                                                        message["heartbeat.analyzer(%d).model" % index])
-        self["node_name"] = self.createInlineFilteredField("heartbeat.analyzer.node.name",
+        self["node_name"] = self.createInlineFilteredField("heartbeat.analyzer(-1).node.name",
                                                            message["heartbeat.analyzer(%d).node.name" % index])
-        self["node_address"] = self.createHostField("heartbeat.analyzer.node.address.address",
+        self["node_address"] = self.createHostField("heartbeat.analyzer(-1).node.address.address",
                                                     message["heartbeat.analyzer(%d).node.address(0).address" % index],
                                                     "unknown")
         self["time"] = self.createTimeField(message["heartbeat.create_time"], self.parameters["timezone"])
@@ -1076,13 +1076,15 @@ class HeartbeatListing(MessageListing, view.View):
 
     def _applyInlineFilters(self, criteria):
         filter_found = False
-        for path in ("hearbeat.analyzer.name", "heartbeat.analyzer.model", \
-                     "heartbeat.analyzer.node.address.address", "heartbeat.analyzer.node.name"):
-            self.dataset[path + "_filtered"] = False
+        for column, path in (("name", "hearbeat.analyzer(-1).name"),
+                             ("model", "heartbeat.analyzer(-1).model"),
+                             ("address", "heartbeat.analyzer(-1).node.address.address"),
+                             ("node_name", "heartbeat.analyzer(-1).node.name")):
+            self.dataset[column + "_filtered"] = False
             if not filter_found:
                 if self.parameters.has_key(path):
                     criteria.append("%s == '%s'" % (path, self.parameters[path]))
-                    self.dataset[path + "_filtered"] = True
+                    self.dataset[column + "_filtered"] = True
                     filter_found = True
         
     def _deleteMessage(self, ident):
