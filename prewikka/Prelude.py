@@ -114,18 +114,19 @@ class Prelude(PreludeDB):
                            port=config.getOptionValue("port", 0),
                            name=config.getOptionValue("name", "prelude"),
                            user=config.getOptionValue("user", "prelude"),
-                           password=config.getOptionValue("password", "prelude"))
+                           password=config.getOptionValue("password", "prelude"),
+                           log=config.getOptionValue("log", None))
         self.connect()
 
     def getAlertIdents(self, criteria=None, limit=-1, offset=-1):
         if criteria:
             criteria = prelude.IDMEFCriteria(criteria)
-        return self.get_alert_ident_list(criteria, limit, offset) or [ ]
+        return self.get_alert_idents(criteria, limit, offset) or [ ]
 
     def getHeartbeatIdents(self, criteria=None, limit=-1, offset=-1):
         if criteria:
             criteria = prelude.IDMEFCriteria(criteria)
-        return self.get_heartbeat_ident_list(criteria, limit, offset) or [ ]
+        return self.get_heartbeat_idents(criteria, limit, offset) or [ ]
 
     def _getLastMessageIdent(self, type, analyzerid):
         criteria = None
@@ -143,17 +144,17 @@ class Prelude(PreludeDB):
     def getLastHeartbeatIdent(self, analyzer=None):
         return self._getLastMessageIdent("heartbeat", analyzer)
 
-    def getAlert(self, analyzerid, alert_ident):
-        return Alert(self.get_alert(analyzerid, alert_ident))
+    def getAlert(self, ident):
+        return Alert(self.get_alert(ident))
 
-    def deleteAlert(self, analyzerid, alert_ident):
-        return self.delete_alert(analyzerid, alert_ident)
+    def deleteAlert(self, ident):
+        return self.delete_alert(ident)
 
-    def getHeartbeat(self, analyzerid, heartbeat_ident):
-        return Heartbeat(self.get_heartbeat(analyzerid, heartbeat_ident))
+    def getHeartbeat(self, ident):
+        return Heartbeat(self.get_heartbeat(ident))
 
-    def deleteHeartbeat(self, analyzerid, heartbeat_ident):
-        return self.delete_heartbeat(analyzerid, heartbeat_ident)
+    def deleteHeartbeat(self, ident):
+        return self.delete_heartbeat(ident)
 
     def getValues(self, selection, criteria=None, distinct=0, limit=-1, offset=-1):
         if criteria:

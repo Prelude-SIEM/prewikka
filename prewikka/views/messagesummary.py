@@ -24,7 +24,6 @@ from prewikka import view, User, utils
 class MessageParameters(view.RelativeViewParameters):
     def register(self):
         view.RelativeViewParameters.register(self)
-        self.mandatory("analyzerid", long)
         self.mandatory("ident", long)
 
 
@@ -167,7 +166,7 @@ class AlertSummary(MessageSummary, view.View):
         self.endSection()
 
     def render(self):
-        alert = self.env.prelude.getAlert(self.parameters["analyzerid"], self.parameters["ident"])
+        alert = self.env.prelude.getAlert(self.parameters["ident"])
         self.dataset["sections"] = [ ]
         self.buildTime(alert)
         self.buildClassification(alert)
@@ -189,8 +188,7 @@ class HeartbeatSummary(MessageSummary, view.View):
         self.endSection()
 
     def render(self):
-        heartbeat = self.env.prelude.getHeartbeat(self.parameters["analyzerid"],
-                                                  self.parameters["ident"])
+        heartbeat = self.env.prelude.getHeartbeat(self.parameters["ident"])
         self.dataset["sections"] = [ ]
         self.buildAnalyzer(heartbeat)
         self.buildTime(heartbeat)

@@ -324,7 +324,7 @@ class AlertDetails(_Element, view.View):
     top_element = True
 
     def render(self):
-        self._alert = self.env.prelude.getAlert(self.parameters["analyzerid"], self.parameters["ident"])
+        self._alert = self.env.prelude.getAlert(self.parameters["ident"])
         self.dataset["node"] = { "name": "Alert", "id": 0, "hidden": False, "entries": _Element.render(self, "alert") }
 
 
@@ -339,5 +339,5 @@ class HeartbeatDetails(_Element, view.View):
     top_element = True
 
     def render(self):
-        self._alert = self.env.prelude.getHeartbeat(self.parameters["analyzerid"], self.parameters["ident"])
+        self._alert = self.env.prelude.getHeartbeat(self.parameters["ident"])
         self.dataset["node"] = { "name": "Heartbeat", "id": 0, "hidden": False, "entries": _Element.render(self, "heartbeat") }

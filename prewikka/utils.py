@@ -41,7 +41,7 @@ def get_gmt_offset():
 def create_link(action_name, parameters=None):
     link = "?view=%s" % action_name
     if parameters:
-        link += "&%s" % urllib.urlencode(parameters)
+        link += "&%s" % urllib.urlencode(parameters, doseq=True)
         
     return link
 

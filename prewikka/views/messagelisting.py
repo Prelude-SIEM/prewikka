@@ -297,27 +297,17 @@ class MessageListing:
 
         return field
     
-    def _createMessageLink(self, message, view):
-        return utils.create_link(view, { "origin": self.view_name,
-                                         "analyzerid": message.getAnalyzerID(),
-                                         "ident": message.getMessageID() })
+    def _createMessageLink(self, ident, view):
+        return utils.create_link(view, { "origin": self.view_name, "ident": ident })
 
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
-
-        objects = [ self.root + ".analyzer.analyzerid",
-                    self.root + ".messageid",
-                    self.root + ".create_time/order_desc" ]
         
-        for analyzerid, ident, ctime in self.env.prelude.getValues(objects,
-                                                                   criteria=criteria,
-                                                                   distinct=1,
-                                                                   limit=self.parameters["limit"],
-                                                                   offset=self.parameters["offset"]):
-            src = self._fetchMessage(analyzerid, ident)
+        for ident in self._getMessageIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
+            src = self._fetchMessage(ident)
             dst = {
-                "summary": self._createMessageLink(src, self.summary_view),
-                "details": self._createMessageLink(src, self.details_view),
+                "summary": self._createMessageLink(ident, self.summary_view),
+                "details": self._createMessageLink(ident, self.details_view),
                 "analyzerid": { "value": src.getAnalyzerID() },
                 "ident": { "value": src.getMessageID() }
                 }
@@ -337,6 +327,9 @@ class MessageListing:
     def _deleteMessages(self):
         if len(self.parameters["idents"]) == 0:
             return
+
+        idents = self.parameters["idents"]
+        del self.parameters["idents"]
         
         if not self.user.has(User.PERM_IDMEF_ALTER):
             raise User.PermissionDeniedError(user.login, self.current_view)
@@ -351,8 +344,6 @@ class MessageListing:
         
         criteria.append(self.time_criteria_format % (str(start), str(end)))
         criteria = " && ".join(criteria)
-
-        print "criteria:", criteria
 
         self._setInlineFilter()
         self._setTimeline(start, end)
@@ -387,11 +378,14 @@ class AlertListing(MessageListing, view.View):
     time_criteria_format = "alert.create_time >= '%s' && alert.create_time < '%s'"
     message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.messageid == '%d'"
 
+    def _getMessageIdents(self, criteria, limit, offset):
+        return self.env.prelude.getAlertIdents(criteria, limit, offset)
+
     def _countMessages(self, criteria):
         return self.env.prelude.countAlerts(criteria)
 
-    def _fetchMessage(self, analyzerid, ident):
-        return self.env.prelude.getAlert(analyzerid, ident)
+    def _fetchMessage(self, ident):
+        return self.env.prelude.getAlert(ident)
 
     def _setMessageSource(self, dst, src):
         dst["sinterface"] = { "value": src["alert.source(0).interface"] }
@@ -595,11 +589,14 @@ class HeartbeatListing(MessageListing, view.View):
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
     message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.messageid == '%d'"
 
+    def _getMessageIdents(self, criteria, limit, offset):
+        return self.env.prelude.getHeartbeatIdents(criteria, limit, offset)
+
     def _countMessages(self, criteria):
         return self.env.prelude.countHeartbeats(criteria)
 
-    def _fetchMessage(self, analyzerid, ident):
-        return self.env.prelude.getHeartbeat(analyzerid, ident)
+    def _fetchMessage(self, ident):
+        return self.env.prelude.getHeartbeat(ident)
 
     def _setMessage(self, dst, src):
         dst["agent"] = self._createInlineFilteredField("heartbeat.analyzer.name",
