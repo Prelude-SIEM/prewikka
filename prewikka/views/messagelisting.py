@@ -129,6 +129,10 @@ class AlertListingParameters(MessageListingParameters):
 
     def register(self):
         MessageListingParameters.register(self)
+        self.optional("groupby_source", list, [ ])
+        self.optional("groupby_source_values", list, [ ])
+        self.optional("groupby_target", list, [ ])
+        self.optional("groupby_target_values", list, [ ])
         self.optional("filter", str)
         self.optional("alert.classification.text", list, [ ])
         self.optional("alert.assessment.impact.severity", list, [ ])
@@ -303,9 +307,22 @@ class MessageListing:
     def _createMessageLink(self, ident, view):
         return utils.create_link(view, { "origin": self.view_name, "ident": ident })
 
+    def _setTimezone(self):
+        for timezone in "utc", "sensor_localtime", "frontend_localtime":
+            if timezone == self.parameters["timezone"]:
+                self.dataset["timeline.%s_selected" % timezone] = "selected"
+            else:
+                self.dataset["timeline.%s_selected" % timezone] = ""
+
+    def _getInlineFilter(self, name):
+        return name, self.parameters.get(name)
+
     def _setMessages(self, criteria):
-        self.dataset["messages"] = [ ]
-        
+        if criteria:
+            criteria = " && ".join(criteria)
+        else:
+            criteria = None
+
         for ident in self._getMessageIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
             message = self._fetchMessage(ident)
             dataset = {
@@ -316,16 +333,6 @@ class MessageListing:
                 }
             self._setMessage(dataset, message)
             self.dataset["messages"].append(dataset)
-
-    def _setTimezone(self):
-        for timezone in "utc", "sensor_localtime", "frontend_localtime":
-            if timezone == self.parameters["timezone"]:
-                self.dataset["timeline.%s_selected" % timezone] = "selected"
-            else:
-                self.dataset["timeline.%s_selected" % timezone] = ""
-
-    def _getInlineFilter(self, name):
-        return name, self.parameters.get(name)
 
     def _deleteMessages(self):
         if len(self.parameters["idents"]) == 0:
@@ -339,9 +346,11 @@ class MessageListing:
 
         for analyzerid, messageid in self.parameters["idents"]:
             self._deleteMessage(analyzerid, messageid)
-
+    
     def render(self, criteria=None):
         self._deleteMessages()
+
+        self.dataset["delete_enabled"] = True
         
         start, end = self._getTimelineRange()
 
@@ -349,14 +358,14 @@ class MessageListing:
             criteria = [ ]
         
         criteria.append(self.time_criteria_format % (str(start), str(end)))
-        criteria = " && ".join(criteria)
 
         self._setInlineFilter()
         self._setTimeline(start, end)
         self._setNavPrev(self.parameters["offset"])
 
-        count = self._countMessages(criteria)
+        count = self._countMessages(criteria and " && ".join(criteria) or None)
 
+        self.dataset["messages"] = [ ]
         self._setMessages(criteria)
 
         self.dataset["current_view"] = self.view_name
@@ -613,9 +622,70 @@ class AlertListing(MessageListing, view.View):
         self._applyCheckboxFilters(criteria, "target")
         self._applyCheckboxFilters(criteria, "analyzer")
 
+    def _setMessages(self, criteria):
+        self.dataset["groupby_source"] = self.parameters["groupby_source"]
+        self.dataset["groupby_source_values"] = self.parameters["groupby_source_values"]
+        self.dataset["groupby_target"] = self.parameters["groupby_target"]
+        self.dataset["groupby_target_values"] = self.parameters["groupby_target_values"]
+
+        groupby = self.parameters["groupby_source"] + self.parameters["groupby_target"]
+        groupby_values = self.parameters["groupby_source_values"] + self.parameters["groupby_target_values"]
+        
+        self.dataset["delete_enabled"] = bool(groupby_values or not groupby)
+        
+        if groupby_values:
+            criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(groupby, groupby_values) ]
+            MessageListing._setMessages(self, criteria2)
+        
+        elif not groupby:
+            MessageListing._setMessages(self, criteria)
+            
+        else:
+            selection = [ "%s/group_by" % p for p in groupby ] + \
+                        [ "max(alert.create_time)/order_desc", "count(alert.messageid)" ]
+
+            results = self.env.prelude.getValues(selection, criteria and " && ".join(criteria) or None,
+                                                 limit=self.parameters["limit"], offset=self.parameters["offset"])
+
+            for values in results:
+                criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(groupby, values[:-2]) ]
+
+                groupby_source_len = len(self.parameters["groupby_source"])
+                groupby_target_len = len(self.parameters["groupby_target"])
+                groupby_source_values = values[0:groupby_source_len]
+                groupby_target_values = values[groupby_source_len:groupby_target_len]
+
+                for ident in self.env.prelude.getAlertIdents(" && ".join(criteria2), limit=1):
+                    message = self._fetchMessage(ident)
+                    dataset = {
+                        "count": values[-1],
+                        "expand": utils.create_link("alert_listing",
+                                                    self.parameters +
+                                                    { "groupby_source_values": groupby_source_values,
+                                                      "groupby_target_values": groupby_target_values })
+                        }
+                    self._setMessage(dataset, message)
+                    self.dataset["messages"].append(dataset)
+
+    def _setDatasetConstants(self):
+        self.dataset["groupby_source"] = [ ]
+        self.dataset["available_groupbys"] = { }
+        for category in "source", "target":
+            tmp = (("address", "alert.%s.node.address.address" % category),
+                   ("name", "alert.%s.node.name" % category),
+                   ("user", "alert.%s.user.user_id.name" % category),
+                   ("process", "alert.%s.process.name" % category),
+                   ("service", "alert.%s.service.name" % category),
+                   ("port", "alert.%s.service.port" % category),
+                   ("name", "alert.%s.node.name" % category),
+                   ("interface", "alert.%s.interface" % category))
+            self.dataset["available_groupbys"][category] = tmp
+                    
     def render(self):
         criteria = [ ]
 
+        self._setDatasetConstants()
+        
         if self.parameters.has_key("filter"):
             filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter"])
             criteria.append("(%s)" % str(filter))

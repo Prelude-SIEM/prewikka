@@ -28,7 +28,9 @@ $message_listing_header
         <tr class='$row_classes[$cnt%2]'>
           $message_fields
           <td class='static_content_column'>
+          #if $delete_enabled
             <input type='checkbox' name='idents' value='$message.analyzerid.value:$message.ident.value'/>
+          #end if
           </td>
         </tr>
         #set $cnt += 1
@@ -37,7 +39,9 @@ $message_listing_header
     <tfoot>
     </tfoot>
   </table>
-  <div align="right"><input type='submit' value='delete'/></div>
+  #if $delete_enabled
+    <div align="right"><input type='submit' value='delete'/></div>
+  #end if
 #end block main_content
 
 

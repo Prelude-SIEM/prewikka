@@ -54,6 +54,108 @@ function simple_add_entry(table_name, object, value) {
 	field.appendChild(link)
 }
 
+#for $category, $groups in $available_groupbys.items()
+function group_by_${category}_add_entry(path) {
+	table = document.getElementById("${category}_groupby_table")
+
+	if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
+		table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
+	}
+
+	row = document.createElement("tr")
+	table.appendChild(row)
+        
+        field = document.createElement("td")
+	row.appendChild(field)
+        content = document.createTextNode("Group by")
+        field.appendChild(content)
+        
+        field = document.createElement("td")
+	row.appendChild(field)
+	select = document.createElement("select")
+	field.appendChild(select)
+	select.setAttribute("name", "groupby_${category}")
+        
+        option = document.createElement("option")
+        select.appendChild(option)
+
+        #for $group_name, $group_path in $groups
+        
+	option = document.createElement("option")
+	option.setAttribute("value", '$group_path')
+	if ( path == '$group_path' ) {
+		option.setAttribute("selected", "true")
+	}
+	option_value = document.createTextNode('$group_name')
+	option.appendChild(option_value)
+	select.appendChild(option)
+        
+        #end for
+	
+	field = document.createElement("td")
+	row.appendChild(field)
+
+	if ( table.firstChild != table.lastChild ) {
+		link = document.createElement("a")
+		link.setAttribute("onclick", "del_entry(this)")
+		content = document.createTextNode("-")
+		link.appendChild(content)
+		field.appendChild(link)		
+	} else {
+		content = document.createTextNode(" ")
+		field.appendChild(content)
+	}
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	link = document.createElement("a")
+	link.setAttribute("onclick", "group_by_${category}_add_entry('')")
+	content = document.createTextNode("+")
+	link.appendChild(content)
+	field.appendChild(link)
+}
+#end for
+
+function simple_add_entry(table_name, object, value) {
+	table = document.getElementById(table_name)
+
+	if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
+		table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
+	}
+
+	row = document.createElement("tr")
+	table.appendChild(row)
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	input = document.createElement("input")
+	field.appendChild(input)
+	input.setAttribute("name", object)
+	input.setAttribute("value", value)
+	
+	field = document.createElement("td")
+	row.appendChild(field)
+
+	if ( table.firstChild != table.lastChild ) {
+		link = document.createElement("a")
+		link.setAttribute("onclick", "del_entry(this)")
+		content = document.createTextNode("-")
+		link.appendChild(content)
+		field.appendChild(link)		
+	} else {
+		content = document.createTextNode(" ")
+		field.appendChild(content)
+	}
+
+	field = document.createElement("td")
+	row.appendChild(field)
+	link = document.createElement("a")
+	link.setAttribute("onclick", "simple_add_entry('" + table_name + "', '" + object + "', '')")
+	content = document.createTextNode("+")
+	link.appendChild(content)
+	field.appendChild(link)
+}
+
 #for $name, $objects in (("analyzer", (("name", "alert.analyzer.name"), ("manufacturer", "alert.analyzer.manufacturer"), ("model", "alert.analyzer.model"), ("class", "alert.analyzer.class"))), ("source", (("address", "alert.source.node.address.address"), ("name", "alert.source.node.name"), ("user", "alert.source.user.user_id.name"), ("process", "alert.source.process.name"), ("service", "alert.source.service.name"), ("port", "alert.source.service.port"), ("interface", "alert.source.interface"))), ("target", (("address", "alert.target.node.address.address"), ("name", "alert.target.node.name"), ("user", "alert.target.user.user_id.name"), ("process", "alert.target.process.name"), ("service", "alert.target.service.name"), ("port", "alert.target.service.port"), ("interface", "alert.target.interface"))))
 
 function ${name}_add_entry(object, value, num) {
@@ -208,6 +310,16 @@ function ${name}_add_entry(object, value, num) {
           #set $cnt = $cnt + 1
         #end for
       </script>
+      <table id="source_groupby_table"></table>
+      <script>
+      #if len($groupby_source) == 0
+        group_by_source_add_entry("")
+      #else
+        #for $path in $groupby_source
+          group_by_source_add_entry('$path')
+        #end for
+      #end if
+      </script>
     </div>
     #if $source_filtered
       <span>*</span>
@@ -225,6 +337,16 @@ function ${name}_add_entry(object, value, num) {
           #set $cnt = $cnt + 1
         #end for
       </script>
+      <table id="target_groupby_table"></table>
+      <script>
+      #if len($groupby_target) == 0
+        group_by_target_add_entry("")
+      #else
+        #for $path in $groupby_target
+          group_by_target_add_entry('$path')
+        #end for
+      #end if
+      </script>
     </div>
     #if $target_filtered
       <span>*</span>
@@ -239,6 +361,7 @@ function ${name}_add_entry(object, value, num) {
           #set $cnt = 0
           #for $object, $value in $analyzer
             analyzer_add_entry('$object', '$value', $cnt)
+            #set $cnt = $cnt + 1
           #end for
         </script>
     </div>
@@ -261,15 +384,23 @@ function ${name}_add_entry(object, value, num) {
 
 <td>
  <ul id="popup_block">
-  <li><span class="$class_">$message.classification.value</span>
+  <li>
+  #if $message.has_key("count")
+    $message.count x 
+  #end if
+  <span class="$class_"> $message.classification.value</span>
   #if $message.completion.value
       (<span class="impact_completion_$message.completion.value">$message.completion.value</span>)
   #end if
       <br/>$message.classification_references
    <ul>
-    <li><a href="$message.details">Alert detail</a></li>
-    <li><a href="$message.summary">Alert summary</a></li>
-    <li><a href="$message.classification.inline_filter">Group by classification</a></li>
+    #if $message.has_key("expand")
+      <li><a href="$message.expand">Expand the alert group</a></li>
+    #else
+      <li><a href="$message.details">Alert detail</a></li>
+      <li><a href="$message.summary">Alert summary</a></li>
+    #end if
+      <li><a href="$message.classification.inline_filter">Group by classification</a></li>
    </ul>
   </li>
  </ul>
