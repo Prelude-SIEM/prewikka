@@ -1,7 +1,7 @@
 import sys
 
 from templates import Hideable
-from templates.modules.mod_alert import MessageDetailsEntries
+from modules.main.templates import MessageDetailsEntries
 import PyTpl
 
 
