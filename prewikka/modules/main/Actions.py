@@ -160,7 +160,8 @@ class MessageListing(Action.Action):
             tmp = self.getMessage(prelude, analyzerid, ident)
             for name, object, filter  in self.fields:
                 message[name] = tmp[object]
-                
+            message["time"] = self.getMessageTime(tmp)
+            
         view.setRange(parameters.getOffset() + 1, parameters.getOffset() + len(messages), parameters.getLimit(), count)
 
         if count > parameters.getOffset() + parameters.getLimit():
@@ -183,8 +184,7 @@ class AlertListing(MessageListing):
                ("classification", "alert.classification(0).name", "alert.classification.name"),
                ("source", "alert.source(0).node.address(0).address", "alert.source.node.address.address"),
                ("target", "alert.target(0).node.address(0).address", "alert.target.node.address.address"),
-               ("sensor", "alert.analyzer.model", "alert.analyzer.model"),
-               ("time", "alert.detect_time", "alert.detect_time") ]
+               ("sensor", "alert.analyzer.model", "alert.analyzer.model") ]
 
     def countMessages(self, prelude, criteria):
         return prelude.countAlerts(criteria)
@@ -195,6 +195,9 @@ class AlertListing(MessageListing):
     def getMessage(self, prelude, analyzerid, ident):
         return prelude.getAlert(analyzerid, ident)
 
+    def getMessageTime(self, message):
+        return message["alert.detect_time"] or message["alert.create_time"] or 0
+
 
 
 class HeartbeatListing(MessageListing):
@@ -203,8 +206,7 @@ class HeartbeatListing(MessageListing):
     message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.ident == '%d'"
     fields = [ ("address", "heartbeat.analyzer.node.address(0).address", "heartbeat.analyzer.node.address.address"),
                ("name", "heartbeat.analyzer.node.name", "heartbeat.analyzer.node.name"),
-               ("type", "heartbeat.analyzer.model", "heartbeat.analyzer.model"),
-               ("time", "heartbeat.analyzer_time", "heartbeat.analyzer_time") ]
+               ("type", "heartbeat.analyzer.model", "heartbeat.analyzer.model") ]
 
     def countMessages(self, prelude, criteria):
         return prelude.countHeartbeats(criteria)
@@ -214,6 +216,9 @@ class HeartbeatListing(MessageListing):
 
     def getMessage(self, prelude, analyzerid, ident):
         return prelude.getHeartbeat(analyzerid, ident)
+
+    def getMessageTime(self, message):
+        return message["heartbeat.create_time"]
 
 
 
