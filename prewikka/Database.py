@@ -23,7 +23,7 @@ import time
 
 from preludedb import *
 
-from prewikka import User, Filter, utils
+from prewikka import User, Filter, utils, siteconfig
 
 class DatabaseError(Exception):
     pass
@@ -77,7 +77,7 @@ class Database:
             results = self.query("SELECT version FROM Prewikka_Version")
         except PreludeDBError:
             print >> sys.stderr, "create Prewikka database"
-            content = open(db_type + ".sql").read()
+            content = open(siteconfig.database + db_type + ".sql").read()
             for query in content.split(";"):
                 query = query.strip()
                 if len(query) > 0:

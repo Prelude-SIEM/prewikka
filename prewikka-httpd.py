@@ -31,7 +31,7 @@ import shutil
 import SocketServer
 import BaseHTTPServer
 
-from prewikka import Core, Request
+from prewikka import Core, Request, siteconfig
 
 
 class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
@@ -46,7 +46,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         return self.headers.get("Cookie")
 
     def getQueryString(self):
-        return self.path
+        return self._query_string
 
     def getReferer(self):
         try:
@@ -79,8 +79,8 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         Request.Request.sendResponse(self)
 
     def _processStatic(self):
-        filename = os.path.abspath(urllib.unquote(self.path[1:]))
-        if filename.find(os.getcwd()) != 0:
+        filename = os.path.abspath(siteconfig.site + urllib.unquote(self.path[1:]))
+        if filename.find(os.path.abspath(siteconfig.site)) != 0:
             self.send_error(403, filename)
             return
         
@@ -104,6 +104,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         shutil.copyfileobj(f, self.wfile)
         
     def do_GET(self):
+        self._query_string = self.path
         self.init()
         if self.path == "/":
             self._processDynamic({ })
@@ -116,8 +117,9 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         self.do_GET()
 
     def do_POST(self):
+        self._query_string = cgi.parse_qs(self.rfile.read(int(self.headers["Content-Length"])))
         self.init()
-        self._processDynamic(cgi.parse_qs(self.rfile.read(int(self.headers["Content-Length"]))))
+        self._processDynamic(self._query_string)
 
     def getClientAddress(self):
         return self.client_address[0]

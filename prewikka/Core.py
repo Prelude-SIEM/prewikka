@@ -28,7 +28,7 @@ import copy
 import prelude, preludedb
 
 from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer, \
-     User, Auth, DataSet, Error, utils
+     User, Auth, DataSet, Error, utils, siteconfig
 
 
 
@@ -49,7 +49,7 @@ class Core:
     def __init__(self):
         class Env: pass
         self._env = Env()
-        self._env.config = Config.Config()
+        self._env.config = Config.Config(siteconfig.conf + "prewikka.conf")
         self._env.db = Database.Database(self._env.config.database)
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
         self._env.auth = Auth.AnonymousAuth()
@@ -132,8 +132,8 @@ class Core:
         
         interface = self._env.config.interface
         dataset["document.title"] = "[PREWIKKA]"
-        dataset["document.css_files"] = [ "lib/style.css" ]
-        dataset["document.js_files"] = [ "lib/functions.js" ]
+        dataset["document.css_files"] = [ "css/style.css" ]
+        dataset["document.js_files"] = [ "js/functions.js" ]
         dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
         dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
         dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
