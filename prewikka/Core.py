@@ -23,7 +23,7 @@ import os, os.path
 
 import copy
 
-from prewikka import Config, Log, Prelude, ParametersNormalizer, Interface, User, \
+from prewikka import Config, Log, Prelude, ParametersNormalizer, User, \
     UserManagement, DataSet, Error, utils
 
 

@@ -21,7 +21,7 @@
 import sys
 import os
 
-from prewikka import Log, Interface
+from prewikka import Log
 
 
 class LogStderr(Log.LogBackend):
