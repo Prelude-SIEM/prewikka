@@ -30,10 +30,16 @@
 <td>
   <ul id="popup_block">
     <li class="popup_title">
-      #if $message.sport.value
-        <span>$message.source.value</span>:$message.sport.value
+      #if $message.sservice.value
+        <span>$message.source.value</span>:$message.sservice.value
+	#if $message.sservice_extra.value
+          ($message.sservice_extra.value)
+        #end if
       #else
         <span>$message.source.value</span>
+      #end if
+      #if $message.source_extra.value
+        <br/>hostname: $message.source_extra.value
       #end if
       #if $message.suser_name.value
         <br/>user: $message.suser_name.value
@@ -63,10 +69,16 @@
 <td>
   <ul id="popup_block">
     <li class="popup_title">
-      #if $message.tport.value
-        <span>$message.target.value</span>:$message.tport.value
+      #if $message.tservice.value
+        <span>$message.target.value</span>:$message.tservice.value
+        #if $message.tservice_extra.value
+          ($message.tservice_extra.value)
+        #end if
       #else
         <span>$message.target.value</span>
+      #end if
+      #if $message.target_extra.value
+        <br/>hostname: $message.target_extra.value
       #end if
       #if $message.tuser_name.value
         <br/>user: $message.tuser_name.value
