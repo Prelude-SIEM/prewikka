@@ -1200,7 +1200,8 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
                 elif time.time() - int(older_time) > int(older_interval) + self._heartbeat_error_margin:
                     analyzer["latest_status_class"] = "abnormal_offline"
                     analyzer["latest_status"] = "abnormal offline"
-                    analyzer["events"].append("sensor is down since %s" % older_time)
+                    analyzer["events"].append({ "value": "sensor is down since %s" % older_time,
+                                                "type": "down"})
                 else:
                     analyzer["latest_status_class"] = "online"
                     analyzer["latest_status"] = "online"
@@ -1210,16 +1211,21 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
                 
                 if newer_status == "starting":
                     if older_status == "exiting":
-                        event = "normal sensor start at %s" % str(newer_time)
+                        event = { "value": "normal sensor start at %s" % str(newer_time),
+                                  "type": "start" }
                     else:
-                        event = "unexpected sensor restart at %s" % str(newer_time)
+                        event = { "value": "unexpected sensor restart at %s" % str(newer_time),
+                                  "type": "unexpected_restart" }
 
                 if newer_status == "running":
                     if abs(int(newer_time) - int(older_time) - int(older_interval)) > self._heartbeat_error_margin:
-                        event = "abnormal heartbeat interval between %s and %s" %  (older_time, newer_time)
+                        event = { "value": "abnormal heartbeat interval between %s and %s" %  (older_time, newer_time),
+                                  "type": "abnormal_heartbeat_interval" }
+                                  
 
                 if newer_status == "exiting":
-                    event = "normal sensor stop at %s" % str(newer_status)
+                    event = { "value": "normal sensor stop at %s" % str(newer_status),
+                              "type": "normal_stop" }
 
                 if event:
                     analyzer["events"].append(event)
@@ -1230,8 +1236,10 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
             newer_time = older_time
 
         if not analyzer["events"]:
-            analyzer["events"].append("No anomaly in the last %d heartbeats (1 heartbeat every %d s average)" %
-                                      (self._heartbeat_count, total_interval / self._heartbeat_count))
+            analyzer["events"].append({ "value":
+                                        "No anomaly in the last %d heartbeats (1 heartbeat every %d s average)" %
+                                        (self._heartbeat_count, total_interval / self._heartbeat_count),
+                                        "type": "no_anomaly" })
 
         return analyzer
     
