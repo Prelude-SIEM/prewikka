@@ -471,8 +471,8 @@ function ${name}_add_entry(object, value, num) {
     #if $message.time_min.value == $message.time_max.value
       $message.time_min.value
     #else
-      $message.time_min.value -
-      $message.time_max.value
+      $message.time_max.value -
+      $message.time_min.value
     #end if
   #else
     $message.time.value

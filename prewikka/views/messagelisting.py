@@ -748,19 +748,20 @@ class AlertListing(MessageListing, view.View):
     def _setAggregatedMessagesNoValues(self, criteria):
         aggregated_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
 
-        selection = [ "%s/group_by" % path for path in aggregated_on ] + [ "count(alert.create_time)" ]
+        selection = [ "%s/group_by" % path for path in aggregated_on ] + \
+                    [ "count(alert.create_time)", "max(alert.create_time)/order_desc" ]
 
         results = self.env.prelude.getValues(selection, criteria)
         total_results = len(results)
 
         for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
             aggregated_source_values = values[:len(self.parameters["aggregated_source"])]
-            aggregated_target_values = values[len(self.parameters["aggregated_source"]):-1]
-            aggregated_count = values[-1]
+            aggregated_target_values = values[len(self.parameters["aggregated_source"]):-2]
+            aggregated_count = values[-2]
 
             criteria2 = criteria[:]
             delete_criteria = [ ]
-            for path, value in zip(aggregated_on, values[:-1]):
+            for path, value in zip(aggregated_on, values[:-2]):
                 if value:
                     criterion = "%s == '%s'" % (path, value)
                 else:
