@@ -1,0 +1,9 @@
+Prewikka: The Prelude-IDS console.
+
+Originally written by Markus Alkio and Miika Keskinen, today written by Nicolas Delon, 
+it was rapidly adopted as the new Prelude frontend.
+Prewikka is a professional looking application providing advanced feature like contextual filtering,
+aggregation, etc.
+Prewikka is a large step forward compared to Piwi.
+As of now, Prewikka use advanced CSS features and won't work under Internet Explorer. We'll be working
+on fixing this ASAP (and any help would be appreciated).
