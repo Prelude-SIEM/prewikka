@@ -1193,19 +1193,11 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
 
             if latest:
                 latest = False
-                analyzer["status"] = _get_analyzer_status_from_latest_heartbeat(older_status,
-                                                                                older_time,
-                                                                                older_interval,
+                analyzer["status"], analyzer["status_meaning"] = \
+                                    _get_analyzer_status_from_latest_heartbeat(older_status, older_time, older_interval,
                                                                                 self._heartbeat_error_margin)
-                if analyzer["status"] == "normal_offline":
-                    analyzer["status_meaning"] = "normal offline"
-                elif analyzer["status"] == "abnormal_offline":
-                    analyzer["status_meaning"] = "abnormal offline"
-                    analyzer["events"].append({ "value": "sensor is down since %s" % older_time,
-                                                "type": "down"})
-                else: # online
-                    analyzer["status_meaning"] = "online"
-                    
+                if analyzer["status"] == "abnormal_offline":
+                    analyzer["events"].append({ "value": "sensor is down since %s" % older_time, "type": "down"})
             if newer:
                 event = None
                 
@@ -1334,10 +1326,10 @@ class SensorHeartbeatDetailsAction(SensorsView, HeartbeatDetailsAction):
 def _get_analyzer_status_from_latest_heartbeat(heartbeat_status, heartbeat_time, heartbeat_interval,
                                                error_margin):
     if heartbeat_status == "exiting":
-        return "normal_offline"
+        return "normal_offline", "normal offline"
     if time.time() - int(heartbeat_time) > int(heartbeat_interval) + error_margin:
-        return "abnormal_offline"
-    return "online"
+        return "abnormal_offline", "abnormal offline"
+    return "online", "online"
 
     
 
@@ -1357,10 +1349,11 @@ class SensorListingAction(SensorsView):
             analyzer["heartbeat_listing"] = utils.create_link("main.sensor_heartbeat_listing", parameters)
             analyzer["heartbeat_analyze"] = utils.create_link("main.heartbeat_analyze", parameters)
 
-            analyzer["status"] = _get_analyzer_status_from_latest_heartbeat(analyzer["last_heartbeat_status"],
-                                                                            analyzer["last_heartbeat_time"],
-                                                                            analyzer["last_heartbeat_interval"],
-                                                                            3)
+            analyzer["status"], analyzer["status_meaning"] = \
+                                _get_analyzer_status_from_latest_heartbeat(analyzer["last_heartbeat_status"],
+                                                                           analyzer["last_heartbeat_time"],
+                                                                           analyzer["last_heartbeat_interval"],
+                                                                           3)
 
             analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(analyzer["last_heartbeat_time"])) + \
                                               " %+.2d:%.2d" % utils.get_gmt_offset()
