@@ -21,7 +21,6 @@
 import time
 
 from prewikka import view, User, utils
-from prewikka.views import admin
 
 
 class HeartbeatAnalyzeParameters(view.Parameters):
@@ -42,8 +41,10 @@ def get_analyzer_status_from_latest_heartbeat(heartbeat_status, heartbeat_time,
                                               heartbeat_interval, error_margin):
     if heartbeat_status == "exiting":
         return "normal_offline", "normal offline"
+    
     if time.time() - int(heartbeat_time) > int(heartbeat_interval) + error_margin:
         return "abnormal_offline", "abnormal offline"
+    
     return "online", "online"
 
 
@@ -57,7 +58,6 @@ class SensorListing(view.View):
     def render(self):
         analyzers = [ ]
         
-        self.dataset["admin_enabled"] = bool(self.env.config.admin)
         for analyzer_path in self.env.prelude.getAnalyzerPaths():
             analyzerid = analyzer_path[-1]
             analyzer = self.env.prelude.getAnalyzer(analyzerid)
@@ -65,11 +65,6 @@ class SensorListing(view.View):
             analyzer["alert_listing"] = utils.create_link("sensor_alert_listing", parameters)
             analyzer["heartbeat_listing"] = utils.create_link("sensor_heartbeat_listing", parameters)
             analyzer["heartbeat_analyze"] = utils.create_link("heartbeat_analyze", parameters)
-
-            if self.env.config.admin:
-                analyzer["configure"] = utils.create_link("admin_config_display",
-                                                          { "analyzer_path":
-                                                            admin.analyzer_path_to_str(analyzer_path) })
 
             analyzer["status"], analyzer["status_meaning"] = \
                                 get_analyzer_status_from_latest_heartbeat(analyzer["last_heartbeat_status"],

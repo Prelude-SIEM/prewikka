@@ -19,7 +19,7 @@
 
 
 from prewikka.views import \
-     messagelisting, messagesummary, messagedetails, sensor, admin, \
+     messagelisting, messagesummary, messagedetails, sensor, \
      commands, filter, usermanagement, settings, misc
 
 
@@ -29,7 +29,6 @@ objects = messagelisting.AlertListing(), \
           messagelisting.SensorAlertListing(), \
           messagelisting.SensorHeartbeatListing(), \
           sensor.SensorListing(), sensor.HeartbeatAnalyze(), sensor.SensorMessagesDelete(), \
-          admin.Admin(), \
           messagesummary.AlertSummary(), messagesummary.HeartbeatSummary(), \
           messagedetails.AlertDetails(), messagedetails.HeartbeatDetails(), \
           commands.Whois(), commands.Traceroute(), \
@@ -48,9 +47,7 @@ sections = [("Events", (("Alerts", ["alert_listing"]),
                         ("Heartbeats", ["heartbeat_listing"]),
                         ("Filters", ["alert_filter_load", "alert_filter_save"]))),
             ("Agents", (("Agents", ["sensor_listing", "sensor_messages_delete", "heartbeat_analyze",
-                                    "sensor_alert_listing", "sensor_heartbeat_listing",
-                                    "admin_config_display", "admin_option_change",
-                                    "admin_instance_create", "admin_destroy"]),)),
+                                    "sensor_alert_listing", "sensor_heartbeat_listing" ]),)),
             ("Users", (("Users", ["user_listing", "user_add_form", "user_add", "user_delete",
                                   "user_password_change_form", "user_password_change",
                                   "user_permissions_change_form", "user_permissions_change"]), )),
