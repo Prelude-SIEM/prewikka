@@ -303,12 +303,8 @@ class MessageListing:
 
         return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
 
-    def _createHostField(self, object, value, category, type=None):
+    def _createHostField(self, object, value, type=None):
         field = self._createInlineFilteredField(object, value, type)
-        if category != "unknown":
-            field["category"] = category + ":"
-        else:
-            field["category"] = ""
         field["host_commands"] = [ ]
         
         if not value:
@@ -429,13 +425,7 @@ class AlertListing(MessageListing, view.View):
             if address is None:
                 break
 
-            category = message["alert.%s(0).node.address(%d).category" % (direction, idx)]
-            if category != "unknown":
-                category = ":" + category
-            else:
-                category = ""
-
-            dataset["addresses"].append({ "value": address, "category": category })
+            dataset["addresses"].append({ "value": address })
             idx += 1
 
         if idx > 1:
@@ -451,11 +441,10 @@ class AlertListing(MessageListing, view.View):
         
         if message["alert.%s(0).node.address(0).address" % direction]:
             address = message["alert.%s(0).node.address(0).address" % direction]
-            category = message["alert.%s(0).node.address(0).category" % direction]
             
             dataset["address"] = self._createHostField("alert.%s.node.address.address" % direction,
-                                                       address, category, type=direction)
-            dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction], "category": "unknown" }
+                                                       address, type=direction)
+            dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction] }
         else:
             dataset["address"] = self._createHostField("alert.%s.node.name" % direction,
                                                        message["alert.%s(0).node.name" % direction], "unknown",
