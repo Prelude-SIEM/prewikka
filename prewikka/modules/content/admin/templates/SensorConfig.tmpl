@@ -14,10 +14,10 @@
 		#set $cnt = 0
 		#if $is_instance
 			<form action='?' method='get'>
-			#for $name, $value in $hiddens
+			#for $name, $value in $hiddens.items()
 				<input type='hidden' name='$name' value='$value'/>
 			#end for
-			<input type='hidden' name='action' value='$change_option'/>
+			<input type='hidden' name='content' value='$change_option'/>
 		#end if
 		#for $option in $simple_options
 			<tr class='$row_classes[$cnt%2]'>
@@ -26,10 +26,10 @@
 				<td>
 					#if not $is_instance
 						<form action='?' method='get'>
-						#for $name, $value in $hiddens
+						#for $name, $value in $hiddens.items()
 							<input type='hidden' name='$name' value='$value'/>
 						#end for
-						<input type='hidden' name='action' value='$change_option'/>
+						<input type='hidden' name='content' value='$change_option'/>
 					#end if
 					<input type='hidden' name='paths' value='$option.path'/>
 					#if $option.boolean
@@ -52,10 +52,10 @@
 				
 				#if $option.destroyable
 					<form action='?' method='get'>
-						#for $name, $value in $hiddens
+						#for $name, $value in $hiddens.items()
 							<input type='hidden' name='$name' value='$value'/>
 						#end for
-						<input type='hidden' name='action' value='$destroy'/>
+						<input type='hidden' name='content' value='$destroy'/>
 						<input type='hidden' name='path' value='$option.path'/>
 						<td><input type='submit' value='destroy'/></td>
 					</form>
@@ -93,10 +93,10 @@
 					<td>$instance.name</td>
 					<td><a href='$instance.view'>view</a></td>
 					<form action='?' method='get'>
-						#for $name, $value in $hiddens
+						#for $name, $value in $hiddens.items()
 							<input type='hidden' name='$name' value='$value'/>
 						#end for
-						<input type='hidden' name='action' value='$destroy'/>
+						<input type='hidden' name='content' value='$destroy'/>
 						<input type='hidden' name='path' value='$instance.path'/>
 						<td><input type='submit' value='destroy'/></td>
 					</form>
@@ -107,10 +107,10 @@
 		</tbody>
 		<tfoot>
 			<form action='?' method='get'>
-				#for $name, $value in $hiddens
+				#for $name, $value in $hiddens.items()
 					<input type='hidden' name='$name' value='$value'/>
 				#end for
-				<input type='hidden' name='action' value='$create_instance'/>
+				<input type='hidden' name='content' value='$create_instance'/>
 				<input type='hidden' name='instantiable_name' value='$instantiable.name'/>
 				<tr>
 					<td><input type='text'  name='name'/></td>

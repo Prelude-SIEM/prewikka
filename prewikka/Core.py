@@ -52,24 +52,12 @@ class Environnement:
 class Core:
     def __init__(self):
         self._contents = { }
+        self._content_names = [ ]
         self._config = Config.Config()
         self.env = Environnement(self._config.prelude)
         self._loadModules()
         self._initUserManagement()
         self._initAuth()
-
-##         if self.env.auth and self.env.auth.canLogout():
-##             class LogoutAction(Action.Action):
-##                 def __init__(self, auth):
-##                     Action.Action.__init__(self, "logout")
-##                     self._auth = auth
-                
-##                 def process(self, request):
-##                     self._auth.logout(request)
-
-##             action = LogoutAction(self.env.auth)
-##             self.registerActionGroup(action)
-##             self.interface.registerQuickAccessor("logout", action.slots["process"].path, Action.ActionParameters())
 
     def _initUserManagement(self):
         user_management = UserManagement.UserManagement(self.env)
@@ -81,6 +69,7 @@ class Core:
         self._contents["configuration"] = { "sections": [("Configuration", user_management.default)],
                                             "default_slot": user_management.default,
                                             "slots": slots }
+        self._content_names.append("configuration")
         
     def _initAuth(self):
         if self.env.auth and self.env.auth.canLogout():
@@ -103,6 +92,7 @@ class Core:
 
         for content in config.contents:
             self._contents[content.name] = self._loadModule("content", content.name, content)
+            self._content_names.append(content.name)
 
     def _setupRequest(self, request, parameters):
         request.parameters = parameters
@@ -120,7 +110,8 @@ class Core:
         dataset["prewikka.url.current"] = request.getQueryString()
         
         dataset["interface.sections"] = [ ]
-        for name, content in self._contents.items():
+        for name in self._content_names:
+            content = self._contents[name]
             if content.has_key("sections"):
                 for section, slot in content["sections"]:
                     dataset["interface.sections"].append((section, utils.create_link("%s.%s" % (name, slot))))
