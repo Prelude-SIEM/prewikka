@@ -275,83 +275,76 @@ function ${name}_add_entry(object, value, num) {
  </ul>
 </td>
 
+#for $name, $direction in ("source", $message.source), ("target", $message.target)
 <td>
   <ul id="popup_block">
     <li class="popup_title">
-      #if $message.sservice.value
-        <span>$message.source.value</span>:$message.sservice.value
-	#if $message.sservice_extra.value
-          ($message.sservice_extra.value)
+      #if $direction.service.value
+       <span>$direction.address.value</span>:$direction.service.value
+	#if $direction.service_extra.value
+          ($direction.service_extra.value)
         #end if
       #else
-        <span>$message.source.value</span>
+        <span>$direction.address.value</span>
       #end if
-      #if $message.source_extra.value
-        <br/>($message.source_extra.value)
+      #if $direction.address_extra.value
+        <br/>($direction.address_extra.value)
       #end if
-      #if $message.suser_name.value
-        <br/>user: $message.suser_name.value
-	#if $message.suser_uid.value != None
-	  ($message.suser_uid.value)
-	#end if
+      #if $direction.addresses
+        #set $cnt = 0
+        #if len($direction.addresses) > 1
+          addresses:
+        #else
+          address:
+        #end if
+        #for $address in $direction.addresses
+          #if $cnt > 0
+            ,&nbsp;
+          #end if
+          $address
+          #set $cnt = $cnt + 1
+        #end for
       #end if
-      #if $message.sprocess_name.value
-        <br/>process: $message.sprocess_name.value
-	#if $message.sprocess_pid.value != None
-	  ($message.sprocess_pid.value)
-	#end if
+      #if $direction.users
+        #if len($direction.users) > 1
+          <br/>users:
+        #else
+          <br/>user:
+        #end if
+        #set $cnt = 0
+        #for $user in $direction.users
+          #if $cnt > 0
+            ;&nbsp;
+          #end if
+          $user.user.value
+          #if $user.user_extra.value
+            ($user.user_extra.value)
+          #end if
+          #set $cnt = $cnt + 1
+        #end for
       #end if
-     #if $message.sinterface.value
-        <br/>interface: $message.sinterface.value
+      #if $direction.process.value
+        <br/>process: $direction.process.value
+        #if $direction.process_extra.value != None
+          ($direction.process_extra.value)
+        #end if
+      #end if
+     #if $direction.interface.value
+        <br/>interface: $direction.interface.value
+     #end if
+     #if $direction.empty
+       n/a
      #end if
       <ul>
-        <li><a href="$message.source.inline_filter">Group by source</a></li>
-        #for $name, $link in $message.source.host_commands
+        <li><a href="$direction.address.inline_filter">Group by $name</a></li>
+        #for $name, $link in $direction.address.host_commands
           <li><a href="$link">$name</a></li>
         #end for
       </ul>
     </li>
   </ul>
 </td>
-
-<td>
-  <ul id="popup_block">
-    <li class="popup_title">
-      #if $message.tservice.value
-        <span>$message.target.value</span>:$message.tservice.value
-        #if $message.tservice_extra.value
-          ($message.tservice_extra.value)
-        #end if
-      #else
-        <span>$message.target.value</span>
-      #end if
-      #if $message.target_extra.value
-        <br/>($message.target_extra.value)
-      #end if
-      #if $message.tuser_name.value
-        <br/>user: $message.tuser_name.value
-	#if $message.tuser_uid.value != None
-	  ($message.tuser_uid.value)
-	#end if
-      #end if
-      #if $message.tprocess_name.value
-        <br/>process: $message.tprocess_name.value
-	#if $message.tprocess_pid.value != None
-	  ($message.tprocess_pid.value)
-	#end if
-      #end if
-     #if $message.tinterface.value
-        <br/>interface: $message.tinterface.value
-     #end if
-      <ul>
-        <li><a href="$message.target.inline_filter">Group by target</a></li>
-        #for $name, $link in $message.target.host_commands
-          <li><a href="$link">$name</a></li>
-        #end for
-      </ul>
-    </li>
-  </ul>
-</td>
+#end if
 
 <td>
   <a href='$message.sensor.inline_filter'>$message.sensor.value</a>

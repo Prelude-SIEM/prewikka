@@ -1,4 +1,4 @@
-# Copyright (C) 2004 Nicolas Delon <nicolas@prelude-ids.org>
+# Copyright (C) 2004,2005 Nicolas Delon <nicolas@prelude-ids.org>
 # All Rights Reserved
 #
 # This file is part of the Prelude program.
@@ -275,16 +275,19 @@ class MessageListing:
 
         return { "value": t }
 
-    def _createInlineFilteredField(self, object, value):
+    def _createInlineFilteredField(self, object, value, type=None):
         if not value:
-            return { "value": "n/a", "inline_filter": None }
+            return { "value": None, "inline_filter": None }
 
-        parameters = self.parameters + { object: value }
+        if type:
+            extra = { "%s_object_0" % type: object, "%s_value_0" % type: value }
+        else:
+            extra = { object: value }
 
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, parameters) }
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
 
-    def _createHostField(self, object, value):
-        field = self._createInlineFilteredField(object, value)
+    def _createHostField(self, object, value, type=None):
+        field = self._createInlineFilteredField(object, value, type)
         field["host_commands"] = [ ]
         if not value:
             return field
@@ -304,15 +307,15 @@ class MessageListing:
         self.dataset["messages"] = [ ]
         
         for ident in self._getMessageIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
-            src = self._fetchMessage(ident)
-            dst = {
+            message = self._fetchMessage(ident)
+            dataset = {
                 "summary": self._createMessageLink(ident, self.summary_view),
                 "details": self._createMessageLink(ident, self.details_view),
-                "analyzerid": { "value": src.getAnalyzerID() },
-                "ident": { "value": src.getMessageID() }
+                "analyzerid": { "value": message.getAnalyzerID() },
+                "ident": { "value": message.getMessageID() }
                 }
-            self._setMessage(dst, src)
-            self.dataset["messages"].append(dst)
+            self._setMessage(dataset, message)
+            self.dataset["messages"].append(dataset)
 
     def _setTimezone(self):
         for timezone in "utc", "sensor_localtime", "frontend_localtime":
@@ -387,67 +390,101 @@ class AlertListing(MessageListing, view.View):
     def _fetchMessage(self, ident):
         return self.env.prelude.getAlert(ident)
 
-    def _setMessageSource(self, dst, src):
-        dst["sinterface"] = { "value": src["alert.source(0).interface"] }
-        dst["suser_name"] = { "value": src["alert.source(0).user.user_id(0).name"] }
-        dst["suser_uid"] = { "value": src["alert.source(0).user.user_id(0).number"] }
-        dst["sprocess_name"] = { "value": src["alert.source(0).process.name"] }
-        dst["sprocess_pid"] = { "value": src["alert.source(0).process.pid"] }
+    def _setMessageDirection(self, direction, dataset, message):
+        empty = True
+        
+        def set_main_and_extra_values(dataset, message, name, object_main, object_extra):
+            if message[object_main]:
+                dataset[name] = { "value": message[object_main] }
+                dataset[name + "_extra"] = { "value": message[object_extra] }
+            else:
+                dataset[name] = { "value": message[object_extra] }
+                dataset[name + "_extra"] = { "value": None }
 
-        if src["alert.source(0).service.port"]:
-            dst["sservice"] = { "value": src["alert.source(0).service.port"] }
-            dst["sservice_extra"] = { "value": src["alert.source(0).service.name"] }
-        else:
-            dst["sservice"] = { "value": src["alert.source(0).service.name"] }
-        
-        if src["alert.source(0).node.address(0).address"]:
-            dst["source"] = self._createHostField("alert.source.node.address.address",
-                                                  src["alert.source(0).node.address(0).address"])
-            dst["source_extra"] = { "value": src["alert.source(0).node.name"] }
-        else:
-            dst["source"] = self._createHostField("alert.source.node.name", src["alert.source(0).node.name"])
-            dst["source_extra"] = { "value": None }
-        
-    def _setMessageTarget(self, dst, src):
-        dst["tinterface"] = { "value": src["alert.target(0).interface"] }
-        dst["tuser_name"] = { "value": src["alert.target(0).user.user_id(0).name"] }
-        dst["tuser_uid"] = { "value": src["alert.target(0).user.user_id(0).number"] }
-        dst["tprocess_name"] = { "value": src["alert.target(0).process.name"] }
-        dst["tprocess_pid"] = { "value": src["alert.target(0).process.pid"] }
+            if dataset[name]["value"] != None:
+                empty = False
+            
+        dataset["interface"] = { "value": message["alert.%s(0).interface" % direction] }
 
-        if src["alert.target(0).service.port"]:
-            dst["tservice"] = { "value": src["alert.target(0).service.port"] }
-            dst["tservice_extra"] = { "value": src["alert.target(0).service.name"] }
-        else:
-            dst["tservice"] = { "value": src["alert.target(0).service.name"] }
-            dst["tservice_extra"] = { "value": None }
-        
-        if src["alert.target(0).node.address(0).address"]:
-            dst["target"] = self._createHostField("alert.target.node.address.address",
-                                                  src["alert.target(0).node.address(0).address"])
-            dst["target_extra"] = { "value": src["alert.target(0).node.name"] }
-        else:
-            dst["target"] = self._createHostField("alert.target.node.name", src["alert.target(0).node.name"])
-            dst["target_extra"] = { "value": None }
-        
-    def _setMessageSensor(self, dst, src):
-        dst["sensor_node_name"] = { "value": alert["alert.analyzer.node.name"] }
-        dst["sensor"] = self._createInlineFilteredField("alert.analyzer.name", src["alert.analyzer.name"])
+        dataset["users"] = [ ]
 
-    def _setMessageClassification(self, dst, src):
+        idx = 0
+        while True:
+            if message["alert.%s(0).user.user_id(%d).ident" % (direction, idx)] is None:
+                break
+
+            user = { }
+            dataset["users"].append(user)
+
+            set_main_and_extra_values(user, message, "user",
+                                      "alert.%s(0).user.user_id(%d).name" % (direction, idx),
+                                      "alert.%s(0).user.user_id(%d).number" % (direction, idx))
+            
+            idx += 1
+
+        if idx:
+            empty = False
+
+        dataset["addresses"] = [ ]
+
+        idx = 1
+        while True:
+            if message["alert.%s(0).node.address(%d).address" % (direction, idx)] is None:
+                break
+
+            dataset["addresses"].append({ "value": message["alert.%s(0).node.address(%d).address" %
+                                                           (direction, idx)]})
+            idx += 1
+
+        if idx:
+            empty = False            
+
+        set_main_and_extra_values(dataset, message, "process",
+                                  "alert.%s(0).process.name" % direction,
+                                  "alert.%s(0).process.pid" % direction)
+
+        set_main_and_extra_values(dataset, message, "service",
+                                  "alert.%s(0).service.port" % direction,
+                                  "alert.%s(0).service.name" % direction)
+        
+        if message["alert.%s(0).node.address(0).address" % direction]:
+            dataset["address"] = self._createHostField("alert.%s.node.address.address" % direction,
+                                                       message["alert.%s(0).node.address(0).address" % direction],
+                                                       type=direction)
+            dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction] }
+        else:
+            dataset["address"] = self._createHostField("alert.%s.node.name" % direction,
+                                                       message["alert.%s(0).node.name" % direction],
+                                                       type=direction)
+            dataset["address_extra"] = { "value": None }
+
+        if dataset["address"]["value"] != None:
+            empty = False
+
+        dataset["empty"] = empty
+
+    def _setMessageSource(self, dataset, message):
+        dataset["source"] = { }
+        self._setMessageDirection("source", dataset["source"], message)
+
+    def _setMessageTarget(self, dataset, message):
+        dataset["target"] = { }
+        self._setMessageDirection("target", dataset["target"], message)
+        
+    def _setMessageClassification(self, dataset, message):
         urls = [ ]
         cnt = 0
 
         while True:
-            origin = src["alert.classification.reference(%d).origin" % cnt]
+            origin = message["alert.classification.reference(%d).origin" % cnt]
             if origin is None:
                 break
             
-            name = src["alert.classification.reference(%d).name" % cnt]
+            name = message["alert.classification.reference(%d).name" % cnt]
             if not name:
                 continue
 
-            url = src["alert.classification.reference(%d).url" % cnt]
+            url = message["alert.classification.reference(%d).url" % cnt]
             if not url:
                 continue
             
@@ -456,36 +493,36 @@ class AlertListing(MessageListing, view.View):
             cnt += 1
 
         if urls:
-            dst["classification_references"] = "(" + ", ".join(urls) + ")"
+            dataset["classification_references"] = "(" + ", ".join(urls) + ")"
         else:
-            dst["classification_references"] = ""
+            dataset["classification_references"] = ""
 
-        dst["classification"] = self._createInlineFilteredField("alert.classification.text",
-                                                                src["alert.classification.text"])
-
-    def _setMessageSensor(self, dst, src):
+        dataset["classification"] = self._createInlineFilteredField("alert.classification.text",
+                                                                    message["alert.classification.text"])
+        
+    def _setMessageSensor(self, dataset, message):
         def get_analyzer_names(alert, root):
             analyzerid = alert[root + ".analyzerid"]
             if analyzerid != None:
                 return [ alert[root + ".name"] ] + get_analyzer_names(alert, root + ".analyzer")
             return [ ]
 
-        analyzers = get_analyzer_names(src, "alert.analyzer")
+        analyzers = get_analyzer_names(message, "alert.analyzer")
 
-        dst["sensor"] = self._createInlineFilteredField("alert.analyzer.name", analyzers[0])
-        dst["sensor"]["value"] = "/".join(analyzers[:-1])
+        dataset["sensor"] = self._createInlineFilteredField("alert.analyzer.name", analyzers[0], type="analyzer")
+        dataset["sensor"]["value"] = "/".join(analyzers[:-1])
 
-        dst["sensor_node_name"] = { "value": src["alert.analyzer.node.name"] }
+        dataset["sensor_node_name"] = { "value": message["alert.analyzer.node.name"] }
         
-    def _setMessage(self, dst, src):
-        dst["severity"] = { "value": src.get("alert.assessment.impact.severity", "low") }
-        dst["completion"] = { "value": src["alert.assessment.impact.completion"] }
-        dst["time"] = self._createTimeField(src["alert.create_time"], self.parameters["timezone"])
-        self._setMessageSource(dst, src)
-        self._setMessageTarget(dst, src)
-        self._setMessageSensor(dst, src)
-        self._setMessageClassification(dst, src)
-        self._setMessageSensor(dst, src)
+    def _setMessage(self, dataset, message):
+        dataset["severity"] = { "value": message.get("alert.assessment.impact.severity", "low") }
+        dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
+        dataset["time"] = self._createTimeField(message["alert.create_time"], self.parameters["timezone"])
+        self._setMessageSource(dataset, message)
+        self._setMessageTarget(dataset, message)
+        self._setMessageSensor(dataset, message)
+        self._setMessageClassification(dataset, message)
+        self._setMessageSensor(dataset, message)
 
     def _getFilters(self, storage, login):
         return storage.getAlertFilters(login)
@@ -598,16 +635,16 @@ class HeartbeatListing(MessageListing, view.View):
     def _fetchMessage(self, ident):
         return self.env.prelude.getHeartbeat(ident)
 
-    def _setMessage(self, dst, src):
-        dst["agent"] = self._createInlineFilteredField("heartbeat.analyzer.name",
-                                                       src["heartbeat.analyzer.name"])
-        dst["model"] = self._createInlineFilteredField("heartbeat.analyzer.model",
-                                                       src["heartbeat.analyzer.model"])
-        dst["node_name"] = self._createInlineFilteredField("heartbeat.analyzer.node.name",
-                                                           src["heartbeat.analyzer.node.name"])
-        dst["node_address"] = self._createHostField("heartbeat.analyzer.node.address.address",
-                                                    src["heartbeat.analyzer.node.address(0).address"])
-        dst["time"] = self._createTimeField(src["heartbeat.create_time"], self.parameters["timezone"])
+    def _setMessage(self, dataset, message):
+        dataset["agent"] = self._createInlineFilteredField("heartbeat.analyzer.name",
+                                                           message["heartbeat.analyzer.name"])
+        dataset["model"] = self._createInlineFilteredField("heartbeat.analyzer.model",
+                                                           message["heartbeat.analyzer.model"])
+        dataset["node_name"] = self._createInlineFilteredField("heartbeat.analyzer.node.name",
+                                                               message["heartbeat.analyzer.node.name"])
+        dataset["node_address"] = self._createHostField("heartbeat.analyzer.node.address.address",
+                                                        message["heartbeat.analyzer.node.address(0).address"])
+        dataset["time"] = self._createTimeField(message["heartbeat.create_time"], self.parameters["timezone"])
 
     def _deleteMessage(self, analyzerid, messageid):
         self.env.prelude.deleteHeartbeat(analyzerid, messageid)

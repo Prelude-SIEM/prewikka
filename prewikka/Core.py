@@ -243,7 +243,7 @@ class Core:
     
     def process(self, request):
         self._env.log(Log.EVENT_QUERY, request)
-
+        
         try:
             user = None
             user = self.checkAuth(request)
