@@ -3,6 +3,7 @@ import glob
 from layout import layoutManager
 import config
 from Module import Module
+from Query import Query
 
 class Frontend:
     def __init__(self):

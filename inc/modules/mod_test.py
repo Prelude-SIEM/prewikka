@@ -26,7 +26,16 @@ class Fetch:
 
 
 
+class Empty:
+    def __init__(self, query):
+        pass
+
+    def __str__(self):
+        return ""
+
+
 def load(module):
     module.setName("Test")
     module.registerSection("fetch", Fetch, default=True)
-    module.registerSection("display", Display, visible=False)
+    module.registerSection("display", Display, parent="fetch")
+    module.registerSection("empty", Empty)

@@ -45,7 +45,7 @@ class normalLayout(genericLayout):
             if page == active:
                 menu.setActiveItem(page)
             else:
-                menu.setInactiveItem(page, str(self._query))
+                menu.setInactiveItem(page, module, page)
         
         return str(menu)
 

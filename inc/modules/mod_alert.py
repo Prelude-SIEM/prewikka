@@ -193,20 +193,6 @@ class SectionAlertView:
         return str(tpl)
 
 
-class Main:
-    default_section = SectionAlertList
-    
-    def __init__(self, query):
-        self.query = query
-    
-    def build(self, section):
-        return {
-            "layout":"normal", 
-            "views":{
-                "main": section,
-                }
-            }
-
 def load(module):
-    module.registerSection("Alert list", SectionAlertList)
-    module.registerSection("Alert view", SectionAlertView)
+    module.registerSection("Alert list", SectionAlertList, default=True)
+    module.registerSection("Alert view", SectionAlertView, parent="Alert list")

@@ -6,8 +6,9 @@ class TopMenu(PyTpl.Template):
         self["menu"]["active"].parse()
         self["menu"].parse()
 
-    def setInactiveItem(self, name, query):
+    def setInactiveItem(self, name, module, section):
         self["menu"]["inactive"].NAME = name
-        self["menu"]["inactive"].QUERY = query
+        self["menu"]["inactive"].MODULE = module
+        self["menu"]["inactive"].SECTION = section
         self["menu"]["inactive"].parse()
         self["menu"].parse()

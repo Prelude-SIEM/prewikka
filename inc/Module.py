@@ -49,8 +49,8 @@ class Module:
     def setName(self, name):
         self.name = name
 
-    def registerSection(self, name, class_, default=False, visible=True):
-        self.sections[name] = { "class": class_, "visible": visible }
+    def registerSection(self, name, class_, default=False, parent=None):
+        self.sections[name] = { "class": class_, "parent": parent }
         self.section_names.append(name)
         if default:
             self.default_section_name = name
@@ -74,6 +74,7 @@ class Module:
         views["layout"] = "normal"
         views["views"] = { }
         views["views"]["main"] = section
-        views["views"]["active"] = section_name
-        views["views"]["pages"] = filter(lambda name: self.sections[name]["visible"], self.section_names)
+        views["views"]["active"] = self.sections[section_name]["parent"] or section_name
+        views["views"]["module"] = self.name
+        views["views"]["pages"] = filter(lambda name: not self.sections[name]["parent"], self.section_names)
         return views
