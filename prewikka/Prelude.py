@@ -75,7 +75,7 @@ def convert_idmef_value(value):
         return IDMEFTime(idmef_time_clone(time))
 
     def get_enum(value):
-        return idmef_type_enum_to_string(idmef_value_get_object_type(value), idmef_value_get_enum(value))
+        return idmef_class_enum_to_string(idmef_value_get_class(value), idmef_value_get_enum(value))
 
     try:
         return {
