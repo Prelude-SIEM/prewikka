@@ -18,6 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+import sys
 import time
 
 from preludedb import *
@@ -56,14 +57,32 @@ class DatabaseInvalidFilterError(_DatabaseInvalidError):
 class Database:
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
-        for param in "host", "port", "name", "user", "password":
-            if config.getOptionValue(param):
-                preludedb_sql_settings_set(settings, param, config.getOptionValue(param))
+        for name, default in (("host", "localhost"),
+                               ("port", None),
+                               ("name", "prewikka"),
+                               ("user", "prewikka"),
+                               ("password", "prewikka")):
+            value = config.getOptionValue(name, default)
+            if value:
+                preludedb_sql_settings_set(settings, name, value)
 
-        self._sql = preludedb_sql_new(config.getOptionValue("type", "mysql"), settings)
+        db_type = config.getOptionValue("type", "mysql")
+
+        self._sql = preludedb_sql_new(db_type, settings)
+
         if config.getOptionValue("log"):
             preludedb_sql_enable_query_logging(self._sql, config.getOptionValue("log"))
 
+        try:
+            results = self.query("SELECT version FROM Prewikka_Version")
+        except PreludeDBError:
+            print >> sys.stderr, "create Prewikka database"
+            content = open(db_type + ".sql").read()
+            for query in content.split(";"):
+                query = query.strip()
+                if len(query) > 0:
+                    self.query(query)
+        
     def query(self, query):
         try:
             _table = preludedb_sql_query(self._sql, query)
