@@ -461,10 +461,12 @@ function ${name}_add_entry(object, value, num) {
 #end for
 
 <td>
-  <a href='$message.sensor.inline_filter'>$message.sensor.value</a>
-  #if $message.sensor_node_name.value
-    (on $message.sensor_node_name.value)
-  #end if
+  #for $sensor in $message.sensors
+    <a href='$sensor.name.inline_filter'>$sensor.name.value</a>
+    #if $sensor.node_name.value
+      (on $sensor.node_name.value)
+    #end if
+  #end for
 </td>
 <td>
   #if $message.aggregated

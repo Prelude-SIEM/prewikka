@@ -276,6 +276,10 @@ class ListedHeartbeat(ListedMessage):
 
 class ListedAlert(ListedMessage):
     view_name = "alert_listing"
+
+    def __init__(self, *args, **kwargs):
+        apply(ListedMessage.__init__, (self, ) + args, kwargs)
+        self["sensors"] = [ ]
     
     def createHostField(self, object, value, type=None):
         field = { "value": value }
@@ -427,26 +431,12 @@ class ListedAlert(ListedMessage):
         dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
         self.setMessageClassification(dataset, message)
 
-    def setMessageSensor(self, message):
-        analyzer_names = [ ]
-        index = 0
-        while True:
-            name = message["alert.analyzer(%d).name" % index]
-            if not name:
-                break
-            analyzer_names.append(name)
-            index += 1
-            
-        if len(analyzer_names) > 0:
-            analyzer_name = analyzer_names[-1]
-        else:
-            analyzer_name = "n/a"
-
-        self["sensor"] = self.createInlineFilteredField("alert.analyzer.name", analyzer_name, type="analyzer")
-        self["sensor"]["value"] = "/".join(analyzer_names[1:])
-
-        self["sensor_node_name"] = { "value": message["alert.analyzer(0).node.name"] }
-
+    def addSensor(self, name, node_name):
+        sensor = { }
+        self["sensors"].append(sensor)
+        sensor["name"] = self.createInlineFilteredField("alert.analyzer.name", name, type="analyzer")
+        sensor["node_name"] = { "value": node_name }
+        
     def setMessageTime(self, message):
         self["time"] = self.createTimeField(message["alert.create_time"], self.parameters["timezone"])
 	if (message["alert.analyzer_time"] != None and
@@ -458,10 +448,20 @@ class ListedAlert(ListedMessage):
     def setMessageCommon(self, message):
         self.setMessageSource(message)
         self.setMessageTarget(message)
-        self.setMessageSensor(message)
 
     def setMessage(self, message, ident):
         self.setMessageCommon(message)
+
+        index = 0
+        while True:
+            if not message["alert.analyzer(%d).name" % index]:
+                break
+            analyzer_name = message["alert.analyzer(%d).name" % index]
+            analyzer_node_name = message["alert.analyzer(%d).node.name" % index]
+            index += 1
+            
+        self.addSensor(analyzer_name, analyzer_node_name)
+        
         self.setMessageTime(message)
         self.setMessageInfo(message, ident)
 
@@ -789,11 +789,11 @@ class AlertListing(MessageListing, view.View):
             delete_base_criteria.append(criterion)
         
         results = self.env.idmef_db.getValues(["alert.classification.text/group_by",
-                                              "alert.assessment.impact.severity/group_by",
-                                              "alert.assessment.impact.completion/group_by",
-                                              "count(alert.classification.text)",
-                                              "max(alert.create_time)/order_desc"], criteria,
-                                             limit=self.parameters["limit"], offset=self.parameters["offset"])
+                                               "alert.assessment.impact.severity/group_by",
+                                               "alert.assessment.impact.completion/group_by",
+                                               "count(alert.classification.text)",
+                                               "max(alert.create_time)/order_desc"], criteria,
+                                              limit=self.parameters["limit"], offset=self.parameters["offset"])
 
         for classification, severity, completion, count, ctime in results:
             criteria2 = criteria + [ "alert.classification.text == '%s'" % classification ]
@@ -880,6 +880,12 @@ class AlertListing(MessageListing, view.View):
                 message.setTime(time_min, time_max)
                 message.setMessageCommon(idmef)
                 message.setCriteriaForDeletion(delete_criteria)
+
+                results = self.env.idmef_db.getValues(["alert.analyzer(-1).name/group_by",
+                                                       "alert.analyzer(-1).node.name/group_by"],
+                                                      criteria2)
+                for analyzer_name, analyzer_node_name in results:
+                    message.addSensor(analyzer_name, analyzer_node_name)
 
                 results = self.env.idmef_db.getValues(["alert.classification.text/group_by",
                                                       "alert.assessment.impact.severity/group_by",
