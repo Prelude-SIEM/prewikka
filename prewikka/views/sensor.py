@@ -38,7 +38,7 @@ class HeartbeatAnalyzeParameters(view.Parameters):
 
 class SensorMessagesDelete(SensorListingParameters):
     def register(self):
-        SensorListingParameters.register()
+        SensorListingParameters.register(self)
         self.optional("analyzerid", list, default=[])
         self.optional("alerts", str, default=None)
         self.optional("heartbeats", str, default=None)
@@ -136,8 +136,7 @@ class SensorMessagesDelete(SensorListing):
     def render(self):
         for analyzerid in self.parameters["analyzerid"]:
             if self.parameters.has_key("alerts"):
-                criteria = "alert.analyzer.analyzerid == %d || alert.analyzer.analyzer.analyzerid == %d" % \
-                           (long(analyzerid), long(analyzerid))
+                criteria = "alert.analyzer.analyzerid == %d" % long(analyzerid)
                 for ident in self.env.idmef_db.getAlertIdents(criteria):
                     self.env.idmef_db.deleteAlert(ident)
             if self.parameters.has_key("heartbeats"):
