@@ -1,7 +1,5 @@
 import PyTpl
 from templates import Table
-from templates.modules.mod_alert import NodeDetails
-
 
 class Node:
     ID = 0
