@@ -93,7 +93,7 @@ class Prelude(PreludeDB):
         if criteria:
             criteria = prelude.IDMEFCriteria(criteria)
         
-        return self.get_values(selection, criteria, distinct, limit, offset)
+        return self.get_values(selection, criteria, distinct, limit, offset) or [ ]
 
     def getAnalyzerids(self):
         analyzerids = [ ]

@@ -160,7 +160,7 @@ class Core:
             
             if self.auth and slot != self._login_action:
                 self.auth.check(request)
-                
+
             parameters = slot.parameters()
             try:
                 parameters.populate(arguments)

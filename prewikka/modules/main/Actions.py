@@ -95,19 +95,26 @@ class _MyTime:
 class MessageListing(Action.Action):
     parameters = ActionParameters.MessageListing
     capabilities = [ CAP.CAPABILITY_READ_MESSAGE ]
-    
+
     def _adjustCriteria(self, request, criteria):
         pass
+
+    def getFilter(self, wanted):
+        for name, filter in self.fields:
+            if name == wanted:
+                return filter
+
+        raise Action.ActionParameterInvalidError(wanted)
     
     def process(self, request):
         parameters = request.parameters
         prelude = request.prelude
-        view = self._getView()()
+        view = View(self.view_name)()
         view.setParameters(parameters)
         criteria = [ ]
         
         if parameters.getFilterName() and parameters.getFilterValue():
-            criteria.append("%s == '%s'" % (parameters.getFilterName(), parameters.getFilterValue()))
+            criteria.append("%s == '%s'" % (self.getFilter(parameters.getFilterName()), parameters.getFilterValue()))
         
         if not parameters.getTimelineValue() or not parameters.getTimelineUnit():
             parameters.setTimelineValue(1)
@@ -136,19 +143,27 @@ class MessageListing(Action.Action):
             view.setTimelineNext(end[parameters.getTimelineUnit()] + parameters.getTimelineValue())
             view.setTimelinePrev(end[parameters.getTimelineUnit()] - parameters.getTimelineValue())
         
-        criteria.append(self._createTimeCriteria(start, end))
+        criteria.append(self.time_criteria_format % (str(start), str(end)))
         self._adjustCriteria(request, criteria)
         criteria = " && ".join(criteria)
-        
-        idents = self._getMessageIdents(prelude, criteria)
-        messages = [ ]
-        if idents:
-            for analyzerid, alert_ident in idents:
-                message = self._getMessage(prelude, analyzerid, alert_ident)
-                messages.append(message)
-        
-        self._sortMessages(messages)
 
+        messages = [ ]
+        tmp = { }
+        rows = prelude.getValues(map(lambda x: x[1], self.fields), criteria)
+
+        for row in rows:
+            analyzerid, ident = row[:2]
+            if tmp.has_key((analyzerid, ident)):
+                continue
+
+            message = { }
+            messages.append(message)
+            tmp[(analyzerid, ident)] = message
+            for key, value in zip(map(lambda x: x[0], self.fields), row):
+                message[key] = value
+
+        messages.sort(lambda x, y: int(y["time"]) - int(x["time"]))
+        
         view.setMessages(messages)
         
         return view
@@ -156,38 +171,28 @@ class MessageListing(Action.Action):
 
 
 class AlertListing(MessageListing):
-    def _createTimeCriteria(self, start, end):
-        return "alert.detect_time >= '%s' && alert.detect_time < '%s'" % (str(start), str(end))
-
-    def _getMessageIdents(self, prelude, criteria):
-        return prelude.getAlertIdents(criteria)
-
-    def _getMessage(self, prelude, analyzerid, alert_ident):
-        return prelude.getAlert(analyzerid, alert_ident)
-
-    def _sortMessages(self, alerts):
-        alerts.sort(lambda a1, a2: int(a2["detect_time"]) - int(a1["detect_time"]))
-
-    def _getView(self):
-        return View("AlertListingView")
+    view_name = "AlertListingView"
+    time_criteria_format = "alert.detect_time >= '%s' && alert.detect_time < '%s'"
+    fields = [ ("analyzerid", "alert.analyzer.analyzerid"),
+               ("ident", "alert.ident"),
+               ("severity", "alert.assessment.impact.severity"),
+               ("classification", "alert.classification.name"),
+               ("source", "alert.source.node.address.address"),
+               ("target", "alert.target.node.address.address"),
+               ("sensor", "alert.analyzer.model"),
+               ("time", "alert.detect_time") ]
 
 
 
 class HeartbeatListing(MessageListing):
-    def _createTimeCriteria(self, start, end):
-        return "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'" % (str(start), str(end))
-    
-    def _getMessageIdents(self, prelude, criteria):
-        return prelude.getHeartbeatIdents(criteria)
-    
-    def _getMessage(self, prelude, analyzerid, alert_ident):
-        return prelude.getHeartbeat(analyzerid, alert_ident)
-    
-    def _sortMessages(self, heartbeats):
-        heartbeats.sort(lambda hb1, hb2: int(hb2["create_time"]) - int(hb1["create_time"]))
-        
-    def _getView(self):
-        return View("HeartbeatListingView")
+    view_name = "HeartbeatListingView"
+    time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
+    fields = [ ("analyzerid", "heartbeat.analyzer.analyzerid"),
+               ("ident", "heartbeat.ident"),
+               ("address", "heartbeat.analyzer.node.address.address"),
+               ("name", "heartbeat.analyzer.node.name"),
+               ("type", "heartbeat.analyzer.model"),
+               ("time", "heartbeat.analyzer_time") ]
 
 
 
@@ -317,12 +322,11 @@ class SensorMessageListing:
 
 
 class SensorAlertListing(SensorMessageListing, AlertListing):
+    view_name = "SensorAlertListingView"
+    
     def _adjustCriteria(self, request, criteria):
         criteria.append("alert.analyzer.analyzerid == %d" % request.parameters.getAnalyzerid())
-
-    def _getView(self):
-        return View("SensorAlertListingView")
-
+        
     def process(self, request):
         view = AlertListing.process(self, request)
         view.setAnalyzer(request.prelude.getAnalyzer(request.parameters.getAnalyzerid()))
@@ -343,12 +347,11 @@ class SensorDeleteAlerts(SensorAlertListing):
 
 
 class SensorHeartbeatListing(SensorMessageListing, HeartbeatListing):
+    view_name = "SensorHeartbeatListingView"
+    
     def _adjustCriteria(self, request, criteria):
         criteria.append("heartbeat.analyzer.analyzerid == %d" % request.parameters.getAnalyzerid())
-
-    def _getView(self):
-        return View("SensorHeartbeatListingView")
-
+    
     def process(self, request):
         view = HeartbeatListing.process(self, request)
         view.setAnalyzer(request.prelude.getAnalyzer(request.parameters.getAnalyzerid()))
@@ -395,7 +398,8 @@ class SensorListing(Action.Action):
         view = View("SensorListingView")()
         
         prelude = request.prelude
-        for analyzerid in prelude.getAnalyzerids():
+        analyzerids = prelude.getAnalyzerids()
+        for analyzerid in analyzerids:
             analyzer = prelude.getAnalyzer(analyzerid)
             view.addAnalyzer(analyzer)
             

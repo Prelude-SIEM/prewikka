@@ -89,20 +89,20 @@ class MessageListingDataSet:
         parameters = copy.copy(parameters)
         if parameters.getTimelineEnd():
             del parameters["timeline_end"]
-        self.timeline["current"] = self.createLink(self._getMessageListingAction(), parameters)
+        self.timeline["current"] = self.createLink(Action(self.listing_action), parameters)
         
         self.active_filter = self._parameters.getFilterName()
         if self.active_filter:
             parameters = copy.copy(self._parameters)
             del parameters["filter_name"]
             del parameters["filter_value"]
-            self.remove_active_filter = self.createLink(self._getMessageListingAction(), parameters)
+            self.remove_active_filter = self.createLink(Action(self.listing_action), parameters)
             
     def setTimeline(self, value, unit):
         self.timeline["value"] = value
         self.timeline[unit + "_selected"] = "selected"
         self.timeline["form_hiddens"] = form_hiddens = [ ]
-        form_hiddens.append(("action", self._getMessageListingAction()))
+        form_hiddens.append(("action", Action(self.listing_action)))
         for name in self._parameters.getNames(ignore=("timeline_value", "timeline_unit")):
             form_hiddens.append((name, self._parameters[name]))
         
@@ -115,22 +115,22 @@ class MessageListingDataSet:
     def setTimelinePrev(self, prev):
         parameters = copy.copy(self._parameters)
         parameters.setTimelineEnd(int(prev))
-        self.timeline["prev"] = self.createLink(self._getMessageListingAction(), parameters)
+        self.timeline["prev"] = self.createLink(Action(self.listing_action), parameters)
         
     def setTimelineNext(self, next):
         parameters = copy.copy(self._parameters)
         parameters.setTimelineEnd(int(next))
-        self.timeline["next"] = self.createLink(self._getMessageListingAction(), parameters)
+        self.timeline["next"] = self.createLink(Action(self.listing_action), parameters)
 
-    def _createMessageField(self, value, filter):
+    def _createMessageField(self, name, value):
         if not value:
             return { "value": "n/a", "filter": None }
         
         parameters = copy.copy(self._parameters)
-        parameters.setFilterName(filter)
+        parameters.setFilterName(name)
         parameters.setFilterValue(value)
         
-        return { "value": value, "filter": self.createLink(self._getMessageListingAction(), parameters) }
+        return { "value": value, "filter": self.createLink(Action(self.listing_action), parameters) }
 
     def _createMessageTimeField(self, t):
         if not t:
@@ -144,60 +144,44 @@ class MessageListingDataSet:
 
         return utils.time_to_ymdhms(t)
     
-    def _createMessageLink(self, message, action):
+    def _createMessageLink(self, message, action_name):
         parameters = ActionParameters.Message()
-        parameters.setAnalyzerid(message["analyzer.analyzerid"])
+        parameters.setAnalyzerid(message["analyzerid"])
         parameters.setMessageIdent(message["ident"])
         
-        return self.createLink(action, parameters)
+        return self.createLink(Action(action_name), parameters)
     
     def addMessage(self, message):
         fields = { }
         self.messages.append(fields)
-        fields["summary"] = self._createMessageLink(message, self._getMessageSummaryAction())
-        fields["details"] = self._createMessageLink(message, self._getMessageDetailsAction())
-        fields["ident"] = message["ident"]
-        fields["analyzerid"] = message["analyzer.analyzerid"]
+        fields["summary"] = self._createMessageLink(message, self.summary_action)
+        fields["details"] = self._createMessageLink(message, self.details_action)
+        fields["ident"], fields["analyzerid"] = message["ident"], message["analyzerid"]
         self._addMessageFields(message, fields)
-        
+
     def setMessages(self, messages):
         for message in messages:
             self.addMessage(message)
         self.delete_form_hiddens = [ ]
-        self.delete_form_hiddens.append(("action", self._getDeleteAction()))
+        self.delete_form_hiddens.append(("action", Action(self.delete_action)))
         for name in self._parameters.getNames():
             self.delete_form_hiddens.append((name, self._parameters[name]))
 
 
 
 class AlertListingDataSet(MessageListingDataSet):
-    def _getMessageListingAction(self):
-        return Action("AlertListing")
-
-    def _getDeleteAction(self):
-        return Action("DeleteAlerts")
-
-    def _getMessageSummaryAction(self):
-        return Action("AlertSummary")
-
-    def _getMessageDetailsAction(self):
-        return Action("AlertDetails")
+    listing_action = "AlertListing"
+    delete_action = "DeleteAlerts"
+    summary_action = "AlertSummary"
+    details_action = "AlertDetails"
 
     def _addMessageFields(self, alert, fields):
-        fields["severity"] = alert["alert.assessment.impact.severity"] or "low"
-        
-        fields["classification"] = self._createMessageField(alert["alert.classification(0).name"],
-                                                            "alert.classification.name")
-        
-        fields["source"] = self._createMessageField(alert["alert.source(0).node.address(0).address"],
-                                                    "alert.source.node.address.address")
-        
-        fields["target"] = self._createMessageField(alert["alert.target(0).node.address(0).address"],
-                                                     "alert.target.node.address.address")
-        
-        fields["sensor"] = self._createMessageField(alert["alert.analyzer.model"], "alert.analyzer.model")
-        
-        fields["time"] = self._createMessageTimeField(alert["alert.detect_time"] or alert["alert.create_time"])
+        fields["severity"] = alert["severity"] or "low"
+        for name in "analyzerid", "ident":
+            fields[name] = alert[name]
+        for name in "classification", "source", "target", "sensor":
+            fields[name] = self._createMessageField(name, alert[name])
+        fields["time"] = self._createMessageTimeField(alert["time"])
 
 
 
@@ -207,30 +191,15 @@ def AlertListingView():
 
 
 class HeartbeatListingDataSet(MessageListingDataSet):
-    def _getMessageListingAction(self):
-        return Action("HeartbeatListing")
+    listing_action = "HeartbeatListing"
+    delete_action = "DeleteHeartbeats"
+    summary_action = "HeartbeatSummary"
+    details_action = "HeartbeatDetails"
 
-    def _getDeleteAction(self):
-        return Action("DeleteHeartbeats")
-
-    def _getMessageSummaryAction(self):
-        return Action("HeartbeatSummary")
-
-    def _getMessageDetailsAction(self):
-        return Action("HeartbeatDetails")
-    
     def _addMessageFields(self, heartbeat, fields):
-        fields["analyzerid"] = self._createMessageField(heartbeat["heartbeat.analyzer.analyzerid"],
-                                                        "heartbeat.analyzer.analyzerid")
-        
-        fields["address"] = self._createMessageField(heartbeat["heartbeat.analyzer.node.address(0).address"],
-                                                     "heartbeat.analyzer.node.address.address")
-        
-        fields["name"] = self._createMessageField(heartbeat["heartbeat.analyzer.node.name"], "heartbeat.analyzer.node.name")
-        
-        fields["type"] = self._createMessageField(heartbeat["heartbeat.analyzer.model"], "heartbeat.analyzer.model")
-        
-        fields["time"] = self._createMessageTimeField(heartbeat["heartbeat.create_time"])
+        for name in "analyzerid", "address", "name", "type":
+            fields[name] = self._createMessageField(name, heartbeat[name])
+        fields["time"] = self._createMessageTimeField(heartbeat["time"])
 
 
 
@@ -704,17 +673,10 @@ class SensorMessageListingDataSet:
 
 
 class SensorAlertListingDataSet(SensorMessageListingDataSet, AlertListingDataSet):
-    def _getMessageListingAction(self):
-        return Action("SensorAlertListing")
-
-    def _getDeleteAction(self):
-        return Action("SensorDeleteAlerts")
-
-    def _getMessageSummaryAction(self):
-        return Action("SensorAlertSummary")
-
-    def _getMessageDetailsAction(self):
-        return Action("SensorAlertDetails")
+    listing_action = "SensorAlertListing"
+    delete_action = "SensorDeleteAlerts"
+    summary_action = "SensorAlertSummary"
+    details_action = "SensorAlertDetails"
 
 
 
@@ -724,17 +686,10 @@ def SensorAlertListingView():
 
 
 class SensorHeartbeatListingDataSet(SensorMessageListingDataSet, HeartbeatListingDataSet):
-    def _getMessageListingAction(self):
-        return Action("SensorHeartbeatListing")
-
-    def _getDeleteAction(self):
-        return Action("SensorDeleteHeartbeats")
-
-    def _getMessageSummaryAction(self):
-        return Action("SensorHeartbeatSummary")
-
-    def _getMessageDetailsAction(self):
-        return Action("SensorHeartbeatDetails")
+    listing_action = "SensorHeartbeatListing"
+    delete_action = "SensorDeleteHeartbeats"
+    summary_action = "SensorHeartbeatSummary"
+    details_action = "SensorHeartbeatDetails"
 
 
 
