@@ -99,7 +99,7 @@ class MessageListingDelete(MessageListing, Delete):
     def register(self):
         MessageListing.register(self)
         Delete.register(self)
-    
+
 
 
 class SensorMessageListing(MessageListing):

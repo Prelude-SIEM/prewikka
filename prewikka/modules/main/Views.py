@@ -279,8 +279,8 @@ class HeartbeatsAnalyzeView(HeartbeatsAnalyzeTab):
             hours = delta / 3600
             mins = (delta - hours * 3600) / 60
             secs = delta % 60
-            return "Sensor was restarted prematurely on %s (after %02d:%02d:%02d %d)" % \
-                   (utils.time_to_ymdhms(int(error["date"])), hours, mins, secs, delta)
+            return "Sensor was restarted prematurely on %s (after %02d:%02d:%02d)" % \
+                   (utils.time_to_ymdhms(int(error["date"])), hours, mins, secs)
         # later
         return "Sensor went down after %s and went back online on %s" % (str(error["after"]), str(error["back"]))
     
