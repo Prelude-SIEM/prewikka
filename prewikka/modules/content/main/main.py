@@ -1022,7 +1022,7 @@ class HeartbeatTracerouteAction(HostCommandAction, HeartbeatsView):
 
 class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
     def __init__(self, config):
-        self._heartbeat_count = config.getOptionValue("heartbeat_count", 48)
+        self._heartbeat_count = config.getOptionValue("heartbeat_count", 10)
         self._heartbeat_error_margin = config.getOptionValue("heartbeat_error_margin", 3)
     
     def _getAnalyzer(self, dataset, prelude, analyzerid):
@@ -1065,7 +1065,7 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
                     if older_status == "exiting":
                         event = "normal sensor start at %s" % str(newer_time)
                     else:
-                        event = "abnormal sensor restart at %s" % str(newer_time)
+                        event = "unexpected sensor restart at %s" % str(newer_time)
 
                 if newer_status == "running":
                     if abs(int(newer_time) - int(older_time) - int(older_interval)) > self._heartbeat_error_margin:
