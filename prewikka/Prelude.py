@@ -193,7 +193,7 @@ class Prelude:
             criteria = " && ".join(criteria)
         
         if criteria:
-            criteria = idmef_criteria_new_string(criteria)
+            criteria = idmef_criteria_new_from_string(criteria)
 
         idents = [ ]
         
@@ -253,7 +253,7 @@ class Prelude:
             criteria = " && ".join(criteria)
         
         if criteria:
-            criteria = idmef_criteria_new_string(criteria)
+            criteria = idmef_criteria_new_from_string(criteria)
 
         my_selection = preludedb_path_selection_new()
         for selected in selection:
