@@ -1,0 +1,40 @@
+#extends prewikka.templates.TopLayout
+
+#def body_class()
+classic_body
+#end def
+
+#block toplayout_content
+<div id="topmenu">
+	<ul>
+		#for $item in $topmenu_items
+			#if $item.type == 'active'
+				#set $class_ = 'topmenu_item_active'
+			#else
+				#set $class_ = 'topmenu_item_inactive'
+			#end if
+		<li class='$class_'><a href="$item.link">$item.name</a></li>
+		#end for
+	</ul>
+	<ul>
+		#for $item in $topmenu_quick_accessors
+			<li class='topmenu_item_special'><a href="$item.link">$item.name</a></li>
+		#end for
+	</ul>
+</div>
+	
+<div id="menu">
+	#for $item in $menu_items
+		#if $item.type == 'active'
+			#set $class_ = 'menu_item_active'
+			#set $name = $item.name
+		#else
+			#set $class_ = 'menu_item_inactive'
+			#set $name = "<a href='%s'>%s</a>" % ($item.link, $item.name)
+		#end if
+	<p class='$class_'>$name</p>
+	#end for
+</div>
+		
+<div id='main'>$main_content</div>
+#end block toplayout_content

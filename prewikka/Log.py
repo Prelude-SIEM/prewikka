@@ -70,13 +70,13 @@ class Log:
             apply(backend.event, (event, ) + args, kwargs)
 
     def debug(self, message):
-        self.event(EVENT_DEBUG, message)
+        self(EVENT_DEBUG, message)
 
     def info(self, message):
-        self.event(EVENT_INFO, message)
+        self(EVENT_INFO, message)
 
     def error(self, message):
-        self.event(EVENT_ERROR, message)
+        self(EVENT_ERROR, message)
 
 
 

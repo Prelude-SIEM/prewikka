@@ -5,7 +5,7 @@ import random
 import md5
 
 from prewikka import Log, Action, DataSet
-from prewikka.templates import LoginPasswordForm, PropertiesChange
+from prewikka.templates import LoginPasswordForm, PropertiesChangeForm
 from prewikka.templates import UserListing
 
 
@@ -167,11 +167,11 @@ class UserListingView(UsersDataSet, UserListing.UserListing):
 
 
 
-class UserAddForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChange.PropertiesChange):
+class UserAddForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
     def __init__(self, action):
         UsersDataSet.__init__(self)
         DataSet.PropertiesChangeDataSet.__init__(self, "add", action)
-        PropertiesChange.PropertiesChange.__init__(self)
+        PropertiesChangeForm.PropertiesChangeForm.__init__(self)
         self.addTextProperty("Login", "login")
         self.addPasswordProperty("Password", "password1")
         self.addPasswordProperty("Password confirmation", "password2")
@@ -180,22 +180,22 @@ class UserAddForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChang
 
 
 
-class ChangePasswordForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChange.PropertiesChange):
+class ChangePasswordForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
     def __init__(self, id, action):
         UsersDataSet.__init__(self)
         DataSet.PropertiesChangeDataSet.__init__(self, "change", action)
-        PropertiesChange.PropertiesChange.__init__(self)
+        PropertiesChangeForm.PropertiesChangeForm.__init__(self)
         self.addHidden("id", id)
         self.addPasswordProperty("Password", "password1")
         self.addPasswordProperty("Password confirmation", "password2")
 
 
 
-class ChangeCapabilitiesForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChange.PropertiesChange):
+class ChangeCapabilitiesForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
     def __init__(self, user, action):
         UsersDataSet.__init__(self)
         DataSet.PropertiesChangeDataSet.__init__(self, "change", action)
-        PropertiesChange.PropertiesChange.__init__(self)
+        PropertiesChangeForm.PropertiesChangeForm.__init__(self)
         self.addHidden("id", user.getID())
         for cap in CAPABILITIES:
             self.addBooleanProperty(cap, cap, user.hasCapability(cap))

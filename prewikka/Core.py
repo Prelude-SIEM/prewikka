@@ -67,7 +67,7 @@ class Core:
         
     def process(self, request):
         self.log(Log.EVENT_QUERY, request, request.getQueryString())
-
+        
         request.log = self.log
         request.prelude = self.prelude
         request.action_engine = self.action_engine
