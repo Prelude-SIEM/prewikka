@@ -186,5 +186,6 @@ class SectionAlertView:
 
 
 def load(module):
+    module.setName("Alert")
     module.registerSection("Alert list", SectionAlertList, default=True)
     module.registerSection("Alert view", SectionAlertView, parent="Alert list")

@@ -38,16 +38,19 @@ from Query import Query
 sys.path.append("inc/modules")
 
 class Module:
-    def __init__(self, mod_name):
-        self.name = mod_name[4:]
+    def __init__(self, name):
+        self.name = name
         self.sections = { }
         self.section_names = [ ]
         self.default_section_name = None
-        module = __import__(mod_name)
+        module = __import__(self.name)
         module.load(self)
 
     def setName(self, name):
         self.name = name
+
+    def getName(self):
+        return self.name
 
     def registerSection(self, name, class_, default=False, parent=None):
         self.sections[name] = { "class": class_, "parent": parent }
@@ -60,8 +63,6 @@ class Module:
             section_name = query["section"]
         except KeyError:
             section_name = self.default_section_name
-
-        sys.stderr.write("### section name: %s\n" % section_name)
 
         try:
             section_query = query[section_name]

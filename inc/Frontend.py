@@ -18,18 +18,18 @@ class Frontend:
     
     def build(self, query):
         try:
-            modname = query["mod"]
+            mod_name = query["mod"]
         except KeyError:
-            modname = "alert"
+            mod_name = "mod_alert"
 
-        mod = self.modules["mod_" + modname]
+        mod = self.modules[mod_name]
         views = mod.build(query)
         
         if "headers" not in views:
             views['headers'] = ["Content-Type: text/html"]
         
-        views['views']['modules'] = config.config['modules']
-        views['views']['module'] = modname
+        views['views']['modules'] = map(lambda name: (name, self.modules[name].getName()), self.module_names)
+        views['views']['module'] = mod_name
         views['views']["software"] = config.config['software']
         views['views']['place'] = config.config['company']
         views['views']['title'] = config.config['title']
