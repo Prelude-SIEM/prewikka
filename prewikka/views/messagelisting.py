@@ -129,10 +129,10 @@ class AlertListingParameters(MessageListingParameters):
 
     def register(self):
         MessageListingParameters.register(self)
-        self.optional("groupby_source", list, [ ])
-        self.optional("groupby_source_values", list, [ ])
-        self.optional("groupby_target", list, [ ])
-        self.optional("groupby_target_values", list, [ ])
+        self.optional("aggregated_source", list, [ "alert.source.node.address.address" ])
+        self.optional("aggregated_source_values", list, [ ])
+        self.optional("aggregated_target", list, [ "alert.target.node.address.address" ])
+        self.optional("aggregated_target_values", list, [ ])
         self.optional("filter", str)
         self.optional("alert.classification.text", list, [ ])
         self.optional("alert.assessment.impact.severity", list, [ ])
@@ -162,6 +162,13 @@ class AlertListingParameters(MessageListingParameters):
                     self[column].append((object, self["%s_value_%s" % (column, num)]))
                 except KeyError:
                     pass # ignore empty inputs
+
+            for category in "source", "target":
+                i = 0
+                for path in self["aggregated_%s" % category]:
+                    if path == "none":
+                        del self["aggregated_%s" % category][i]
+                    i += 1
 
 
 
@@ -259,11 +266,11 @@ class MessageListing:
         else:
             self.dataset["nav.next"] = None
 
-    def _createTimeField(self, t, timezone):
+    def _createTimeField(self, t):
         if t:
-            if timezone == "utc":
+            if self.parameters["timezone"] == "utc":
                 t = time.gmtime(t)
-            elif timezone == "sensor_localtime":
+            elif self.parameters["timezone"] == "sensor_localtime":
                 t = time.gmtime(int(t) + t.gmt_offset)
             else: # timezone == "frontend_localtime"
                 t = time.localtime(t)
@@ -318,11 +325,6 @@ class MessageListing:
         return name, self.parameters.get(name)
 
     def _setMessages(self, criteria):
-        if criteria:
-            criteria = " && ".join(criteria)
-        else:
-            criteria = None
-
         for ident in self._getMessageIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
             message = self._fetchMessage(ident)
             dataset = {
@@ -346,36 +348,6 @@ class MessageListing:
 
         for analyzerid, messageid in self.parameters["idents"]:
             self._deleteMessage(analyzerid, messageid)
-    
-    def render(self, criteria=None):
-        self._deleteMessages()
-
-        self.dataset["delete_enabled"] = True
-        
-        start, end = self._getTimelineRange()
-
-        if criteria is None:
-            criteria = [ ]
-        
-        criteria.append(self.time_criteria_format % (str(start), str(end)))
-
-        self._setInlineFilter()
-        self._setTimeline(start, end)
-        self._setNavPrev(self.parameters["offset"])
-
-        count = self._countMessages(criteria and " && ".join(criteria) or None)
-
-        self.dataset["messages"] = [ ]
-        self._setMessages(criteria)
-
-        self.dataset["current_view"] = self.view_name
-        self.dataset["nav.from"] = self.parameters["offset"] + 1
-        self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
-        self.dataset["limit"] = self.parameters["limit"]
-        self.dataset["total"] = count
-
-        self._setNavNext(self.parameters["offset"], count)
-        self._setTimezone()
 
 
 
@@ -390,8 +362,6 @@ class AlertListing(MessageListing, view.View):
     analyzerid_object = "alert.analyzer.analyzerid"
     summary_view = "alert_summary"
     details_view = "alert_details"
-    time_criteria_format = "alert.create_time >= '%s' && alert.create_time < '%s'"
-    message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.messageid == '%d'"
 
     def _getMessageIdents(self, criteria, limit, offset):
         return self.env.prelude.getAlertIdents(criteria, limit, offset)
@@ -541,19 +511,23 @@ class AlertListing(MessageListing, view.View):
         dataset["sensor_node_name"] = { "value": message["alert.analyzer.node.name"] }
         
     def _setMessageCommon(self, dataset, message):
-        dataset["time"] = self._createTimeField(message["alert.create_time"], self.parameters["timezone"])
-	if (message["alert.analyzer_time"] != None and
-	    abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
-	    dataset["analyzer_time"] = self._createTimeField(message["alert.analyzer_time"], self.parameters["timezone"])
-	else:
-	    dataset["analyzer_time"] = { "value": None }
 
         self._setMessageSource(dataset, message)
         self._setMessageTarget(dataset, message)
         self._setMessageSensor(dataset, message)
 
+    def _setMessageTime(self, dataset, message):
+        dataset["time"] = self._createTimeField(message["alert.create_time"])
+	if (message["alert.analyzer_time"] != None and
+	    abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
+	    dataset["analyzer_time"] = self._createTimeField(message["alert.analyzer_time"])
+	else:
+	    dataset["analyzer_time"] = { "value": None }
+
     def _setMessage(self, dataset, message):
+        dataset["aggregated"] = False
         self._setMessageCommon(dataset, message)
+        self._setMessageTime(dataset, message)
         self._setMessageInfo(dataset, message)
     
     def _getFilters(self, storage, login):
@@ -629,70 +603,81 @@ class AlertListing(MessageListing, view.View):
         self._applyCheckboxFilters(criteria, "target")
         self._applyCheckboxFilters(criteria, "analyzer")
 
-    def _setMessages(self, criteria):
-        self.dataset["groupby_source"] = self.parameters["groupby_source"]
-        self.dataset["groupby_source_values"] = self.parameters["groupby_source_values"]
-        self.dataset["groupby_target"] = self.parameters["groupby_target"]
-        self.dataset["groupby_target_values"] = self.parameters["groupby_target_values"]
+    def _setAggregatedMessages(self, criteria):
+        aggregated_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
+        
+        selection = [ "%s/group_by" % path for path in aggregated_on ] + \
+                    [ "max(alert.create_time)/order_desc", "min(alert.create_time)", "count(alert.messageid)" ]
+        
+        results = self.env.prelude.getValues(selection, criteria)
 
-        groupby = self.parameters["groupby_source"] + self.parameters["groupby_target"]
-        groupby_values = self.parameters["groupby_source_values"] + self.parameters["groupby_target_values"]
-        
-        self.dataset["delete_enabled"] = bool(groupby_values or not groupby)
-        
-        if groupby_values:
-            criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(groupby, groupby_values) ]
-            MessageListing._setMessages(self, criteria2)
-        
-        elif not groupby:
-            MessageListing._setMessages(self, criteria)
+        for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
+            aggregated_source_values = values[:len(self.parameters["aggregated_source"])]
+            aggregated_target_values = values[len(self.parameters["aggregated_source"]):-3]
+            time_max, time_min, count = values[-3:]
             
+            criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(aggregated_on, values[:-3]) ]
+
+            for ident in self.env.prelude.getAlertIdents(criteria2, limit=1):
+                message = self._fetchMessage(ident)
+                dataset = {
+                    "aggregated": True,
+                    "count": values[-1],
+                    "expand": utils.create_link("alert_listing",
+                                                self.parameters +
+                                                { "aggregated_source_values": aggregated_source_values,
+                                                  "aggregated_target_values": aggregated_target_values })
+                    }
+                self.dataset["messages"].append(dataset)
+                
+                self._setMessageCommon(dataset, message)
+
+                dataset["infos"] = [ ]
+
+                dataset["time_max"] = self._createTimeField(time_max)
+                dataset["time_min"] = self._createTimeField(time_min)
+
+                for classification, severity, completion, count in \
+                        self.env.prelude.getValues(["alert.classification.text/group_by",
+                                                    "alert.assessment.impact.severity/group_by",
+                                                    "alert.assessment.impact.completion/group_by",
+                                                    "count(alert.messageid)"], criteria2):
+                    classification = self._createInlineFilteredField("alert.classification.text", classification)
+                    dataset["infos"].append({ "count": count,
+                                              "classification": classification,
+                                              "classification_references": "",
+                                              "severity": { "value": severity or "low" },
+                                              "completion": { "value": completion } })
+
+        return len(results)        
+
+    def _setMessages(self, criteria):
+        self.dataset["aggregated_source"] = self.parameters["aggregated_source"] or [ "none" ]
+        self.dataset["aggregated_source_values"] = self.parameters["aggregated_source_values"]
+        self.dataset["aggregated_target"] = self.parameters["aggregated_target"] or [ "none" ]
+        self.dataset["aggregated_target_values"] = self.parameters["aggregated_target_values"]
+
+        aggregate_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
+        aggregated_values = self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]
+        
+        if aggregated_values:
+            criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(aggregate_on, aggregated_values) ]
+            self.dataset["delete_enabled"] = True
+            MessageListing._setMessages(self, criteria2)
+            return self.env.prelude.countAlerts(criteria2)
+        elif not aggregate_on:
+            self.dataset["delete_enabled"] = True
+            MessageListing._setMessages(self, criteria)
+            return self.env.prelude.countAlerts(criteria)
         else:
-            selection = [ "%s/group_by" % p for p in groupby ] + \
-                        [ "max(alert.create_time)/order_desc", "count(alert.messageid)" ]
-
-            results = self.env.prelude.getValues(selection, criteria and " && ".join(criteria) or None,
-                                                 limit=self.parameters["limit"], offset=self.parameters["offset"])
-
-            for values in results:
-                criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(groupby, values[:-2]) ]
-
-                groupby_source_len = len(self.parameters["groupby_source"])
-                groupby_target_len = len(self.parameters["groupby_target"])
-                groupby_source_values = values[0:groupby_source_len]
-                groupby_target_values = values[groupby_source_len:groupby_target_len]
-
-                for ident in self.env.prelude.getAlertIdents(" && ".join(criteria2), limit=1):
-                    message = self._fetchMessage(ident)
-                    dataset = {
-                        "count": values[-1],
-                        "expand": utils.create_link("alert_listing",
-                                                    self.parameters +
-                                                    { "groupby_source_values": groupby_source_values,
-                                                      "groupby_target_values": groupby_target_values })
-                        }
-                    self._setMessageCommon(dataset, message)
-                    self.dataset["messages"].append(dataset)
-
-                    dataset["infos"] = [ ]
-
-                    for classification, severity, completion, count in \
-                            self.env.prelude.getValues(["alert.classification.text/group_by",
-                                                        "alert.assessment.impact.severity/group_by",
-                                                        "alert.assessment.impact.completion/group_by",
-                                                        "count(alert.messageid)"], " && ".join(criteria2)):
-                        classification = self._createInlineFilteredField("alert.classification.text", classification)
-                        dataset["infos"].append({ "count": count,
-                                                  "classification": classification,
-                                                  "classification_references": "",
-                                                  "severity": { "value": severity or "low" },
-                                                  "completion": { "value": completion } })
-                    
+            self.dataset["delete_enabled"] = False
+            return self._setAggregatedMessages(criteria)            
+            
     def _setDatasetConstants(self):
-        self.dataset["groupby_source"] = [ ]
-        self.dataset["available_groupbys"] = { }
+        self.dataset["available_aggregations"] = { }
         for category in "source", "target":
-            tmp = (("address", "alert.%s.node.address.address" % category),
+            tmp = (("", "none"),
+                   ("address", "alert.%s.node.address.address" % category),
                    ("name", "alert.%s.node.name" % category),
                    ("user", "alert.%s.user.user_id.name" % category),
                    ("process", "alert.%s.process.name" % category),
@@ -700,23 +685,44 @@ class AlertListing(MessageListing, view.View):
                    ("port", "alert.%s.service.port" % category),
                    ("name", "alert.%s.node.name" % category),
                    ("interface", "alert.%s.interface" % category))
-            self.dataset["available_groupbys"][category] = tmp
+            self.dataset["available_aggregations"][category] = tmp
                     
     def render(self):
-        criteria = [ ]
-
+        self._deleteMessages()
+        
         self._setDatasetConstants()
+        self.dataset["filters"] = self.env.storage.getAlertFilters(self.user.login)
+        self.dataset["current_filter"] = self.parameters.get("filter", "")
+        
+        criteria = [ ]
         
         if self.parameters.has_key("filter"):
             filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter"])
             criteria.append("(%s)" % str(filter))
 
         self._applyFilters(criteria)
-
-        MessageListing.render(self, criteria)
         
-        self.dataset["filters"] = self.env.storage.getAlertFilters(self.user.login)
-        self.dataset["current_filter"] = self.parameters.get("filter", "")
+        start, end = self._getTimelineRange()
+        
+        criteria.append("alert.create_time >= '%s' && alert.create_time < '%s'" % (str(start), str(end)))
+
+        self._setInlineFilter()
+        self._setTimeline(start, end)
+        self._setNavPrev(self.parameters["offset"])
+
+        self.dataset["messages"] = [ ]
+        total = self._setMessages(criteria)
+
+        self.dataset["hidden_parameters"] = [ [ "current_view", self.view_name ] ]
+        if self.parameters.has_key("timeline_end"):
+            self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
+        self.dataset["nav.from"] = self.parameters["offset"] + 1
+        self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
+        self.dataset["limit"] = self.parameters["limit"]
+        self.dataset["total"] = total
+
+        self._setNavNext(self.parameters["offset"], total)
+        self._setTimezone()
 
 
 
@@ -730,8 +736,6 @@ class HeartbeatListing(MessageListing, view.View):
     filters = { }
     summary_view = "heartbeat_summary"
     details_view = "heartbeat_details"
-    time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
-    message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.messageid == '%d'"
 
     def _getMessageIdents(self, criteria, limit, offset):
         return self.env.prelude.getHeartbeatIdents(criteria, limit, offset)
@@ -751,10 +755,39 @@ class HeartbeatListing(MessageListing, view.View):
                                                                message["heartbeat.analyzer.node.name"])
         dataset["node_address"] = self._createHostField("heartbeat.analyzer.node.address.address",
                                                         message["heartbeat.analyzer.node.address(0).address"])
-        dataset["time"] = self._createTimeField(message["heartbeat.create_time"], self.parameters["timezone"])
+        dataset["time"] = self._createTimeField(message["heartbeat.create_time"])
 
     def _deleteMessage(self, analyzerid, messageid):
         self.env.prelude.deleteHeartbeat(analyzerid, messageid)
+
+    def render(self):
+        self._deleteMessages()
+
+        self.dataset["delete_enabled"] = True
+        
+        start, end = self._getTimelineRange()
+        
+        criteria = [ "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'" % (str(start), str(end)) ]
+
+        self._setInlineFilter()
+        self._setTimeline(start, end)
+        self._setNavPrev(self.parameters["offset"])
+
+        count = self.env.prelude.countHeartbeats(criteria and " && ".join(criteria) or None)
+
+        self.dataset["messages"] = [ ]
+        self._setMessages(criteria)
+
+        self.dataset["hidden_parameters"] = [ [ "current_view", self.view_name ] ]
+        if self.parameters.has_key("timeline_end"):
+            self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
+        self.dataset["nav.from"] = self.parameters["offset"] + 1
+        self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
+        self.dataset["limit"] = self.parameters["limit"]
+        self.dataset["total"] = count
+
+        self._setNavNext(self.parameters["offset"], count)
+        self._setTimezone()
 
 
 

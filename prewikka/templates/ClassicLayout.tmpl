@@ -28,12 +28,10 @@ classic_body
        #end if
 </div>
 
-#block layout_start_hook
-#end block
+#def layout_start_hook
+#end def
 $layout_start_hook
 
-<form action="?" method="get">
-	
 <div id="menu">
 	#for $name, $link in $interface.sections
 		#if $name == $interface.active_section
@@ -51,8 +49,8 @@ $layout_start_hook
 		
 <div id='main'>$main_content</div>
 
-#block layout_end_hook
-#end block
+#def layout_end_hook
+#end def
 $layout_end_hook
 
 #end block toplayout_content

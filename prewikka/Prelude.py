@@ -118,6 +118,9 @@ class Prelude(PreludeDB):
                            log=config.getOptionValue("log", None))
 
     def getAlertIdents(self, criteria=None, limit=-1, offset=-1):
+        if type(criteria) is list:
+            criteria = " && ".join(criteria)
+        
         if criteria:
             criteria = prelude.IDMEFCriteria(criteria)
         return self.get_alert_idents(criteria, limit, offset) or [ ]
@@ -155,6 +158,9 @@ class Prelude(PreludeDB):
         return self.delete_heartbeat(ident)
 
     def getValues(self, selection, criteria=None, distinct=0, limit=-1, offset=-1):
+        if type(criteria) is list:
+            criteria = " && ".join(criteria)
+        
         if criteria:
             criteria = prelude.IDMEFCriteria(criteria)
         

@@ -1,15 +1,17 @@
 #extends prewikka.templates.ClassicLayout
 
-#block layout_hook_start
+#def layout_start_hook
 <form>
-<input type="hidden" name="view" value="$current_view"/>
-#end block
+#for $name, $value in $hidden_parameters
+  <input type="hidden" name="$name" value="$value"/>
+#end for
+#end def
 
 
 
-#block layout_hook_end
+#def layout_end_hook
 </form>
-#end block
+#end def
 
 
 
@@ -48,7 +50,6 @@ $message_listing_header
 
 
 #block menu_extra_content
-<input type="hidden" name="view" value="$current_view"/>
 <table id="timeline">
   #def timeline_extra_content
   #end def
