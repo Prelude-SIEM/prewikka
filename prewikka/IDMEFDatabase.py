@@ -295,7 +295,7 @@ class IDMEFDatabase:
     def countHeartbeats(self, criteria=None):
         return self._countMessages("heartbeat", criteria)
 
-    def getAnalyzerids(self, criteria):
+    def getAnalyzerids(self, criteria=None):
         analyzerids = [ ]
         rows = self.getValues([ "heartbeat.analyzer(-1).analyzerid/group_by" ], criteria)
         for row in rows:
