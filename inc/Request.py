@@ -1,4 +1,6 @@
 import sys
+
+import copy
 import urllib
 
 class Error(Exception):
@@ -43,18 +45,21 @@ class Request(dict):
             raise AlreadyRegisteredFieldError(name)
         self._fields[name] = { "type": type, "hidden": hidden }
 
-    def __setattr__(self, name, value):
-        if name == "_fields" or not self._fields.has_key(name):
-            dict.__setattr__(self, name, value)
-            return
-
+    def __setitem__(self, name, value):
         type = self._fields[name]["type"]
 
         try:
             value = type(value)
         except ValueError:
             raise InvalidFieldTypeError(name, type)
+
+        dict.__setitem__(self, name, value)
         
+    def __setattr__(self, name, value):
+        if name == "_fields" or not self._fields.has_key(name):
+            dict.__setattr__(self, name, value)
+            return
+
         self[name] = value
 
     def __getattribute__(self, name):
@@ -69,6 +74,14 @@ class Request(dict):
 
     def getHiddens(self):
         return filter(lambda name: self._fields[name]["hidden"], self._fields.keys())
+
+    def __copy__(self):
+        request = Request()
+        request._fields = copy.copy(self._fields)
+        for key, value in self.items():
+            request[key] = value
+        
+        return request
 
     def __str__(self):
         return urllib.urlencode(self)

@@ -1,4 +1,5 @@
 import sys
+import copy
 import prelude
 import time
 import util
@@ -10,6 +11,61 @@ import interface
 import core
 
 
+class MyTime:
+    def __init__(self, t=None):
+        self._t = t or time.time()
+        self._index = 5 # second index
+
+    def __getitem__(self, key):
+        try:
+            self._index = [ "year", "month", "day", "hour", "min", "sec" ].index(key)
+        except ValueError:
+            raise KeyError
+        
+        return self
+
+    def round(self, unit):
+        t = list(time.localtime(self._t))
+        if unit != "sec":
+            t[5] = 0
+            if unit != "min":
+                t[4] = 0
+                if unit != "hour":
+                    t[3] = 0
+                    if unit != "day":
+                        t[2] = 1
+                        if unit != "month":
+                            t[1] = 1
+                        else:
+                            t[1] += 1
+                    else:
+                        t[2] += 1
+                else:
+                    t[3] += 1
+            else:
+                t[4] += 1
+        else:
+            t[5] += 1
+        self._t = time.mktime(t)                
+
+    def __add__(self, value):
+        t = time.localtime(self._t)
+        t = list(t)
+        t[self._index] += value
+        t = time.mktime(t)
+        return MyTime(t)
+
+    def __sub__(self, value):
+        return self + (-value)
+
+    def __str__(self):
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self._t))
+
+    def __int__(self):
+        return self._t
+
+    
+        
 class ModuleInterface(interface.NormalInterface):
     def init(self):
         interface.NormalInterface.init(self)
@@ -38,9 +94,7 @@ class ListInterface(ModuleInterface):
         
         value = alert[field]
         if value:
-            request = ListRequest()
-            request.module = "Alerts"
-            request.action = "list"
+            request = self._request
             request.filter_name = filter_name
             request.filter_value = value
             field = self._createLink(request, value, class_)
@@ -62,14 +116,49 @@ class ListInterface(ModuleInterface):
         row.append(self._createAlertLink(alert, "details"))
 
         table.addRow(row)
+
+    def _buildEdition(self, template):
+        template.addHidden("module", "Alerts")
+        template.addHidden("action", "list")
+        if self._request.timeline_end:
+            template.addHidden("timeline_end", self._request.timeline_end)
+        
+        template.setTimelineStart(str(self._data["start"]))
+        template.setTimelineEnd(str(self._data["end"]))
+
+        request = copy.copy(self._request)
+
+        if request.timeline_end:
+            del request["timeline_end"]
+        template.setCurrentQuery(str(request))
+
+        request = copy.copy(self._request)
+        
+        request.timeline_end = int(self._data["end"][self._request.timeline_unit] + self._request.timeline_value)
+        template.setNextQuery(str(request))
+
+        request.timeline_end = int(self._data["end"][self._request.timeline_unit] - self._request.timeline_value)
+        template.setPrevQuery(str(request))
+        
+        template.setTimelineValue(self._request.timeline_value or 1)
+        template.setTimelineUnit(self._request.timeline_unit or "hour")
     
-    def build(self):
-        alerts = self._data
+    def _buildAlertList(self, template):
+        alerts = self._data["alerts"]
         table = Table.Table()
         table.setHeader(("Classification", "Source", "Target", "Sensor", "Time", "", ""))
         for alert in alerts:
             self._addAlert(table, alert)
-        self.setMainContent(str(table))
+
+        template.setAlertList(str(table))
+
+    def build(self):
+        template = AlertList.AlertList()
+        self._buildEdition(template)
+        self._buildAlertList(template)
+        self.setMainContent(str(template))
+
+        
 
 
 
@@ -98,6 +187,9 @@ class ListRequest(core.CoreRequest):
         core.CoreRequest.__init__(self)
         self.registerField("filter_name", str)
         self.registerField("filter_value", str)
+        self.registerField("timeline_value", int)
+        self.registerField("timeline_unit", str)
+        self.registerField("timeline_end", int)
 
 
 
@@ -110,18 +202,61 @@ class AlertModule(module.ContentModule):
         self.registerAction("details", AlertRequest)
 
     def handle_list(self, request):
+        result = { }
+        
         prelude = self._core.prelude
-        criteria = "alert.detect_time >= 'month:current-1'"
+
+        criteria = [ ]
+        
         if request.filter_name and request.filter_value:
-            criteria += " && %s == '%s'" % (request.filter_name, request.filter_value)
-        idents = prelude.getAlertIdents(criteria)
+            criteria.append("%s == '%s'" % (request.filter_name, request.filter_value))
+
+        if not request.timeline_value or not request.timeline_unit:
+            request.timeline_value = 1
+            request.timeline_unit = "hour"
+
+        if request.timeline_end:
+            end = MyTime(request.timeline_end)
+        else:
+            end = MyTime()
+            end.round(request.timeline_unit)
+        
+        start = end[request.timeline_unit] - request.timeline_value
+
+        result["start"], result["end"] = start, end
+
+        tmp = "alert.detect_time >= '%s' && alert.detect_time < '%s'" % (str(start), str(end))
+            
+##         if request.timeline_end:
+##             end = time.localtime(request.timeline_end)
+##         else:
+##             t = time.time()
+##             request.timeline_end = t - (t % 3600)
+##             end = time.localtime(t)
+
+##         start = list(end)
+##         start[["year", "month", "day", "hour", "min", "sec"].index(request.timeline_unit)] -= request.timeline_value
+##         start = time.localtime(time.mktime(start))
+            
+##         result["start"] = start
+##         result["end"] = end
+        
+##         tmp = "alert.detect_time >= '%s' && alert.detect_time < '%s'" % \
+##               (time.strftime("%Y-%m-%d %H:%M:%S", start),
+##                time.strftime("%Y-%m-%d %H:%M:%S", end))
+            
+        criteria.append(tmp)
+            
+        idents = prelude.getAlertIdents(" && ".join(criteria))
         alerts = [ ]
         if idents:
             for analyzerid, alert_ident in idents:
                 alert = prelude.getAlert(analyzerid, alert_ident)
                 alerts.append(alert)
+
+        result["alerts"] = alerts
         
-        return ListInterface, alerts
+        return ListInterface, result
 
     def handle_default(self, request):
         return self.handle_list(request)

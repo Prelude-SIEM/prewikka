@@ -34,7 +34,7 @@ class ContentModule(Module):
         request = request_class()
         request.populate(query)
         interface_class, data = handler(request)
-        interface = interface_class(self._core, interface_config, data)
+        interface = interface_class(self._core, interface_config, request, data)
         interface.init()
         interface.build()
 

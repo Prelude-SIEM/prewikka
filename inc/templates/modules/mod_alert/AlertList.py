@@ -5,49 +5,32 @@ import PyTpl
 from templates import Table
 
 
+class AlertList(PyTpl.Template):
+    def setAlertList(self, content):
+        self.ALERT_LIST = content
 
-class Link:
-    def __init__(self, module, section, content):
-        self._module = module
-        self._section = section
-        self._content = content
-        self._arguments = { }
+    def setTimelineValue(self, value):        
+        self.TIMELINE_VALUE = value
 
-    def __setitem__(self, key, value):
-        self._arguments[key] = value
+    def setTimelineUnit(self, unit):
+        setattr(self, unit.upper() + "_SELECTED", "selected")
 
-    def __str__(self):
-        self._arguments["mod"] = self._module
-        self._arguments["section"] = self._section
-        query = urllib.urlencode(self._arguments)
+    def setTimelineStart(self, start):
+        self.TIMELINE_START = start
 
-        return "<a href=\"index.py?%s\">%s</a>" % (query, self._content)
+    def setTimelineEnd(self, end):
+        self.TIMELINE_END = end
 
+    def setPrevQuery(self, query):
+        self.PREV_QUERY = query
 
+    def setNextQuery(self, query):
+        self.NEXT_QUERY = query
 
-class AlertList:
-    def __init__(self):
-        self._table = Table.Table()
-        self._table.setHeader(("Classification", "Source", "Target", "Sensor", "Time", "", ""))
+    def setCurrentQuery(self, query):
+        self.CURRENT_QUERY = query
 
-    def addAlert(self, alert):
-        summary_link = Link("mod_alert", "Alert summary", "summary")
-        summary_link["Alert summary.analyzerid"] = alert["alert.analyzer.analyzerid"]
-        summary_link["Alert summary.alert_ident"] = alert["alert.ident"]
-
-        details_link = Link("mod_alert", "Alert details", "details")
-        details_link["Alert details.analyzerid"] = alert["alert.analyzer.analyzerid"]
-        details_link["Alert details.alert_ident"] = alert["alert.ident"]
-
-        impact_severity = "impact_severity_" + alert["alert.assessment.impact.severity"]
-        
-        self._table.addRow(("<span class=\"%s\">%s</span>" % (impact_severity, alert["alert.classification(0).name"]),
-                            alert["alert.source(0).node.address(0).address"] or "n/a",
-                            alert["alert.target(0).node.address(0).address"] or "n/a",
-                            alert["alert.analyzer.model"],
-                            alert["alert.detect_time"],
-                            str(summary_link),
-                            str(details_link)));
-
-    def __str__(self):
-        return str(self._table)
+    def addHidden(self, name, value):
+        self["hidden"].NAME = name
+        self["hidden"].VALUE = value
+        self["hidden"].parse()

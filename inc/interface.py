@@ -4,9 +4,10 @@ import core
 
 
 class Interface:
-    def __init__(self, core, config, data):
+    def __init__(self, core, config, request, data):
         self._core = core
         self._config = config
+        self._request = request
         self._data = data
         self.headers = { "Content-type": "text/html" }
 

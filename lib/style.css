@@ -187,9 +187,58 @@ table {
 	color: green;
 }
 
+.impact_severity_high:hover, .impact_severity_medium:hover, .impact_severity_low:hover {
+	text-decoration: underline;
+}
+
 .alert_field_value {
 	text-decoration: none;
 	color: inherit;
+}
+
+.alert_field_value:hover {
+	text-decoration: underline;
+}
+
+#alert_list_result table {
+	width: 100%;
+}
+
+#alert_list_edition {
+	border: 1px;
+	border-style: solid;
+	border-color: #4D535C;
+	padding-right: 5px;
+	padding-left: 5px;
+	padding-top: 5px;
+	padding-bottom: 5px;
+	margin-bottom: 20px;
+ 	height: 65px;
+}
+
+#timeline {
+	float: left;
+}
+
+#timeline div {
+	float: left;
+	margin-left: 5px;
+}
+
+#timeline_navigation {
+	clear: both;
+	float: right;
+}
+
+#timeline_navigation div {
+	float: left;
+	margin-left: 10px;
+	font-weight: bold;
+}
+
+#timeline_range {
+	float: right;
+	text-align: right;
 }
 
 .section_alert {
@@ -276,9 +325,18 @@ table {
 	background-color: white;
 }
 
-a:link.tlink {
+/*a:link.tlink {
     color:#D2312A;
     text-decoration: underline;
+}*/
+
+a {
+	color: #333333;
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
 }
 
 img {

@@ -14,8 +14,9 @@ class Prelude(PreludeDB):
                            password=config.get("password", "prelude"))
         self.connect()
 
-    def getAlertIdents(self, criteria):
-        criteria = prelude.IDMEFCriteria(criteria)
+    def getAlertIdents(self, criteria=None):
+        if criteria:
+            criteria = prelude.IDMEFCriteria(criteria)
         return self.get_alert_ident_list(criteria)
 
     def getAlert(self, analyzerid, alert_ident):
