@@ -1,5 +1,4 @@
 import sys
-from database import getDB
 import prelude
 from preludedb import PreludeDB
 import time

@@ -22,7 +22,6 @@ import glob
 
 import Config
 from layout import layoutManager
-import config
 from Module import Module
 from Query import Query
 
@@ -54,9 +53,9 @@ class Frontend:
 
         views['views']['modules'] = map(lambda name: (name, self.modules[name].getName()), self.module_names)
         views['views']['module'] = mod_name
-        views['views']["software"] = config.config['software']
-        views['views']['place'] = config.config['company']
-        views['views']['title'] = config.config['title']
+        views['views']["software"] = self.config['software']
+        views['views']['place'] = self.config['company']
+        views['views']['title'] = self.config['title']
         views['views']['sid'] = ""
 
         layout = layoutManager.getLayout(views['layout'], views['views'], query)
