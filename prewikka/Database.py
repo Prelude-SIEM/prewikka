@@ -76,8 +76,9 @@ class Database:
         # check if the database has been created
         try:
             self.query("SELECT * FROM Prewikka_Version")
-        except PreludeDBError:
-            print >> sys.stderr, "The Prewikka database has not been created, please create it."
+        except PreludeDBError, e:
+            print >> sys.stderr, e
+            print >> sys.stderr, "The Prewikka database does not seem to have been created."
             sys.exit(1)
             
     def queries_from_file(self, filename):
