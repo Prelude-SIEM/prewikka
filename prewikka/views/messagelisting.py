@@ -621,23 +621,6 @@ class AlertListing(MessageListing, view.View):
         self._applyCheckboxFilters(criteria, "target")
         self._applyCheckboxFilters(criteria, "analyzer")
 
-    def _setAggregatedMessageBase(self, criteria):
-        ident = self.env.prelude.getAlertIdents(criteria, limit=1)[0]
-        idmef = self._fetchMessage(ident)
-
-        expand = utils.create_link("alert_listing",
-                                   self.parameters +
-                                   { "aggregated_source_values": source_values,
-                                     "aggregated_target_values": target_values })
-
-        message = { "aggregated": True, "count": count }
-        self.dataset["messages"].append(message)
-        self._setMessageCommon(message, idmef)
-
-        message["infos"] = [ ]
-        message["time_max"] = self._createTimeField(time_max)
-        message["time_min"] = self._createTimeField(time_min)
-
     def _setAggregatedMessage(self, criteria, source_values, target_values, time_max, time_min, count):
         criteria = criteria[:]
         for p, v in zip(self.parameters["aggregated_source"] + self.parameters["aggregated_target"],
@@ -681,14 +664,16 @@ class AlertListing(MessageListing, view.View):
         aggregated_values = self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]
 
         criteria += [ "%s == '%s'" % (p, v) for p, v in zip(aggregate_on, aggregated_values) ]
-        for classification, severity, completion, time_min, time_max, count in \
-                self.env.prelude.getValues(["alert.classification.text/group_by",
-                                            "alert.assessment.impact.severity/group_by",
-                                            "alert.assessment.impact.completion/group_by",
-                                            "min(alert.create_time)",
-                                            "max(alert.create_time)",
-                                            "count(alert.messageid)"], criteria,
-                                           limit=self.parameters["limit"], offset=self.parameters["offset"]):
+        
+        results = self.env.prelude.getValues(["alert.classification.text/group_by",
+                                              "alert.assessment.impact.severity/group_by",
+                                              "alert.assessment.impact.completion/group_by",
+                                              "min(alert.create_time)",
+                                              "max(alert.create_time)",
+                                              "count(alert.messageid)"], criteria,
+                                             limit=self.parameters["limit"], offset=self.parameters["offset"])
+
+        for classification, severity, completion, time_min, time_max, count in results:
             ident = self.env.prelude.getAlertIdents(criteria + [ "alert.classification.text == '%s'" % classification ], limit=1)[0]
             idmef = self._fetchMessage(ident)
             message = {
@@ -713,6 +698,8 @@ class AlertListing(MessageListing, view.View):
                 "completion": { "value": completion },
                 "display": display
                 } ]
+
+        return len(results)
 
     def _setAggregatedMessagesNoValues(self, criteria):
         aggregated_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
@@ -798,9 +785,9 @@ class AlertListing(MessageListing, view.View):
 
     def _setAggregatedMessages(self, criteria):
         if self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]:
-            self._setAggregatedMessagesValues(criteria)
+            return self._setAggregatedMessagesValues(criteria)
         else:
-            self._setAggregatedMessagesNoValues(criteria)
+            return self._setAggregatedMessagesNoValues(criteria)
 
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
