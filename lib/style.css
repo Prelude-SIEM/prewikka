@@ -28,14 +28,16 @@ h1 {
     padding-bottom: 10px;
     color: #000000;
 }
+
 h2 {
     font-family: Verdana, Arial, Helvetica, sans-serif;
     font-size: 16px;
     margin: 0px;
 }
 
-tr.odd {background:#eeeeee}
-tr.even {background:#ffffff}
+table {
+	border-spacing: 3px 2px;
+}
 
 input {
         border: 1px solid black;
@@ -515,16 +517,36 @@ thead {
 	background-color: white;
 }
 
-.heartbeats_analyze_analyzer td {
-	border: 0px;
-	border-bottom: 1px;
-	border-style: solid;
-	border-color: black;
+.hearbeat_analyze thead {
+	font-size: 120%;
 }
 
-.heartbeats_analyze_message {
-	font-size: 80%;
+.heartbeat_analyze_sensor_status_normal_offline {
+	background-color: #ef9a07;
+	font-weight: bold;
+	font-size: 120%;
+	text-align: center;
 }
+ 
+ .heartbeat_analyze_sensor_status_abnormal_offline {
+	background-color: #d82424;
+	font-weight: bold;
+	font-size: 120%;
+	text-align: center;
+}
+
+.heartbeat_analyze_sensor_status_online {
+	background-color: #33a054;
+	font-weight: bold;
+	font-size: 120%;
+	text-align: center;
+}
+
+.heartbeat_analyze_sensor_info {
+	font-weight: bold;
+	border-top: 10px;
+}
+
 
 .error_name, .error_message, .error_links {
 	position: relative;

@@ -37,9 +37,30 @@ class Message:
         value = self[key]
         return value is None and default or value
 
+    def getAdditionalData(self, searched, many_values=False):
+        values = [ ]
+        i = 0
+        while True:
+            meaning = self["%s.additional_data(%d).meaning" % (self._root, i)]
+            if meaning is None:
+                break
+            
+            if meaning == searched:
+                value = self["%s.additional_data(%d).data" % (self._root, i)]
+                if not many_values:
+                    return value
+                
+                values.append(value)
+
+            i += 1
+
+        return many_values and [ ] or None
+
 
 
 class Alert(Message):
+    _root = "alert"
+    
     def __getitem__(self, key):
         if key.find("alert.") != 0:
             key = "alert." + key
@@ -48,6 +69,8 @@ class Alert(Message):
 
 
 class Heartbeat(Message):
+    _root = "heartbeat"
+    
     def __getitem__(self, key):
         if key.find("heartbeat.") != 0:
             key = "heartbeat." + key

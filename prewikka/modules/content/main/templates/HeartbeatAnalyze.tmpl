@@ -1,0 +1,40 @@
+#extends prewikka.templates.ClassicLayout
+
+#block main_content
+<table class='heartbeat_analyze'>
+  <thead>
+    <tr class='heartbeat_analyze_header'>
+      <td>Analyzerid</td>
+      <td>Model</td>
+      <td>OS</td>
+      <td>Name</td>
+      <td>Location</<td>
+      <td>Address</td>
+      <td>Latest heartbeat</td>
+      <td>Current status</td>
+    </tr>
+  </thead>
+  <tbody>
+  #for $analyzer in $analyzers
+    <tr class='heartbeat_analyze_sensor_info'>
+      <td>$analyzer.analyzerid</td>
+      <td>$analyzer.model $analyzer.version</td>
+      <td>$analyzer.ostype $analyzer.osversion</td>
+      <td>$analyzer.name</td>
+      <td>$analyzer.location</td>
+      <td>$analyzer.address</td>
+      <td>$analyzer.latest_time</td>
+      <td class='heartbeat_analyze_sensor_status_$analyzer.latest_status_class'>
+        $analyzer.latest_status
+      </td>
+    </tr>
+    #for $event in $analyzer.events
+      <tr class='heartbeat_analyze_sensor_event'>
+        <td colspan="8">$event</td>
+      </tr>
+    #end for
+    <tr><td colspan="8">&nbsp</td></tr>
+  #end for
+  </tbody>
+</table>
+#end block

@@ -30,7 +30,7 @@ from prewikka import User, Filter, ParametersNormalizer, utils
 from prewikka.modules.content.main.templates import \
      AlertListing, HeartbeatListing, MessageDetails, MessageListing, \
      MessageSummary, SensorAlertListing, SensorHeartbeatListing, \
-     SensorListing, FilterEdition, CommandOutput
+     SensorListing, FilterEdition, CommandOutput, HeartbeatAnalyze
 
 
 
@@ -144,6 +144,12 @@ class DeletePM:
 
 
 
+class HeartbeatAnalyzePM(ParametersNormalizer.ParametersNormalizer):
+    def register(self):
+        self.optional("analyzerid", long)
+
+
+
 class MessageListingDeletePM(MessageListingPM, DeletePM):
     def register(self):
         MessageListingPM.register(self)
@@ -236,8 +242,13 @@ class AlertFilterEditionView(AlertsView):
 
 class HeartbeatsView(View):
     _active_section = "Heartbeats"
-    _tabs = [("Heartbeats", "main.heartbeat_listing")]
-    _active_tab = "Heartbeats"
+    _tabs = [("Analyze", "main.heartbeat_analyze"), ("Listing", "main.heartbeat_listing")]
+    _active_tab = "Listing"
+
+
+
+class HeartbeatAnalyzeView(HeartbeatsView):
+    _active_tab = "Analyze"
 
 
 
@@ -1009,46 +1020,85 @@ class HeartbeatTracerouteAction(HostCommandAction, HeartbeatsView):
 
 
 
-## class HeartbeatsAnalyze(Action.Action):
-##     def process(self, core, parameters, request):
-##         heartbeat_number = 48
-##         heartbeat_value = 3600
-##         heartbeat_error_tolerance = 3
-        
-##         prelude = core.prelude
-        
-##         data = { }
-##         data["analyzers"] = [ ]
-##         data["heartbeat_number"] = heartbeat_number
-##         data["heartbeat_value"] = heartbeat_value
-##         data["heartbeat_error_tolerance"] = heartbeat_error_tolerance
-        
-##         analyzers = data["analyzers"]
+class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
+    def __init__(self, config):
+        self._heartbeat_count = config.getOptionValue("heartbeat_count", 48)
+        self._heartbeat_error_margin = config.getOptionValue("heartbeat_error_margin", 3)
+    
+    def _getAnalyzer(self, dataset, prelude, analyzerid):
+        analyzer = prelude.getAnalyzer(analyzerid)
+        analyzer["events"] = [ ]
+        rows = prelude.getValues(selection=["heartbeat.ident", "heartbeat.create_time/order_desc"],
+                                 criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
+                                 limit=self._heartbeat_count)
 
-##         for analyzerid in prelude.getAnalyzerids():
-##             analyzer = prelude.getAnalyzer(analyzerid)
-##             analyzer["errors"] = [ ]
-##             analyzers.append(analyzer)
-            
-##             previous_date = 0
-            
-##             rows = prelude.getValues(selection=["heartbeat.create_time/order_desc"],
-##                                      criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
-##                                      limit=heartbeat_number)
-            
-##             for row in rows:
-##                 date = row[0]
-##                 if previous_date:
-##                     delta = int(previous_date) - int(date)
-##                     if delta > heartbeat_value + heartbeat_error_tolerance:
-##                         analyzer["errors"].append({ "type": "later", "after": date, "back": previous_date })
-##                     elif delta < heartbeat_value - heartbeat_error_tolerance:
-##                         analyzer["errors"].append({ "type": "sooner", "date": previous_date, "delta": delta })
-##                 else:
-##                     analyzer["last_heartbeat"] = date
-##                 previous_date = date
+        newer = None
+        latest = True
+        total_interval = 0
         
-##         return View("HeartbeatsAnalyzeView"), data
+        for ident, t in rows:
+            older = prelude.getHeartbeat(analyzerid, ident)
+            older_status = older.getAdditionalData("Analyzer status")
+            older_interval = older.getAdditionalData("Analyzer heartbeat interval")
+            older_time = t
+            total_interval += int(older_interval)
+
+            if latest:
+                latest = False
+                analyzer["latest_time"] = str(older_time)
+                if older_status == "exiting":
+                    analyzer["latest_status_class"] = "normal_offline"
+                    analyzer["latest_status"] = "normal offline"
+                # FIXME: workaround a current bug of libpreludedb that returns time in UTC instead of GMT+n
+                elif time.mktime(time.gmtime(time.time())) - int(older_time) > int(older_interval) + self._heartbeat_error_margin:
+                    analyzer["latest_status_class"] = "abnormal_offline"
+                    analyzer["latest_status"] = "abnormal offline"
+                    analyzer["events"].append("sensor is down since %s" % older_time)
+                else:
+                    analyzer["latest_status_class"] = "online"
+                    analyzer["latest_status"] = "online"
+                
+            if newer:
+                event = None
+                
+                if newer_status == "starting":
+                    if older_status == "exiting":
+                        event = "normal sensor start at %s" % str(newer_time)
+                    else:
+                        event = "abnormal sensor restart at %s" % str(newer_time)
+
+                if newer_status == "running":
+                    if abs(int(newer_time) - int(older_time) - int(older_interval)) > self._heartbeat_error_margin:
+                        event = "abnormal heartbeat interval between %s and %s" %  (older_time, newer_time)
+
+                if newer_status == "exiting":
+                    event = "normal sensor stop at %s" % str(newer_status)
+
+                if event:
+                    analyzer["events"].append(event)
+
+            newer = older
+            newer_status = older_status
+            newer_interval = older_interval
+            newer_time = older_time
+
+        if not analyzer["events"]:
+            analyzer["events"].append("No anomaly in the last %d hearbeats (1 heartbeat every %d s average)" %
+                                      (self._heartbeat_count, total_interval / self._heartbeat_count))
+
+        return analyzer
+    
+    def process(self, request):
+        self._setView(request.dataset)
+        
+        if request.parameters.has_key("analyzerid"):
+            request.dataset["analyzers"] = [ self._getAnalyzer(request.dataset, request.env.prelude,
+                                                               request.parameters["analyzerid"]) ]
+        else:
+            request.dataset["analyzers"] = [ self._getAnalyzer(request.dataset, request.env.prelude,
+                                                               analyzerid) \
+                                             for analyzerid in request.env.prelude.getAnalyzerids() ]
+
 
 
 
@@ -1230,7 +1280,7 @@ class AlertFilterEdition(AlertFilterEditionView):
 def load(env, config):
     return {
         "sections": [("Alerts", "alert_listing"),
-                     ("Heartbeats", "heartbeat_listing"),
+                     ("Heartbeats", "heartbeat_analyze"),
                      ("Sensors", "sensor_listing")],
 
         "default_slot": "alert_listing",
@@ -1299,6 +1349,11 @@ def load(env, config):
 ##                                           "template": FilterEdition.FilterEdition },
                    
                    # Hearbeats section
+
+                   "heartbeat_analyze": { "handler": HeartbeatAnalyzeAction(config).process,
+                                          "parameters": HeartbeatAnalyzePM(),
+                                          "permissions": [ User.PERM_IDMEF_VIEW ],
+                                          "template": HeartbeatAnalyze.HeartbeatAnalyze },
 
                    "heartbeat_listing": { "handler": HeartbeatListingAction().process,
                                           "parameters": MessageListingPM(),
