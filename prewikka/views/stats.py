@@ -20,6 +20,9 @@
 
 from prewikka import User, view
 
+import matplotlib
+matplotlib.use("Agg")
+
 from pylab import *
 
 
@@ -65,13 +68,22 @@ class Chart:
     
     def renderPie(self):
         total = float(reduce(lambda x, y: x + y, self._values))
-        patches, texts, autotexts = pie(self._values, labels=self._labels, autopct=lambda x: "")
+        explode = map(lambda x: (0,0.05)[x / total > 0.2], self._values)
+        patches, texts, autotexts = pie(self._values, explode=explode, labels=self._labels, autopct=lambda x: "", shadow=True)
 ##         for autotext, value in zip(autotexts, self._values):
 ##             autotext.set_text("%d (%.1f%%)" % (value, value / total * 100))
         for text in texts:
             text.set_text("")
-        legend([ "%s: %d (%.1f%%)" % (label, value, value / total * 100) for label, value in zip(self._labels, self._values) ],
-               loc=(0,0))
+        l = legend([ "%s: %d (%.1f%%)" % (label, value, value / total * 100) for label, value in zip(self._labels, self._values) ],
+                   loc=(0,0), shadow=True)
+        l.set_alpha(0.75)
+##         content = [ ]
+##         for value in self._values:
+##             content.append((str(value), "%.1f%%" % (value / total * 100)))
+##         t = table(cellText=content, rowLabels=self._labels, colLabels=("Count", "Percent"))
+##         t.set_fontsize(10)
+##         for col in range(3):
+##             t.auto_set_column_width(col)
         self._render()
 
     def _setYticks(self):
