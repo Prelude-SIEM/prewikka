@@ -84,7 +84,7 @@ class SensorListing(view.View):
             if analyzer["node_name"]:
                 analyzer["node_name"] = "<a href='%s'>%s</a>" % \
                                         (utils.create_link(self.view_name,
-                                                           { "filter_path": "heartbeat.analyzer.node.name",
+                                                           { "filter_path": "heartbeat.analyzer(-1).node.name",
                                                              "filter_value": analyzer["node_name"] }),
                                          analyzer["node_name"])
             else:
@@ -93,7 +93,7 @@ class SensorListing(view.View):
             if analyzer["node_location"]:
                 analyzer["node_location"] = "<a href='%s'>%s</a>" % \
                                             (utils.create_link(self.view_name,
-                                                               { "filter_path": "heartbeat.analyzer.node.location",
+                                                               { "filter_path": "heartbeat.analyzer(-1).node.location",
                                                                  "filter_value": analyzer["node_location"] }),
                                              analyzer["node_location"])
             else:
@@ -102,7 +102,7 @@ class SensorListing(view.View):
             if analyzer["node_address"]:
                 analyzer["node_address"] = "<a href='%s'>%s</a>" % \
                                            (utils.create_link(self.view_name,
-                                                              { "filter_path": "heartbeat.analyzer.node.address.address",
+                                                              { "filter_path": "heartbeat.analyzer(-1).node.address(0).address",
                                                                 "filter_value": analyzer["node_address"] }),
                                             analyzer["node_address"])
             else:
