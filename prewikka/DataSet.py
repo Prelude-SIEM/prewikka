@@ -20,8 +20,6 @@
 
 import sys
 
-import prewikka.Action
-
 
 class DataSet(dict):
     def __setitem__(self, key, value):
