@@ -57,9 +57,9 @@ class my_build_py(build_py):
 
 class my_install(install):
     def run(self):
-        site = os.path.abspath(self.prefix + "/share/prewikka/site/")
-        database = os.path.abspath(self.prefix + "/share/prewikka/database/")
-        conf = os.path.abspath(self.prefix + "/share/prewikka/conf/")
+        site = os.path.abspath(self.prefix + "/share/prewikka/site") + "/"
+        database = os.path.abspath(self.prefix + "/share/prewikka/database") + "/"
+        conf = os.path.abspath(self.prefix + "/share/prewikka/conf") + "/"
         f = open("prewikka/siteconfig.py", "w")
         print >> f, "site = '%s'" % site
         print >> f, "database = '%s'" % database
@@ -81,7 +81,7 @@ setup(name="Prewikka",
                    ("share/prewikka/site/js", glob.glob("js/*.js")),
                    ("share/prewikka/database", glob.glob("*.sql")),
                    ("share/prewikka/conf", glob.glob("*.conf")) ],
-      scripts=[ "prewikka-database-create.py", "prewikka-httpd.py" ],
+      scripts=[ "prewikka-httpd.py" ],
       cmdclass={ 'build_py': my_build_py,
                  'install': my_install })
       

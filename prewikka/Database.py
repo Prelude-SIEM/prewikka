@@ -73,6 +73,12 @@ class Database:
         if config.has_key("log"):
             preludedb_sql_enable_query_logging(self._sql, config["log"])
 
+        # check if the database has been created
+        try:
+            self.query("SELECT * FROM Prewikka_Version")
+        except preludedb.PreludeDBError:
+            print >> sys.stderr, "The Prewikka database has not been created, please create it."
+            
     def queries_from_file(self, filename):
         content = open(filename).read()
         for query in content.split(";"):
