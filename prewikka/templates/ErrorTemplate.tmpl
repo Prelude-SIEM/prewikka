@@ -9,8 +9,13 @@
    Failed query: <input type="text" value="$query" style="width: 200px;" />
 
    <br/><br/>
-
-   <input style="float: left; position: relative;" type="button" value="Back"/><input style="float: right; position: relative;" type="button" value="Retry"/>
+   
+   <form action="$prewikka.url.referer" method="GET">
+     <input style="float: left; position: relative;" type="submit" value="Back"/>
+   </form>
+   <form action="$prewikka.url.current" method="GET"">
+     <input style="float: right; position: relative;" type="submit" value="Retry"/>
+   </form>
   </fieldset>
  </div>
 
