@@ -24,29 +24,29 @@
 </td>
 
 <td>
- <ul id="popup_block">
-  <li class="popup_title">$message.source.value
-   <ul>
-    <li><a href="$message.source.inline_filter">Group by source</a></li>
-    <li><a href="scan">Scan source</a></li>
-    <li><a href="traceroute">Traceroute source</a></li>
-    <li><a href="whois">Whois</a></li>
-   </ul>
-  </li>
- </ul>
+  <ul id="popup_block">
+    <li class="popup_title">$message.source.value
+      <ul>
+        <li><a href="$message.source.inline_filter">Group by source</a></li>
+        #for $name, $link in $message.source.host_commands
+          <li><a href="$link">$name</a></li>
+        #end for
+      </ul>
+    </li>
+  </ul>
 </td>
 
 <td>
- <ul id="popup_block">
-  <li class="popup_title">$message.target.value
-   <ul>
-    <li><a href="$message.target.inline_filter">Group by target</a></li>
-    <li><a href="scan">Scan target</a></li>
-    <li><a href="traceroute">Traceroute target</a></li>
-    <li><a href="whois">Whois target</a></li>
-   </ul>
-  </li>
- </ul>
+  <ul id="popup_block">
+    <li class="popup_title">$message.target.value
+      <ul>
+        <li><a href="$message.target.inline_filter">Group by target</a></li>
+        #for $name, $link in $message.target.host_commands
+          <li><a href="$link">$name</a></li>
+        #end for
+      </ul>
+    </li>
+  </ul>
 </td>
 
 

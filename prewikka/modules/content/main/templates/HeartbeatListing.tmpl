@@ -27,7 +27,9 @@
   <li class="popup_title">$message.address.value
    <ul>
     <li><a href="$message.address.inline_filter">Group by address</a></li>
-    <li><a href="whois">Whois</a></li>
+    #for $name, $link in $message.address.host_commands
+     <li><a href="$link">$name</a></li>
+    #end for
    </ul>
   </li>
  </ul>
@@ -35,13 +37,6 @@
 
 <td><a href='$message.name.inline_filter'>$message.name.value</a></td>
 <td><a href='$message.type.inline_filter'>$message.type.value</a></td>
-
-<!--
-<td><a href='$message.analyzerid.inline_filter'>$message.analyzerid.value</a></td>
-<td><a href='$message.address.inline_filter'>$message.address.value</a></td>
-<td><a href='$message.name.inline_filter'>$message.name.value</a></td>
-<td><a href='$message.type.inline_filter'>$message.type.value</a></td>
--->
 
 <td>$message.time</td>
 #end block message_fields

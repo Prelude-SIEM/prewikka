@@ -21,6 +21,7 @@
 import sys
 import time
 import os, os.path
+import distutils.spawn
 
 import copy
 
@@ -47,6 +48,11 @@ class Environnement:
         self.auth = None
         self.storage = None
         self.log = Log.Log()
+        self.host_commands = { }
+        for command in "whois", "traceroute":
+            path = distutils.spawn.find_executable(command)
+            if path:
+                self.host_commands[command] = path
 
 
 

@@ -19,6 +19,7 @@
 
 
 import sys
+import os
 
 import time
 import copy
@@ -29,7 +30,7 @@ from prewikka import User, Filter, ParametersNormalizer, utils
 from prewikka.modules.content.main.templates import \
      AlertListing, HeartbeatListing, MessageDetails, MessageListing, \
      MessageSummary, SensorAlertListing, SensorHeartbeatListing, \
-     SensorListing, FilterEdition
+     SensorListing, FilterEdition, CommandOutput
 
 
 
@@ -113,6 +114,12 @@ class MessageListingPM(ParametersNormalizer.ParametersNormalizer):
         for p1, p2 in ("inline_filter_name", "inline_filter_value"), ("timeline_value", "timeline_unit"):
             if parameters.has_key(p1) ^ parameters.has_key(p2):
                 raise ParametersNormalizer.MissingParameterError(parameters.has_key(p1) and p1 or p2)
+
+
+
+class HostCommandPM(ParametersNormalizer.ParametersNormalizer):
+    def register(self):
+        self.mandatory("host", str)
 
 
 
@@ -359,25 +366,40 @@ class MessageListingAction:
             return { "value": "n/a", "inline_filter": None }
 
         parameters = dict(parameters.items() + [("inline_filter_name", name), ("inline_filter_value", value)])
-        
+
         return { "value": value, "inline_filter": self._createLink(self.listing_action, parameters) }
 
+    def _createMessageHostField(self, request, name, value):
+        field = self._createMessageField(request.parameters, name, value)
+        field["host_commands"] = [ ]
+        if not value:
+            return field
+
+        for command, action in ("whois", self.whois_action), ("traceroute", self.traceroute_action):
+            if request.env.host_commands.has_key(command):
+                field["host_commands"].append((command.capitalize(),
+                                               self._createLink(action, { "host": value })))
+
+        return field
+    
     def _createMessageLink(self, message, action):
         return self._createLink(action, { "analyzerid": message["analyzerid"], "ident": message["ident"] })
 
-    def _addMessage(self, parameters, fields, message):
+    def _addMessage(self, request, fields, message):
         fields["summary"] = self._createMessageLink(message, self.summary_action)
         fields["details"] = self._createMessageLink(message, self.details_action)
         fields["ident"] = message["ident"]
         fields["analyzerid"] = message["analyzerid"]
-        self._addMessageFields(parameters, fields, message)
+        self._addMessageFields(request, fields, message)
 
-    def _setMessages(self, dataset, parameters, messages):
+    def _setMessages(self, request, messages):
+        dataset = request.dataset
+        parameters = request.parameters
         dataset["messages"] = [ ]
         for message in messages:
             fields = { }
             dataset["messages"].append(fields)
-            self._addMessage(parameters, fields, message)
+            self._addMessage(request, fields, message)
 
         dataset["delete_form_hiddens"] = { "content": "main.%s" % self.delete_action }
         dataset["delete_form_hiddens"].update(parameters)
@@ -416,7 +438,7 @@ class MessageListingAction:
         dataset["total"] = count
 
         self._setNavNext(dataset, parameters, offset, count)
-        self._setMessages(dataset, parameters, messages)
+        self._setMessages(request, messages)
 
 
 
@@ -425,6 +447,8 @@ class AlertListingAction(MessageListingAction, AlertsView):
     delete_action = "alert_delete"
     summary_action = "alert_summary"
     details_action = "alert_details"
+    whois_action = "alert_whois"
+    traceroute_action = "alert_traceroute"
     time_criteria_format = "alert.detect_time >= '%s' && alert.detect_time < '%s'"
     message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.ident == '%d'"
     fields = [ ("severity", "alert.assessment.impact.severity", "alert.assessment.impact.severity"),
@@ -445,12 +469,14 @@ class AlertListingAction(MessageListingAction, AlertsView):
     def getMessageTime(self, message):
         return message["alert.detect_time"] or message["alert.create_time"] or 0
 
-    def _addMessageFields(self, parameters, fields, alert):
+    def _addMessageFields(self, request, fields, alert):
         fields["severity"] = alert["severity"] or "low"
         for name in "analyzerid", "ident":
             fields[name] = alert[name]
-        for name in "classification", "source", "target", "sensor":
-            fields[name] = self._createMessageField(parameters, name, alert[name])
+        for name in "classification", "sensor":
+            fields[name] = self._createMessageField(request.parameters, name, alert[name])
+        for name in  "source", "target",:
+            fields[name] = self._createMessageHostField(request, name, alert[name])
         fields["time"] = self._createMessageTimeField(alert["time"])
 
     def getFilters(self, storage, login):
@@ -476,6 +502,8 @@ class HeartbeatListingAction(MessageListingAction, HeartbeatsView):
     delete_action = "hearbeat_delete"
     summary_action = "heartbeat_summary"
     details_action = "heartbeat_details"
+    whois_action = "heartbeat_whois"
+    traceroute_action = "heartbeat_traceroute"
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
     message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.ident == '%d'"
     fields = [ ("address", "heartbeat.analyzer.node.address(0).address", "heartbeat.analyzer.node.address.address"),
@@ -494,9 +522,10 @@ class HeartbeatListingAction(MessageListingAction, HeartbeatsView):
     def getMessageTime(self, message):
         return message["heartbeat.create_time"]
 
-    def _addMessageFields(self, parameters, fields, heartbeat):
-        for name in "analyzerid", "address", "name", "type":
-            fields[name] = self._createMessageField(parameters, name, heartbeat[name])
+    def _addMessageFields(self, request, fields, heartbeat):
+        for name in "analyzerid", "name", "type":
+            fields[name] = self._createMessageField(request.parameters, name, heartbeat[name])
+        fields["address"] = self._createMessageHostField(request, "address", heartbeat["address"])
         fields["time"] = self._createMessageTimeField(heartbeat["time"])
 
 
@@ -949,6 +978,37 @@ class HeartbeatDeleteAction(HeartbeatListingAction):
 
 
 
+class HostCommandAction:
+    def process(self, request):
+        command = request.env.host_commands[self.command]
+        stdin, stdout = os.popen2([ command, request.parameters["host"]])
+        output = stdout.read()
+        output = output.replace(" ", "&nbsp;").replace("\n", "<br/>\n")
+        request.dataset["command_output"] = output
+        self._setView(request.dataset)
+
+
+
+class AlertWhoisAction(HostCommandAction, AlertsView):
+    command = "whois"
+
+
+
+class HeartbeatWhoisAction(HostCommandAction, HeartbeatsView):
+    command = "whois"
+
+
+
+class AlertTracerouteAction(HostCommandAction, AlertsView):
+    command = "traceroute"
+
+
+
+class HeartbeatTracerouteAction(HostCommandAction, HeartbeatsView):
+    command = "traceroute"
+
+
+
 ## class HeartbeatsAnalyze(Action.Action):
 ##     def process(self, core, parameters, request):
 ##         heartbeat_number = 48
@@ -1207,6 +1267,26 @@ def load(env, config):
                                           "permissions": [ User.PERM_IDMEF_VIEW ],
                                           "template": FilterEdition.FilterEdition },
 
+                   "alert_whois": { "handler": AlertWhoisAction().process,
+                                    "parameters": HostCommandPM(),
+                                    "permissions": [ User.PERM_IDMEF_VIEW ],
+                                    "template": CommandOutput.CommandOutput },
+
+                   "alert_traceroute": { "handler": AlertTracerouteAction().process,
+                                         "parameters": HostCommandPM(),
+                                         "permissions": [ User.PERM_IDMEF_VIEW ],
+                                         "template": CommandOutput.CommandOutput },
+
+                   "heartbeat_whois": { "handler": HeartbeatWhoisAction().process,
+                                        "parameters": HostCommandPM(),
+                                        "permissions": [ User.PERM_IDMEF_VIEW ],
+                                        "template": CommandOutput.CommandOutput },
+
+                   "heartbeat_traceroute": { "handler": HeartbeatTracerouteAction().process,
+                                             "parameters": HostCommandPM(),
+                                             "permissions": [ User.PERM_IDMEF_VIEW ],
+                                             "template": CommandOutput.CommandOutput },
+                   
 
 ##                    "alert_filter_new_element": { "handler": AlertFilterEdition().newElement,
 ##                                                  "parameters": FilterEditPM(),
