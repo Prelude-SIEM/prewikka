@@ -511,6 +511,15 @@ class AlertListing(MessageListing, view.View):
 
         dataset["classification"] = self._createInlineFilteredField("alert.classification.text",
                                                                     message["alert.classification.text"])
+
+    def _setMessageInfo(self, dataset, message):
+        dataset["infos"] = [ { } ]
+        dataset = dataset["infos"][0]
+
+        dataset["count"] = 0
+        dataset["severity"] = { "value": message.get("alert.assessment.impact.severity", "low") }
+        dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
+        self._setMessageClassification(dataset, message)
         
     def _setMessageSensor(self, dataset, message):
         def get_analyzer_names(alert, root):
@@ -531,24 +540,22 @@ class AlertListing(MessageListing, view.View):
 
         dataset["sensor_node_name"] = { "value": message["alert.analyzer.node.name"] }
         
-    def _setMessage(self, dataset, message):
-        dataset["severity"] = { "value": message.get("alert.assessment.impact.severity", "low") }
-        dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
-        
+    def _setMessageCommon(self, dataset, message):
         dataset["time"] = self._createTimeField(message["alert.create_time"], self.parameters["timezone"])
 	if (message["alert.analyzer_time"] != None and
 	    abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
 	    dataset["analyzer_time"] = self._createTimeField(message["alert.analyzer_time"], self.parameters["timezone"])
 	else:
 	    dataset["analyzer_time"] = { "value": None }
-	    
-	
+
         self._setMessageSource(dataset, message)
         self._setMessageTarget(dataset, message)
         self._setMessageSensor(dataset, message)
-        self._setMessageClassification(dataset, message)
-        self._setMessageSensor(dataset, message)
 
+    def _setMessage(self, dataset, message):
+        self._setMessageCommon(dataset, message)
+        self._setMessageInfo(dataset, message)
+    
     def _getFilters(self, storage, login):
         return storage.getAlertFilters(login)
 
@@ -664,9 +671,23 @@ class AlertListing(MessageListing, view.View):
                                                     { "groupby_source_values": groupby_source_values,
                                                       "groupby_target_values": groupby_target_values })
                         }
-                    self._setMessage(dataset, message)
+                    self._setMessageCommon(dataset, message)
                     self.dataset["messages"].append(dataset)
 
+                    dataset["infos"] = [ ]
+
+                    for classification, severity, completion, count in \
+                            self.env.prelude.getValues(["alert.classification.text/group_by",
+                                                        "alert.assessment.impact.severity/group_by",
+                                                        "alert.assessment.impact.completion/group_by",
+                                                        "count(alert.messageid)"], " && ".join(criteria2)):
+                        classification = self._createInlineFilteredField("alert.classification.text", classification)
+                        dataset["infos"].append({ "count": count,
+                                                  "classification": classification,
+                                                  "classification_references": "",
+                                                  "severity": { "value": severity or "low" },
+                                                  "completion": { "value": completion } })
+                    
     def _setDatasetConstants(self):
         self.dataset["groupby_source"] = [ ]
         self.dataset["available_groupbys"] = { }
