@@ -47,6 +47,9 @@ class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
 class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHandler):
     def getCookieString(self):
         return self.headers.get("Cookie")
+
+    def getQueryString(self):
+        return self.path
     
     def write(self, data):
         self.wfile.write(data)

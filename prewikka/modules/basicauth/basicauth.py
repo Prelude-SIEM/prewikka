@@ -54,7 +54,7 @@ class User(UserManagement.User):
 
     def checkPassword(self, password):
         if self._hashPassword(password) != self.data["password"]:
-            raise UserManagement.LoginError
+            raise UserManagement.PasswordError
         
     def addSession(self, sessionid, t):
         self.data["sessions"][sessionid] = t
@@ -137,7 +137,7 @@ class BasicUserManagement(UserManagement.UserManagement):
             if login == data["login"]:
                 return User(self.db, data)
             
-        raise Exception
+        raise UserManagement.LoginError
     
     def getUserByID(self, id):
         return User(self.db, self.db[str(id)])

@@ -61,10 +61,11 @@ class Core:
                 module = __import__(file)
                 module.load(self, self._config.modules.get(mod_name, { }))
             except ImportError:
-                print >> sys.stderr, "cannot load module named %s (%s)" % (mod_name, file)
+                self.log.error("cannot load module named %s (%s)" % (mod_name, file))
                 raise
         
     def process(self, request):
+        self.log.event(Log.EVENT_QUERY, request, request.getQueryString())
         view = self.interface.process(request)
         
         request.content = view

@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import ConfigParser
+from prewikka import MyConfigParser
 
 
 class Config(dict):
@@ -26,18 +26,30 @@ class Config(dict):
         dict.__init__(self)
         self.modules = { }
         self._module_names = [ ]
-        input = ConfigParser.ConfigParser()
-        input.readfp(open(filename))
-        for section in input.sections():
-            if section.find("module ") == 0:
-                mod_name = section.replace("module ", "")
+##         input = ConfigParser.ConfigParser()
+##         input.readfp(open(filename))
+##         for section in input.sections():
+##             if section.find("module ") == 0:
+##                 mod_name = section.replace("module ", "")
+##                 self._module_names.append(mod_name)
+##                 subconfig = self.modules[mod_name] = { }
+##             else:
+##                 subconfig = self[section] = { }
+##             for option in input.options(section):
+##                 subconfig[option] = input.get(section, option)
+        input = MyConfigParser.MyConfigParser(filename)
+        input.load()
+        for section in input.getSections():
+            name = section.name
+            if name.find("module ") == 0:
+                mod_name = name.replace("module ", "")
                 self._module_names.append(mod_name)
                 subconfig = self.modules[mod_name] = { }
             else:
-                subconfig = self[section] = { }
-            for option in input.options(section):
-                subconfig[option] = input.get(section, option)
-
+                subconfig = self[name] = { }
+            for option in section.getOptions():
+                subconfig[option.getName()] = option.getValue()
+                
     def getModuleNames(self):
         return self._module_names
     

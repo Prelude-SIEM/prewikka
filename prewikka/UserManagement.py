@@ -4,7 +4,7 @@ import time
 import random
 import md5
 
-from prewikka import Interface, Views
+from prewikka import Log, Interface, Views
 from prewikka.templates import LoginPasswordForm, Table, PropertiesChange
 from prewikka.templates import UserListing
 
@@ -17,12 +17,17 @@ class SessionError(Error):
     pass
 
 
+class LoginError(Error):
+    pass
+
+
+class PasswordError(Error):
+    pass
+
+
 class AuthError(Error):
     pass
 
-
-class LoginError(Error):
-    pass
 
 
 CAPABILITY_READ_MESSAGE = "READ_MESSAGE"
@@ -296,8 +301,21 @@ class UserManagement:
             return self._checkSession(request)
         
     def login(self, core, parameters, request):
-        user = self.getUserByLogin(parameters.getLogin())
-        user.checkPassword(parameters.getPassword())
+        login = parameters.getLogin()
+        password = parameters.getPassword()
+        
+        try:
+            user = self.getUserByLogin(login)
+        except LoginError:
+            core.log.event(Log.EVENT_BAD_LOGIN, request, login)
+            raise AuthError
+        
+        try:
+            user.checkPassword(password)
+        except PasswordError:
+            core.log.event(Log.EVENT_BAD_PASSWORD, request, login, password)
+            raise AuthError
+        
         t = int(time.time())
         sessionid = md5.new(str(t * random.random())).hexdigest()
         user.addSession(sessionid, t)
@@ -305,6 +323,8 @@ class UserManagement:
         
         request.output_cookie["sessionid"] = sessionid
         request.user = user
+        
+        core.log.event(Log.EVENT_LOGIN_SUCCESSFUL, request, user)
         
         return self.core.interface.forwardToDefaultAction(core, request)
     
@@ -351,5 +371,7 @@ class UserManagement:
     def handle_user_logout(self, core, parameters, request):
         request.user.removeSession(request.input_cookie["sessionid"].value)
         request.user.save()
+
+        core.log.event(Log.EVENT_LOGOUT, request, request.user)
         
         return LoginPasswordPromptView, self.login

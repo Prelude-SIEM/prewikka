@@ -188,7 +188,7 @@ class Interface:
         try:
             registered = self._actions[name]
         except KeyError:
-            self._core.log.invalidQuery(request, data)
+            self._core.log.event(Log.EVENT_INVALID_ACTION, request, name)
             return self._buildView(Views.ErrorView, "unknown action name %s" % name)
         
         if request.user:
@@ -204,34 +204,12 @@ class Interface:
             parameters.populate(arguments)
             parameters.check()
         except ActionParameterError, e:
-            self._core.log.invalidQuery(request, str(e))
+            self._core.log.event(Log.EVENT_INVALID_ACTION_PARAMETERS, request, str(e))
             return self._buildView(Views.ErrorView, cgi.escape(str(e)))
         
         view_class, data = self.callAction(action, self._core, parameters, request)
         
         return self._buildView(view_class, data)
-    
-##         try:
-##             registered = self._actions[name]
-##             action = registered["action"]
-##             parameters = registered["parameters"]()
-##             parameters.populate(arguments)
-##             parameters.check()
-##         except KeyError:
-##             data = "unknown action name %s" % name
-##             self._core.log.invalidQuery(request, data)
-##             view_class = Views.ErrorView
-##         except ActionParameterError, e:
-##             self._core.log.invalidQuery(request, str(e))
-##             view_class = Views.ErrorView
-##             data = cgi.escape(str(e))
-##         else:
-##             view_class, data = self.callAction(action, self._core, parameters, request)
-             
-##         view = view_class(self._core)
-##         view.build(data)
-        
-##         return str(view)
     
     def processDefaultAction(self, arguments, request):
         return self.processAction(self._default_action, arguments, request)
