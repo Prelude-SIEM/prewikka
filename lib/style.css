@@ -29,7 +29,7 @@ img {
 }
 
 h1 {
-    font-size: 18px;
+    font-size: 20px;
     margin: 0px;
     padding-bottom: 10px;
     color: #000000;
@@ -46,7 +46,6 @@ table {
 
 
 input {
-/*        border: 1px solid black; */
         padding:0px;
         font-size: inherit;
         font-family: inherit;
@@ -271,7 +270,7 @@ thead {
         color:black;
 }
 
-#filter_control_label, #timezone_control_label, #timeline_limit_label, #timeline_submit, #timeline_step_label {
+#filter_control_label, #timezone_control_label, #timeline_limit_label, #timeline_submit, #timeline_step_label, .navigation_label {
         font-weight: bold;
 }
 
@@ -324,8 +323,8 @@ thead {
         position: absolute;
         left: 160px;
         top: 80px;
-	right: 0px;
-	bottom: 0px;
+/*	right: 0px; 
+	bottom: 0px;*/
 }
 
 /*
@@ -357,7 +356,7 @@ thead {
 }
 
 .login_password table {
-	/*width: 100%;*/
+	width: 100%;
 }
 
 .authentication_error {
@@ -536,13 +535,12 @@ thead {
 }
 
 .heartbeat_analyze_sensor_status_normal_offline {
-	background-color: #ef9a07;
-	font-weight: bold;
-	font-size: 120%;
+	background-color: #b5cba0;
 	text-align: center;
 }
  
 .heartbeat_analyze_sensor_status_abnormal_offline {
+	text-align: center;
 	background-color: #e77070;
 }
 
@@ -551,6 +549,7 @@ thead {
 }
 
 .heartbeat_analyze_sensor_status_online {
+	text-align: center;
 	background-color: #b5cba0;
 }
 
@@ -694,7 +693,25 @@ ul#popup_block > li:hover > ul {
 
 
 /*
- * misc
+ * Stats
+ */
+
+.stats_infos h1, .stats_infos h2 {
+	padding-left: 10px;
+}
+
+.stats_infos {
+	margin-left: 10px;
+	border: 0px;
+	border-left: 5px;
+	border-color: #4D535C;
+	border-style: solid;
+	background: #eeeeee;
+}
+
+
+/*
+ * About
  */ 
 
 #about {
@@ -715,3 +732,38 @@ ul#popup_block > li:hover > ul {
 	color: white; 
 	border: 1px solid #D2312A;
 }
+
+
+/*
+ * ticket
+ */
+#fieldset_page { max-width: 700px; }
+#fieldset_page textarea { border: 1px outset black; }
+#fieldset_page input { border: 1px outset black; }
+#fieldset_page fieldset { border: 1px outset black; padding: 1em }
+#fieldset_page legend { font-size: 13px; font-weight: bold; }
+
+#ticket { 
+ background: #E2EBF5;
+ border: 1px outset #996;
+ padding: 1em;
+ position: relative;
+}
+
+#ticket h1, #ticket h2 { margin: 0 }
+#ticket h2 { font-weight: normal; font-size: 150%; margin-bottom: 1em }
+#ticket .date { color: #996; font-size: 130%; float: right; position: relative }
+
+#ticket table { border-collapse: collapse; width: 100%; }
+#ticket tr { border-bottom: 1px dashed white; }
+
+#ticket td, #ticket th { font-size: 90%; padding: .5em 1em; vertical-align: top }
+#ticket th { color: #996; font-weight: normal; text-align: left; }
+#ticket hr { color: #dd9; border-color: /*#dd9*/ black; border-width: 1px 0 0; height: 1px; margin: .5em 0 0 }
+
+#changelog .title { background-color: white }
+#comment textarea { width: 600px; }
+
+#properties th { text-align: left; }
+#properties input { width: 520px; }
+#properties textarea { width: 520px; }
