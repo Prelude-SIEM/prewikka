@@ -1,9 +1,6 @@
 import PyTpl
 
-class NormalLayout(PyTpl.Template):
-    def __init__(self):
-        PyTpl.PyTpl.__init__(self, "tpl/normalLayout.tpl")
-
+class Normal(PyTpl.Template):
     def setHelp(self, help):
         self["help"].HELP = help
 

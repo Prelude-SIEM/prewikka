@@ -88,6 +88,7 @@ class PYTPL_block:
             return ""
 
 
+
 class PyTpl(PYTPL_block):
     """
     """
@@ -100,4 +101,5 @@ class PyTpl(PYTPL_block):
 
 class Template(PyTpl):
     def __init__(self):
-        PyTpl.__init__(self, "inc/templates/resources/%s.tpl" % self.__class__.__name__)
+        template_file = "inc/" + self.__module__.replace(".", "/") + ".tpl"
+        PyTpl.__init__(self, template_file)
