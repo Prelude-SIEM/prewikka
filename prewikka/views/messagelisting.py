@@ -133,20 +133,6 @@ class AlertListingParameters(MessageListingParameters):
         self.optional("alert.classification.text", list, [ ])
         self.optional("alert.assessment.impact.severity", list, [ ])
         self.optional("alert.assessment.impact.completion", list, [ ])
-        self.optional("alert.source.user.user_id.name", list, [ ])
-        self.optional("alert.source.process.name", list, [ ])
-        self.optional("alert.source.service.name", list, [ ])
-        self.optional("alert.source.service.port", list, [ ])
-        self.optional("alert.source.interface", list, [ ])
-        self.optional("alert.target.user.user_id.name", list, [ ])
-        self.optional("alert.target.process.name", list, [ ])
-        self.optional("alert.target.service.name", list, [ ])
-        self.optional("alert.target.service.port", list, [ ])
-        self.optional("alert.target.interface", list, [ ])
-        self.optional("alert.analyzer.name", list, [ ])
-        self.optional("alert.analyzer.manufacturer", list, [ ])
-        self.optional("alert.analyzer.model", list, [ ])
-        self.optional("alert.analyzer.class", list, [ ])
         
 
     def normalize(self):
@@ -160,17 +146,18 @@ class AlertListingParameters(MessageListingParameters):
             if not completion in ("succeeded", "failed", "none"):
                 raise view.InvalidParameterValueError("alert.assessment.impact.completion", completion)
         
-        for direction in "source", "target":
-            self["alert.%s.node" % direction] = [ ]
-            for parameter, value in self.items():
-                idx = parameter.find("%s_type_" % direction)
+        for column in "source", "target", "analyzer":
+            self[column] = [ ]
+            for parameter, object in self.items():
+                idx = parameter.find(column + "_object_")
                 if idx == -1:
                     continue
-                num = parameter.replace("%s_type_" % direction, "", 1)
+                num = parameter.replace(column + "_object_", "", 1)
 
-                if self.has_key("alert.%s.node_%s" % (direction, num)):
-                    self["alert.%s.node" % direction].append((value,
-                                                              self["alert.%s.node_%s" % (direction, num)]))
+                try:
+                    self[column].append((object, self["%s_value_%s" % (column, num)]))
+                except KeyError:
+                    pass # ignore empty inputs
 
 
 
@@ -556,38 +543,28 @@ class AlertListing(MessageListing, view.View):
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.completion",
                                       ["failed", "succeeded", "none"])
         
-        print "completion:", self.parameters["alert.assessment.impact.completion"]
 
-    def _applyAnalyzerFilters(self, criteria):
-        self.dataset["analyzer_filtered"] = False
-        self._applySimpleFilter(criteria, "analyzer", "alert.analyzer.name")
-        self._applySimpleFilter(criteria, "analyzer", "alert.analyzer.manufacturer")
-        self._applySimpleFilter(criteria, "analyzer", "alert.analyzer.model")
-        self._applySimpleFilter(criteria, "analyzer", "alert.analyzer.class")
-
-    def _applyDirectionFilters(self, criteria, direction):
-        self.dataset[direction + "_filtered"] = False
+    def _applyCheckboxFilters(self, criteria, type):
+        def get_operator(object):
+            if object in ("alert.source.service.port", "alert.target.service.port"):
+                return "=="
+            return "substr"
         
-        if self.parameters["alert.%s.node" % direction]:
-            criteria.append(" || ".join(map(lambda (o,v): "%s substr '%s'" % (o, v),
-                                                self.parameters["alert.%s.node" % direction])))
-            self.dataset["alert.%s.node" % direction] = self.parameters["alert.%s.node" % direction]
-            self.dataset["%s_filtered" % direction] = True
+        if self.parameters[type]:
+            criteria.append("(" + " || ".join(map(lambda (object, value): "%s %s '%s'" %
+                                                  (object, get_operator(object), value),
+                                                  self.parameters[type])) + ")")
+            self.dataset[type] = self.parameters[type]
+            self.dataset["%s_filtered" % type] = True
         else:
-            self.dataset["alert.%s.node" % direction] = [ ("alert.%s.node.address.address" % direction, "") ]
-            self.dataset["%s_filtered" % direction] = False
-
-        self._applySimpleFilter(criteria, direction, "alert.%s.user.user_id.name" % direction)
-        self._applySimpleFilter(criteria, direction, "alert.%s.process.name" % direction)
-        self._applySimpleFilter(criteria, direction, "alert.%s.service.name" % direction)
-        self._applySimpleFilter(criteria, direction, "alert.%s.service.port" % direction)
-        self._applySimpleFilter(criteria, direction, "alert.%s.interface" % direction)
+            self.dataset[type] = [ ("", "") ]
+            self.dataset["%s_filtered" % type] = False
         
     def _applyFilters(self, criteria):
         self._applyClassificationFilters(criteria)
-        self._applyDirectionFilters(criteria, "source")
-        self._applyDirectionFilters(criteria, "target")
-        self._applyAnalyzerFilters(criteria)
+        self._applyCheckboxFilters(criteria, "source")
+        self._applyCheckboxFilters(criteria, "target")
+        self._applyCheckboxFilters(criteria, "analyzer")
 
     def render(self):
         criteria = [ ]
