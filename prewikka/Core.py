@@ -25,7 +25,7 @@ import distutils.spawn
 
 import copy
 
-from prewikka import Config, Log, Prelude, Chart, ParametersNormalizer, User, \
+from prewikka import Config, Log, Prelude, ParametersNormalizer, User, \
      DataSet, Error, utils
 
 
@@ -44,7 +44,6 @@ class PermissionDeniedError(Error.SimpleError):
 
 class Core:
     def __init__(self):
-        self._launchIdleIfNeeded()
         class Env: pass
         self._env = Env()
         self._env.config = Config.Config()
@@ -77,10 +76,6 @@ class Core:
                     self.env.auth.logout(self.request)
             
             self._views.update(Logout().get())
-
-    def _launchIdleIfNeeded(self):
-        daemon = Chart.ChartGenerator()
-        daemon.run()
 
     def _loadViews(self):
         import prewikka.views
