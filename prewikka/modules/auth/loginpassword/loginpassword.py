@@ -25,8 +25,7 @@ from prewikka import Auth, User, Storage
 
 class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
     def __init__(self, env, config):
-        Auth.LoginPasswordAuth.__init__(self,
-                                        env.storage,
+        Auth.LoginPasswordAuth.__init__(self, env,
                                         int(config.getOptionValue("expiration", 60)) * 60)
         
         if not self.storage.hasPassword(User.ADMIN_LOGIN):

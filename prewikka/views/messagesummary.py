@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import view, User
+from prewikka import view, User, utils
 
 
 class MessageParameters(view.RelativeViewParameters):
@@ -43,7 +43,9 @@ class MessageSummary:
         if value is None or value == "":
             return
 
-        self._current_section["entries"].append({ "name": name, "value": value, "emphase": emphase })
+        self._current_section["entries"].append({ "name": name,
+                                                  "value": value,
+                                                  "emphase": emphase })
 
     def endSection(self):
         if self._current_section["entries"]:
@@ -80,7 +82,8 @@ class MessageSummary:
             value = alert["additional_data(%d).data" % i]
             if alert["additional_data(%d).type" % i] == "byte-string":
                 value = utils.hexdump(value)
-            emphase = (alert["analyzer.model"] == "Prelude LML" and alert["additional_data(%d).meaning" % i] == "Original Log")
+            emphase = (alert["analyzer.model"] == "Prelude LML" and
+                       alert["additional_data(%d).meaning" % i] == "Original Log")
             self.newSectionEntry(meaning, value, emphase)
             i += 1
         
@@ -186,7 +189,8 @@ class HeartbeatSummary(MessageSummary, view.View):
         self.endSection()
 
     def render(self):
-        heartbeat = self.env.prelude.getHeartbeat(self.parameters["analyzerid"], self.parameters["ident"])
+        heartbeat = self.env.prelude.getHeartbeat(self.parameters["analyzerid"],
+                                                  self.parameters["ident"])
         self.dataset["sections"] = [ ]
         self.buildAnalyzer(heartbeat)
         self.buildTime(heartbeat)

@@ -133,30 +133,30 @@ class Core:
         del object.env
         
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
+        interface = self._env.config.interface
         dataset["document.title"] = "[PREWIKKA]"
         dataset["document.css_files"] = [ "lib/style.css" ]
         dataset["document.js_files"] = [ "lib/functions.js" ]
-        dataset["prewikka.title"] = self._env.config.interface.getOptionValue("title", "Prelude management")
-        dataset["prewikka.software"] = self._env.config.interface.getOptionValue("software", "Prewikka")
-        dataset["prewikka.place"] = self._env.config.interface.getOptionValue("place", "company ltd.")
+        dataset["prewikka.title"] = interface.getOptionValue("title", "Prelude management")
+        dataset["prewikka.software"] = interface.getOptionValue("software", "Prewikka")
+        dataset["prewikka.place"] = interface.getOptionValue("place", "company ltd.")
         dataset["prewikka.url.referer"] = request.getReferer()
         dataset["prewikka.url.current"] = request.getQueryString()
         dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
 
-##         dataset["interface.sections"] = map(lambda section: (section[0], utils.create_link(section[1][0][1][0])),
-##                                             self._positions)
-
         dataset["interface.sections"] = [ ]
-        for section_name, tabs in self._sections:
-            viewable_tabs = 0
-            for tab_name, views in tabs:
-                default_view = views[0]
-                if user.has(self._views[default_view]["permissions"]):
-                    viewable_tabs += 1                            
+        if user:
+            for section_name, tabs in self._sections:
+                viewable_tabs = 0
+                for tab_name, views in tabs:
+                    default_view = views[0]
+                    if user.has(self._views[default_view]["permissions"]):
+                        viewable_tabs += 1                            
 
-            if viewable_tabs > 0:
-                dataset["interface.sections"].append((section_name, utils.create_link(tabs[0][1][0])))
-                
+                if viewable_tabs > 0:
+                    dataset["interface.sections"].append((section_name,
+                                                          utils.create_link(tabs[0][1][0])))
+                    
         import prewikka.view
 
         if view and self._views_position.has_key(view["name"]):
@@ -169,16 +169,19 @@ class Core:
         dataset["interface.active_section"] = active_section
 
         dataset["interface.tabs"] = [ ]
-        for tab, views in tabs:
-            if user.has(self._views[views[0]]["permissions"]):
-                dataset["interface.tabs"].append((tab, utils.create_link(views[0])))
+        if user:
+            for tab, views in tabs:
+                if user.has(self._views[views[0]]["permissions"]):
+                    dataset["interface.tabs"].append((tab, utils.create_link(views[0])))
         
         dataset["interface.tabs"] = [ (tab, utils.create_link(views[0])) for tab, views in tabs ]
         dataset["interface.active_tab"] = active_tab
 
         if user:
             dataset["prewikka.user.login"] = user and user.login or None
-            dataset["prewikka.user.logout"] = self._env.auth.canLogout() and utils.create_link("logout") or None
+            dataset["prewikka.user.logout"] = self._env.auth.canLogout() and \
+                                              utils.create_link("logout") or \
+                                              None
 
     def _printDataSet(self, dataset, level=0):
         for key, value in dataset.items():
@@ -229,7 +232,9 @@ class Core:
     def checkAuth(self, request):
         if self._env.auth:
             login = self._env.auth.getLogin(request)
-            permissions = self._env.storage and self._env.storage.getPermissions(login) or User.ALL_PERMISSIONS
+            permissions = self._env.storage and \
+                          self._env.storage.getPermissions(login) or \
+                          User.ALL_PERMISSIONS
         else:
             login = "anonymous"
             permissions = User.ALL_PERMISSIONS
@@ -238,7 +243,6 @@ class Core:
     
     def process(self, request):
         self._env.log(Log.EVENT_QUERY, request)
-        request.env = self._env
 
         try:
             user = None

@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import view, User
+from prewikka import view, User, utils
 from prewikka.views.messagesummary import MessageParameters
 
 

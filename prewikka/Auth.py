@@ -38,10 +38,11 @@ class AuthError(PrewikkaError):
 
 
 class Auth:
-    def __init__(self, storage):
-        if not storage:
+    def __init__(self, env):
+        if not env.storage:
             raise Exception("You must have a storage backend in order to use authentication.")
-        self.storage = storage
+        self.storage = env.storage
+        self.log = env.log
         login = User.ADMIN_LOGIN
         if not self.storage.hasUser(login):
             self.storage.createUser(login)
@@ -68,12 +69,12 @@ class Session:
         try:
             login, t = self.storage.getSession(sessionid)
         except Storage.StorageError:
-            request.env.log(Log.EVENT_INVALID_SESSIONID, request, sessionid)
+            self.log(Log.EVENT_INVALID_SESSIONID, request)
             raise AuthError("invalid sessionid")
 
         if time.time() > t + self._expiration:
             self.storage.deleteSession(sessionid)
-            request.env.log(Log.EVENT_SESSION_EXPIRED, request, login, sessionid)
+            self.log(Log.EVENT_SESSION_EXPIRED, request)
             raise AuthError("session expired")
 
         return login
@@ -92,8 +93,8 @@ class Session:
 
 
 class LoginPasswordAuth(Auth, Session):
-    def __init__(self, storage, session_expiration):
-        Auth.__init__(self, storage)
+    def __init__(self, env, session_expiration):
+        Auth.__init__(self, env)
         Session.__init__(self, session_expiration)
 
     def getLogin(self, request):
