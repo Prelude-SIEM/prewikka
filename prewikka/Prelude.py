@@ -116,7 +116,6 @@ class Prelude(PreludeDB):
                            user=config.getOptionValue("user", "prelude"),
                            password=config.getOptionValue("password", "prelude"),
                            log=config.getOptionValue("log", None))
-        self.connect()
 
     def getAlertIdents(self, criteria=None, limit=-1, offset=-1):
         if criteria:
@@ -127,16 +126,6 @@ class Prelude(PreludeDB):
         if criteria:
             criteria = prelude.IDMEFCriteria(criteria)
         return self.get_heartbeat_idents(criteria, limit, offset) or [ ]
-
-##     def _getLastMessageIdent(self, type, analyzerid):
-##         criteria = None
-##         if analyzerid != None:
-##             criteria = "%s.analyzer.analyzerid == %d" % (type, analyzerid)
-
-##         rows = self.getValues(selection=("%s.create_time/order_desc" % type, "%s.messageid" % type),
-##                               criteria=criteria, limit=1)
-
-##         return rows[0][1]
 
     def _getLastMessageIdent(self, type, get_message_ident, analyzerid):
         criteria = None
