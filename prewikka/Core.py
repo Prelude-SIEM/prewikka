@@ -34,7 +34,7 @@ from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer,
 
 class InvalidQueryError(Error.SimpleError):
     def __init__(self, query):
-        Error.SimpleError.__init__(self, "query error", "invalid query " + query)
+        Error.SimpleError.__init__(self, "query error", "invalid query")
 
 
 
@@ -260,6 +260,7 @@ class Core:
         except Error.PrewikkaError, e:
             template_name = e.template
             dataset = e.dataset
+            dataset["query"] = request.getQueryString()
             self._setupDataSet(dataset, request, user)
 
         #self._printDataSet(dataset)

@@ -104,7 +104,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         shutil.copyfileobj(f, self.wfile)
         
     def do_GET(self):
-        self._query_string = self.path
+        self._query_string = self.raw_requestline
         self.init()
         if self.path == "/":
             self._processDynamic({ })
