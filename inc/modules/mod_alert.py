@@ -36,6 +36,7 @@ class MyTime:
                         t[2] = 1
                         if unit != "month":
                             t[1] = 1
+                            t[0] += 1
                         else:
                             t[1] += 1
                     else:
