@@ -5,7 +5,7 @@ import random
 import md5
 
 from prewikka import Log, Interface, Views
-from prewikka.templates import LoginPasswordForm, Table, PropertiesChange
+from prewikka.templates import LoginPasswordForm, PropertiesChange
 from prewikka.templates import UserListing
 
 

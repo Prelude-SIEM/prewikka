@@ -24,9 +24,7 @@ import copy
 
 from prewikka import Views, Interface
 from prewikka.modules.main import ActionParameters
-from prewikka.templates import Table
-from prewikka.modules.main.templates import MessageSummary, MessageDetails,\
-     HeartbeatsAnalyze
+from prewikka.modules.main.templates import MessageSummary, MessageDetails
 from prewikka import utils
 
 
@@ -748,22 +746,3 @@ class SensorListingView(SensorsSection, template("SensorListing")):
         analyzer["alerts"] = self.createLink(Action("SensorAlertListing")(), parameters)
         analyzer["heartbeats"] = self.createLink(Action("SensorHeartbeatListing")(), parameters)
         self.analyzers.append(analyzer)
-        
-    def buildMainContent(self, analyzers):
-        table = Table.Table()
-        
-        table.setHeader(("Analyzerid", "Type", "OS", "Name", "Location", "Address", "", ""))
-        
-        for analyzer in analyzers:
-            parameters = ActionParameters.SensorMessageListing()
-            parameters.setAnalyzerid(analyzer["analyzerid"])
-            table.addRow((analyzer["analyzerid"],
-                          "%s %s" % (analyzer["model"], analyzer["version"]),
-                          "%s %s" % (analyzer["ostype"], analyzer["osversion"]),
-                          analyzer["name"],
-                          analyzer["location"],
-                          analyzer["address"],
-                          self._createLinkTag(Action("SensorAlertListing"), parameters, "alerts"),
-                          self._createLinkTag(Action("SensorHeartbeatListing"), parameters, "heartbeats")))
-            
-        return str(table)
