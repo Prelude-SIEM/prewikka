@@ -1,0 +1,64 @@
+
+we're using mvc really loosely here, beware...
+
+'module' is composite of it's model, view and controller.
+
+modules model sits in inc/modules/modMODULENAME.py file
+
+model has following api:
+
+class module:
+    def __init__(self, r, data):
+        """
+        r would be the request, most likely requested action or pagename
+        data would be the data associated with request:
+        if r=get, and get[v1]=a, get[v2]=b, then data would be
+        {'v1':'a', 'v2':'b'}
+        """
+    def request(self):
+        """
+        This is called right before output is asked. module should prepare it's data during this call
+        possibly based on (in constructor) given r and data .
+        """
+    def get(self):
+        """
+        This is called when module should have it's output ready. output has following format
+        view = {
+            "layout":"normal", 
+            "views":{
+                "main":"pagedata. this will be visible",
+                "active":"active sublabel, this  (if any) will be highlighted", 
+                "sid":"sessionid of client",
+                "pages":[
+                    ("internalname, would be r","Description visible for user"),
+                    ]
+                }
+            }
+        return view
+        """
+    
+Controller sits in inc/modules/lib and is named MODULEhandler.py - it has no general API. 
+
+'View' sits in /tpl/ and is presented as .tpl - files. .tpl is like html but serves as simple
+templating framework. (if you now pears IT.php/Integrated_template.php you know this)
+
+templates are used via PyTpl and are constructed like.
+
+variables:
+
+variables are presented as {VARIABLENAME} - note that using caps is not forced, it's only suggested
+loops are presented as <!-- BEGIN loopname -->loopstuff<!-- END loopname --> - note that using
+lower case letters in loopname is not forced, it's only suggested
+
+variables are set via tpl.VARIABLENAME = "variabledata" or tpl.setVar("VARIABLENAME", "variabledata)
+loops are used via tpl['loopname'], each loop acts like a template (it's recursive structure)
+loops and templates are parsed by .parse() method (so you can run loop multiple times easily)
+
+for x in range(0,100):
+    tpl['loop'].X = str(x)
+    tpl['loop'].parse()
+
+value of template is retrieved via .get()
+
+
+

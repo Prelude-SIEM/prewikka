@@ -1,0 +1,48 @@
+Copyright 2004
+------------------------------------------
+Miika Keskinen miika.keskinen@citadec.com
+Markus Alkio markus.alkio@citadec.com
+Citadec Solutions OY
+
+License:
+------------------------------------------
+GPL
+
+
+Code organization
+--------------------------------------------
+/
+|
+|-doc                                   - documentation
+|-img                                   - www - images
+|-lib                                   - stylesheet(s)
+|-tpl                                   - www templates
+|-inc                                   - root for code
+    |-modules                           - root for submodules
+    |       |-lib                       - module specific handlers
+    |
+    |-layout                            - layout classes
+
+Configuration
+----------------------------------------------
+
+configuration happens through inc/config.py
+sample configuration for apache is given in apache.conf
+(one might Include apache.conf)
+
+todo
+---------------------------------------------
+still lots of things, most notably  (these are under construction)
+
+-alert filters
+-reports
+-better user managements (sensor-based acl etc)
+-heartbeat monitor
+-better name
+
+future
+--------------------------------------------
+to get good alternative and good overall management gui for
+best ids!
+
+
