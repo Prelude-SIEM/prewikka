@@ -26,7 +26,7 @@
 	<td>$option.description</td>
 	<td>
 	  #if not $is_instance
-	    <form action='?' method='get'>
+	    <form action='?' method='POST'>
 	      #for $name, $value in $hiddens.items()
 	        <input type='hidden' name='$name' value='$value'/>
 	      #end for
@@ -51,7 +51,7 @@
 	</form>
 	#end if
 	#if $option.destroyable
-          <form action='?' method='get'>
+          <form action='?' method='POST'>
 	    #for $name, $value in $hiddens.items()
 	      <input type='hidden' name='$name' value='$value'/>
 	    #end for
@@ -89,7 +89,7 @@
       <tr class="$row_classes[$cnt%2]">
         <td>$instance.name</td>
         <td><a href='$instance.view'>view</a></td>
-        <form action='?' method='get'>
+        <form action='?' method='POST'>
           #for $name, $value in $hiddens.items()
             <input type='hidden' name='$name' value='$value'/>
           #end for
@@ -102,7 +102,7 @@
     #end for
   </tbody>
   <tfoot>
-    <form action='?' method='get'>
+    <form action='?' method='POST'>
       #for $name, $value in $hiddens.items()
         <input type='hidden' name='$name' value='$value'/>
       #end for
@@ -122,7 +122,7 @@
 
 
 #if $is_instance
-<form action='?' method='get'>
+<form action='?' method='POST'>
   #for $name, $value in $hiddens.items()
   <input type='hidden' name='$name' value='$value'/>
   #end for
