@@ -749,6 +749,13 @@ ul#popup_block > li:hover > ul {
  * misc
  */
 
+#fieldset_heading {
+	background: #E2EBF5;
+	border: 1px outset #996;
+	padding: 1em;
+	position: relative;
+}
+
 #fieldset_heading h1, #fieldset_heading h2 { margin: 0 }  
 #fieldset_heading h2 { font-weight: normal; font-size: 150%; margin-bottom: 1em }
 #fieldset_heading .date { color: #996; font-size: 130%; float: right; position: relative }  
