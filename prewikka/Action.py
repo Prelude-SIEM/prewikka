@@ -109,12 +109,12 @@ class ActionEngine:
             self._log.event(Log.EVENT_INVALID_ACTION, request, action_name)
             raise ActionInvalidError
 
-    def _execute(self, core, handler, parameters, request):
+    def _execute(self, handler, request):
         if isinstance(handler, Action):
-            return handler.process(core, parameters, request)
-        return handler(core, parameters, request)
+            return handler.process(request)
+        return handler(request)
 
-    def process(self, core, registered, arguments, request):
+    def process(self, registered, arguments, request):
         if request.user:
             required = registered.capabilities
             if filter(lambda cap: request.user.hasCapability(cap), required) != required:
@@ -131,17 +131,16 @@ class ActionEngine:
             self._log.event(Log.EVENT_INVALID_ACTION_PARAMETERS, request, str(e))
             raise
 
-        return self._execute(core, handler, parameters, request)
+        request.parameters = parameters
 
-    def processDefaultAction(self, core, request):
-        return self.process(core, self._default_action, { }, request)
+        return self._execute(handler, request)
+
+    def processDefaultAction(self, request):
+        return self.process(self._default_action, { }, request)
     
 
 
 class Action(object):
-    def process(self, core, parameters):
-        pass
-    
     def getName(self):
         return self.__module__ + "." + self.__class__.__name__
 
@@ -160,15 +159,15 @@ class ActionParameters:
     def register(self):
         pass
     
-    def registerParameter(self, name, type):
+    def registerParameter(self, name, type, required=False):
         if self._parameters.has_key(name):
             raise ActionParameterAlreadyRegisteredError(name)
         
-        self._parameters[name] = type
+        self._parameters[name] = { "type": type, "required": required }
         
     def __setitem__(self, name, value):
         try:
-            parameter_type = self._parameters[name]
+            parameter_type = self._parameters[name]["type"]
         except KeyError:
             raise ActionParameterInvalidError(name)
         
@@ -199,8 +198,10 @@ class ActionParameters:
             self[name] = value
         
     def check(self):
-        return True
-
+        for name in self._parameters.keys():
+            if self._parameters[name]["required"] and not self.hasParameter(name):
+                raise ActionParameterMissingError(name)
+            
     def getNames(self, ignore=[]):
         return filter(lambda name: not name in ignore, self._values.keys())
 

@@ -23,13 +23,8 @@ from prewikka import Action
 class Message(Action.ActionParameters):
     def register(self):
         Action.ActionParameters.register(self)
-        self.registerParameter("analyzerid", long)
-        self.registerParameter("message_ident", long)
-
-    def check(self):
-        for parameter in "analyzerid", "message_ident":
-            if not self.hasParameter(parameter):
-                raise Action.ActionParameterMissingError(parameter)
+        self.registerParameter("analyzerid", long, required=True)
+        self.registerParameter("message_ident", long, required=True)
         
     def setAnalyzerid(self, analyzerid):
         self["analyzerid"] = analyzerid
@@ -54,6 +49,8 @@ class MessageListing(Action.ActionParameters):
         self.registerParameter("timeline_end", int)
 
     def check(self):
+        Action.ActionParameters.check(self)
+        
         if self.hasParameter("filter_name") ^ self.hasParameter("filter_value"):
             raise Action.ActionParameterMissingError(self.hasParameter("filter_name") and "filter_name" or "filter_value")
 
@@ -117,12 +114,7 @@ class MessageListingDelete(MessageListing, Delete):
 class SensorMessageListing(MessageListing):
     def register(self):
         MessageListing.register(self)
-        self.registerParameter("analyzerid", long)
-        
-    def check(self):
-        MessageListing.check(self)
-        if not self.hasParameter("analyzerid"):
-            raise Action.ActionParameterMissingError("analyzerid")
+        self.registerParameter("analyzerid", long, required=True)
         
     def setAnalyzerid(self, analyzerid):
         self["analyzerid"] = analyzerid

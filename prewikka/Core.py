@@ -34,7 +34,6 @@ class Core:
         self.log = Log.Log()
         self.action_engine = Action.ActionEngine(self.log)
         self.interface = Interface.Interface(self, self._config.get("interface", { }))
-        self.action_engine
         self.prelude = Prelude.Prelude(self._config["prelude"])
         self.auth = None
         self._initModules()
@@ -63,11 +62,15 @@ class Core:
                 module = __import__(file)
                 module.load(self, self._config.modules.get(mod_name, { }))
             except ImportError:
-                self.log.error("cannot load module named %s (%s)" % (mod_name, file))
+                self._log.error("cannot load module named %s (%s)" % (mod_name, file))
                 raise
         
     def process(self, request):
-        self.log.event(Log.EVENT_QUERY, request, request.getQueryString())
+        self.log(Log.EVENT_QUERY, request, request.getQueryString())
+
+        request.log = self.log
+        request.prelude = self.prelude
+        request.action_engine = self.action_engine
 
         arguments = copy.copy(request.arguments)
         if arguments.has_key("action"):
@@ -80,13 +83,13 @@ class Core:
 
         if self.auth:
             if registered_action == self.action_engine.getLoginAction():
-                view = self.action_engine.process(self, registered_action, arguments, request)
+                view = self.action_engine.process(registered_action, arguments, request)
             else:
                 view = self.auth.check(request)
                 if not view:
-                    view = self.action_engine.process(self, registered_action, arguments, request)
+                    view = self.action_engine.process(registered_action, arguments, request)
         else:
-            view = self.action_engine.process(self, registered_action, arguments, request)
+            view = self.action_engine.process(registered_action, arguments, request)
 
         interface = self.interface
         

@@ -65,7 +65,7 @@ class Log:
     def registerBackend(self, backend):
         self._backends.append(backend)
         
-    def event(self, event, *args, **kwargs):
+    def __call__(self, event, *args, **kwargs):
         for backend in self._backends:
             apply(backend.event, (event, ) + args, kwargs)
 

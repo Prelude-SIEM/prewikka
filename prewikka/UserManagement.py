@@ -40,17 +40,14 @@ CAPABILITIES_ADMIN = CAPABILITIES
 
 class LoginPasswordActionParameters(Action.ActionParameters):
     def register(self):
-        self.registerParameter("login", str)
-        self.registerParameter("password", str)
+        self.registerParameter("login", str, required=True)
+        self.registerParameter("password", str, required=True)
         
     def getLogin(self):
         return self["login"]
     
     def getPassword(self):
         return self["password"]
-    
-    def check(self):
-        return self.hasParameter("login") and self.hasParameter("password")
 
 
 
@@ -70,14 +67,14 @@ class CapabilityActionParameters:
             if self.hasParameter(capability) and self[capability] != "on":
                 raise Action.ActionParameterInvalidError(capability)
 
-            
+
 
 class AddUserActionParameters(Action.ActionParameters, CapabilityActionParameters):
     def register(self):
         CapabilityActionParameters.register(self)
-        self.registerParameter("login", str)
-        self.registerParameter("password1", str)
-        self.registerParameter("password2", str)
+        self.registerParameter("login", str, required=True)
+        self.registerParameter("password1", str, required=True)
+        self.registerParameter("password2", str, required=True)
         
     def getLogin(self):
         return self["login"]
@@ -86,43 +83,36 @@ class AddUserActionParameters(Action.ActionParameters, CapabilityActionParameter
         return self["password1"]
     
     def check(self):
+        Action.ActionParameters.check(self)
         CapabilityActionParameters.check(self)
-        for parameter in "login", "password1", "password2":
-            if not self.hasParameter(parameter):
-                raise Action.ActionParameterMissingError(parameter)
 
 
 
 class UserActionParameters(Action.ActionParameters):
     def register(self):
-        self.registerParameter("id", int)
+        self.registerParameter("id", int, required=True)
         
     def getID(self):
         return self["id"]
     
     def setID(self, id):
         self["id"] = id
-        
-    def check(self):
-        if not self.hasParameter("id"):
-            raise Action.ActionParameterMissingError("id")
 
 
 
 class ChangePasswordActionParameters(UserActionParameters):
     def register(self):
         UserActionParameters.register(self)
-        self.registerParameter("password1", str)
-        self.registerParameter("password2", str)
+        self.registerParameter("password1", str, required=True)
+        self.registerParameter("password2", str, required=True)
         
     def getPassword(self):
         return self["password1"]
         
     def check(self):
         UserActionParameters.check(self)
-        for parameter in "password1", "password2":
-            if not self.hasParameter(parameter):
-                raise Action.ActionParameterMissingError(parameter)
+        if self["password1"] != self["password2"]:
+            raise Action.ActionParameterError
 
 
 
@@ -134,11 +124,6 @@ class ChangeCapabilitiesActionParameters(UserActionParameters, CapabilityActionP
     def check(self):
         UserActionParameters.check(self)
         CapabilityActionParameters.check(self)
-
-
-
-def template(name):
-    return getattr(__import__("prewikka/templates/" + name), name)
 
 
 
@@ -299,20 +284,20 @@ class UserManagement:
         else:
             return self._checkSession(request)
         
-    def login(self, core, parameters, request):
-        login = parameters.getLogin()
-        password = parameters.getPassword()
+    def login(self, request):
+        login = request.parameters.getLogin()
+        password = request.parameters.getPassword()
         
         try:
             user = self.getUserByLogin(login)
         except LoginError:
-            core.log.event(Log.EVENT_BAD_LOGIN, request, login)
+            request.log(Log.EVENT_BAD_LOGIN, request, login)
             raise AuthError
         
         try:
             user.checkPassword(password)
         except PasswordError:
-            core.log.event(Log.EVENT_BAD_PASSWORD, request, login, password)
+            request.log(Log.EVENT_BAD_PASSWORD, request, login, password)
             raise AuthError
         
         t = int(time.time())
@@ -323,11 +308,11 @@ class UserManagement:
         request.output_cookie["sessionid"] = sessionid
         request.user = user
         
-        core.log.event(Log.EVENT_LOGIN_SUCCESSFUL, request, user)
+        request.log(Log.EVENT_LOGIN_SUCCESSFUL, request, user)
         
-        return self.core.action_engine.processDefaultAction(core, request)
+        return request.action_engine.processDefaultAction(request)
     
-    def handle_user_listing(self, core, parameters, request):
+    def handle_user_listing(self, request):
         ids = self.getUsers()
         ids.sort()
         view = UserListingView(self.handle_user_add_form,
@@ -341,47 +326,55 @@ class UserManagement:
         return view
         
     
-    def handle_user_add_form(self, core, parameters, request):
+    def handle_user_add_form(self, request):
         return UserAddForm(self.handle_user_add)
     
-    def handle_user_add(self, core, parameters, request):
+    def handle_user_add(self, request):
         user = self.newUser()
-        user.setLogin(parameters.getLogin())
-        user.setPassword(parameters.getPassword())
-        user.setCapabilities(parameters.getCapabilities())
+        user.setLogin(request.parameters.getLogin())
+        user.setPassword(request.parameters.getPassword())
+        user.setCapabilities(request.parameters.getCapabilities())
         user.save()
-        
-        return self.handle_user_listing(core, Action.ActionParameters(), request)
-        
-    def handle_user_delete(self, core, parameters, request):
-        self.removeUser(parameters.getID())
-        
-        return self.handle_user_listing(core, Action.ActionParameters(), request)
-    
-    def handle_change_password_form(self, core, parameters, request):
-        return ChangePasswordForm(parameters.getID(), self.handle_change_password)
-    
-    def handle_change_password(self, core, parameters, request):
-        user = self.getUserByID(parameters.getID())
-        user.setPassword(parameters.getPassword())
-        user.save()
-        
-        return self.handle_user_listing(core, Action.ActionParameters(), request)
-    
-    def handle_change_capabilities_form(self, core, parameters, request):
-        return ChangeCapabilitiesForm(self.getUserByID(parameters.getID()), self.handle_change_capabilities)
-    
-    def handle_change_capabilities(self, core, parameters, request):
-        user = self.getUserByID(parameters.getID())
-        user.setCapabilities(parameters.getCapabilities())
-        user.save()
-        
-        return self.handle_user_listing(core, Action.ActionParameters(), request)
 
-    def handle_user_logout(self, core, parameters, request):
+        request.parameters = Action.ActionParameters()
+        
+        return self.handle_user_listing(request)
+        
+    def handle_user_delete(self, request):
+        self.removeUser(request.parameters.getID())
+
+        request.parameters = Action.ActionParameters()
+        
+        return self.handle_user_listing(request)
+    
+    def handle_change_password_form(self, request):
+        return ChangePasswordForm(request.parameters.getID(), self.handle_change_password)
+    
+    def handle_change_password(self, request):
+        user = self.getUserByID(request.parameters.getID())
+        user.setPassword(request.parameters.getPassword())
+        user.save()
+
+        request.parameters = Action.ActionParameters()
+        
+        return self.handle_user_listing(request)
+    
+    def handle_change_capabilities_form(self, request):
+        return ChangeCapabilitiesForm(self.getUserByID(request.parameters.getID()), self.handle_change_capabilities)
+    
+    def handle_change_capabilities(self, request):
+        user = self.getUserByID(request.parameters.getID())
+        user.setCapabilities(request.parameters.getCapabilities())
+        user.save()
+
+        request.parameters = Action.ActionParameters()
+        
+        return self.handle_user_listing(request)
+
+    def handle_user_logout(self, request):
         request.user.removeSession(request.input_cookie["sessionid"].value)
         request.user.save()
 
-        core.log.event(Log.EVENT_LOGOUT, request, request.user)
+        request.log(Log.EVENT_LOGOUT, request, request.user)
         
         return LoginPasswordPromptView(self.login)

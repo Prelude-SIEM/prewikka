@@ -92,13 +92,14 @@ class _MyTime:
 
 
 class MessageListing(Action.Action):
-    def _adjustCriteria(self, core, parameters, criteria):
+    def _adjustCriteria(self, request, criteria):
         pass
     
-    def process(self, core, parameters, request):
+    def process(self, request):
+        parameters = request.parameters
+        prelude = request.prelude
         view = self._getView()()
         view.setParameters(parameters)
-        prelude = core.prelude
         criteria = [ ]
         
         if parameters.getFilterName() and parameters.getFilterValue():
@@ -132,7 +133,7 @@ class MessageListing(Action.Action):
             view.setTimelinePrev(end[parameters.getTimelineUnit()] - parameters.getTimelineValue())
         
         criteria.append(self._createTimeCriteria(start, end))
-        self._adjustCriteria(core, parameters, criteria)
+        self._adjustCriteria(request, criteria)
         criteria = " && ".join(criteria)
         
         idents = self._getMessageIdents(prelude, criteria)
@@ -187,8 +188,8 @@ class HeartbeatListing(MessageListing):
 
 
 class AlertAction(Action.Action):
-    def process(self, core, parameters, request):
-        alert = core.prelude.getAlert(parameters.getAnalyzerid(), parameters.getMessageIdent())
+    def process(self, request):
+        alert = request.prelude.getAlert(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
         view = View(self.view_name)()
         view.setMessage(alert)
         return view
@@ -196,8 +197,8 @@ class AlertAction(Action.Action):
 
 
 class HeartbeatAction(Action.Action):
-    def process(self, core, parameters, request):
-        heartbeat = core.prelude.getHeartbeat(parameters.getAnalyzerid(), parameters.getMessageIdent())
+    def process(self, request):
+        heartbeat = request.prelude.getHeartbeat(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
         view = View(self.view_name)()
         view.setMessage(heartbeat)
         return view
@@ -225,24 +226,24 @@ class HeartbeatDetails(HeartbeatAction):
 
 
 class DeleteAlerts(AlertListing):
-    def process(self, core, parameters, request):
-        for analyzerid, alert_ident in parameters.getIdents():
-            core.prelude.deleteAlert(analyzerid, alert_ident)
+    def process(self, request):
+        for analyzerid, alert_ident in request.parameters.getIdents():
+            request.prelude.deleteAlert(analyzerid, alert_ident)
         
-        parameters = ActionParameters.MessageListing(parameters)
+        request.parameters = ActionParameters.MessageListing(request.parameters)
         
-        return AlertListing.process(self, core, parameters, request)
+        return AlertListing.process(self, request)
 
 
 
 class DeleteHeartbeats(HeartbeatListing):
-    def process(self, core, parameters, request):
-        for analyzerid, heartbeat_ident in parameters.getIdents():
-            core.prelude.deleteHeartbeat(analyzerid, heartbeat_ident)
+    def process(self, request):
+        for analyzerid, heartbeat_ident in request.parameters.getIdents():
+            request.prelude.deleteHeartbeat(analyzerid, heartbeat_ident)
         
-        parameters = ActionParameters.MessageListing(parameters)
+        request.parameters = ActionParameters.MessageListing(request.parameters)
         
-        return HeartbeatListing.process(self, core, parameters, request)
+        return HeartbeatListing.process(self, request)
 
 
 
@@ -290,54 +291,54 @@ class DeleteHeartbeats(HeartbeatListing):
 
 
 class SensorAlertListing(AlertListing):
-    def _adjustCriteria(self, core, parameters, criteria):
-        criteria.append("alert.analyzer.analyzerid == %d" % parameters.getAnalyzerid())
+    def _adjustCriteria(self, request, criteria):
+        criteria.append("alert.analyzer.analyzerid == %d" % request.parameters.getAnalyzerid())
 
     def _getView(self):
         return View("SensorAlertListingView")
 
-    def process(self, core, parameters, request):
-        view = AlertListing.process(self, core, parameters, request)
-        view.setAnalyzer(core.prelude.getAnalyzer(parameters.getAnalyzerid()))
+    def process(self, request):
+        view = AlertListing.process(self, request)
+        view.setAnalyzer(request.prelude.getAnalyzer(request.parameters.getAnalyzerid()))
         
         return view
 
 
 
 class SensorDeleteAlerts(SensorAlertListing):
-    def process(self, core, parameters, request):
-        for analyzerid, alert_ident in parameters.getIdents():
-            core.prelude.deleteAlert(analyzerid, alert_ident)
+    def process(self, request):
+        for analyzerid, alert_ident in request.parameters.getIdents():
+            request.prelude.deleteAlert(analyzerid, alert_ident)
 
-        parameters = ActionParameters.SensorMessageListing(parameters)
+        request.parameters = ActionParameters.SensorMessageListing(request.parameters)
 
-        return SensorAlertListing.process(self, core, parameters, request)
+        return SensorAlertListing.process(self, request)
 
 
 
 class SensorHeartbeatListing(HeartbeatListing):
-    def _adjustCriteria(self, core, parameters, criteria):
-        criteria.append("heartbeat.analyzer.analyzerid == %d" % parameters.getAnalyzerid())
+    def _adjustCriteria(self, request, criteria):
+        criteria.append("heartbeat.analyzer.analyzerid == %d" % request.parameters.getAnalyzerid())
 
     def _getView(self):
         return View("SensorHeartbeatListingView")
 
-    def process(self, core, parameters, request):
-        view = HeartbeatListing.process(self, core, parameters, request)
-        view.setAnalyzer(core.prelude.getAnalyzer(parameters.getAnalyzerid()))
-
+    def process(self, request):
+        view = HeartbeatListing.process(self, request)
+        view.setAnalyzer(request.prelude.getAnalyzer(request.parameters.getAnalyzerid()))
+        
         return view
 
 
 
 class SensorDeleteHeartbeats(SensorHeartbeatListing):
-    def process(self, core, parameters, request):
-        for analyzerid, alert_ident in parameters.getIdents():
-            core.prelude.deleteHeartbeat(analyzerid, alert_ident)
+    def process(self, request):
+        for analyzerid, alert_ident in request.parameters.getIdents():
+            request.prelude.deleteHeartbeat(analyzerid, alert_ident)
 
-        parameters = ActionParameters.SensorMessageListing(parameters)
+        request.parameters = ActionParameters.SensorMessageListing(request.parameters)
 
-        return SensorHeartbeatListing.process(self, core, parameters, request)
+        return SensorHeartbeatListing.process(self, request)
 
 
 
@@ -362,10 +363,10 @@ class SensorHeartbeatDetails(HeartbeatDetails):
 
 
 class SensorListing(Action.Action):
-    def process(self, core, parameters, request):
+    def process(self, request):
         view = View("SensorListingView")()
         
-        prelude = core.prelude
+        prelude = request.prelude
         for analyzerid in prelude.getAnalyzerids():
             analyzer = prelude.getAnalyzer(analyzerid)
             view.addAnalyzer(analyzer)
