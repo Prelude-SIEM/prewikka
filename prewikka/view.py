@@ -73,7 +73,7 @@ class Parameters(dict):
             
             try:
                 value = parameter_type(value)
-            except ValueError:
+            except (ValueError, TypeError):
                 raise InvalidParameterValueError(name, value)
         
             self[name] = value
