@@ -681,7 +681,7 @@ class AlertListing(MessageListing, view.View):
                                               "alert.assessment.impact.completion/group_by",
                                               "min(alert.create_time)",
                                               "max(alert.create_time)",
-                                              "count(alert.messageid)"], criteria,
+                                              "count(alert.classification.text)"], criteria,
                                              limit=self.parameters["limit"], offset=self.parameters["offset"])
 
         for classification, severity, completion, time_min, time_max, count in results:
@@ -746,7 +746,7 @@ class AlertListing(MessageListing, view.View):
         aggregated_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
 
         selection = [ "%s/group_by" % path for path in aggregated_on ] + \
-                    [ "max(alert.create_time)/order_desc", "min(alert.create_time)", "count(alert.messageid)" ]
+                    [ "max(alert.create_time)/order_desc", "min(alert.create_time)", "count(alert.create_time)" ]
 
         results = self.env.prelude.getValues(selection, criteria)
         total_results = len(results)
@@ -789,7 +789,7 @@ class AlertListing(MessageListing, view.View):
                 results = self.env.prelude.getValues(["alert.classification.text/group_by",
                                                       "alert.assessment.impact.severity/group_by",
                                                       "alert.assessment.impact.completion/group_by",
-                                                      "count(alert.messageid)"], criteria2)
+                                                      "count(alert.classification.text)"], criteria2)
 
                 def cmp_severities(x, y):
                     d = { None: 0, "low": 1, "medium": 2, "high": 3 }
