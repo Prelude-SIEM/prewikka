@@ -467,7 +467,17 @@ class AlertListingAction(MessageListingAction, AlertsView):
     fields = [ ("severity", "alert.assessment.impact.severity", "alert.assessment.impact.severity"),
                ("classification", "alert.classification(0).name", "alert.classification.name"),
                ("source", "alert.source(0).node.address(0).address", "alert.source.node.address.address"),
+               ("sport", "alert.source(0).service.port", "alert.source.node.service.port"),
+               ("suser_name", "alert.source(0).user.userid(0).name", "alert.source.user.userid.name"),
+               ("suser_uid", "alert.source(0).user.userid(0).number", "alert.source.user.userid.number"),
+               ("sprocess_name", "alert.source(0).process.name", "alert.source.process.name"),
+               ("sprocess_pid", "alert.source(0).process.pid", "alert.source.process.pid"),
                ("target", "alert.target(0).node.address(0).address", "alert.target.node.address.address"),
+               ("tport", "alert.target(0).service.port", "alert.target.node.service.port"),
+               ("tuser_name", "alert.target(0).user.userid(0).name", "alert.target.user.userid.name"),
+               ("tuser_uid", "alert.target(0).user.userid(0).number", "alert.target.user.userid.number"),
+               ("tprocess_name", "alert.target(0).process.name", "alert.target.process.name"),
+               ("tprocess_pid", "alert.target(0).process.pid", "alert.target.process.pid"),
                ("sensor", "alert.analyzer.model", "alert.analyzer.model") ]
 
     def countMessages(self, prelude, criteria):
@@ -484,7 +494,9 @@ class AlertListingAction(MessageListingAction, AlertsView):
 
     def _addMessageFields(self, request, fields, alert):
         fields["severity"] = { "value": alert["severity"] or "low" }
-        for name in "analyzerid", "ident":
+        for name in ("analyzerid", "ident",
+                     "sport", "suser_name", "suser_uid", "sprocess_name", "sprocess_pid",
+                     "tport", "tuser_name", "tuser_uid", "tprocess_name", "tprocess_pid"):
             fields[name] = { "value": alert[name] }
         for name in "classification", "sensor":
             fields[name] = self._createMessageField(request.parameters, name, alert[name])

@@ -597,10 +597,13 @@ ul#popup_block li:hover > ul {
 
 .popup_title {
 	display: block;
+}
+
+.popup_title span {
 	text-decoration: underline;
 }
 
-.popup_title:hover {
+.popup_title:hover span {
         text-decoration: none;
 }
 
