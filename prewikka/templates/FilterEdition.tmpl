@@ -79,13 +79,16 @@ function newFilterElement(name, object, operator, object_value) {
 	link = document.createElement("a")
 	field.appendChild(link)
 	link.setAttribute("onclick", "javascript:this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)")
-	value = document.createTextNode("del")
+	link.setAttribute("style", "position: relative; float: right;")
+	value = document.createTextNode("-")
 	link.appendChild(value)
 }
 </script>
 
-<div class='box'>
-<h1>Load</h1>
+<div id="fieldset_page">
+
+<fieldset>
+<legend>Available filters</legend>
 <form action="?" method="POST">
   <input type="hidden" name="view" value="filter_edition"/>
   <select name="filter_name">
@@ -98,47 +101,52 @@ function newFilterElement(name, object, operator, object_value) {
     <option value="$f" $selected>$f
   #end for
   </select>
-  <input type='submit' name="mode" value='load'/>
-  <input type='submit' name="mode" value='delete'/>
-</div>
+
+  <input type='submit' name="mode" value='Load'/>
+  <input type='submit' name="mode" value='Delete'/>
 </form>
+</fieldset>
+
+<br/>
 
 <form action="?" method="POST">
 <input type="hidden" name="view" value="filter_edition"/>
-<div class='box'>
-<h1>Edition</h1>
+
+<fieldset>
+<legend>Edition</legend>
 <table id="elements">
 </table>
+
 <script>
 #for $element in $elements
 	newFilterElement("$element.name", "$element.object", "$element.operator", "$element.value");
 #end for
 </script>
+
+<a style="float: right;" href="javascript:newFilterElement('', '', '', '')">+</a>
+
+<br />
+
 <table>
-  <tr>
-    <td><a href="javascript:newFilterElement('', '', '', '')">more</a></td>
-    <td></td>
-    <td></td>
-    <td></td>
+ <tr>
+  <th>Formula:</th>
+  <td>
+  <input style="width: 400px;" type='text' name='formula' value='Example: (A AND B) OR (C AND D)'/>
+  </td>
+ </tr>
+ <tr>
+  <th>name:</th>
+   <td><input style="width: 400px;" type='text' name='save_as' value='$fltr.name'/></td>
   </tr>
-</table>
-
-Formula: <input type='text' name='formula' value='$formula'/> <b>Example:</b> <i>(A AND B) OR (C AND D)</i>
-</div>
-
-<div class='box'>
-  <h1>Save</h1>
-  <table>
-    <tr>
-      <td>name</td>
-      <td><input type='text' name='save_as' value='$fltr.name'/></td>
-    </tr>
-    <tr>
-      <td>comment</td>
-      <td><textarea type='textarea' name='filter_comment'>$fltr.comment</textarea></td>
-    </tr>
+  <tr>
+   <th style="vertical-align: top;">comment:</th>
+   <td><textarea style="width: 400px;" type='textarea' name='filter_comment'>$fltr.comment</textarea></td>
+  </tr>
   </table>
-  <input type='submit' name='mode' value='save'/>
+
+  <input style="float: right;" type='submit' name='mode' value='Save'/>
 </form>
+</fieldset>
+
 </div>
 #end block main_content

@@ -1,11 +1,17 @@
 #extends prewikka.templates.TopLayout
 
 #block toplayout_content
-<div class="error_name">
-	$name
-</div>
-<div class='error_message'>
-	$message
-</div>
-<p class='error_links'><a href='$prewikka.url.referer'>back</a> | <a href='$prewikka.url.current'>retry</a>
+
+ <div id="fieldset_page" style="position: relative; margin: 0px auto; margin-top: 150px; width:500px; height: 300px;">
+  <fieldset style="text-align: center; vertical-align: middle;">
+   <legend class="error_name">$name</legend>
+   <p><b>Error message</b></p>
+   Failed query: <input type="text" value="$message" style="width: 200px;" />
+
+   <br/><br/>
+
+   <input style="float: left; position: relative;" type="button" value="Back"/><input style="float: right; position: relative;" type="button" value="Retry"/>
+  </fieldset>
+ </div>
+
 #end block toplayout_content
