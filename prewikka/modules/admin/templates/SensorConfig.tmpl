@@ -1,0 +1,67 @@
+#from prewikka.Views import NormalLayoutView
+#extends NormalLayoutView
+
+#block main_content
+<table>
+	<thead>
+		<tr>
+			<td>Name</td>
+			<td>Description</td>
+			<td>Value</td>
+		</tr>
+	</thead>
+	<tbody>
+		#set $row_classes = ("table_row_even", "table_row_odd")
+		#set $cnt = 0
+		#for $option in $simple_options
+			<tr class='$row_classes[$cnt%2]'>
+				<td>$option.name</td>
+				<td>$option.description</td>
+				<form action='?' method='POST'>
+				<td>
+					#for $name, $value in $option.hiddens
+						<input type='hidden' name='$name' value='$value'/>
+					#end for
+					#if $option.boolean
+						#if $option.value
+							#set $checked = "checked"
+						#else
+							#set $checked = ""
+						#end if
+						<input type='checkbox' name='$option.name' $checked/>
+					#else
+						<input type='text' name='value' value='$option.value'/>
+					#end if
+				</td>
+				<td>
+					<input type='submit' value='change'/>
+				</td>
+				</form>
+			</tr>
+			#set $cnt += 1
+		#end for
+	</tbody>
+</table>
+<br/>
+#for $instantiable in $instantiables
+	<table>
+		<thead>
+			<tr>
+				<td colspan='2'>$instantiable.name</td>
+			</tr>
+		</thead>
+		<tbody>
+			#set $row_classes = ("table_row_even", "table_row_odd")
+			#set $cnt = 0
+			#for $instance in $instantiable.instances
+				<tr class="$row_classes[$cnt%2]">
+					<td>$instance.name</td>
+					<td><a href='$instance.view'>view</a></td>
+				</tr>
+				#set $cnt += 1
+			#end for
+		</tbody>
+	</table>
+	<br/>
+#end for
+#end block main_content
