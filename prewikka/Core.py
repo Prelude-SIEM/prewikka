@@ -85,7 +85,7 @@ class Core:
         
         self._views_position = { }
         for section, tabs in (prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.users_section,
-                              prewikka.views.settings_section, prewikka.views.about_section):
+                              prewikka.views.about_section):
             for tab, views in tabs:
                 for view in views:
                     self._views_position[view] = section, tabs, tab
@@ -145,7 +145,7 @@ class Core:
             sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.about_section
         else:
             sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.users_section, \
-                       prewikka.views.settings_section, prewikka.views.about_section
+                       prewikka.views.about_section
 
         dataset["interface.sections"] = [ ]
         if user:

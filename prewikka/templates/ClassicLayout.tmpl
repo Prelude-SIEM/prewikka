@@ -6,25 +6,29 @@ classic_body
 
 #block toplayout_content
 <div id="topmenu">
-	#for $name, $link in $interface.tabs
-		#if $name == $interface.active_tab
-			#set $class_ = 'topmenu_item_active'
-		#else
-			#set $class_ = 'topmenu_item_inactive'
-		#end if
-	<div class='$class_'><a href="$link">$name</a></div>
-	#end for
+  #for $name, $link in $interface.tabs
+    #if $name == $interface.active_tab
+      #set $class_ = 'topmenu_item_active'
+    #else
+      #set $class_ = 'topmenu_item_inactive'
+    #end if
+    <div class='$class_'><a href="$link">$name</a></div>
+  #end for
 
-	#if $prewikka.user.login or $prewikka.user.logout
-		<div class='topmenu_item_special'>
-			#if $prewikka.user.logout
-				<a href="$prewikka.user.logout">logout</a>
-			#end if
-		</div>
-	#end if
+  #if $prewikka.user.login or $prewikka.user.logout
+    <div class='topmenu_item_special'>
+    #if $prewikka.user.logout
+      <a href="$prewikka.user.logout">logout</a>
+    #end if
+    </div>
+  #end if
 
-       #if $prewikka.user.login
-                <div class="topmenu_item_info">&nbsp;<p style='vertical-align: inherit; display: inline;'><b>$prewikka.user.login</b>, on $prewikka.date</p></div>
+  #if $prewikka.user.login
+    <div class="topmenu_item_info">&nbsp;
+      <p style='vertical-align: inherit; display: inline;'>
+        <b><a href="?view=settings_display">$prewikka.user.login</a></b>, on $prewikka.date
+      </p>
+    </div>
        #end if
 </div>
 
@@ -33,18 +37,18 @@ classic_body
 $layout_start_hook
 
 <div id="menu">
-	#for $name, $link in $interface.sections
-		#if $name == $interface.active_section
-			#set $class_ = 'menu_item_active'
-		#else
-			#set $class_ = 'menu_item_inactive'
-			#set $name = "<a href='%s'>%s</a>" % ($link, $name)
-		#end if
-	<p class='$class_'>$name</p>
-	#end for
-	#def menu_extra_content
-	#end def
-	$menu_extra_content
+  #for $name, $link in $interface.sections
+    #if $name == $interface.active_section
+      #set $class_ = 'menu_item_active'
+    #else
+      #set $class_ = 'menu_item_inactive'
+      #set $name = "<a href='%s'>%s</a>" % ($link, $name)
+    #end if
+    <p class='$class_'>$name</p>
+  #end for
+  #def menu_extra_content
+  #end def
+  $menu_extra_content
 </div>
 		
 <div id='main'>$main_content</div>

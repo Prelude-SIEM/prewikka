@@ -55,6 +55,4 @@ users_section = ("Users", [("Users", ["user_listing", "user_add_form", "user_add
                                       "user_password_change_form", "user_password_change",
                                       "user_permissions_change_form", "user_permissions_change"])])
 
-settings_section = ("Settings", [("Settings", ["settings_display", "settings_password_change"])])
-
 about_section = ("About", [("About", ["about"])])
