@@ -21,7 +21,7 @@ class Frontend:
         try:
             mod_name = query["mod"]
         except KeyError:
-            mod_name = "mod_test"
+            mod_name = "mod_alert"
 
         mod = self.modules[mod_name]
         views = mod.build(query)
