@@ -28,7 +28,7 @@ from pylab import *
 
 GRADIENT_COLOR_START = (17.0/255, 17.0/255, 191.0/255)
 GRADIENT_COLOR_END = (209.0/255, 209.0/255, 209.0/255)
-
+COLOR_BLACK = (0.0, 0.0, 0.0)
 
 def get_color_gradient(steps):
     colors = [ GRADIENT_COLOR_START ]
@@ -88,12 +88,14 @@ class Chart:
         figure(figsize=(7,7))
         total = float(reduce(lambda x, y: x + y, self._values))
         values = [ ]
+        colors = get_color_gradient(len(self._values))
         for value in self._values:
             if value / total < 0.007 and len(self._values) - len(values):
                 values.append(reduce(lambda x, y: x + y, self._values[len(values):]))
+                colors = get_color_gradient(len(values) - 1)
+                colors.append(COLOR_BLACK)
                 break
             values.append(value)
-        colors = get_color_gradient(len(values))
         patches, texts, autotexts = pie(values, labels=self._labels[:len(values)], colors=colors, autopct=lambda x: "", shadow=True)
         for text in texts:
             text.set_text("")
