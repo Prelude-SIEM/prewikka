@@ -197,8 +197,9 @@ thead {
 	bottom: 0px;
 	z-index: 1;
 	position: fixed;
-	border-width: 0 1px 0 0;
-	border-color: white;
+	border-width: 0 0px 0 0;
+	border-width: 0 1px 0 0; 
+	border-color: white; 
 	border-style: solid;
 	background: #acacac;
 }
@@ -209,7 +210,8 @@ thead {
 }
 
 #menu p:hover {
-	background: #E2EBF5;
+/*	background: #E2EBF5; */
+	background: #d6d6d6;
 	text-decoration: none;
 }
 
@@ -237,7 +239,8 @@ thead {
 }
 
 .menu_item_active {
-	background-color: #E2EBF5;
+	background-color: #d6d6d6;
+	/* background-color: #E2EBF5; */
 }
 
 /* menu timeline control */
