@@ -49,6 +49,19 @@
 					</td>
 					</form>
 				#end if
+				
+				#if $option.destroyable
+					<form action='?' method='get'>
+						#for $name, $value in $hiddens
+							<input type='hidden' name='$name' value='$value'/>
+						#end for
+						<input type='hidden' name='action' value='$destroy'/>
+						<input type='hidden' name='path' value='$option.path'/>
+						<td><input type='submit' value='destroy'/></td>
+					</form>
+				#end if
+
+						
 			</tr>
 			#set $cnt += 1
 		#end for
@@ -83,10 +96,11 @@
 						#for $name, $value in $hiddens
 							<input type='hidden' name='$name' value='$value'/>
 						#end for
-						<input type='hidden' name='action' value='$destroy_instance'/>
-						<input type='hidden' name='instance' value='$instance.path'/>
+						<input type='hidden' name='action' value='$destroy'/>
+						<input type='hidden' name='path' value='$instance.path'/>
 						<td><input type='submit' value='destroy'/></td>
 					</form>
+					
 				</tr>
 				#set $cnt += 1
 			#end for
