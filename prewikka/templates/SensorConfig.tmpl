@@ -30,7 +30,7 @@
 	      #for $name, $value in $hiddens.items()
 	        <input type='hidden' name='$name' value='$value'/>
 	      #end for
-	      <input type='hidden' name='content' value='$change_option'/>
+	      <input type='hidden' name="view" value="$change_option"/>
 	  #end if
 	  <input type='hidden' name='paths' value='$option.path'/>
 	    #if $option.boolean
@@ -55,7 +55,7 @@
 	    #for $name, $value in $hiddens.items()
 	      <input type='hidden' name='$name' value='$value'/>
 	    #end for
-	    <input type='hidden' name='content' value='$destroy'/>
+	    <input type='hidden' name="view" value='$destroy'/>
 	    <input type='hidden' name='path' value='$option.path'/>
 	    <td><input type='submit' value='destroy'/></td>
 	  </form>
@@ -93,7 +93,7 @@
           #for $name, $value in $hiddens.items()
             <input type='hidden' name='$name' value='$value'/>
           #end for
-          <input type='hidden' name='content' value='$destroy'/>
+          <input type='hidden' name="view" value='$destroy'/>
           <input type='hidden' name='path' value='$instance.path'/>
           <td><input type='submit' value='destroy'/></td>
         </form>
@@ -106,7 +106,7 @@
       #for $name, $value in $hiddens.items()
         <input type='hidden' name='$name' value='$value'/>
       #end for
-      <input type='hidden' name='content' value='$create_instance'/>
+      <input type='hidden' name="view" value='$create_instance'/>
       <input type='hidden' name='path' value='$instantiable.path'/>
       <tr>
         <td><input type='text'  name='name'/></td>
@@ -126,7 +126,7 @@
   #for $name, $value in $hiddens.items()
   <input type='hidden' name='$name' value='$value'/>
   #end for
-  <input type='hidden' name='content' value='$change_option'/>
+  <input type='hidden' name="view" value='$change_option'/>
 #end if
 
 $display_section($section)
