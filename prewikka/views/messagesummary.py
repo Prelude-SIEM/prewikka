@@ -142,7 +142,7 @@ class AlertSummary(MessageSummary, view.View):
         address = alert["%s(0).node.address(0).address" % direction]
         if address:
             port = alert["%s(0).service.port" % direction]
-            if port:
+            if port != None:
                 address += ":%d" % port
             protocol = alert["%s(0).service.protocol" % direction]
             if protocol:
