@@ -27,11 +27,11 @@ from prewikka.templates import ErrorTemplate
 
 
 def time_to_hms(t):
-    return time.strftime("%H:%M:%S", time.localtime(t))
+    return time.strftime("%H:%M:%S", t)
 
 
 def time_to_ymdhms(t):
-    return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
+    return time.strftime("%Y-%m-%d %H:%M:%S", t)
 
 
 def create_link(action_name, parameters=None):

@@ -75,6 +75,17 @@ $message_listing_header
   </tr>
 
   <tr>
+    <td>Timezone:</td>
+    <td colspan="2">
+      <select name="timezone">
+        <option value="frontend_localtime" $timeline.frontend_localtime_selected>Frontend localtime
+	<option value="sensor_localtime" $timeline.sensor_localtime_selected>Sensor localtime
+	<option value="utc" $timeline.utc_selected>UTC
+       </select>
+     </td>
+  </tr>
+	
+  <tr>
    <td id="timeline_limit_label">Limit: </td>
    <td>
     <input id="timeline_limit_value" type='text' size="2" name='limit' value='$limit'/>

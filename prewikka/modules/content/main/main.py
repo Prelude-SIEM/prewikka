@@ -83,7 +83,7 @@ class _MyTime:
         return self + (-value)
 
     def __str__(self):
-        return utils.time_to_ymdhms(self._t)
+        return utils.time_to_ymdhms(time.localtime(self._t))
     
     def __int__(self):
         return int(self._t)
@@ -107,6 +107,7 @@ class MessageListingPM(ParametersNormalizer.ParametersNormalizer):
         self.optional("timeline_end", int)
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50)
+        self.optional("timezone", str, "frontend_localtime")
 
     def normalize(self, parameters):
         ParametersNormalizer.ParametersNormalizer.normalize(self, parameters)
@@ -115,6 +116,9 @@ class MessageListingPM(ParametersNormalizer.ParametersNormalizer):
             if parameters.has_key(p1) ^ parameters.has_key(p2):
                 raise ParametersNormalizer.MissingParameterError(parameters.has_key(p1) and p1 or p2)
 
+        if not parameters["timezone"] in ("frontend_localtime", "sensor_localtime", "utc"):
+            raise ParametersNormalizer.InvalidValueError("timezone", parameters["timezone"])
+        
 
 
 class HostCommandPM(ParametersNormalizer.ParametersNormalizer):
@@ -309,7 +313,7 @@ class MessageListingAction:
         dataset["timeline.%s_selected" % parameters["timeline_unit"]] = "selected"
         dataset["timeline.hidden_parameters"] = { "content": "main.%s" % self.listing_action }
         for name in parameters.keys():
-            if not name in ("timeline_value", "timeline_unit", "limit", "filter"):
+            if not name in ("timeline_value", "timeline_unit", "limit", "filter", "timezone"):
                 dataset["timeline.hidden_parameters"][name] = parameters[name]
         dataset["timeline.start"] = str(start)
         dataset["timeline.end"] = str(end)
@@ -360,12 +364,18 @@ class MessageListingAction:
 
         return messages
 
-    def _createMessageTimeField(self, t):
+    def _createMessageTimeField(self, t, timezone):
         if t:
-            tmp = time.localtime(t)
+            if timezone == "utc":
+                t = time.gmtime(t)
+            elif timezone == "sensor_localtime":
+                t = time.gmtime(int(t) + t.gmt_offset)
+            else: # timezone == "frontend_localtime"
+                t = time.localtime(t)
+            
             current = time.localtime()
         
-            if tmp[:3] == current[:3]: # message time is today
+            if t[:3] == current[:3]: # message time is today
                 t = utils.time_to_hms(t)
             else:
                 t = utils.time_to_ymdhms(t)
@@ -417,6 +427,13 @@ class MessageListingAction:
         dataset["delete_form_hiddens"] = { "content": "main.%s" % self.delete_action }
         dataset["delete_form_hiddens"].update(parameters)
 
+    def _setTimezone(self, request):
+        for timezone in "utc", "sensor_localtime", "frontend_localtime":
+            if timezone == request.parameters["timezone"]:
+                request.dataset["timeline.%s_selected" % timezone] = "selected"
+            else:
+                request.dataset["timeline.%s_selected" % timezone] = ""
+        
     def process(self, request):
         dataset = request.dataset
 
@@ -452,6 +469,7 @@ class MessageListingAction:
 
         self._setNavNext(dataset, parameters, offset, count)
         self._setMessages(request, messages)
+        self._setTimezone(request)
 
 
 
@@ -502,7 +520,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
             fields[name] = self._createMessageField(request.parameters, name, alert[name])
         for name in  "source", "target",:
             fields[name] = self._createMessageHostField(request, name, alert[name])
-        fields["time"] = self._createMessageTimeField(alert["time"])
+        fields["time"] = self._createMessageTimeField(alert["time"], request.parameters["timezone"])
 
     def getFilters(self, storage, login):
         return storage.getAlertFilters(login)
