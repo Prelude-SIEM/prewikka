@@ -82,10 +82,14 @@ class Session:
             self.log(Log.EVENT_INVALID_SESSIONID, request)
             raise AuthError("invalid sessionid", request.arguments)
 
-        if time.time() > t + self._expiration:
+        now = int(time.time())
+
+        if now > t + self._expiration:
             self.storage.deleteSession(sessionid)
             self.log(Log.EVENT_SESSION_EXPIRED, request)
             raise AuthError("session expired", request.arguments)
+
+        self.storage.createSession(sessionid, login, now)
 
         return login
 
