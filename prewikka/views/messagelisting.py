@@ -662,7 +662,7 @@ class SensorAlertListing(AlertListing, view.View):
 
     def render(self):
         AlertListing.render(self)
-        self.dataset["analyzer"] = self.env.prelude.getAnalyzer(self.parameters["analyzerid"])
+        self.dataset["analyzer_infos"] = self.env.prelude.getAnalyzer(self.parameters["analyzerid"])
 
 
 
