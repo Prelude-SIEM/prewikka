@@ -49,7 +49,7 @@ class Core:
     def __init__(self):
         class Env: pass
         self._env = Env()
-        self._env.config = Config.Config(siteconfig.conf + "prewikka.conf")
+        self._env.config = Config.Config(siteconfig.conf_dir + "/prewikka.conf")
         self._initDatabase()
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
         self._env.auth = Auth.AnonymousAuth()

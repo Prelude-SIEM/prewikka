@@ -84,9 +84,9 @@ class my_install(install):
             
     def init_siteconfig(self):
         config = open("prewikka/siteconfig.py", "w")
-        print >> config, "htdocs = '%s'" % (self.prefix + "/share/prewikka/htdocs/")
-        print >> config, "database = '%s'" % (self.prefix + "/share/prewikka/database/")
-        print >> config, "conf = '%s'" % (self.conf_prefix + "/")
+        print >> config, "htdocs_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/htdocs"))
+        print >> config, "database_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/database"))
+        print >> config, "conf_dir = '%s'" % os.path.abspath((self.conf_prefix))
         config.close()
         
     def run(self):
