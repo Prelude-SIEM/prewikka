@@ -6,9 +6,6 @@
 <form action="?" method="POST">
 <input type="hidden" name="view" value="user_settings_modify"/>
 <input type="hidden" name="login" value="$user.login"/>
-#if $user_management_mode
-  <input type="hidden" name="user_management_mode" value="yes"/>
-#end if
 
 <fieldset id="fieldset_heading">
   <legend>Account informations</legend>
@@ -59,7 +56,7 @@
 <fieldset>
   <legend>Change password</legend>
   <table>
-    #if not $user_management_mode
+    #if $ask_current_password
     <tr>
       <th>Current password:</th>
       <td><input type="password" name="password_current"/></td>
@@ -71,7 +68,7 @@
     </tr>
     <tr>
       <th>Confirm new password:</td>
-      <td><input type="password" name="password_confirmation"/></td>
+      <td><input type="password" name="password_new_confirmation"/></td>
     </tr>
   </table>
 </fieldset>

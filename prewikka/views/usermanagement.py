@@ -24,7 +24,7 @@ import time
 import random
 import md5
 
-from prewikka import view, Log, DataSet, User
+from prewikka import view, Log, DataSet, User, Auth
 import prewikka.Error
 from prewikka import utils
 
@@ -74,7 +74,6 @@ class UserAddParameters(UserParameters, PermissionsParameters, PasswordParameter
 
 class UserSettingsParameters(view.Parameters):
     def register(self):
-        self.optional("user_management_mode", str)
         self.optional("login", str)
 
 
@@ -121,8 +120,7 @@ class UserListing(view.View):
             user = self.env.db.getUser(login)
             tmp = { }
             tmp["login"] = user.login
-            tmp["settings_link"] = utils.create_link("user_settings_display",
-                                                     { "login": login, "user_management_mode": "yes" })
+            tmp["settings_link"] = utils.create_link("user_settings_display", { "login": login })
             tmp["permissions"] = map(lambda perm: user.has(perm), User.ALL_PERMISSIONS)
             self.dataset["users"].append(tmp)
 
@@ -188,7 +186,7 @@ class UserSettingsDisplay(view.View):
     def render(self):
         login = self.parameters.get("login", self.user.login)
 
-        self.dataset["user_management_mode"] = self.parameters.has_key("user_management_mode")
+        self.dataset["ask_current_password"] = (login == self.user.login)
         self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
         self.dataset["can_change_password"] = self.env.auth.canSetPassword()
         self.dataset["current_user"] = self.user.login
@@ -215,10 +213,13 @@ class UserSettingsModify(UserSettingsDisplay):
 
         if self.parameters.has_key("password_new") and self.parameters.has_key("password_new_confirmation"):
             if self.parameters.has_key("password_current"):
-                self.env.auth.checkPassword(login, self.parameters["password_current"])
+                try:
+                    self.env.auth.checkPassword(login, self.parameters["password_current"])
+                except Auth.AuthError, e:
+                    raise prewikka.Error.SimpleError("Password Error", "cannot change password")
 
             if self.parameters["password_new"] != self.parameters["password_new_confirmation"]:
-                raise prewikka.Error.SimpleError("Password Error", "passwords mismatch")
+                raise prewikka.Error.SimpleError("Password Error", "cannot change password")
 
             self.env.auth.setPassword(login, self.parameters["password_new"])
 
