@@ -74,12 +74,14 @@ class UserAddParameters(UserParameters, PermissionsParameters, PasswordParameter
 
 class UserSettingsParameters(view.Parameters):
     def register(self):
+        self.optional("user_management_mode", str)
         self.optional("login", str)
 
 
 
-class UserSettingsModifyParameters(view.Parameters):
+class UserSettingsModifyParameters(UserSettingsParameters):
     def register(self):
+        UserSettingsParameters.register(self)
         self.optional("login", str)
         for perm in User.ALL_PERMISSIONS:
             self.optional(perm, str)
@@ -119,7 +121,8 @@ class UserListing(view.View):
             user = self.env.db.getUser(login)
             tmp = { }
             tmp["login"] = user.login
-            tmp["settings_link"] = utils.create_link("user_settings_display", { "login": login })
+            tmp["settings_link"] = utils.create_link("user_settings_display",
+                                                     { "login": login, "user_management_mode": "yes" })
             tmp["permissions"] = map(lambda perm: user.has(perm), User.ALL_PERMISSIONS)
             self.dataset["users"].append(tmp)
 
@@ -184,8 +187,9 @@ class UserSettingsDisplay(view.View):
 
     def render(self):
         login = self.parameters.get("login", self.user.login)
-        
-        self.dataset["management_mode"] = self.user.has(User.PERM_USER_MANAGEMENT)
+
+        self.dataset["user_management_mode"] = self.parameters.has_key("user_management_mode")
+        self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
         self.dataset["can_change_password"] = self.env.auth.canSetPassword()
         self.dataset["current_user"] = self.user.login
         self.dataset["user.login"] = login

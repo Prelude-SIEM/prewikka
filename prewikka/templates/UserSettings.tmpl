@@ -35,7 +35,7 @@
               #else
                 #set $checked = ""
               #end if
-              #if $management_mode
+              #if $can_manage_user
                 #set $disabled = ""
               #else
                 #set $disabled = "disabled"
@@ -56,10 +56,12 @@
 <fieldset>
   <legend>Change password</legend>
   <table>
+    #if not $user_management_mode
     <tr>
       <th>Current password:</th>
       <td><input type="password" name="password_current"/></td>
     </tr>
+    #end if
     <tr>
       <th>New password:</th>
       <td><input type="password" name="password_new"/></td>
