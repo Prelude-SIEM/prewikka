@@ -35,5 +35,10 @@
 </div>
 
 <div id="alert_list_result">
-{ALERT_LIST}
+<form action="?" method="post">
+<!-- BEGIN delete_hidden -->
+<input type="hidden" name="{NAME}" value="{VALUE}"/>
+<!-- END delete_hidden -->
+{MESSAGE_LIST}
+</form>
 </div>

@@ -1,5 +1,6 @@
 import sys
 
+import re
 import copy
 import urllib
 
@@ -36,52 +37,53 @@ class AlreadyRegisteredFieldError(Error):
 
 
 class Request(dict):
-    def __init__(self):
+    def __init__(self, request=None):
         dict.__init__(self)
         self._fields = { }
+        self.register()
+        if request:
+            for key in self._fields.keys():
+                if request.has_key(key):
+                    self[key] = request[key]
+        
+    def register(self):
+        pass
 
-    def registerField(self, name, type, hidden=False):
+    def registerField(self, name, type):
         if self._fields.has_key(name):
             raise AlreadyRegisteredFieldError(name)
-        self._fields[name] = { "type": type, "hidden": hidden }
+        self._fields[name] = type
 
     def __setitem__(self, name, value):
-        type = self._fields[name]["type"]
+        field_type = self._fields[name]
 
+        if field_type is list and not type(value) is list:
+            value = [ value ]
+        
         try:
-            value = type(value)
+            value = field_type(value)
         except ValueError:
-            raise InvalidFieldTypeError(name, type)
+            raise InvalidFieldTypeError(name, field_type)
 
         dict.__setitem__(self, name, value)
-        
-    def __setattr__(self, name, value):
-        if name == "_fields" or not self._fields.has_key(name):
-            dict.__setattr__(self, name, value)
-            return
-
-        self[name] = value
-
-    def __getattribute__(self, name):
-        if not dict.__getattribute__(self, "_fields").has_key(name):
-            return dict.__getattribute__(self, name)
-            
-        return self.get(name)
 
     def populate(self, fields):
         for name, value in fields.items():
             self[name] = value
 
-    def getHiddens(self):
-        return filter(lambda name: self._fields[name]["hidden"], self._fields.keys())
+    def check(self):
+        return True
 
+    def keys(self, ignore=[]):
+        return filter(lambda key: not key in ignore, dict.keys(self))
+    
     def __copy__(self):
-        request = Request()
+        request = self.__class__()
         request._fields = copy.copy(self._fields)
         for key, value in self.items():
             request[key] = value
-        
+         
         return request
-
+     
     def __str__(self):
         return urllib.urlencode(self)

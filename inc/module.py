@@ -1,3 +1,5 @@
+import copy
+
 import Interface
 import Request
 
@@ -42,18 +44,24 @@ class ContentModule(Module):
             
         handler = getattr(self, "handle_" + action)
         request = request_class()
+        args = copy.copy(query)
+        if args.has_key("module"):
+            del args["module"]
+        if args.has_key("action"):
+            del args["action"]
+        
         try:
-            request.populate(query)
+            request.populate(args)
         except Request.Error:
             self._core.log.invalidQuery(query)
             interface_class = Interface.ErrorInterface
             data = "Query error"
         else:
             interface_class, data = handler(request)
-        interface = interface_class(self._core, interface_config, request, data)
+        interface = interface_class(self._core, interface_config, data)
         interface.init()
         interface.build()
-
+        
         return str(interface)
 
 

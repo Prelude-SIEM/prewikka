@@ -43,9 +43,9 @@ class FetchDataViewInstance(DataView):
     def build(self):
         form = Form.Form()
         request = DataRequest()
-        request.module = "Test"
-        request.action = "display_data"
-        for name in request.getHiddens():
+        request.setModule("Test")
+        request.setAction("display_data")
+        for name in request.keys(ignore=("foo", "bar")):
             form.setFixedField(name, request[name])
         form.setInteractiveField("foo", "foo")
         form.setInteractiveField("bar", "bar")
@@ -84,10 +84,16 @@ class ThirdViewInstance(ThirdView):
 
 
 class DataRequest(core.CoreRequest):
-    def __init__(self):
-        core.CoreRequest.__init__(self)
+    def register(self):
+        core.CoreRequest.register(self)
         self.registerField("foo", str)
         self.registerField("bar", str)
+
+    def getFoo(self):
+        return self.get("foo")
+
+    def getBar(self):
+        return self.get("bar")
 
 
 

@@ -5,10 +5,10 @@ import PyTpl
 from templates import Table
 
 
-class AlertList(PyTpl.Template):
-    def setAlertList(self, content):
-        self.ALERT_LIST = content
-
+class MessageList(PyTpl.Template):
+    def setMessageList(self, content):
+        self.MESSAGE_LIST = content
+        
     def setTimelineValue(self, value):        
         self.TIMELINE_VALUE = value
 
@@ -34,3 +34,8 @@ class AlertList(PyTpl.Template):
         self["hidden"].NAME = name
         self["hidden"].VALUE = value
         self["hidden"].parse()
+
+    def addDeleteHidden(self, name, value):
+        self["delete_hidden"].NAME = name
+        self["delete_hidden"].VALUE = value
+        self["delete_hidden"].parse()

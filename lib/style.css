@@ -364,3 +364,8 @@ h2 {
 
 tr.odd {background:#eeeeee}
 tr.even {background:#ffffff}
+
+input {
+	border: 1px solid black;
+	padding:2px;
+}

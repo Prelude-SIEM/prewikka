@@ -1,5 +1,7 @@
+import sys
+
 from templates import Hideable
-from templates.modules.mod_alert import AlertDetailsEntries
+from templates.modules.mod_alert import MessageDetailsEntries
 import PyTpl
 
 
@@ -11,7 +13,7 @@ class _Element:
     
     def __init__(self, alert):
         self._alert = alert
-        self._entries = AlertDetailsEntries.AlertDetailsEntries()
+        self._entries = MessageDetailsEntries.AlertDetailsEntries()
 
     def _humanizeField(self, field):
         return field.replace("_", " ").capitalize()
@@ -29,8 +31,10 @@ class _Element:
         name = self._humanizeField(field)
         field = "%s.%s" % (root, field)
         value = self._alert[field]
+        value = str(value)
         if value == "":
             value = "n/a"
+
         self._entries.newEntry(name, value)
 
     def _renderElement(self, root, field):
@@ -50,7 +54,7 @@ class _Element:
             self._entries.newSection(element.render("%s.%s(%d)" % (root, field.name, count)))
             count += 1
         
-    def render(self, root):
+    def render(self, root=None):
         for field in self.fields:
             if type(field) is str:
                 self._renderNormal(root, field)
@@ -245,3 +249,13 @@ class AlertDetails(_Element):
 
     def __str__(self):
         return self.render("alert")
+
+
+
+class HeartbeatDetails(_Element):
+    name = "heartbeat"
+    fields = "ident", Analyzer, "create_time", "analyzer_time", AdditionalData
+    top_element = True
+
+    def __str__(self):
+        return self.render("heartbeat")
