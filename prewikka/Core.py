@@ -25,8 +25,11 @@ import distutils.spawn
 
 import copy
 
+import prelude, preludedb
+
 from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer, User, \
      DataSet, Error, utils
+
 
 
 class InvalidQueryError(Error.SimpleError):
@@ -248,7 +251,7 @@ class Core:
 
             try:
                 getattr(view["object"], view["handler"])()
-            except (Prelude.PreludeError, Prelude.PreludeDBError), e:
+            except (prelude.PreludeError, preludedb.PreludeDBError), e:
                 raise Error.SimpleError("prelude internal error", str(e))
 
             dataset = view["object"].dataset
