@@ -483,8 +483,12 @@ function ${name}_add_entry(object, value, num) {
 </td>
 <td>
   #if $message.aggregated
-    $message.time_min.value
-    $message.time_max.value
+    #if $message.time_min.value == $message.time_max.value
+      $message.time_min.value
+    #else
+      $message.time_min.value -
+      $message.time_max.value
+    #end if
   #else
     $message.time.value
     #if $message.analyzer_time.value
