@@ -173,15 +173,23 @@ table {
 }
 
 .impact_severity_high {
+	text-decoration: none;
 	color: red;
 }
 
 .impact_severity_medium {
+	text-decoration: none;
 	color: orange;
 }
 
 .impact_severity_low {
+	text-decoration: none;
 	color: green;
+}
+
+.alert_field_value {
+	text-decoration: none;
+	color: inherit;
 }
 
 .section_alert {
@@ -277,10 +285,6 @@ img {
     border:0;
 }
 
-.row2:hover {
-    background-color:#f0d0d0;
-}
-
 h1 {
     font-size: 18px;
     margin: 0px;
@@ -292,52 +296,6 @@ h2 {
     font-size: 16px;
     margin: 0px;
 }
-.style5 {
-    font-size: 18px;
-    color: #ffffff;
-    padding: 10px 10px 20px 8px;
-}
-.style6 {color: #CCCCCC}
-
-
-.leftnavi {
-    padding: 6px 4px;
-}
-.topnavi {
-    padding: 6px 8px;
-    white-space: nowrap;
-}
-
-.login {
-    border:1px solid black;
-    padding:0px;
-}
-
-#mod_alert h1 {color:black; font-style:italic;}
-#mod_alert em { font-weight:bold; font-style:normal;}
 
 tr.odd {background:#eeeeee}
 tr.even {background:#ffffff}
-
-.tree_node_label a:visited {
-	font-size: 300%;
-	color: black;
-}
-
-.tree_node_level1 {
-	padding-left: 50px;
-	background: #ffffff;
-	color: black;
-}
-
-.tree_node_level2 {
-	padding-left: 50px;
-	background: #fffff0;
-	color: black;
-}
-
-.tree_node_level3 {
-	padding-left: 50px;
-	background: #ffffe0;
-	color: black;
-}

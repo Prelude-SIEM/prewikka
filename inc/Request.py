@@ -61,7 +61,7 @@ class Request(dict):
         if not dict.__getattribute__(self, "_fields").has_key(name):
             return dict.__getattribute__(self, name)
             
-        return self[name]
+        return self.get(name)
 
     def populate(self, fields):
         for name, value in fields.items():
