@@ -53,6 +53,7 @@ class Core:
         class Env: pass
         self._env = Env()
         self._env.config = Config.Config(siteconfig.conf_dir + "/prewikka.conf")
+        preludedb.preludedb_init(len(sys.argv), sys.argv)
         self._initDatabase()
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
         self._env.auth = Auth.AnonymousAuth()
