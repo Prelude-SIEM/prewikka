@@ -130,7 +130,7 @@ class Chart:
         self._render()
 
     def renderBar(self):
-        bar(arange(len(self._values)), self._values)
+        bar(arange(len(self._values)), self._values, color=GRADIENT_COLOR_START)
         self._setTicks()
         self._render()
 
