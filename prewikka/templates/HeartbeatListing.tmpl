@@ -42,9 +42,8 @@
   <ul id="popup_block">
     <li class="popup_title">$message.agent.value
       <ul>
-        <li><a href="$message.details">Heartbeat detail</a></li>
         <li><a href="$message.summary">Heartbeat summary</a></li>
-        <li><a href="$message.agent.inline_filter">Group by agent</a></li>
+        <li><a href="$message.agent.inline_filter">Filter on agent</a></li>
       </ul>
     </li>
   </ul>
@@ -54,7 +53,7 @@
  <ul id="popup_block">
   <li class="popup_title">$message.node_address.value
    <ul>
-    <li><a href="$message.node_address.inline_filter">Group by address</a></li>
+    <li><a href="$message.node_address.inline_filter">Filter on address</a></li>
     #for $name, $link in $message.node_address.host_commands
      <li><a href="$link">$name</a></li>
     #end for
