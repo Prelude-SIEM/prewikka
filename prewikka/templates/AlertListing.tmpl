@@ -483,14 +483,13 @@ function ${name}_add_entry(object, value, num) {
 </td>
 #end block message_fields
 
-#block timeline_extra_content
+#def chart_content
 #if $timeline_chart_img
-  <tr>
-    <td colspan=3 style="text-align: center;">
-      <img src="$timeline_chart_img"/>
-    </td>
-  </tr>
+<div style="text-align:center;"><img src="$timeline_chart_img"/></div>
 #end if
+#end def
+
+#block timeline_extra_content
 <tr>
   <td id="filter_control_label">Filter: </td>
   <td colspan='2'>
