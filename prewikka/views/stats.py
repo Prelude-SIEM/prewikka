@@ -29,9 +29,17 @@ class Chart:
         self._title = ""
         self._values = [ ]
         self._labels = [ ]
+        self._values_title = None
+        self._labels_title = None
 
     def getFilename(self):
         return self._filename
+
+    def setValuesTitle(self, title):
+        self._values_title = title
+
+    def setLabelsTitle(self, title):
+        self._labels_title = title
 
     def setTitle(self, title):
         self._title = title        
@@ -47,8 +55,11 @@ class Chart:
         self._values.append(value)
     
     def _render(self):
-        figure(facecolor="b")
-        title(self._title)
+        title(self._title, verticalalignment="center")
+        if self._values_title:
+            ylabel(self._values_title)
+        if self._labels_title:
+            xlabel(self._labels_title)
         savefig(self._filename)
         clf()
     
@@ -65,6 +76,11 @@ class Chart:
 
     def renderPlot(self):
         plot(self._values)
+        xticks(arange(len(self._values)), self._labels)
+        self._render()
+
+    def renderBar(self):
+        bar(range(len(self._values)), self._values)
         xticks(arange(len(self._values)), self._labels)
         self._render()
 
@@ -117,12 +133,14 @@ class Stats(view.View):
     def render_timeline(self):
         chart = Chart("timeline.png")
         chart.setTitle("Timeline")
+        chart.setValuesTitle("Alerts count")
+        chart.setLabelsTitle("Hours")
         
         for hour in range(24):
             count = self.env.prelude.getValues(["count(alert.messageid)"],
-                                               criteria="alert.create_time == 'hour:%d'" % hour)
-            chart.addLabelValuePair("%dh" % hour, count)
-        chart.renderPlot()
+                                               criteria="alert.create_time == 'hour:%d'" % hour)[0][0]
+            chart.addLabelValuePair(hour, count)
+        chart.renderBar()
 
         self.dataset["charts"].append(chart.getFilename())
 
