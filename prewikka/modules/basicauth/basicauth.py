@@ -185,6 +185,7 @@ class BasicUserManagement(UserManagement.UserManagement):
         self.db.sync()
 
 
+
 def load(core, config):
     auth = BasicUserManagement(core, config)
     core.registerAuth(auth)

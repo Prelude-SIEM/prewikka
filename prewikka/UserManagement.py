@@ -48,8 +48,9 @@ class SessionError(Error):
 CAPABILITY_READ_MESSAGE = "READ_MESSAGE"
 CAPABILITY_DELETE_MESSAGE = "DELETE_MESSAGE"
 CAPABILITY_USER_MANAGEMENT = "USER_MANAGEMENT"
+CAPABILITY_ADMIN_CONSOLE = "ADMIN_CONSOLE"
 
-CAPABILITIES = [ CAPABILITY_READ_MESSAGE, CAPABILITY_DELETE_MESSAGE, CAPABILITY_USER_MANAGEMENT ]
+CAPABILITIES = [ CAPABILITY_READ_MESSAGE, CAPABILITY_DELETE_MESSAGE, CAPABILITY_USER_MANAGEMENT, CAPABILITY_ADMIN_CONSOLE ]
 CAPABILITIES_ADMIN = CAPABILITIES
 
 
@@ -148,18 +149,16 @@ class UsersDataSet(DataSet.ConfigDataSet):
 
 
 class UserListingView(UsersDataSet, UserListing.UserListing):
-    def __init__(self, add_user_action, delete_user_action, change_password_action, change_capabilities_action):
+    def __init__(self, user_management):
         UsersDataSet.__init__(self)
         UserListing.UserListing.__init__(self)
+        self._user_management = user_management
         self.users = [ ]
-        self.add_form_hiddens = self.createAccess(add_user_action)
-        self._delete_user_action = delete_user_action
-        self._change_password_action = change_password_action
-        self._change_capabilities_action = change_capabilities_action
+        self.add_form_hiddens = self.createAccess(user_management.slots["user_add_form"].path)
         self.capabilities = CAPABILITIES
 
-    def createAccess(self, action, parameters=[]):
-        return [("action", Action.get_action_name(action))] + parameters
+    def createAccess(self, action_name, parameters=[]):
+        return [("action", action_name)] + parameters
 
     def addUser(self, user):
         parameters = [("id", user.getID())]
@@ -167,17 +166,17 @@ class UserListingView(UsersDataSet, UserListing.UserListing):
         new["id"] = user.getID()
         new["login"] = user.getLogin()
         new["capabilities"] = map(lambda cap: user.hasCapability(cap), CAPABILITIES)
-        new["delete_form_hiddens"] = self.createAccess(self._delete_user_action, parameters)
-        new["password_form_hiddens"] = self.createAccess(self._change_password_action, parameters)
-        new["capabilities_form_hiddens"] = self.createAccess(self._change_capabilities_action, parameters)
+        new["delete_form_hiddens"] = self.createAccess(self._user_management.slots["user_delete"].path, parameters)
+        new["password_form_hiddens"] = self.createAccess(self._user_management.slots["change_password_form"].path, parameters)
+        new["capabilities_form_hiddens"] = self.createAccess(self._user_management.slots["change_capabilities_form"].path, parameters)
         self.users.append(new)
 
 
 
 class UserAddForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
-    def __init__(self, action):
+    def __init__(self, user_management):
         UsersDataSet.__init__(self)
-        DataSet.PropertiesChangeDataSet.__init__(self, "add", action)
+        DataSet.PropertiesChangeDataSet.__init__(self, "add", user_management.slots["user_add"].path)
         PropertiesChangeForm.PropertiesChangeForm.__init__(self)
         self.addTextProperty("Login", "login")
         self.addPasswordProperty("Password", "password1")
@@ -188,9 +187,9 @@ class UserAddForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChang
 
 
 class ChangePasswordForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
-    def __init__(self, id, action):
+    def __init__(self, id, user_management):
         UsersDataSet.__init__(self)
-        DataSet.PropertiesChangeDataSet.__init__(self, "change", action)
+        DataSet.PropertiesChangeDataSet.__init__(self, "change", user_management.slots["change_password"].path)
         PropertiesChangeForm.PropertiesChangeForm.__init__(self)
         self.addHidden("id", id)
         self.addPasswordProperty("Password", "password1")
@@ -199,9 +198,9 @@ class ChangePasswordForm(UsersDataSet, DataSet.PropertiesChangeDataSet, Properti
 
 
 class ChangeCapabilitiesForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
-    def __init__(self, user, action):
+    def __init__(self, user, user_management):
         UsersDataSet.__init__(self)
-        DataSet.PropertiesChangeDataSet.__init__(self, "change", action)
+        DataSet.PropertiesChangeDataSet.__init__(self, "change", user_management.slots["change_capabilities"].path)
         PropertiesChangeForm.PropertiesChangeForm.__init__(self)
         self.addHidden("id", user.getID())
         for cap in CAPABILITIES:
@@ -223,37 +222,34 @@ class User:
         content = ""
         content += "id: %s\n" % self.getID()
         content += "login: %s\n" % self.getLogin()
-        content += "password: %s\n" % self.getPassword()
-        content += "sessions: %s\n" % str(self.sessions)
-        content += "can read message: %s\n" % self.canReadMessage()
-        content += "can delete message: %s\n" % self.canDeleteMessage()
+        content += "sessions: %s\n" % str(self.getSessions())
+        content += "capabilities: %s\n" % str(self.getCapabilities())
         
         return content
     
 
 
-class UserManagement:
+class UserManagement(Action.ActionGroup):
     def __init__(self, core, config):
+        Action.ActionGroup.__init__(self)
         self.core = core
         self._use_ssl = config.getOptionValue("use_ssl", "") in ("yes", "true", "on")
         self._expiration = int(config.getOptionValue("expiration", 30))
-        self.core.interface.registerConfigurationSection("Users", self.handle_user_listing)
-        self.core.interface.registerQuickAccessor("logout", self.handle_user_logout, None)
-        self.core.registerLoginAction(self.login, LoginPasswordActionParameters)
-        self.core.registerAction(self.handle_user_listing, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.registerAction(self.handle_user_add_form, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.registerAction(self.handle_user_add, AddUserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.registerAction(self.handle_change_password_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.registerAction(self.handle_change_password, ChangePasswordActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.registerAction(self.handle_change_capabilities_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.registerAction(self.handle_change_capabilities, ChangeCapabilitiesActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.registerAction(self.handle_user_delete, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.registerAction(self.handle_user_logout, Action.ActionParameters, [ ])
-        Error.login_action = Action.get_action_name(self.login)
-
-    def __del__(self):
-        print "destroy UserManagement"
-
+        self.registerSlot("login", LoginPasswordActionParameters, [ ])
+        self.registerSlot("user_listing", Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.registerSlot("user_add_form", Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.registerSlot("user_add", AddUserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.registerSlot("change_password_form", UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.registerSlot("change_password", ChangePasswordActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.registerSlot("change_capabilities_form", UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.registerSlot("change_capabilities", ChangeCapabilitiesActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.registerSlot("user_delete", UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.registerSlot("user_logout", Action.ActionParameters, [ ])
+        self.core.interface.registerConfigurationSection("Users", self.slots["user_listing"].path)
+        self.core.interface.registerQuickAccessor("logout", self.slots["user_logout"].path, None)
+        self.core.setLoginAction(self.slots["login"])
+        Error.login_action = self.slots["login"].path
+        
     def enableSSL(self):
         self._use_ssl = True
         
@@ -295,7 +291,7 @@ class UserManagement:
         else:
             return self._checkSession(request)
         
-    def login(self, request):
+    def handle_login(self, request):
         login = request.parameters.getLogin()
         password = request.parameters.getPassword()
         
@@ -326,10 +322,7 @@ class UserManagement:
     def handle_user_listing(self, request):
         ids = self.getUsers()
         ids.sort()
-        view = UserListingView(self.handle_user_add_form,
-                               self.handle_user_delete,
-                               self.handle_change_password_form,
-                               self.handle_change_capabilities_form)
+        view = UserListingView(self)
         for id in ids:
             user = self.getUserByID(id)
             view.addUser(user)
@@ -338,7 +331,7 @@ class UserManagement:
         
     
     def handle_user_add_form(self, request):
-        return UserAddForm(self.handle_user_add)
+        return UserAddForm(self)
     
     def handle_user_add(self, request):
         user = self.newUser()
@@ -359,7 +352,7 @@ class UserManagement:
         return self.handle_user_listing(request)
     
     def handle_change_password_form(self, request):
-        return ChangePasswordForm(request.parameters.getID(), self.handle_change_password)
+        return ChangePasswordForm(request.parameters.getID(), self)
     
     def handle_change_password(self, request):
         user = self.getUserByID(request.parameters.getID())
@@ -371,7 +364,7 @@ class UserManagement:
         return self.handle_user_listing(request)
     
     def handle_change_capabilities_form(self, request):
-        return ChangeCapabilitiesForm(self.getUserByID(request.parameters.getID()), self.handle_change_capabilities)
+        return ChangeCapabilitiesForm(self.getUserByID(request.parameters.getID()), self)
     
     def handle_change_capabilities(self, request):
         user = self.getUserByID(request.parameters.getID())

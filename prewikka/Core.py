@@ -39,18 +39,6 @@ class PermissionDeniedError(Error.SimpleError):
 
 
 
-class RegisteredAction:
-    def __init__(self, handler, parameters, capabilities):
-        self.handler = handler
-        self.parameters = parameters
-        self.capabilities = capabilities
-        self.name = Action.get_action_name(handler)
-
-    def __str__(self):
-        return self.name
-
-
-
 class Core:
     def __init__(self):
         self.content_modules = { }
@@ -65,18 +53,18 @@ class Core:
         self.auth = None
         self._initModules()
 
-    def registerAction(self, handler, parameters, capabilities, default=False):
-        registered = RegisteredAction(handler, parameters, capabilities)
-        self._actions[registered.name] = registered
-        
-        if default:
-            self._default_action = registered
+    def registerActionGroup(self, action_group):
+        self._actions[action_group.name] = action_group
 
-        return registered
-        
-    def registerLoginAction(self, handler, parameters):
-        self._login_action = self.registerAction(handler, parameters, [ ])
-        
+    def registerAction(self, action):
+        self.registerActionGroup(action)
+
+    def setLoginAction(self, action):
+        self._login_action = action
+
+    def setDefaultAction(self, action):
+        self._default_action = action
+
     def shutdown(self):
         # Core references objects that themself reference Core, those circular
         # references mean that garbage collector won't destroy those objects.
@@ -88,10 +76,11 @@ class Core:
         self.interface = None
         self.prelude = None
         self.auth = None
-        
+
     def registerAuth(self, auth):
+        self.registerActionGroup(auth)
         self.auth = auth
-        
+
     def _initModules(self):
         base_dir = "prewikka/modules/"
         for mod_name in self._config.getModuleNames():
@@ -124,7 +113,7 @@ class Core:
         view.referer = request.getReferer()
         view.current = request.getQueryString()
         
-    def _getActionAndArguments(self, request):
+    def _getActionNameAndArguments(self, request):
         arguments = copy.copy(request.arguments)
         if arguments.has_key("action"):
             action_name = arguments["action"]
@@ -134,45 +123,45 @@ class Core:
 
         return action_name, arguments
 
-    def _getRegisteredActionFromName(self, request, action_name):
+    def _getActionSlot(self, request, action_name):
         if not action_name:
             return self._default_action
         
         try:
-            return self._actions[action_name]
-        except KeyError:
+            group_name, slot_name = Action.ActionGroup.getGroupAndSlot(action_name)
+            return self._actions[group_name].slots[slot_name]
+        except ValueError, KeyError:
             self.log(Log.EVENT_INVALID_ACTION, request, action_name)
             raise InvalidQueryError(request.getQueryString())
         
-    def _checkCapabilities(self, registered, request):
+    def _checkCapabilities(self, slot, request):
         if request.user:
-            required = registered.capabilities
+            required = slot.capabilities
             if filter(lambda cap: request.user.hasCapability(cap), required) != required:
-                self.log(Log.EVENT_ACTION_DENIED, request, registered.name)
-                raise PermissionDeniedError(request.user.getLogin(), registered.name)
-
-    def processAction(self, registered, request):
-        self._checkCapabilities(registered, request)
-        handler = registered.handler
-        if isinstance(handler, Action.Action):
-            return handler.process(request)
-        return handler(request)
+                self.log(Log.EVENT_ACTION_DENIED, request, slot.path)
+                raise PermissionDeniedError(request.user.getLogin(), slot.path)
+        
+    def processAction(self, slot, request):
+        self._checkCapabilities(slot, request)
+        
+        return slot.handler(request)
 
     def processDefaultAction(self, request):
         request.parameters = self._default_action.parameters()
+        
         return self.processAction(self._default_action, request)
     
     def process(self, request):
         self.log(Log.EVENT_QUERY, request, request.getQueryString())
 
         try:
-            action_name, arguments = self._getActionAndArguments(request)
-            registered_action = self._getRegisteredActionFromName(request, action_name)
+            action_name, arguments = self._getActionNameAndArguments(request)
+            slot = self._getActionSlot(request, action_name)
             
-            if self.auth and registered_action != self._login_action:
+            if self.auth and slot != self._login_action:
                 self.auth.check(request)
                 
-            parameters = registered_action.parameters()
+            parameters = slot.parameters()
             try:
                 parameters.populate(arguments)
                 parameters.check()
@@ -183,7 +172,7 @@ class Core:
             self._setupRequest(request, parameters)
 
             try:
-                view = self.processAction(registered_action, request)
+                view = self.processAction(slot, request)
             except Prelude.Error, e:
                 raise Error.SimpleError("prelude internal error", str(e))
                 

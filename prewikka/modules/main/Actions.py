@@ -25,6 +25,7 @@ import copy
 
 from prewikka import Action
 from prewikka import utils
+import prewikka.UserManagement as CAP
 
 from prewikka.modules.main import ActionParameters
 
@@ -92,6 +93,9 @@ class _MyTime:
 
 
 class MessageListing(Action.Action):
+    parameters = ActionParameters.MessageListing
+    capabilities = [ CAP.CAPABILITY_READ_MESSAGE ]
+    
     def _adjustCriteria(self, request, criteria):
         pass
     
@@ -187,17 +191,27 @@ class HeartbeatListing(MessageListing):
 
 
 
-class AlertAction(Action.Action):
-    def process(self, request):
-        alert = request.prelude.getAlert(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
+class DisplayMessageAction(Action.Action):
+    parameters = ActionParameters.Message
+    capabilities = [ CAP.CAPABILITY_READ_MESSAGE ]
+    
+    def process(self, request, get_message):
+        alert = get_message(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
         view = View(self.view_name)()
         view.setMessage(alert)
         return view
+    
 
 
-
-class HeartbeatAction(Action.Action):
+class DisplayAlertAction(DisplayMessageAction):
     def process(self, request):
+        return DisplayMessageAction.process(self, request, request.prelude.getAlert)
+
+
+
+class DisplayHeartbeatAction(Action.Action):
+    def process(self, request):
+        return DisplayMessageAction.process(self, request, request.prelude.getHeartbeat)
         heartbeat = request.prelude.getHeartbeat(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
         view = View(self.view_name)()
         view.setMessage(heartbeat)
@@ -205,27 +219,34 @@ class HeartbeatAction(Action.Action):
 
 
 
-class AlertSummary(AlertAction):
+class AlertSummary(DisplayAlertAction):
     view_name = "AlertSummaryView"
 
 
 
-class HeartbeatSummary(HeartbeatAction):
+class HeartbeatSummary(DisplayHeartbeatAction):
     view_name = "HeartbeatSummaryView"
 
 
 
-class AlertDetails(AlertAction):
+class AlertDetails(DisplayAlertAction):
     view_name = "AlertDetailsView"
 
 
 
-class HeartbeatDetails(HeartbeatAction):
+class HeartbeatDetails(DisplayHeartbeatAction):
     view_name = "HeartbeatDetailsView"
 
 
 
-class DeleteAlerts(AlertListing):
+class DeleteMessages:
+    parameters = ActionParameters.MessageListingDelete
+    capabilities = [ CAP.CAPABILITY_DELETE_MESSAGE ]
+
+    
+
+class DeleteAlerts(AlertListing, DeleteMessages):
+    
     def process(self, request):
         for analyzerid, alert_ident in request.parameters.getIdents():
             request.prelude.deleteAlert(analyzerid, alert_ident)
@@ -236,7 +257,7 @@ class DeleteAlerts(AlertListing):
 
 
 
-class DeleteHeartbeats(HeartbeatListing):
+class DeleteHeartbeats(HeartbeatListing, DeleteMessages):
     def process(self, request):
         for analyzerid, heartbeat_ident in request.parameters.getIdents():
             request.prelude.deleteHeartbeat(analyzerid, heartbeat_ident)
@@ -290,7 +311,12 @@ class DeleteHeartbeats(HeartbeatListing):
 
 
 
-class SensorAlertListing(AlertListing):
+class SensorMessageListing:
+    parameters = ActionParameters.SensorMessageListing
+
+
+
+class SensorAlertListing(SensorMessageListing, AlertListing):
     def _adjustCriteria(self, request, criteria):
         criteria.append("alert.analyzer.analyzerid == %d" % request.parameters.getAnalyzerid())
 
@@ -316,7 +342,7 @@ class SensorDeleteAlerts(SensorAlertListing):
 
 
 
-class SensorHeartbeatListing(HeartbeatListing):
+class SensorHeartbeatListing(SensorMessageListing, HeartbeatListing):
     def _adjustCriteria(self, request, criteria):
         criteria.append("heartbeat.analyzer.analyzerid == %d" % request.parameters.getAnalyzerid())
 
@@ -363,6 +389,8 @@ class SensorHeartbeatDetails(HeartbeatDetails):
 
 
 class SensorListing(Action.Action):
+    capabilities = [ CAP.CAPABILITY_READ_MESSAGE ]
+    
     def process(self, request):
         view = View("SensorListingView")()
         

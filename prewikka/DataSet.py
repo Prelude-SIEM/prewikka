@@ -91,8 +91,8 @@ class BaseDataSet:
     def setConfiguration(self, configuration):
         pass
         
-    def createLink(self, action, parameters=None):
-        link = "?action=%s" % prewikka.Action.get_action_name(action)
+    def createLink(self, action_name, parameters=None):
+        link = "?action=%s" % action_name
         if parameters:
             link += "&%s" % str(parameters)
         
@@ -101,11 +101,11 @@ class BaseDataSet:
 
 
 class PropertiesChangeDataSet:
-    def __init__(self, action_name, action):
+    def __init__(self, name, action_name):
         self.properties = [ ]
         self.hiddens = [ ]
-        self.submit = action_name
-        self.addHidden("action", prewikka.Action.get_action_name(action))
+        self.submit = name
+        self.addHidden("action", action_name)
 
     def addHidden(self, name, value):
         self.hiddens.append([ name, value ])

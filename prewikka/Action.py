@@ -68,19 +68,6 @@ class ActionParameterAlreadyRegisteredError(ActionParameterError):
 
 
 
-def get_action_name(action):
-    if isinstance(action, Action):
-        return action.getName()
-    return "%s.%s.%s" % (action.im_func.__module__, action.im_class.__name__, action.im_func.__name__)
-
-
-
-class Action(object):
-    def getName(self):
-        return self.__module__ + "." + self.__class__.__name__
-
-
-
 class ActionParameters:
     def __init__(self, parameters=None):
         self._parameters = { }
@@ -159,3 +146,49 @@ class ActionParameters:
         new._values = copy.copy(self._values)
         
         return new
+
+
+
+class ActionSlot:
+    def __init__(self, path, name, parameters, capabilities, handler):
+        self.path = path
+        self.name = name
+        self.parameters = parameters
+        self.capabilities = capabilities
+        self.handler = handler
+
+
+
+class ActionGroup(object):
+    def __init__(self):
+        self.slots = { }
+        self.name = self.__module__.replace("/", ".").split(".")[-2] + "." + self.__class__.__name__
+
+    def registerSlot(self, name, parameters=ActionParameters, capabilities=[], handler=None):
+        if not handler:
+            handler = getattr(self, "handle_" + name)
+        
+        slot = ActionSlot(":".join((self.name, name)), name, parameters, capabilities, handler)
+        self.slots[name] = slot
+
+        return slot
+
+    def getGroupAndSlot(s):
+        return s.split(":")
+
+    getGroupAndSlot = staticmethod(getGroupAndSlot)
+
+
+
+class Action(ActionGroup):
+    parameters = ActionParameters
+    capabilities = [ ]
+    
+    def __init__(self):
+        ActionGroup.__init__(self)
+        slot = self.registerSlot("process", self.parameters, self.capabilities, self.process)
+        self.slot = slot
+        self.path = slot.path
+        
+    def process(self, request):
+        pass

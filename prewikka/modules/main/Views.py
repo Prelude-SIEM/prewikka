@@ -38,20 +38,23 @@ def Action(name):
     # module import (View -> Actions -> View -> ...)
     # TODO: find a cleaner way to solve this problem
     import prewikka.modules.main.Actions
-    return getattr(prewikka.modules.main.Actions, name)
+    action_class = getattr(prewikka.modules.main.Actions, name)
+    object = action_class()
+
+    return object.path
 
 
 
 class AlertsSection(DataSet.BaseDataSet):
     active_section = "Alerts"
-    tabs = [("Alerts", Action("AlertListing")())]
+    tabs = [("Alerts", Action("AlertListing"))]
     active_tab = "Alerts"
 
 
 
 class HeartbeatsSection(DataSet.BaseDataSet):
     active_section = "Heartbeats"
-    tabs = [("List", Action("HeartbeatListing")())]
+    tabs = [("List", Action("HeartbeatListing"))]
 
 
 
@@ -67,7 +70,7 @@ class HeartbeatListingTab(HeartbeatsSection):
 
 class SensorsSection(DataSet.BaseDataSet):
     active_section = "Sensors"
-    tabs = [("Sensors", Action("SensorListing")())]
+    tabs = [("Sensors", Action("SensorListing"))]
     active_tab = "Sensors"
 
 
@@ -99,7 +102,7 @@ class MessageListingDataSet:
         self.timeline["value"] = value
         self.timeline[unit + "_selected"] = "selected"
         self.timeline["form_hiddens"] = form_hiddens = [ ]
-        form_hiddens.append(("action", prewikka.Action.get_action_name(self._getMessageListingAction())))
+        form_hiddens.append(("action", self._getMessageListingAction()))
         for name in self._parameters.getNames(ignore=("timeline_value", "timeline_unit")):
             form_hiddens.append((name, self._parameters[name]))
         
@@ -161,7 +164,7 @@ class MessageListingDataSet:
         for message in messages:
             self.addMessage(message)
         self.delete_form_hiddens = [ ]
-        self.delete_form_hiddens.append(("action", prewikka.Action.get_action_name(self._getDeleteAction())))
+        self.delete_form_hiddens.append(("action", self._getDeleteAction()))
         for name in self._parameters.getNames():
             self.delete_form_hiddens.append((name, self._parameters[name]))
 
@@ -169,16 +172,16 @@ class MessageListingDataSet:
 
 class AlertListingDataSet(MessageListingDataSet):
     def _getMessageListingAction(self):
-        return Action("AlertListing")()
+        return Action("AlertListing")
 
     def _getDeleteAction(self):
-        return Action("DeleteAlerts")()
+        return Action("DeleteAlerts")
 
     def _getMessageSummaryAction(self):
-        return Action("AlertSummary")()
+        return Action("AlertSummary")
 
     def _getMessageDetailsAction(self):
-        return Action("AlertDetails")()
+        return Action("AlertDetails")
 
     def _addMessageFields(self, alert, fields):
         fields["severity"] = alert["alert.assessment.impact.severity"] or "low"
@@ -205,16 +208,16 @@ def AlertListingView():
 
 class HeartbeatListingDataSet(MessageListingDataSet):
     def _getMessageListingAction(self):
-        return Action("HeartbeatListing")()
+        return Action("HeartbeatListing")
 
     def _getDeleteAction(self):
-        return Action("DeleteHeartbeats")()
+        return Action("DeleteHeartbeats")
 
     def _getMessageSummaryAction(self):
-        return Action("HeartbeatSummary")()
+        return Action("HeartbeatSummary")
 
     def _getMessageDetailsAction(self):
-        return Action("HeartbeatDetails")()
+        return Action("HeartbeatDetails")
     
     def _addMessageFields(self, heartbeat, fields):
         fields["analyzerid"] = self._createMessageField(heartbeat["heartbeat.analyzer.analyzerid"],
@@ -702,16 +705,16 @@ class SensorMessageListingDataSet:
 
 class SensorAlertListingDataSet(SensorMessageListingDataSet, AlertListingDataSet):
     def _getMessageListingAction(self):
-        return Action("SensorAlertListing")()
+        return Action("SensorAlertListing")
 
     def _getDeleteAction(self):
-        return Action("SensorDeleteAlerts")()
+        return Action("SensorDeleteAlerts")
 
     def _getMessageSummaryAction(self):
-        return Action("SensorAlertSummary")()
+        return Action("SensorAlertSummary")
 
     def _getMessageDetailsAction(self):
-        return Action("SensorAlertDetails")()
+        return Action("SensorAlertDetails")
 
 
 
@@ -722,16 +725,16 @@ def SensorAlertListingView():
 
 class SensorHeartbeatListingDataSet(SensorMessageListingDataSet, HeartbeatListingDataSet):
     def _getMessageListingAction(self):
-        return Action("SensorHeartbeatListing")()
+        return Action("SensorHeartbeatListing")
 
     def _getDeleteAction(self):
-        return Action("SensorDeleteHeartbeats")()
+        return Action("SensorDeleteHeartbeats")
 
     def _getMessageSummaryAction(self):
-        return Action("SensorHeartbeatSummary")()
+        return Action("SensorHeartbeatSummary")
 
     def _getMessageDetailsAction(self):
-        return Action("SensorHeartbeatDetails")()
+        return Action("SensorHeartbeatDetails")
 
 
 
@@ -767,8 +770,8 @@ class SensorListingDataSet:
     def addAnalyzer(self, analyzer):
         parameters = ActionParameters.SensorMessageListing()
         parameters.setAnalyzerid(analyzer["analyzerid"])
-        analyzer["alerts"] = self.createLink(Action("SensorAlertListing")(), parameters)
-        analyzer["heartbeats"] = self.createLink(Action("SensorHeartbeatListing")(), parameters)
+        analyzer["alerts"] = self.createLink(Action("SensorAlertListing"), parameters)
+        analyzer["heartbeats"] = self.createLink(Action("SensorHeartbeatListing"), parameters)
         self.analyzers.append(analyzer)
 
 
