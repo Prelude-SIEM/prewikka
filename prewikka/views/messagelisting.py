@@ -690,8 +690,8 @@ class AlertListing(MessageListing, view.View):
             time_min = self.env.prelude.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
             time_max = self.env.prelude.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
             idmef = self._fetchMessage(ident)
-            delete_base_criteria = delete_base_criteria + [ "alert.create_time >= '%s'" % time_min.toYMDHMS(),
-                                                            "alert.create_time <= '%s'" % time_max.toYMDHMS() ]
+            delete_criteria = delete_base_criteria + [ "alert.create_time >= '%s'" % time_min.toYMDHMS(),
+                                                       "alert.create_time <= '%s'" % time_max.toYMDHMS() ]
             message = {
                 "aggregated": True,
                 "time_min": self._createTimeField(time_min),
