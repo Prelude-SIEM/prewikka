@@ -449,7 +449,7 @@ function ${name}_add_entry(object, value, num) {
      #end if
      #if $direction.address.value
         <ul>
-          <li><a href="$direction.address.inline_filter">See all alerts $separator this $name</a></li>
+          <li><a href="$direction.address.inline_filter">Filter on this $name</a></li>
           #for $name, $link in $direction.address.host_commands
             <li><a href="$link">$name</a></li>
           #end for
