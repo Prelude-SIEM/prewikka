@@ -17,8 +17,9 @@
 	border-color: #acacac;
 	border-style: solid;
 	text-align: center;
+	font-weight: bold;
 	height: 30px;
-	font-size: 15px;
+	font-size: 13px;
 }
 
 .menu_item_inactive {
@@ -35,11 +36,11 @@
 }
 
 .menu_item_active {
-	background: white;
+	background-color: #E2EBF5;
+	//background: white;
 }
 
 /* END Menu style */
-
 
 
 /**************************
@@ -73,7 +74,8 @@
 	border-right: 1px;
 	border-color: white;
 	border-style: solid;
-	font-size: 15px;
+	font-size: 13px;
+	font-weight: bold;
 	text-align: center;
 }
 
@@ -93,13 +95,13 @@
 }
 
 .topmenu_item_active {
-	background: white;
+	background-color: #E2EBF5;
 	text-decoration: none;
 }
  
 .topmenu_item_special {
 	float: right;
-	background-color: #2a7dd2;
+	background-color: #b5cba0;
 }
 
 /* END TopMenu Style */
@@ -120,7 +122,7 @@ body {
 	margin-right: 0px;
 	margin-bottom: 0px;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 13px;
+	font-size: 10px;
 	color: #333333;
 	/*text-align: center;*/
 }
@@ -291,12 +293,13 @@ td {
 	width: 50px;
 	height: 15px;
 	text-align: center;
-	font-size: 14px;
+	font-size: 10px;
 	/*font-weight: bold;*/
 }
 
 .message_list_nav_button, .message_list_nav_infos {
-	border-width: 2px;
+	background: white;
+	border-width: 1px;
 	border-style: solid;
 }
 
@@ -314,7 +317,7 @@ td {
 
 #timeline {
 	float: left;
-	font-size: 14px;
+	font-size: 10px;
 }
 
 #timeline div {
@@ -322,8 +325,10 @@ td {
 	margin-left: 5px;
 }
 
-#timeline_limit_label, #timeline_submit {
+#timeline_limit_label, #timeline_submit, #timeline_step_label {
 	padding-left: 10px;
+	font-style: verdana;
+	font-weight: bold;
 }
 
 #timeline_links {
@@ -341,6 +346,7 @@ td {
 	float: right;
 	text-align: right;
 }
+
 
 .section_alert {
 	margin-bottom: 20px;
@@ -496,6 +502,12 @@ input {
 	border: 1px solid black;
 	padding:2px;
 	font-size: inherit;
+	font-family: inherit;
+}
+
+select {
+	font-size: inherit;
+	font-family: inherit;
 }
 
 form {
