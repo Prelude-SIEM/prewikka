@@ -18,11 +18,14 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+import sys
+
 import time
 import copy
 
 from prewikka import Interface
 from prewikka.modules.main import Views, ActionParameters
+from prewikka import utils
 
 
 class _MyTime:
@@ -74,8 +77,8 @@ class _MyTime:
         return self + (-value)
 
     def __str__(self):
-        return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(self._t))
-
+        return utils.time_to_ymdhms(self._t)
+    
     def __int__(self):
         return self._t
 
@@ -183,18 +186,18 @@ class HeartbeatAction(Interface.Action):
 
 class AlertSummary(AlertAction):
     def process(self, core, parameters):
-        return Views.AlertSummary, self._getAlert(core, parameters)
+        return Views.AlertSummaryView, self._getAlert(core, parameters)
 
 
 class HeartbeatSummary(HeartbeatAction):
     def process(self, core, parameters):
-        return Views.HeartbeatSummary, self._getHeartbeat(core, parameters)
+        return Views.HeartbeatSummaryView, self._getHeartbeat(core, parameters)
 
 
 
 class AlertDetails(AlertAction):
     def process(self, core, parameters):
-        return Views.AlertDetails, self._getAlert(core, parameters)
+        return Views.AlertDetailsView, self._getAlert(core, parameters)
 
 
 
@@ -223,3 +226,63 @@ class DeleteHeartbeats(HeartbeatListing):
         parameters = ActionParameters.Listing(parameters)
         
         return HeartbeatListing.process(self, core, parameters)
+
+
+
+class HeartbeatsAnalyze(Interface.Action):
+    def process(self, core, parameters):
+        heartbeat_number = 48
+        heartbeat_value = 3600
+        heartbeat_error_tolerance = 3
+        
+        prelude = core.prelude
+        
+        data = { }
+        data["analyzers"] = [ ]
+        data["heartbeat_number"] = heartbeat_number
+        data["heartbeat_value"] = heartbeat_value
+        data["heartbeat_error_tolerance"] = heartbeat_error_tolerance
+        
+        analyzers = data["analyzers"]
+        
+        rows = prelude.getValues(selection=[ "heartbeat.analyzer.analyzerid/group_by" ])
+        for row in rows:
+            analyzerid = row[0]
+            analyzer = { }
+            analyzers.append(analyzer)
+            analyzer["analyzerid"] = analyzerid
+            
+            rows = prelude.getValues(selection=["max(heartbeat.ident)"],
+                                     criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid)
+            row = rows[0]
+            last_heartbeat_ident = row[0]
+            
+            heartbeat = prelude.getHeartbeat(analyzerid, last_heartbeat_ident) 
+            analyzer["model"] = heartbeat.get("heartbeat.analyzer.model", "n/a") 
+            analyzer["version"] = heartbeat.get("heartbeat.analyzer.version", "n/a")
+            analyzer["ostype"] = heartbeat.get("heartbeat.analyzer.ostype", "n/a")
+            analyzer["osversion"] = heartbeat.get("heartbeat.analyzer.osversion", "n/a")
+            analyzer["name"] = heartbeat.get("heartbeat.analyzer.node.name", "n/a")
+            analyzer["location"] = heartbeat.get("heartbeat.analyzer.node.location", "n/a")
+            analyzer["address"] = heartbeat.get("heartbeat.analyzer.node.address(0).address", "n/a")
+            analyzer["errors"] = [ ]
+            
+            previous_date = 0
+            
+            rows = prelude.getValues(selection=["heartbeat.create_time/order_desc"],
+                                     criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
+                                     limit=heartbeat_number)
+            
+            for row in rows:
+                date = row[0]
+                if previous_date:
+                    delta = int(previous_date) - int(date)
+                    if delta > heartbeat_value + heartbeat_error_tolerance:
+                        analyzer["errors"].append({ "type": "later", "after": date, "back": previous_date })
+                    elif delta < heartbeat_value - heartbeat_error_tolerance:
+                        analyzer["errors"].append({ "type": "sooner", "date": previous_date, "delta": delta })
+                else:
+                    analyzer["last_heartbeat"] = date
+                previous_date = date
+        
+        return Views.HeartbeatsAnalyzeView, data

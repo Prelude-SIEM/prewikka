@@ -332,6 +332,17 @@ table {
 	background-color: white;
 }
 
+.heartbeats_analyze_analyzer td {
+	border: 0px;
+	border-bottom: 1px;
+	border-style: solid;
+	border-color: black;
+}
+
+.heartbeats_analyze_message {
+	font-size: 80%;
+}
+
 /*a:link.tlink {
     color:#D2312A;
     text-decoration: underline;

@@ -25,7 +25,9 @@ import copy
 from prewikka import Views
 from prewikka.modules.main import ActionParameters
 from prewikka.templates import Table
-from prewikka.modules.main.templates import MessageListing, MessageSummary, MessageDetails
+from prewikka.modules.main.templates import MessageListing, MessageSummary, MessageDetails,\
+     HeartbeatsAnalyze
+from prewikka import utils
 
 def Actions():
     # workaround: we cannot do a simple "from modules.main import Actions" statement
@@ -50,9 +52,22 @@ class HeartbeatsSection(Views.NormalView):
     def init(self):
         Views.NormalView.init(self)
         self.setActiveSection("Heartbeats")
-        self.setTabs([ ("Heartbeats", Actions().HeartbeatListing()) ])
-        self.setActiveTab("Heartbeats")
+        self.setTabs([ ("Analyze", Actions().HeartbeatsAnalyze()), ("List", Actions().HeartbeatListing()) ])
 
+
+
+class HeartbeatsAnalyzeTab(HeartbeatsSection):
+    def init(self):
+        HeartbeatsSection.init(self)
+        self.setActiveTab("Analyze")
+
+
+
+class HeartbeatListingTab(HeartbeatsSection):
+    def init(self):
+        HeartbeatsSection.init(self)
+        self.setActiveTab("List")
+    
 
 
 class MessageListingView:
@@ -93,12 +108,10 @@ class MessageListingView:
         current = time.localtime()
         
         if t[:3] == current[:3]: # message time is today
-            format = "%H:%M:%S"
-        else:
-            format = "%Y-%m-%d %H:%M:%S"
+            return utils.time_to_hms(t)
         
-        return time.strftime(format, t)
-
+        return utils.time_to_ymdhms(t)
+    
     def _buildEdition(self, template):
         # build step form
         template.addHidden("action", self._getMessageListingAction().getId())
@@ -191,7 +204,7 @@ class AlertListingView(MessageListingView, AlertsSection):
 
 
 
-class HeartbeatListingView(MessageListingView, HeartbeatsSection):
+class HeartbeatListingView(MessageListingView, HeartbeatListingTab):
     ROOT = "heartbeat"
     HEADER = "Analyzerid", "Address", "Name", "Type", "Time"
     FILTERS = [ "heartbeat.analyzer.analyzerid", "heartbeat.analyzer.node.address.address", "heartbeat.analyzer.node.name",
@@ -225,7 +238,7 @@ class AlertSummaryView(AlertsSection):
 
 
 
-class HeartbeatSummaryView(HeartbeatsSection):
+class HeartbeatSummaryView(HeartbeatListingTab):
     def build(self):
         self.setMainContent(MessageSummary.HeartbeatSummary(self._data))
 
@@ -237,6 +250,35 @@ class AlertDetailsView(AlertsSection):
 
 
 
-class HeartbeatDetailsView(HeartbeatsSection):
+class HeartbeatDetailsView(HeartbeatListingTab):
     def build(self):
         self.setMainContent(MessageDetails.HeartbeatDetails(self._data))
+
+
+
+class HeartbeatsAnalyzeView(HeartbeatsAnalyzeTab):
+    def _createErrorMessage(self, error):
+        if error["type"] == "sooner":
+            delta = error["delta"]
+            hours = delta / 3600
+            mins = (delta - hours * 3600) / 60
+            secs = delta % 60
+            return "Sensor was restarted prematurely on %s (after %02d:%02d:%02d %d)" % \
+                   (utils.time_to_ymdhms(int(error["date"])), hours, mins, secs, delta)
+        # later
+        return "Sensor went down after %s and went back online on %s" % (str(error["after"]), str(error["back"]))
+        
+    
+    def build(self):
+        template = HeartbeatsAnalyze.HeartbeatsAnalyze(self._data["heartbeat_number"],
+                                                       self._data["heartbeat_value"],
+                                                       self._data["heartbeat_error_tolerance"])
+        
+        for analyzer in self._data["analyzers"]:
+            messages = [ ]
+            for error in analyzer["errors"]:
+                message = self._createErrorMessage(error)
+                messages.append(message)
+            template.addAnalyzer(analyzer, messages)
+        
+        self.setMainContent(str(template))

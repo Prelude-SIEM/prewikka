@@ -28,6 +28,10 @@ class Message:
 
     def __getitem__(self, key):
         return self._message[key]
+    
+    def get(self, key, default=None):
+        value = self[key]
+        return value is None and default or value
 
 
 
@@ -80,3 +84,9 @@ class Prelude(PreludeDB):
     
     def deleteHeartbeat(self, analyzerid, heartbeat_ident):
         return self.delete_heartbeat(analyzerid, heartbeat_ident)
+
+    def getValues(self, selection, criteria=None, distinct=0, limit=-1, offset=-1):
+        if criteria:
+            criteria = prelude.IDMEFCriteria(criteria)
+        
+        return self.get_values(selection, criteria, distinct, limit, offset)

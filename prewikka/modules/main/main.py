@@ -27,10 +27,11 @@ def load(core, config):
     core.interface.registerAction(Actions.AlertSummary(), ActionParameters.Message)
     core.interface.registerAction(Actions.AlertDetails(), ActionParameters.Message)
     core.interface.registerAction(Actions.DeleteAlerts(), ActionParameters.Delete)
-
+    
     # Heartbeats
-    core.interface.registerSection("Heartbeats", Actions.HeartbeatListing())
+    core.interface.registerSection("Heartbeats", Actions.HeartbeatsAnalyze())
     core.interface.registerAction(Actions.HeartbeatListing(), ActionParameters.Listing)
+    core.interface.registerAction(Actions.HeartbeatsAnalyze(), ActionParameters.HeartbeatsAnalyze)
     core.interface.registerAction(Actions.HeartbeatSummary(), ActionParameters.Message)
     core.interface.registerAction(Actions.HeartbeatDetails(), ActionParameters.Message)
     core.interface.registerAction(Actions.DeleteHeartbeats(), ActionParameters.Delete)

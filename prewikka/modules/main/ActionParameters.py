@@ -93,3 +93,8 @@ class Delete(Listing):
                 idents.append((analyzerid, alert_ident))
         
         return idents
+
+
+
+class HeartbeatsAnalyze(Interface.ActionParameters):
+    pass
