@@ -45,7 +45,7 @@
     #set $row_classes = ("table_row_even", "table_row_odd")
     #set $cnt = 0
     #for $event in $analyzer.events
-      <tr class='$row_classes[$cnt%2]'><td colspan="8">$event.value</td></tr>
+      <tr class='$row_classes[$cnt%2]'><td colspan="8" class='heartbeat_analyzer_event_$event.type'>$event.value</td></tr>
       #set $cnt += 1
     #end for
   #end for

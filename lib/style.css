@@ -377,26 +377,22 @@ thead {
 	background-color: #eeeeee;
 }
 
-.impact_severity_high {
-	display: block;
+.impact_severity_high, .impact_completion_succeeded {
 	text-decoration: none;
 	color: red;
 }
 
 .impact_severity_medium {
-	display: block;
 	text-decoration: none;
 	color: orange;
 }
 
-.impact_severity_low {
-	display: block;
+.impact_severity_low, .impact_completion_failed {
 	text-decoration: none;
 	color: green;
 }
 
 .impact_severity_info {
-	display: block;
         text-decoration: none;
         color: blue;
 }
@@ -520,6 +516,18 @@ thead {
 	width: 100%;
 }
 
+.heartbeat_analyzer_event_start, .heartbeat_analyzer_event_normal_stop, .heartbeat_analyzer_event_no_anomaly {
+	color: green;
+}
+
+.heartbeat_analyzer_event_unexpected_restart, .heartbeat_analyzer_event_abnormal_heartbeat_interval {
+	color: orange;
+}
+
+.heartbeat_analyzer_event_down {
+        color: red;
+}
+
 .heartbeat_analyze_sensor_status_normal_offline {
 	background-color: #ef9a07;
 	font-weight: bold;
@@ -527,27 +535,17 @@ thead {
 	text-align: center;
 }
  
- .heartbeat_analyze_sensor_status_abnormal_offline {
-	background-color: #d82424;
-	font-weight: bold;
-	font-size: 120%;
-	text-align: center;
+.heartbeat_analyze_sensor_status_abnormal_offline {
+	background-color: #e77070;
 }
 
 .heartbeat_analyze_sensor_status_online {
-	background-color: #33a054;
-	font-weight: bold;
-	font-size: 120%;
-	text-align: center;
+	background-color: #b5cba0;
 }
 
 .heartbeat_analyze_sensor_info {
 	font-weight: bold;
 	border-top: 10px;
-}
-
-.sensor_ko {
- 	background-color: #e77070;
 }
 
 .error_name, .error_message, .error_links {

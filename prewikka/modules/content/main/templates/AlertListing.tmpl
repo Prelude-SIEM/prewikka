@@ -13,7 +13,11 @@
 
 <td>
  <ul id="popup_block">
-  <li class="$class_">$message.classification.value<br/>$message.classification_references
+  <li><span class="$class_">$message.classification.value</span>
+  #if $message.completion.value
+      (<span class="impact_completion_$message.completion.value">$message.completion.value</span>)
+  #end if
+      <br/>$message.classification_references
    <ul>
     <li><a href="$message.details">Alert detail</a></li>
     <li><a href="$message.summary">Alert summary</a></li>
