@@ -143,6 +143,12 @@ body {
 	/*width: 100%;*/
 }
 
+.authentication_error {
+	color: red;
+	font-weight: bold;
+	text-align: right;
+}
+
 #top_view_header {
 	height: 60px;
 	padding-top: 10px;
@@ -397,14 +403,26 @@ td {
 	font-size: 80%;
 }
 
-.error_message {
-	font-size:60px;
-	color: red;
+.error_name, .error_message, .error_links {
 	position: relative;
 	margin: 0px auto;
 	margin-top: 50px;
-	width: 600px;
-	padding: 10px;
+	text-align: center;
+	width:90%;
+}
+
+.error_name {
+	font-size:60px;
+	color: red;
+}
+
+.error_message {
+	font-size: 20px;
+	color: black;
+}
+
+.error_links {
+	font-size: 16px;
 }
 
 /*a:link.tlink {

@@ -42,7 +42,7 @@ class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
     def __del__(self):
         self.core.shutdown()
 
-
+        
 
 class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHandler):
     def getCookieString(self):
@@ -50,7 +50,13 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
 
     def getQueryString(self):
         return self.path
-    
+
+    def getReferer(self):
+        try:
+            return self.input_header["referer"]
+        except KeyError:
+            return ""
+
     def write(self, data):
         self.wfile.write(data)
     

@@ -20,6 +20,9 @@
 
 import time
 
+from prewikka import DataSet
+from prewikka.templates import ErrorTemplate
+
 def time_to_hms(t):
     return time.strftime("%H:%M:%S", time.localtime(t))
 

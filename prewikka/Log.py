@@ -61,6 +61,9 @@ def get_event_type(event):
 class Log:
     def __init__(self):
         self._backends = [ ]
+
+    def __del__(self):
+        return "destroy Log"
         
     def registerBackend(self, backend):
         self._backends.append(backend)
@@ -121,7 +124,7 @@ class LogBackend:
     def handle_action(self, request, action_name):
         pass
 
-    def handle_login_successful(self, request, user):
+    def handle_login_successful(self, request, user, sessionid):
         pass
 
     def handle_logout(self, request, user):

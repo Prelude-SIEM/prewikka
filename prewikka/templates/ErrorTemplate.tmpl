@@ -1,0 +1,11 @@
+#extends prewikka.templates.TopLayout
+
+#block toplayout_content
+<div class="error_name">
+	$name
+</div>
+<div class='error_message'>
+	$message
+</div>
+<p class='error_links'><a href='$referer'>back</a> | <a href='$current'>retry</a>
+#end block toplayout_content

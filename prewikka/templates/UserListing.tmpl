@@ -23,7 +23,7 @@
 					<td>$cap</td>
 				#end for
 				<td>
-					<form action='?' method='POST'>
+					<form action='?' method='get'>
 						#for $name, $value in $user.delete_form_hiddens
 							<input type='hidden' name='$name' value='$value'/>
 						#end for
@@ -31,7 +31,7 @@
 					</form>
 				</td>
 				<td>
-					<form action='?' method='POST'>
+					<form action='?' method='get'>
 						#for $name, $value in $user.password_form_hiddens
 							<input type='hidden' name='$name' value='$value'/>
 						#end for
@@ -39,7 +39,7 @@
 					</form>
 				</td>
 				<td>
-					<form action='?' method='POST'>
+					<form action='?' method='get'>
 						#for $name, $value in $user.capabilities_form_hiddens
 							<input type='hidden' name='$name' value='$value'/>
 						#end for
@@ -52,7 +52,7 @@
 	</tbody>
 </table>
 <br/>
-<form action='?' method='POST'>
+<form action='?' method='get'>
 	#for $name, $value in $add_form_hiddens
 		<input type='hidden' name='$name' value='$value'/>
 	#end for

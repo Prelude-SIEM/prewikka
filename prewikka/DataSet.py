@@ -20,7 +20,7 @@
 
 import sys
 
-from prewikka import Action
+import prewikka.Action
 
 
 class BaseDataSet:
@@ -39,6 +39,8 @@ class BaseDataSet:
         self.menu_items = [ ]
         self.topmenu_items = [ ]
         self.topmenu_quick_accessors = [ ]
+        self.referer = ""
+        self.current = ""
         if self.tabs:
             self.addTabs(self.tabs)
         
@@ -90,7 +92,7 @@ class BaseDataSet:
         pass
         
     def createLink(self, action, parameters=None):
-        link = "?action=%s" % Action.get_action_name(action)
+        link = "?action=%s" % prewikka.Action.get_action_name(action)
         if parameters:
             link += "&%s" % str(parameters)
         
@@ -103,7 +105,7 @@ class PropertiesChangeDataSet:
         self.properties = [ ]
         self.hiddens = [ ]
         self.submit = action_name
-        self.addHidden("action", Action.get_action_name(action))
+        self.addHidden("action", prewikka.Action.get_action_name(action))
 
     def addHidden(self, name, value):
         self.hiddens.append([ name, value ])

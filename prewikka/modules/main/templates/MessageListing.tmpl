@@ -6,7 +6,7 @@
 $message_listing_header
 <div id="message_list_edition">
 	<div id="timeline">
-	<form action="?" method="post">
+	<form action="?" method="get">
 		#for $name, $value in $timeline.form_hiddens
 			<input type="hidden" name="$name" value="$value"/>
 		#end for
@@ -41,9 +41,9 @@ $message_listing_header
 </div>
 
 <div id="message_list_result">
-<form action="?" method="post">
+<form action="?" method="get">
 #for $name, $value in $delete_form_hiddens
-	<input type="hidden" name="{NAME}" value="{VALUE}"/>
+	<input type="hidden" name="$name" value="$value"/>
 #end for
 <table>
 	<thead>

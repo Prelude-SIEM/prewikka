@@ -37,8 +37,8 @@ class LogStderr(Log.LogBackend):
     def handle_action(self, request, action_name):
         self._log("action %s" % action_name)
         
-    def handle_login_successful(self, request, user):
-        self._log("user '%s' logged in" % user.getLogin())
+    def handle_login_successful(self, request, user, sessionid):
+        self._log("user '%s' logged in, sessionid %s set" % (user.getLogin(), sessionid))
         
     def handle_logout(self, request, user):
         self._log("user '%s' logout" % user.getLogin())
@@ -53,7 +53,7 @@ class LogStderr(Log.LogBackend):
         self._log("bad login '%s'" % login)
 
     def handle_bad_password(self, request, login, password):
-        self._log("bad password '%s' for '%s'" % (login, password))
+        self._log("bad password '%s' for '%s'" % (password, login))
 
     def handle_invalid_userid(self, request, userid):
         self._log("invalid userid %d" % userid)
@@ -65,7 +65,7 @@ class LogStderr(Log.LogBackend):
         self._log("invalid action parameters, " + reason)
 
     def handle_action_denied(self, request, action_name):
-        self._log("action '%s' forbidden for user '%s'" % action_name, request.user.getLogin())
+        self._log("action '%s' forbidden for user '%s'" % (action_name, request.user.getLogin()))
 
     def handle_debug(self, message):
         self._log(message)

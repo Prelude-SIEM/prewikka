@@ -19,7 +19,11 @@
 
 
 import prelude
+import preludedb
 from preludedb import PreludeDB
+
+
+Error = (prelude.Error, preludedb.Error)
 
 
 class Message:

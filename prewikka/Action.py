@@ -1,30 +1,38 @@
+# Copyright (C) 2004 Nicolas Delon <nicolas@prelude-ids.org>
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
 import copy
 import urllib
 
 from prewikka import Log
 
-class Error(Exception):
+
+class ActionParameterError(Exception):
     pass
 
-
-
-class ActionInvalidError(Error):
-    pass
-
-
-
-class ActionParameterError(Error):
-    pass
-
-
-class ActionDeniedError(Error):
-    pass
 
 
 class ActionParameterInvalidError(ActionParameterError):
     def __init__(self, name):
         self._name = name
-        
+
     def __str__(self):
         return "invalid parameter '%s'" % self._name
 
@@ -65,81 +73,6 @@ def get_action_name(action):
         return action.getName()
     return "%s.%s.%s" % (action.im_func.__module__, action.im_class.__name__, action.im_func.__name__)
 
-
-
-class RegisteredAction:
-    def __init__(self, handler, parameters, capabilities):
-        self.handler = handler
-        self.parameters = parameters
-        self.capabilities = capabilities
-        self.name = get_action_name(handler)
-
-    def __str__(self):
-        return self.name
-
-
-
-class ActionEngine:
-    def __init__(self, log):
-        self._log = log
-        self._actions = { }
-        self._default_action = None
-        self._login_action = None
-        
-    def registerAction(self, handler, parameters, capabilities, default=False):
-        registered = RegisteredAction(handler, parameters, capabilities)
-        self._actions[registered.name] = registered
-        
-        if default:
-            self._default_action = registered
-
-        return registered
-        
-    def registerLoginAction(self, handler, parameters):
-        self._login_action = self.registerAction(handler, parameters, [ ])
-        
-    def getLoginAction(self):
-        return self._login_action
-
-    def getRegisteredActionFromName(self, action_name):
-        if not action_name:
-            return self._default_action
-        
-        try:
-            return self._actions[action_name]
-        except KeyError:
-            self._log.event(Log.EVENT_INVALID_ACTION, request, action_name)
-            raise ActionInvalidError
-
-    def _execute(self, handler, request):
-        if isinstance(handler, Action):
-            return handler.process(request)
-        return handler(request)
-
-    def process(self, registered, arguments, request):
-        if request.user:
-            required = registered.capabilities
-            if filter(lambda cap: request.user.hasCapability(cap), required) != required:
-                self._log.event(Log.EVENT_ACTION_DENIED, request, registered.name)
-                raise ActionDeniedError
-
-        handler = registered.handler
-        parameters = registered.parameters()
-
-        try:
-            parameters.populate(arguments)
-            parameters.check()
-        except ActionParameterError, e:
-            self._log.event(Log.EVENT_INVALID_ACTION_PARAMETERS, request, str(e))
-            raise
-
-        request.parameters = parameters
-
-        return self._execute(handler, request)
-
-    def processDefaultAction(self, request):
-        return self.process(self._default_action, { }, request)
-    
 
 
 class Action(object):

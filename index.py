@@ -55,6 +55,9 @@ class CGIRequest(Request.Request):
     def getCookieString(self):
         return os.getenv("HTTP_COOKIE")
 
+    def getReferer(self):
+        return os.getenv("HTTP_REFERER", "")
+
 
 
 request = CGIRequest()

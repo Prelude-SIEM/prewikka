@@ -5,27 +5,42 @@ import random
 import md5
 
 from prewikka import Log, Action, DataSet
+import prewikka.Error
 from prewikka.templates import LoginPasswordForm, PropertiesChangeForm
 from prewikka.templates import UserListing
 
 
-class Error(Exception):
-    pass
+class Error(LoginPasswordForm.LoginPasswordForm, prewikka.Error.BaseError, DataSet.BaseDataSet):
+    message = ""
+
+    def __init__(self):
+        prewikka.Error.BaseError.__init__(self)
+        DataSet.BaseDataSet.__init__(self)
+        LoginPasswordForm.LoginPasswordForm.__init__(self)
+    
 
 
-class SessionError(Error):
-    pass
+class SessionExpiredError(Error):
+    message = "session expired"
 
-
-class LoginError(Error):
-    pass
-
-
-class PasswordError(Error):
-    pass
 
 
 class AuthError(Error):
+    message = "authentication failed"
+
+
+
+class LoginError(AuthError):
+    pass
+
+
+
+class PasswordError(AuthError):
+    pass
+
+
+
+class SessionError(Error):
     pass
 
 
@@ -112,7 +127,7 @@ class ChangePasswordActionParameters(UserActionParameters):
     def check(self):
         UserActionParameters.check(self)
         if self["password1"] != self["password2"]:
-            raise Action.ActionParameterError
+            raise Action.ActionParameterError()
 
 
 
@@ -124,14 +139,6 @@ class ChangeCapabilitiesActionParameters(UserActionParameters, CapabilityActionP
     def check(self):
         UserActionParameters.check(self)
         CapabilityActionParameters.check(self)
-
-
-
-class LoginPasswordPromptView(DataSet.BaseDataSet, LoginPasswordForm.LoginPasswordForm):
-    def __init__(self, login_action):
-        DataSet.BaseDataSet.__init__(self)
-        LoginPasswordForm.LoginPasswordForm.__init__(self)
-        self.login_action = Action.get_action_name(login_action)
 
 
 
@@ -232,17 +239,21 @@ class UserManagement:
         self._expiration = int(config.getOptionValue("expiration", 30))
         self.core.interface.registerConfigurationSection("Users", self.handle_user_listing)
         self.core.interface.registerQuickAccessor("logout", self.handle_user_logout, None)
-        self.core.action_engine.registerLoginAction(self.login, LoginPasswordActionParameters)
-        self.core.action_engine.registerAction(self.handle_user_listing, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.action_engine.registerAction(self.handle_user_add_form, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.action_engine.registerAction(self.handle_user_add, AddUserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.action_engine.registerAction(self.handle_change_password_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.action_engine.registerAction(self.handle_change_password, ChangePasswordActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.action_engine.registerAction(self.handle_change_capabilities_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.action_engine.registerAction(self.handle_change_capabilities, ChangeCapabilitiesActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.action_engine.registerAction(self.handle_user_delete, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.action_engine.registerAction(self.handle_user_logout, Action.ActionParameters, [ ])
-        
+        self.core.registerLoginAction(self.login, LoginPasswordActionParameters)
+        self.core.registerAction(self.handle_user_listing, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.registerAction(self.handle_user_add_form, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.registerAction(self.handle_user_add, AddUserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.registerAction(self.handle_change_password_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.registerAction(self.handle_change_password, ChangePasswordActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.registerAction(self.handle_change_capabilities_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.registerAction(self.handle_change_capabilities, ChangeCapabilitiesActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.registerAction(self.handle_user_delete, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.registerAction(self.handle_user_logout, Action.ActionParameters, [ ])
+        Error.login_action = Action.get_action_name(self.login)
+
+    def __del__(self):
+        print "destroy UserManagement"
+
     def enableSSL(self):
         self._use_ssl = True
         
@@ -267,16 +278,16 @@ class UserManagement:
                 sessionid = request.input_cookie["sessionid"].value
                 user = self.getUserBySessionID(sessionid)
             except SessionError:
-                # TODO: log invalid sessions
-                return self.redirectToLogin()
+                self.core.log(Log.EVENT_INVALID_SESSIONID, request, sessionid)
+                raise
             if time.time() - user.getSessionTime(sessionid) < self._expiration * 60:
                 request.user = user
                 return
             
             user.removeSession(sessionid)
             user.save()
-            
-        return self.redirectToLogin()
+
+        raise Error()
     
     def check(self, request):
         if self._use_ssl:
@@ -292,13 +303,13 @@ class UserManagement:
             user = self.getUserByLogin(login)
         except LoginError:
             request.log(Log.EVENT_BAD_LOGIN, request, login)
-            raise AuthError
+            raise
         
         try:
             user.checkPassword(password)
         except PasswordError:
             request.log(Log.EVENT_BAD_PASSWORD, request, login, password)
-            raise AuthError
+            raise
         
         t = int(time.time())
         sessionid = md5.new(str(t * random.random())).hexdigest()
@@ -308,9 +319,9 @@ class UserManagement:
         request.output_cookie["sessionid"] = sessionid
         request.user = user
         
-        request.log(Log.EVENT_LOGIN_SUCCESSFUL, request, user)
+        request.log(Log.EVENT_LOGIN_SUCCESSFUL, request, user, sessionid)
         
-        return request.action_engine.processDefaultAction(request)
+        return request.forwardToDefaultAction()
     
     def handle_user_listing(self, request):
         ids = self.getUsers()
@@ -376,5 +387,5 @@ class UserManagement:
         request.user.save()
 
         request.log(Log.EVENT_LOGOUT, request, request.user)
-        
-        return LoginPasswordPromptView(self.login)
+
+        raise Error()

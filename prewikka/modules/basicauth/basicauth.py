@@ -54,7 +54,7 @@ class User(UserManagement.User):
 
     def checkPassword(self, password):
         if self._hashPassword(password) != self.data["password"]:
-            raise UserManagement.PasswordError
+            raise UserManagement.PasswordError()
         
     def addSession(self, sessionid, t):
         self.data["sessions"][sessionid] = t
@@ -79,6 +79,7 @@ class User(UserManagement.User):
 
     def save(self):
         self.db[str(self.getID())] = self.data
+        self.db.sync()
 
 
 
@@ -93,6 +94,7 @@ class BasicUserManagement(UserManagement.UserManagement):
             user.setPassword("admin")
             user.setCapabilities(UserManagement.CAPABILITIES_ADMIN)
             user.save()
+            self.db.sync()
         
     def __del__(self):
         self.db.close()
@@ -130,14 +132,14 @@ class BasicUserManagement(UserManagement.UserManagement):
             if sessionid in data["sessions"].keys():
                 return User(self.db, data)
         
-        raise UserManagement.SessionError
+        raise UserManagement.SessionError()
     
     def getUserByLogin(self, login):
         for data in self.db.values():
             if login == data["login"]:
                 return User(self.db, data)
             
-        raise UserManagement.LoginError
+        raise UserManagement.LoginError()
     
     def getUserByID(self, id):
         return User(self.db, self.db[str(id)])
@@ -153,17 +155,18 @@ class BasicUserManagement(UserManagement.UserManagement):
                 break
         
         if user is None:
-            raise UserManagement.LoginError
+            raise UserManagement.LoginError()
         
         password = self._hashPassword(password)
         if password != user.password:
-            raise UserManagement.LoginError
+            raise UserManagement.LoginError()
         
         t = int(time.time())
         sessionid = md5.new(str(t * random.random())).hexdigest()
         user.sessions[sessionid] = t
 
         self.db[str(user.id)] = user
+        self.db.sync()
         
         return sessionid
     
@@ -171,12 +174,15 @@ class BasicUserManagement(UserManagement.UserManagement):
         user.password = self._hashPassword(user.password)
         user.id = self._getNextID()
         self.db[str(user.id)] = user
+        self.db.sync()
         
     def modifyUser(self, user):
         self.db[str(user.id)] = user
+        self.db.sync()
         
     def removeUser(self, id):
         del self.db[str(id)]
+        self.db.sync()
 
 
 def load(core, config):
