@@ -37,7 +37,7 @@ class PermissionsParameters:
     def normalize(self):
         for perm in User.ALL_PERMISSIONS:
             if self.has_key(perm) and self[perm] != "on":
-                raise ParametersNormalizer.InvalidValueError(perm, self[perm])
+                raise view.InvalidParameterValueError(perm, self[perm])
 
 
 
@@ -48,7 +48,7 @@ class PasswordParameters:
 
     def normalize(self):
         if self["password1"] != self["password2"]:
-            raise ParametersNormalizer.InvalidValueError("password mismatch")
+            raise view.ParameterError("passwords mismatch")
         self["password"] = self["password1"]
 
 

@@ -110,7 +110,7 @@ class LoginPasswordAuth(Auth, Session):
         if request.arguments.keys() == ["login", "password"]:
             login = request.arguments["login"]
             password = request.arguments["password"]
-            self.handle_login(login, password)
+            self.checkPassword(login, password)
             self.createSession(request, login)
             request.arguments = { }
             return login

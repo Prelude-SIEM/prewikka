@@ -292,7 +292,7 @@ thead {
 
 #message_list_nav a:visited, #message_list_nav a:link, #message_list_nav a:hover {
         color: black;
-        text-decoraction: none;
+        text-decoration: none;
 }
 
 #message_list_nav td {
@@ -547,6 +547,19 @@ thead {
 	font-weight: bold;
 	border-top: 10px;
 }
+
+/*
+ * Settings view
+ */
+
+.settings_label {
+        font-weight: bold;
+        display: inline;
+}
+ 
+/*
+ * Error view
+ */
 
 .error_name, .error_message, .error_links {
 	position: relative;

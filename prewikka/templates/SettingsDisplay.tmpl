@@ -1,0 +1,38 @@
+#extends prewikka.templates.ClassicLayout
+
+#block main_content
+<div class="settings_label">Login</div>: $login
+<br/>
+<br/>
+
+<div class="settings_label">Permissions</div>:
+<br/>
+#for $perm in $permissions
+  $perm<br/>
+#end for
+<br/><br/>
+
+#if $can_change_password
+  <form action="?" method="POST">
+    <input type="hidden" name="view" value="settings_password_change"/>
+    <table>
+      <tr>
+        <td>current password</td>
+	<td><input type="password" name="current"/></td>
+      </tr>
+      <tr>
+        <td>new password</td>
+	<td><input type="password" name="new"/></td>
+      </tr>
+      <tr>
+        <td>new password (confirm)</td>
+        <td><input type="password" name="confirmation"/></td>
+      </tr>
+      <tr>
+        <td>
+        <td><input type="submit" value="change password"/>
+      </tr>
+    </table>
+  </form>
+#end if
+#end block

@@ -35,7 +35,7 @@ class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
     def _hash(self, data):
         return md5.new(data).hexdigest()
     
-    def handle_login(self, login, password):
+    def checkPassword(self, login, password):
         try:
             real_password = self.storage.getPassword(login)
         except Storage.StorageError:

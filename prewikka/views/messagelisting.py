@@ -124,7 +124,7 @@ class DeleteParameters:
             try:
                 analyzerid, message_ident = map(lambda x: long(x), ident.split(":"))
             except ValueError:
-                raise ParametersNormalizer.InvalidValueError("idents", self["idents"])
+                raise view.InvalidParameterValueError("idents", self["idents"])
             
             idents.append((analyzerid, message_ident))
 
@@ -163,7 +163,7 @@ class MessageListing:
             if name == wanted:
                 return filter
 
-        raise ParametersNormalizer.InvalidParameterError(wanted)
+        raise view.InvalidParameterValueError("inline_filter_name", wanted)
 
     def _setInlineFilter(self):
         self.dataset["active_inline_filter"] = self.parameters.get("inline_filter_name", "")
