@@ -74,14 +74,28 @@ class Chart:
                loc=(0,0))
         self._render()
 
+    def _setYticks(self):
+        locs, labels = yticks()
+        step = int(locs[1] / 2)
+        ymin, ymax = ylim()
+        r = range(int(ymin), int(ymax + step), step)
+        yticks(r, r)
+
+    def _setXticks(self):
+        xticks(arange(len(self._values)), self._labels, horizontalalignment="center")
+
+    def _setTicks(self):
+        self._setXticks()
+        self._setYticks()
+
     def renderPlot(self):
         plot(self._values)
-        xticks(arange(len(self._values)), self._labels)
+        self._setTicks()
         self._render()
 
     def renderBar(self):
-        bar(range(len(self._values)), self._values)
-        xticks(arange(len(self._values)), self._labels)
+        bar(arange(len(self._values)), self._values)
+        self._setTicks()
         self._render()
 
 
