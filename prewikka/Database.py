@@ -61,7 +61,7 @@ class Database:
                               ("port", None),
                               ("name", "prewikka"),
                               ("user", "prewikka"),
-                              ("password", "prewikka")):
+                              ("pass", "prewikka")):
             value = config.get(name, default)
             if value:
                 preludedb_sql_settings_set(settings, name, value)
