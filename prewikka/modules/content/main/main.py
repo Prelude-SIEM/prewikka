@@ -460,7 +460,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
     def _adjustCriteria(self, request, criteria):
         if request.parameters.has_key("filter"):
             filter = self.getFilter(request.env.storage, request.user.login, request.parameters["filter"])
-            criteria.append(str(filter))
+            criteria.append("(%s)" % str(filter))
 
     def process(self, request):
         MessageListingAction.process(self, request)
