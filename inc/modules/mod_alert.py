@@ -98,6 +98,6 @@ class AlertModule(module.ContentModule):
 
 
 
-def load(core, config):
-    module = AlertModule(core, config)
-    core.registerContentModule(module)
+def load(_core, config):
+    module = AlertModule(_core, config)
+    _core.registerContentModule(module)

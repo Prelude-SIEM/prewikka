@@ -16,9 +16,16 @@ for path in "inc/", "inc/modules":
 
 from Query import Query
 from Frontend import Frontend
+from core import Core
+
+
+class Response:
+    def write(self, content):
+        sys.stdout.write(content)
+
 
 query = Query(cgi.FieldStorage())
+response = Response()
 
-frontend = Frontend()
-
-print frontend.build(query)
+core = Core()
+core.process(query, response)
