@@ -25,6 +25,9 @@ import distutils.spawn
 
 import copy
 
+import urllib
+import cgi
+
 import prelude, preludedb
 
 from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer, \
@@ -144,8 +147,9 @@ class Core:
         dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
         dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
         dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
-        dataset["prewikka.url.referer"] = request.getReferer()
-        dataset["prewikka.url.current"] = request.getQueryString()
+        query = urllib.splitquery(request.getReferer())[1]
+        dataset["prewikka.url.referer"] = cgi.parse_qs(query or "")
+        dataset["prewikka.url.current"] = cgi.parse_qs(request.getQueryString()[2:])
         dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
 
         if isinstance(self._env.auth, Auth.AnonymousAuth):

@@ -117,9 +117,9 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         self.do_GET()
 
     def do_POST(self):
-        self._query_string = cgi.parse_qs(self.rfile.read(int(self.headers["Content-Length"])))
+        self._query_string = self.rfile.read(int(self.headers["Content-Length"]))
         self.init()
-        self._processDynamic(self._query_string)
+        self._processDynamic(cgi.parse_qs((self._query_string)))
 
     def getClientAddress(self):
         return self.client_address[0]

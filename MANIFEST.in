@@ -7,4 +7,5 @@ include htdocs/js/*.js
 include conf/*.conf
 include doc/*
 include *.py
+include NEWS
 recursive-include prewikka *.py *.tmpl

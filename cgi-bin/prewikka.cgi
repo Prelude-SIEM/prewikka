@@ -44,7 +44,7 @@ class CGIRequest(Request.Request):
         sys.stdout.write(data)
         
     def getQueryString(self):
-        return os.environ.get("QUERY_STRING", "").strip()
+        return os.environ.get("REQUEST_URI", "").strip()
 
     def getClientAddr(self):
         return os.environ.get("REMOTE_ADDR", "").strip()

@@ -10,12 +10,24 @@
 
    <br/><br/>
    
-   <form action="$prewikka.url.referer" method="GET">
+   <form action="?" method="GET">
+     #for $param, $values in $prewikka.url.referer.items()
+       #for $value in $values
+         <input type="hidden" name="$param" value="$value"/>
+       #end for
+     #end for
      <input style="float: left; position: relative;" type="submit" value="Back"/>
    </form>
-   <form action="$prewikka.url.current" method="GET">
+
+   <form action="?" method="GET">
+     #for $param, $values in $prewikka.url.current.items()
+       #for $value in $values
+         <input type="hidden" name="$param" value="$value"/>
+       #end for
+     #end for
      <input style="float: right; position: relative;" type="submit" value="Retry"/>
    </form>
+
   </fieldset>
  </div>
 
