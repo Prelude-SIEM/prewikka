@@ -9,7 +9,7 @@ body {
         font-family: Verdana, Arial, Helvetica, sans-serif;
         font-size: 10px;
         color: #333333;
-	background-color: #d6d6d6;
+        background-color: #d6d6d6;
 }
 
 
@@ -659,7 +659,7 @@ ul#popup_block > li:hover > ul {
 	display: inline;
 }
 
-.filter_popup table {
+.filter_popup div {
 	display: none;
 	margin-top: 15px;
 	padding: 3px;

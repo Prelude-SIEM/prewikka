@@ -130,12 +130,36 @@ class AlertListingParameters(MessageListingParameters):
     def register(self):
         MessageListingParameters.register(self)
         self.optional("filter", str)
-        self.optional("alert.classification.text", list)
-        self.optional("alert.analyzer.name", list)
+        self.optional("alert.classification.text", list, [ ])
+        self.optional("alert.assessment.impact.severity", list, [ ])
+        self.optional("alert.assessment.impact.completion", list, [ ])
+        self.optional("alert.source.user.user_id.name", list, [ ])
+        self.optional("alert.source.process.name", list, [ ])
+        self.optional("alert.source.service.name", list, [ ])
+        self.optional("alert.source.service.port", list, [ ])
+        self.optional("alert.source.interface", list, [ ])
+        self.optional("alert.target.user.user_id.name", list, [ ])
+        self.optional("alert.target.process.name", list, [ ])
+        self.optional("alert.target.service.name", list, [ ])
+        self.optional("alert.target.service.port", list, [ ])
+        self.optional("alert.target.interface", list, [ ])
+        self.optional("alert.analyzer.name", list, [ ])
+        self.optional("alert.analyzer.manufacturer", list, [ ])
+        self.optional("alert.analyzer.model", list, [ ])
+        self.optional("alert.analyzer.class", list, [ ])
+        
 
     def normalize(self):
         MessageListingParameters.normalize(self)
-
+        
+        for severity in self["alert.assessment.impact.severity"]:
+            if not severity in ("info", "low", "medium", "high", "none"):
+                raise view.InvalidParameterValueError("alert.assessment.impact.severity", severity)
+        
+        for completion in self["alert.assessment.impact.completion"]:
+            if not completion in ("succeeded", "failed", "none"):
+                raise view.InvalidParameterValueError("alert.assessment.impact.completion", completion)
+        
         for direction in "source", "target":
             self["alert.%s.node" % direction] = [ ]
             for parameter, value in self.items():
@@ -341,6 +365,8 @@ class MessageListing:
         criteria.append(self.time_criteria_format % (str(start), str(end)))
         criteria = " && ".join(criteria)
 
+        print "criteria:", criteria
+
         self._setInlineFilter()
         self._setTimeline(start, end)
         self._setNavPrev(self.parameters["offset"])
@@ -486,16 +512,83 @@ class AlertListing(MessageListing, view.View):
     def _getFilter(self, storage, login, name):
         return storage.getAlertFilter(login, name)
 
-    def _getInlineFilterObject(self, filter):
-        try:
-            return self.parameters({"alert.source.node": "source_type",
-                                    "alert.target.node": "target_type"}[filter])
-        except:
-            return filter
-
     def _deleteMessage(self, analyzerid, messageid):
         self.env.prelude.deleteAlert(analyzerid, messageid)
+
+    def _applySimpleFilter(self, criteria, column, object):
+        if len(self.parameters[object]) > 0:
+            criteria.append(" || ".join(map(lambda value: "%s substr '%s'" % (object, value),
+                                            self.parameters[object])))
+            self.dataset[object] = self.parameters[object]
+            self.dataset[column + "_filtered"] = True
+        else:
+            self.dataset[object] = [ "" ]
+
+    def _applyOptionalEnumFilter(self, criteria, column, object, values):
+        def lists_have_same_content(l1, l2):
+            l1 = copy.copy(l1)
+            l2 = copy.copy(l2)
+            l1.sort()
+            l2.sort()
+            
+            return l1 == l2
         
+        if (len(self.parameters[object]) != 0 and
+            not lists_have_same_content(self.parameters[object], values)):
+            for value in self.parameters[object]:
+                new = [ ]
+                # FIXME: disable filter on none, it needs a fix in libpreludedb
+##                 if value == "none":
+##                     new.append("! %s" % object)
+##                 else:
+                new.append("%s == '%s'" % (object, value))
+            criteria.append("(" + " || ".join(new) + ")")
+            self.dataset[object] = self.parameters[object]
+            self.dataset[column + "_filtered"] = True
+        else:
+            self.dataset[object] = values
+
+    def _applyClassificationFilters(self, criteria):
+        self.dataset["classification_filtered"] = False
+        self._applySimpleFilter(criteria, "classification", "alert.classification.text")
+        self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.severity",
+                                      ["info", "low", "medium", "high", "none"])
+        self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.completion",
+                                      ["failed", "succeeded", "none"])
+        
+        print "completion:", self.parameters["alert.assessment.impact.completion"]
+
+    def _applyAnalyzerFilters(self, criteria):
+        self.dataset["analyzer_filtered"] = False
+        self._applySimpleFilter(criteria, "analyzer", "alert.analyzer.name")
+        self._applySimpleFilter(criteria, "analyzer", "alert.analyzer.manufacturer")
+        self._applySimpleFilter(criteria, "analyzer", "alert.analyzer.model")
+        self._applySimpleFilter(criteria, "analyzer", "alert.analyzer.class")
+
+    def _applyDirectionFilters(self, criteria, direction):
+        self.dataset[direction + "_filtered"] = False
+        
+        if self.parameters["alert.%s.node" % direction]:
+            criteria.append(" || ".join(map(lambda (o,v): "%s substr '%s'" % (o, v),
+                                                self.parameters["alert.%s.node" % direction])))
+            self.dataset["alert.%s.node" % direction] = self.parameters["alert.%s.node" % direction]
+            self.dataset["%s_filtered" % direction] = True
+        else:
+            self.dataset["alert.%s.node" % direction] = [ ("alert.%s.node.address.address" % direction, "") ]
+            self.dataset["%s_filtered" % direction] = False
+
+        self._applySimpleFilter(criteria, direction, "alert.%s.user.user_id.name" % direction)
+        self._applySimpleFilter(criteria, direction, "alert.%s.process.name" % direction)
+        self._applySimpleFilter(criteria, direction, "alert.%s.service.name" % direction)
+        self._applySimpleFilter(criteria, direction, "alert.%s.service.port" % direction)
+        self._applySimpleFilter(criteria, direction, "alert.%s.interface" % direction)
+        
+    def _applyFilters(self, criteria):
+        self._applyClassificationFilters(criteria)
+        self._applyDirectionFilters(criteria, "source")
+        self._applyDirectionFilters(criteria, "target")
+        self._applyAnalyzerFilters(criteria)
+
     def render(self):
         criteria = [ ]
 
@@ -503,35 +596,7 @@ class AlertListing(MessageListing, view.View):
             filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter"])
             criteria.append("(%s)" % str(filter))
 
-        if self.parameters.has_key("alert.classification.text") and \
-           len(self.parameters["alert.classification.text"]) > 0:
-            criteria.append(" || ".join(map(lambda x: "alert.classification.text substr '%s'" % x,
-                                            self.parameters["alert.classification.text"])))
-            self.dataset["alert.classification.text"] = self.parameters["alert.classification.text"]
-            self.dataset["classification_filtered"] = True
-        else:
-            self.dataset["alert.classification.text"] = [ "" ]
-            self.dataset["classification_filtered"] = False
-
-        for direction in "source", "target":
-            if self.parameters["alert.%s.node" % direction]:
-                criteria.append(" || ".join(map(lambda (o,v): "%s substr '%s'" % (o, v),
-                                                self.parameters["alert.%s.node" % direction])))
-                self.dataset["alert.%s.node" % direction] = self.parameters["alert.%s.node" % direction]
-                self.dataset["%s_filtered" % direction] = True
-            else:
-                self.dataset["alert.%s.node" % direction] = [ ("alert.%s.node.address.address" % direction, "") ]
-                self.dataset["%s_filtered" % direction] = False
-
-        if self.parameters.has_key("alert.analyzer.name") and \
-           len(self.parameters["alert.analyzer.name"]) > 0:
-            criteria.append(" || ".join(map(lambda x: "alert.analyzer.name substr '%s'" % x,
-                                            self.parameters["alert.analyzer.name"])))
-            self.dataset["alert.analyzer.name"] = self.parameters["alert.analyzer.name"]
-            self.dataset["analyzer_filtered"] = True
-        else:
-            self.dataset["alert.analyzer.name"] = [ "" ]
-            self.dataset["analyzer_filtered"] = False
+        self._applyFilters(criteria)
 
         MessageListing.render(self, criteria)
         
