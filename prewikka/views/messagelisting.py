@@ -681,10 +681,11 @@ class AlertListing(MessageListing, view.View):
         results = self.env.prelude.getValues(["alert.classification.text/group_by",
                                               "alert.assessment.impact.severity/group_by",
                                               "alert.assessment.impact.completion/group_by",
-                                              "count(alert.classification.text)"], criteria,
+                                              "count(alert.classification.text)",
+                                              "max(alert.create_time)/order_desc"], criteria,
                                              limit=self.parameters["limit"], offset=self.parameters["offset"])
 
-        for classification, severity, completion, count in results:
+        for classification, severity, completion, count, ctime in results:
             criteria2 = criteria + [ "alert.classification.text == '%s'" % classification ]
             ident = self.env.prelude.getAlertIdents(criteria2, limit=1)[0]
             time_min = self.env.prelude.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
