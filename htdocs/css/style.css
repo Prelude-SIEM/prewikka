@@ -546,7 +546,8 @@ thead {
 }
 
 .heartbeat_analyze_sensor_status_normal_offline {
-	background-color: #b5cba0;
+        /* background-color: #b5cba0; */
+        background-color: #ffb063;
 	text-align: center;
 }
  

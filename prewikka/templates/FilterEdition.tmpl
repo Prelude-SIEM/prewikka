@@ -87,11 +87,11 @@ function newFilterElement(name, object, operator, object_value) {
 
 <div id="fieldset_page">
 
-<fieldset>
+<fieldset id="fieldset_heading">
 <legend>Available filters</legend>
 <form action="?" method="POST">
   <input type="hidden" name="view" value="filter_edition"/>
-  <select name="filter_name">
+  <select style="min-width: 100px;" name="filter_name">
   #for $f in $filters
     #if $f == $fltr.name
       #set $selected = "selected"
