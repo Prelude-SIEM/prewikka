@@ -74,7 +74,7 @@ class Session:
 
         if time.time() > t + self._expiration:
             self.storage.deleteSession(sessionid)
-            request.env.log(Log.EVENT_SESSION_EXPIRED, request, sessionid)
+            request.env.log(Log.EVENT_SESSION_EXPIRED, request, login, sessionid)
             raise AuthError("session expired")
 
         return login

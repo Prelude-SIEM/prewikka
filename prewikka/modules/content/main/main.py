@@ -361,16 +361,18 @@ class MessageListingAction:
         return messages
 
     def _createMessageTimeField(self, t):
-        if not t:
-            return "n/a"
+        if t:
+            tmp = time.localtime(t)
+            current = time.localtime()
         
-        tmp = time.localtime(t)
-        current = time.localtime()
-        
-        if tmp[:3] == current[:3]: # message time is today
-            return utils.time_to_hms(t)
+            if tmp[:3] == current[:3]: # message time is today
+                t = utils.time_to_hms(t)
+            else:
+                t = utils.time_to_ymdhms(t)
+        else:
+            t = "n/a"
 
-        return utils.time_to_ymdhms(t)
+        return { "value": t }
 
     def _createMessageField(self, parameters, name, value):
         if not value:
@@ -481,9 +483,9 @@ class AlertListingAction(MessageListingAction, AlertsView):
         return message["alert.detect_time"] or message["alert.create_time"] or 0
 
     def _addMessageFields(self, request, fields, alert):
-        fields["severity"] = alert["severity"] or "low"
+        fields["severity"] = { "value": alert["severity"] or "low" }
         for name in "analyzerid", "ident":
-            fields[name] = alert[name]
+            fields[name] = { "value": alert[name] }
         for name in "classification", "sensor":
             fields[name] = self._createMessageField(request.parameters, name, alert[name])
         for name in  "source", "target",:
@@ -510,7 +512,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
 
 class HeartbeatListingAction(MessageListingAction, HeartbeatsView):
     listing_action = "heartbeat_listing"
-    delete_action = "hearbeat_delete"
+    delete_action = "heartbeat_delete"
     summary_action = "heartbeat_summary"
     details_action = "heartbeat_details"
     whois_action = "heartbeat_whois"
@@ -666,7 +668,7 @@ class HeartbeatSummaryAction(MessageSummaryAction, HeartbeatsView):
         self.endSection(dataset)
 
     def process(self, request):
-        hearbeat = request.env.prelude.getHeartbeat(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
+        heartbeat = request.env.prelude.getHeartbeat(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
         dataset = request.dataset
         dataset["sections"] = [ ]
         self.buildAnalyzer(dataset, heartbeat)
@@ -1022,16 +1024,16 @@ class HeartbeatTracerouteAction(HostCommandAction, HeartbeatsView):
 
 class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
     def __init__(self, config):
-        self._heartbeat_count = config.getOptionValue("heartbeat_count", 10)
+        self._heartbeat_count = config.getOptionValue("heartbeat_count", 30)
         self._heartbeat_error_margin = config.getOptionValue("heartbeat_error_margin", 3)
     
     def _getAnalyzer(self, dataset, prelude, analyzerid):
         analyzer = prelude.getAnalyzer(analyzerid)
         analyzer["events"] = [ ]
+        start = time.time()
         rows = prelude.getValues(selection=["heartbeat.ident", "heartbeat.create_time/order_desc"],
                                  criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
                                  limit=self._heartbeat_count)
-
         newer = None
         latest = True
         total_interval = 0
@@ -1083,7 +1085,7 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
             newer_time = older_time
 
         if not analyzer["events"]:
-            analyzer["events"].append("No anomaly in the last %d hearbeats (1 heartbeat every %d s average)" %
+            analyzer["events"].append("No anomaly in the last %d heartbeats (1 heartbeat every %d s average)" %
                                       (self._heartbeat_count, total_interval / self._heartbeat_count))
 
         return analyzer
@@ -1182,7 +1184,7 @@ class SensorListingAction(SensorsView):
         prelude = request.env.prelude
 
         dataset["analyzers"] = [ ]
-        
+
         analyzerids = prelude.getAnalyzerids()
         for analyzerid in analyzerids:
             analyzer = prelude.getAnalyzer(analyzerid)

@@ -24,7 +24,7 @@ $message_listing_header
 			#set global $message = $message
 			<tr class='$row_classes[$cnt%2]'>
 				$message_fields
-				<td class='static_content_column'><input type='checkbox' name='idents' value='$message.analyzerid:$message.ident'/></td>
+				<td class='static_content_column'><input type='checkbox' name='idents' value='$message.analyzerid.value:$message.ident.value'/></td>
 			</tr>
 			#set $cnt += 1
 		#end for
@@ -81,7 +81,7 @@ $message_listing_header
    </td>
 
    <td id="timeline_submit">
-    <input type="submit"  value="apply">
+    <input type="submit" value="apply">
    </td>
   </tr>
  

@@ -9,7 +9,7 @@
 #end block message_fields_header
 
 #block message_fields
-#set $class_ = "impact_severity_" + $message.severity
+#set $class_ = "impact_severity_" + $message.severity.value
 
 <td>
  <ul id="popup_block">
@@ -51,7 +51,7 @@
 
 
 <td><a href='$message.sensor.inline_filter'>$message.sensor.value</a></td>
-<td>$message.time</td>
+<td>$message.time.value</td>
 #end block message_fields
 
 #block timeline_extra_content
