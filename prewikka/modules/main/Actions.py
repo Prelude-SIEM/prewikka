@@ -450,6 +450,8 @@ class MessageSummaryAction(Action.Action):
             if not meaning:
                 break
             value = alert["additional_data(%d).data" % i]
+            if alert["additional_data(%d).type" % i] == "byte":
+                value = utils.hexdump(value)
             emphase = (alert["analyzer.model"] == "Prelude LML" and alert["additional_data(%d).meaning" % i] == "Original Log")
             self.newSectionEntry(meaning, value, emphase)
             i += 1
@@ -744,9 +746,18 @@ class Classification(_Element):
 
 class AdditionalData(_Element):
     name = "additional_data"
-    fields = "type", "meaning", "data"
+    fields = "type", "meaning"
     is_list = True
     check_field = "type"
+
+    def render(self, root):
+        entries = _Element.render(self, root)
+        value = self._alert["%s.data" % root]
+        if self._alert["%s.type" % root] == "byte":
+            value = utils.hexdump(value)
+        entries.append({"name": "Data", "value": value})
+
+        return entries
 
 
 

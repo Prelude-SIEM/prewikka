@@ -125,6 +125,11 @@ body {
 	/*text-align: center;*/
 }
 
+.fixed {
+	font-family: Courier;
+	font-weight: bold;
+}
+
 .classic_body {
 	background-image: url(../img/bg2.gif);
 }

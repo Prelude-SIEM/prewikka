@@ -19,6 +19,7 @@
 
 
 import time
+import struct
 
 from prewikka import DataSet
 from prewikka.templates import ErrorTemplate
@@ -55,13 +56,15 @@ def boolean_property(name, parameter, value=False):
     return property("checkbox", name, parameter, value)
 
 
-def mixin(*bases):
-    class Dummy:
-        def __init__(self):
-            for base in Dummy.__bases__:
-                if hasattr(base, "__init__"):
-                    base.__init__(self)
+def hexdump(content):
+    decoded = struct.unpack("B" * len(content), content)
+    content = ""
+    i = 0
 
-    Dummy.__bases__ = bases
-    
-    return Dummy()
+    while i < len(decoded):
+        chunk = decoded[i:i+16]
+        content += " ".join(map(lambda b: "%02x" % b, chunk)) + " " + \
+                   "".join(map(lambda b: (b >= 32 and b < 127) and chr(b) or ".", chunk)) + "<br/>"
+        i += 16
+
+    return "<div class='fixed'>" + content + "</div>"
