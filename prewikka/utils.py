@@ -34,6 +34,10 @@ def time_to_ymdhms(t):
     return time.strftime("%Y-%m-%d %H:%M:%S", t)
 
 
+def get_gmt_offset():
+    return time.localtime(0)[3:5]
+
+
 def create_link(action_name, parameters=None):
     link = "?content=%s" % action_name
     if parameters:

@@ -4,36 +4,43 @@
 <table>
 	<thead>
 		<tr>
-			<td>Analyzerid</td>
+			<td>Name</td>
 			<td>Type</td>
 			<td>OS</td>
-			<td>Name</td>
-			<td>Location</td>
-			<td>Address</td>
+			<td>Node Name</td>
+			<td>Node Location</td>
+			<td>Node Address</td>
+			<td>Last Heartbeat Time</td>
 		</tr>
 	</thead>
 	<tbody>
 		#set $row_classes = ("table_row_even", "table_row_odd")
 		#set $cnt = 0
 		#for $analyzer in $analyzers
-			<tr class='$row_classes[$cnt%2]'>
-
+		  #if $analyzer["status"] == "ok"
+		    #set $row_class = $row_classes[$cnt%2]
+		  #else
+		    #set $row_class = "sensor_ko"
+		  #end if
+			<tr class='$row_class'>
 			        <td>
  			         <ul id="popup_block">
-  			          <li class="popup_title">$analyzer.analyzerid
+  			          <li class="popup_title">$analyzer.name
    			           <ul>
-    			            <li><a href="$analyzer.alerts">Alert listing</a></li>
-                                    <li><a href="$analyzer.heartbeats">Heartbeat listing</a></li>
+    			            <li><a href="$analyzer.alert_listing">Alert listing</a></li>
+                                    <li><a href="$analyzer.heartbeat_listing">Heartbeat listing</a></li>
+                                    <li><a href="$analyzer.heartbeat_analyze">Heartbeat analyze</a></li>
                                    </ul>
                                   </li>
                                  </ul>
                                 </td>
-
+				
 				<td>$analyzer.model $analyzer.version</td>
 				<td>$analyzer.ostype $analyzer.osversion</td>
-				<td>$analyzer.name</td>
-				<td>$analyzer.location</td>
-				<td>$analyzer.address</td>
+				<td>$analyzer.node_name</td>
+				<td>$analyzer.node_location</td>
+				<td>$analyzer.node_address</td>
+				<td>$analyzer.last_heartbeat_time</td>
 			</tr>
 			#set $cnt += 1
 		#end for

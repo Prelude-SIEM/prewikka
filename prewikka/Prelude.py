@@ -161,12 +161,16 @@ class Prelude(PreludeDB):
         
         analyzer = { }
         analyzer["analyzerid"] = analyzerid
+        analyzer["name"] = heartbeat.get("heartbeat.analyzer.name", "n/a")
         analyzer["model"] = heartbeat.get("heartbeat.analyzer.model", "n/a") 
         analyzer["version"] = heartbeat.get("heartbeat.analyzer.version", "n/a")
         analyzer["ostype"] = heartbeat.get("heartbeat.analyzer.ostype", "n/a")
         analyzer["osversion"] = heartbeat.get("heartbeat.analyzer.osversion", "n/a")
-        analyzer["name"] = heartbeat.get("heartbeat.analyzer.node.name", "n/a")
-        analyzer["location"] = heartbeat.get("heartbeat.analyzer.node.location", "n/a")
-        analyzer["address"] = heartbeat.get("heartbeat.analyzer.node.address(0).address", "n/a")
+        analyzer["node_name"] = heartbeat.get("heartbeat.analyzer.node.name", "n/a")
+        analyzer["node_location"] = heartbeat.get("heartbeat.analyzer.node.location", "n/a")
+        analyzer["node_address"] = heartbeat.get("heartbeat.analyzer.node.address(0).address", "n/a")
+        analyzer["last_heartbeat_time"] = heartbeat.get("heartbeat.create_time")
+        analyzer["last_heartbeat_interval"] = heartbeat.getAdditionalData("Analyzer heartbeat interval")
+        analyzer["last_status"] = heartbeat.getAdditionalData("Analyzer status")
         
         return analyzer

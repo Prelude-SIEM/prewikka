@@ -545,6 +545,9 @@ thead {
 	border-top: 10px;
 }
 
+.sensor_ko {
+ 	background-color: #e77070;
+}
 
 .error_name, .error_message, .error_links {
 	position: relative;

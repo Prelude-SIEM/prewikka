@@ -257,9 +257,9 @@ class HeartbeatAnalyzeView(HeartbeatsView):
 
 
 class SensorsView(View):
-    _active_section = "Sensors"
-    _tabs = [("Sensors", "main.sensor_listing")]
-    _active_tab = "Sensors"
+    _active_section = "Agents"
+    _tabs = [("Agents", "main.sensor_listing")]
+    _active_tab = "Agents"
 
 
 
@@ -323,7 +323,7 @@ class MessageListingAction:
         else:
             dataset["timeline.start"] = utils.time_to_ymdhms(time.localtime(int(start)))
             dataset["timeline.end"] = utils.time_to_ymdhms(time.localtime(int(end)))
-            dataset["timeline.range_timezone"] = "%+.2d:%.2d" % time.localtime(0)[3:5]
+            dataset["timeline.range_timezone"] = "%+.2d:%.2d" % utils.get_gmt_offset()
 
         if not parameters.has_key("timeline_end") and parameters["timeline_unit"] in ("min", "hour"):
             tmp = copy.copy(end)
@@ -1196,7 +1196,8 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
                     analyzer["latest_status_class"] = "normal_offline"
                     analyzer["latest_status"] = "normal offline"
                 # FIXME: workaround a current bug of libpreludedb that returns time in UTC instead of GMT+n
-                elif time.mktime(time.gmtime(time.time())) - int(older_time) > int(older_interval) + self._heartbeat_error_margin:
+                #elif time.mktime(time.gmtime(time.time())) - int(older_time) > int(older_interval) + self._heartbeat_error_margin:
+                elif time.time() - int(older_time) > int(older_interval) + self._heartbeat_error_margin:
                     analyzer["latest_status_class"] = "abnormal_offline"
                     analyzer["latest_status"] = "abnormal offline"
                     analyzer["events"].append("sensor is down since %s" % older_time)
@@ -1327,15 +1328,35 @@ class SensorListingAction(SensorsView):
         dataset = request.dataset
         prelude = request.env.prelude
 
-        dataset["analyzers"] = [ ]
+        analyzers = [ ]
 
         analyzerids = prelude.getAnalyzerids()
         for analyzerid in analyzerids:
             analyzer = prelude.getAnalyzer(analyzerid)
             parameters = dict(request.parameters.items() + [("analyzerid", analyzer["analyzerid"])])
-            analyzer["alerts"] = utils.create_link("main.sensor_alert_listing", parameters)
-            analyzer["heartbeats"] = utils.create_link("main.sensor_heartbeat_listing", parameters)
-            dataset["analyzers"].append(analyzer)
+            analyzer["alert_listing"] = utils.create_link("main.sensor_alert_listing", parameters)
+            analyzer["heartbeat_listing"] = utils.create_link("main.sensor_heartbeat_listing", parameters)
+            analyzer["heartbeat_analyze"] = utils.create_link("main.heartbeat_analyze", parameters)
+
+            if analyzer["last_status"] == "exiting":
+                analyzer["status"] = "ok"
+            elif time.time() - int(analyzer["last_heartbeat_time"]) > \
+                     int(analyzer["last_heartbeat_interval"]) - 3:
+                analyzer["status"] = "ko"
+            else:
+                analyzer["status"] = "ok"
+
+            analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(analyzer["last_heartbeat_time"])) + \
+                                              " %+.2d:%.2d" % utils.get_gmt_offset()
+            
+            analyzers.append(analyzer)
+
+        dataset["analyzers"] = [ ]
+        for analyzer in analyzers:
+            if analyzer["status"] == "ok":
+                dataset["analyzers"].append(analyzer)
+            else:
+                dataset["analyzers"].insert(0, analyzer)
 
         self._setView(dataset)
 
@@ -1427,7 +1448,7 @@ def load(env, config):
     return {
         "sections": [("Alerts", "alert_listing"),
                      ("Heartbeats", "heartbeat_analyze"),
-                     ("Sensors", "sensor_listing")],
+                     ("Agents", "sensor_listing")],
 
         "default_slot": "alert_listing",
 
