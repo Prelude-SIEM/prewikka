@@ -89,6 +89,15 @@ class ListInterface(ModuleInterface):
         
         return "<a href='%s'>%s</a>" % (self.createLink(request), action)
 
+    def _createDeleteLink(self, alert):
+        request = DeleteRequest(self._request)
+        request.module = "Alerts"
+        request.action = "delete"
+        request.analyzerid = alert["alert.analyzer.analyzerid"]
+        request.alert_ident = alert["alert.ident"]
+
+        return "<a href='%s'>delete</a>" % self.createLink(request)
+
     def _addAlertField(self, row, alert, field, filter_name=None, class_="alert_field_value"):
         if filter_name is None:
             filter_name = field
@@ -130,6 +139,7 @@ class ListInterface(ModuleInterface):
         row.append(self._createAlertTime(alert))
         row.append(self._createAlertLink(alert, "summary"))
         row.append(self._createAlertLink(alert, "details"))
+        row.append(self._createDeleteLink(alert))
 
         table.addRow(row)
 
@@ -162,14 +172,14 @@ class ListInterface(ModuleInterface):
     def _buildAlertList(self, template):
         alerts = self._data["alerts"]
         table = Table.Table()
-        table.setHeader(("Classification", "Source", "Target", "Sensor", "Time", "", ""))
+        table.setHeader(("Classification", "Source", "Target", "Sensor", "Time", "", "", ""))
         for alert in alerts:
             self._addAlert(table, alert)
 
         if self._request.filter_name:
             filters = [ "alert.classification.name", "alert.source.node.address.address", "alert.target.node.address.address", \
                         "alert.analyzer.model" ]
-            footer = [ "" ] * 7
+            footer = [ "" ] * 8
             request = copy.copy(self._request)
             filter_name = request["filter_name"]
             del request["filter_name"]
@@ -220,6 +230,17 @@ class ListRequest(core.CoreRequest):
 
 
 
+class DeleteRequest(ListRequest):
+    def __init__(self, request=None):
+        ListRequest.__init__(self)
+        self.registerField("analyzerid", long)
+        self.registerField("alert_ident", long)
+        if request:
+            for key, value in request.items():
+                self[key] = value
+
+
+
 class AlertModule(module.ContentModule):
     def __init__(self, _core, config):
         module.ContentModule.__init__(self, _core)
@@ -227,6 +248,7 @@ class AlertModule(module.ContentModule):
         self.registerAction("list", ListRequest, default=True)
         self.registerAction("summary", AlertRequest)
         self.registerAction("details", AlertRequest)
+        self.registerAction("delete", DeleteRequest)
 
     def handle_list(self, request):
         result = { }
@@ -290,6 +312,10 @@ class AlertModule(module.ContentModule):
 
     def handle_details(self, request):
         return DetailsInterface, self._getAlert(request)
+
+    def handle_delete(self, request):
+        self._core.prelude.deleteAlert(request.analyzerid, request.alert_ident)
+        return self.handle_list(request)
 
 
 

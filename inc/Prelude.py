@@ -22,3 +22,5 @@ class Prelude(PreludeDB):
     def getAlert(self, analyzerid, alert_ident):
         return self.get_alert(analyzerid, alert_ident)
 
+    def deleteAlert(self, analyzerid, alert_ident):
+        return self.delete_alert(analyzerid, alert_ident)
