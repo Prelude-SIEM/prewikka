@@ -13,7 +13,7 @@ import core
 class ModuleInterface(interface.NormalInterface):
     def init(self):
         interface.NormalInterface.init(self)
-        self.setMenuName("Alerts")
+        self.setModuleName("Alerts")
         self.setTabs([ ("alert list", "list") ])
         self.setActiveTab("alert list")
 

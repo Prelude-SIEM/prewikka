@@ -10,7 +10,7 @@ import Request
 class ModuleInterface(interface.NormalInterface):
     def init(self):
         interface.NormalInterface.init(self)
-        self.setMenuName("Test")
+        self.setModuleName("Test")
         self.setTabs([ ("fetch", "fetch_data"), ("empty", "empty"), ("third", "third") ])
 
 
