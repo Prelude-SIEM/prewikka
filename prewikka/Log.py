@@ -29,12 +29,11 @@ class Log:
         for backend in self._backends:
             apply(getattr(backend, handler), args, kwargs)
 
-    def invalidQuery(self, error):
-        self._applyOnBackends("invalidQuery", error)
+    def invalidQuery(self, request, error):
+        self._applyOnBackends("invalidQuery", request, error)
 
 
 
 class LogBackend:
-    def invalidQuery(self, query, reason):
+    def invalidQuery(self, request, error):
         pass
-    

@@ -85,7 +85,7 @@ class MessageListingView:
         return "<a class='%s' href='%s'>%s</a>" % (class_, self.createLink(action, parameters), name)
     
     def _createMessageLink(self, message, name, action):
-        parameters = ActionParameters.Message(self.core.log)
+        parameters = ActionParameters.Message()
         parameters.setAnalyzerid(message["analyzer.analyzerid"])
         parameters.setMessageIdent(message["ident"])
         
@@ -348,7 +348,8 @@ class SensorHeartbeatListingView(SensorMessageListingView, HeartbeatListingView)
         return Actions().SensorHeartbeatDetails()
     
     def buildMainContent(self, data):
-        return self.buildAnalyzerHeader(data["analyzer"]) + "<br/>" + HeartbeatListingView.buildMainContent(self, data["heartbeats"])
+        return self.buildAnalyzerHeader(data["analyzer"]) + "<br/>" + \
+               HeartbeatListingView.buildMainContent(self, data["heartbeats"])
 
 
 
@@ -379,7 +380,7 @@ class SensorListingView(MessageListingView, SensorsSection):
         table.setHeader(("Analyzerid", "Type", "OS", "Name", "Location", "Address", "", ""))
         
         for analyzer in analyzers:
-            parameters = ActionParameters.SensorMessageListing(self.core.log)
+            parameters = ActionParameters.SensorMessageListing()
             parameters.setAnalyzerid(analyzer["analyzerid"])
             table.addRow((analyzer["analyzerid"],
                           "%s %s" % (analyzer["model"], analyzer["version"]),

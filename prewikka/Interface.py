@@ -59,7 +59,7 @@ class ActionParameterInvalidTypeError(ActionParameterError):
         
     def __str__(self):
         return "invalid type %s for parameter '%s', %s required" % \
-               (cgi.escape(str(type(self._value))), self._name, cgi.escape(str(self._required_type)))
+               (str(type(self._value)), self._name, str(self._required_type))
 
 
 
@@ -111,23 +111,25 @@ class Interface:
         if default:
             self._default_action = registered
         
-    def process(self, action_name, query):
+    def process(self, action_name, args, request):
         if action_name:
             registered = self._actions[action_name]
         else:
             registered = self._default_action
         
         action = registered["action"]
-        parameters = registered["parameters"](self._core.log)
+        parameters = registered["parameters"]()
         
         try:
-            parameters.populate(query)
+            parameters.populate(args)
             parameters.check()
-        except Error, e:
+        except ActionParameterError, e:
+            self._core.log.invalidQuery(request, str(e))
             view_class = Views.ErrorView
-            data = str(e)
+            data = cgi.escape(str(e))
         else:
             view_class, data = action.process(self._core, parameters)
+        
         view = view_class(self._core)
         view.build(data)
         
@@ -145,8 +147,7 @@ class Action(object):
 
 
 class ActionParameters:
-    def __init__(self, log, parameters=None):
-        self.log = log
+    def __init__(self, parameters=None):
         self._parameters = { }
         self._values = { }
         self.register()
@@ -194,11 +195,7 @@ class ActionParameters:
 
     def populate(self, query):
         for name, value in query.items():
-            try:
-                self[name] = value
-            except ActionParameterError, e:
-                self.log.invalidQuery(str(e))
-                raise e
+            self[name] = value
         
     def check(self):
         return True
@@ -210,7 +207,7 @@ class ActionParameters:
         return urllib.urlencode(self._values)
 
     def __copy__(self):
-        new = self.__class__(self.log)
+        new = self.__class__()
         new._parameters = copy.copy(self._parameters)
         new._values = copy.copy(self._values)
         

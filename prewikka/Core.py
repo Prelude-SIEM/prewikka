@@ -24,6 +24,44 @@ import os, os.path
 from prewikka import Config, Log, Prelude, Interface
 
 
+class Request:
+    def __init__(self):
+        pass
+
+    def getQueryString(self):
+        pass
+
+    def getClientAddr(self):
+        pass
+
+    def getClientPort(self):
+        pass
+
+    def getServerAddr(self):
+        pass
+
+    def getServerPort(self):
+        pass
+
+    def getUserAgent(self):
+        pass
+
+    def getMethod(self):
+        pass
+
+    def getURI(self):
+        pass
+
+    def getArguments(self):
+        pass
+
+
+
+class Response:
+    pass
+
+
+
 class Core:
     def __init__(self):
         self.content_modules = { }
@@ -44,12 +82,13 @@ class Core:
                     module = __import__(base_dir + file + "/" + name)
                     module.load(self, self._config.modules.get(name, {}))
         
-    def process(self, query, response):
-        if query.has_key("action"):
-            action = query["action"]
-            del query["action"]
+    def process(self, request, response):
+        args = request.getArguments()
+        if args.has_key("action"):
+            action = args["action"]
+            del args["action"]
         else:
             action = None
         
-        view = self.interface.process(action, query)
+        view = self.interface.process(action, args, request)
         response.write(view)

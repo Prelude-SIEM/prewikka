@@ -24,9 +24,9 @@ import os
 import prewikka.Log
 
 class LogStderr(prewikka.Log.LogBackend):
-    def invalidQuery(self, error):
+    def invalidQuery(self, request, error):
         print >> sys.stderr, "[prewikka] invalid query '%s': %s" % \
-              (os.environ["QUERY_STRING"], error)
+              (request.getQueryString(), error)
 
 
 
