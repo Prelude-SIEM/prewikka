@@ -152,6 +152,7 @@ body {
 #top_view_header {
 	z-index: 1;
 	position: fixed;
+	top: 0px;
 	height: 60px;
 	padding-top: 10px;
 	padding-left: 10px;
