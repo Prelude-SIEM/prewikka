@@ -192,7 +192,7 @@ class Heartbeat(Message):
 class IDMEFDatabase:
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
-        for param in "host", "port", "name", "user", "password":
+        for param in "host", "port", "name", "user", "pass":
             if config.getOptionValue(param):
                 preludedb_sql_settings_set(settings, param, config.getOptionValue(param))
 
