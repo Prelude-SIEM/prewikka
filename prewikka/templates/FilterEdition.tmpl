@@ -4,7 +4,7 @@
 <div class='box'>
 <h1>Load</h1>
 <form action="?" method="POST">
-  <input type="hidden" name="content" value="main.alert_filter_load"/>
+  <input type="hidden" name="view" value="alert_filter_load"/>
   <select name="filter_name">
   #for $f in $filters
     #if $f == $fltr.name
@@ -22,7 +22,7 @@
 <div class='box'>
 <h1>Edition</h1>
 <form action="?" method="POST">
-<input type='hidden' name='content' value='main.alert_filter_edition'/>
+<input type='hidden' name='view' value='alert_filter_edition'/>
 <table>
 #for $element in $elements
 <tr>

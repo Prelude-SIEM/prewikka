@@ -119,6 +119,13 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         self.init()
         self._processDynamic(cgi.parse_qs(self.rfile.read(int(self.headers["Content-Length"]))))
 
+    def getClientAddress(self):
+        return self.client_address[0]
+
+    def getClientPort(self):
+        return self.client_address[1]
+
+
 
 server = PrewikkaServer(("0.0.0.0", 8000), PrewikkaRequestHandler)
 server.serve_forever()

@@ -42,94 +42,143 @@ class PermissionDeniedError(Error.SimpleError):
 
 
 
-class Environnement:
-    def __init__(self, prelude_config):
-        self.prelude = Prelude.Prelude(prelude_config)
-        self.auth = None
-        self.storage = None
-        self.log = Log.Log()
-        self.host_commands = { }
+class Core:
+    def __init__(self):
+        class Env: pass
+        self._env = Env()
+        self._env.config = Config.Config()
+        self._env.prelude = Prelude.Prelude(self._env.config.prelude)
+        self._env.auth = None
+        self._env.storage = None
+        self._env.log = Log.Log()
+        self._initHostCommands()
+        self._loadViews()
+        self._loadModules()
+        self._initAuth()
+
+    def _initHostCommands(self):
+        self._env.host_commands = { }
         for command in "whois", "traceroute":
             path = distutils.spawn.find_executable(command)
             if path:
-                self.host_commands[command] = path
-
-
-
-class Core:
-    def __init__(self):
-        self._contents = { }
-        self._content_names = [ ]
-        self._config = Config.Config()
-        self.env = Environnement(self._config.prelude)
-        self._loadModules()
-        self._initUserManagement()
-        self._initAuth()
-
-    def _initUserManagement(self):
-        user_management = UserManagement.UserManagement(self.env)
-        slots = user_management.slots
-        for name, slot in slots.items():
-            slot["permissions"] = [ User.PERM_USER_MANAGEMENT ]
-            slot["handler"] = getattr(user_management, "handle_%s" % name)
+                self._env.host_commands[command] = path
             
-        self._contents["configuration"] = { "sections": [("Configuration", user_management.default)],
-                                            "default_slot": user_management.default,
-                                            "slots": slots }
-        self._content_names.append("configuration")
-        
     def _initAuth(self):
-        if self.env.auth and self.env.auth.canLogout():
-            self._contents["logout"] = { "slots": { "logout": { "handler": self.env.auth.logout } } }
+        if self._env.auth and self._env.auth.canLogout():
+            from prewikka import view
+
+            class Logout(view.View):
+                view_name = "logout"
+                view_parameters = view.Parameters
+                view_permissions = [ ]
+                
+                def render(self):
+                    self.env.auth.logout(self.request)
+            
+            self._views.update(Logout().get())
+
+    def _loadViews(self):
+        import prewikka.views
+        
+        self._sections = prewikka.views.sections
+        
+        self._views_position = { }
+        for section, tabs in self._sections:
+            for tab, views in tabs:
+                for view in views:
+                    self._views_position[view] = section, tabs, tab
+                    
+        self._views = { }
+        for object in prewikka.views.objects:
+            self._views.update(object.get())
         
     def _loadModule(self, type, name, config):
-        return __import__("prewikka/modules/%s/%s/%s" % (type, name, name)).load(self.env, config)
+        module = "prewikka/modules/%s/%s/%s" % (type, name, name)
+        return __import__(module).load(self._env, config)
 
     def _loadModules(self):
-        config = self._config
+        config = self._env.config
 
         if config.storage != None:
-            self.env.storage = self._loadModule("storage", config.storage.name, config.storage)
+            self._env.storage = self._loadModule("storage", config.storage.name, config.storage)
 
         if config.auth != None:
-            self.env.auth = self._loadModule("auth", config.auth.name, config.auth)
+            self._env.auth = self._loadModule("auth", config.auth.name, config.auth)
         
         for backend in config.logs:
-            self.env.log.registerBackend(self._loadModule("log", backend.name, backend))
+            self._env.log.registerBackend(self._loadModule("log", backend.name, backend))
 
-        for content in config.contents:
-            self._contents[content.name] = self._loadModule("content", content.name, content)
-            self._content_names.append(content.name)
+##         for content in config.contents:
+##             self._contents[content.name] = self._loadModule("content", content.name, content)
+##             self._content_names.append(content.name)
 
-    def _setupRequest(self, request, parameters):
-        request.parameters = parameters
-        request.dataset = DataSet.DataSet()
-        self._setupDataSet(request.dataset, request)
+    def _setupView(self, view, request, parameters, user):
+        object = view["object"]
+        if not object.view_initialized:
+            object.init(self._env)
+            object.view_initialized = True
+        object.request = request
+        object.parameters = parameters
+        object.user = user
+        object.dataset = DataSet.DataSet()
+        object.env = self._env
+        self._setupDataSet(object.dataset, request, user, view, parameters)
+
+    def _cleanupView(self, view):
+        object = view["object"]
+        del object.request
+        del object.parameters
+        del object.user
+        del object.dataset
+        del object.env
         
-    def _setupDataSet(self, dataset, request):
+    def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
         dataset["document.title"] = "[PREWIKKA]"
         dataset["document.css_files"] = [ "lib/style.css" ]
         dataset["document.js_files"] = [ "lib/functions.js" ]
-        dataset["prewikka.title"] = self._config.interface.getOptionValue("title", "Prelude management")
-        dataset["prewikka.software"] = self._config.interface.getOptionValue("software", "Prewikka")
-        dataset["prewikka.place"] = self._config.interface.getOptionValue("place", "company ltd.")
+        dataset["prewikka.title"] = self._env.config.interface.getOptionValue("title", "Prelude management")
+        dataset["prewikka.software"] = self._env.config.interface.getOptionValue("software", "Prewikka")
+        dataset["prewikka.place"] = self._env.config.interface.getOptionValue("place", "company ltd.")
         dataset["prewikka.url.referer"] = request.getReferer()
         dataset["prewikka.url.current"] = request.getQueryString()
         dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
-        
-        dataset["interface.sections"] = [ ]
-        for name in self._content_names:
-            content = self._contents[name]
-            if content.has_key("sections"):
-                for section, slot in content["sections"]:
-                    dataset["interface.sections"].append((section,
-                                                          utils.create_link("%s.%s" % (name, slot))))
 
-        dataset["prewikka.user.login"] = request.user and request.user.login
-        if self.env.auth.canLogout():
-            dataset["prewikka.user.logout"] = utils.create_link("logout.logout")
+##         dataset["interface.sections"] = map(lambda section: (section[0], utils.create_link(section[1][0][1][0])),
+##                                             self._positions)
+
+        dataset["interface.sections"] = [ ]
+        for section_name, tabs in self._sections:
+            viewable_tabs = 0
+            for tab_name, views in tabs:
+                default_view = views[0]
+                if user.has(self._views[default_view]["permissions"]):
+                    viewable_tabs += 1                            
+
+            if viewable_tabs > 0:
+                dataset["interface.sections"].append((section_name, utils.create_link(tabs[0][1][0])))
+                
+        import prewikka.view
+
+        if view and self._views_position.has_key(view["name"]):
+            active_section, tabs, active_tab = self._views_position[view["name"]]
+        elif isinstance(parameters, prewikka.view.RelativeViewParameters):
+            active_section, tabs, active_tab = self._views_position[parameters["origin"]]
         else:
-            dataset["prewikka.user.logout"] = None
+            active_section, tabs, active_tab = "", "", ""
+
+        dataset["interface.active_section"] = active_section
+
+        dataset["interface.tabs"] = [ ]
+        for tab, views in tabs:
+            if user.has(self._views[views[0]]["permissions"]):
+                dataset["interface.tabs"].append((tab, utils.create_link(views[0])))
+        
+        dataset["interface.tabs"] = [ (tab, utils.create_link(views[0])) for tab, views in tabs ]
+        dataset["interface.active_tab"] = active_tab
+
+        if user:
+            dataset["prewikka.user.login"] = user and user.login or None
+            dataset["prewikka.user.logout"] = self._env.auth.canLogout() and utils.create_link("logout") or None
 
     def _printDataSet(self, dataset, level=0):
         for key, value in dataset.items():
@@ -140,89 +189,85 @@ class Core:
             else:
                 print "%s: %s" % (key, value)
             
-    def _setupTemplate(self, template_class, dataset):
-        template = template_class()
+    def _setupTemplate(self, name, dataset):
+        template = getattr(__import__("prewikka/templates/" + name), name)()
+        
         for key, value in dataset.items():
             setattr(template, key, value)
 
         return template
         
-    def _checkPermissions(self, request, slot):
-        if request.user and slot.has_key("permissions"):
-            required = slot["permissions"]
-            if filter(lambda perm: request.user.has(perm), required) != required:
-                self.env.log(Log.EVENT_ACTION_DENIED, request, request.handler_name)
-                raise PermissionDeniedError(request.user.login, request.handler_name)
+    def _checkPermissions(self, request, view, user):
+        if user and view.has_key("permissions"):
+            if not user.has(view["permissions"]):
+                self._env.log(Log.EVENT_VIEW_FORBIDDEN, request, view, user)
+                raise PermissionDeniedError(user.login, view["name"])
 
-    def _normalizeParameters(self, request, slot):
-        request.parameters = copy.copy(request.arguments)
-        
-        if slot.has_key("parameters"):
-            try:
-                slot["parameters"].normalize(request.parameters)
-            except ParametersNormalizer.Error, e:
-                self.env.log(Log.EVENT_INVALID_ACTION_PARAMETERS, request, str(e))
-                raise InvalidQueryError(request.getQueryString())
-        
-    def _getContentSlot(self, request):
-        if request.arguments.has_key("content"):
-            content = request.arguments["content"]
-            del request.arguments["content"]
-        else:
-            content = "main"
+    def _getParameters(self, request, view, user):
+        from prewikka.view import ParameterError
+
+        parameters = view["parameters"](request.arguments) - [ "view" ]
 
         try:
-            if "." in content:
-                content_name, slot_name = content.split(".")
-            else:
-                content_name = content
-                slot_name = self._contents[content_name]["default_slot"]
+            parameters.normalize()
+        except ParameterError, e:
+                self._env.log(Log.EVENT_INVALID_PARAMETERS, request, view, details=str(e))
+                raise InvalidQueryError(request.getQueryString())
 
-            request.handler_name = "%s.%s" % (content_name, slot_name)
+        return parameters
+        
+    def _getView(self, request, user):
+        name = request.arguments.get("view", "alert_listing")
 
-            return self._contents[content_name]["slots"][slot_name]
+        try:
+            return self._views[name]
 
         except KeyError:
-            self.env.log(Log.EVENT_INVALID_ACTION, request, content)
+            self._env.log(Log.EVENT_INVALID_VIEW, request=request, user=user)
             raise InvalidQueryError(request.getQueryString())
 
     def checkAuth(self, request):
-        if self.env.auth:
-            login = self.env.auth.getLogin(request)
-            permissions = self.env.storage and self.env.storage.getPermissions(login) or User.ALL_PERMISSIONS
+        if self._env.auth:
+            login = self._env.auth.getLogin(request)
+            permissions = self._env.storage and self._env.storage.getPermissions(login) or User.ALL_PERMISSIONS
         else:
             login = "anonymous"
             permissions = User.ALL_PERMISSIONS
 
-        request.user = User.User(login, permissions)
+        return User.User(login, permissions)
     
     def process(self, request):
-        self.env.log(Log.EVENT_QUERY, request, request.getQueryString())
-        request.env = self.env
+        self._env.log(Log.EVENT_QUERY, request)
+        request.env = self._env
 
         try:
-            self.checkAuth(request)
-            slot = self._getContentSlot(request)
-            self._checkPermissions(request, slot)
-            self._normalizeParameters(request, slot)
+            user = None
+            user = self.checkAuth(request)
+            view = self._getView(request, user)
+            self._checkPermissions(request, view, user)
+            parameters = self._getParameters(request, view, user)
                     
-            self._setupRequest(request, request.parameters)
+            self._setupView(view, request, parameters, user)
 
-            #try:
-            slot["handler"](request)
-            #except Prelude.Error, e:
-            #raise Error.SimpleError("prelude internal error", str(e))
+            self._env.log(Log.EVENT_RENDER_VIEW, request, view, user)
 
-            dataset = request.dataset
-            template_class = slot["template"]
+            try:
+                getattr(view["object"], view["handler"])()
+            except Prelude.Error, e:
+                raise Error.SimpleError("prelude internal error", str(e))
+
+            dataset = view["object"].dataset
+            template_name = view["template"]
+
+            self._cleanupView(view)
             
         except Error.PrewikkaError, e:
-            template_class = e.template_class
+            template_name = e.template
             dataset = e.dataset
-            self._setupDataSet(dataset, request)
+            self._setupDataSet(dataset, request, user)
 
         #self._printDataSet(dataset)
-        template = self._setupTemplate(template_class, dataset)
+        template = self._setupTemplate(template_name, dataset)
 
         request.content = str(template)
         request.sendResponse()

@@ -20,39 +20,39 @@
 
 import copy
 
-EVENT_QUERY = "EVENT_QUERY"
-EVENT_ACTION = "EVENT_ACTION"
-EVENT_LOGIN_SUCCESSFUL = "EVENT_LOGIN_SUCCESSFUL"
-EVENT_LOGOUT = "EVENT_LOGOUT"
-EVENT_SESSION_EXPIRED = "EVENT_SESSION_EXPIRED"
-EVENT_INVALID_SESSIONID = "EVENT_INVALID_SESSIONID"
-EVENT_BAD_LOGIN = "EVENT_BAD_LOGIN"
-EVENT_BAD_PASSWORD = "EVENT_BAD_PASSWORD"
-EVENT_INVALID_USERID = "EVENT_INVALID_USERID"
-EVENT_INVALID_ACTION = "EVENT_INVALID_ACTION"
-EVENT_INVALID_ACTION_PARAMETERS = "EVENT_INVALID_ACTION_PARAMETERS"
-EVENT_ACTION_DENIED = "EVENT_ACTION_DENIED"
+EVENT_QUERY = "QUERY"
+EVENT_RENDER_VIEW = "PROCESS_RENDER_VIEW"
+EVENT_LOGIN_SUCCESSFUL = "LOGIN_SUCCESSFUL"
+EVENT_LOGOUT = "LOGOUT"
+EVENT_SESSION_EXPIRED = "SESSION_EXPIRED"
+EVENT_INVALID_SESSIONID = "INVALID_SESSIONID"
+EVENT_BAD_LOGIN = "BAD_LOGIN"
+EVENT_BAD_PASSWORD = "BAD_PASSWORD"
+EVENT_INVALID_USERID = "INVALID_USERID"
+EVENT_INVALID_VIEW = "INVALID_VIEW"
+EVENT_INVALID_PARAMETERS = "INVALID_PARAMETERS"
+EVENT_VIEW_FORBIDDEN = "VIEW_FORBIDDEN"
 
-EVENT_DEBUG = "EVENT_DEBUG"
-EVENT_INFO = "EVENT_INFO"
-EVENT_ERROR = "EVENT_ERROR"
+EVENT_DEBUG = "DEBUG"
+EVENT_INFO = "INFO"
+EVENT_ERROR = "ERROR"
 
-TYPE_DEBUG = "TYPE_DEBUG"
-TYPE_INFO = "TYPE_INFO"
-TYPE_ERROR = "TYPE_ERROR"
+TYPE_DEBUG = "DEBUG"
+TYPE_INFO = "INFO"
+TYPE_ERROR = "ERROR"
 
-CLASSIFICATIONS = {
-    TYPE_DEBUG: [ EVENT_DEBUG, EVENT_QUERY, EVENT_ACTION, EVENT_SESSION_EXPIRED ],
+_CLASSIFICATIONS = {
+    TYPE_DEBUG: [ EVENT_DEBUG, EVENT_QUERY, EVENT_RENDER_VIEW, EVENT_SESSION_EXPIRED ],
     TYPE_INFO: [ EVENT_INFO, EVENT_LOGIN_SUCCESSFUL, EVENT_LOGOUT ],
     TYPE_ERROR: [ EVENT_ERROR, EVENT_INVALID_SESSIONID, EVENT_BAD_LOGIN,
-                  EVENT_BAD_PASSWORD, EVENT_INVALID_USERID, EVENT_INVALID_ACTION,
-                  EVENT_INVALID_ACTION_PARAMETERS, EVENT_ACTION_DENIED ]
+                  EVENT_BAD_PASSWORD, EVENT_INVALID_USERID, EVENT_INVALID_VIEW,
+                  EVENT_INVALID_PARAMETERS, EVENT_VIEW_FORBIDDEN ]
     }
 
 
 
 def get_event_type(event):
-    for type, events in CLASSIFICATIONS.items():
+    for type, events in _CLASSIFICATIONS.items():
         if event in events:
             return type
 
@@ -61,36 +61,34 @@ def get_event_type(event):
 class Log:
     def __init__(self):
         self._backends = [ ]
-
-    def __del__(self):
-        return "destroy Log"
         
     def registerBackend(self, backend):
         self._backends.append(backend)
         
-    def __call__(self, event, *args, **kwargs):
+    def __call__(self, event, request=None, view=None, user=None, details=None):
         for backend in self._backends:
-            apply(backend.event, (event, ) + args, kwargs)
+            if event in backend.events:
+                apply(backend, (get_event_type(event), event, request, view, user, details))
 
-    def debug(self, message):
-        self(EVENT_DEBUG, message)
+    def debug(self, request=None, view=None, user=None, details=None):
+        self(EVENT_DEBUG, request, view, user, details)
 
-    def info(self, message):
-        self(EVENT_INFO, message)
+    def info(self, request=None, view=None, user=None, details=None):
+        self(EVENT_INFO, request, view, user, details)
 
-    def error(self, message):
-        self(EVENT_ERROR, message)
+    def error(self, request=None, view=None, user=None, details=None):
+        self(EVENT_ERROR, request, view, user, details)
 
 
 
 class LogBackend:
     def __init__(self, config):
-        classifications = copy.copy(CLASSIFICATIONS)
+        classifications = copy.copy(_CLASSIFICATIONS)
         for option in config.getOptions():
             if option.name.find("TYPE_") == 0:
                 type = option.name
                 if option.value == "enable":
-                    classifications[type] = CLASSIFICATIONS[type]
+                    classifications[type] = _CLASSIFICATIONS[type]
                 else:
                     del classifications[type]
             elif option.name.find("EVENT_") == 0:
@@ -105,66 +103,12 @@ class LogBackend:
                 else:
                     classifications[type].remove(event)
 
-        self._events = [ ]
+        self.events = [ ]
         for events in classifications.values():
-            self._events += events
-        
-    def event(self, event, *args, **kwargs):
-        if not event in self._events:
-            return
-        
-        handler = event.lower().replace("event", "handle", 1)
-        self.current_event = event
-        self.current_event_type = get_event_type(event)
-        apply(getattr(self, handler), args, kwargs)
-        
-    def handle_query(self, request, query):
-        pass
-
-    def handle_action(self, request, action_name):
-        pass
-
-    def handle_login_successful(self, request, user, sessionid):
-        pass
-
-    def handle_logout(self, request, user):
-        pass
-
-    def handle_session_expired(self, request, login, sessionid):
-        pass
-
-    def handle_invalid_sessionid(self, request, sessionid):
-        pass
-
-    def handle_bad_login(self, request, login):
-        pass
-
-    def handle_bad_password(self, request, user, password):
-        pass
-
-    def handle_invalid_userid(self, request, userid):
-        pass
-
-    def handle_invalid_action(self, request, action_name):
-        pass
-
-    def handle_invalid_action_parameters(self, request, reason):
-        pass
-
-    def handle_action_denied(self, request, action_name):
-        pass
-
-    def handle_debug(self, message):
-        pass
-
-    def handle_info(self, message):
-        pass
-
-    def handle_error(self, message):
-        pass
+            self.events += events
 
 
-            
+
 if __name__ == "__main__":
     from MyConfigParser import OrderedDict
     

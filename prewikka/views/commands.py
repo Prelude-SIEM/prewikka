@@ -18,35 +18,43 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import sys
 import os
 
-from prewikka import Log
-
-
-class LogStderr(Log.LogBackend):
-    def __call__(self, type, event, request, view, user, details):
-        message = "[%s/%s] " % (type, event)
-        separator = ""
-        
-        if request:
-            message += "peer %s:%d" % (request.getClientAddr(), request.getClientPort())
-            separator = "; "
-
-        if user:
-            message += "%suser %s" % (separator, user.login)
-            separator = "; "
-
-        if view:
-            message += "%sview %s" % (separator, view["name"])
-            separator = "; "
-
-        if details:
-            message += separator + details
-
-        print >> sys.stderr, message
+from prewikka import view, User
 
 
 
-def load(env, config):
-    return LogStderr(config)
+class HostCommandParameters(view.RelativeViewParameters):
+    def register(self):
+        view.RelativeViewParameters.register(self)
+        self.mandatory("host", str)
+
+
+
+class Command(view.View):
+    view_template = "Command"
+
+
+
+class HostCommand(Command):
+    view_parameters = HostCommandParameters
+    view_permissions = [ User.PERM_COMMAND ]
+
+    def render(self):
+        command = self.env.host_commands[self.command]
+        stdin, stdout = os.popen2((command, self.parameters["host"]))
+        output = stdout.read()
+        output = output.replace(" ", "&nbsp;").replace("\n", "<br/>\n")
+        self.dataset["command_output"] = output
+
+
+
+class Whois(HostCommand):
+    view_name = "whois"
+    command = "whois"
+
+
+
+class Traceroute(HostCommand):
+    view_name = "traceroute"
+    command = "traceroute"

@@ -33,4 +33,4 @@ class SimpleError(PrewikkaError):
         self.dataset = DataSet.DataSet()
         self.dataset["message"] = message
         self.dataset["name"] = name
-        self.template_class = ErrorTemplate.ErrorTemplate
+        self.template = "ErrorTemplate"

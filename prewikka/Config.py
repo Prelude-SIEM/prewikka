@@ -23,8 +23,10 @@ from prewikka import MyConfigParser
 
 class Config:
     def __init__(self, filename="prewikka.conf"):
-        self.prelude = None
-        self.interface = None
+        self.general = MyConfigParser.ConfigParserSection("general")
+        self.interface = MyConfigParser.ConfigParserSection("interface")
+        self.prelude = MyConfigParser.ConfigParserSection("prelude")
+        self.admin = MyConfigParser.ConfigParserSection("admin")
         self.auth = None
         self.storage = None
         self.logs = [ ]
@@ -42,6 +44,18 @@ class Config:
                     getattr(self, handler)(section)
             else:
                 setattr(self, section.name, section)
+
+    def _set_general(self, general):
+        self.general = general
+
+    def _set_interface(self, interface):
+        self.interface = interface
+
+    def _set_prelude(self, prelude):
+        self.prelude = prelude
+
+    def _set_admin(self, admin):
+        self.admin = admin
 
     def _set_auth(self, auth):
         self.auth = auth

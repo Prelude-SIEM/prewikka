@@ -22,11 +22,15 @@ PERM_IDMEF_VIEW = "IDMEF_VIEW"
 PERM_IDMEF_ALTER = "IDMEF_ALTER"
 PERM_ADMIN_CONSOLE = "ADMIN_CONSOLE"
 PERM_USER_MANAGEMENT = "USER_MANAGEMENT"
+PERM_COMMAND = "COMMAND"
+PERM_INTRUSIVE_COMMAND = "INTRUSIVE_COMMAND"
 
 ALL_PERMISSIONS = [ PERM_IDMEF_VIEW,
                     PERM_IDMEF_ALTER,
                     PERM_ADMIN_CONSOLE,
-                    PERM_USER_MANAGEMENT ]
+                    PERM_USER_MANAGEMENT,
+                    PERM_COMMAND,
+                    PERM_INTRUSIVE_COMMAND ]
 
 ADMIN_LOGIN = "admin"
 
@@ -37,4 +41,6 @@ class User:
         self.permissions = permissions
 
     def has(self, perm):
+        if type(perm) in (list, tuple):
+            return filter(lambda p: self.has(p), perm) == perm
         return perm in self.permissions
