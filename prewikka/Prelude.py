@@ -225,7 +225,6 @@ class Prelude:
         criteria = None
         if analyzerid != None:
             criteria = "%s.analyzer.analyzerid == '%s'" % (type, str(analyzerid))
-            print criteria
 
         idents = get_message_idents(criteria, limit=1)
 
@@ -337,7 +336,7 @@ class Prelude:
         analyzer["node_location"] = heartbeat.get("heartbeat.analyzer.node.location", "n/a")
         analyzer["node_address"] = heartbeat.get("heartbeat.analyzer.node.address(0).address", "n/a")
         analyzer["last_heartbeat_time"] = heartbeat.get("heartbeat.create_time")
-        analyzer["last_heartbeat_interval"] = heartbeat.getAdditionalData("Analyzer heartbeat interval")
+        analyzer["last_heartbeat_interval"] = heartbeat["heartbeat.heartbeat_interval"]
         analyzer["last_heartbeat_status"] = heartbeat.getAdditionalData("Analyzer status")
         
         return analyzer

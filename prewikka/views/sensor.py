@@ -137,11 +137,11 @@ class HeartbeatAnalyze(view.View):
         newer = None
         latest = True
         total_interval = 0
-        
+
         for ident in idents:
             older = self.env.prelude.getHeartbeat(ident)
             older_status = older.getAdditionalData("Analyzer status")
-            older_interval = older.getAdditionalData("Analyzer heartbeat interval")
+            older_interval = older["heartbeat.heartbeat_interval"]
             if not older_status or not older_interval:
                 continue
             older_time = older["heartbeat.create_time"]
