@@ -1,6 +1,8 @@
 import copy
 import urllib
 
+from prewikka import Log
+
 class Error(Exception):
     pass
 
