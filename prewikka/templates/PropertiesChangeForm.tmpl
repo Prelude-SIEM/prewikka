@@ -1,7 +1,7 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
-<form action='?' method='get'>
+<form action='?' method='POST'>
 #for $name, $value in $hiddens
 	<input type='hidden' name='$name' value='$value'/>
 #end for
