@@ -109,6 +109,13 @@ class MessageListingParameters(view.Parameters):
         if not self["timezone"] in ("frontend_localtime", "sensor_localtime", "utc"):
             raise view.InvalidValueError("timezone", self["timezone"])
 
+        # remove the bulshit
+        try:
+            del self["x"]
+            del self["y"]
+        except KeyError:
+            pass
+
 
 
 class SensorMessageListingParameters(MessageListingParameters):
