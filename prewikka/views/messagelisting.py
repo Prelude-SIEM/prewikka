@@ -680,13 +680,14 @@ class AlertListing(MessageListing, view.View):
         results = self.env.prelude.getValues(["alert.classification.text/group_by",
                                               "alert.assessment.impact.severity/group_by",
                                               "alert.assessment.impact.completion/group_by",
-                                              "min(alert.create_time)",
-                                              "max(alert.create_time)",
                                               "count(alert.classification.text)"], criteria,
                                              limit=self.parameters["limit"], offset=self.parameters["offset"])
 
-        for classification, severity, completion, time_min, time_max, count in results:
-            ident = self.env.prelude.getAlertIdents(criteria + [ "alert.classification.text == '%s'" % classification ], limit=1)[0]
+        for classification, severity, completion, count in results:
+            criteria2 = criteria + [ "alert.classification.text == '%s'" % classification ]
+            ident = self.env.prelude.getAlertIdents(criteria2, limit=1)[0]
+            time_min = self.env.prelude.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
+            time_max = self.env.prelude.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
             idmef = self._fetchMessage(ident)
             delete_base_criteria = delete_base_criteria + [ "alert.create_time >= '%s'" % time_min.toYMDHMS(),
                                                             "alert.create_time <= '%s'" % time_max.toYMDHMS() ]
@@ -746,20 +747,19 @@ class AlertListing(MessageListing, view.View):
     def _setAggregatedMessagesNoValues(self, criteria):
         aggregated_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
 
-        selection = [ "%s/group_by" % path for path in aggregated_on ] + \
-                    [ "max(alert.create_time)/order_desc", "min(alert.create_time)", "count(alert.create_time)" ]
+        selection = [ "%s/group_by" % path for path in aggregated_on ] + [ "count(alert.create_time)" ]
 
         results = self.env.prelude.getValues(selection, criteria)
         total_results = len(results)
 
         for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
             aggregated_source_values = values[:len(self.parameters["aggregated_source"])]
-            aggregated_target_values = values[len(self.parameters["aggregated_source"]):-3]
-            time_max, time_min, aggregated_count = values[-3:]
+            aggregated_target_values = values[len(self.parameters["aggregated_source"]):-1]
+            aggregated_count = values[-1]
 
             criteria2 = criteria[:]
             delete_criteria = [ ]
-            for path, value in zip(aggregated_on, values[:-3]):
+            for path, value in zip(aggregated_on, values[:-1]):
                 if value:
                     criterion = "%s == '%s'" % (path, value)
                 else:
@@ -768,6 +768,9 @@ class AlertListing(MessageListing, view.View):
                 criteria2.append(criterion)
                 delete_criteria.append(criterion)
 
+            time_min = self.env.prelude.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
+            time_max = self.env.prelude.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
+            
             delete_criteria.append("alert.create_time >= '%s'" % time_min.toYMDHMS())
             delete_criteria.append("alert.create_time <= '%s'" % time_max.toYMDHMS())
 
