@@ -14,16 +14,18 @@ classic_body
 		#end if
 	<div class='$class_'><a href="$link">$name</a></div>
 	#end for
+
 	#if $prewikka.user.login or $prewikka.user.logout
 		<div class='topmenu_item_special'>
-			#if $prewikka.user.login
-				logged as $prewikka.user.login
-			#end if
 			#if $prewikka.user.logout
-				|&nbsp;<a href="$prewikka.user.logout">logout</a></div>
+				<a href="$prewikka.user.logout">logout</a>
 			#end if
 		</div>
 	#end if
+
+       #if $prewikka.user.login
+                <div class="topmenu_item_info">&nbsp;<p style='vertical-align: inherit; display: inline;'><b>$prewikka.user.login</b>, on $prewikka.date</p></div>
+       #end if
 </div>
 	
 <div id="menu">

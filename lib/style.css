@@ -138,6 +138,19 @@ thead {
         text-decoration: none;
 }
 
+.topmenu_item_info {
+        padding: 0 10px 0 0;
+        height: 21px;
+        min-width: 45px;
+        float: right;
+	font-size: 11px;
+	font-style: italic;
+	font-weight: normal;
+	vertical-align: middle;
+	color: white;
+}
+
+
 .topmenu_item_inactive {
         padding: 0 10px 0 10px;
         height: 21px;
@@ -145,7 +158,6 @@ thead {
         float: left;
         border-right: 1px white solid;
         background: #4D535C;
-        color: white;
 }
 
 .topmenu_item_active {
