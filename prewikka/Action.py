@@ -150,25 +150,25 @@ class ActionParameters:
 
 
 class ActionSlot:
-    def __init__(self, path, name, parameters, capabilities, handler):
+    def __init__(self, path, name, parameters, permissions, handler):
         self.path = path
         self.name = name
         self.parameters = parameters
-        self.capabilities = capabilities
+        self.permissions = permissions
         self.handler = handler
 
 
 
 class ActionGroup(object):
-    def __init__(self):
+    def __init__(self, name=None):
         self.slots = { }
-        self.name = self.__module__.replace("/", ".").split(".")[-2] + "." + self.__class__.__name__
+        self.name = name or self.__module__.replace("/", ".").split(".")[-2] + "." + self.__class__.__name__
 
-    def registerSlot(self, name, parameters=ActionParameters, capabilities=[], handler=None):
+    def registerSlot(self, name, parameters=ActionParameters, permissions=[], handler=None):
         if not handler:
             handler = getattr(self, "handle_" + name)
         
-        slot = ActionSlot(":".join((self.name, name)), name, parameters, capabilities, handler)
+        slot = ActionSlot(":".join((self.name, name)), name, parameters, permissions, handler)
         self.slots[name] = slot
 
         return slot
@@ -182,11 +182,11 @@ class ActionGroup(object):
 
 class Action(ActionGroup):
     parameters = ActionParameters
-    capabilities = [ ]
+    permissions = [ ]
     
-    def __init__(self):
-        ActionGroup.__init__(self)
-        slot = self.registerSlot("process", self.parameters, self.capabilities, self.process)
+    def __init__(self, name=None):
+        ActionGroup.__init__(self, name)
+        slot = self.registerSlot("process", self.parameters, self.permissions, self.process)
         self.slot = slot
         self.path = slot.path
         

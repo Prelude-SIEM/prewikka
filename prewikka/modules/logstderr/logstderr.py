@@ -38,13 +38,13 @@ class LogStderr(Log.LogBackend):
         self._log("action %s" % action_name)
         
     def handle_login_successful(self, request, user, sessionid):
-        self._log("user '%s' logged in, sessionid %s set" % (user.getLogin(), sessionid))
+        self._log("user '%s' logged in, sessionid %s set" % (user.login, sessionid))
         
     def handle_logout(self, request, user):
-        self._log("user '%s' logout" % user.getLogin())
+        self._log("user '%s' logout" % user.login)
         
-    def handle_session_expired(self, request, sessionid):
-        self._log("session '%s' for user '%s' has expired" % (sessionid, request.user.getLogin()))
+    def handle_session_expired(self, request, login, sessionid):
+        self._log("session '%s' for user '%s' has expired" % (sessionid, login))
 
     def handle_invalid_sessionid(self, request, sessionid):
         self._log("sessionid '%s' is invalid" % sessionid)
@@ -65,7 +65,7 @@ class LogStderr(Log.LogBackend):
         self._log("invalid action parameters, " + reason)
 
     def handle_action_denied(self, request, action_name):
-        self._log("action '%s' forbidden for user '%s'" % (action_name, request.user.getLogin()))
+        self._log("action '%s' forbidden for user '%s'" % (action_name, request.user.login))
 
     def handle_debug(self, message):
         self._log(message)

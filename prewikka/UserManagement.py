@@ -1,93 +1,56 @@
+# Copyright (C) 2004 Nicolas Delon <nicolas@prelude-ids.org>
+# All Rights Reserved
+#
+# This file is part of the Prelude program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; see the file COPYING.  If not, write to
+# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+
+
 import sys
 
 import time
 import random
 import md5
 
-from prewikka import Log, Action, DataSet
+from prewikka import Log, Action, DataSet, User
 import prewikka.Error
 from prewikka.templates import LoginPasswordForm, PropertiesChangeForm
 from prewikka.templates import UserListing
 
 
-class Error(LoginPasswordForm.LoginPasswordForm, prewikka.Error.BaseError, DataSet.BaseDataSet):
-    message = ""
-
-    def __init__(self):
-        prewikka.Error.BaseError.__init__(self)
-        DataSet.BaseDataSet.__init__(self)
-        LoginPasswordForm.LoginPasswordForm.__init__(self)
-    
-
-
-class SessionExpiredError(Error):
-    message = "session expired"
-
-
-
-class AuthError(Error):
-    message = "authentication failed"
-
-
-
-class LoginError(AuthError):
-    pass
-
-
-
-class PasswordError(AuthError):
-    pass
-
-
-
-class SessionError(Error):
-    pass
-
-
-
-CAPABILITY_READ_MESSAGE = "READ_MESSAGE"
-CAPABILITY_DELETE_MESSAGE = "DELETE_MESSAGE"
-CAPABILITY_USER_MANAGEMENT = "USER_MANAGEMENT"
-CAPABILITY_ADMIN_CONSOLE = "ADMIN_CONSOLE"
-
-CAPABILITIES = [ CAPABILITY_READ_MESSAGE, CAPABILITY_DELETE_MESSAGE, CAPABILITY_USER_MANAGEMENT, CAPABILITY_ADMIN_CONSOLE ]
-CAPABILITIES_ADMIN = CAPABILITIES
-
-
-class LoginPasswordActionParameters(Action.ActionParameters):
+class PermissionActionParameters:
     def register(self):
-        self.registerParameter("login", str, required=True)
-        self.registerParameter("password", str, required=True)
+        for perm in User.ALL_PERMISSIONS:
+            self.registerParameter(perm, str)
         
-    def getLogin(self):
-        return self["login"]
+    def has(self, perm):
+        return self.hasParameter(perm)
     
-    def getPassword(self):
-        return self["password"]
-
-
-
-class CapabilityActionParameters:
-    def register(self):
-        for capability in CAPABILITIES:
-            self.registerParameter(capability, str)
-        
-    def can(self, capability):
-        return self.hasParameter(capability)
-    
-    def getCapabilities(self):
-        return filter(lambda cap: self.can(cap), CAPABILITIES)
+    def getPermissions(self):
+        return filter(lambda perm: self.has(perm), User.ALL_PERMISSIONS)
     
     def check(self):
-        for capability in CAPABILITIES:
-            if self.hasParameter(capability) and self[capability] != "on":
-                raise Action.ActionParameterInvalidError(capability)
+        for perm in User.ALL_PERMISSIONS:
+            if self.hasParameter(perm) and self[perm] != "on":
+                raise Action.ActionParameterInvalidError(perm)
 
 
 
-class AddUserActionParameters(Action.ActionParameters, CapabilityActionParameters):
+class AddUserActionParameters(Action.ActionParameters, PermissionActionParameters):
     def register(self):
-        CapabilityActionParameters.register(self)
+        PermissionActionParameters.register(self)
         self.registerParameter("login", str, required=True)
         self.registerParameter("password1", str, required=True)
         self.registerParameter("password2", str, required=True)
@@ -100,19 +63,19 @@ class AddUserActionParameters(Action.ActionParameters, CapabilityActionParameter
     
     def check(self):
         Action.ActionParameters.check(self)
-        CapabilityActionParameters.check(self)
+        PermissionActionParameters.check(self)
 
 
 
 class UserActionParameters(Action.ActionParameters):
     def register(self):
-        self.registerParameter("id", int, required=True)
+        self.registerParameter("login", str, required=True)
         
-    def getID(self):
-        return self["id"]
+    def getLogin(self):
+        return self["login"]
     
-    def setID(self, id):
-        self["id"] = id
+    def setLogin(self, login):
+        self["login"] = login
 
 
 
@@ -132,14 +95,14 @@ class ChangePasswordActionParameters(UserActionParameters):
 
 
 
-class ChangeCapabilitiesActionParameters(UserActionParameters, CapabilityActionParameters):
+class ChangePermissionsActionParameters(UserActionParameters, PermissionActionParameters):
     def register(self):
         UserActionParameters.register(self)
-        CapabilityActionParameters.register(self)
+        PermissionActionParameters.register(self)
         
     def check(self):
         UserActionParameters.check(self)
-        CapabilityActionParameters.check(self)
+        PermissionActionParameters.check(self)
 
 
 
@@ -155,20 +118,20 @@ class UserListingView(UsersDataSet, UserListing.UserListing):
         self._user_management = user_management
         self.users = [ ]
         self.add_form_hiddens = self.createAccess(user_management.slots["user_add_form"].path)
-        self.capabilities = CAPABILITIES
+        self.permissions = User.ALL_PERMISSIONS
+        self.can_set_password = self._user_management.core.auth.canSetPassword()
 
     def createAccess(self, action_name, parameters=[]):
         return [("action", action_name)] + parameters
 
     def addUser(self, user):
-        parameters = [("id", user.getID())]
+        parameters = [("login", user.login)]
         new = { }
-        new["id"] = user.getID()
-        new["login"] = user.getLogin()
-        new["capabilities"] = map(lambda cap: user.hasCapability(cap), CAPABILITIES)
+        new["login"] = user.login
+        new["permissions"] = map(lambda perm: user.has(perm), User.ALL_PERMISSIONS)
         new["delete_form_hiddens"] = self.createAccess(self._user_management.slots["user_delete"].path, parameters)
         new["password_form_hiddens"] = self.createAccess(self._user_management.slots["change_password_form"].path, parameters)
-        new["capabilities_form_hiddens"] = self.createAccess(self._user_management.slots["change_capabilities_form"].path, parameters)
+        new["permissions_form_hiddens"] = self.createAccess(self._user_management.slots["change_permissions_form"].path, parameters)
         self.users.append(new)
 
 
@@ -179,206 +142,103 @@ class UserAddForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChang
         DataSet.PropertiesChangeDataSet.__init__(self, "add", user_management.slots["user_add"].path)
         PropertiesChangeForm.PropertiesChangeForm.__init__(self)
         self.addTextProperty("Login", "login")
-        self.addPasswordProperty("Password", "password1")
-        self.addPasswordProperty("Password confirmation", "password2")
-        for capability in CAPABILITIES:
-            self.addBooleanProperty(capability, capability)
+        if user_management.core.auth.canSetPassword():
+            self.addPasswordProperty("Password", "password1")
+            self.addPasswordProperty("Password confirmation", "password2")
+        for perm in User.ALL_PERMISSIONS:
+            self.addBooleanProperty(perm, perm)
 
 
 
 class ChangePasswordForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
-    def __init__(self, id, user_management):
+    def __init__(self, login, user_management):
         UsersDataSet.__init__(self)
         DataSet.PropertiesChangeDataSet.__init__(self, "change", user_management.slots["change_password"].path)
         PropertiesChangeForm.PropertiesChangeForm.__init__(self)
-        self.addHidden("id", id)
+        self.addHidden("login", login)
         self.addPasswordProperty("Password", "password1")
         self.addPasswordProperty("Password confirmation", "password2")
 
 
 
-class ChangeCapabilitiesForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
+class ChangePermissionsForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChangeForm.PropertiesChangeForm):
     def __init__(self, user, user_management):
         UsersDataSet.__init__(self)
-        DataSet.PropertiesChangeDataSet.__init__(self, "change", user_management.slots["change_capabilities"].path)
+        DataSet.PropertiesChangeDataSet.__init__(self, "change", user_management.slots["change_permissions"].path)
         PropertiesChangeForm.PropertiesChangeForm.__init__(self)
-        self.addHidden("id", user.getID())
-        for cap in CAPABILITIES:
-            self.addBooleanProperty(cap, cap, user.hasCapability(cap))
-
-
-
-class User:
-    def canReadMessage(self, value=None):
-        return self.hasCapability(CAPABILITY_READ_MESSAGE)
-    
-    def canDeleteMessage(self, value=None):
-        return self.hasCapability(CAPABILITY_DELETE_MESSAGE)
-    
-    def canManageUser(self, value=None):
-        return self.hasCapability(CAPABILITY_USER_MANAGEMENT)
-    
-    def __str__(self):
-        content = ""
-        content += "id: %s\n" % self.getID()
-        content += "login: %s\n" % self.getLogin()
-        content += "sessions: %s\n" % str(self.getSessions())
-        content += "capabilities: %s\n" % str(self.getCapabilities())
-        
-        return content
+        self.addHidden("login", user.login)
+        for perm in User.ALL_PERMISSIONS:
+            self.addBooleanProperty(perm, perm, user.has(perm))
     
 
 
 class UserManagement(Action.ActionGroup):
-    def __init__(self, core, config):
-        Action.ActionGroup.__init__(self)
+    def __init__(self, core):
+        Action.ActionGroup.__init__(self, "user_management")
         self.core = core
-        self._use_ssl = config.getOptionValue("use_ssl", "") in ("yes", "true", "on")
-        self._expiration = int(config.getOptionValue("expiration", 30))
-        self.registerSlot("login", LoginPasswordActionParameters, [ ])
-        self.registerSlot("user_listing", Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.registerSlot("user_add_form", Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.registerSlot("user_add", AddUserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.registerSlot("change_password_form", UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.registerSlot("change_password", ChangePasswordActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.registerSlot("change_capabilities_form", UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.registerSlot("change_capabilities", ChangeCapabilitiesActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.registerSlot("user_delete", UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.registerSlot("user_logout", Action.ActionParameters, [ ])
+        self.registerSlot("user_listing", Action.ActionParameters, [ User.PERM_USER_MANAGEMENT ])
+        self.registerSlot("user_add_form", Action.ActionParameters, [ User.PERM_USER_MANAGEMENT ])
+        self.registerSlot("user_add", AddUserActionParameters, [ User.PERM_USER_MANAGEMENT ])
+        self.registerSlot("change_password_form", UserActionParameters, [ User.PERM_USER_MANAGEMENT ])
+        self.registerSlot("change_password", ChangePasswordActionParameters, [ User.PERM_USER_MANAGEMENT ])
+        self.registerSlot("change_permissions_form", UserActionParameters, [ User.PERM_USER_MANAGEMENT ])
+        self.registerSlot("change_permissions", ChangePermissionsActionParameters, [ User.PERM_USER_MANAGEMENT ])
+        self.registerSlot("user_delete", UserActionParameters, [ User.PERM_USER_MANAGEMENT ])
         self.core.interface.registerConfigurationSection("Users", self.slots["user_listing"].path)
-        self.core.interface.registerQuickAccessor("logout", self.slots["user_logout"].path, None)
-        self.core.setLoginAction(self.slots["login"])
-        Error.login_action = self.slots["login"].path
         
-    def enableSSL(self):
-        self._use_ssl = True
-        
-    def disableSSL(self):
-        self._use_ssl = False
-        
-    def isSSLenabled(self):
-        return self._use_ssl
-    
-    def setExpiration(self, expiration):
-        self._expiration = expiration
-        
-    def _checkSSL(self, request):
-        pass # TODO
-    
-    def redirectToLogin(self):
-        return LoginPasswordPromptView(self.login)
-    
-    def _checkSession(self, request):
-        if request.input_cookie.has_key("sessionid"):
-            try:
-                sessionid = request.input_cookie["sessionid"].value
-                user = self.getUserBySessionID(sessionid)
-            except SessionError:
-                self.core.log(Log.EVENT_INVALID_SESSIONID, request, sessionid)
-                raise
-            if time.time() - user.getSessionTime(sessionid) < self._expiration * 60:
-                request.user = user
-                return
-            
-            user.removeSession(sessionid)
-            user.save()
-
-        raise Error()
-    
-    def check(self, request):
-        if self._use_ssl:
-            self._checkSSL()
-        else:
-            return self._checkSession(request)
-        
-    def handle_login(self, request):
-        login = request.parameters.getLogin()
-        password = request.parameters.getPassword()
-        
-        try:
-            user = self.getUserByLogin(login)
-        except LoginError:
-            request.log(Log.EVENT_BAD_LOGIN, request, login)
-            raise
-        
-        try:
-            user.checkPassword(password)
-        except PasswordError:
-            request.log(Log.EVENT_BAD_PASSWORD, request, login, password)
-            raise
-        
-        t = int(time.time())
-        sessionid = md5.new(str(t * random.random())).hexdigest()
-        user.addSession(sessionid, t)
-        user.save()
-        
-        request.output_cookie["sessionid"] = sessionid
-        request.user = user
-        
-        request.log(Log.EVENT_LOGIN_SUCCESSFUL, request, user, sessionid)
-        
-        return request.forwardToDefaultAction()
-    
     def handle_user_listing(self, request):
-        ids = self.getUsers()
-        ids.sort()
         view = UserListingView(self)
-        for id in ids:
-            user = self.getUserByID(id)
+        users = self.core.storage.getUsers()
+        for login in users:
+            user = self.core.storage.getUser(login)
             view.addUser(user)
 
         return view
         
-    
     def handle_user_add_form(self, request):
         return UserAddForm(self)
     
     def handle_user_add(self, request):
-        user = self.newUser()
-        user.setLogin(request.parameters.getLogin())
-        user.setPassword(request.parameters.getPassword())
-        user.setCapabilities(request.parameters.getCapabilities())
-        user.save()
+        login = request.parameters.getLogin()
+        
+        self.core.storage.createUser(login)
+        if self.core.auth.canSetPassword():
+            self.core.auth.setPassword(login, request.parameters.getPassword())
+        self.core.storage.setPermissions(login, request.parameters.getPermissions())
 
         request.parameters = Action.ActionParameters()
         
         return self.handle_user_listing(request)
         
     def handle_user_delete(self, request):
-        self.removeUser(request.parameters.getID())
+        self.core.storage.deleteUser(request.parameters.getLogin())
 
         request.parameters = Action.ActionParameters()
         
         return self.handle_user_listing(request)
     
     def handle_change_password_form(self, request):
-        return ChangePasswordForm(request.parameters.getID(), self)
+        if not self.core.auth.canSetPassword():
+            raise Error.SimpleError("permission denied")
+        return ChangePasswordForm(request.parameters.getLogin(), self)
     
     def handle_change_password(self, request):
-        user = self.getUserByID(request.parameters.getID())
-        user.setPassword(request.parameters.getPassword())
-        user.save()
+        if not self.core.auth.canSetPassword():
+            raise Error.SimpleError("permission denied")
+        self.core.auth.setPassword(request.parameters.getLogin(),
+                                   request.parameters.getPassword())
 
         request.parameters = Action.ActionParameters()
         
         return self.handle_user_listing(request)
     
-    def handle_change_capabilities_form(self, request):
-        return ChangeCapabilitiesForm(self.getUserByID(request.parameters.getID()), self)
+    def handle_change_permissions_form(self, request):
+        return ChangePermissionsForm(self.core.storage.getUser(request.parameters.getLogin()), self)
     
-    def handle_change_capabilities(self, request):
-        user = self.getUserByID(request.parameters.getID())
-        user.setCapabilities(request.parameters.getCapabilities())
-        user.save()
+    def handle_change_permissions(self, request):
+        self.core.storage.setPermissions(request.parameters.getLogin(),
+                                         request.parameters.getPermissions())
 
         request.parameters = Action.ActionParameters()
         
         return self.handle_user_listing(request)
-
-    def handle_user_logout(self, request):
-        request.user.removeSession(request.input_cookie["sessionid"].value)
-        request.user.save()
-
-        request.log(Log.EVENT_LOGOUT, request, request.user)
-
-        raise Error()

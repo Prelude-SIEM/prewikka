@@ -4,10 +4,9 @@
 <table class="user_list_table">
 	<thead>
 		<tr>
-			<td>Id</td>
 			<td>Login</td>
-			#for $capability in $capabilities
-				<td>$capability</td>
+			#for $perm in $permissions
+				<td>$perm</td>
 			#end for
 		</tr>
 	</thead>
@@ -16,11 +15,10 @@
 		#set $cnt = 0
 		#for $user in $users
 			<tr class="$row_classes[$cnt%2]">
-				<td>$user.id</td>
 				<td>$user.login</td>
-				#for $capability in $user.capabilities
-					#set $cap = ("", "x")[$capability]
-					<td>$cap</td>
+				#for $perm in $user.permissions
+					#set $perm = ("", "x")[$perm]
+					<td>$perm</td>
 				#end for
 				<td>
 					<form action='?' method='get'>
@@ -30,6 +28,7 @@
 						<input type='submit' value='delete'/>
 					</form>
 				</td>
+				#if $can_set_password
 				<td>
 					<form action='?' method='get'>
 						#for $name, $value in $user.password_form_hiddens
@@ -38,12 +37,13 @@
 						<input type='submit' value='password'/>
 					</form>
 				</td>
+				#end if
 				<td>
 					<form action='?' method='get'>
-						#for $name, $value in $user.capabilities_form_hiddens
+						#for $name, $value in $user.permissions_form_hiddens
 							<input type='hidden' name='$name' value='$value'/>
 						#end for
-						<input type='submit' value='capabilities'/>
+						<input type='submit' value='permissions'/>
 					</form>
 				</td>
 			</tr>

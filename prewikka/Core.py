@@ -23,7 +23,7 @@ import os, os.path
 
 import copy
 
-from prewikka import Config, Log, Prelude, Action, Interface, Error
+from prewikka import Config, Log, Prelude, Action, Interface, User, UserManagement, Error
 
 
 class InvalidQueryError(Error.SimpleError):
@@ -38,7 +38,6 @@ class PermissionDeniedError(Error.SimpleError):
                                    "user %s cannot access action %s" % (user, action_name))
 
 
-
 class Core:
     def __init__(self):
         self.content_modules = { }
@@ -50,20 +49,32 @@ class Core:
         self.log = Log.Log()
         self.interface = Interface.Interface(self, self._config.get("interface", { }))
         self.prelude = Prelude.Prelude(self._config["prelude"])
+        self.storage = None
         self.auth = None
         self._initModules()
+
+        if self.storage:        
+            user_management = UserManagement.UserManagement(self)
+            self.registerActionGroup(user_management)
+        
+        if self.auth and self.auth.canLogout():
+            class LogoutAction(Action.Action):
+                def __init__(self, auth):
+                    Action.Action.__init__(self, "logout")
+                    self._auth = auth
+                
+                def process(self, request):
+                    self._auth.logout(request)
+
+            action = LogoutAction(self.auth)
+            self.registerActionGroup(action)
+            self.interface.registerQuickAccessor("logout", action.slots["process"].path, Action.ActionParameters())
 
     def registerActionGroup(self, action_group):
         self._actions[action_group.name] = action_group
 
     def registerAction(self, action):
         self.registerActionGroup(action)
-
-    def setLoginAction(self, action):
-        self._login_action = action
-
-    def setDefaultAction(self, action):
-        self._default_action = action
 
     def shutdown(self):
         # Core references objects that themself reference Core, those circular
@@ -77,9 +88,14 @@ class Core:
         self.prelude = None
         self.auth = None
 
+    def setDefaultAction(self, action):
+        self._default_action = action
+
     def registerAuth(self, auth):
-        self.registerActionGroup(auth)
         self.auth = auth
+
+    def registerStorage(self, storage):
+        self.storage = storage
 
     def _initModules(self):
         base_dir = "prewikka/modules/"
@@ -93,14 +109,8 @@ class Core:
                 raise
 
     def _setupRequest(self, request, parameters):
-        request.log = self.log
         request.prelude = self.prelude
         request.parameters = parameters
-        
-        def dummy():
-            return self.processDefaultAction(request)
-        
-        request.forwardToDefaultAction = dummy
         
     def _setupView(self, view, request):
         interface = self.interface
@@ -134,15 +144,15 @@ class Core:
             self.log(Log.EVENT_INVALID_ACTION, request, action_name)
             raise InvalidQueryError(request.getQueryString())
         
-    def _checkCapabilities(self, slot, request):
+    def _checkPermissions(self, slot, request):
         if request.user:
-            required = slot.capabilities
-            if filter(lambda cap: request.user.hasCapability(cap), required) != required:
+            required = slot.permissions
+            if filter(lambda perm: request.user.has(perm), required) != required:
                 self.log(Log.EVENT_ACTION_DENIED, request, slot.path)
-                raise PermissionDeniedError(request.user.getLogin(), slot.path)
+                raise PermissionDeniedError(request.user.login, slot.path)
         
     def processAction(self, slot, request):
-        self._checkCapabilities(slot, request)
+        self._checkPermissions(slot, request)
         
         return slot.handler(request)
 
@@ -150,17 +160,27 @@ class Core:
         request.parameters = self._default_action.parameters()
         
         return self.processAction(self._default_action, request)
+
+    def checkAuth(self, request):
+        if self.auth:
+            login = self.auth.getLogin(request)
+            permissions = self.storage and self.storage.getPermissions(login) or User.ALL_PERMISSIONS
+        else:
+            login = "anonymous"
+            permissions = User.ALL_PERMISSIONS
+
+        request.user = User.User(login, permissions)
     
     def process(self, request):
         self.log(Log.EVENT_QUERY, request, request.getQueryString())
 
+        request.log = self.log
+
         try:
+            self.checkAuth(request)
+            
             action_name, arguments = self._getActionNameAndArguments(request)
             slot = self._getActionSlot(request, action_name)
-            
-            if self.auth and slot != self._login_action:
-                self.auth.check(request)
-
             parameters = slot.parameters()
             
             try:
@@ -178,7 +198,7 @@ class Core:
                 raise Error.SimpleError("prelude internal error", str(e))
                 
             
-        except Error.BaseError, view:
+        except Error.PrewikkaError, view:
             pass
 
         self._setupView(view, request)

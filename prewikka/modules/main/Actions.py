@@ -25,7 +25,7 @@ import copy
 
 from prewikka import Action
 from prewikka import utils
-import prewikka.UserManagement as CAP
+from prewikka import User
 
 from prewikka.modules.main import ActionParameters
 
@@ -94,7 +94,7 @@ class _MyTime:
 
 class MessageListing(Action.Action):
     parameters = ActionParameters.MessageListing
-    capabilities = [ CAP.CAPABILITY_READ_MESSAGE ]
+    permissions = [ User.PERM_MESSAGE_VIEW ]
 
     def _adjustCriteria(self, request, criteria):
         pass
@@ -161,7 +161,7 @@ class MessageListing(Action.Action):
             for name, object, filter  in self.fields:
                 message[name] = tmp[object]
             message["time"] = self.getMessageTime(tmp)
-            
+        
         view.setRange(parameters.getOffset() + 1, parameters.getOffset() + len(messages), parameters.getLimit(), count)
 
         if count > parameters.getOffset() + parameters.getLimit():
@@ -224,7 +224,7 @@ class HeartbeatListing(MessageListing):
 
 class DisplayMessageAction(Action.Action):
     parameters = ActionParameters.Message
-    capabilities = [ CAP.CAPABILITY_READ_MESSAGE ]
+    permissions = [ User.PERM_MESSAGE_VIEW ]
     
     def process(self, request, get_message):
         alert = get_message(request.parameters.getAnalyzerid(), request.parameters.getMessageIdent())
@@ -272,7 +272,7 @@ class HeartbeatDetails(DisplayHeartbeatAction):
 
 class DeleteMessages:
     parameters = ActionParameters.MessageListingDelete
-    capabilities = [ CAP.CAPABILITY_DELETE_MESSAGE ]
+    permissions = [ User.PERM_MESSAGE_ALTER ]
 
     
 
@@ -418,7 +418,7 @@ class SensorHeartbeatDetails(HeartbeatDetails):
 
 
 class SensorListing(Action.Action):
-    capabilities = [ CAP.CAPABILITY_READ_MESSAGE ]
+    permissions = [ User.PERM_MESSAGE_VIEW ]
     
     def process(self, request):
         view = View("SensorListingView")()

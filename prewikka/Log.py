@@ -130,7 +130,7 @@ class LogBackend:
     def handle_logout(self, request, user):
         pass
 
-    def handle_session_expired(self, request, sessionid):
+    def handle_session_expired(self, request, login, sessionid):
         pass
 
     def handle_invalid_sessionid(self, request, sessionid):
