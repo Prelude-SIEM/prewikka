@@ -948,8 +948,8 @@ class HeartbeatDetailsAction(_Element, HeartbeatsView):
         return { "name": "Heartbeat", "id": 0, "hidden": False, "entries": entries }
 
     def process(self, request):
-        self._alert = request.env.prelude.getHeartbeat(request.parameters.getAnalyzerid(),
-                                                   request.parameters.getMessageIdent())
+        self._alert = request.env.prelude.getHeartbeat(request.parameters["analyzerid"],
+                                                       request.parameters["ident"])
         request.dataset["node"] = self.render()
 
         self._setView(request.dataset)
