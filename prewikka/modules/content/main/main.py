@@ -649,15 +649,29 @@ class AlertSummaryAction(MessageSummaryAction, AlertsView):
 
         self.beginSection("Classification")
         self.newSectionEntry("Text", alert["classification.text"])
+
+        cnt = 0
+
+        while True:
+            origin = alert["classification.reference(%d).origin" % cnt]
+            if origin == None:
+                break
+
+            content = alert["classification.reference(%d).name" % cnt]
+            
+            meaning = alert["classification.reference(%d).meaning" % cnt]
+            if meaning:
+                content += " (%s)" % meaning
+
+            url = alert["classification.reference(%d).url" % cnt]
+            if url:
+                content += " <a href='%s'>%s</a>" % (url, url)
+
+            self.newSectionEntry(origin, content)
+
+            cnt += 1
+
         self.endSection(dataset)
-##         if not alert["classification(0).name"]:
-##             return
-        
-##         self.beginSection("Classification")
-##         self.newSectionEntry("Name", alert["classification(0).name"], emphase=True)
-##         self.newSectionEntry("Url", alert["classification(0).url"])
-##         self.newSectionEntry("Origin", alert["classification(0).origin"])
-##         self.endSection(dataset)
 
     def buildImpact(self, dataset, alert):
         self.beginSection("Impact")
