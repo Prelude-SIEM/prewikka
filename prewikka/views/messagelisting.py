@@ -1046,7 +1046,7 @@ class SensorAlertListing(AlertListing, view.View):
     view_template = "SensorAlertListing"
 
     def _adjustCriteria(self, criteria):
-        criteria.append("alert.analyzer(-1).analyzerid == %d" % self.parameters["analyzerid"])
+        criteria.append("alert.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
 
     def _setHiddenParameters(self):
         AlertListing._setHiddenParameters(self)
@@ -1065,7 +1065,7 @@ class SensorHeartbeatListing(HeartbeatListing, view.View):
     view_template = "SensorHeartbeatListing"
 
     def _adjustCriteria(self, criteria):
-        criteria.append("heartbeat.analyzer(-1).analyzerid == %d" % self.parameters["analyzerid"])
+        criteria.append("heartbeat.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
 
     def _setHiddenParameters(self):
         HeartbeatListing._setHiddenParameters(self)

@@ -295,19 +295,18 @@ class IDMEFDatabase:
     def countHeartbeats(self, criteria=None):
         return self._countMessages("heartbeat", criteria)
 
-    def getAnalyzerids(self):
+    def getAnalyzerids(self, criteria):
         analyzerids = [ ]
-        rows = self.getValues(selection=[ "heartbeat.analyzer(-1).analyzerid/group_by" ],
-                              criteria="heartbeat.analyzer(-1).analyzerid != 0")
+        rows = self.getValues([ "heartbeat.analyzer(-1).analyzerid/group_by" ], criteria)
         for row in rows:
             analyzerid = row[0]
             analyzerids.append(analyzerid)
 
         return analyzerids
 
-    def getAnalyzerPaths(self):
+    def getAnalyzerPaths(self, criteria=None):
         analyzer_paths = [ ]
-        for analyzerid in self.getAnalyzerids():
+        for analyzerid in self.getAnalyzerids(criteria):
             ident = self.getLastHeartbeatIdent(analyzerid)
             heartbeat = self.getHeartbeat(ident)
             path = [ ]
@@ -334,14 +333,14 @@ class IDMEFDatabase:
         
         analyzer = { }
         analyzer["analyzerid"] = analyzerid
-        analyzer["name"] = heartbeat.get("heartbeat.analyzer(%d).name" % index, "n/a")
-        analyzer["model"] = heartbeat.get("heartbeat.analyzer(%d).model" % index, "n/a") 
-        analyzer["version"] = heartbeat.get("heartbeat.analyzer(%d).version" % index, "n/a")
-        analyzer["ostype"] = heartbeat.get("heartbeat.analyzer(%d).ostype" % index, "n/a")
-        analyzer["osversion"] = heartbeat.get("heartbeat.analyzer(%d).osversion" % index, "n/a")
-        analyzer["node_name"] = heartbeat.get("heartbeat.analyzer(%d).node.name" % index, "n/a")
-        analyzer["node_location"] = heartbeat.get("heartbeat.analyzer(%d).node.location" % index, "n/a")
-        analyzer["node_address"] = heartbeat.get("heartbeat.analyzer(%d).node.address(0).address" % index, "n/a")
+        analyzer["name"] = heartbeat.get("heartbeat.analyzer(%d).name" % index)
+        analyzer["model"] = heartbeat.get("heartbeat.analyzer(%d).model" % index) 
+        analyzer["version"] = heartbeat.get("heartbeat.analyzer(%d).version" % index)
+        analyzer["ostype"] = heartbeat.get("heartbeat.analyzer(%d).ostype" % index)
+        analyzer["osversion"] = heartbeat.get("heartbeat.analyzer(%d).osversion" % index)
+        analyzer["node_name"] = heartbeat.get("heartbeat.analyzer(%d).node.name" % index)
+        analyzer["node_location"] = heartbeat.get("heartbeat.analyzer(%d).node.location" % index)
+        analyzer["node_address"] = heartbeat.get("heartbeat.analyzer(%d).node.address(0).address" % index)
         analyzer["last_heartbeat_time"] = heartbeat.get("heartbeat.create_time")
         analyzer["last_heartbeat_interval"] = heartbeat["heartbeat.heartbeat_interval"]
         analyzer["last_heartbeat_status"] = heartbeat.getAdditionalData("Analyzer status")

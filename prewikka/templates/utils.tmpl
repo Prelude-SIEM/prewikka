@@ -1,24 +1,42 @@
 #def display_analyzer(analyzer)
-	<table>
-		<thead>
-			<tr>
-				<td>Name</td>
-				<td>Type</td>
-				<td>OS</td>
-				<td>Node Name</td>
-				<td>Node Location</td>
-				<td>Node Address</td>
-			</tr>
-		</thead>
-		<tbody>
-			<tr>
-				<td>$analyzer.name</td>
-				<td>$analyzer.model $analyzer.version</td>
-				<td>$analyzer.ostype $analyzer.osversion</td>
-				<td>$analyzer.node_name</td>
-				<td>$analyzer.node_location</td>
-				<td>$analyzer.node_address</td>
-			</tr>
-		</tbody>
-	</table>
+  <table>
+    <thead>
+      <tr>
+        <td>Name</td>
+        <td>Type</td>
+        <td>OS</td>
+        <td>Node Name</td>
+        <td>Node Location</td>
+        <td>Node Address</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>#echo $analyzer.name or "n/a" #</td>
+	<td>
+          #if $analyzer.model
+            $analyzer.model
+            #if $analyzer.version
+              $analyzer.version
+            #end if
+          #else
+            n/a
+          #end if
+        </td>
+	<td>
+          #if $analyzer.ostype
+            $analyzer.ostype
+            #if $analyzer.osversion
+              $analyzer.osversion
+            #end if
+          #else
+            n/a
+          #end if
+        </td>
+	<td>#echo $analyzer.node_name or "n/a" #</td>
+        <td>#echo $analyzer.node_location or "n/a" #</td>
+	<td>#echo $analyzer.node_address or "n/a"#</td>
+      </tr>
+    </tbody>
+  </table>
 #end def

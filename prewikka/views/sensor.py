@@ -23,18 +23,26 @@ import time
 from prewikka import view, User, utils
 
 
+class SensorListingParameters(view.Parameters):
+    def register(self):
+        self.optional("filter_path", str)
+        self.optional("filter_value", str)
+
+
+
 class HeartbeatAnalyzeParameters(view.Parameters):
     def register(self):
         self.mandatory("analyzerid", long)
 
 
 
-class SensorMessagesDelete(view.Parameters):
+class SensorMessagesDelete(SensorListingParameters):
     def register(self):
+        SensorListingParameters.register()
         self.optional("analyzerid", list, default=[])
         self.optional("alerts", str, default=None)
         self.optional("heartbeats", str, default=None)
-    
+
 
 
 def get_analyzer_status_from_latest_heartbeat(heartbeat_status, heartbeat_time,
@@ -54,20 +62,51 @@ def get_analyzer_status_from_latest_heartbeat(heartbeat_status, heartbeat_time,
 
 class SensorListing(view.View):
     view_name = "sensor_listing"
-    view_parameters = view.Parameters
+    view_parameters = SensorListingParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "SensorListing"
     
     def render(self):
         analyzers = [ ]
+
+        criteria = None
+        if self.parameters.has_key("filter_path"):
+            criteria = "%s == '%s'" % (self.parameters["filter_path"], self.parameters["filter_value"])
         
-        for analyzer_path in self.env.idmef_db.getAnalyzerPaths():
+        for analyzer_path in self.env.idmef_db.getAnalyzerPaths(criteria):
             analyzerid = analyzer_path[-1]
             analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
             parameters = { "analyzerid": analyzer["analyzerid"] }
             analyzer["alert_listing"] = utils.create_link("sensor_alert_listing", parameters)
             analyzer["heartbeat_listing"] = utils.create_link("sensor_heartbeat_listing", parameters)
             analyzer["heartbeat_analyze"] = utils.create_link("heartbeat_analyze", parameters)
+
+            if analyzer["node_name"]:
+                analyzer["node_name"] = "<a href='%s'>%s</a>" % \
+                                        (utils.create_link(self.view_name,
+                                                           { "filter_path": "heartbeat.analyzer.node.name",
+                                                             "filter_value": analyzer["node_name"] }),
+                                         analyzer["node_name"])
+            else:
+                analyzer["node_name"] = "n/a"
+
+            if analyzer["node_location"]:
+                analyzer["node_location"] = "<a href='%s'>%s</a>" % \
+                                            (utils.create_link(self.view_name,
+                                                               { "filter_path": "heartbeat.analyzer.node.location",
+                                                                 "filter_value": analyzer["node_location"] }),
+                                             analyzer["node_location"])
+            else:
+                analyzer["node_location"] = "n/a"
+
+            if analyzer["node_address"]:
+                analyzer["node_address"] = "<a href='%s'>%s</a>" % \
+                                           (utils.create_link(self.view_name,
+                                                              { "filter_path": "heartbeat.analyzer.node.address.address",
+                                                                "filter_value": analyzer["node_address"] }),
+                                            analyzer["node_address"])
+            else:
+                analyzer["node_address"] = "n/a"
 
             analyzer["status"], analyzer["status_meaning"] = \
                                 get_analyzer_status_from_latest_heartbeat(analyzer["last_heartbeat_status"],
