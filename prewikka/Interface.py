@@ -163,6 +163,7 @@ class Interface:
             del arguments["action"]
         else:
             action = None
+        
         auth = self._core.auth
         
         if action == "login":
