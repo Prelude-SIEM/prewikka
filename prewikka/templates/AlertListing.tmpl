@@ -385,7 +385,7 @@ function ${name}_add_entry(object, value, num) {
     <br/>
   #end if
   #for $info in $message.infos
-    #if $message.aggregated
+    #if $message.aggregated and (len($message.infos) > 1 or $info.count > 1)
       $info.count x
     #end if
      <a class="impact_severity_$info.severity.value" href="$info.display">$info.classification.value</a>
