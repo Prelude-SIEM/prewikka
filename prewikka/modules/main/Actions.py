@@ -152,26 +152,21 @@ class MessageListing(Action.Action):
 
         messages = [ ]
         tmp = { }
-        count = prelude.countAlerts(criteria)
-        rows = prelude.getValues(map(lambda x: x[1], self.fields), criteria, limit=parameters.getLimit(), offset=parameters.getOffset())
+        count = self.countMessages(prelude, criteria)
 
-        view.setRange(parameters.getOffset() + 1, parameters.getOffset() + len(rows), parameters.getLimit(), count)
+        for analyzerid, ident in self.getMessageIdents(prelude, criteria, parameters.getLimit(), parameters.getOffset()):
+            message = { "analyzerid": analyzerid, "ident": ident }
+            messages.append(message)
+            tmp = self.getMessage(prelude, analyzerid, ident)
+            for name, field in self.fields:
+                message[name] = tmp[field]
+                
+        view.setRange(parameters.getOffset() + 1, parameters.getOffset() + len(messages), parameters.getLimit(), count)
 
         if count > parameters.getOffset() + parameters.getLimit():
             view.setOffsetNext(parameters.getOffset() + parameters.getLimit(),
                                count - ((count % parameters.getLimit()) or parameters.getLimit()))
             
-        for row in rows:
-            analyzerid, ident = row[:2]
-            if tmp.has_key((analyzerid, ident)):
-                continue
-
-            message = { }
-            messages.append(message)
-            tmp[(analyzerid, ident)] = message
-            for key, value in zip(map(lambda x: x[0], self.fields), row):
-                message[key] = value
-
         messages.sort(lambda x, y: int(y["time"]) - int(x["time"]))
         
         view.setMessages(messages)
@@ -183,26 +178,42 @@ class MessageListing(Action.Action):
 class AlertListing(MessageListing):
     view_name = "AlertListingView"
     time_criteria_format = "alert.detect_time >= '%s' && alert.detect_time < '%s'"
-    fields = [ ("analyzerid", "alert.analyzer.analyzerid"),
-               ("ident", "alert.ident"),
-               ("severity", "alert.assessment.impact.severity"),
-               ("classification", "alert.classification.name"),
-               ("source", "alert.source.node.address.address"),
-               ("target", "alert.target.node.address.address"),
+    message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.ident == '%d'"
+    fields = [ ("severity", "alert.assessment.impact.severity"),
+               ("classification", "alert.classification(0).name"),
+               ("source", "alert.source(0).node.address(0).address"),
+               ("target", "alert.target(0).node.address(0).address"),
                ("sensor", "alert.analyzer.model"),
                ("time", "alert.detect_time") ]
+
+    def countMessages(self, prelude, criteria):
+        return prelude.countAlerts(criteria)
+
+    def getMessageIdents(self, prelude, *args, **kwargs):
+        return apply(prelude.getAlertIdents, args, kwargs)
+
+    def getMessage(self, prelude, analyzerid, ident):
+        return prelude.getAlert(analyzerid, ident)
 
 
 
 class HeartbeatListing(MessageListing):
     view_name = "HeartbeatListingView"
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
-    fields = [ ("analyzerid", "heartbeat.analyzer.analyzerid"),
-               ("ident", "heartbeat.ident"),
-               ("address", "heartbeat.analyzer.node.address.address"),
+    message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.ident == '%d'"
+    fields = [ ("address", "heartbeat.analyzer.node.address.address"),
                ("name", "heartbeat.analyzer.node.name"),
                ("type", "heartbeat.analyzer.model"),
                ("time", "heartbeat.analyzer_time") ]
+
+    def countMessages(self, prelude, criteria):
+        return prelude.countHeartbeats(criteria)
+
+    def getMessageIdents(self, prelude, *args, **kwargs):
+        return apply(prelude.getHeartbeatIdents, args, kwargs)
+
+    def getMessage(self, prelude, analyzerid, ident):
+        return prelude.getHeartbeat(analyzerid, ident)
 
 
 

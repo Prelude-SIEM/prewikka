@@ -67,25 +67,25 @@ class Prelude(PreludeDB):
                            password=config.getOptionValue("password", "prelude"))
         self.connect()
 
-    def getAlertIdents(self, criteria=None):
+    def getAlertIdents(self, criteria=None, limit=-1, offset=-1):
         if criteria:
             criteria = prelude.IDMEFCriteria(criteria)
-        return self.get_alert_ident_list(criteria)
+        return self.get_alert_ident_list(criteria, limit, offset) or [ ]
 
-    def getHeartbeatIdents(self, criteria=None):
+    def getHeartbeatIdents(self, criteria=None, limit=-1, offset=-1):
         if criteria:
             criteria = prelude.IDMEFCriteria(criteria)
-        return self.get_heartbeat_ident_list(criteria)
-    
+        return self.get_heartbeat_ident_list(criteria, limit, offset) or [ ]
+
     def getAlert(self, analyzerid, alert_ident):
         return Alert(self.get_alert(analyzerid, alert_ident))
-    
+
     def deleteAlert(self, analyzerid, alert_ident):
         return self.delete_alert(analyzerid, alert_ident)
-    
+
     def getHeartbeat(self, analyzerid, heartbeat_ident):
         return Heartbeat(self.get_heartbeat(analyzerid, heartbeat_ident))
-    
+
     def deleteHeartbeat(self, analyzerid, heartbeat_ident):
         return self.delete_heartbeat(analyzerid, heartbeat_ident)
 
