@@ -552,7 +552,7 @@ class AlertListing(MessageListing, view.View):
             index += 1
             
         if len(analyzer_names) > 0:
-            analyzer_name = analyzer_names[0]
+            analyzer_name = analyzer_names[-1]
         else:
             analyzer_name = "n/a"
 
