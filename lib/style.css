@@ -126,7 +126,7 @@ thead {
         text-decoration: none;
 }
 
-.topmenu_item_active a:visited, .topmenu_item_active a:link
+.topmenu_item_active a:visited, .topmenu_item_active a:link,
 .topmenu_item_special a:visited, .topmenu_item_special a:link {
         color: black;
         text-decoration: none;
@@ -170,7 +170,7 @@ thead {
         min-width: 45px;
         float: left;
         border-right: 1px white solid;
-        background-image: url(../img/bg_content.gif);
+	background-color: #d6d6d6;
         text-decoration: none;
 }
 
@@ -320,9 +320,7 @@ thead {
         position: absolute;
         left: 160px;
         top: 80px;
-        right: 0px;
-        bottom: 0px;
-        background-image: url(../img/bg_content.gif);
+	background-color: #d6d6d6;
 }
 
 #main a {
