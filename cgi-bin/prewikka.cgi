@@ -44,34 +44,34 @@ class CGIRequest(Request.Request):
         sys.stdout.write(data)
         
     def getQueryString(self):
-        return os.getenv("QUERY_STRING").strip()
+        return os.environ.get("QUERY_STRING", "").strip()
 
     def getClientAddr(self):
-        return os.getenv("REMOTE_ADDR").strip()
+        return os.environ.get("REMOTE_ADDR", "").strip()
 
     def getClientPort(self):
-        return int(os.getenv("REMOTE_PORT").strip())
+        return int(os.environ.get("REMOTE_PORT", "0").strip())
 
     def getServerAddr(self):
-        return os.getenv("SExRVER_ADDR").strip()
+        return os.environ.get("SERVER_ADDR", "").strip()
 
     def getServerPort(self):
-        return os.getenv("SERVER_PORT").strip()
+        return os.environ.get("SERVER_PORT", "").strip()
 
     def getUserAgent(self):
-        return os.getenv("USER_AGENT").strip()
+        return os.environ.get("USER_AGENT", "").strip()
 
     def getMethod(self):
-        return os.getenv("REQUEST_METHOD").strip()
+        return os.environ.get("REQUEST_METHOD", "").strip()
 
     def getURI(self):
-        return os.getenv("REQUEST_URI").strip()
+        return os.environ.get("REQUEST_URI", "").strip()
     
     def getCookieString(self):
-        return os.getenv("HTTP_COOKIE").strip()
+        return os.environ.get("HTTP_COOKIE", "").strip()
 
     def getReferer(self):
-        return os.getenv("HTTP_REFERER", "").strip()
+        return os.environ.get("HTTP_REFERER", "").strip()
 
 
 
