@@ -28,15 +28,18 @@
     </tr>
     #set $cnt += 1
   #end for
+  <tr>
+    <td colspan="0" style="text-align: right;">
+     <input style="float: right;" type="submit" value="Delete user"/></form>
+
+     <form action='?' method='get'>
+      <input type="hidden" name="view" value="user_add_form"/>
+      <input style="float: left;" type='submit' value='Create user'/>
+     </form>
+    </td>
+  </tr>
   </tbody>
 </table>
+</form>
 <br/>
-
-<input style="position: relative; float: right;" type="submit" value="Delete user"/>
-</form>
-
-<form action='?' method='get'>
-  <input type="hidden" name="view" value="user_add_form"/>
-  <input type='submit' value='Create user'/>
-</form>
 #end block main_content
