@@ -208,10 +208,10 @@ class Core:
                     
             self._setupRequest(request, request.parameters)
 
-            try:
-                slot["handler"](request)
-            except Prelude.Error, e:
-                raise Error.SimpleError("prelude internal error", str(e))
+            #try:
+            slot["handler"](request)
+            #except Prelude.Error, e:
+            #raise Error.SimpleError("prelude internal error", str(e))
 
             dataset = request.dataset
             template_class = slot["template"]

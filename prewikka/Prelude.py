@@ -108,7 +108,7 @@ class Prelude(PreludeDB):
         if analyzerid:
             criteria = "%s.analyzer.analyzerid == %d" % (type, analyzerid)
 
-        rows = self.getValues(selection=("%s.create_time/order_desc" % type, "%s.ident" % type),
+        rows = self.getValues(selection=("%s.create_time/order_desc" % type, "%s.messageid" % type),
                               criteria=criteria, limit=1)
 
         return rows[0][1]
@@ -138,7 +138,7 @@ class Prelude(PreludeDB):
         return self.get_values(selection, criteria, distinct, limit, offset) or [ ]
 
     def _countMessages(self, root, criteria):
-        return self.getValues(["count(%s.ident)" % root], criteria)[0][0]
+        return self.getValues(["count(%s.messageid)" % root], criteria)[0][0]
 
     def countAlerts(self, criteria=None):
         return self._countMessages("alert", criteria)

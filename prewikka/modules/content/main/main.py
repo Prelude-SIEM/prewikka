@@ -463,19 +463,19 @@ class AlertListingAction(MessageListingAction, AlertsView):
     whois_action = "alert_whois"
     traceroute_action = "alert_traceroute"
     time_criteria_format = "alert.detect_time >= '%s' && alert.detect_time < '%s'"
-    message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.ident == '%d'"
+    message_criteria_format = "alert.analyzer.analyzerid == '%d' && alert.messageid == '%d'"
     fields = [ ("severity", "alert.assessment.impact.severity", "alert.assessment.impact.severity"),
-               ("classification", "alert.classification(0).name", "alert.classification.name"),
+               ("classification", "alert.classification.text", "alert.classification.text"),
                ("source", "alert.source(0).node.address(0).address", "alert.source.node.address.address"),
                ("sport", "alert.source(0).service.port", "alert.source.node.service.port"),
-               ("suser_name", "alert.source(0).user.userid(0).name", "alert.source.user.userid.name"),
-               ("suser_uid", "alert.source(0).user.userid(0).number", "alert.source.user.userid.number"),
+               ("suser_name", "alert.source(0).user.user_id(0).name", "alert.source.user.user_id.name"),
+               ("suser_uid", "alert.source(0).user.user_id(0).number", "alert.source.user.user_id.number"),
                ("sprocess_name", "alert.source(0).process.name", "alert.source.process.name"),
                ("sprocess_pid", "alert.source(0).process.pid", "alert.source.process.pid"),
                ("target", "alert.target(0).node.address(0).address", "alert.target.node.address.address"),
                ("tport", "alert.target(0).service.port", "alert.target.node.service.port"),
-               ("tuser_name", "alert.target(0).user.userid(0).name", "alert.target.user.userid.name"),
-               ("tuser_uid", "alert.target(0).user.userid(0).number", "alert.target.user.userid.number"),
+               ("tuser_name", "alert.target(0).user.user_id(0).name", "alert.target.user.user_id.name"),
+               ("tuser_uid", "alert.target(0).user.user_id(0).number", "alert.target.user.user_id.number"),
                ("tprocess_name", "alert.target(0).process.name", "alert.target.process.name"),
                ("tprocess_pid", "alert.target(0).process.pid", "alert.target.process.pid"),
                ("sensor", "alert.analyzer.model", "alert.analyzer.model") ]
@@ -530,7 +530,7 @@ class HeartbeatListingAction(MessageListingAction, HeartbeatsView):
     whois_action = "heartbeat_whois"
     traceroute_action = "heartbeat_traceroute"
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
-    message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.ident == '%d'"
+    message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.messageid == '%d'"
     fields = [ ("address", "heartbeat.analyzer.node.address(0).address", "heartbeat.analyzer.node.address.address"),
                ("name", "heartbeat.analyzer.node.name", "heartbeat.analyzer.node.name"),
                ("type", "heartbeat.analyzer.model", "heartbeat.analyzer.model") ]
@@ -613,14 +613,20 @@ class AlertSummaryAction(MessageSummaryAction, AlertsView):
         self.endSection(dataset)
 
     def buildClassification(self, dataset, alert):
-        if not alert["classification(0).name"]:
+        if not alert["classification.text"]:
             return
-        
+
         self.beginSection("Classification")
-        self.newSectionEntry("Name", alert["classification(0).name"], emphase=True)
-        self.newSectionEntry("Url", alert["classification(0).url"])
-        self.newSectionEntry("Origin", alert["classification(0).origin"])
+        self.newSectionEntry("Text", alert["classification.text"])
         self.endSection(dataset)
+##         if not alert["classification(0).name"]:
+##             return
+        
+##         self.beginSection("Classification")
+##         self.newSectionEntry("Name", alert["classification(0).name"], emphase=True)
+##         self.newSectionEntry("Url", alert["classification(0).url"])
+##         self.newSectionEntry("Origin", alert["classification(0).origin"])
+##         self.endSection(dataset)
 
     def buildImpact(self, dataset, alert):
         self.beginSection("Impact")
@@ -642,8 +648,8 @@ class AlertSummaryAction(MessageSummaryAction, AlertsView):
             self.newSectionEntry("Address", address, emphase=True)
 
         self.newSectionEntry("Interface", alert["%s(0).interface" % direction])
-        self.newSectionEntry("User", alert["%s(0).user.userid(0).name" % direction])
-        self.newSectionEntry("Uid", alert["%s(0).user.userid(0).number" % direction])
+        self.newSectionEntry("User", alert["%s(0).user.user_id(0).name" % direction])
+        self.newSectionEntry("Uid", alert["%s(0).user.user_id(0).number" % direction])
         self.newSectionEntry("Process", alert["%s(0).process.name" % direction])
 
     def buildSource(self, dataset, alert):
@@ -703,6 +709,9 @@ class _Element:
         name = self._humanizeField(field)
         field = "%s.%s" % (root, field)
         value = self._alert[field]
+        if not value:
+            return None
+        
         value = str(value)
         if value == "":
             value = "n/a"
@@ -748,7 +757,9 @@ class _Element:
         
         for field in self.fields:
             if type(field) is str:
-                entries.append(self._renderNormal(root, field))
+                field = self._renderNormal(root, field)
+                if field:
+                    entries.append(field)
             else:
                 if field.is_list:
                     entries += self._renderList(root, field)
@@ -761,28 +772,29 @@ class _Element:
 
 
 
-class Web(_Element):
-    name = "web"
-    fields = "url", "cgi", "http_method"#, "arg("
+class WebService(_Element):
+    name = "web_service"
+    fields = "url", "cgi", "http_method", "arg("
     check_field = "url"
 
 
 
-class SNMP(_Element):
-    name = "snmp"
-    fields = "oid", "community", "command"
+class SNMPService(_Element):
+    name = "snmp_service"
+    fields = "oid", "community", "security_name", "context_name", "context_engine_id", "command"
     check_field = "oid"
 
 
 
 class Service(_Element):
     name = "service"
-    fields = "ident", "name", "port", "portlist", "protocol", Web, SNMP
+    fields = "ident", "ip_version", "name", "port", "iana_protocol_number", "iana_protocol_name", "portlist", \
+             "protocol", WebService, SNMPService
     check_field = "ident"
 
 
 class UserID(_Element):
-    name = "userid"
+    name = "user_id"
     fields = "ident", "type", "name", "number"
     check_field = "ident"
     is_list = True
@@ -813,7 +825,7 @@ class Node(_Element):
 
 class Process(_Element):
     name = "process"
-    fields = "ident", "name", "pid", "path"#, "arg(", "env("
+    fields = "ident", "name", "pid", "path", "arg(", "env("
     check_field = "ident"
 
 
@@ -826,22 +838,41 @@ class FileAccess(_Element):
 
 
 
+class Linkage(_Element):
+    name = "linkage"
+    fields = "category", "name", "path"
+    check_field = "category"
+    is_list = True
+
+
+
+class Inode(_Element):
+    name = "inode"
+    fields = "change_time", "number", "major_device", "minor_device", "c_major_device", "c_minor_device"
+    check_field = "change_time"
+
+
+
+class Checksum(_Element):
+    name = "checksum"
+    fields = "value", "key", "algorithm"
+    check_field = "value"
+    is_list = True
+
+
+
 class File(_Element):
     name = "file"
     fields = "ident", "category", "fstype", "name", "path", "create_time", "modify_time", \
-             "access_time", "data_size", "disk_size", FileAccess
+             "access_time", "data_size", "disk_size", FileAccess, Linkage, Inode, Checksum
     check_field = "ident"
-
-
-
-class Files(File):
     is_list = True
 
 
 
 class Target(_Element):
     name = "target"
-    fields = "ident", "decoy", "interface", Node, User_, Process, Service, Files
+    fields = "ident", "decoy", "interface", Node, User_, Process, Service, File
     check_field = "ident"
     is_list = True
 
@@ -876,11 +907,18 @@ class Impact(_Element):
 
 
 
-class Classification(_Element):
-    name = "classification"
-    fields = ("origin", "name", "url")
+class Reference(_Element):
+    name = "reference"
+    fields = "origin", "name", "url", "meaning"
     is_list = True
     check_field = "origin"
+
+
+
+class Classification(_Element):
+    name = "classification"
+    fields = "ident", "text"
+    check_field = "ident"
 
 
 
@@ -945,7 +983,7 @@ class OverflowAlert(_Element):
 
 class AlertDetailsAction(_Element, AlertsView):
     name = "alert"
-    fields = "ident", Assessment, Analyzer, "create_time", "detect_time", "analyzer_time", \
+    fields = "messageid", Assessment, Analyzer, "create_time", "detect_time", "analyzer_time", \
              Source, Target, Classification, AdditionalData, ToolAlert, CorrelationAlert, \
              OverflowAlert
     top_element = True
@@ -965,7 +1003,7 @@ class AlertDetailsAction(_Element, AlertsView):
 
 class HeartbeatDetailsAction(_Element, HeartbeatsView):
     name = "heartbeat"
-    fields = "ident", Analyzer, "create_time", "analyzer_time", AdditionalData
+    fields = "messageid", Analyzer, "create_time", "analyzer_time", AdditionalData
     top_element = True
 
     def render(self):
@@ -1043,7 +1081,7 @@ class HeartbeatAnalyzeAction(HeartbeatAnalyzeView):
         analyzer = prelude.getAnalyzer(analyzerid)
         analyzer["events"] = [ ]
         start = time.time()
-        rows = prelude.getValues(selection=["heartbeat.ident", "heartbeat.create_time/order_desc"],
+        rows = prelude.getValues(selection=["heartbeat.messageid", "heartbeat.create_time/order_desc"],
                                  criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
                                  limit=self._heartbeat_count)
         newer = None
