@@ -537,6 +537,8 @@ class AlertListingAction(MessageListingAction, AlertsView):
             
             urls.append("<a href='%s'>%s</a>" % (url, name))
 
+            cnt += 1
+
         if urls:
             dst["classification_references"] = "(" + ", ".join(urls) + ")"
         else:
