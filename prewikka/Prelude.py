@@ -22,8 +22,17 @@ import prelude
 import preludedb
 from preludedb import PreludeDB
 
+from prewikka.utils import escape_html_string
+
 
 Error = (prelude.Error, preludedb.Error)
+
+
+def escape_value(value):
+    if type(value) is str:
+        return escape_html_string(value)
+    return value
+
 
 
 class Message:
@@ -31,13 +40,19 @@ class Message:
         self._message = message
 
     def __getitem__(self, key):
-        return self._message[key]
+        return escape_value(self._message[key])
     
-    def get(self, key, default=None):
+    def get(self, key, default=None, escape=True):
         value = self[key]
-        return value is None and default or value
+        if value is None:
+            value = default
+        
+        if escape:
+            value = escape_value(value)
+            
+        return value
 
-    def getAdditionalData(self, searched, many_values=False):
+    def getAdditionalData(self, searched, many_values=False, escape=True):
         values = [ ]
         i = 0
         while True:
@@ -47,6 +62,9 @@ class Message:
             
             if meaning == searched:
                 value = self["%s.additional_data(%d).data" % (self._root, i)]
+                if escape:
+                    value = escape_value(value)
+                
                 if not many_values:
                     return value
                 

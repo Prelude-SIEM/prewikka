@@ -79,7 +79,7 @@ class MessageSummary:
             meaning = alert["additional_data(%d).meaning" % i]
             if not meaning:
                 break
-            value = alert["additional_data(%d).data" % i]
+            value = alert.get("additional_data(%d).data" % i, escape=False)
             if alert["additional_data(%d).type" % i] == "byte-string":
                 value = utils.hexdump(value)
             emphase = (alert["analyzer.model"] == "Prelude LML" and

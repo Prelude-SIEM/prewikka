@@ -73,6 +73,10 @@ def escape_html_char(c):
         return c
 
 
+def escape_html_string(s):
+    return "".join(map(lambda c: escape_html_char(c), s))
+
+
 def hexdump(content):
     decoded = struct.unpack("B" * len(content), content)
     content = ""

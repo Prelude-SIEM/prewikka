@@ -256,7 +256,7 @@ class AdditionalData(_Element):
 
     def render(self, root):
         entries = _Element.render(self, root)
-        value = self._alert["%s.data" % root]
+        value = self._alert.get("%s.data" % root, escape=False)
         if self._alert["%s.type" % root] == "byte-string":
             value = utils.hexdump(value)
         entries.append({"name": "Data", "value": value})
