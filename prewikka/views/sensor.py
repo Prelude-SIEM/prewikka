@@ -168,8 +168,8 @@ class HeartbeatAnalyze(view.View):
         analyzer["status_meaning"] = "abnormal offline"
         
         start = time.time()
-        idents = self.env.idmef_db.getHeartbeatIdents(criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
-                                                     limit=self._heartbeat_count)
+        idents = self.env.idmef_db.getHeartbeatIdents(criteria="heartbeat.analyzer(-1).analyzerid == %d" % analyzerid,
+                                                      limit=self._heartbeat_count)
         newer = None
         latest = True
         total_interval = 0
