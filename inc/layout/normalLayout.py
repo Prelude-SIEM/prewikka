@@ -5,6 +5,7 @@
 
 from genericLayout import genericLayout
 from templates.layouts.normal import Normal, Menu, TopMenu
+import core
 
 class normalLayout(genericLayout):
 
@@ -39,12 +40,15 @@ class normalLayout(genericLayout):
         return self._output
 
     def _getPageMenu(self, pages, active, module):
+        request = core.CoreRequest()
+        request.module = module
         menu = TopMenu.TopMenu()
         for page, action in pages:
             if page == active:
                 menu.setActiveItem(page)
             else:
-                menu.setInactiveItem(page, module, action)
+                request.action = action
+                menu.setInactiveItem(page, str(request))
         
         return str(menu)
 
@@ -54,5 +58,7 @@ class normalLayout(genericLayout):
             if module == self._views["module"]:
                 menu.setActiveItem(module)
             else:
-                menu.setInactiveItem(module, module)
+                request = core.CoreRequest()
+                request.module = module
+                menu.setInactiveItem(module, str(request))
         return str(menu)

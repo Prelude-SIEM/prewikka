@@ -13,9 +13,9 @@ import core
 class ModuleInterface(interface.NormalInterface):
     def init(self):
         interface.NormalInterface.init(self)
-        self.setModuleName("Alerts")
-        self.setViewNames([ ("alert list", "list") ])
-        self.setViewName("alert list")
+        self.setMenuName("Alerts")
+        self.setTabs([ ("alert list", "list") ])
+        self.setActiveTab("alert list")
 
 
 
@@ -26,7 +26,7 @@ class ListInterface(ModuleInterface):
         request.action = action
         request.analyzerid = alert["alert.analyzer.analyzerid"]
         request.alert_ident = alert["alert.ident"]
-        return self.createLink(request, action)
+        return "<a href='index.py?%s'>%s</a>" % (str(request), action)
     
     def build(self):
         table = Table.Table()

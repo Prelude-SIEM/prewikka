@@ -14,9 +14,6 @@ class Interface:
     def build(self):
         pass
 
-    def createLink(self, form, label):
-        return "<a href='index.py?%s'>%s</a>" % (str(form), label)
-
     def __str__(self):
         content = ""
         for key, value in self.headers.items():
@@ -35,14 +32,14 @@ class NormalInterface(Interface):
         self._views["views"]["place"] = self._config["company"]
         self._views["views"]["title"] = self._config["title"]
 
-    def setModuleName(self, module_name):
-        self._views["views"]["module"] = module_name
+    def setMenuName(self, name):
+        self._views["views"]["module"] = name
 
-    def setViewNames(self, view_names):
-        self._views["views"]["pages"] = view_names
+    def setTabs(self, tabs):
+        self._views["views"]["pages"] = tabs
 
-    def setViewName(self, view_name):
-        self._views["views"]["active"] = view_name
+    def setActiveTab(self, tab):
+        self._views["views"]["active"] = tab
 
     def setMainContent(self, content):
         self._views["views"]["main"] = content

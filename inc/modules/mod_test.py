@@ -10,29 +10,29 @@ import Request
 class ModuleInterface(interface.NormalInterface):
     def init(self):
         interface.NormalInterface.init(self)
-        self.setModuleName("Test")
-        self.setViewNames([ ("fetch", "fetch_data"), ("empty", "empty"), ("third", "third") ])
+        self.setMenuName("Test")
+        self.setTabs([ ("fetch", "fetch_data"), ("empty", "empty"), ("third", "third") ])
 
 
 
 class DataInterface(ModuleInterface):
     def init(self):
         ModuleInterface.init(self)
-        self.setViewName("fetch")
+        self.setActiveTab("fetch")
 
 
 
 class EmptyInterface(ModuleInterface):
     def init(self):
         ModuleInterface.init(self)
-        self.setViewName("empty")
+        self.setActiveTab("empty")
 
 
 
 class ThirdInterface(ModuleInterface):
     def init(self):
         ModuleInterface.init(self)
-        self.setViewName("third")
+        self.setActiveTab("third")
 
     def build(self):
         table = Table.Table()
