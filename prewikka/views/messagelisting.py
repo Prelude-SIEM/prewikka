@@ -246,9 +246,15 @@ class MessageListing:
 
     def _fetchMessages(self, criteria):
         messages = [ ]
+
+        objects = [ self.root + ".analyzer.analyzerid",
+                    self.root + ".messageid",
+                    self.root + ".create_time/order_desc" ]
         
-        for analyzerid, ident in self.getMessageIdents(criteria,
-                                                       self.parameters["limit"], self.parameters["offset"]):
+        for analyzerid, ident, ctime in self.env.prelude.getValues(objects,
+                                                                   distinct=1,
+                                                                   limit=self.parameters["limit"],
+                                                                   offset=self.parameters["offset"]):
             message = { "analyzerid": analyzerid, "ident": ident }
             messages.append(message)
             tmp = self.getMessage(analyzerid, ident)
@@ -361,7 +367,10 @@ class AlertListing(MessageListing, view.View):
     view_parameters = MessageListingParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "AlertListing"
-    
+
+    root = "alert"
+    messageid_object = "alert.messageid"
+    analyzerid_object = "alert.analyzer.analyzerid"
     delete_view = "alert_delete"
     summary_view = "alert_summary"
     details_view = "alert_details"
@@ -389,9 +398,6 @@ class AlertListing(MessageListing, view.View):
 
     def countMessages(self, criteria):
         return self.env.prelude.countAlerts(criteria)
-
-    def getMessageIdents(self, *args, **kwargs):
-        return apply(self.env.prelude.getAlertIdents, args, kwargs)
 
     def getMessage(self, analyzerid, ident):
         return self.env.prelude.getAlert(analyzerid, ident)
@@ -469,7 +475,8 @@ class HeartbeatListing(MessageListing, view.View):
     view_parameters = MessageListingParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "HeartbeatListing"
-    
+
+    root = "heartbeat"
     delete_view = "heartbeat_delete"
     summary_view = "heartbeat_summary"
     details_view = "heartbeat_details"
@@ -482,9 +489,6 @@ class HeartbeatListing(MessageListing, view.View):
 
     def countMessages(self, criteria):
         return self.env.prelude.countHeartbeats(criteria)
-
-    def getMessageIdents(self, *args, **kwargs):
-        return apply(self.env.prelude.getHeartbeatIdents, args, kwargs)
 
     def getMessage(self, analyzerid, ident):
         return self.env.prelude.getHeartbeat(analyzerid, ident)
