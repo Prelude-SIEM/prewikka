@@ -5,6 +5,9 @@
 #menu {
 	float: left;
 	width: 160px;
+	top: 84px;
+	z-index: 1;
+	position: fixed;
 }
 
 .menu_item_active, .menu_item_inactive, .menu_item_special {
@@ -37,7 +40,6 @@
 
 .menu_item_active {
 	background-color: #E2EBF5;
-	//background: white;
 }
 
 /* END Menu style */
@@ -48,7 +50,8 @@
  **************************/
 
 #topmenu {
-	position: absolute;
+	z-index: 1;
+	position: fixed;
 	top: 58px;
 	left: 160px;
 	right: -0px;
@@ -115,6 +118,7 @@
 	border-color: #D2312A;
 }
 
+
 body {
 	background-color: #F0F0F0;
 	margin-left: 0px;
@@ -152,6 +156,8 @@ body {
 }
 
 #top_view_header {
+	z-index: 1;
+	position: fixed;
 	height: 60px;
 	padding-top: 10px;
 	padding-left: 10px;
@@ -298,7 +304,7 @@ td {
 }
 
 .message_list_nav_button, .message_list_nav_infos {
-	background: white;
+	background: #E2EBF5;
 	border-width: 1px;
 	border-style: solid;
 }
