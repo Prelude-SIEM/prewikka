@@ -72,11 +72,10 @@ class Module:
         tmp = self.sections[section_name]
         
         section = self.sections[section_name]["class"](section_query)
-        section_content = str(section)
         views = { }
         views["layout"] = "normal"
         views["views"] = { }
-        views["views"]["main"] = section
+        views["views"]["main"] = str(section)
         views["views"]["active"] = self.sections[section_name]["parent"] or section_name
         views["views"]["module"] = self.name
         views["views"]["pages"] = filter(lambda name: not self.sections[name]["parent"], self.section_names)

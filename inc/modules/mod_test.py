@@ -1,5 +1,6 @@
 import sys
 from templates.modules.mod_test import Form
+from templates import Table
 
 class Display:
     def __init__(self, query):
@@ -34,8 +35,20 @@ class Empty:
         return ""
 
 
+
+class Third(Empty):
+    def __str__(self):
+        table = Table.Table()
+        table.setHeader(("Character", "Numeric"))
+        for char, num in ("one", 1), ("two", 2), ("three", 3), ("four", 4):
+            table.addRow((char, num))
+        return str(table)
+
+
+
 def load(module):
     module.setName("Test")
     module.registerSection("fetch", Fetch, default=True)
     module.registerSection("display", Display, parent="fetch")
     module.registerSection("empty", Empty)
+    module.registerSection("third", Third)
