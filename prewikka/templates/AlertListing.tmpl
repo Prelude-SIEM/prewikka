@@ -400,9 +400,9 @@ function ${name}_add_entry(object, value, num) {
 <td>
   <ul id="popup_block">
     <li class="popup_title">
-      #if $direction.service.value
+      #if $direction.service.value != None
        <span>$direction.address.value</span>:$direction.service.value
-	#if $direction.service_extra.value
+	#if $direction.service_extra.value != None
           ($direction.service_extra.value)
         #end if
       #else

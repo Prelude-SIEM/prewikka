@@ -399,7 +399,7 @@ class AlertListing(MessageListing, view.View):
         empty = True
         
         def set_main_and_extra_values(dataset, message, name, object_main, object_extra):
-            if message[object_main]:
+            if message[object_main] != None:
                 dataset[name] = { "value": message[object_main] }
                 dataset[name + "_extra"] = { "value": message[object_extra] }
             else:
