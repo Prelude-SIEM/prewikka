@@ -267,8 +267,35 @@ td {
 	text-decoration: underline;
 }
 
-#message_list_result table {
+#message_list_result {
 	width: 100%;
+}
+
+#message_list_nav {
+	margin: 0px auto;
+}
+
+#message_list_nav_limit_input {
+	float: left;
+}
+
+#message_list_nav_limit_submit {
+	float: left;
+}
+
+#message_list_nav span {
+	float: left;
+}
+
+#message_list_nav td {
+	width: 50px;
+	height: 15px;
+	border-width: 2px;
+	border-style: solid;
+	text-align: center;
+	font-size: 14px;
+	/*font-weight: bold;*/
+	
 }
 
 #message_list_edition {
@@ -285,6 +312,7 @@ td {
 
 #timeline {
 	float: left;
+	font-size: 14px;
 }
 
 #timeline div {
@@ -292,12 +320,16 @@ td {
 	margin-left: 5px;
 }
 
-#timeline_navigation {
+#timeline_limit_label, #timeline_submit {
+	padding-left: 10px;
+}
+
+#timeline_links {
 	clear: both;
 	float: right;
 }
 
-#timeline_navigation div {
+#timeline_links div {
 	float: left;
 	margin-left: 10px;
 	font-weight: bold;

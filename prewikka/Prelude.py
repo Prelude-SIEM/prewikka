@@ -95,6 +95,15 @@ class Prelude(PreludeDB):
         
         return self.get_values(selection, criteria, distinct, limit, offset) or [ ]
 
+    def _countMessages(self, root, criteria):
+        return self.getValues(["count(%s.ident)" % root], criteria)[0][0]
+
+    def countAlerts(self, criteria=None):
+        return self._countMessages("alert", criteria)
+
+    def countHeartbeats(self, criteria=None):
+        return self._countMessages("heartbeat", criteria)
+
     def getAnalyzerids(self):
         analyzerids = [ ]
         rows = self.getValues(selection=[ "heartbeat.analyzer.analyzerid/group_by" ])

@@ -79,12 +79,26 @@ class MessageListingDataSet:
     def __init__(self):
         self.timeline = { }
         self.messages = [ ]
+        self.offset_prev = None
+        self.offset_first = None
+        self.offset_next = None
+        self.offset_last = None
         
         for unit in "sec", "min", "hour", "day", "month", "year":
             self.timeline[unit + "_selected"] = ""
+
+    def setRange(self, range_from, range_to, limit, total):
+        self.range_from = range_from
+        self.range_to = range_to
+        self.limit = limit
+        self.total = total
         
     def setParameters(self, parameters):
-        self._parameters = parameters
+        self._parameters = copy.copy(parameters)
+        try:
+            del self._parameters["offset"]
+        except KeyError:
+            pass
         
         parameters = copy.copy(parameters)
         if parameters.getTimelineEnd():
@@ -103,7 +117,7 @@ class MessageListingDataSet:
         self.timeline[unit + "_selected"] = "selected"
         self.timeline["form_hiddens"] = form_hiddens = [ ]
         form_hiddens.append(("action", Action(self.listing_action)))
-        for name in self._parameters.getNames(ignore=("timeline_value", "timeline_unit")):
+        for name in self._parameters.getNames(ignore=("timeline_value", "timeline_unit", "limit")):
             form_hiddens.append((name, self._parameters[name]))
         
     def setTimelineStart(self, start):
@@ -121,6 +135,19 @@ class MessageListingDataSet:
         parameters = copy.copy(self._parameters)
         parameters.setTimelineEnd(int(next))
         self.timeline["next"] = self.createLink(Action(self.listing_action), parameters)
+
+    def setOffsetPrev(self, offset):
+        parameters = copy.copy(self._parameters)
+        self.offset_first = self.createLink(Action(self.listing_action), parameters)
+        parameters.setOffset(offset)
+        self.offset_prev = self.createLink(Action(self.listing_action), parameters)
+
+    def setOffsetNext(self, offset_next, offset_last):
+        parameters = copy.copy(self._parameters)
+        parameters.setOffset(offset_next)
+        self.offset_next = self.createLink(Action(self.listing_action), parameters)
+        parameters.setOffset(offset_last)
+        self.offset_last = self.createLink(Action(self.listing_action), parameters)
 
     def _createMessageField(self, name, value):
         if not value:

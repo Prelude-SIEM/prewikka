@@ -47,6 +47,8 @@ class MessageListing(Action.ActionParameters):
         self.registerParameter("timeline_value", int)
         self.registerParameter("timeline_unit", str)
         self.registerParameter("timeline_end", int)
+        self.registerParameter("offset", int)
+        self.registerParameter("limit", int)
 
     def check(self):
         Action.ActionParameters.check(self)
@@ -86,6 +88,18 @@ class MessageListing(Action.ActionParameters):
 
     def getTimelineEnd(self):
         return self.get("timeline_end")
+
+    def setOffset(self, offset):
+        self["offset"] = offset
+        
+    def getOffset(self):
+        return self.get("offset", 0)
+
+    def setLimit(self, limit):
+        self["limit"] = limit
+
+    def getLimit(self):
+        return self.get("limit", 50)
 
 
 

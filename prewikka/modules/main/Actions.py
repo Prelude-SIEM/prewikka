@@ -126,6 +126,9 @@ class MessageListing(Action.Action):
             end = _MyTime()
             if not parameters.getTimelineUnit() in ("min", "hour"):
                 end.round(parameters.getTimelineUnit())
+
+        if parameters.getOffset():
+            view.setOffsetPrev(parameters.getOffset() - parameters.getLimit())
         
         start = end[parameters.getTimelineUnit()] - parameters.getTimelineValue()
 
@@ -149,8 +152,15 @@ class MessageListing(Action.Action):
 
         messages = [ ]
         tmp = { }
-        rows = prelude.getValues(map(lambda x: x[1], self.fields), criteria)
+        count = prelude.countAlerts(criteria)
+        rows = prelude.getValues(map(lambda x: x[1], self.fields), criteria, limit=parameters.getLimit(), offset=parameters.getOffset())
 
+        view.setRange(parameters.getOffset() + 1, parameters.getOffset() + len(rows), parameters.getLimit(), count)
+
+        if count > parameters.getOffset() + parameters.getLimit():
+            view.setOffsetNext(parameters.getOffset() + parameters.getLimit(),
+                               count - ((count % parameters.getLimit()) or parameters.getLimit()))
+            
         for row in rows:
             analyzerid, ident = row[:2]
             if tmp.has_key((analyzerid, ident)):

@@ -10,42 +10,47 @@ $message_listing_header
 		#for $name, $value in $timeline.form_hiddens
 			<input type="hidden" name="$name" value="$value"/>
 		#end for
-		<div id="timeline_label">Step:</div>
-		<div id="timeline_value">
+		<div id="timeline_step_label">Step:</div>
+		<div id="timeline_step_value">
 			<input name="timeline_value" type="text" size="8" value="$timeline.value"/>
 		</div>
-			<div id="timeline_unit">
-				<select name="timeline_unit">
-					<option value="sec" $timeline.sec_selected>Seconds
-					<option value="min" $timeline.min_selected>Minutes
-					<option value="hour" $timeline.hour_selected>Hours
-					<option value="day" $timeline.day_selected>Days
-					<option value="month" $timeline.month_selected>Months
-					<option value="year" $timeline.year_selected>Years
-				</select>
-			</div>
-			<div id="timeline_submit">
-				<input type="submit"  value="apply">
-			</div>
+		<div id="timeline_unit">
+			<select name="timeline_unit">
+				<option value="sec" $timeline.sec_selected>Seconds
+				<option value="min" $timeline.min_selected>Minutes
+				<option value="hour" $timeline.hour_selected>Hours
+				<option value="day" $timeline.day_selected>Days
+				<option value="month" $timeline.month_selected>Months
+				<option value="year" $timeline.year_selected>Years
+			</select>
+		</div>
+		<div id="timeline_limit_label">Limit: </div>
+		<div>
+			<input id="timeline_limit_value" type='text' size="3" name='limit' value='$limit'/>
+		</div>
+		<div id="timeline_submit">
+			<input type="submit"  value="apply">
+		</div>
 	</form>
 	</div>
-	<div id="timeline_range">
-		<div id="timeline_start">From $timeline.start</div>
-		<div id="timeline_end">To $timeline.end</div>
-	</div>
 	<div id="timeline_navigation">
-		<div id="timeline_prev"><a href="$timeline.prev">prev</a></div>
-		<div id="timeline_current"><a href="$timeline.current">current</a></div>
-		<div id="timeline_next"><a href="$timeline.next">next</a></div>
+		<div id="timeline_range">
+			<div id="timeline_start">From $timeline.start</div>
+			<div id="timeline_end">To $timeline.end</div>
+		</div>
+		<div id="timeline_links">
+			<div id="timeline_prev"><a href="$timeline.prev">prev</a></div>
+			<div id="timeline_current"><a href="$timeline.current">current</a></div>
+			<div id="timeline_next"><a href="$timeline.next">next</a></div>
+		</div>
 	</div>
 </div>
 
-<div id="message_list_result">
 <form action="?" method="get">
 #for $name, $value in $delete_form_hiddens
 	<input type="hidden" name="$name" value="$value"/>
 #end for
-<table>
+<table id="message_list_result">
 	<thead>
 		<tr>
 			$message_fields_header
@@ -82,5 +87,27 @@ $message_listing_header
 	</tfoot>
 </table>
 </form>
-</div>
+<table id="message_list_nav">
+	<tr>
+		#if $offset_prev
+			<td><a href='$offset_first'>&lt;&lt;</a></td>
+			<td><a href='$offset_prev'>&lt;</a></td>
+		#else
+			<td></td>
+			<td></td>
+		#end if
+		#if $offset_next
+			<td><a href='$offset_next'>&gt;</a></td>
+			<td><a href='$offset_last'>&gt;&gt;</a></td>
+		#else
+			<td></td>
+			<td></td>
+		#end if
+	</tr>
+	<tr>
+		<td colspan="0">
+			$range_from ... $range_to (total:$total)
+		</td>
+	</tr>
+</table>
 #end block main_content
