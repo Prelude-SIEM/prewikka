@@ -5,14 +5,9 @@
 # Licensed under GPL
 # 
 
-"""
-Main module
-"""
+import sys, os
 
-import cgi, sys, os
-
-for path in "inc/", "inc/modules":
-    sys.path.append(os.path.abspath(path))
+import cgi
 
 from prewikka.Core import Core
 
