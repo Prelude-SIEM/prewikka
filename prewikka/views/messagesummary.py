@@ -169,7 +169,7 @@ class AlertSummary(MessageSummary, view.View):
         self.endSection()
 
     def render(self):
-        alert = self.env.prelude.getAlert(self.parameters["ident"])
+        alert = self.env.idmef_db.getAlert(self.parameters["ident"])
         self.dataset["sections"] = [ ]
         self.buildTime(alert)
         self.buildClassification(alert)
@@ -191,7 +191,7 @@ class HeartbeatSummary(MessageSummary, view.View):
         self.endSection()
 
     def render(self):
-        heartbeat = self.env.prelude.getHeartbeat(self.parameters["ident"])
+        heartbeat = self.env.idmef_db.getHeartbeat(self.parameters["ident"])
         self.dataset["sections"] = [ ]
         self.buildAnalyzer(heartbeat)
         self.buildTime(heartbeat)

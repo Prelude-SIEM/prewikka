@@ -25,10 +25,10 @@ class Config:
     def __init__(self, filename="prewikka.conf"):
         self.general = MyConfigParser.ConfigParserSection("general")
         self.interface = MyConfigParser.ConfigParserSection("interface")
-        self.prelude = MyConfigParser.ConfigParserSection("prelude")
+        self.database = MyConfigParser.ConfigParserSection("database")
+        self.idmef_database = MyConfigParser.ConfigParserSection("idmef_database")
         self.admin = None
         self.auth = None
-        self.storage = None
         self.logs = [ ]
         self.views = [ ]
 
@@ -51,17 +51,17 @@ class Config:
     def _set_interface(self, interface):
         self.interface = interface
 
-    def _set_prelude(self, prelude):
-        self.prelude = prelude
+    def _set_database(self, database):
+        self.database = database
+
+    def _set_idmef_database(self, idmef_database):
+        self.idmef_database = idmef_database
 
     def _set_admin(self, admin):
         self.admin = admin
 
     def _set_auth(self, auth):
         self.auth = auth
-
-    def _set_storage(self, storage):
-        self.storage = storage
 
     def _set_log(self, log):
         self.logs.append(log)

@@ -62,7 +62,7 @@ class AlertFilterEdition(view.Views):
         }
 
     def _setCommon(self):
-        self.dataset["filters"] = self.env.storage.getAlertFilters(self.user.login)
+        self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
         self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.ALERT_OBJECTS))
         self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("==", "!=", "<", "<=", ">", ">=")))
         self.dataset["elements"] = [ ]
@@ -82,7 +82,7 @@ class AlertFilterEdition(view.Views):
         self._setCommon()
         
         if self.parameters.has_key("filter_name"):
-            filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter_name"])
+            filter = self.env.db.getAlertFilter(self.user.login, self.parameters["filter_name"])
             self.dataset["fltr.name"] = filter.name
             self.dataset["fltr.comment"] = filter.comment
             self.dataset["formula"] = filter.formula
@@ -106,7 +106,7 @@ class AlertFilterEdition(view.Views):
                                     elements,
                                     self.parameters["formula"])
 
-        self.env.storage.setFilter(self.user.login, filter)
+        self.env.db.setFilter(self.user.login, filter)
 
         self._setCommon()
         

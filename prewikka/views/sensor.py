@@ -61,9 +61,9 @@ class SensorListing(view.View):
     def render(self):
         analyzers = [ ]
         
-        for analyzer_path in self.env.prelude.getAnalyzerPaths():
+        for analyzer_path in self.env.idmef_db.getAnalyzerPaths():
             analyzerid = analyzer_path[-1]
-            analyzer = self.env.prelude.getAnalyzer(analyzerid)
+            analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
             parameters = { "analyzerid": analyzer["analyzerid"] }
             analyzer["alert_listing"] = utils.create_link("sensor_alert_listing", parameters)
             analyzer["heartbeat_listing"] = utils.create_link("sensor_heartbeat_listing", parameters)
@@ -99,12 +99,12 @@ class SensorMessagesDelete(SensorListing):
             if self.parameters.has_key("alerts"):
                 criteria = "alert.analyzer.analyzerid == %d || alert.analyzer.analyzer.analyzerid == %d" % \
                            (long(analyzerid), long(analyzerid))
-                for ident in self.env.prelude.getAlertIdents(criteria):
-                    self.env.prelude.deleteAlert(ident)
+                for ident in self.env.idmef_db.getAlertIdents(criteria):
+                    self.env.idmef_db.deleteAlert(ident)
             if self.parameters.has_key("heartbeats"):
                 criteria = "heartbeat.analyzer.analyzerid == %d" % long(analyzerid)
-                for ident in self.env.prelude.getHeartbeatIdents(criteria):
-                    self.env.prelude.deleteHeartbeat(ident)
+                for ident in self.env.idmef_db.getHeartbeatIdents(criteria):
+                    self.env.idmef_db.deleteHeartbeat(ident)
             
         SensorListing.render(self)
 
@@ -123,21 +123,21 @@ class HeartbeatAnalyze(view.View):
     def render(self):
         analyzerid = self.parameters["analyzerid"]
         
-        analyzer = self.env.prelude.getAnalyzer(analyzerid)
+        analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
         analyzer["last_heartbeat_time"] = str(analyzer["last_heartbeat_time"])
         analyzer["events"] = [ ]
         analyzer["status"] = "abnormal_offline"
         analyzer["status_meaning"] = "abnormal offline"
         
         start = time.time()
-        idents = self.env.prelude.getHeartbeatIdents(criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
+        idents = self.env.idmef_db.getHeartbeatIdents(criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
                                                      limit=self._heartbeat_count)
         newer = None
         latest = True
         total_interval = 0
 
         for ident in idents:
-            older = self.env.prelude.getHeartbeat(ident)
+            older = self.env.idmef_db.getHeartbeat(ident)
             older_status = older.getAdditionalData("Analyzer status")
             older_interval = older["heartbeat.heartbeat_interval"]
             if not older_status or not older_interval:

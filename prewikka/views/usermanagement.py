@@ -106,10 +106,10 @@ class UserListing(view.View):
         self.dataset["can_set_password"] = self.env.auth and self.env.auth.canSetPassword()
         self.dataset["users"] = [ ]
 
-        users = self.env.storage.getUsers()
-        users.sort()
-        for login in users:
-            user = self.env.storage.getUser(login)
+        logins = self.env.db.getUserLogins()
+        logins.sort()
+        for login in logins:
+            user = self.env.db.getUser(login)
             tmp = { }
             tmp["login"] = user.login
             tmp["permissions"] = map(lambda perm: user.has(perm), User.ALL_PERMISSIONS)
@@ -147,13 +147,13 @@ class UserAdd(UserListing):
     def render(self):
         login = self.parameters["login"]
 
-        self.env.storage.createUser(login)
+        self.env.db.createUser(login)
         
         if self.env.auth.canSetPassword():
             self.env.auth.setPassword(login, self.parameters["password"])
         
         permissions = filter(lambda perm: self.parameters.has_key(perm), User.ALL_PERMISSIONS)
-        self.env.storage.setPermissions(login, permissions)
+        self.env.db.setPermissions(login, permissions)
 
         self.parameters.clear()
         UserListing.render(self)
@@ -165,7 +165,7 @@ class UserDelete(UserListing):
     view_parameters = UserParameters
 
     def render(self):
-        self.env.storage.deleteUser(self.parameters["login"])
+        self.env.db.deleteUser(self.parameters["login"])
         
         self.parameters.clear()
         UserListing.render(self)
@@ -215,7 +215,7 @@ class PermissionsChangeForm(view.View):
         self.dataset["hiddens"] = [ ("view", "user_permissions_change"),
                                     ("login", self.parameters["login"]) ]
         self.dataset["properties"] = [ ]
-        user = self.env.storage.getUser(self.parameters["login"])
+        user = self.env.db.getUser(self.parameters["login"])
         for perm in User.ALL_PERMISSIONS:
             self.dataset["properties"].append(utils.boolean_property(perm, perm, user.has(perm)))
 
@@ -227,7 +227,7 @@ class PermissionsChange(UserListing):
 
     def render(self):
         permissions = filter(lambda perm: self.parameters.has_key(perm), User.ALL_PERMISSIONS)
-        self.env.storage.setPermissions(self.parameters["login"], permissions)
+        self.env.db.setPermissions(self.parameters["login"], permissions)
 
         self.parameters.clear()
         UserListing.render(self)

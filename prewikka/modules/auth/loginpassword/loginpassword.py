@@ -20,7 +20,7 @@
 
 import md5
 
-from prewikka import Auth, User, Storage
+from prewikka import Auth, User, Database
 
 
 class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
@@ -28,24 +28,23 @@ class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
         Auth.LoginPasswordAuth.__init__(self, env,
                                         int(config.getOptionValue("expiration", 60)) * 60)
         
-        if (self.storage.hasUser(User.ADMIN_LOGIN) and
-            not self.storage.hasPassword(User.ADMIN_LOGIN)):
+        if (self.db.hasUser(User.ADMIN_LOGIN) and not self.db.hasPassword(User.ADMIN_LOGIN)):
             self.setPassword(User.ADMIN_LOGIN, User.ADMIN_LOGIN)
-            
+        
     def _hash(self, data):
         return md5.new(data).hexdigest()
     
     def checkPassword(self, login, password):
         try:
-            real_password = self.storage.getPassword(login)
-        except Storage.StorageError:
+            real_password = self.db.getPassword(login)
+        except Database.DatabaseError:
             raise Auth.AuthError("invalid login '%s'" % login)
         
         if self._hash(password) != real_password:
             raise Auth.AuthError("invalid password for login '%s'" % login)
 
     def setPassword(self, login, password):
-        self.storage.setPassword(login, self._hash(password))
+        self.db.setPassword(login, self._hash(password))
 
 
 def load(env, config):

@@ -382,13 +382,13 @@ class AlertListing(MessageListing, view.View):
         self._max_aggregated_classifications = int(env.config.general.getOptionValue("max_aggregated_classifications", 10))
 
     def _getMessageIdents(self, criteria, limit=-1, offset=-1):
-        return self.env.prelude.getAlertIdents(criteria, limit, offset)
+        return self.env.idmef_db.getAlertIdents(criteria, limit, offset)
 
     def _countMessages(self, criteria):
-        return self.env.prelude.countAlerts(criteria)
+        return self.env.idmef_db.countAlerts(criteria)
 
     def _fetchMessage(self, ident):
-        return self.env.prelude.getAlert(ident)
+        return self.env.idmef_db.getAlert(ident)
 
     def _createHostField(self, object, value, type=None):
         field = { "value": value }
@@ -586,14 +586,8 @@ class AlertListing(MessageListing, view.View):
 
         return dataset
     
-    def _getFilters(self, storage, login):
-        return storage.getAlertFilters(login)
-
-    def _getFilter(self, storage, login, name):
-        return storage.getAlertFilter(login, name)
-
     def _deleteMessage(self, ident):
-        self.env.prelude.deleteAlert(ident)
+        self.env.idmef_db.deleteAlert(ident)
 
     def _applySimpleFilter(self, criteria, column, object):
         if len(self.parameters[object]) > 0:
@@ -678,7 +672,7 @@ class AlertListing(MessageListing, view.View):
             criteria.append(criterion)
             delete_base_criteria.append(criterion)
         
-        results = self.env.prelude.getValues(["alert.classification.text/group_by",
+        results = self.env.idmef_db.getValues(["alert.classification.text/group_by",
                                               "alert.assessment.impact.severity/group_by",
                                               "alert.assessment.impact.completion/group_by",
                                               "count(alert.classification.text)",
@@ -687,9 +681,9 @@ class AlertListing(MessageListing, view.View):
 
         for classification, severity, completion, count, ctime in results:
             criteria2 = criteria + [ "alert.classification.text == '%s'" % classification ]
-            ident = self.env.prelude.getAlertIdents(criteria2, limit=1)[0]
-            time_min = self.env.prelude.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
-            time_max = self.env.prelude.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
+            ident = self.env.idmef_db.getAlertIdents(criteria2, limit=1)[0]
+            time_min = self.env.idmef_db.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
+            time_max = self.env.idmef_db.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
             idmef = self._fetchMessage(ident)
             delete_criteria = delete_base_criteria + [ "alert.create_time >= '%s'" % time_min.toYMDHMS(),
                                                        "alert.create_time <= '%s'" % time_max.toYMDHMS() ]
@@ -752,7 +746,7 @@ class AlertListing(MessageListing, view.View):
         selection = [ "%s/group_by" % path for path in aggregated_on ] + \
                     [ "count(alert.create_time)", "max(alert.create_time)/order_desc" ]
 
-        results = self.env.prelude.getValues(selection, criteria)
+        results = self.env.idmef_db.getValues(selection, criteria)
         total_results = len(results)
 
         for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
@@ -771,13 +765,13 @@ class AlertListing(MessageListing, view.View):
                 criteria2.append(criterion)
                 delete_criteria.append(criterion)
 
-            time_min = self.env.prelude.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
-            time_max = self.env.prelude.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
+            time_min = self.env.idmef_db.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
+            time_max = self.env.idmef_db.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
             
             delete_criteria.append("alert.create_time >= '%s'" % time_min.toYMDHMS())
             delete_criteria.append("alert.create_time <= '%s'" % time_max.toYMDHMS())
 
-            for ident in self.env.prelude.getAlertIdents(criteria2, limit=1):
+            for ident in self.env.idmef_db.getAlertIdents(criteria2, limit=1):
                 message = self._fetchMessage(ident)
 
                 dataset = {
@@ -793,7 +787,7 @@ class AlertListing(MessageListing, view.View):
                 dataset["time_max"] = self._createTimeField(time_max)
                 dataset["time_min"] = self._createTimeField(time_min)
 
-                results = self.env.prelude.getValues(["alert.classification.text/group_by",
+                results = self.env.idmef_db.getValues(["alert.classification.text/group_by",
                                                       "alert.assessment.impact.severity/group_by",
                                                       "alert.assessment.impact.completion/group_by",
                                                       "count(alert.classification.text)"], criteria2)
@@ -834,8 +828,8 @@ class AlertListing(MessageListing, view.View):
                                 criteria3.append("%s == '%s'" % (path, value))
                             else:
                                 criteria3.append("! %s" % path)
-                        
-                        ident = self.env.prelude.getAlertIdents(criteria3, limit=1)[0]
+
+                        ident = self.env.idmef_db.getAlertIdents(criteria3, limit=1)[0]
 
                         display = self._createMessageLink(ident, "alert_summary")
                     else:
@@ -886,12 +880,12 @@ class AlertListing(MessageListing, view.View):
                 else:
                     criteria.append("! %s" % path)
 
-        for ident in self.env.prelude.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
-            message = self.env.prelude.getAlert(ident)
+        for ident in self.env.idmef_db.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
+            message = self.env.idmef_db.getAlert(ident)
             dataset = self._setMessage(message, ident)
             self.dataset["messages"].append(dataset)
 
-        return self.env.prelude.countAlerts(criteria)
+        return self.env.idmef_db.countAlerts(criteria)
             
     def _setDatasetConstants(self):
         self.dataset["available_aggregations"] = { }
@@ -911,13 +905,13 @@ class AlertListing(MessageListing, view.View):
         self._deleteMessages()
         
         self._setDatasetConstants()
-        self.dataset["filters"] = self.env.storage.getAlertFilters(self.user.login)
+        self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
         self.dataset["current_filter"] = self.parameters.get("filter", "")
         
         criteria = [ ]
         
         if self.parameters.has_key("filter"):
-            filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter"])
+            filter = self.env.db.getAlertFilter(self.user.login, self.parameters["filter"])
             criteria.append("(%s)" % str(filter))
 
         self._applyFilters(criteria)
@@ -959,19 +953,19 @@ class HeartbeatListing(MessageListing, view.View):
     details_view = "heartbeat_details"
 
     def _getMessageIdents(self, criteria, limit=-1, offset=-1):
-        return self.env.prelude.getHeartbeatIdents(criteria, limit, offset)
+        return self.env.idmef_db.getHeartbeatIdents(criteria, limit, offset)
 
     def _countMessages(self, criteria):
-        return self.env.prelude.countHeartbeats(criteria)
+        return self.env.idmef_db.countHeartbeats(criteria)
 
     def _fetchMessage(self, ident):
-        return self.env.prelude.getHeartbeat(ident)
+        return self.env.idmef_db.getHeartbeat(ident)
 
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
         
-        for ident in self.env.prelude.getHeartbeatIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
-            message = self.env.prelude.getHeartbeat(ident)
+        for ident in self.env.idmef_db.getHeartbeatIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
+            message = self.env.idmef_db.getHeartbeat(ident)
             dataset = self._setMessage(message, ident)
             self.dataset["messages"].append(dataset)
 
@@ -1012,7 +1006,7 @@ class HeartbeatListing(MessageListing, view.View):
                     filter_found = True
         
     def _deleteMessage(self, ident):
-        self.env.prelude.deleteHeartbeat(ident)
+        self.env.idmef_db.deleteHeartbeat(ident)
 
     def render(self):
         self._deleteMessages()
@@ -1029,7 +1023,7 @@ class HeartbeatListing(MessageListing, view.View):
         self._setTimeline(start, end)
         self._setNavPrev(self.parameters["offset"])
 
-        count = self.env.prelude.countHeartbeats(criteria and " && ".join(criteria) or None)
+        count = self.env.idmef_db.countHeartbeats(criteria and " && ".join(criteria) or None)
 
         self._setMessages(criteria)
 
@@ -1060,7 +1054,7 @@ class SensorAlertListing(AlertListing, view.View):
 
     def render(self):
         AlertListing.render(self)
-        self.dataset["analyzer_infos"] = self.env.prelude.getAnalyzer(self.parameters["analyzerid"])
+        self.dataset["analyzer_infos"] = self.env.idmef_db.getAnalyzer(self.parameters["analyzerid"])
 
 
 
@@ -1079,4 +1073,4 @@ class SensorHeartbeatListing(HeartbeatListing, view.View):
 
     def render(self):
         HeartbeatListing.render(self)
-        self.dataset["analyzer"] = self.env.prelude.getAnalyzer(self.parameters["analyzerid"])
+        self.dataset["analyzer"] = self.env.idmef_db.getAnalyzer(self.parameters["analyzerid"])

@@ -24,7 +24,7 @@ import random
 
 from prewikka.Error import PrewikkaError, SimpleError
 from prewikka import DataSet
-from prewikka import Storage
+from prewikka import Database
 from prewikka import Log
 from prewikka import User
 
@@ -40,23 +40,19 @@ class AuthError(PrewikkaError):
 
 class Auth:
     def __init__(self, env):
-        if not env.storage:
-            raise Exception("You must have a storage backend in order to use authentication.")
-        self.storage = env.storage
+        self.db = env.db
         self.log = env.log
         
-        users = self.storage.getUsers()
-        
         has_user_manager = False
-        for login in users:
-            user = self.storage.getUser(login)
+        for login in self.db.getUserLogins():
+            user = self.db.getUser(login)
             if User.PERM_USER_MANAGEMENT in user.permissions:
                 has_user_manager = True
                 break
             
         if not has_user_manager:
-            self.storage.createUser(User.ADMIN_LOGIN)
-            self.storage.setPermissions(User.ADMIN_LOGIN, User.ALL_PERMISSIONS)
+            self.db.createUser(User.ADMIN_LOGIN)
+            self.db.setPermissions(User.ADMIN_LOGIN, User.ALL_PERMISSIONS)
         
     def canSetPassword(self):
         return hasattr(self, "setPassword")
@@ -77,32 +73,32 @@ class Session:
         sessionid = request.input_cookie["sessionid"].value
 
         try:
-            login, t = self.storage.getSession(sessionid)
-        except Storage.StorageError:
+            login, t = self.db.getSession(sessionid)
+        except Database.DatabaseInvalidSessionError:
             self.log(Log.EVENT_INVALID_SESSIONID, request)
             raise AuthError("invalid sessionid", request.arguments)
 
         now = int(time.time())
 
         if now > t + self._expiration:
-            self.storage.deleteSession(sessionid)
+            self.db.deleteSession(sessionid)
             self.log(Log.EVENT_SESSION_EXPIRED, request)
             raise AuthError("session expired", request.arguments)
 
-        self.storage.createSession(sessionid, login, now)
+        self.db.updateSession(sessionid, now)
 
         return login
 
     def createSession(self, request, login):
         t = int(time.time())
-        self.storage.deleteExpiredSessions(t - self._expiration)
+        self.db.deleteExpiredSessions(t - self._expiration)
         sessionid = md5.new(str(t * random.random())).hexdigest()
-        self.storage.createSession(sessionid, login, t)
+        self.db.createSession(sessionid, login, t)
         request.output_cookie["sessionid"] = sessionid
         request.output_cookie["sessionid"]["expires"] = self._expiration
 
     def deleteSession(self, request):
-        self.storage.deleteSession(request.input_cookie["sessionid"].value)
+        self.db.deleteSession(request.input_cookie["sessionid"].value)
 
 
 

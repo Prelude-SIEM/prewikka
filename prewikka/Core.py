@@ -25,7 +25,7 @@ import distutils.spawn
 
 import copy
 
-from prewikka import Config, Log, Prelude, ParametersNormalizer, User, \
+from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer, User, \
      DataSet, Error, utils
 
 
@@ -47,9 +47,9 @@ class Core:
         class Env: pass
         self._env = Env()
         self._env.config = Config.Config()
-        self._env.prelude = Prelude.Prelude(self._env.config.prelude)
+        self._env.db = Database.Database(self._env.config.database)
+        self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
         self._env.auth = None
-        self._env.storage = None
         self._env.log = Log.Log()
         self._initHostCommands()
         self._loadViews()
@@ -99,18 +99,11 @@ class Core:
     def _loadModules(self):
         config = self._env.config
 
-        if config.storage:
-            self._env.storage = self._loadModule("storage", config.storage.name, config.storage)
-
         if config.auth:
             self._env.auth = self._loadModule("auth", config.auth.name, config.auth)
         
         for backend in config.logs:
             self._env.log.registerBackend(self._loadModule("log", backend.name, backend))
-
-##         for content in config.contents:
-##             self._contents[content.name] = self._loadModule("content", content.name, content)
-##             self._content_names.append(content.name)
 
     def _setupView(self, view, request, parameters, user):
         object = view["object"]
@@ -232,9 +225,7 @@ class Core:
     def checkAuth(self, request):
         if self._env.auth:
             login = self._env.auth.getLogin(request)
-            permissions = self._env.storage and \
-                          self._env.storage.getPermissions(login) or \
-                          User.ALL_PERMISSIONS
+            permissions = self._env.db.getPermissions(login)
         else:
             login = "anonymous"
             permissions = User.ALL_PERMISSIONS
@@ -255,10 +246,10 @@ class Core:
 
             self._env.log(Log.EVENT_RENDER_VIEW, request, view, user)
 
-            #try:
-            getattr(view["object"], view["handler"])()
-            #except (Prelude.PreludeError, Prelude.PreludeDBError), e:
-            #raise Error.SimpleError("prelude internal error", str(e))
+            try:
+                getattr(view["object"], view["handler"])()
+            except (Prelude.PreludeError, Prelude.PreludeDBError), e:
+                raise Error.SimpleError("prelude internal error", str(e))
 
             dataset = view["object"].dataset
             template_name = view["template"]
