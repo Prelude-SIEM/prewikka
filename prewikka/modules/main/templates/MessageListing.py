@@ -25,9 +25,9 @@ from prewikka import PyTpl
 from prewikka.templates import Table
 
 
-class MessageList(PyTpl.Template):
-    def setMessageList(self, content):
-        self.MESSAGE_LIST = content
+class MessageListing(PyTpl.Template):
+    def setMessageListing(self, content):
+        self.MESSAGE_LISTING = content
         
     def setTimelineValue(self, value):        
         self.TIMELINE_VALUE = value

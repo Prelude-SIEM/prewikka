@@ -39,6 +39,6 @@
 <!-- BEGIN delete_hidden -->
 <input type="hidden" name="{NAME}" value="{VALUE}"/>
 <!-- END delete_hidden -->
-{MESSAGE_LIST}
+{MESSAGE_LISTING}
 </form>
 </div>

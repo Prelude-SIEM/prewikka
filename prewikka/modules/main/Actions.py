@@ -22,7 +22,7 @@ import time
 import copy
 
 from prewikka import Interface
-from prewikka.modules.main import View, ActionParameters
+from prewikka.modules.main import Views, ActionParameters
 
 
 class _MyTime:
@@ -147,7 +147,7 @@ class AlertListing(MessageListing):
         alerts.sort(lambda a1, a2: int(a2["detect_time"]) - int(a1["detect_time"]))
 
     def _getView(self):
-        return View.AlertListing
+        return Views.AlertListingView
 
 
 
@@ -165,7 +165,7 @@ class HeartbeatListing(MessageListing):
         heartbeats.sort(lambda hb1, hb2: int(hb2["create_time"]) - int(hb1["create_time"]))
         
     def _getView(self):
-        return View.HeartbeatListing
+        return Views.HeartbeatListingView
 
 
 
@@ -183,24 +183,24 @@ class HeartbeatAction(Interface.Action):
 
 class AlertSummary(AlertAction):
     def process(self, core, parameters):
-        return View.AlertSummary, self._getAlert(core, parameters)
+        return Views.AlertSummary, self._getAlert(core, parameters)
 
 
 class HeartbeatSummary(HeartbeatAction):
     def process(self, core, parameters):
-        return View.HeartbeatSummary, self._getHeartbeat(core, parameters)
+        return Views.HeartbeatSummary, self._getHeartbeat(core, parameters)
 
 
 
 class AlertDetails(AlertAction):
     def process(self, core, parameters):
-        return View.AlertDetails, self._getAlert(core, parameters)
+        return Views.AlertDetails, self._getAlert(core, parameters)
 
 
 
 class HeartbeatDetails(HeartbeatAction):
     def process(self, core, parameters):
-        return View.HeartbeatDetails, self._getHeartbeat(core, parameters)
+        return Views.HeartbeatDetailsView, self._getHeartbeat(core, parameters)
 
 
 

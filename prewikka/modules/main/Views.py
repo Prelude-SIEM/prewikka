@@ -25,7 +25,7 @@ import copy
 from prewikka import Views
 from prewikka.modules.main import ActionParameters
 from prewikka.templates import Table
-from prewikka.modules.main.templates import MessageList, MessageSummary, MessageDetails
+from prewikka.modules.main.templates import MessageListing, MessageSummary, MessageDetails
 
 def Actions():
     # workaround: we cannot do a simple "from modules.main import Actions" statement
@@ -55,7 +55,7 @@ class HeartbeatsSection(Views.NormalView):
 
 
 
-class MessageListing:
+class MessageListingView:
     def _createLinkTag(self, action, parameters, name, class_=""):
         return "<a class='%s' href='%s'>%s</a>" % (class_, self.createLink(action, parameters), name)
     
@@ -79,7 +79,7 @@ class MessageListing:
             parameters = copy.copy(self._data["parameters"])
             parameters.setFilterName(filter_name)
             parameters.setFilterValue(value)
-            field = self._createLinkTag(self._getMessageListAction(), parameters, value, class_)
+            field = self._createLinkTag(self._getMessageListingAction(), parameters, value, class_)
         else:
             field = "n/a"
             
@@ -101,7 +101,7 @@ class MessageListing:
 
     def _buildEdition(self, template):
         # build step form
-        template.addHidden("action", self._getMessageListAction().getId())
+        template.addHidden("action", self._getMessageListingAction().getId())
         for key in self._data["parameters"].getNames(ignore=("timeline_value", "timeline_unit")):
             template.addHidden(key, self._data["parameters"][key])
         template.setTimelineValue(self._data["parameters"].getTimelineValue() or 1)
@@ -117,17 +117,17 @@ class MessageListing:
         parameters = copy.copy(self._data["parameters"])
         if parameters.getTimelineEnd():
             del parameters["timeline_end"]
-        template.setCurrent(self.createLink(self._getMessageListAction(), parameters))
+        template.setCurrent(self.createLink(self._getMessageListingAction(), parameters))
         
         # build "next" link
         parameters.setTimelineEnd(int(self._data["next"]))
-        template.setNext(self.createLink(self._getMessageListAction(), parameters))
+        template.setNext(self.createLink(self._getMessageListingAction(), parameters))
         
         # build "prev" link
         parameters.setTimelineEnd(int(self._data["prev"]))
-        template.setPrev(self.createLink(self._getMessageListAction(), parameters))
+        template.setPrev(self.createLink(self._getMessageListingAction(), parameters))
         
-    def _buildMessageList(self, template):
+    def _buildMessageListing(self, template):
         messages = self._data["messages"]
         table = Table.Table()
         footer = [ "" ] * 8
@@ -141,7 +141,8 @@ class MessageListing:
             filter_name = parameters["filter_name"]
             del parameters["filter_name"]
             del parameters["filter_value"]
-            footer[self.FILTERS.index(filter_name)] = self._createLinkTag(self._getMessageListAction(), parameters, "del filter")
+            footer[self.FILTERS.index(filter_name)] = self._createLinkTag(self._getMessageListingAction(), parameters,
+                                                                          "del filter")
             
         template.addDeleteHidden("action", self._getDeleteAction().getId())
         parameters = self._data["parameters"]
@@ -151,23 +152,23 @@ class MessageListing:
         footer[-1] = "<input type='submit' value='delete'/>"
         table.setFooter(footer)
         
-        template.setMessageList(str(table))
+        template.setMessageListing(str(table))
         
     def build(self):
-        template = MessageList.MessageList()
+        template = MessageListing.MessageListing()
         self._buildEdition(template)
-        self._buildMessageList(template)
+        self._buildMessageListing(template)
         self.setMainContent(str(template))
 
 
 
-class AlertListing(MessageListing, AlertsSection):
+class AlertListingView(MessageListingView, AlertsSection):
     ROOT = "alert"
     HEADER = "Classification", "Source", "Target", "Sensor", "Time"
     FILTERS = [ "alert.classification.name", "alert.source.node.address.address", "alert.target.node.address.address",
                 "alert.analyzer.model" ]
     
-    def _getMessageListAction(self):
+    def _getMessageListingAction(self):
         return Actions().AlertListing()
     
     def _getDeleteAction(self):
@@ -190,13 +191,13 @@ class AlertListing(MessageListing, AlertsSection):
 
 
 
-class HeartbeatListing(MessageListing, HeartbeatsSection):
+class HeartbeatListingView(MessageListingView, HeartbeatsSection):
     ROOT = "heartbeat"
     HEADER = "Analyzerid", "Address", "Name", "Type", "Time"
     FILTERS = [ "heartbeat.analyzer.analyzerid", "heartbeat.analyzer.node.address.address", "heartbeat.analyzer.node.name",
                 "heartbeat.analyzer.model", "heartbeat.create_time" ]
 
-    def _getMessageListAction(self):
+    def _getMessageListingAction(self):
         return Actions().HeartbeatListing()
 
     def _getDeleteAction(self):
@@ -218,24 +219,24 @@ class HeartbeatListing(MessageListing, HeartbeatsSection):
 
 
 
-class AlertSummary(AlertsSection):
+class AlertSummaryView(AlertsSection):
     def build(self):
         self.setMainContent(MessageSummary.AlertSummary(self._data))
 
 
 
-class HeartbeatSummary(HeartbeatsSection):
+class HeartbeatSummaryView(HeartbeatsSection):
     def build(self):
         self.setMainContent(MessageSummary.HeartbeatSummary(self._data))
 
 
 
-class AlertDetails(AlertsSection):
+class AlertDetailsView(AlertsSection):
     def build(self):
         self.setMainContent(MessageDetails.AlertDetails(self._data))
 
 
 
-class HeartbeatDetails(HeartbeatsSection):
+class HeartbeatDetailsView(HeartbeatsSection):
     def build(self):
         self.setMainContent(MessageDetails.HeartbeatDetails(self._data))

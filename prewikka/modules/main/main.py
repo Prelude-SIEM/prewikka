@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka.modules.main import ActionParameters, Actions, View
+from prewikka.modules.main import ActionParameters, Actions
 
 def load(core, config):
     # Alerts
