@@ -539,7 +539,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
             if not url:
                 continue
             
-            urls.append("<a href='%s'>%s:%s</a>" % (url, orgin, name))
+            urls.append("<a href='%s'>%s:%s</a>" % (url, origin, name))
 
             cnt += 1
 
