@@ -88,9 +88,9 @@ class Chart:
         figure(figsize=(7,7))
         total = float(reduce(lambda x, y: x + y, self._values))
         values = [ ]
-        i = 0
         for value in self._values:
             if value / total < 0.007 and len(self._values) - len(values):
+                values.append(reduce(lambda x, y: x + y, self._values[len(values):]))
                 break
             values.append(value)
         colors = get_color_gradient(len(values))
