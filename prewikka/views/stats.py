@@ -26,6 +26,24 @@ matplotlib.use("Agg")
 from pylab import *
 
 
+GRADIENT_COLOR_START = (17.0/255, 17.0/255, 191.0/255)
+GRADIENT_COLOR_END = (209.0/255, 209.0/255, 209.0/255)
+
+
+def get_color_gradient(steps):
+    colors = [ GRADIENT_COLOR_START ]
+    if steps == 1:
+        return colors
+    step = [ (e - s) / (steps - 1) for e, s in zip(GRADIENT_COLOR_END, GRADIENT_COLOR_START) ]
+    prev = GRADIENT_COLOR_START
+    for i in range(steps - 1):
+        new = [ x + s for x, s in zip(prev, step) ]
+        colors.append(new)
+        prev = new
+
+    return colors
+
+
 class Chart:
     def __init__(self, filename):
         self._filename = "img/generated/" + filename
@@ -69,22 +87,27 @@ class Chart:
     def renderPie(self):
         figure(figsize=(7,7))
         total = float(reduce(lambda x, y: x + y, self._values))
-        explode = map(lambda x: (0,0.05)[x / total > 0.2], self._values)
-        patches, texts, autotexts = pie(self._values, labels=self._labels, autopct=lambda x: "", shadow=True)
-##         for autotext, value in zip(autotexts, self._values):
-##             autotext.set_text("%d (%.1f%%)" % (value, value / total * 100))
+        values = [ ]
+        i = 0
+        for value in self._values:
+            if value / total < 0.007 and len(self._values) - len(values):
+                break
+            values.append(value)
+        colors = get_color_gradient(len(values))
+        patches, texts, autotexts = pie(values, labels=self._labels[:len(values)], colors=colors, autopct=lambda x: "", shadow=True)
         for text in texts:
             text.set_text("")
-        l = legend([ "%s: %d (%.1f%%)" % (label, value, value / total * 100) for label, value in zip(self._labels, self._values) ],
-                   loc=(0,0), shadow=True)
+        labels = [ "%s: %d (%.1f%%)" % (label, value, value / total * 100) for label, value in zip(self._labels, self._values) ]
+        l = legend(labels, loc=(0,0), shadow=True)
+        i = 0
+        for patch in l.get_patches():
+            if i < len(values):
+                color = colors[i]
+            else:
+                color = colors[-1]
+            patch.set_fc(color)
+            i += 1
         l.set_alpha(0.75)
-##         content = [ ]
-##         for value in self._values:
-##             content.append((str(value), "%.1f%%" % (value / total * 100)))
-##         t = table(cellText=content, rowLabels=self._labels, colLabels=("Count", "Percent"))
-##         t.set_fontsize(10)
-##         for col in range(3):
-##             t.auto_set_column_width(col)
         self._render()
 
     def _setYticks(self):
