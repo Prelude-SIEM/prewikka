@@ -17,11 +17,12 @@
 # along with this program; see the file COPYING.  If not, write to
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
+import time
 
 from prelude import *
 from preludedb import *
 
-from prewikka.utils import escape_html_string
+from prewikka.utils import escape_html_string, time_to_ymdhms
 
 
 
@@ -48,15 +49,18 @@ class IDMEFTime(object):
     def __float__(self):
         return float(idmef_time_get_sec(self._res)) + float(idmef_time_get_usec(self._res)) / 10 ** 6
 
+    def toYMDHMS(self):
+        return time_to_ymdhms(time.localtime(idmef_time_get_sec(self._res)))
+
     def __getattribute__(self, name):
         if name is "sec":
-            return idmef_time_get_sec(self.res)
+            return idmef_time_get_sec(self._res)
 
         if name is "usec":
-            return idmef_time_get_usec(self.res)
+            return idmef_time_get_usec(self._res)
 
         if name is "gmt_offset":
-            return idmef_time_get_gmt_offset(self.res)
+            return idmef_time_get_gmt_offset(self._res)
 
         return object.__getattribute__(self, name)
 

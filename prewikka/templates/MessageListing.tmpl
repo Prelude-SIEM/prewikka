@@ -30,9 +30,7 @@ $message_listing_header
         <tr class='$row_classes[$cnt%2]'>
           $message_fields
           <td class='static_content_column'>
-          #if $delete_enabled
-            <input type='checkbox' name='idents' value='$message.ident'/>
-          #end if
+            <input type='checkbox' name='delete' value='$message.delete'/>
           </td>
         </tr>
         #set $cnt += 1
@@ -41,9 +39,7 @@ $message_listing_header
     <tfoot>
     </tfoot>
   </table>
-  #if $delete_enabled
-    <div align="right"><input type='submit' value='delete'/></div>
-  #end if
+  <div align="right"><input type='submit' value='delete'/></div>
 #end block main_content
 
 

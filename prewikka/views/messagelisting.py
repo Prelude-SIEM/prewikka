@@ -19,6 +19,7 @@
 
 
 import os.path
+import urllib
 import time
 import copy
 
@@ -89,7 +90,7 @@ class MessageListingParameters(view.Parameters):
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50)
         self.optional("timezone", str, "frontend_localtime")
-        self.optional("idents", list, [])
+        self.optional("delete", list, [ ])
         # submit with an image passes the x and y coordinate values
         # where the image was clicked
         self.optional("x", int)
@@ -104,17 +105,6 @@ class MessageListingParameters(view.Parameters):
             
         if not self["timezone"] in ("frontend_localtime", "sensor_localtime", "utc"):
             raise view.InvalidValueError("timezone", self["timezone"])
-        
-        idents = [ ]
-        for ident in self["idents"]:
-            try:
-                analyzerid, message_ident = map(lambda x: long(x), ident.split(":"))
-            except ValueError:
-                raise view.InvalidParameterValueError("idents", self["idents"])
-            
-            idents.append((analyzerid, message_ident))
-
-        self["idents"] = idents
 
         # remove the bulshit
         try:
@@ -207,6 +197,9 @@ class SensorHeartbeatListingParameters(HeartbeatListingParameters):
 
 
 class MessageListing:
+    def _adjustCriteria(self, criteria):
+        pass
+    
     def _setHiddenParameters(self):
         self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
         if self.parameters.has_key("timeline_end"):
@@ -358,17 +351,22 @@ class MessageListing:
             self.dataset["messages"].append(dataset)
 
     def _deleteMessages(self):
-        if len(self.parameters["idents"]) == 0:
+        if len(self.parameters["delete"]) == 0:
             return
-
-        idents = self.parameters["idents"]
-        del self.parameters["idents"]
-        
         if not self.user.has(User.PERM_IDMEF_ALTER):
             raise User.PermissionDeniedError(user.login, self.current_view)
 
-        for analyzerid, messageid in self.parameters["idents"]:
-            self._deleteMessage(analyzerid, messageid)
+        for delete in self.parameters["delete"]:
+            if delete.isdigit():
+                idents = [ delete ]
+            else:
+                criteria = urllib.unquote_plus(delete)
+                idents = self._getMessageIdents(criteria)
+
+            for ident in idents:
+                self._deleteMessage(long(ident))
+        
+        del self.parameters["delete"]
 
 
 
@@ -388,10 +386,7 @@ class AlertListing(MessageListing, view.View):
     def init(self, env):
         self._max_aggregated_classifications = int(env.config.general.getOptionValue("max_aggregated_classifications", 10))
 
-    def _adjustCriteria(self, criteria):
-        pass
-
-    def _getMessageIdents(self, criteria, limit, offset):
+    def _getMessageIdents(self, criteria, limit=-1, offset=-1):
         return self.env.prelude.getAlertIdents(criteria, limit, offset)
 
     def _countMessages(self, criteria):
@@ -543,7 +538,6 @@ class AlertListing(MessageListing, view.View):
         dataset["sensor_node_name"] = { "value": message["alert.analyzer.node.name"] }
         
     def _setMessageCommon(self, dataset, message):
-
         self._setMessageSource(dataset, message)
         self._setMessageTarget(dataset, message)
         self._setMessageSensor(dataset, message)
@@ -559,7 +553,7 @@ class AlertListing(MessageListing, view.View):
     def _setMessage(self, message, ident):
         dataset = {
             "aggregated": False,
-            "ident": ident,
+            "delete": ident,
             }
 
         self._setMessageCommon(dataset, message)
@@ -574,8 +568,8 @@ class AlertListing(MessageListing, view.View):
     def _getFilter(self, storage, login, name):
         return storage.getAlertFilter(login, name)
 
-    def _deleteMessage(self, analyzerid, messageid):
-        self.env.prelude.deleteAlert(analyzerid, messageid)
+    def _deleteMessage(self, ident):
+        self.env.prelude.deleteAlert(ident)
 
     def _applySimpleFilter(self, criteria, column, object):
         if len(self.parameters[object]) > 0:
@@ -651,11 +645,14 @@ class AlertListing(MessageListing, view.View):
         aggregated_values = self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]
 
         criteria = criteria[:]
+        delete_base_criteria = [ ]
         for path, value in zip(aggregate_on, aggregated_values):
             if value:
-                criteria.append("%s == '%s'" % (path, value))
+                criterion = "%s == '%s'" % (path, value)
             else:
-                criteria.append("! %s" % path)
+                criterion = "! %s" % path
+            criteria.append(criterion)
+            delete_base_criteria.append(criterion)
         
         results = self.env.prelude.getValues(["alert.classification.text/group_by",
                                               "alert.assessment.impact.severity/group_by",
@@ -668,10 +665,13 @@ class AlertListing(MessageListing, view.View):
         for classification, severity, completion, time_min, time_max, count in results:
             ident = self.env.prelude.getAlertIdents(criteria + [ "alert.classification.text == '%s'" % classification ], limit=1)[0]
             idmef = self._fetchMessage(ident)
+            delete_base_criteria = delete_base_criteria + [ "alert.create_time >= '%s'" % time_min.toYMDHMS(),
+                                                            "alert.create_time <= '%s'" % time_max.toYMDHMS() ]
             message = {
                 "aggregated": True,
                 "time_min": self._createTimeField(time_min),
                 "time_max": self._createTimeField(time_max),
+                "delete": urllib.quote_plus(" && ".join(delete_criteria)),
                 "aggregated_classifications_hidden": 0
                 }
             self.dataset["messages"].append(message)
@@ -735,17 +735,25 @@ class AlertListing(MessageListing, view.View):
             time_max, time_min, aggregated_count = values[-3:]
 
             criteria2 = criteria[:]
+            delete_criteria = [ ]
             for path, value in zip(aggregated_on, values[:-3]):
                 if value:
-                    criteria2.append("%s == '%s'" % (path, value))
+                    criterion = "%s == '%s'" % (path, value)
                 else:
-                    criteria2.append("! %s" % path)
+                    criterion = "! %s" % path
+
+                criteria2.append(criterion)
+                delete_criteria.append(criterion)
+
+            delete_criteria.append("alert.create_time >= '%s'" % time_min.toYMDHMS())
+            delete_criteria.append("alert.create_time <= '%s'" % time_max.toYMDHMS())
 
             for ident in self.env.prelude.getAlertIdents(criteria2, limit=1):
                 message = self._fetchMessage(ident)
 
                 dataset = {
                     "aggregated": True,
+                    "delete": urllib.quote_plus(" && ".join(delete_criteria)),
                     "count": aggregated_count,
                     "infos": [ ]
                     }
@@ -921,7 +929,7 @@ class HeartbeatListing(MessageListing, view.View):
     summary_view = "heartbeat_summary"
     details_view = "heartbeat_details"
 
-    def _getMessageIdents(self, criteria, limit, offset):
+    def _getMessageIdents(self, criteria, limit=-1, offset=-1):
         return self.env.prelude.getHeartbeatIdents(criteria, limit, offset)
 
     def _countMessages(self, criteria):
@@ -941,7 +949,7 @@ class HeartbeatListing(MessageListing, view.View):
     def _setMessage(self, message, ident):
         dataset = { }
         
-        dataset["ident"] = { "value": ident }
+        dataset["delete"] = ident
         dataset["summary"] = self._createMessageLink(ident, "heartbeat_summary")
         dataset["details"] = self._createMessageLink(ident, "heartbeat_details")
         dataset["agent"] = self._createInlineFilteredField("heartbeat.analyzer.name",
@@ -967,8 +975,8 @@ class HeartbeatListing(MessageListing, view.View):
                     self.dataset[path + "_filtered"] = True
                     filter_found = True
         
-    def _deleteMessage(self, analyzerid, messageid):
-        self.env.prelude.deleteHeartbeat(analyzerid, messageid)
+    def _deleteMessage(self, ident):
+        self.env.prelude.deleteHeartbeat(ident)
 
     def render(self):
         self._deleteMessages()
