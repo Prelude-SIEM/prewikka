@@ -515,8 +515,9 @@ thead {
 	background-color: white;
 }
 
-.hearbeat_analyze thead {
+.hearbeat_analyze {
 	font-size: 120%;
+	width: 100%;
 }
 
 .heartbeat_analyze_sensor_status_normal_offline {
