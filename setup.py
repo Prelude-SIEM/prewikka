@@ -20,9 +20,11 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import sys
-import os.path
+import os, os.path
+import stat
 import glob
 
+from distutils.dist import Distribution
 from distutils.core import setup
 from distutils.command.build import build
 from distutils.command.build_py import build_py
@@ -55,17 +57,51 @@ class my_build_py(build_py):
 
 
 
+class MyDistribution(Distribution):
+    def __init__(self, attrs):
+        self.conf_files = [ ]
+        Distribution.__init__(self, attrs)
+
+
+
 class my_install(install):
+    def finalize_options(self):
+        ### if no prefix is given, configuration should go to /etc or in {prefix}/etc otherwise
+        if self.prefix:
+            self.conf_prefix = self.prefix + "/etc/prewikka"
+        else:
+            self.conf_prefix = "/etc/prewikka"
+
+        install.finalize_options(self)
+
+    def install_conf(self):
+        self.mkpath(self.conf_prefix)
+        for file in self.distribution.conf_files:
+            dest = self.conf_prefix + "/" + os.path.basename(file)
+            if os.path.exists(dest):
+                dest += "-dist"
+            self.copy_file(file, dest)
+            
+    def init_siteconfig(self):
+        config = open("prewikka/siteconfig.py", "w")
+        print >> config, "htdocs = '%s'" % (self.prefix + "/share/prewikka/htdocs/")
+        print >> config, "database = '%s'" % (self.prefix + "/share/prewikka/database/")
+        print >> config, "conf = '%s'" % (self.conf_prefix + "/")
+        config.close()
+        
     def run(self):
-        site = os.path.abspath(self.prefix + "/share/prewikka/site") + "/"
-        database = os.path.abspath(self.prefix + "/share/prewikka/database") + "/"
-        conf = os.path.abspath(self.prefix + "/share/prewikka/conf") + "/"
-        f = open("prewikka/siteconfig.py", "w")
-        print >> f, "site = '%s'" % site
-        print >> f, "database = '%s'" % database
-        print >> f, "conf = '%s'" % conf
-        f.close()
+        self.install_conf()
+        self.init_siteconfig()
         install.run(self)
+        if not self.dry_run:
+            for filename in self.get_outputs():
+                if filename.find(".conf"):
+                    continue
+                mode = os.stat(filename)[stat.ST_MODE]
+                mode |= 044
+                if mode & 0100:
+                    mode |= 011
+                os.chmod(filename, mode)
 
 
 
@@ -75,13 +111,13 @@ setup(name="Prewikka",
                  'prewikka.modules',
                  'prewikka.modules.log', 'prewikka.modules.log.stderr',
                  'prewikka.modules.auth', 'prewikka.modules.auth.loginpassword' ],
-      data_files=[ ("share/prewikka/site", [ "index.py" ]),
-                   ("share/prewikka/site/images", glob.glob("images/*.gif") + glob.glob("images/*.png")),
-                   ("share/prewikka/site/css", glob.glob("css/*.css")),
-                   ("share/prewikka/site/js", glob.glob("js/*.js")),
-                   ("share/prewikka/database", glob.glob("*.sql")),
-                   ("share/prewikka/conf", glob.glob("*.conf")) ],
-      scripts=[ "prewikka-httpd.py" ],
+      data_files=[ ("share/prewikka/cgi-bin", [ "cgi-bin/prewikka.cgi" ]),
+                   ("share/prewikka/htdocs/images", glob.glob("htdocs/images/*.gif") + glob.glob("htdocs/images/*.png")),
+                   ("share/prewikka/htdocs/css", glob.glob("htdocs/css/*.css")),
+                   ("share/prewikka/htdocs/js", glob.glob("htdocs/js/*.js")),
+                   ("share/prewikka/database", glob.glob("database/*.sql")) ],
+      scripts=[ "scripts/prewikka-httpd.py" ],
+      conf_files=[ "conf/prewikka.conf" ],
       cmdclass={ 'build_py': my_build_py,
-                 'install': my_install })
-      
+                 'install': my_install },
+      distclass=MyDistribution)

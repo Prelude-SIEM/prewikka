@@ -1,8 +1,9 @@
-include *.sql
-include *.py
-include images/*
-include css/*.css
-include js/*.js
+include database/*.sql
+include cgi-bin/*.cgi
+include scripts/*.py
+include htdocs/images/*
+include htdocs/css/*.css
+include htdocs/js/*.js
 include prewikka.conf
 include *.py
 recursive-include prewikka *.py *.tmpl
