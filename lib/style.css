@@ -110,12 +110,6 @@
 /* END TopMenu Style */
 
 #top_view  {
-	border-top: 4px;
-	border-right: 0;
-	border-left: 0;
-	border-bottom: 0;
-	border-style: solid;
-	border-color: #D2312A;
 }
 
 
@@ -164,6 +158,12 @@ body {
 	padding-right: 10px;
 	padding-bottom: 10px;
 	background: #4D535C;
+        border-top: 4px;
+        border-right: 0;
+        border-left: 0;
+        border-bottom: 0;
+        border-style: solid;
+        border-color: #D2312A;
 }
 
 #top_view_header_software, #top_view_header_title, #top_view_header_place {
