@@ -482,11 +482,12 @@ class AlertListing(MessageListing, view.View):
         dataset["classification"] = self._createInlineFilteredField("alert.classification.text",
                                                                     message["alert.classification.text"])
 
-    def _setMessageInfo(self, dataset, message):
+    def _setMessageInfo(self, dataset, message, ident):
         dataset["infos"] = [ { } ]
         dataset = dataset["infos"][0]
 
-        dataset["count"] = 0
+        dataset["count"] = 1
+        dataset["display"] = self._createMessageLink(ident, "alert_summary")
         dataset["severity"] = { "value": message.get("alert.assessment.impact.severity", "low") }
         dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
         self._setMessageClassification(dataset, message)
@@ -511,7 +512,6 @@ class AlertListing(MessageListing, view.View):
         dataset["sensor_node_name"] = { "value": message["alert.analyzer.node.name"] }
         
     def _setMessageCommon(self, dataset, message):
-
         self._setMessageSource(dataset, message)
         self._setMessageTarget(dataset, message)
         self._setMessageSensor(dataset, message)
@@ -524,11 +524,17 @@ class AlertListing(MessageListing, view.View):
 	else:
 	    dataset["analyzer_time"] = { "value": None }
 
-    def _setMessage(self, dataset, message):
-        dataset["aggregated"] = False
+    def _setMessage(self, message, ident):
+        dataset = {
+            "aggregated": False,
+            "ident": ident,
+            }
+
         self._setMessageCommon(dataset, message)
         self._setMessageTime(dataset, message)
-        self._setMessageInfo(dataset, message)
+        self._setMessageInfo(dataset, message, ident)
+
+        return dataset
     
     def _getFilters(self, storage, login):
         return storage.getAlertFilters(login)
@@ -615,18 +621,21 @@ class AlertListing(MessageListing, view.View):
             aggregated_source_values = values[:len(self.parameters["aggregated_source"])]
             aggregated_target_values = values[len(self.parameters["aggregated_source"]):-3]
             time_max, time_min, count = values[-3:]
-            
+
             criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(aggregated_on, values[:-3]) ]
 
             for ident in self.env.prelude.getAlertIdents(criteria2, limit=1):
                 message = self._fetchMessage(ident)
+
+                expand = utils.create_link("alert_listing",
+                                           self.parameters +
+                                           { "aggregated_source_values": aggregated_source_values,
+                                             "aggregated_target_values": aggregated_target_values })
+                
+                
                 dataset = {
                     "aggregated": True,
                     "count": values[-1],
-                    "expand": utils.create_link("alert_listing",
-                                                self.parameters +
-                                                { "aggregated_source_values": aggregated_source_values,
-                                                  "aggregated_target_values": aggregated_target_values })
                     }
                 self.dataset["messages"].append(dataset)
                 
@@ -642,16 +651,35 @@ class AlertListing(MessageListing, view.View):
                                                     "alert.assessment.impact.severity/group_by",
                                                     "alert.assessment.impact.completion/group_by",
                                                     "count(alert.messageid)"], criteria2):
-                    classification = self._createInlineFilteredField("alert.classification.text", classification)
-                    dataset["infos"].append({ "count": count,
-                                              "classification": classification,
-                                              "classification_references": "",
-                                              "severity": { "value": severity or "low" },
-                                              "completion": { "value": completion } })
+                    infos = {
+                        "count": count,
+                        "classification": self._createInlineFilteredField("alert.classification.text", classification),
+                        "classification_references": "",
+                        "severity": { "value": severity or "low" },
+                        "completion": { "value": completion }
+                        }
+
+                    if count == 1:
+                        criteria3 = criteria2
+                        if classification:
+                            criteria3.append("alert.classification.text == '%s'" % classification)
+                        if severity:
+                            criteria3.append("alert.assessment.impact.severity == '%s'" % severity)
+                        if completion:
+                            criteria3.append("alert.assessment.impact.completion == '%s'" % completion)
+                        
+                        for ident in self.env.prelude.getAlertIdents(criteria3, limit=1):
+                            infos["display"] = self._createMessageLink(ident, "alert_summary")
+                    else:
+                        infos["display"] = expand
+                        
+                    dataset["infos"].append(infos)
 
         return len(results)        
 
     def _setMessages(self, criteria):
+        self.dataset["messages"] = [ ]
+        
         self.dataset["aggregated_source"] = self.parameters["aggregated_source"] or [ "none" ]
         self.dataset["aggregated_source_values"] = self.parameters["aggregated_source_values"]
         self.dataset["aggregated_target"] = self.parameters["aggregated_target"] or [ "none" ]
@@ -659,19 +687,22 @@ class AlertListing(MessageListing, view.View):
 
         aggregate_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
         aggregated_values = self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]
-        
-        if aggregated_values:
-            criteria2 = criteria + [ "%s == '%s'" % (p, v) for p, v in zip(aggregate_on, aggregated_values) ]
-            self.dataset["delete_enabled"] = True
-            MessageListing._setMessages(self, criteria2)
-            return self.env.prelude.countAlerts(criteria2)
-        elif not aggregate_on:
-            self.dataset["delete_enabled"] = True
-            MessageListing._setMessages(self, criteria)
-            return self.env.prelude.countAlerts(criteria)
-        else:
+
+        if aggregate_on and not aggregated_values:
             self.dataset["delete_enabled"] = False
-            return self._setAggregatedMessages(criteria)            
+            return self._setAggregatedMessages(criteria)
+
+        self.dataset["delete_enabled"] = True
+
+        if aggregated_values:
+            criteria += [ "%s == '%s'" % (p, v) for p, v in zip(aggregate_on, aggregated_values) ]
+
+        for ident in self.env.prelude.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
+            message = self.env.prelude.getAlert(ident)
+            dataset = self._setMessage(message, ident)
+            self.dataset["messages"].append(dataset)
+
+        return self.env.prelude.countAlerts(criteria)
             
     def _setDatasetConstants(self):
         self.dataset["available_aggregations"] = { }
@@ -746,7 +777,20 @@ class HeartbeatListing(MessageListing, view.View):
     def _fetchMessage(self, ident):
         return self.env.prelude.getHeartbeat(ident)
 
-    def _setMessage(self, dataset, message):
+    def _setMessages(self, criteria):
+        self.dataset["messages"] = [ ]
+        
+        for ident in self.env.prelude.getHeartbeatIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
+            message = self.env.prelude.getHeartbeat(ident)
+            dataset = self._setMessage(message, ident)
+            self.dataset["messages"].append(dataset)
+
+    def _setMessage(self, message, ident):
+        dataset = { }
+        
+        dataset["ident"] = { "value": ident }
+        dataset["summary"] = self._createMessageLink(ident, "heartbeat_summary")
+        dataset["details"] = self._createMessageLink(ident, "heartbeat_details")
         dataset["agent"] = self._createInlineFilteredField("heartbeat.analyzer.name",
                                                            message["heartbeat.analyzer.name"])
         dataset["model"] = self._createInlineFilteredField("heartbeat.analyzer.model",
@@ -756,6 +800,8 @@ class HeartbeatListing(MessageListing, view.View):
         dataset["node_address"] = self._createHostField("heartbeat.analyzer.node.address.address",
                                                         message["heartbeat.analyzer.node.address(0).address"])
         dataset["time"] = self._createTimeField(message["heartbeat.create_time"])
+
+        return dataset
 
     def _deleteMessage(self, analyzerid, messageid):
         self.env.prelude.deleteHeartbeat(analyzerid, messageid)
@@ -775,7 +821,6 @@ class HeartbeatListing(MessageListing, view.View):
 
         count = self.env.prelude.countHeartbeats(criteria and " && ".join(criteria) or None)
 
-        self.dataset["messages"] = [ ]
         self._setMessages(criteria)
 
         self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
