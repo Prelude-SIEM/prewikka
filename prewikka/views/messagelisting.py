@@ -196,6 +196,306 @@ class SensorHeartbeatListingParameters(HeartbeatListingParameters):
 
 
 
+class ListedMessage(dict):
+    def __init__(self, env, parameters):
+        self.env = env
+        self.parameters = parameters
+    
+    def createTimeField(self, t, timezone=None):
+        if t:
+            if timezone == "utc":
+                t = time.gmtime(t)
+            elif timezone == "sensor_localtime":
+                t = time.gmtime(int(t) + t.gmt_offset)
+            else: # timezone == "frontend_localtime"
+                t = time.localtime(t)
+            
+            current = time.localtime()
+        
+            if t[:3] == current[:3]: # message time is today
+                t = utils.time_to_hms(t)
+            else:
+                t = utils.time_to_ymdhms(t)
+        else:
+            t = "n/a"
+
+        return { "value": t }
+
+    def createInlineFilteredField(self, object, value, type=None):
+        if not value:
+            return { "value": None, "inline_filter": None }
+
+        if type:
+            extra = { "%s_object_0" % type: object, "%s_value_0" % type: value }
+        else:
+            extra = { object: value }
+
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
+
+    def createHostField(self, object, value, type=None):
+        field = self.createInlineFilteredField(object, value, type)
+        field["host_commands"] = [ ]
+        for command in "whois", "traceroute":
+            if self.env.host_commands.has_key(command):
+                field["host_commands"].append((command.capitalize(),
+                                               utils.create_link(command,
+                                                                 { "origin": self.view_name, "host": value })))
+
+        return field
+    
+    def createMessageLink(self, ident, view):
+        return utils.create_link(view, { "origin": self.view_name, "ident": ident })
+
+
+
+class ListedHeartbeat(ListedMessage):
+    view_name = "heartbeat_listing"
+    
+    def setMessage(self, message, ident):
+        index = 0
+        while True:
+            if not message["heartbeat.analyzer(%d).name" % (index + 1)]:
+                break
+            index += 1
+
+        self["delete"] = ident
+        self["summary"] = self.createMessageLink(ident, "heartbeat_summary")
+        self["details"] = self.createMessageLink(ident, "heartbeat_details")
+        self["agent"] = self.createInlineFilteredField("heartbeat.analyzer.name",
+                                                       message["heartbeat.analyzer(%d).name" % index])
+        self["model"] = self.createInlineFilteredField("heartbeat.analyzer.model",
+                                                       message["heartbeat.analyzer(%d).model" % index])
+        self["node_name"] = self.createInlineFilteredField("heartbeat.analyzer.node.name",
+                                                           message["heartbeat.analyzer(%d).node.name" % index])
+        self["node_address"] = self.createHostField("heartbeat.analyzer.node.address.address",
+                                                    message["heartbeat.analyzer(%d).node.address(0).address" % index],
+                                                    "unknown")
+        self["time"] = self.createTimeField(message["heartbeat.create_time"])
+
+
+
+class ListedAlert(ListedMessage):
+    view_name = "alert_listing"
+    
+    def createHostField(self, object, value, type=None):
+        field = { "value": value }
+
+        if not value:
+            return field
+
+        parameters = self.parameters - [ "source", "target", "analyzer" ]
+        i = 0
+        while True:
+            if not parameters.has_key("%s_object_%d" % (type, i)):
+                break
+            del parameters["%s_object_%d" % (type, i)]
+            if self.parameters.has_key("%s_value_%d" % (type, i)):
+                del parameters["%s_value_%d" % (type, i)]
+        parameters["%s_object_0" % type] = object
+        parameters["%s_value_0" % type] = value
+        field["inline_filter"] = utils.create_link(self.view_name, parameters)
+        
+        field["host_commands"] = [ ]
+        for command in "whois", "traceroute":
+            if self.env.host_commands.has_key(command):
+                field["host_commands"].append((command.capitalize(),
+                                               utils.create_link(command,
+                                                                 { "origin": self.view_name, "host": value })))
+
+        return field
+    
+    def _setMessageDirection(self, dataset, message, direction):
+        empty = True
+        
+        def set_main_and_extra_values(dataset, message, name, object_main, object_extra):
+            if message[object_main] != None:
+                dataset[name] = { "value": message[object_main] }
+                dataset[name + "_extra"] = { "value": message[object_extra] }
+            else:
+                dataset[name] = { "value": message[object_extra] }
+                dataset[name + "_extra"] = { "value": None }
+
+            if dataset[name]["value"] != None:
+                empty = False
+            
+        dataset["interface"] = { "value": message["alert.%s(0).interface" % direction] }
+
+        dataset["users"] = [ ]
+
+        idx = 0
+        while True:
+            if (message["alert.%s(0).user.user_id(%d).name" % (direction, idx)] is None and
+                message["alert.%s(0).user.user_id(%d).number" % (direction, idx)] is None):
+                break
+
+            user = { }
+            dataset["users"].append(user)
+
+            set_main_and_extra_values(user, message, "user",
+                                      "alert.%s(0).user.user_id(%d).name" % (direction, idx),
+                                      "alert.%s(0).user.user_id(%d).number" % (direction, idx))
+            
+            idx += 1
+
+        if idx:
+            empty = False
+
+        dataset["addresses"] = [ ]
+
+        idx = 1
+        while True:
+            address = message["alert.%s(0).node.address(%d).address" % (direction, idx)]
+            if address is None:
+                break
+
+            dataset["addresses"].append({ "value": address })
+            idx += 1
+
+        if idx > 1:
+            empty = False            
+
+        set_main_and_extra_values(dataset, message, "process",
+                                  "alert.%s(0).process.name" % direction,
+                                  "alert.%s(0).process.pid" % direction)
+
+        set_main_and_extra_values(dataset, message, "service",
+                                  "alert.%s(0).service.port" % direction,
+                                  "alert.%s(0).service.name" % direction)
+        
+        if message["alert.%s(0).node.address(0).address" % direction]:
+            address = message["alert.%s(0).node.address(0).address" % direction]
+            
+            dataset["address"] = self.createHostField("alert.%s.node.address.address" % direction,
+                                                      address, type=direction)
+            dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction] }
+        else:
+            dataset["address"] = self.createHostField("alert.%s.node.name" % direction,
+                                                      message["alert.%s(0).node.name" % direction],
+                                                      type=direction)
+            dataset["address_extra"] = { "value": None }
+
+        if dataset["address"]["value"] != None:
+            empty = False
+
+        dataset["empty"] = empty
+
+    def setMessageSource(self, message):
+        self["source"] = { }
+        self._setMessageDirection(self["source"], message, "source")
+
+    def setMessageTarget(self, message):
+        self["target"] = { }
+        self._setMessageDirection(self["target"], message, "target")
+
+    def setMessageClassificationReferences(self, dataset, message):
+        urls = [ ]
+        cnt = 0
+
+        while True:
+            origin = message["alert.classification.reference(%d).origin" % cnt]
+            if origin is None:
+                break
+            
+            name = message["alert.classification.reference(%d).name" % cnt]
+            if not name:
+                continue
+
+            url = message["alert.classification.reference(%d).url" % cnt]
+            if not url:
+                continue
+            
+            urls.append("<a href='%s'>%s:%s</a>" % (url, origin, name))
+
+            cnt += 1
+
+        if urls:
+            dataset["classification_references"] = "(" + ", ".join(urls) + ")"
+        else:
+            dataset["classification_references"] = ""
+
+    def setMessageClassification(self, dataset, message):
+        self.setMessageClassificationReferences(dataset, message)
+        dataset["classification"] = self.createInlineFilteredField("alert.classification.text",
+                                                                   message["alert.classification.text"])
+    def setMessageInfo(self, message, ident):
+        self["infos"] = [ { } ]
+        dataset = self["infos"][0]
+
+        dataset["count"] = 1
+        dataset["display"] = self.createMessageLink(ident, "alert_summary")
+        dataset["severity"] = { "value": message.get("alert.assessment.impact.severity", "low") }
+        dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
+        self.setMessageClassification(dataset, message)
+
+    def setMessageSensor(self, message):
+        analyzer_names = [ ]
+        index = 0
+        while True:
+            name = message["alert.analyzer(%d).name" % index]
+            if not name:
+                break
+            analyzer_names.append(name)
+            index += 1
+            
+        if len(analyzer_names) > 0:
+            analyzer_name = analyzer_names[-1]
+        else:
+            analyzer_name = "n/a"
+
+        self["sensor"] = self.createInlineFilteredField("alert.analyzer.name", analyzer_name, type="analyzer")
+        self["sensor"]["value"] = "/".join(analyzer_names[1:])
+
+        self["sensor_node_name"] = { "value": message["alert.analyzer(0).node.name"] }
+
+    def setMessageTime(self, message):
+        self["time"] = self.createTimeField(message["alert.create_time"])
+	if (message["alert.analyzer_time"] != None and
+	    abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
+	    self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"])
+	else:
+	    self["analyzer_time"] = { "value": None }
+
+    def setMessageCommon(self, message):
+        self.setMessageSource(message)
+        self.setMessageTarget(message)
+        self.setMessageSensor(message)
+
+    def setMessage(self, message, ident):
+        self.setMessageCommon(message)
+        self.setMessageTime(message)
+        self.setMessageInfo(message, ident)
+
+
+
+class ListedAggregatedAlert(ListedAlert):
+    def __init__(self, *args, **kwargs):
+        apply(ListedAlert.__init__, (self,) + args, kwargs)
+        self["aggregated"] = True
+        self["aggregated_classification_hidden"] = 0
+        self["infos"] = [ ]
+        
+    def setTime(self, time_min, time_max):
+        self["time_min"] = self.createTimeField(time_min)
+        self["time_max"] = self.createTimeField(time_max)
+
+    def setCriteriaForDeletion(self, delete_criteria):
+        self["delete"] = urllib.quote_plus(" && ".join(delete_criteria))
+
+    def setInfos(self, count, classification, severity, completion):
+        infos = {
+            "classification_references": "",
+            "count": count,
+            "classification": self.createInlineFilteredField("alert.classification.text", classification),
+            "severity": { "value": severity or "low" },
+            "completion": { "value": completion }
+            }
+
+        self["infos"].append(infos)
+
+        return infos
+
+
+
 class MessageListing:
     def _adjustCriteria(self, criteria):
         pass
@@ -279,51 +579,6 @@ class MessageListing:
         else:
             self.dataset["nav.next"] = None
 
-    def _createTimeField(self, t):
-        if t:
-            if self.parameters["timezone"] == "utc":
-                t = time.gmtime(t)
-            elif self.parameters["timezone"] == "sensor_localtime":
-                t = time.gmtime(int(t) + t.gmt_offset)
-            else: # timezone == "frontend_localtime"
-                t = time.localtime(t)
-            
-            current = time.localtime()
-        
-            if t[:3] == current[:3]: # message time is today
-                t = utils.time_to_hms(t)
-            else:
-                t = utils.time_to_ymdhms(t)
-        else:
-            t = "n/a"
-
-        return { "value": t }
-
-    def _createInlineFilteredField(self, object, value, type=None):
-        if not value:
-            return { "value": None, "inline_filter": None }
-
-        if type:
-            extra = { "%s_object_0" % type: object, "%s_value_0" % type: value }
-        else:
-            extra = { object: value }
-
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
-
-    def _createHostField(self, object, value, type=None):
-        field = self._createInlineFilteredField(object, value, type)
-        field["host_commands"] = [ ]
-        for command in "whois", "traceroute":
-            if self.env.host_commands.has_key(command):
-                field["host_commands"].append((command.capitalize(),
-                                               utils.create_link(command,
-                                                                 { "origin": self.view_name, "host": value })))
-
-        return field
-    
-    def _createMessageLink(self, ident, view):
-        return utils.create_link(view, { "origin": self.view_name, "ident": ident })
-
     def _setTimezone(self):
         for timezone in "utc", "sensor_localtime", "frontend_localtime":
             if timezone == self.parameters["timezone"]:
@@ -338,8 +593,8 @@ class MessageListing:
         for ident in self._getMessageIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
             message = self._fetchMessage(ident)
             dataset = {
-                "summary": self._createMessageLink(ident, self.summary_view),
-                "details": self._createMessageLink(ident, self.details_view),
+                "summary": self.createMessageLink(ident, self.summary_view),
+                "details": self.createMessageLink(ident, self.details_view),
                 "analyzerid": { "value": message.getAnalyzerID() },
                 "ident": { "value": message.getMessageID() }
                 }
@@ -390,153 +645,18 @@ class AlertListing(MessageListing, view.View):
     def _fetchMessage(self, ident):
         return self.env.idmef_db.getAlert(ident)
 
-    def _createHostField(self, object, value, type=None):
-        field = { "value": value }
-
-        if not value:
-            return field
-
-        parameters = self.parameters - [ "source", "target", "analyzer" ]
-        i = 0
-        while True:
-            if not parameters.has_key("%s_object_%d" % (type, i)):
-                break
-            del parameters["%s_object_%d" % (type, i)]
-            if self.parameters.has_key("%s_value_%d" % (type, i)):
-                del parameters["%s_value_%d" % (type, i)]
-        parameters["%s_object_0" % type] = object
-        parameters["%s_value_0" % type] = value
-        field["inline_filter"] = utils.create_link(self.view_name, parameters)
-        
-        field["host_commands"] = [ ]
-        for command in "whois", "traceroute":
-            if self.env.host_commands.has_key(command):
-                field["host_commands"].append((command.capitalize(),
-                                               utils.create_link(command,
-                                                                 { "origin": self.view_name, "host": value })))
-
-        return field
-
-    def _setMessageDirection(self, direction, dataset, message):
-        empty = True
-        
-        def set_main_and_extra_values(dataset, message, name, object_main, object_extra):
-            if message[object_main] != None:
-                dataset[name] = { "value": message[object_main] }
-                dataset[name + "_extra"] = { "value": message[object_extra] }
-            else:
-                dataset[name] = { "value": message[object_extra] }
-                dataset[name + "_extra"] = { "value": None }
-
-            if dataset[name]["value"] != None:
-                empty = False
-            
-        dataset["interface"] = { "value": message["alert.%s(0).interface" % direction] }
-
-        dataset["users"] = [ ]
-
-        idx = 0
-        while True:
-            if (message["alert.%s(0).user.user_id(%d).name" % (direction, idx)] is None and
-                message["alert.%s(0).user.user_id(%d).number" % (direction, idx)] is None):
-                break
-
-            user = { }
-            dataset["users"].append(user)
-
-            set_main_and_extra_values(user, message, "user",
-                                      "alert.%s(0).user.user_id(%d).name" % (direction, idx),
-                                      "alert.%s(0).user.user_id(%d).number" % (direction, idx))
-            
-            idx += 1
-
-        if idx:
-            empty = False
-
-        dataset["addresses"] = [ ]
-
-        idx = 1
-        while True:
-            address = message["alert.%s(0).node.address(%d).address" % (direction, idx)]
-            if address is None:
-                break
-
-            dataset["addresses"].append({ "value": address })
-            idx += 1
-
-        if idx > 1:
-            empty = False            
-
-        set_main_and_extra_values(dataset, message, "process",
-                                  "alert.%s(0).process.name" % direction,
-                                  "alert.%s(0).process.pid" % direction)
-
-        set_main_and_extra_values(dataset, message, "service",
-                                  "alert.%s(0).service.port" % direction,
-                                  "alert.%s(0).service.name" % direction)
-        
-        if message["alert.%s(0).node.address(0).address" % direction]:
-            address = message["alert.%s(0).node.address(0).address" % direction]
-            
-            dataset["address"] = self._createHostField("alert.%s.node.address.address" % direction,
-                                                       address, type=direction)
-            dataset["address_extra"] = { "value": message["alert.%s(0).node.name" % direction] }
-        else:
-            dataset["address"] = self._createHostField("alert.%s.node.name" % direction,
-                                                       message["alert.%s(0).node.name" % direction],
-                                                       type=direction)
-            dataset["address_extra"] = { "value": None }
-
-        if dataset["address"]["value"] != None:
-            empty = False
-
-        dataset["empty"] = empty
-
-    def _setMessageSource(self, dataset, message):
-        dataset["source"] = { }
-        self._setMessageDirection("source", dataset["source"], message)
-
-    def _setMessageTarget(self, dataset, message):
-        dataset["target"] = { }
-        self._setMessageDirection("target", dataset["target"], message)
-
-    def _setMessageClassificationReferences(self, dataset, message):
-        urls = [ ]
-        cnt = 0
-
-        while True:
-            origin = message["alert.classification.reference(%d).origin" % cnt]
-            if origin is None:
-                break
-            
-            name = message["alert.classification.reference(%d).name" % cnt]
-            if not name:
-                continue
-
-            url = message["alert.classification.reference(%d).url" % cnt]
-            if not url:
-                continue
-            
-            urls.append("<a href='%s'>%s:%s</a>" % (url, origin, name))
-
-            cnt += 1
-
-        if urls:
-            dataset["classification_references"] = "(" + ", ".join(urls) + ")"
-        else:
-            dataset["classification_references"] = ""
         
     def _setMessageClassification(self, dataset, message):
         self._setMessageClassificationReferences(dataset, message)
-        dataset["classification"] = self._createInlineFilteredField("alert.classification.text",
-                                                                    message["alert.classification.text"])
+        dataset["classification"] = self.createInlineFilteredField("alert.classification.text",
+                                                                   message["alert.classification.text"])
 
     def _setMessageInfo(self, dataset, message, ident):
         dataset["infos"] = [ { } ]
         dataset = dataset["infos"][0]
 
         dataset["count"] = 1
-        dataset["display"] = self._createMessageLink(ident, "alert_summary")
+        dataset["display"] = self.createMessageLink(ident, "alert_summary")
         dataset["severity"] = { "value": message.get("alert.assessment.impact.severity", "low") }
         dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
         self._setMessageClassification(dataset, message)
@@ -556,7 +676,7 @@ class AlertListing(MessageListing, view.View):
         else:
             analyzer_name = "n/a"
 
-        dataset["sensor"] = self._createInlineFilteredField("alert.analyzer.name", analyzer_name, type="analyzer")
+        dataset["sensor"] = self.createInlineFilteredField("alert.analyzer.name", analyzer_name, type="analyzer")
         dataset["sensor"]["value"] = "/".join(analyzer_names[1:])
 
         dataset["sensor_node_name"] = { "value": message["alert.analyzer(0).node.name"] }
@@ -567,24 +687,20 @@ class AlertListing(MessageListing, view.View):
         self._setMessageSensor(dataset, message)
 
     def _setMessageTime(self, dataset, message):
-        dataset["time"] = self._createTimeField(message["alert.create_time"])
+        dataset["time"] = self.createTimeField(message["alert.create_time"])
 	if (message["alert.analyzer_time"] != None and
 	    abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
-	    dataset["analyzer_time"] = self._createTimeField(message["alert.analyzer_time"])
+	    dataset["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"])
 	else:
 	    dataset["analyzer_time"] = { "value": None }
 
     def _setMessage(self, message, ident):
-        dataset = {
-            "aggregated": False,
-            "delete": ident,
-            }
-
-        self._setMessageCommon(dataset, message)
-        self._setMessageTime(dataset, message)
-        self._setMessageInfo(dataset, message, ident)
-
-        return dataset
+        msg = ListedAlert(self.env, self.parameters)
+        msg.setMessage(message, ident)
+        msg["aggregated"] = False
+        msg["delete"] = False
+        
+        return msg
     
     def _deleteMessage(self, ident):
         self.env.idmef_db.deleteAlert(ident)
@@ -687,33 +803,19 @@ class AlertListing(MessageListing, view.View):
             idmef = self._fetchMessage(ident)
             delete_criteria = delete_base_criteria + [ "alert.create_time >= '%s'" % time_min.toYMDHMS(),
                                                        "alert.create_time <= '%s'" % time_max.toYMDHMS() ]
-            message = {
-                "aggregated": True,
-                "time_min": self._createTimeField(time_min),
-                "time_max": self._createTimeField(time_max),
-                "delete": urllib.quote_plus(" && ".join(delete_criteria)),
-                "aggregated_classifications_hidden": 0
-                }
-            self.dataset["messages"].append(message)
-            self._setMessageCommon(message, idmef)
-
-            infos = { "classification_references": "" }
-            message["infos"] = [ infos ]
-            
+            message = ListedAggregatedAlert(self.env, self.parameters)
+            message.setMessageCommon(idmef)
+            message.setTime(time_min, time_max)
+            message.setCriteriaForDeletion(delete_criteria)
+            infos = message.setInfos(ident, idmef, count, classification, severity, completion)
             if count == 1:
-                display = self._createMessageLink(ident, "alert_summary")
-                self._setMessageClassificationReferences(infos, idmef)
+                infos["display"] = message.createMessageLink(ident, "alert_summary")
+                self.setMessageClassificationReferences(infos, message)
             else:
-                display = utils.create_link("alert_listing",
-                                            self.parameters + { "aggregated_classification_value": classification } - [ "offset" ])
-                
-            infos.update({
-                "count": count,
-                "classification": self._createInlineFilteredField("alert.classification.text", classification),
-                "severity": { "value": severity or "low" },
-                "completion": { "value": completion },
-                "display": display
-                })
+                infos["display"] = utils.create_link("alert_listing",
+                                                     self.parameters + { "aggregated_classification_value": classification } - [ "offset" ])
+            
+            self.dataset["messages"].append(message)
 
         return len(results)
 
@@ -772,20 +874,12 @@ class AlertListing(MessageListing, view.View):
             delete_criteria.append("alert.create_time <= '%s'" % time_max.toYMDHMS())
 
             for ident in self.env.idmef_db.getAlertIdents(criteria2, limit=1):
-                message = self._fetchMessage(ident)
-
-                dataset = {
-                    "aggregated": True,
-                    "delete": urllib.quote_plus(" && ".join(delete_criteria)),
-                    "count": aggregated_count,
-                    "infos": [ ]
-                    }
-                self.dataset["messages"].append(dataset)
-
-                self._setMessageCommon(dataset, message)
-
-                dataset["time_max"] = self._createTimeField(time_max)
-                dataset["time_min"] = self._createTimeField(time_min)
+                idmef = self._fetchMessage(ident)
+                message = ListedAggregatedAlert(self.env, self.parameters)
+                self.dataset["messages"].append(message)
+                message.setTime(time_min, time_max)
+                message.setMessageCommon(idmef)
+                message.setCriteriaForDeletion(delete_criteria)
 
                 results = self.env.idmef_db.getValues(["alert.classification.text/group_by",
                                                       "alert.assessment.impact.severity/group_by",
@@ -801,23 +895,22 @@ class AlertListing(MessageListing, view.View):
 
                 parameters = self._createAggregationParameters(aggregated_source_values, aggregated_target_values)
 
-                dataset["aggregated_classifications_total"] = aggregated_count
-                dataset["aggregated_classifications_hidden"] = aggregated_count
-                dataset["aggregated_classifications_hidden_expand"] = utils.create_link("alert_listing",
+                message["aggregated_classifications_total"] = aggregated_count
+                message["aggregated_classifications_hidden"] = aggregated_count
+                message["aggregated_classifications_hidden_expand"] = utils.create_link("alert_listing",
                                                                                         self.parameters - [ "offset",
                                                                                                             "aggregated_source",
                                                                                                             "aggregated_target" ] +
                                                                                         parameters)
 
                 for classification, severity, completion, count in results[:self._max_aggregated_classifications]:
-                    dataset["aggregated_classifications_hidden"] -= count
-                    
-                    infos = { "classification_references": "" }
-                    dataset["infos"].append(infos)
+                    message["aggregated_classifications_hidden"] -= count
 
+                    infos = message.setInfos(count, classification, severity, completion)
+                    
                     if count == 1:
                         if aggregated_count == 1:
-                            self._setMessageClassificationReferences(infos, message)
+                            message.setMessageClassificationReferences(infos, idmef)
                         
                         criteria3 = criteria2[:]
 
@@ -831,21 +924,13 @@ class AlertListing(MessageListing, view.View):
 
                         ident = self.env.idmef_db.getAlertIdents(criteria3, limit=1)[0]
 
-                        display = self._createMessageLink(ident, "alert_summary")
+                        infos["display"] = message.createMessageLink(ident, "alert_summary")
                     else:
                         parameters["aggregated_classification_value"] = classification
-                        display = utils.create_link("alert_listing",
-                                                    self.parameters - [ "offset", "aggregated_source", "aggregated_target" ] +
-                                                    parameters)
+                        infos["display"] = utils.create_link("alert_listing",
+                                                             self.parameters - [ "offset", "aggregated_source", "aggregated_target" ] +
+                                                             parameters)
 
-                    infos.update({
-                        "count": count,
-                        "classification": self._createInlineFilteredField("alert.classification.text", classification),
-                        "severity": { "value": severity or "low" },
-                        "completion": { "value": completion },
-                        "display": display
-                        })
-        
         return total_results
 
     def _setAggregatedMessages(self, criteria):
@@ -970,29 +1055,10 @@ class HeartbeatListing(MessageListing, view.View):
             self.dataset["messages"].append(dataset)
 
     def _setMessage(self, message, ident):
-        dataset = { }
+        msg = ListedHeartbeat(self.env, self.parameters)
+        msg.setMessage(message, ident)
 
-        index = 0
-        while True:
-            if not message["heartbeat.analyzer(%d).name" % (index + 1)]:
-                break
-            index += 1
-
-        dataset["delete"] = ident
-        dataset["summary"] = self._createMessageLink(ident, "heartbeat_summary")
-        dataset["details"] = self._createMessageLink(ident, "heartbeat_details")
-        dataset["agent"] = self._createInlineFilteredField("heartbeat.analyzer.name",
-                                                           message["heartbeat.analyzer(%d).name" % index])
-        dataset["model"] = self._createInlineFilteredField("heartbeat.analyzer.model",
-                                                           message["heartbeat.analyzer(%d).model" % index])
-        dataset["node_name"] = self._createInlineFilteredField("heartbeat.analyzer.node.name",
-                                                               message["heartbeat.analyzer(%d).node.name" % index])
-        dataset["node_address"] = self._createHostField("heartbeat.analyzer.node.address.address",
-                                                        message["heartbeat.analyzer(%d).node.address(0).address" % index],
-                                                        "unknown")
-        dataset["time"] = self._createTimeField(message["heartbeat.create_time"])
-
-        return dataset
+        return msg
 
     def _applyInlineFilters(self, criteria):
         filter_found = False
