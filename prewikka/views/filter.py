@@ -121,8 +121,6 @@ class AlertFilterEdition(view.Views):
         elif "new_element" in parameters:
             self._addEmptyElement(self.dataset["elements"])
 
-        self._setCommon()
-
     def render_alert_filter_load(self):
         self._setCommon()
         filter = self.env.storage.getAlertFilter(self.user.login, self.parameters["filter_name"])
