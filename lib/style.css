@@ -265,12 +265,12 @@ thead {
         color:black;
 }
 
-#filter_control_label, #timeline_limit_label, #timeline_submit, #timeline_step_label {
+#filter_control_label, #timezone_control_label, #timeline_limit_label, #timeline_submit, #timeline_step_label {
         font-style: verdana;
         font-weight: bold;
 }
 
-.filter_control_select {
+.filter_control_select, .timezone_control_select {
 	width: 107px;
 	max-width: 107px;
 }
