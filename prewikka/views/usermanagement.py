@@ -72,26 +72,33 @@ class UserAddParameters(UserParameters, PermissionsParameters, PasswordParameter
 
 
 
-class PasswordChangeParameters(UserParameters, PasswordParameters):
+class UserSettingsParameters(view.Parameters):
     def register(self):
-        UserParameters.register(self)
-        PasswordParameters.register(self)
+        self.optional("login", str)
+
+
+
+class UserSettingsModifyParameters(view.Parameters):
+    def register(self):
+        self.optional("login", str)
+        for perm in User.ALL_PERMISSIONS:
+            self.optional(perm, str)
+        self.optional("password_current", str)
+        self.optional("password_new", str)
+        self.optional("password_new_confirmation", str)
 
     def normalize(self):
-        UserParameters.normalize(self)
-        PasswordParameters.normalize(self)
-
-
-
-class PermissionsChangeParameters(UserParameters, PermissionsParameters):
-    def register(self):
-        UserParameters.register(self)
-        PermissionsParameters.register(self)
+        self["permissions"] = [ ]
+        for perm in User.ALL_PERMISSIONS:
+            if self.get(perm) == "on":
+                self["permissions"].append(perm)
         
-    def normalize(self, ):
-        UserParameters.normalize(self)
-        PermissionsParameters.normalize(self)
 
+
+class UserDeleteParameters(view.Parameters):
+    def register(self):
+        self.optional("users", list, [ ])
+    
 
 
 class UserListing(view.View):
@@ -112,12 +119,8 @@ class UserListing(view.View):
             user = self.env.db.getUser(login)
             tmp = { }
             tmp["login"] = user.login
+            tmp["settings_link"] = utils.create_link("user_settings_display", { "login": login })
             tmp["permissions"] = map(lambda perm: user.has(perm), User.ALL_PERMISSIONS)
-            tmp["delete_form_hiddens"] = [("view", "user_delete"), ("login", user.login)]
-            tmp["password_form_hiddens"] = [("view", "user_password_change_form"),
-                                            ("login", user.login)]
-            tmp["permissions_form_hiddens"] = [("view", "user_permissions_change_form"),
-                                               ("login", user.login)]
             self.dataset["users"].append(tmp)
 
 
@@ -162,72 +165,57 @@ class UserAdd(UserListing):
 
 class UserDelete(UserListing):
     view_name = "user_delete"
-    view_parameters = UserParameters
+    view_parameters = UserDeleteParameters
 
     def render(self):
-        self.env.db.deleteUser(self.parameters["login"])
+        for user in self.parameters["users"]:
+            self.env.db.deleteUser(user)
         
         self.parameters.clear()
         UserListing.render(self)
 
 
 
-class PasswordChangeForm(view.View):
-    view_name = "user_password_change_form"
-    view_parameters = UserParameters
-    view_permissions = [ User.PERM_USER_MANAGEMENT ]
-    view_template = "PropertiesChangeForm"
-    
+class UserSettingsDisplay(view.View):
+    view_name = "user_settings_display"
+    view_parameters = UserSettingsParameters
+    view_permissions = [ ]
+    view_template = "UserSettings"
+
     def render(self):
-        if not self.env.auth.canSetPassword():
-            raise Error.SimpleError("permission denied")
+        login = self.parameters.get("login", self.user.login)
         
-        self.dataset["submit"] = "change"
-        self.dataset["hiddens"] = [ ("view", "user_password_change"),
-                                    ("login", self.parameters["login"]) ]
-        self.dataset["properties"] = [ utils.password_property("Password", "password1"),
-                                       utils.password_property("Password confirmation", "password2") ]
-
-
-
-class PasswordChange(UserListing):
-    view_name = "user_password_change"
-    view_parameters = PasswordChangeParameters
-
-    def render(self):
-        if not self.env.auth.canSetPassword():
-            raise Error.SimpleError("permission denied")
-        self.env.auth.setPassword(self.parameters["login"], self.parameters["password"])
-
-        self.parameters.clear()
-        UserListing.render(self)
-
-
-
-class PermissionsChangeForm(view.View):
-    view_name = "user_permissions_change_form"
-    view_parameters = UserParameters
-    view_permissions = [ User.PERM_USER_MANAGEMENT ]
-    view_template = "PropertiesChangeForm"
-
-    def render(self):
-        self.dataset["submit"] = "change"
-        self.dataset["hiddens"] = [ ("view", "user_permissions_change"),
-                                    ("login", self.parameters["login"]) ]
-        self.dataset["properties"] = [ ]
-        user = self.env.db.getUser(self.parameters["login"])
+        self.dataset["management_mode"] = self.user.has(User.PERM_USER_MANAGEMENT)
+        self.dataset["can_change_password"] = self.env.auth.canSetPassword()
+        self.dataset["current_user"] = self.user.login
+        self.dataset["user.login"] = login
+        self.dataset["user.permissions"] = [ ]
+        permissions = self.env.db.getPermissions(login)
         for perm in User.ALL_PERMISSIONS:
-            self.dataset["properties"].append(utils.boolean_property(perm, perm, user.has(perm)))
+            self.dataset["user.permissions"].append((perm, perm in permissions))
 
 
 
-class PermissionsChange(UserListing):
-    view_name = "user_permissions_change"
-    view_parameters = PermissionsChangeParameters
+class UserSettingsModify(UserSettingsDisplay):
+    view_name = "user_settings_modify"
+    view_parameters = UserSettingsModifyParameters
+    view_permissions = [ ]
 
     def render(self):
-        permissions = filter(lambda perm: self.parameters.has_key(perm), User.ALL_PERMISSIONS)
-        self.env.db.setPermissions(self.parameters["login"], permissions)
+        login = self.parameters.get("login", self.user.login)
+        
+        if self.user.has(User.PERM_USER_MANAGEMENT):
+            self.env.db.setPermissions(login, self.parameters["permissions"])
+            if login == self.user.permissions:
+                self.user.permissions = self.parameters["permissions"]
 
-        self.parameters.clear()
-        UserListing.render(self)
+        if self.parameters.has_key("password_new") and self.parameters.has_key("password_new_confirmation"):
+            if self.parameters.has_key("password_current"):
+                self.env.auth.checkPassword(login, self.parameters["password_current"])
+
+            if self.parameters["password_new"] != self.parameters["password_new_confirmation"]:
+                raise prewikka.Error.SimpleError("Password Error", "passwords mismatch")
+
+            self.env.auth.setPassword(login, self.parameters["password_new"])
+
+        UserSettingsDisplay.render(self)

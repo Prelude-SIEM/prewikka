@@ -1,61 +1,42 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
+<form action="?" method="POST">
+<input type="hidden" name="view" value="user_delete"/>
+
 <table class="user_list_table">
-	<thead>
-		<tr>
-			<td>Login</td>
-			#for $perm in $permissions
-				<td>$perm</td>
-			#end for
-		</tr>
-	</thead>
-	<tbody>
-		#set $row_classes = ("table_row_even", "table_row_odd")
-		#set $cnt = 0
-		#for $user in $users
-			<tr class="$row_classes[$cnt%2]">
-				<td>$user.login</td>
-				#for $perm in $user.permissions
-					#set $perm = ("", "x")[$perm]
-					<td>$perm</td>
-				#end for
-				<td>
-					<form action='?' method='get'>
-						#for $name, $value in $user.delete_form_hiddens
-							<input type='hidden' name='$name' value='$value'/>
-						#end for
-						<input type='submit' value='delete'/>
-					</form>
-				</td>
-				#if $can_set_password
-				<td>
-					<form action='?' method='get'>
-						#for $name, $value in $user.password_form_hiddens
-							<input type='hidden' name='$name' value='$value'/>
-						#end for
-						<input type='submit' value='password'/>
-					</form>
-				</td>
-				#end if
-				<td>
-					<form action='?' method='get'>
-						#for $name, $value in $user.permissions_form_hiddens
-							<input type='hidden' name='$name' value='$value'/>
-						#end for
-						<input type='submit' value='permissions'/>
-					</form>
-				</td>
-			</tr>
-			#set $cnt += 1
-		#end for
-	</tbody>
+  <thead>
+    <tr>
+      <td>Login</td>
+        #for $perm in $permissions
+          <td>#echo $perm.replace("_", " ") #</td>
+        #end for
+        <td></td>
+      </tr>
+  </thead>
+  <tbody>
+  #set $row_classes = ("table_row_even", "table_row_odd")
+  #set $cnt = 0
+  #for $user in $users
+    <tr class="$row_classes[$cnt%2]">
+      <td><a href="$user.settings_link">$user.login</a></td>
+      #for $perm in $user.permissions
+        #set $perm = ("", "x")[$perm]
+        <td>$perm</td>
+      #end for
+      <td><input type="checkbox" name="users" value="$user.login"/></td>
+    </tr>
+    #set $cnt += 1
+  #end for
+  <tr>
+    <td colspan="0" style="text-align: right;"><input type="submit" value="delete"/></td>
+  </tr>
+  </tbody>
 </table>
+</form>
 <br/>
 <form action='?' method='get'>
-	#for $name, $value in $add_form_hiddens
-		<input type='hidden' name='$name' value='$value'/>
-	#end for
-	<input type='submit' value='add user'/>
+  <input type="hidden" name="view" value="user_add_form"/>
+  <input type='submit' value='add user'/>
 </form>
 #end block main_content

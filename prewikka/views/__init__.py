@@ -20,7 +20,7 @@
 
 from prewikka.views import \
      messagelisting, messagesummary, messagedetails, sensor, \
-     commands, filter, usermanagement, settings, misc
+     commands, filter, usermanagement, misc
 
 
 
@@ -34,11 +34,8 @@ objects = messagelisting.AlertListing(), \
           commands.Whois(), commands.Traceroute(), \
           filter.AlertFilterEdition(), \
           usermanagement.UserListing(), \
-          usermanagement.UserAddForm(), usermanagement.UserAdd(), \
-          usermanagement.UserDelete(), \
-          usermanagement.PasswordChangeForm(), usermanagement.PasswordChange(), \
-          usermanagement.PermissionsChangeForm(), usermanagement.PermissionsChange(), \
-          settings.SettingsDisplay(), settings.PasswordChange(), \
+          usermanagement.UserAddForm(), usermanagement.UserAdd(), usermanagement.UserDelete(), \
+          usermanagement.UserSettingsDisplay(), usermanagement.UserSettingsModify(), \
           misc.About()
 
 
