@@ -38,11 +38,8 @@ class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
     def __init__(self, *args, **kwargs):
         apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
         self.core = Core.Core()
-
-    def __del__(self):
-        self.core.shutdown()
-
         
+
 
 class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHandler):
     def getCookieString(self):
