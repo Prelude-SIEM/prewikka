@@ -64,8 +64,4 @@ request = CGIRequest()
 request.init()
 
 core = Core.Core()
-
-try:
-    core.process(request)
-finally:
-    core.shutdown()
+core.process(request)
