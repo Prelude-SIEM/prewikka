@@ -7,11 +7,11 @@ from normalLayout import normalLayout
 from loginLayout import loginLayout
 from noneLayout import noneLayout
 
-def getLayout(layout, data, query):
+def getLayout(layout, data):
 	layouts = {
 			"normal":normalLayout,
 			"login":loginLayout,
 			"none":noneLayout
 	}
 
-	return layouts[layout](data, query)
+	return layouts[layout](data)

@@ -21,26 +21,27 @@
 import ConfigParser
 
 
-class Config:
+class Config(dict):
     def __init__(self, filename="prewikka.conf"):
-        self._global = { }
+        dict.__init__(self)
         self.modules = { }
-        conf = ConfigParser.ConfigParser()
-        conf.readfp(open(filename))
-        for option in conf.options("prewikka"):
-            self._global[option] = conf.get("prewikka", option)
-        for section in conf.sections():
+        input = ConfigParser.ConfigParser()
+        input.readfp(open(filename))
+        for section in input.sections():
             if section.find("module ") == 0:
-                module = self.modules[section.replace("module ", "")] = { }
-                for option in conf.options(section):
-                    value = conf.get(section, option)
-                    module[option] = value
-
-    def __getitem__(self, key):
-        return self._global[key]
+                mod_name = section.replace("module ", "")
+                subconfig = self.modules[mod_name] = { }
+            else:
+                subconfig = self[section] = { }
+            for option in input.options(section):
+                subconfig[option] = input.get(section, option)
 
     def __str__(self):
-        content = "global: %s\n" % self._global
-        for name, module in self.modules.items():
-            content += "module %s: %s\n" % (name, module)
+        content = dict.__str__(self)
+        for name, value in self.modules.items():
+            content += "\n%s: %s" % (name, value)
         return content
+
+
+if __name__ == "__main__":
+    print Config()

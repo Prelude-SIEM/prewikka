@@ -1,67 +1,103 @@
 import sys
 import prelude
-from preludedb import PreludeDB
 import time
 import util
 import re
 from templates.modules.mod_alert import AlertList, AlertSummary, AlertDetails
+from templates import Table
+import module
+import interface
+import core
 
 
-PRELUDE = None
-
-
-class Prelude(PreludeDB):
-    def __init__(self, config):
-        PreludeDB.init()
-        PreludeDB.__init__(self,
-                           type=config.get("type", "mysql"),
-                           host=config.get("host", "127.0.0.1"),
-                           port=config.get("port", 0),
-                           name=config.get("name", "prelude"),
-                           user=config.get("user", "prelude"),
-                           password=config.get("password", "prelude"))
-        self.connect()
+class ModuleInterface(interface.NormalInterface):
+    def init(self):
+        interface.NormalInterface.init(self)
+        self.setModuleName("Alerts")
+        self.setViewNames([ ("alert list", "list") ])
+        self.setViewName("alert list")
 
 
 
-class SectionAlertList:
-    def __init__(self, query):
-        self.query = query
-
-    def __str__(self):
-        display = AlertList.AlertList()
-        criteria = prelude.IDMEFCriteria("alert.detect_time >= 'month:current-1'")
-        results = PRELUDE.get_alert_ident_list(criteria)
-        if results:
-            for analyzerid, alert_ident in results:
-                alert = PRELUDE.get_alert(analyzerid, alert_ident)
-                display.addAlert(alert)
-        return str(display)
-
-
-
-class SectionAlert:
-    def __init__(self, query):
-        self._alert = PRELUDE.get_alert(query["analyzerid"], query["alert_ident"])
+class ListInterface(ModuleInterface):
+    def _createAlertLink(self, action, alert):
+        request = AlertRequest()
+        request.module = "Alerts"
+        request.action = action
+        request.analyzerid = alert["alert.analyzer.analyzerid"]
+        request.alert_ident = alert["alert.ident"]
+        return self.createLink(request, action)
+    
+    def build(self):
+        table = Table.Table()
+        table.setHeader(("Classification", "Source", "Target", "Sensor", "Time", "", ""))
+        for alert in self._data:
+            impact_severity = "impact_severity_" + alert["alert.assessment.impact.severity"]
+            table.addRow(("<span class=\"%s\">%s</span>" % (impact_severity, alert["alert.classification(0).name"]),
+                          alert["alert.source(0).node.address(0).address"] or "n/a",
+                          alert["alert.target(0).node.address(0).address"] or "n/a",
+                          alert["alert.analyzer.model"],
+                          alert["alert.detect_time"],
+                          self._createAlertLink("summary", alert),
+                          self._createAlertLink("details", alert)));
         
-
-
-class SectionAlertSummary(SectionAlert):
-    def __str__(self):
-        return str(AlertSummary.AlertSummary(self._alert))
+        self.setMainContent(str(table))
 
 
 
-class SectionAlertDetails(SectionAlert):
-    def __str__(self):
-        return str(AlertDetails.AlertDetails(self._alert))
+class SummaryInterface(ModuleInterface):
+    def build(self):
+        self.setMainContent(AlertSummary.AlertSummary(self._data))
 
 
 
-def load(module, config):
-    global PRELUDE
-    PRELUDE = Prelude(config)
-    module.setName("Alert")
-    module.registerSection("Alert list", SectionAlertList, default=True)
-    module.registerSection("Alert summary", SectionAlertSummary, parent="Alert list")
-    module.registerSection("Alert details", SectionAlertDetails, parent="Alert list")
+class DetailsInterface(ModuleInterface):
+    def build(self):
+        self.setMainContent(AlertDetails.AlertDetails(self._data))
+
+
+
+class AlertRequest(core.CoreRequest):
+    def __init__(self):
+        core.CoreRequest.__init__(self)
+        self.registerField("analyzerid", long)
+        self.registerField("alert_ident", long)
+
+
+
+class AlertModule(module.ContentModule):
+    def __init__(self, _core, config):
+        module.ContentModule.__init__(self, _core)
+        self.setName("Alerts")
+        self.registerAction("list", core.CoreRequest, default=True)
+        self.registerAction("summary", AlertRequest)
+        self.registerAction("details", AlertRequest)
+
+    def handle_list(self, request):
+        prelude = self._core.prelude
+        idents = prelude.getAlertIdents("alert.detect_time >= 'month:current-1'")
+        alerts = [ ]
+        if idents:
+            for analyzerid, alert_ident in idents:
+                alert = prelude.getAlert(analyzerid, alert_ident)
+                alerts.append(alert)
+        
+        return ListInterface, alerts
+
+    def handle_default(self, request):
+        return self.handle_list(request)
+
+    def _getAlert(self, request):
+        return self._core.prelude.getAlert(request.analyzerid, request.alert_ident)
+
+    def handle_summary(self, request):
+        return SummaryInterface, self._getAlert(request)
+
+    def handle_details(self, request):
+        return DetailsInterface, self._getAlert(request)
+
+
+
+def load(core, config):
+    module = AlertModule(core, config)
+    core.registerContentModule(module)
