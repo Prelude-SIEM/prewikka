@@ -216,6 +216,20 @@ table {
 	font-weight: bold;
 }
 
+.hideable {
+	padding-left: 0px;
+}
+
+.hideable_title {
+	background-color: #E2EBF5;
+	font-size: 120%;
+}
+
+.hideable_content {
+	background-color: #ffffff;
+	padding-left: 20px;
+}
+
 a:link.tlink {
     color:#D2312A;
     text-decoration: underline;

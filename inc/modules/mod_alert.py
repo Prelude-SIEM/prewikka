@@ -5,7 +5,7 @@ import preludedb
 import time
 import util
 import re
-from templates.modules.mod_alert import AlertList, AlertSummary
+from templates.modules.mod_alert import AlertList, AlertSummary, AlertDetails
 
 
 class SectionAlertList:
@@ -27,19 +27,29 @@ class SectionAlertList:
 
 
 
-class SectionAlertView:
+class SectionAlert:
     def __init__(self, query):
-        self.query = query
-
-    def __str__(self):
         preludedb.PreludeDB.init()
         db = preludedb.PreludeDB()
         db.connect()
-        return str(AlertSummary.AlertSummary(db.get_alert(self.query["analyzerid"], self.query["alert_ident"])))
+        self._alert = db.get_alert(query["analyzerid"], query["alert_ident"])
+        
+
+
+class SectionAlertSummary(SectionAlert):
+    def __str__(self):
+        return str(AlertSummary.AlertSummary(self._alert))
+
+
+
+class SectionAlertDetails(SectionAlert):
+    def __str__(self):
+        return str(AlertDetails.AlertDetails(self._alert))
 
 
 
 def load(module):
     module.setName("Alert")
     module.registerSection("Alert list", SectionAlertList, default=True)
-    module.registerSection("Alert view", SectionAlertView, parent="Alert list")
+    module.registerSection("Alert summary", SectionAlertSummary, parent="Alert list")
+    module.registerSection("Alert details", SectionAlertDetails, parent="Alert list")

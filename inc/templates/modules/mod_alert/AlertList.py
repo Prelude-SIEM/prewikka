@@ -28,12 +28,16 @@ class Link:
 class AlertList:
     def __init__(self):
         self._table = Table.Table()
-        self._table.setHeader(("Classification", "Source", "Target", "Sensor", "Time", ""))
+        self._table.setHeader(("Classification", "Source", "Target", "Sensor", "Time", "", ""))
 
     def addAlert(self, alert):
-        link = Link("mod_alert", "Alert view", "view")
-        link["Alert view.analyzerid"] = alert["alert.analyzer.analyzerid"]
-        link["Alert view.alert_ident"] = alert["alert.ident"]
+        summary_link = Link("mod_alert", "Alert summary", "summary")
+        summary_link["Alert summary.analyzerid"] = alert["alert.analyzer.analyzerid"]
+        summary_link["Alert summary.alert_ident"] = alert["alert.ident"]
+
+        details_link = Link("mod_alert", "Alert details", "details")
+        details_link["Alert details.analyzerid"] = alert["alert.analyzer.analyzerid"]
+        details_link["Alert details.alert_ident"] = alert["alert.ident"]
 
         impact_severity = "impact_severity_" + alert["alert.assessment.impact.severity"]
         
@@ -42,7 +46,8 @@ class AlertList:
                             alert["alert.target(0).node.address(0).address"] or "n/a",
                             alert["alert.analyzer.model"],
                             alert["alert.detect_time"],
-                            str(link)))
+                            str(summary_link),
+                            str(details_link)));
 
     def __str__(self):
         return str(self._table)
