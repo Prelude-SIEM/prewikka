@@ -6,6 +6,9 @@
 <form action="?" method="POST">
 <input type="hidden" name="view" value="user_settings_modify"/>
 <input type="hidden" name="login" value="$user.login"/>
+#if $user_management_mode
+  <input type="hidden" name="user_management_mode" value="yes"/>
+#end if
 
 <fieldset>
   <legend>Account informations</legend>
