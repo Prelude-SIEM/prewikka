@@ -919,6 +919,7 @@ class Classification(_Element):
     name = "classification"
     fields = "ident", "text"
     check_field = "ident"
+    fields = Reference,
 
 
 
