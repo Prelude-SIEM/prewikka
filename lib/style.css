@@ -122,17 +122,25 @@ body {
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	font-size: 13px;
 	color: #333333;
+	/*text-align: center;*/
 }
 
-.normal_body {
+.classic_body {
 	background-image: url(../img/bg2.gif);
 }
 
 .login_password {
-	position: absolute;
-	left: 160px;
-	top: 85px;
+	position: relative;
+	margin: 0px auto;
+	margin-top: 50px;
+	width: 300px;
+	border-style: solid;
+	border-width: 2px;
 	padding: 10px;
+}
+
+.login_password table {
+	/*width: 100%;*/
 }
 
 #top_view_header {
@@ -387,6 +395,16 @@ td {
 
 .heartbeats_analyze_message {
 	font-size: 80%;
+}
+
+.error_message {
+	font-size:60px;
+	color: red;
+	position: relative;
+	margin: 0px auto;
+	margin-top: 50px;
+	width: 600px;
+	padding: 10px;
 }
 
 /*a:link.tlink {
