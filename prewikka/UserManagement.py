@@ -4,7 +4,7 @@ import time
 import random
 import md5
 
-from prewikka import Log, Action, Interface, Views
+from prewikka import Log, Action, DataSet
 from prewikka.templates import LoginPasswordForm, PropertiesChange
 from prewikka.templates import UserListing
 
@@ -142,22 +142,23 @@ def template(name):
 
 
 
-class LoginPasswordPromptView(template("LoginPasswordForm")):
-    def __init__(self, core, login_action):
-        template("LoginPasswordForm").__init__(self, core)
+class LoginPasswordPromptView(DataSet.BaseDataSet, LoginPasswordForm.LoginPasswordForm):
+    def __init__(self, login_action):
+        DataSet.BaseDataSet.__init__(self)
+        LoginPasswordForm.LoginPasswordForm.__init__(self)
         self.login_action = Action.get_action_name(login_action)
 
 
 
-class UsersView(Interface.ConfigView):
+class UsersDataSet(DataSet.ConfigDataSet):
     active_tab = "Users"
 
 
 
-class UserListingView(UsersView, template("UserListing")):
-    def __init__(self, core, add_user_action, delete_user_action, change_password_action, change_capabilities_action):
-        UsersView.__init__(self, core)
-        template("UserListing").__init__(self, core)
+class UserListingView(UsersDataSet, UserListing.UserListing):
+    def __init__(self, add_user_action, delete_user_action, change_password_action, change_capabilities_action):
+        UsersDataSet.__init__(self)
+        UserListing.UserListing.__init__(self)
         self.users = [ ]
         self.add_form_hiddens = self.createAccess(add_user_action)
         self._delete_user_action = delete_user_action
@@ -181,32 +182,35 @@ class UserListingView(UsersView, template("UserListing")):
 
 
 
-class UserAddForm(UsersView, Views.PropertiesChangeView):
-    def __init__(self, core, action):
-        UsersView.__init__(self, core)
-        Views.PropertiesChangeView.__init__(self, core, "add", action)
+class UserAddForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChange.PropertiesChange):
+    def __init__(self, action):
+        UsersDataSet.__init__(self)
+        DataSet.PropertiesChangeDataSet.__init__(self, "add", action)
+        PropertiesChange.PropertiesChange.__init__(self)
         self.addTextProperty("Login", "login")
         self.addPasswordProperty("Password", "password1")
         self.addPasswordProperty("Password confirmation", "password2")
         for capability in CAPABILITIES:
             self.addBooleanProperty(capability, capability)
-        
 
 
-class ChangePasswordForm(UsersView, Views.PropertiesChangeView):
-    def __init__(self, core, id, action):
-        UsersView.__init__(self, core)
-        Views.PropertiesChangeView.__init__(self, core, "change", action)
+
+class ChangePasswordForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChange.PropertiesChange):
+    def __init__(self, id, action):
+        UsersDataSet.__init__(self)
+        DataSet.PropertiesChangeDataSet.__init__(self, "change", action)
+        PropertiesChange.PropertiesChange.__init__(self)
         self.addHidden("id", id)
         self.addPasswordProperty("Password", "password1")
         self.addPasswordProperty("Password confirmation", "password2")
 
 
 
-class ChangeCapabilitiesForm(UsersView, Views.PropertiesChangeView):
-    def __init__(self, core, user, action):
-        UsersView.__init__(self, core)
-        Views.PropertiesChangeView.__init__(self, core, "change", action)
+class ChangeCapabilitiesForm(UsersDataSet, DataSet.PropertiesChangeDataSet, PropertiesChange.PropertiesChange):
+    def __init__(self, user, action):
+        UsersDataSet.__init__(self)
+        DataSet.PropertiesChangeDataSet.__init__(self, "change", action)
+        PropertiesChange.PropertiesChange.__init__(self)
         self.addHidden("id", user.getID())
         for cap in CAPABILITIES:
             self.addBooleanProperty(cap, cap, user.hasCapability(cap))
@@ -242,7 +246,7 @@ class UserManagement:
         self._use_ssl = config.getOptionValue("use_ssl", "") in ("yes", "true", "on")
         self._expiration = int(config.getOptionValue("expiration", 30))
         self.core.interface.registerConfigurationSection("Users", self.handle_user_listing)
-        self.core.interface.registerQuickAccess("logout", self.handle_user_logout, None)
+        self.core.interface.registerQuickAccessor("logout", self.handle_user_logout, None)
         self.core.action_engine.registerLoginAction(self.login, LoginPasswordActionParameters)
         self.core.action_engine.registerAction(self.handle_user_listing, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
         self.core.action_engine.registerAction(self.handle_user_add_form, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
@@ -270,7 +274,7 @@ class UserManagement:
         pass # TODO
     
     def redirectToLogin(self):
-        return LoginPasswordPromptView(self.core, self.login)
+        return LoginPasswordPromptView(self.login)
     
     def _checkSession(self, request):
         if request.input_cookie.has_key("sessionid"):
@@ -326,8 +330,7 @@ class UserManagement:
     def handle_user_listing(self, core, parameters, request):
         ids = self.getUsers()
         ids.sort()
-        view = UserListingView(core,
-                               self.handle_user_add_form,
+        view = UserListingView(self.handle_user_add_form,
                                self.handle_user_delete,
                                self.handle_change_password_form,
                                self.handle_change_capabilities_form)
@@ -339,7 +342,7 @@ class UserManagement:
         
     
     def handle_user_add_form(self, core, parameters, request):
-        return UserAddForm(core, self.handle_user_add)
+        return UserAddForm(self.handle_user_add)
     
     def handle_user_add(self, core, parameters, request):
         user = self.newUser()
@@ -356,7 +359,7 @@ class UserManagement:
         return self.handle_user_listing(core, Action.ActionParameters(), request)
     
     def handle_change_password_form(self, core, parameters, request):
-        return ChangePasswordForm(core, parameters.getID(), self.handle_change_password)
+        return ChangePasswordForm(parameters.getID(), self.handle_change_password)
     
     def handle_change_password(self, core, parameters, request):
         user = self.getUserByID(parameters.getID())
@@ -366,7 +369,7 @@ class UserManagement:
         return self.handle_user_listing(core, Action.ActionParameters(), request)
     
     def handle_change_capabilities_form(self, core, parameters, request):
-        return ChangeCapabilitiesForm(core, self.getUserByID(parameters.getID()), self.handle_change_capabilities)
+        return ChangeCapabilitiesForm(self.getUserByID(parameters.getID()), self.handle_change_capabilities)
     
     def handle_change_capabilities(self, core, parameters, request):
         user = self.getUserByID(parameters.getID())
@@ -381,4 +384,4 @@ class UserManagement:
 
         core.log.event(Log.EVENT_LOGOUT, request, request.user)
         
-        return LoginPasswordPromptView(core, self.login)
+        return LoginPasswordPromptView(self.login)

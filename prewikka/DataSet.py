@@ -22,15 +22,13 @@ import sys
 
 from prewikka import Action
 
-def template(name):
-    return getattr(__import__("prewikka/templates/" + name), name)
 
+class BaseDataSet:
+    active_section = None
+    tabs = None
+    active_tab = None
 
-    
-class HTMLDocumentView(template("HTMLDocument")):
-    def __init__(self, core):
-        template("HTMLDocument").__init__(self)
-        self._core = core
+    def __init__(self):
         self.document = { }
         self.document['title'] = "[PREWIKKA]"
         self.document['css_files'] = [ ]
@@ -38,65 +36,78 @@ class HTMLDocumentView(template("HTMLDocument")):
         self.document['css_files'].append("lib/style.css")
         self.document['js_files'].append("lib/functions.js")
         self.info = { }
-        self.info['software'] = core.interface.getSoftware()
-        self.info['place'] = core.interface.getPlace()
-        self.info['title'] = core.interface.getTitle()
+        self.menu_items = [ ]
+        self.topmenu_items = [ ]
+        self.topmenu_quick_accessors = [ ]
+        if self.tabs:
+            self.addTabs(self.tabs)
+        
+    def setInfoSoftware(self, software):
+        self.info['software'] = software
 
+    def setInfoPlace(self, place):
+        self.info['place'] = place
+
+    def setInfoTitle(self, title):
+        self.info['title'] = title
+
+    def addSection(self, name, action):
+        item = { }
+        item["name"] = name
+        if name == self.active_section:
+            item["type"] = "active"
+        else:
+            item["type"] = "inactive"
+            item["link"] = self.createLink(action)
+        self.menu_items.append(item)
+        
+    def addSections(self, sections):
+        for name, action in sections:
+            self.addSection(name, action)
+
+    def addTab(self, name, action):
+        item = { }
+        item["name"] = name
+        item["link"] = self.createLink(action)
+        item["type"] = ("inactive", "active")[name == self.active_tab]
+        self.topmenu_items.append(item)
+
+    def addTabs(self, tabs):
+        for name, action in tabs:
+            self.addTab(name, action)
+
+    def addQuickAccessor(self, name, action, parameters):
+        item = { }
+        item["name"] = name
+        item["link"] = self.createLink(action, parameters)
+        self.topmenu_quick_accessors.append(item)
+        
+    def addQuickAccessors(self, accessors):
+        for name, action, parameters in accessors:
+            self.addQuickAccessor(name, action, parameters)
+    
+    def setConfiguration(self, configuration):
+        pass
+        
     def createLink(self, action, parameters=None):
         link = "?action=%s" % Action.get_action_name(action)
         if parameters:
             link += "&%s" % str(parameters)
+        
         return link
 
 
 
-class NormalLayoutView(template("NormalLayout")):
-    action_section = None
-    tabs = None
-    active_tab = None
-    
-    def __init__(self, core):
-        template("NormalLayout").__init__(self, core)
-        self.topmenu_items = [ ]
-        self.topmenu_quick_accesses = [ ]
-        self.menu_items = [ ]
-        
-        for section, action in self._core.interface.getSections():
-            item = { }
-            item["name"] = section
-            if section == self.active_section:
-                item["type"] = "active"
-            else:
-                item["type"] = "inactive"
-                item["link"] = self.createLink(action)
-            self.menu_items.append(item)
-
-        for name, action in self.tabs:
-            item = { }
-            item["name"] = name
-            item["link"] = self.createLink(action)
-            item["type"] = ("inactive", "active")[name == self.active_tab]
-            self.topmenu_items.append(item)
-            
-        for name, action, parameters in self._core.interface.getQuickAccesses():
-            item = { }
-            item["name"] = name
-            item["link"] = self.createLink(action, parameters)
-            self.topmenu_quick_accesses.append(item)
-
-
-
-class PropertiesChangeView(template("PropertiesChange")):
-    def __init__(self, core, action_name, action):
-        template("PropertiesChange").__init__(self, core)
+class PropertiesChangeDataSet:
+    def __init__(self, action_name, action):
         self.properties = [ ]
-        self.submit = action_name
         self.hiddens = [ ]
+        self.submit = action_name
         self.addHidden("action", Action.get_action_name(action))
 
     def addHidden(self, name, value):
         self.hiddens.append([ name, value ])
-    
+
     def _addProperty(self, type, name, parameter, value=None):
         property = { "type": type, "name": name, "parameter": parameter, "value": value }
         self.properties.append(property)
@@ -112,10 +123,8 @@ class PropertiesChangeView(template("PropertiesChange")):
 
 
 
-class NormalView(NormalLayoutView):
-    pass
-
-
-
-class TopView:
-    pass
+class ConfigDataSet(BaseDataSet):
+    active_section = "Configuration"
+    
+    def setConfiguration(self, configuration):
+        self.addTabs(configuration)

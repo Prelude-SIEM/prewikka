@@ -25,8 +25,6 @@ import copy
 import urllib
 import cgi
 
-from prewikka import Views, Log
-
 
 class ConfigView:
     def __init__(self, core):
@@ -38,20 +36,23 @@ class ConfigView:
 class Interface:
     def __init__(self, core, config):
         self._sections = [ ]
-        self._quick_accesses = [ ]
+        self._quick_accessors = [ ]
         self._software = config.getOptionValue("software", "Prewikka")
         self._place = config.getOptionValue("place", "")
         self._title = config.getOptionValue("title", "Prelude management")
         self._configuration = [ ]
 
-    def registerQuickAccess(self, name, action, parameters):
-        self._quick_accesses.append((name, action, parameters))
+    def registerQuickAccessor(self, name, action, parameters):
+        self._quick_accessors.append((name, action, parameters))
 
-    def getQuickAccesses(self):
-        return self._quick_accesses
+    def getQuickAccessors(self):
+        return self._quick_accessors
 
     def getSections(self):
         return self._sections
+
+    def getConfiguration(self):
+        return self._configuration
 
     def getSoftware(self):
         return self._software

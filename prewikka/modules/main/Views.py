@@ -22,16 +22,13 @@ import sys
 import time
 import copy
 
-from prewikka import Views
 import prewikka.Action
+from prewikka import DataSet
 from prewikka.modules.main import ActionParameters
-from prewikka.modules.main.templates import MessageSummary, MessageDetails
+from prewikka.modules.main.templates import AlertListing, HeartbeatListing, \
+     MessageDetails, MessageSummary, SensorAlertListing, SensorHeartbeatListing, \
+     SensorListing
 from prewikka import utils
-
-
-
-def template(name):
-    return getattr(__import__("prewikka/modules/main/templates/" + name), name)
 
 
 
@@ -40,22 +37,22 @@ def Action(name):
     # because Actions imports View, which means that we would have an indirect recursive
     # module import (View -> Actions -> View -> ...)
     # TODO: find a cleaner way to solve this problem
-    from prewikka.modules.main import Actions
-    return getattr(Actions, name)
+    import prewikka.modules.main.Actions
+    return getattr(prewikka.modules.main.Actions, name)
 
 
 
-class AlertsSection:
+class AlertsSection(DataSet.BaseDataSet):
     active_section = "Alerts"
     tabs = [("Alerts", Action("AlertListing")())]
     active_tab = "Alerts"
 
 
 
-class HeartbeatsSection(Views.NormalView):
+class HeartbeatsSection(DataSet.BaseDataSet):
     active_section = "Heartbeats"
     tabs = [("List", Action("HeartbeatListing")())]
-    
+
 
 
 class HeartbeatsAnalyzeTab(HeartbeatsSection):
@@ -68,16 +65,15 @@ class HeartbeatListingTab(HeartbeatsSection):
 
 
 
-class SensorsSection:
+class SensorsSection(DataSet.BaseDataSet):
     active_section = "Sensors"
     tabs = [("Sensors", Action("SensorListing")())]
     active_tab = "Sensors"
-    
 
 
-class MessageListingView(template("MessageListing")):
-    def __init__(self, core):
-        template("MessageListing").__init__(self, core)
+
+class MessageListingDataSet:
+    def __init__(self):
         self.timeline = { }
         self.messages = [ ]
         
@@ -171,22 +167,19 @@ class MessageListingView(template("MessageListing")):
 
 
 
-class AlertListingView(AlertsSection, template("AlertListing")):
-    def __init__(self, core):
-        template("AlertListing").__init__(self, core)
-        
+class AlertListingDataSet(MessageListingDataSet):
     def _getMessageListingAction(self):
         return Action("AlertListing")()
-    
+
     def _getDeleteAction(self):
         return Action("DeleteAlerts")()
 
     def _getMessageSummaryAction(self):
         return Action("AlertSummary")()
-    
+
     def _getMessageDetailsAction(self):
         return Action("AlertDetails")()
-    
+
     def _addMessageFields(self, alert, fields):
         fields["severity"] = alert["alert.assessment.impact.severity"] or "low"
         
@@ -205,10 +198,12 @@ class AlertListingView(AlertsSection, template("AlertListing")):
 
 
 
-class HeartbeatListingView(HeartbeatListingTab, template("HeartbeatListing")):
-    def __init__(self, core):
-        template("HeartbeatListing").__init__(self, core)
-        
+def AlertListingView():
+    return utils.mixin(AlertsSection, AlertListingDataSet, AlertListing.AlertListing)
+
+
+
+class HeartbeatListingDataSet(MessageListingDataSet):
     def _getMessageListingAction(self):
         return Action("HeartbeatListing")()
 
@@ -236,9 +231,13 @@ class HeartbeatListingView(HeartbeatListingTab, template("HeartbeatListing")):
 
 
 
-class MessageSummaryView(template("MessageSummary")):
-    def __init__(self, core):
-        template("MessageSummary").__init__(self, core)
+def HeartbeatListingView():
+    return utils.mixin(HeartbeatListingTab, HeartbeatListingDataSet, HeartbeatListing.HeartbeatListing)
+
+
+
+class MessageSummaryDataSet:
+    def __init__(self):
         self.sections = [ ]
 
     def beginSection(self, title):
@@ -255,7 +254,7 @@ class MessageSummaryView(template("MessageSummary")):
     def endSection(self):
         if self._current_section["entries"]:
             self.sections.append(self._current_section)
-        
+
     def buildAnalyzer(self, alert):
         self.beginSection("Analyzer")
         self.newSectionEntry("Analyzerid", alert["analyzer.analyzerid"])
@@ -287,9 +286,8 @@ class MessageSummaryView(template("MessageSummary")):
 
 
 
-class AlertSummaryView(AlertsSection, MessageSummaryView):
-    def __init__(self, core, alert):
-        MessageSummaryView.__init__(self, core)
+class AlertSummaryDataSet(MessageSummaryDataSet):
+    def setMessage(self, alert):
         self.buildTime(alert)
         self.buildClassification(alert)
         self.buildImpact(alert)
@@ -352,9 +350,13 @@ class AlertSummaryView(AlertsSection, MessageSummaryView):
 
 
 
-class HeartbeatSummaryView(HeartbeatListingTab, MessageSummaryView):
-    def __init__(self, core, heartbeat):
-        MessageSummaryView.__init__(self, core)
+def AlertSummaryView():
+    return utils.mixin(AlertsSection, AlertSummaryDataSet, MessageSummary.MessageSummary)
+
+
+
+class HeartbeatSummaryDataSet(MessageSummaryDataSet):
+    def setMessage(self, heartbeat):
         self.buildAnalyzer(heartbeat)
         self.buildTime(heartbeat)
         self.buildAdditionalData(heartbeat)
@@ -364,6 +366,11 @@ class HeartbeatSummaryView(HeartbeatListingTab, MessageSummaryView):
         self.newSectionEntry("Create time", heartbeat["create_time"])
         self.newSectionEntry("Analyzer time", heartbeat["analyzer_time"])
         self.endSection()
+
+
+
+def HeartbeatSummaryView():
+    return utils.mixin(HeartbeatListingTab, HeartbeatSummaryDataSet, MessageSummary.MessageSummary)
 
 
 
@@ -636,19 +643,26 @@ class HeartbeatDetails(_Element):
 
 
 
-class AlertDetailsView(AlertsSection, template("MessageDetails")):
-    def __init__(self, core, alert):
-        template("MessageDetails").__init__(self, core)
+class AlertDetailsDataSet:
+    def setMessage(self, alert):
         details = AlertDetails(alert)
         self.node = details.render()
 
 
+def AlertDetailsView():
+    return utils.mixin(AlertsSection, AlertDetailsDataSet, MessageDetails.MessageDetails)
 
-class HeartbeatDetailsView(HeartbeatListingTab, template("MessageDetails")):
-    def __init__(self, core, heartbeat):
-        template("MessageDetails").__init__(self, core)
+
+
+class HeartbeatDetailsDataSet:
+    def setMessage(self, heartbeat):
         details = HeartbeatDetails(heartbeat)
         self.node = details.render()
+
+
+
+def HeartbeatDetailsView():
+    return utils.mixin(HeartbeatListingTab, HeartbeatDetailsDataSet, MessageDetails.MessageDetails)
 
 
 
@@ -680,13 +694,13 @@ class HeartbeatsAnalyzeView(HeartbeatsAnalyzeTab):
 
 
 
-class SensorMessageListingView(SensorsSection):
+class SensorMessageListingDataSet:
     def setAnalyzer(self, analyzer):
         self.analyzer = analyzer
 
 
 
-class SensorAlertListingView(SensorMessageListingView, template("SensorAlertListing")):
+class SensorAlertListingDataSet(SensorMessageListingDataSet, AlertListingDataSet):
     def _getMessageListingAction(self):
         return Action("SensorAlertListing")()
 
@@ -701,7 +715,12 @@ class SensorAlertListingView(SensorMessageListingView, template("SensorAlertList
 
 
 
-class SensorHeartbeatListingView(SensorMessageListingView, template("SensorHeartbeatListing")):
+def SensorAlertListingView():
+    return utils.mixin(SensorsSection, SensorAlertListingDataSet, SensorAlertListing.SensorAlertListing)
+
+
+
+class SensorHeartbeatListingDataSet(SensorMessageListingDataSet, HeartbeatListingDataSet):
     def _getMessageListingAction(self):
         return Action("SensorHeartbeatListing")()
 
@@ -716,34 +735,43 @@ class SensorHeartbeatListingView(SensorMessageListingView, template("SensorHeart
 
 
 
-class SensorAlertSummaryView(SensorsSection, AlertSummaryView):
-    pass
+def SensorHeartbeatListingView():
+    return utils.mixin(SensorsSection, SensorHeartbeatListingDataSet, SensorHeartbeatListing.SensorHeartbeatListing)
 
 
 
-class SensorAlertDetailsView(SensorsSection, AlertDetailsView):
-    pass
+def SensorAlertSummaryView():
+    return utils.mixin(SensorsSection, AlertSummaryDataSet, MessageSummary.MessageSummary)
 
 
 
-class SensorHeartbeatSummaryView(SensorsSection, HeartbeatSummaryView):
-    pass
+def SensorAlertDetailsView():
+    return utils.mixin(SensorsSection, AlertDetailsDataSet, MessageDetails.MessageDetails)
 
 
 
-class SensorHeartbeatDetailsView(SensorsSection, HeartbeatDetailsView):
-    pass
+def SensorHeartbeatSummaryView():
+    return utils.mixin(SensorsSection, HeartbeatSummaryDataSet, MessageSummary.MessageSummary)
 
 
 
-class SensorListingView(SensorsSection, template("SensorListing")):
-    def __init__(self, core):
-        template("SensorListing").__init__(self, core)
+def SensorHeartbeatDetailsView():
+    return utils.mixin(SensorsSection, HeartbeatSummaryDataSet, MessageDetails.MessageDetails)
+
+
+
+class SensorListingDataSet:
+    def __init__(self):
         self.analyzers = [ ]
-        
+
     def addAnalyzer(self, analyzer):
         parameters = ActionParameters.SensorMessageListing()
         parameters.setAnalyzerid(analyzer["analyzerid"])
         analyzer["alerts"] = self.createLink(Action("SensorAlertListing")(), parameters)
         analyzer["heartbeats"] = self.createLink(Action("SensorHeartbeatListing")(), parameters)
         self.analyzers.append(analyzer)
+
+
+
+def SensorListingView():
+    return utils.mixin(SensorsSection, SensorListingDataSet, SensorListing.SensorListing)

@@ -1,5 +1,4 @@
-#from prewikka.Views import HTMLDocumentView
-#extends HTMLDocumentView
+#extends prewikka.templates.HTMLDocument
 
 #block body
 <body class='normal_body'>
@@ -21,9 +20,11 @@
 				<li class='$class_'><a href="$item.link">$item.name</a></li>
 				#end for
 			</ul>
-			#for $item in $topmenu_quick_accesses
-				<li class='topmenu_item_special'><a href="$item.link">$item.name</a></li>
-			#end for
+			<ul>
+				#for $item in $topmenu_quick_accessors
+					<li class='topmenu_item_special'><a href="$item.link">$item.name</a></li>
+				#end for
+			</ul>
 		</div>
 		
 		<div id="menu">
@@ -35,7 +36,7 @@
 					#set $class_ = 'menu_item_inactive'
 					#set $name = "<a href='%s'>%s</a>" % ($item.link, $item.name)
 				#end if
-			<p class='$class_'>$name</li>
+			<p class='$class_'>$name</p>
 			#end for
 		</div>
 		

@@ -24,15 +24,15 @@ import time
 import copy
 
 from prewikka import Action
-#from prewikka.modules.main import Views, ActionParameters
-from prewikka.modules.main import ActionParameters
 from prewikka import utils
+
+from prewikka.modules.main import ActionParameters
 
 
 def View(name):
-    from prewikka.modules.main import Views
+    import prewikka.modules.main.Views
     
-    return getattr(Views, name)
+    return getattr(prewikka.modules.main.Views, name)
     
 
 class _MyTime:
@@ -96,7 +96,7 @@ class MessageListing(Action.Action):
         pass
     
     def process(self, core, parameters, request):
-        view = self._getView()(core)
+        view = self._getView()()
         view.setParameters(parameters)
         prelude = core.prelude
         criteria = [ ]
@@ -189,14 +189,18 @@ class HeartbeatListing(MessageListing):
 class AlertAction(Action.Action):
     def process(self, core, parameters, request):
         alert = core.prelude.getAlert(parameters.getAnalyzerid(), parameters.getMessageIdent())
-        return View(self.view_name)(core, alert)
+        view = View(self.view_name)()
+        view.setMessage(alert)
+        return view
 
 
 
 class HeartbeatAction(Action.Action):
     def process(self, core, parameters, request):
-        alert = core.prelude.getHeartbeat(parameters.getAnalyzerid(), parameters.getMessageIdent())
-        return View(self.view_name)(core, alert)
+        heartbeat = core.prelude.getHeartbeat(parameters.getAnalyzerid(), parameters.getMessageIdent())
+        view = View(self.view_name)()
+        view.setMessage(heartbeat)
+        return view
 
 
 
@@ -242,46 +246,46 @@ class DeleteHeartbeats(HeartbeatListing):
 
 
 
-class HeartbeatsAnalyze(Action.Action):
-    def process(self, core, parameters, request):
-        heartbeat_number = 48
-        heartbeat_value = 3600
-        heartbeat_error_tolerance = 3
+## class HeartbeatsAnalyze(Action.Action):
+##     def process(self, core, parameters, request):
+##         heartbeat_number = 48
+##         heartbeat_value = 3600
+##         heartbeat_error_tolerance = 3
         
-        prelude = core.prelude
+##         prelude = core.prelude
         
-        data = { }
-        data["analyzers"] = [ ]
-        data["heartbeat_number"] = heartbeat_number
-        data["heartbeat_value"] = heartbeat_value
-        data["heartbeat_error_tolerance"] = heartbeat_error_tolerance
+##         data = { }
+##         data["analyzers"] = [ ]
+##         data["heartbeat_number"] = heartbeat_number
+##         data["heartbeat_value"] = heartbeat_value
+##         data["heartbeat_error_tolerance"] = heartbeat_error_tolerance
         
-        analyzers = data["analyzers"]
+##         analyzers = data["analyzers"]
 
-        for analyzerid in prelude.getAnalyzerids():
-            analyzer = prelude.getAnalyzer(analyzerid)
-            analyzer["errors"] = [ ]
-            analyzers.append(analyzer)
+##         for analyzerid in prelude.getAnalyzerids():
+##             analyzer = prelude.getAnalyzer(analyzerid)
+##             analyzer["errors"] = [ ]
+##             analyzers.append(analyzer)
             
-            previous_date = 0
+##             previous_date = 0
             
-            rows = prelude.getValues(selection=["heartbeat.create_time/order_desc"],
-                                     criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
-                                     limit=heartbeat_number)
+##             rows = prelude.getValues(selection=["heartbeat.create_time/order_desc"],
+##                                      criteria="heartbeat.analyzer.analyzerid == %d" % analyzerid,
+##                                      limit=heartbeat_number)
             
-            for row in rows:
-                date = row[0]
-                if previous_date:
-                    delta = int(previous_date) - int(date)
-                    if delta > heartbeat_value + heartbeat_error_tolerance:
-                        analyzer["errors"].append({ "type": "later", "after": date, "back": previous_date })
-                    elif delta < heartbeat_value - heartbeat_error_tolerance:
-                        analyzer["errors"].append({ "type": "sooner", "date": previous_date, "delta": delta })
-                else:
-                    analyzer["last_heartbeat"] = date
-                previous_date = date
+##             for row in rows:
+##                 date = row[0]
+##                 if previous_date:
+##                     delta = int(previous_date) - int(date)
+##                     if delta > heartbeat_value + heartbeat_error_tolerance:
+##                         analyzer["errors"].append({ "type": "later", "after": date, "back": previous_date })
+##                     elif delta < heartbeat_value - heartbeat_error_tolerance:
+##                         analyzer["errors"].append({ "type": "sooner", "date": previous_date, "delta": delta })
+##                 else:
+##                     analyzer["last_heartbeat"] = date
+##                 previous_date = date
         
-        return View("HeartbeatsAnalyzeView"), data
+##         return View("HeartbeatsAnalyzeView"), data
 
 
 
@@ -359,7 +363,7 @@ class SensorHeartbeatDetails(HeartbeatDetails):
 
 class SensorListing(Action.Action):
     def process(self, core, parameters, request):
-        view = View("SensorListingView")(core)
+        view = View("SensorListingView")()
         
         prelude = core.prelude
         for analyzerid in prelude.getAnalyzerids():

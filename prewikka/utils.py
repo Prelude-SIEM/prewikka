@@ -26,3 +26,15 @@ def time_to_hms(t):
 
 def time_to_ymdhms(t):
     return time.strftime("%Y-%m-%d %H:%M:%S", time.localtime(t))
+
+
+def mixin(*bases):
+    class Dummy:
+        def __init__(self):
+            for base in Dummy.__bases__:
+                if hasattr(base, "__init__"):
+                    base.__init__(self)
+
+    Dummy.__bases__ = bases
+    
+    return Dummy()

@@ -87,6 +87,15 @@ class Core:
                     view = self.action_engine.process(self, registered_action, arguments, request)
         else:
             view = self.action_engine.process(self, registered_action, arguments, request)
-            
+
+        interface = self.interface
+        
+        view.setInfoTitle(interface.getTitle())
+        view.setInfoSoftware(interface.getSoftware())
+        view.setInfoPlace(interface.getPlace())
+        view.addSections(interface.getSections())
+        view.setConfiguration(interface.getConfiguration())
+        view.addQuickAccessors(interface.getQuickAccessors())
+        
         request.content = str(view)
         request.sendResponse()
