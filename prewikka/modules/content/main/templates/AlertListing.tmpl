@@ -10,9 +10,41 @@
 
 #block message_fields
 #set $class_ = "impact_severity_" + $message.severity
-<td><a href='$message.classification.filter' class='$class_'>$message.classification.value</a></td>
-<td><a href='$message.source.filter'>$message.source.value</a></td>
-<td><a href='$message.target.filter'>$message.target.value</a></td>
+
+<td>
+ <ul id="popup_block">
+  <li class="$class_">$message.classification.value
+   <ul>
+    <li><a href="$message.details">Alert detail</a></li>
+    <li><a href="$message.summary">Alert summary</a></li>
+    <li><a href="$message.classification.filter">Group by classification</a></li>
+   </ul>
+  </li>
+ </ul>
+</td>
+
+<td>
+ <ul id="popup_block">
+  <li class="popup_title">$message.source.value
+   <ul>
+    <li><a href="$message.source.filter">Group by source</a></li>
+    <li><a href="whois">Whois</a></li>
+   </ul>
+  </li>
+ </ul>
+</td>
+
+<td>
+ <ul id="popup_block">
+  <li class="popup_title">$message.target.value
+   <ul>
+    <li><a href="$message.target.filter">Group by target</a></li>
+    <li><a href="whois">Whois</a></li>
+   </ul>
+  </li>
+ </ul>
+</td>
+
 <td><a href='$message.sensor.filter'>$message.sensor.value</a></td>
 <td>$message.time</td>
 #end block message_fields

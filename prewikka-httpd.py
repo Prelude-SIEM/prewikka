@@ -120,5 +120,5 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         self._processDynamic(cgi.parse_qs(self.rfile.read(int(self.headers["Content-Length"]))))
 
 
-server = PrewikkaServer(("127.0.0.1", 8000), PrewikkaRequestHandler)
+server = PrewikkaServer(("0.0.0.0", 8000), PrewikkaRequestHandler)
 server.serve_forever()

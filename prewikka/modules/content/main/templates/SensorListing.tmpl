@@ -17,14 +17,23 @@
 		#set $cnt = 0
 		#for $analyzer in $analyzers
 			<tr class='$row_classes[$cnt%2]'>
-				<td>$analyzer.analyzerid</td>
+
+			        <td>
+ 			         <ul id="popup_block">
+  			          <li class="popup_title">$analyzer.analyzerid
+   			           <ul>
+    			            <li><a href="$analyzer.alerts">Alert listing</a></li>
+                                    <li><a href="$analyzer.heartbeats">Heartbeat listing</a></li>
+                                   </ul>
+                                  </li>
+                                 </ul>
+                                </td>
+
 				<td>$analyzer.model $analyzer.version</td>
 				<td>$analyzer.ostype $analyzer.osversion</td>
 				<td>$analyzer.name</td>
 				<td>$analyzer.location</td>
 				<td>$analyzer.address</td>
-				<td><a href='$analyzer.alerts'>alerts</a></td>
-				<td><a href='$analyzer.heartbeats'>heartbeats</a></td>
 			</tr>
 			#set $cnt += 1
 		#end for

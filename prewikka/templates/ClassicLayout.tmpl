@@ -6,23 +6,17 @@ classic_body
 
 #block toplayout_content
 <div id="topmenu">
-	<ul>
 		#for $name, $link in $interface.tabs
 			#if $name == $interface.active_tab
 				#set $class_ = 'topmenu_item_active'
 			#else
 				#set $class_ = 'topmenu_item_inactive'
 			#end if
-		<li class='$class_'><a href="$link">$name</a></li>
+		<div class='$class_'><a href="$link">$name</a></div>
 		#end for
-	</ul>
-	<ul>
 		#if $prewikka.user.logout
-			<li class='topmenu_item_special'>
-				<a href="$prewikka.user.logout">logout</a>
-			</li>
+			<div class='topmenu_item_special'><a href="$prewikka.user.logout">logout</a></div>
 		#end if
-	</ul>
 </div>
 	
 <div id="menu">
