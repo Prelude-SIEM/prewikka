@@ -527,7 +527,7 @@ class AlertListingAction(MessageListingAction, AlertsView):
         cnt = 0
 
         while True:
-            orgin = src["alert.classification.reference(%d).origin" % cnt]
+            origin = src["alert.classification.reference(%d).origin" % cnt]
             if origin is None:
                 break
             
