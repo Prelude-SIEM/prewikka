@@ -36,8 +36,8 @@ from prewikka import Core, Request
 
 class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
     def __init__(self, *args, **kwargs):
-        apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
         self.core = Core.Core()
+        apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
         
 
 

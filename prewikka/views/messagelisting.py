@@ -18,6 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+import os.path
 import time
 import copy
 
@@ -846,11 +847,25 @@ class AlertListing(MessageListing, view.View):
                    ("name", "alert.%s.node.name" % category),
                    ("interface", "alert.%s.interface" % category))
             self.dataset["available_aggregations"][category] = tmp
-                    
+
+    def _setTimelineChart(self):
+        if self.parameters["timeline_unit"] in ("min", "hour"):
+            self.dataset["timeline_chart_img"] = "img/generated/last_hour_timeline.png"
+        elif self.parameters["timeline_unit"] == "day":
+            self.dataset["timeline_chart_img"] = "img/generated/last_day_timeline.png"
+        elif self.parameters["timeline_unit"] in ("month", "year"):
+            self.dataset["timeline_chart_img"] = "img/generated/last_month_timeline.png"
+        else:
+            self.dataset["timeline_chart_img"] = None
+
+        if self.dataset["timeline_chart_img"] and not os.path.exists(self.dataset["timeline_chart_img"]):
+            self.dataset["timeline_chart_img"] = None
+            
     def render(self):
         self._deleteMessages()
         
         self._setDatasetConstants()
+        self._setTimelineChart()
         self.dataset["filters"] = self.env.storage.getAlertFilters(self.user.login)
         self.dataset["current_filter"] = self.parameters.get("filter", "")
         
