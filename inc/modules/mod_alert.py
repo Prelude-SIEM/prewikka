@@ -149,11 +149,11 @@ class ListInterface(ModuleInterface):
         template.setCurrent(self.createLink(request))
 
         request = copy.copy(self._request)
-        
-        request.timeline_end = int(self._data["end"][self._request.timeline_unit] + self._request.timeline_value)
+
+        request.timeline_end = int(self._data["next"])
         template.setNext(self.createLink(request))
 
-        request.timeline_end = int(self._data["end"][self._request.timeline_unit] - self._request.timeline_value)
+        request.timeline_end = int(self._data["prev"])
         template.setPrev(self.createLink(request))
         
         template.setTimelineValue(self._request.timeline_value or 1)
@@ -166,10 +166,7 @@ class ListInterface(ModuleInterface):
         for alert in alerts:
             self._addAlert(table, alert)
 
-        print >> sys.stderr, "###", str(self._request)
-
         if self._request.filter_name:
-            #print >> sys.stderr, "###", self._request.filter_name
             filters = [ "alert.classification.name", "alert.source.node.address.address", "alert.target.node.address.address", \
                         "alert.analyzer.model" ]
             footer = [ "" ] * 7
@@ -249,14 +246,25 @@ class AlertModule(module.ContentModule):
             end = MyTime(request.timeline_end)
         else:
             end = MyTime()
-            end.round(request.timeline_unit)
+            if not request.timeline_unit in ("min", "hour"):
+                end.round(request.timeline_unit)
         
         start = end[request.timeline_unit] - request.timeline_value
-
+        
         result["start"], result["end"] = start, end
 
+        if not request.timeline_end and request.timeline_unit in ("min", "hour"):
+            tmp = copy.copy(end)
+            tmp.round(request.timeline_unit)
+            tmp = tmp[request.timeline_unit] - 1
+            result["next"] = tmp[request.timeline_unit] + request.timeline_value
+            result["prev"] = tmp[request.timeline_unit] - (request.timeline_value - 1)
+        else:
+            result["next"] = end[request.timeline_unit] + request.timeline_value
+            result["prev"] = end[request.timeline_unit] - request.timeline_value
+        
         criteria.append("alert.detect_time >= '%s' && alert.detect_time < '%s'" % (str(start), str(end)))
-            
+        
         idents = prelude.getAlertIdents(" && ".join(criteria))
         alerts = [ ]
         if idents:
@@ -264,10 +272,10 @@ class AlertModule(module.ContentModule):
                 alert = prelude.getAlert(analyzerid, alert_ident)
                 alerts.append(alert)
 
-        result["alerts"] = alerts
-
         alerts.sort(lambda alert1, alert2: (int(alert2["alert.detect_time"] or alert2["alert.create_time"]) -
                                             int(alert1["alert.detect_time"] or alert1["alert.create_time"])))
+
+        result["alerts"] = alerts
         
         return ListInterface, result
 
