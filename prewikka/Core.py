@@ -23,7 +23,7 @@ import os, os.path
 
 import copy
 
-from prewikka import Config, Log, Prelude, Interface
+from prewikka import Config, Log, Prelude, Action, Interface
 
 
 class Core:
@@ -31,8 +31,10 @@ class Core:
         self.content_modules = { }
         self._content_module_names = [ ]
         self._config = Config.Config()
-        self.interface = Interface.Interface(self, self._config.get("interface", { }))
         self.log = Log.Log()
+        self.action_engine = Action.ActionEngine(self.log)
+        self.interface = Interface.Interface(self, self._config.get("interface", { }))
+        self.action_engine
         self.prelude = Prelude.Prelude(self._config["prelude"])
         self.auth = None
         self._initModules()
@@ -66,7 +68,25 @@ class Core:
         
     def process(self, request):
         self.log.event(Log.EVENT_QUERY, request, request.getQueryString())
-        view = self.interface.process(request)
-        
-        request.content = view
+
+        arguments = copy.copy(request.arguments)
+        if arguments.has_key("action"):
+            action_name = arguments["action"]
+            del arguments["action"]
+        else:
+            action_name = None
+
+        registered_action = self.action_engine.getRegisteredActionFromName(action_name)
+
+        if self.auth:
+            if registered_action == self.action_engine.getLoginAction():
+                view = self.action_engine.process(self, registered_action, arguments, request)
+            else:
+                view = self.auth.check(request)
+                if not view:
+                    view = self.action_engine.process(self, registered_action, arguments, request)
+        else:
+            view = self.action_engine.process(self, registered_action, arguments, request)
+            
+        request.content = str(view)
         request.sendResponse()

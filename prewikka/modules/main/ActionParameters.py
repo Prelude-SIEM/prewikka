@@ -18,18 +18,18 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import Interface
+from prewikka import Action
 
-class Message(Interface.ActionParameters):
+class Message(Action.ActionParameters):
     def register(self):
-        Interface.ActionParameters.register(self)
+        Action.ActionParameters.register(self)
         self.registerParameter("analyzerid", long)
         self.registerParameter("message_ident", long)
 
     def check(self):
         for parameter in "analyzerid", "message_ident":
             if not self.hasParameter(parameter):
-                raise Interface.ActionParameterMissingError(parameter)
+                raise Action.ActionParameterMissingError(parameter)
         
     def setAnalyzerid(self, analyzerid):
         self["analyzerid"] = analyzerid
@@ -45,7 +45,7 @@ class Message(Interface.ActionParameters):
 
 
 
-class MessageListing(Interface.ActionParameters):
+class MessageListing(Action.ActionParameters):
     def register(self):
         self.registerParameter("filter_name", str)
         self.registerParameter("filter_value", str)
@@ -55,10 +55,10 @@ class MessageListing(Interface.ActionParameters):
 
     def check(self):
         if self.hasParameter("filter_name") ^ self.hasParameter("filter_value"):
-            raise Interface.ActionParameterMissingError(self.hasParameter("filter_name") and "filter_name" or "filter_value")
+            raise Action.ActionParameterMissingError(self.hasParameter("filter_name") and "filter_name" or "filter_value")
 
         if self.hasParameter("timeline_value") ^ self.hasParameter("timeline_unit"):
-            raise Interface.ActionParameterMissingError(self.hasParameter("timeline_value") and "timeline_value" or "timeline_unit")
+            raise Action.ActionParameterMissingError(self.hasParameter("timeline_value") and "timeline_value" or "timeline_unit")
         
     def setFilterName(self, name):
         self["filter_name"] = name
@@ -122,7 +122,7 @@ class SensorMessageListing(MessageListing):
     def check(self):
         MessageListing.check(self)
         if not self.hasParameter("analyzerid"):
-            raise Interface.ActionParameterMissingError("analyzerid")
+            raise Action.ActionParameterMissingError("analyzerid")
         
     def setAnalyzerid(self, analyzerid):
         self["analyzerid"] = analyzerid

@@ -20,6 +20,8 @@
 
 import sys
 
+from prewikka import Action
+
 def template(name):
     return getattr(__import__("prewikka/templates/" + name), name)
 
@@ -41,9 +43,7 @@ class HTMLDocumentView(template("HTMLDocument")):
         self.info['title'] = core.interface.getTitle()
 
     def createLink(self, action, parameters=None):
-        from prewikka import Interface
-        
-        link = "?action=%s" % Interface.get_action_name(action)
+        link = "?action=%s" % Action.get_action_name(action)
         if parameters:
             link += "&%s" % str(parameters)
         return link
@@ -58,7 +58,7 @@ class NormalLayoutView(template("NormalLayout")):
     def __init__(self, core):
         template("NormalLayout").__init__(self, core)
         self.topmenu_items = [ ]
-        self.topmenu_special_items = [ ]
+        self.topmenu_quick_accesses = [ ]
         self.menu_items = [ ]
         
         for section, action in self._core.interface.getSections():
@@ -78,11 +78,11 @@ class NormalLayoutView(template("NormalLayout")):
             item["type"] = ("inactive", "active")[name == self.active_tab]
             self.topmenu_items.append(item)
             
-        for name, action, parameters in self._core.interface.getSpecialActions():
+        for name, action, parameters in self._core.interface.getQuickAccesses():
             item = { }
             item["name"] = name
             item["link"] = self.createLink(action, parameters)
-            self.topmenu_special_items.append(item)
+            self.topmenu_quick_accesses.append(item)
 
 
 
@@ -92,8 +92,7 @@ class PropertiesChangeView(template("PropertiesChange")):
         self.properties = [ ]
         self.submit = action_name
         self.hiddens = [ ]
-        from prewikka import Interface
-        self.addHidden("action", Interface.get_action_name(action))
+        self.addHidden("action", Action.get_action_name(action))
 
     def addHidden(self, name, value):
         self.hiddens.append([ name, value ])

@@ -64,8 +64,8 @@ class LogStderr(Log.LogBackend):
     def handle_invalid_action_parameters(self, request, reason):
         self._log("invalid action parameters, " + reason)
 
-    def handle_action_denied(self, request, action):
-        self._log("action '%s' forbidden for user '%s'" % Interface.get_action_name(action), request.user.getLogin())
+    def handle_action_denied(self, request, action_name):
+        self._log("action '%s' forbidden for user '%s'" % action_name, request.user.getLogin())
 
     def handle_debug(self, message):
         self._log(message)

@@ -23,7 +23,7 @@ import sys
 import time
 import copy
 
-from prewikka import Interface
+from prewikka import Action
 #from prewikka.modules.main import Views, ActionParameters
 from prewikka.modules.main import ActionParameters
 from prewikka import utils
@@ -91,7 +91,7 @@ class _MyTime:
 
 
 
-class MessageListing(Interface.Action):
+class MessageListing(Action.Action):
     def _adjustCriteria(self, core, parameters, criteria):
         pass
     
@@ -186,14 +186,14 @@ class HeartbeatListing(MessageListing):
 
 
 
-class AlertAction(Interface.Action):
+class AlertAction(Action.Action):
     def process(self, core, parameters, request):
         alert = core.prelude.getAlert(parameters.getAnalyzerid(), parameters.getMessageIdent())
         return View(self.view_name)(core, alert)
 
 
 
-class HeartbeatAction(Interface.Action):
+class HeartbeatAction(Action.Action):
     def process(self, core, parameters, request):
         alert = core.prelude.getHeartbeat(parameters.getAnalyzerid(), parameters.getMessageIdent())
         return View(self.view_name)(core, alert)
@@ -242,7 +242,7 @@ class DeleteHeartbeats(HeartbeatListing):
 
 
 
-class HeartbeatsAnalyze(Interface.Action):
+class HeartbeatsAnalyze(Action.Action):
     def process(self, core, parameters, request):
         heartbeat_number = 48
         heartbeat_value = 3600
@@ -357,7 +357,7 @@ class SensorHeartbeatDetails(HeartbeatDetails):
 
 
 
-class SensorListing(Interface.Action):
+class SensorListing(Action.Action):
     def process(self, core, parameters, request):
         view = View("SensorListingView")(core)
         

@@ -4,7 +4,7 @@ import time
 import random
 import md5
 
-from prewikka import Log, Interface, Views
+from prewikka import Log, Action, Interface, Views
 from prewikka.templates import LoginPasswordForm, PropertiesChange
 from prewikka.templates import UserListing
 
@@ -38,7 +38,7 @@ CAPABILITIES = [ CAPABILITY_READ_MESSAGE, CAPABILITY_DELETE_MESSAGE, CAPABILITY_
 CAPABILITIES_ADMIN = CAPABILITIES
 
 
-class LoginPasswordActionParameters(Interface.ActionParameters):
+class LoginPasswordActionParameters(Action.ActionParameters):
     def register(self):
         self.registerParameter("login", str)
         self.registerParameter("password", str)
@@ -68,11 +68,11 @@ class CapabilityActionParameters:
     def check(self):
         for capability in CAPABILITIES:
             if self.hasParameter(capability) and self[capability] != "on":
-                raise Interface.ActionParameterInvalidError(capability)
+                raise Action.ActionParameterInvalidError(capability)
 
             
 
-class AddUserActionParameters(Interface.ActionParameters, CapabilityActionParameters):
+class AddUserActionParameters(Action.ActionParameters, CapabilityActionParameters):
     def register(self):
         CapabilityActionParameters.register(self)
         self.registerParameter("login", str)
@@ -89,12 +89,11 @@ class AddUserActionParameters(Interface.ActionParameters, CapabilityActionParame
         CapabilityActionParameters.check(self)
         for parameter in "login", "password1", "password2":
             if not self.hasParameter(parameter):
-                raise Interface.ActionParameterMissingError(parameter)
-            
+                raise Action.ActionParameterMissingError(parameter)
 
 
 
-class UserActionParameters(Interface.ActionParameters):
+class UserActionParameters(Action.ActionParameters):
     def register(self):
         self.registerParameter("id", int)
         
@@ -106,7 +105,7 @@ class UserActionParameters(Interface.ActionParameters):
         
     def check(self):
         if not self.hasParameter("id"):
-            raise Interface.ActionParameterMissingError("id")
+            raise Action.ActionParameterMissingError("id")
 
 
 
@@ -123,7 +122,7 @@ class ChangePasswordActionParameters(UserActionParameters):
         UserActionParameters.check(self)
         for parameter in "password1", "password2":
             if not self.hasParameter(parameter):
-                raise Interface.ActionParameterMissingError(parameter)
+                raise Action.ActionParameterMissingError(parameter)
 
 
 
@@ -146,7 +145,7 @@ def template(name):
 class LoginPasswordPromptView(template("LoginPasswordForm")):
     def __init__(self, core, login_action):
         template("LoginPasswordForm").__init__(self, core)
-        self.login_action = Interface.get_action_name(login_action)
+        self.login_action = Action.get_action_name(login_action)
 
 
 
@@ -167,7 +166,7 @@ class UserListingView(UsersView, template("UserListing")):
         self.capabilities = CAPABILITIES
 
     def createAccess(self, action, parameters=[]):
-        return [("action", Interface.get_action_name(action))] + parameters
+        return [("action", Action.get_action_name(action))] + parameters
 
     def addUser(self, user):
         parameters = [("id", user.getID())]
@@ -242,18 +241,18 @@ class UserManagement:
         self.core = core
         self._use_ssl = config.getOptionValue("use_ssl", "") in ("yes", "true", "on")
         self._expiration = int(config.getOptionValue("expiration", 30))
-        self.core.interface.registerLoginAction(self.login, LoginPasswordActionParameters)
         self.core.interface.registerConfigurationSection("Users", self.handle_user_listing)
-        self.core.interface.registerAction(self.handle_user_listing, Interface.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.interface.registerAction(self.handle_user_add_form, Interface.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.interface.registerAction(self.handle_user_add, AddUserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.interface.registerAction(self.handle_change_password_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.interface.registerAction(self.handle_change_password, ChangePasswordActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.interface.registerAction(self.handle_change_capabilities_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.interface.registerAction(self.handle_change_capabilities, ChangeCapabilitiesActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.interface.registerAction(self.handle_user_delete, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
-        self.core.interface.registerSpecialAction("logout", self.handle_user_logout, None)
-        self.core.interface.registerAction(self.handle_user_logout, Interface.ActionParameters, [ ])
+        self.core.interface.registerQuickAccess("logout", self.handle_user_logout, None)
+        self.core.action_engine.registerLoginAction(self.login, LoginPasswordActionParameters)
+        self.core.action_engine.registerAction(self.handle_user_listing, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.action_engine.registerAction(self.handle_user_add_form, Action.ActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.action_engine.registerAction(self.handle_user_add, AddUserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.action_engine.registerAction(self.handle_change_password_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.action_engine.registerAction(self.handle_change_password, ChangePasswordActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.action_engine.registerAction(self.handle_change_capabilities_form, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.action_engine.registerAction(self.handle_change_capabilities, ChangeCapabilitiesActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.action_engine.registerAction(self.handle_user_delete, UserActionParameters, [ CAPABILITY_USER_MANAGEMENT ])
+        self.core.action_engine.registerAction(self.handle_user_logout, Action.ActionParameters, [ ])
         
     def enableSSL(self):
         self._use_ssl = True
@@ -322,7 +321,7 @@ class UserManagement:
         
         core.log.event(Log.EVENT_LOGIN_SUCCESSFUL, request, user)
         
-        return self.core.interface.forwardToDefaultAction(core, request)
+        return self.core.action_engine.processDefaultAction(core, request)
     
     def handle_user_listing(self, core, parameters, request):
         ids = self.getUsers()
@@ -349,12 +348,12 @@ class UserManagement:
         user.setCapabilities(parameters.getCapabilities())
         user.save()
         
-        return self.handle_user_listing(core, Interface.ActionParameters(), request)
+        return self.handle_user_listing(core, Action.ActionParameters(), request)
         
     def handle_user_delete(self, core, parameters, request):
         self.removeUser(parameters.getID())
         
-        return self.handle_user_listing(core, Interface.ActionParameters(), request)
+        return self.handle_user_listing(core, Action.ActionParameters(), request)
     
     def handle_change_password_form(self, core, parameters, request):
         return ChangePasswordForm(core, parameters.getID(), self.handle_change_password)
@@ -364,7 +363,7 @@ class UserManagement:
         user.setPassword(parameters.getPassword())
         user.save()
         
-        return self.handle_user_listing(core, Interface.ActionParameters(), request)
+        return self.handle_user_listing(core, Action.ActionParameters(), request)
     
     def handle_change_capabilities_form(self, core, parameters, request):
         return ChangeCapabilitiesForm(core, self.getUserByID(parameters.getID()), self.handle_change_capabilities)
@@ -374,7 +373,7 @@ class UserManagement:
         user.setCapabilities(parameters.getCapabilities())
         user.save()
         
-        return self.handle_user_listing(core, Interface.ActionParameters(), request)
+        return self.handle_user_listing(core, Action.ActionParameters(), request)
 
     def handle_user_logout(self, core, parameters, request):
         request.user.removeSession(request.input_cookie["sessionid"].value)

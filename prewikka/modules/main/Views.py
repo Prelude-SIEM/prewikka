@@ -22,7 +22,8 @@ import sys
 import time
 import copy
 
-from prewikka import Views, Interface
+from prewikka import Views
+import prewikka.Action
 from prewikka.modules.main import ActionParameters
 from prewikka.modules.main.templates import MessageSummary, MessageDetails
 from prewikka import utils
@@ -102,7 +103,7 @@ class MessageListingView(template("MessageListing")):
         self.timeline["value"] = value
         self.timeline[unit + "_selected"] = "selected"
         self.timeline["form_hiddens"] = form_hiddens = [ ]
-        form_hiddens.append(("action", Interface.get_action_name(self._getMessageListingAction())))
+        form_hiddens.append(("action", prewikka.Action.get_action_name(self._getMessageListingAction())))
         for name in self._parameters.getNames(ignore=("timeline_value", "timeline_unit")):
             form_hiddens.append((name, self._parameters[name]))
         
@@ -164,7 +165,7 @@ class MessageListingView(template("MessageListing")):
         for message in messages:
             self.addMessage(message)
         self.delete_form_hiddens = [ ]
-        self.delete_form_hiddens.append(("action", Interface.get_action_name(self._getDeleteAction())))
+        self.delete_form_hiddens.append(("action", prewikka.Action.get_action_name(self._getDeleteAction())))
         for name in self._parameters.getNames():
             self.delete_form_hiddens.append((name, self._parameters[name]))
 

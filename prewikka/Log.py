@@ -148,7 +148,7 @@ class LogBackend:
     def handle_invalid_action_parameters(self, request, reason):
         pass
 
-    def handle_action_denied(self, request, action):
+    def handle_action_denied(self, request, action_name):
         pass
 
     def handle_debug(self, message):
