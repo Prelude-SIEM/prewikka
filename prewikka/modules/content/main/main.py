@@ -315,8 +315,15 @@ class MessageListingAction:
         for name in parameters.keys():
             if not name in ("timeline_value", "timeline_unit", "limit", "filter", "timezone"):
                 dataset["timeline.hidden_parameters"][name] = parameters[name]
-        dataset["timeline.start"] = str(start)
-        dataset["timeline.end"] = str(end)
+
+        if parameters["timezone"] == "utc":
+            dataset["timeline.start"] = utils.time_to_ymdhms(time.gmtime(int(start)))
+            dataset["timeline.end"] = utils.time_to_ymdhms(time.gmtime(int(end)))
+            dataset["timeline.range_timezone"] = "UTC"
+        else:
+            dataset["timeline.start"] = utils.time_to_ymdhms(time.localtime(int(start)))
+            dataset["timeline.end"] = utils.time_to_ymdhms(time.localtime(int(end)))
+            dataset["timeline.range_timezone"] = "%+.2d:%.2d" % time.localtime(0)[3:5]
 
         if not parameters.has_key("timeline_end") and parameters["timeline_unit"] in ("min", "hour"):
             tmp = copy.copy(end)
