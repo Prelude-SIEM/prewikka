@@ -201,7 +201,7 @@ class HeartbeatListing(MessageListing):
     view_name = "HeartbeatListingView"
     time_criteria_format = "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'"
     message_criteria_format = "heartbeat.analyzer.analyzerid == '%d' && heartbeat.ident == '%d'"
-    fields = [ ("address", "heartbeat.analyzer.node.address.address"),
+    fields = [ ("address", "heartbeat.analyzer.node.address(0).address"),
                ("name", "heartbeat.analyzer.node.name"),
                ("type", "heartbeat.analyzer.model"),
                ("time", "heartbeat.analyzer_time") ]
