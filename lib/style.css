@@ -106,13 +106,23 @@
 
 body {
 	background-color: #F0F0F0;
-	background-image: url(../img/bg2.gif);
 	margin-left: 0px;
 	margin-top: 0px;
 	margin-right: 0px;
 	margin-bottom: 0px;
 	font-family: Verdana, Arial, Helvetica, sans-serif;
 	color: #333333;
+}
+
+.normal_body {
+	background-image: url(../img/bg2.gif);
+}
+
+.login_password {
+	position: absolute;
+	left: 160px;
+	top: 85px;
+	padding: 10px;
 }
 
 #top_view_header {

@@ -88,7 +88,7 @@ class MessageListing(Interface.Action):
     def _adjustCriteria(self, core, parameters, criteria):
         pass
     
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         result = { "parameters": parameters }
         prelude = core.prelude
         criteria = [ ]
@@ -189,52 +189,53 @@ class HeartbeatAction(Interface.Action):
 
 
 class AlertSummary(AlertAction):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         return Views.AlertSummaryView, self._getAlert(core, parameters)
 
 
+
 class HeartbeatSummary(HeartbeatAction):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         return Views.HeartbeatSummaryView, self._getHeartbeat(core, parameters)
 
 
 
 class AlertDetails(AlertAction):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         return Views.AlertDetailsView, self._getAlert(core, parameters)
 
 
 
 class HeartbeatDetails(HeartbeatAction):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         return Views.HeartbeatDetailsView, self._getHeartbeat(core, parameters)
 
 
 
 class DeleteAlerts(AlertListing):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         for analyzerid, alert_ident in parameters.getIdents():
             core.prelude.deleteAlert(analyzerid, alert_ident)
         
         parameters = ActionParameters.MessageListing(parameters)
         
-        return AlertListing.process(self, core, parameters)
+        return AlertListing.process(self, core, parameters, request)
 
 
 
 class DeleteHeartbeats(HeartbeatListing):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         for analyzerid, heartbeat_ident in parameters.getIdents():
             core.prelude.deleteHeartbeat(analyzerid, heartbeat_ident)
         
         parameters = ActionParameters.MessageListing(parameters)
         
-        return HeartbeatListing.process(self, core, parameters)
+        return HeartbeatListing.process(self, core, parameters, request)
 
 
 
 class HeartbeatsAnalyze(Interface.Action):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         heartbeat_number = 48
         heartbeat_value = 3600
         heartbeat_error_tolerance = 3
@@ -283,22 +284,22 @@ class SensorAlertListing(AlertListing):
     def _getView(self):
         return Views.SensorAlertListingView
 
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         result = { }
         result["analyzer"] = core.prelude.getAnalyzer(parameters.getAnalyzerid())
-        view, result["alerts"] = AlertListing.process(self, core, parameters)
+        view, result["alerts"] = AlertListing.process(self, core, parameters, request)
         return view, result
 
 
 
 class SensorDeleteAlerts(SensorAlertListing):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         for analyzerid, alert_ident in parameters.getIdents():
             core.prelude.deleteAlert(analyzerid, alert_ident)
 
         parameters = ActionParameters.SensorMessageListing(parameters)
 
-        return SensorAlertListing.process(self, core, parameters)
+        return SensorAlertListing.process(self, core, parameters, request)
 
 
 
@@ -309,51 +310,51 @@ class SensorHeartbeatListing(HeartbeatListing):
     def _getView(self):
         return Views.SensorHeartbeatListingView
 
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         result = { }
         result["analyzer"] = core.prelude.getAnalyzer(parameters.getAnalyzerid())
-        view, result["heartbeats"] = HeartbeatListing.process(self, core, parameters)
+        view, result["heartbeats"] = HeartbeatListing.process(self, core, parameters, request)
         return view, result
 
 
 
 class SensorDeleteHeartbeats(SensorHeartbeatListing):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         for analyzerid, alert_ident in parameters.getIdents():
             core.prelude.deleteHeartbeat(analyzerid, alert_ident)
 
         parameters = ActionParameters.SensorMessageListing(parameters)
 
-        return SensorHeartbeatListing.process(self, core, parameters)
+        return SensorHeartbeatListing.process(self, core, parameters, request)
 
 
 
 class SensorAlertSummary(AlertSummary):
-    def process(self, core, parameters):
-        return Views.SensorAlertSummaryView, AlertSummary.process(self,core, parameters)[1]
+    def process(self, core, parameters, request):
+        return Views.SensorAlertSummaryView, AlertSummary.process(self,core, parameters, request)[1]
 
 
 
 class SensorAlertDetails(AlertDetails):
-    def process(self, core, parameters):
-        return Views.SensorAlertDetailsView, AlertDetails.process(self, core, parameters)[1]
+    def process(self, core, parameters, request):
+        return Views.SensorAlertDetailsView, AlertDetails.process(self, core, parameters, request)[1]
 
 
 
 class SensorHeartbeatSummary(HeartbeatSummary):
-    def process(self, core, parameters):
-        return Views.SensorHeartbeatSummaryView, HeartbeatSummary.process(self,core, parameters)[1]
+    def process(self, core, parameters, request):
+        return Views.SensorHeartbeatSummaryView, HeartbeatSummary.process(self,core, parameters, request)[1]
 
 
 
 class SensorHeartbeatDetails(HeartbeatDetails):
-    def process(self, core, parameters):
-        return Views.SensorHeartbeatDetailsView, HeartbeatDetails.process(self, core, parameters)[1]
+    def process(self, core, parameters, request):
+        return Views.SensorHeartbeatDetailsView, HeartbeatDetails.process(self, core, parameters, request)[1]
 
 
 
 class SensorListing(Interface.Action):
-    def process(self, core, parameters):
+    def process(self, core, parameters, request):
         analyzers = [ ]
         
         prelude = core.prelude

@@ -124,7 +124,7 @@ class MessageListingView:
     
     def _buildEdition(self, template):
         # build step form
-        template.addHidden("action", self._getMessageListingAction().getId())
+        template.addHidden("action", self._getMessageListingAction().getName())
         for key in self.data["parameters"].getNames(ignore=("timeline_value", "timeline_unit")):
             template.addHidden(key, self.data["parameters"][key])
         template.setTimelineValue(self.data["parameters"].getTimelineValue() or 1)
@@ -173,7 +173,7 @@ class MessageListingView:
             footer[self.FILTERS.index(filter_name)] = self._createLinkTag(self._getMessageListingAction(), parameters,
                                                                           "del filter")
             
-        template.addDeleteHidden("action", self._getDeleteAction().getId())
+        template.addDeleteHidden("action", self._getDeleteAction().getName())
         parameters = self.data["parameters"]
         for name in parameters.getNames(ignore=("idents", )):
             template.addDeleteHidden(name, parameters[name])

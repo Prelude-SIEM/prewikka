@@ -10,17 +10,24 @@ import sys, os
 import copy
 import cgi
 
-from prewikka import Core
+from prewikka import Core, Request
 
 
-class Request(Core.Request):
+class CGIRequest(Request.Request):
     def __init__(self):
-        Core.Request.__init__(self)
-        self._arguments = { }
+        Request.Request.__init__(self)
         fs = cgi.FieldStorage()
         for key in fs.keys():
-            self._arguments[key] = fs.getvalue(key)
+            self.arguments[key] = fs.getvalue(key)
+        for key in fs.headers.keys():
+            self.input_headers[key] = fs.headers.get(key)
+        
+    def read(self, *args):
+        return apply(sys.stdin.read, args)
     
+    def write(self, data):
+        sys.stdout.write(data)
+        
     def getQueryString(self):
         return os.getenv("QUERY_STRING")
 
@@ -44,20 +51,13 @@ class Request(Core.Request):
 
     def getURI(self):
         return os.getenv("REQUEST_URI")
-
-    def getArguments(self):
-        return copy.copy(self._arguments)
-
-
-
-class Response(Core.Response):
-    def write(self, content):
-        sys.stdout.write(content)
+    
+    def getCookieString(self):
+        return os.getenv("HTTP_COOKIE")
 
 
 
-request = Request()
-response = Response()
+request = CGIRequest()
 
 core = Core.Core()
-core.process(request, response)
+core.process(request)

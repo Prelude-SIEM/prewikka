@@ -25,17 +25,22 @@ class Config(dict):
     def __init__(self, filename="prewikka.conf"):
         dict.__init__(self)
         self.modules = { }
+        self._module_names = [ ]
         input = ConfigParser.ConfigParser()
         input.readfp(open(filename))
         for section in input.sections():
             if section.find("module ") == 0:
                 mod_name = section.replace("module ", "")
+                self._module_names.append(mod_name)
                 subconfig = self.modules[mod_name] = { }
             else:
                 subconfig = self[section] = { }
             for option in input.options(section):
                 subconfig[option] = input.get(section, option)
 
+    def getModuleNames(self):
+        return self._module_names
+    
     def __str__(self):
         content = dict.__str__(self)
         for name, value in self.modules.items():

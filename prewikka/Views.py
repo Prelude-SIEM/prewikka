@@ -20,46 +20,81 @@
 
 import sys
 
-from templates.layouts.normal import Normal, Menu, TopMenu
+from prewikka.templates import TopLayout, NormalLayout
 
 
 class View:
     def __init__(self, core):
         self.core = core
-        self.headers = { "Content-type": "text/html" }
+        self._title = None
+        self._css_files = [ ]
+        self._javascript_files = [ ]
+        self._content = ""
+        
+    def setTitle(self, title):
+        self._title = title
 
-    def build(self, data):
-        pass
-
+    def addCss(self, css_file):
+        self._css_files.append(css_file)
+    
+    def addJavascript(self, javascript_file):
+        self._javascript_files.append(javascript_file)
+    
+    def build(self, content):
+        self._content = content
+        
     def createLink(self, action, parameters=None):
-        link = "index.py?action=%s" % action.getId()
+        link = "index.py?action=%s" % action.getName()
         if parameters:
             link += "&%s" % str(parameters)
         return link
     
     def __str__(self):
-        content = ""
-        for key, value in self.headers.items():
-            content += "%s: %s\r\n" % (key, value)
-        return content + "\r\n"
+        content = """
+        <!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN' 'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+        <html xmlns='http://www.w3.org/1999/xhtml'>
+        <head>"""
+        if self._title:
+            title = "[PREWIKKA] " + self._title
+        else:
+            title = "PREWIKKA"
+        content += "<title>%s</title>" % title
+        content += "<meta http-equiv='Content-Type' content='text/html; charset=iso-8859-1'/>"
+        for css_file in self._css_files:
+            content += "<link rel='stylesheet' href='%s' type='text/css'/>" % css_file
+        for javascript_file in self._javascript_files:
+            content += "<script src='%s' type='text/javascript'></script>" % javascript_file
+        content += "</head>"
+        content += self._content
+        content += "</html>"
+        
+        return content
+
+
+
+class TopView(View):
+    def build(self, content):
+        self.addCss("lib/style.css")
+        self.addJavascript("lib/functions.js")
+        interface = self.core.interface
+        top = TopLayout.TopLayout()
+        top.setSoftware(interface.getSoftware())
+        top.setPlace(interface.getPlace())
+        top.setTitle(interface.getTitle())
+        top.setContent(content)
+        View.build(self, str(top))
 
 
 
 class ErrorView(View):
     def build(self, message):
-        self._message = message
-    
-    def __str__(self):
-        return View.__str__(self) + "<h1>%s</h1>" % self._message
+        View.build(self, "<h1>%s</h1>" % message)
 
 
 
-class NormalView(View):
+class NormalView(TopView):
     def __init__(self, core):
         View.__init__(self, core)
-        self._software = core.interface.getSoftware()
-        self._place = core.interface.getPlace()
-        self._title = core.interface.getTitle()
         self._active_module = None
         self._active_section = None
         self._tabs = [ ]
@@ -77,36 +112,23 @@ class NormalView(View):
 
     def setActiveTab(self, tab):
         self._active_tab = tab
-    
+
     def build(self, data):
-        self._main_content = self.buildMainContent(data)
-        
-    def __str__(self):
-        headers = View.__str__(self)
-        
-        normal = Normal.Normal()
-        normal.setSoftware(self._software)
-        normal.setTitle(self._title)
-        normal.setPlace(self._place)
-        
-        menu = Menu.Menu()
+        normal = NormalLayout.NormalLayout()
+
         for section, action in self.core.interface.getSections():
             if section == self._active_section:
-                menu.setActiveItem(section)
+                normal.addActiveMenuEntry(section)
             else:
-                menu.setInactiveItem(section, self.createLink(action))
-        normal.setMenu(str(menu))
+                normal.addInactiveMenuEntry(section, self.createLink(action))
         
-        topmenu = TopMenu.TopMenu()
-        for name, action in self._tabs:
-            if name == self._active_tab:
-                set_item = topmenu.setActiveItem
+        for tab, action in self._tabs:
+            if tab == self._active_tab:
+                set_tab = normal.addActiveTabEntry
             else:
-                set_item = topmenu.setInactiveItem
-            set_item(name, self.createLink(action))
-        
-        normal.setTopMenu(str(topmenu))
-        
-        normal.setPage(self._main_content)
-        
-        return headers + str(normal)
+                set_tab = normal.addInactiveTabEntry
+            set_tab(tab, self.createLink(action))
+
+        normal.setContent(self.buildMainContent(data))
+
+        return TopView.build(self, str(normal))

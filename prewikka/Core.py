@@ -21,45 +21,9 @@
 import sys
 import os, os.path
 
-from prewikka import Config, Log, Prelude, Interface
+import copy
 
-
-class Request:
-    def __init__(self):
-        pass
-
-    def getQueryString(self):
-        pass
-
-    def getClientAddr(self):
-        pass
-
-    def getClientPort(self):
-        pass
-
-    def getServerAddr(self):
-        pass
-
-    def getServerPort(self):
-        pass
-
-    def getUserAgent(self):
-        pass
-
-    def getMethod(self):
-        pass
-
-    def getURI(self):
-        pass
-
-    def getArguments(self):
-        pass
-
-
-
-class Response:
-    pass
-
+from prewikka import Config, Log, Prelude, Interface, Auth
 
 
 class Core:
@@ -70,25 +34,24 @@ class Core:
         self.interface = Interface.Interface(self, self._config.get("interface", { }))
         self.log = Log.Log()
         self.prelude = Prelude.Prelude(self._config["prelude"])
+        self.auth = Auth.DefaultAuth(self)
         self._initModules()
-
+        
+    def registerAuth(self, auth):
+        self.auth = auth
+        
     def _initModules(self):
         base_dir = "prewikka/modules/"
-        files = os.listdir(base_dir)
-        for file in files:
-            if os.path.isdir(base_dir + file):
-                name = os.path.basename(file)
-                if os.path.isfile(base_dir + file + "/" + name + ".py"):
-                    module = __import__(base_dir + file + "/" + name)
-                    module.load(self, self._config.modules.get(name, {}))
+        for mod_name in self._config.getModuleNames():
+            try:
+                file = base_dir + mod_name + "/" + mod_name
+                module = __import__(file)
+                module.load(self, self._config.modules.get(mod_name, { }))
+            except ImportError:
+                print >> sys.stderr, "cannot load module named %s (%s)" % (mod_name, file)
         
-    def process(self, request, response):
-        args = request.getArguments()
-        if args.has_key("action"):
-            action = args["action"]
-            del args["action"]
-        else:
-            action = None
+    def process(self, request):
+        view = self.interface.process(request)
         
-        view = self.interface.process(action, args, request)
-        response.write(view)
+        request.content = view
+        request.sendResponse()

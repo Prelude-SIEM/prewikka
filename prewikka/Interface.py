@@ -93,7 +93,10 @@ class Interface:
         
     def getSections(self):
         return self._sections
-
+    
+    def getDefaultAction(self):
+        return self._default_action
+    
     def getSoftware(self):
         return self._software
 
@@ -102,47 +105,86 @@ class Interface:
 
     def getTitle(self):
         return self._title
-
+    
     def registerSection(self, name, action):
         self._sections.append((name, action))
 
     def registerAction(self, action, parameters, default=False):
-        registered = self._actions[action.getId()] = { "action": action, "parameters": parameters }
+        name = action.getName()
+        self._actions[name] = { "action": action, "parameters": parameters }
         if default:
-            self._default_action = registered
+            self._default_action = name
         
-    def process(self, action_name, args, request):
-        if action_name:
-            registered = self._actions[action_name]
-        else:
-            registered = self._default_action
-        
-        action = registered["action"]
-        parameters = registered["parameters"]()
-        
+    def processAction(self, name, arguments, request):
         try:
-            parameters.populate(args)
+            registered = self._actions[name]
+            action = registered["action"]
+            parameters = registered["parameters"]()
+            parameters.populate(arguments)
             parameters.check()
+        except KeyError:
+            data = "unknown action name %s" % name
+            self._core.log.invalidQuery(request, data)
+            view_class = Views.ErrorView
         except ActionParameterError, e:
             self._core.log.invalidQuery(request, str(e))
             view_class = Views.ErrorView
             data = cgi.escape(str(e))
         else:
-            view_class, data = action.process(self._core, parameters)
+            view_class, data = action.process(self._core, parameters, request)
         
         view = view_class(self._core)
         view.build(data)
-        
+
         return str(view)
+
+    def processDefaultAction(self, arguments, request):
+        return self.processAction(self._default_action, arguments, request)
+    
+    def processLogin(self, arguments, request):
+        import Auth
+        
+        auth = self._core.auth
+        login = arguments["login"]
+        password = arguments["password"]
+        try:
+            auth.login(login, password, request)
+        except (Auth.LoginError, Auth.AuthError):
+            return auth.getLoginScreen(request)
+        
+        return self.processDefaultAction({ }, request)
+
+    def process(self, request):
+        from prewikka import Auth
+        
+        arguments = copy.copy(request.arguments)
+        action = arguments.pop("action", None)
+        auth = self._core.auth
+        
+        if action == "login":
+            return self.processLogin(arguments, request)
+        
+        try:
+            name = auth.check(request)
+        except Auth.AuthError:
+            return auth.getLoginScreen(request)
+        
+        if action is None:
+            return self.processDefaultAction(arguments, request)
+        
+        return self.processAction(action, arguments, request)
 
 
 
 class Action(object):
     def process(self, core, parameters):
         pass
-
-    def getId(self):
+    
+    def getName(self):
         return self.__module__ + "." + self.__class__.__name__
+
+    def test(self):
+        return self.getId()
 
 
 
