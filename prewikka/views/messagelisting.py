@@ -267,9 +267,16 @@ class ListedHeartbeat(ListedMessage):
                                                        message["heartbeat.analyzer(%d).model" % index])
         self["node_name"] = self.createInlineFilteredField("heartbeat.analyzer(-1).node.name",
                                                            message["heartbeat.analyzer(%d).node.name" % index])
-        self["node_address"] = self.createHostField("heartbeat.analyzer(-1).node.address.address",
-                                                    message["heartbeat.analyzer(%d).node.address(0).address" % index],
-                                                    "unknown")
+
+        self["node_addresses"] = [ ]
+        i = 0
+        while True:
+            address = message["heartbeat.analyzer(%d).node.address(%d).address" % (index, i)]
+            if not address:
+                break
+            self["node_addresses"].append(self.createHostField("heartbeat.analyzer(-1).node.address.address", address))
+            i += 1
+            
         self["time"] = self.createTimeField(message["heartbeat.create_time"], self.parameters["timezone"])
 
 

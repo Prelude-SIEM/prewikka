@@ -50,16 +50,22 @@
 </td>
 
 <td>
- <ul id="popup_block">
-  <li class="popup_title">$message.node_address.value
-   <ul>
-    <li><a href="$message.node_address.inline_filter">Filter on address</a></li>
-    #for $name, $link in $message.node_address.host_commands
-     <li><a href="$link">$name</a></li>
+  #if len($message.node_addresses) > 0
+    #for $address in $message.node_addresses
+    <ul id="popup_block">
+      <li class="popup_title">$address.value
+        <ul>
+          <li><a href="$address.inline_filter">Filter on address</a></li>
+          #for $name, $link in $address.host_commands
+            <li><a href="$link">$name</a></li>
+          #end for
+        </ul>
+      </li>
+    </ul>
     #end for
-   </ul>
-  </li>
- </ul>
+  #else
+    n/a
+  #end if
 </td>
 
 <td>

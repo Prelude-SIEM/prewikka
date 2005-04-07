@@ -66,7 +66,13 @@ class MessageSummary:
             self.newSectionEntry("Operating System", "%s %s" %
                                  (alert["analyzer(%d).ostype" % index], alert["analyzer(%d).osversion" % index]))
             self.newSectionEntry("Node name", alert["analyzer(%d).node.name" % index])
-            self.newSectionEntry("Address", alert["analyzer(%d).node.address(0).address" % index])
+            i = 0
+            while True:
+                address = alert["analyzer(%d).node.address(%d).address" % (index, i)]
+                if not address:
+                    break
+                self.newSectionEntry("Address", address)
+                i += 1
             self.newSectionEntry("Process", alert["analyzer(%d).process.name" % index])
             self.newSectionEntry("Pid", alert["analyzer(%d).process.pid" % index])
             self.endSection()

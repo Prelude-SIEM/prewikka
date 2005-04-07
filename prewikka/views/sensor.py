@@ -99,14 +99,12 @@ class SensorListing(view.View):
             else:
                 analyzer["node_location"] = "n/a"
 
-            if analyzer["node_address"]:
-                analyzer["node_address"] = "<a href='%s'>%s</a>" % \
-                                           (utils.create_link(self.view_name,
-                                                              { "filter_path": "heartbeat.analyzer(-1).node.address(0).address",
-                                                                "filter_value": analyzer["node_address"] }),
-                                            analyzer["node_address"])
-            else:
-                analyzer["node_address"] = "n/a"
+            for i in range(len(analyzer["node_addresses"])):
+                analyzer["node_addresses"][i] = "<a href='%s'>%s</a>" % \
+                                                (utils.create_link(self.view_name,
+                                                                   { "filter_path": "heartbeat.analyzer(-1).node.address(0).address",
+                                                                     "filter_value": analyzer["node_addresses"][i] }),
+                                                 analyzer["node_addresses"][i])
 
             analyzer["status"], analyzer["status_meaning"] = \
                                 get_analyzer_status_from_latest_heartbeat(analyzer["last_heartbeat_status"],

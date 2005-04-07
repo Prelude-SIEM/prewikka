@@ -356,7 +356,16 @@ class IDMEFDatabase:
         analyzer["osversion"] = heartbeat.get("heartbeat.analyzer(%d).osversion" % index)
         analyzer["node_name"] = heartbeat.get("heartbeat.analyzer(%d).node.name" % index)
         analyzer["node_location"] = heartbeat.get("heartbeat.analyzer(%d).node.location" % index)
-        analyzer["node_address"] = heartbeat.get("heartbeat.analyzer(%d).node.address(0).address" % index)
+        
+        i = 0
+        analyzer["node_addresses"] = [ ]
+        while True:
+            address = heartbeat.get("heartbeat.analyzer(%d).node.address(%d).address" % (index, i))
+            if not address:
+                break
+            analyzer["node_addresses"].append(address)
+            i += 1
+        
         analyzer["last_heartbeat_time"] = heartbeat.get("heartbeat.create_time")
         analyzer["last_heartbeat_interval"] = heartbeat["heartbeat.heartbeat_interval"]
         analyzer["last_heartbeat_status"] = heartbeat.getAdditionalData("Analyzer status")
