@@ -35,7 +35,14 @@
         </td>
 	<td>#echo $analyzer.node_name or "n/a" #</td>
         <td>#echo $analyzer.node_location or "n/a" #</td>
-	<td>#echo $analyzer.node_address or "n/a"#</td>
+	<td>
+          #if len($analyzer.node_addresses) > 0
+            #for $address in $analyzer.node_addresses
+              $address<br/>
+            #end for
+          #else
+            n/a
+          #end if
       </tr>
     </tbody>
   </table>
