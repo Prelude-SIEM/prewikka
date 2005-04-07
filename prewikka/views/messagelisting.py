@@ -281,6 +281,11 @@ class ListedHeartbeat(ListedMessage):
 
 
 
+class ListedSensorHeartbeat(ListedHeartbeat):
+    view_name = "sensor_heartbeat_listing"
+
+
+
 class ListedAlert(ListedMessage):
     view_name = "alert_listing"
 
@@ -474,6 +479,11 @@ class ListedAlert(ListedMessage):
 
 
 
+class ListedSensorAlert(ListedAlert):
+    view_name = "sensor_alert_listing"
+
+
+
 class ListedAggregatedAlert(ListedAlert):
     def __init__(self, *args, **kwargs):
         apply(ListedAlert.__init__, (self,) + args, kwargs)
@@ -500,6 +510,11 @@ class ListedAggregatedAlert(ListedAlert):
         self["infos"].append(infos)
 
         return infos
+
+
+
+class ListedSensorAggregatedAlert(ListedAggregatedAlert):
+    view_name = "sensor_alert_listing"
 
 
 
@@ -639,6 +654,8 @@ class AlertListing(MessageListing, view.View):
     analyzerid_object = "alert.analyzer.analyzerid"
     summary_view = "alert_summary"
     details_view = "alert_details"
+    listed_alert = ListedAlert
+    listed_aggregated_alert = ListedAggregatedAlert
 
     def init(self, env):
         self._max_aggregated_classifications = int(env.config.general.getOptionValue("max_aggregated_classifications", 10))
@@ -702,7 +719,7 @@ class AlertListing(MessageListing, view.View):
 	    dataset["analyzer_time"] = { "value": None }
 
     def _setMessage(self, message, ident):
-        msg = ListedAlert(self.env, self.parameters)
+        msg = self.listed_alert(self.env, self.parameters)
         msg.setMessage(message, ident)
         msg["aggregated"] = False
         msg["delete"] = False
@@ -810,7 +827,7 @@ class AlertListing(MessageListing, view.View):
             idmef = self._fetchMessage(ident)
             delete_criteria = delete_base_criteria + [ "alert.create_time >= '%s'" % time_min.toYMDHMS(),
                                                        "alert.create_time <= '%s'" % time_max.toYMDHMS() ]
-            message = ListedAggregatedAlert(self.env, self.parameters)
+            message = self.listed_aggregated_alert(self.env, self.parameters)
             message.setMessageCommon(idmef)
             message.setTime(time_min, time_max)
             message.setCriteriaForDeletion(delete_criteria)
@@ -890,7 +907,7 @@ class AlertListing(MessageListing, view.View):
 
             for ident in self.env.idmef_db.getAlertIdents(criteria2, limit=1):
                 idmef = self._fetchMessage(ident)
-                message = ListedAggregatedAlert(self.env, self.parameters)
+                message = self.listed_aggregated_alert(self.env, self.parameters)
                 self.dataset["messages"].append(message)
                 message.setTime(time_min, time_max)
                 message.setMessageCommon(idmef)
@@ -1057,6 +1074,7 @@ class HeartbeatListing(MessageListing, view.View):
     filters = { }
     summary_view = "heartbeat_summary"
     details_view = "heartbeat_details"
+    listed_heartbeat = ListedHeartbeat
 
     def _getMessageIdents(self, criteria, limit=-1, offset=-1):
         return self.env.idmef_db.getHeartbeatIdents(criteria, limit, offset)
@@ -1076,7 +1094,8 @@ class HeartbeatListing(MessageListing, view.View):
             self.dataset["messages"].append(dataset)
 
     def _setMessage(self, message, ident):
-        msg = ListedHeartbeat(self.env, self.parameters)
+        msg = self.listed_heartbeat(self.env, self.parameters)
+        msg.view_name = self.view_name
         msg.setMessage(message, ident)
 
         return msg
@@ -1134,6 +1153,9 @@ class SensorAlertListing(AlertListing, view.View):
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "SensorAlertListing"
 
+    listed_alert = ListedSensorAlert
+    listed_aggregated_alert = ListedSensorAggregatedAlert
+
     def _adjustCriteria(self, criteria):
         criteria.append("alert.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
 
@@ -1152,6 +1174,8 @@ class SensorHeartbeatListing(HeartbeatListing, view.View):
     view_parameters = SensorHeartbeatListingParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "SensorHeartbeatListing"
+
+    listed_heartbeat = ListedSensorHeartbeat
 
     def _adjustCriteria(self, criteria):
         criteria.append("heartbeat.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
