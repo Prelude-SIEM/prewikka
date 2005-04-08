@@ -22,6 +22,7 @@ import os.path
 import urllib
 import time
 import copy
+import re
 
 from prewikka import view, User, utils
 
@@ -733,7 +734,7 @@ class AlertListing(MessageListing, view.View):
         if len(self.parameters[object]) > 0:
             criteria.append(" || ".join(map(lambda value: "%s substr '%s'" % (object, value),
                                             self.parameters[object])))
-            self.dataset[object] = self.parameters[object]
+            self.dataset[object] = dict([ (re.sub("\(-?\d+\)", "", path), value) for path, value in self.parameters[object] ])
             self.dataset[column + "_filtered"] = True
         else:
             self.dataset[object] = [ "" ]
@@ -770,7 +771,6 @@ class AlertListing(MessageListing, view.View):
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.completion",
                                       ["failed", "succeeded", "none"])
         
-
     def _applyCheckboxFilters(self, criteria, type):
         def get_operator(object):
             if object in ("alert.source.service.port", "alert.target.service.port"):
