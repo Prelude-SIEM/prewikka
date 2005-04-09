@@ -29,9 +29,9 @@ from prewikka import User
 
 
 class AuthError(PrewikkaError):
-    def __init__(self, arguments={}):
+    def __init__(self, arguments={}, message="Authentication failed"):
         self.dataset = DataSet.DataSet()
-        self.dataset["message"] = "authentication failed"
+        self.dataset["message"] = ""
         self.dataset["arguments"] = [ ]
         for name, value in arguments.items():
             if name in ("_login", "_password"):
@@ -133,7 +133,7 @@ class LoginPasswordAuth(Auth, Session):
 
     def logout(self, request):
         self.deleteSession(request)
-        raise AuthError()
+        raise AuthError(message="")
 
 
 

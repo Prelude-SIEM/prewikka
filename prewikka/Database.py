@@ -159,11 +159,11 @@ class Database:
         self.query("UPDATE Prewikka_User SET password=%s WHERE login = %s" % (self.escape(password), self.escape(login)))
 
     def getPassword(self, login):
-        rows = self.query("SELECT password FROM Prewikka_User WHERE login = %s" % (self.escape(login)))
-        if not rows:
+        rows = self.query("SELECT login, password FROM Prewikka_User WHERE login = %s" % (self.escape(login)))
+        if not rows or rows[0][0] != login:
             raise DatabaseInvalidUserError(login)
 
-        return rows[0][0]
+        return rows[0][1]
 
     def hasPassword(self, login):
         return bool(self.query("SELECT password FROM Prewikka_User WHERE login = %s AND password IS NOT NULL" % self.escape(login)))
