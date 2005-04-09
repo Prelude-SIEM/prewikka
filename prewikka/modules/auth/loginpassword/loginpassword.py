@@ -38,10 +38,10 @@ class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
         try:
             real_password = self.db.getPassword(login)
         except Database.DatabaseError:
-            raise Auth.AuthError("invalid login '%s'" % login)
+            raise Auth.AuthError()
         
         if self._hash(password) != real_password:
-            raise Auth.AuthError("invalid password for login '%s'" % login)
+            raise Auth.AuthError()
 
     def setPassword(self, login, password):
         self.db.setPassword(login, self._hash(password))

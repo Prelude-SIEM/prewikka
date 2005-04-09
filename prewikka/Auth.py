@@ -29,10 +29,14 @@ from prewikka import User
 
 
 class AuthError(PrewikkaError):
-    def __init__(self, message="", arguments={}):
+    def __init__(self, arguments={}):
         self.dataset = DataSet.DataSet()
-        self.dataset["message"] = message
-        self.dataset["arguments"] = arguments.items()
+        self.dataset["message"] = "authentication failed"
+        self.dataset["arguments"] = [ ]
+        for name, value in arguments.items():
+            if name in ("_login", "_password"):
+                continue
+            self.dataset["arguments"].append((name, value))
         self.template = "LoginPasswordForm"
 
 
@@ -75,14 +79,14 @@ class Session:
             login, t = self.db.getSession(sessionid)
         except Database.DatabaseInvalidSessionError:
             self.log(Log.EVENT_INVALID_SESSIONID, request)
-            raise AuthError("invalid sessionid", request.arguments)
+            raise AuthError(request.arguments)
 
         now = int(time.time())
 
         if now > t + self._expiration:
             self.db.deleteSession(sessionid)
             self.log(Log.EVENT_SESSION_EXPIRED, request)
-            raise AuthError("session expired", request.arguments)
+            raise AuthError(request.arguments)
 
         self.db.updateSession(sessionid, now)
 
@@ -107,12 +111,12 @@ class LoginPasswordAuth(Auth, Session):
         Session.__init__(self, session_expiration)
 
     def getUser(self, request):
-        if not request.arguments.has_key("view") and request.arguments.has_key("login"):
-            login = request.arguments["login"]
-            del request.arguments["login"]
-            password = request.arguments.get("password")
+        if request.arguments.has_key("_login"):
+            login = request.arguments["_login"]
+            del request.arguments["_login"]
+            password = request.arguments.get("_password", "")
             try:
-                del request.arguments["password"]
+                del request.arguments["_password"]
             except KeyError:
                 pass
 
@@ -120,7 +124,7 @@ class LoginPasswordAuth(Auth, Session):
                 self.checkPassword(login, password)
             except AuthError, e:
                 e.dataset["arguments"] = request.arguments.items()
-                raise AuthError("Authentication failed")
+                raise AuthError()
             self.createSession(request, login)
         else:
             login = self.checkSession(request)
