@@ -31,7 +31,7 @@ from prewikka import User
 class AuthError(PrewikkaError):
     def __init__(self, arguments={}, message="Authentication failed"):
         self.dataset = DataSet.DataSet()
-        self.dataset["message"] = ""
+        self.dataset["message"] = message
         self.dataset["arguments"] = [ ]
         for name, value in arguments.items():
             if name in ("_login", "_password"):
