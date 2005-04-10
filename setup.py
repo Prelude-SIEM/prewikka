@@ -114,7 +114,7 @@ class my_install(install):
 
 
 setup(name="prewikka",
-      version="0.9.0-rc3",
+      version="0.9.0-rc4",
       packages=[ 'prewikka', 'prewikka.views', 'prewikka.templates',
                  'prewikka.modules',
                  'prewikka.modules.log', 'prewikka.modules.log.stderr',

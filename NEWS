@@ -1,10 +1,33 @@
-* prewikka-0.9.0-rc3:
-  - Installation cleanup / bugfix.
-  - Fix database authentication failure.
-  - Fix error page.
+* 2005-04-05, prewikka-0.9.0-rc4:
 
-* Prewikka-0.9.0-rc2
-  - Fix a loading problem when the database is not created.
+	- Minor UI tweak.
 
-* Prewikka-0.9.0-rc1
-  - Initial release
+	- Fix a problem when changing password.
+
+	- Remove trailling space from config entry.
+
+	- Display all analyzer address in agent listing.
+
+	- Fix some bug in the authentication system, that would refuse
+          login for no appearent reasons.
+
+	- Set default session expiration time to 60 minutes.
+	
+	
+* 2005-03-31, prewikka-0.9.0-rc3:
+
+	- Installation cleanup / bugfix.
+
+  	- Fix database authentication failure.
+
+  	- Fix error page.
+
+
+* 2005-03-31, prewikka-0.9.0-rc2
+
+  	- Fix a loading problem when the database is not created.
+
+
+* 2005-03-29, prewikka-0.9.0-rc1:
+
+  	- Initial release
