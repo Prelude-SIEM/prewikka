@@ -72,11 +72,10 @@ class Core:
         
     def _initHostCommands(self):
         self._env.host_commands = { }
-        for command in "whois", "traceroute":
-            path = distutils.spawn.find_executable(command)
-            if path:
-                self._env.host_commands[command] = path
-            
+        for option in self._env.config.command.getOptions():
+            if os.access(option.value, os.X_OK):
+                self._env.host_commands[option.name] = option.value
+        
     def _initAuth(self):
         if self._env.auth.canLogout():
             from prewikka import view

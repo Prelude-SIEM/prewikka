@@ -25,6 +25,7 @@ class Config:
     def __init__(self, filename="prewikka.conf"):
         self.general = MyConfigParser.ConfigParserSection("general")
         self.interface = MyConfigParser.ConfigParserSection("interface")
+        self.command = MyConfigParser.ConfigParserSection("command")
         self.database = MyConfigParser.ConfigParserSection("database")
         self.idmef_database = MyConfigParser.ConfigParserSection("idmef_database")
         self.admin = None
@@ -50,6 +51,9 @@ class Config:
 
     def _set_interface(self, interface):
         self.interface = interface
+
+    def _set_command(self, command):
+        self.command = command
 
     def _set_database(self, database):
         self.database = database
