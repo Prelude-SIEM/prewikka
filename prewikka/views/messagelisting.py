@@ -765,7 +765,13 @@ class AlertListing(MessageListing, view.View):
 
     def _applyClassificationFilters(self, criteria):
         self.dataset["classification_filtered"] = False
-        self._applySimpleFilter(criteria, "classification", "alert.classification.text")
+        if len(self.parameters["alert.classification.text"]) > 0:
+            criteria.append(" || ".join(map(lambda value: "alert.classification.text substr '%s'" % value,
+                                            self.parameters["alert.classification.text"])))
+            self.dataset["alert.classification.text"] = self.parameters["alert.classification.text"]
+            self.dataset["alert.classification.text_filtered"] = True
+        else:
+            self.dataset[""]
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.severity",
                                       ["info", "low", "medium", "high", "none"])
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.completion",
