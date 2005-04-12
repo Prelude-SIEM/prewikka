@@ -644,6 +644,13 @@ class MessageListing:
 
 
 
+def cmp_severities(x, y):
+    d = { None: 0, "info": 1, "low": 2, "medium": 3, "high": 4 }
+
+    return d[y] - d[x]
+
+
+
 class AlertListing(MessageListing, view.View):
     view_name = "alert_listing"
     view_parameters = AlertListingParameters
@@ -800,11 +807,6 @@ class AlertListing(MessageListing, view.View):
         self._applyCheckboxFilters(criteria, "analyzer")
 
     def _setAggregatedMessagesValues(self, criteria):
-        def cmp_severities(x, y):
-            d = { None: 0, "low": 1, "medium": 2, "high": 3 }
-
-            return d[y] - d[x]
-
         aggregate_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
         aggregated_values = self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]
 
@@ -929,11 +931,6 @@ class AlertListing(MessageListing, view.View):
                                                       "alert.assessment.impact.severity/group_by",
                                                       "alert.assessment.impact.completion/group_by",
                                                       "count(alert.classification.text)"], criteria2)
-
-                def cmp_severities(x, y):
-                    d = { None: 0, "low": 1, "medium": 2, "high": 3 }
-
-                    return d[y] - d[x]
 
                 results.sort(lambda x, y: cmp_severities(x[1], y[1]))
 
