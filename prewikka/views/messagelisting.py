@@ -560,6 +560,9 @@ class MessageListing:
         return start, end
         
     def _setTimeline(self, start, end):
+        for unit in "min", "hour", "day", "month", "year":
+            self.dataset["timeline.%s_selected" % unit] = ""
+        
         self.dataset["timeline.current"] = utils.create_link(self.view_name, self.parameters - ["timeline_end"])
 
         self.dataset["timeline.value"] = self.parameters["timeline_value"]
