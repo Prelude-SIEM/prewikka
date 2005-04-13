@@ -35,6 +35,13 @@ from Cheetah.CheetahWrapper import CheetahWrapper
 
 
 class my_build_py(build_py):
+    def finalize_options(self):
+        build_py.finalize_options(self)
+        self.outfiles = [ ]
+
+    def get_outputs(self, *args, **kwargs):
+        return self.outfiles + apply(build_py.get_outputs, (self, ) + args, kwargs)
+    
     def build_templates(self):
         cheetah = CheetahWrapper()
         
@@ -43,6 +50,7 @@ class my_build_py(build_py):
             templates = glob.glob(package_dir + '/*.tmpl')
             for template in templates:
                 compiled = self.build_lib + "/" + template.replace(".tmpl", ".py")
+                self.outfiles.append(compiled)
                 if os.path.exists(compiled):
                     template_stat = os.stat(template)
                     compiled_stat = os.stat(compiled)
@@ -51,9 +59,9 @@ class my_build_py(build_py):
                 argv = [ sys.argv[0], "compile", "--odir", self.build_lib, "--nobackup", template ]
                 cheetah.main(argv)
     
-    def build_packages(self):
+    def run(self):
         self.build_templates()
-        build_py.build_packages(self)
+        build_py.run(self)
 
 
 
@@ -90,11 +98,13 @@ class my_install(install):
         config.close()
         
     def run(self):
+        os.umask(022)
         self.install_conf()
         self.init_siteconfig()
         install.run(self)
         
-        for dir in ("share/prewikka",
+        for dir in ("/",
+                    "share/prewikka",
                     "share/prewikka/htdocs",
                     "share/prewikka/htdocs/images", "share/prewikka/htdocs/js", "share/prewikka/htdocs/css",
                     "share/prewikka/database", "share/prewikka/cgi-bin"):
