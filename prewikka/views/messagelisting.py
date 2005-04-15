@@ -733,7 +733,7 @@ class AlertListing(MessageListing, view.View):
         msg = self.listed_alert(self.env, self.parameters)
         msg.setMessage(message, ident)
         msg["aggregated"] = False
-        msg["delete"] = False
+        msg["delete"] = ident
         
         return msg
     
