@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import time
+import time, calendar
 import struct
 import urllib
 
@@ -35,7 +35,14 @@ def time_to_ymdhms(t):
 
 
 def get_gmt_offset():
-    return time.localtime(0)[3:5]
+    utc = time.time()
+    tm = time.localtime(utc)
+    local = calendar.timegm(tm)
+
+    offset = local - utc + 1
+
+    return (offset / 3600, offset % 3600 / 60)
+
 
 
 def create_link(action_name, parameters=None):
