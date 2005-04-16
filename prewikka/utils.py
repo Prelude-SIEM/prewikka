@@ -35,11 +35,11 @@ def time_to_ymdhms(t):
 
 
 def get_gmt_offset():
-    utc = time.time()
+    utc = int(time.time())
     tm = time.localtime(utc)
     local = calendar.timegm(tm)
 
-    offset = local - utc + 1
+    offset = local - utc
 
     return (offset / 3600, offset % 3600 / 60)
 
