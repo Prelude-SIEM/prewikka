@@ -106,7 +106,7 @@ function aggregated_${category}_add_entry(path) {
 	field = document.createElement("td")
 	row.appendChild(field)
 	link = document.createElement("a")
-	link.setAttribute("onclick", "group_by_${category}_add_entry('')")
+	link.setAttribute("onclick", "aggregated_${category}_add_entry('')")
 	content = document.createTextNode("+")
 	link.appendChild(content)
 	field.appendChild(link)
