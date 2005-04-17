@@ -87,9 +87,12 @@ class MessageSummary:
             meaning = alert["additional_data(%d).meaning" % i]
             if not meaning:
                 break
-            value = alert.get("additional_data(%d).data" % i, escape=False)
+            
             if alert["additional_data(%d).type" % i] == "byte-string":
-                value = utils.hexdump(value)
+                value = utils.hexdump(alert.get("additional_data(%d).data" % i, escape=False))
+            else:
+                value = alert.get("additional_data(%d).data" % i)
+                
             emphase = (alert["analyzer.model"] == "Prelude LML" and
                        alert["additional_data(%d).meaning" % i] == "Original Log")
             self.newSectionEntry(meaning, value, emphase)
