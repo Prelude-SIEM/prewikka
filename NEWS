@@ -1,3 +1,27 @@
+* 2005-04-17, prewikka-0.9.0-rc5:
+
+	- Fix classification filters in the alert listing.
+
+	- Let the user provide the path to external command (whois, traceroute).
+
+	- Fix prewikka exception on 'info' severity.
+
+	- Fix broken installation permission.
+
+	- Fix bad template variable initialization resulting in an exception
+	  with Cheetah 0.9.16.
+
+	- Fix alert deletion in un-agreggated mode.
+
+	- Fix GMT offset calculation.
+
+	- Fix a problem when appending more filters in the alert list view.
+
+	- Update Auth cookie expiration time.
+
+	- Fix escaping issue.
+	
+
 * 2005-04-05, prewikka-0.9.0-rc4:
 
 	- Minor UI tweak.
