@@ -68,6 +68,10 @@ class Auth:
 class Session:
     def __init__(self, expiration):
         self._expiration = expiration
+
+    def setSession(self, request, sessionid):
+        request.output_cookie["sessionid"] = sessionid
+        request.output_cookie["sessionid"]["expires"] = self._expiration
     
     def checkSession(self, request):
         if not request.input_cookie.has_key("sessionid"):
@@ -83,12 +87,13 @@ class Session:
 
         now = int(time.time())
 
-        if now > t + self._expiration:
+        if now - t > self._expiration:
             self.db.deleteSession(sessionid)
             self.log(Log.EVENT_SESSION_EXPIRED, request)
             raise AuthError(request.arguments)
 
         self.db.updateSession(sessionid, now)
+        self.setSession(request, sessionid)
 
         return login
 
@@ -97,8 +102,7 @@ class Session:
         self.db.deleteExpiredSessions(t - self._expiration)
         sessionid = md5.new(str(t * random.random())).hexdigest()
         self.db.createSession(sessionid, login, t)
-        request.output_cookie["sessionid"] = sessionid
-        request.output_cookie["sessionid"]["expires"] = self._expiration
+        self.setSession(request, sessionid)
 
     def deleteSession(self, request):
         self.db.deleteSession(request.input_cookie["sessionid"].value)
