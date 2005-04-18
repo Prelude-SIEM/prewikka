@@ -48,11 +48,36 @@ class PermissionDeniedError(Error.SimpleError):
 
 
 
+def init_dataset(dataset, config, request):
+    interface = config.interface
+    dataset["document.title"] = "[PREWIKKA]"
+    dataset["document.css_files"] = [ "prewikka/css/style.css" ]
+    dataset["document.js_files"] = [ "prewikka/js/functions.js" ]
+    dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
+    dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
+    dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
+    dataset["prewikka.url.referer"] = cgi.parse_qs(urllib.splitquery(request.getReferer())[1] or "")
+    dataset["prewikka.url.current"] = cgi.parse_qs(request.getQueryString()[2:])
+    dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
+    dataset["prewikka.query_string"] = request.getQueryString()
+
+
+
+def load_template(name, dataset):
+    template = getattr(__import__("prewikka.templates." + name, globals(), locals(), [ name ]), name)()
+        
+    for key, value in dataset.items():
+        setattr(template, key, value)
+
+    return template
+
+
+
 class Core:
-    def __init__(self):
+    def __init__(self, config=None):
         class Env: pass
         self._env = Env()
-        self._env.config = Config.Config(siteconfig.conf_dir + "/prewikka.conf")
+        self._env.config = config or Config.Config()
         preludedb.preludedb_init()
         self._initDatabase()
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
@@ -139,19 +164,9 @@ class Core:
         
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
         import prewikka.views
-        
-        interface = self._env.config.interface
-        dataset["document.title"] = "[PREWIKKA]"
-        dataset["document.css_files"] = [ "prewikka/css/style.css" ]
-        dataset["document.js_files"] = [ "prewikka/js/functions.js" ]
-        dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
-        dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
-        dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
-        query = urllib.splitquery(request.getReferer())[1]
-        dataset["prewikka.url.referer"] = cgi.parse_qs(query or "")
-        dataset["prewikka.url.current"] = cgi.parse_qs(request.getQueryString()[2:])
-        dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
 
+        init_dataset(dataset, self._env.config, request)
+        
         if isinstance(self._env.auth, Auth.AnonymousAuth):
             sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.about_section
         else:
@@ -202,15 +217,7 @@ class Core:
                 self._printDataSet(value, level + 1)
             else:
                 print "%s: %s" % (key, value)
-            
-    def _setupTemplate(self, name, dataset):
-        template = getattr(__import__("prewikka.templates." + name, globals(), locals(), [ name ]), name)()
-        
-        for key, value in dataset.items():
-            setattr(template, key, value)
-
-        return template
-        
+                    
     def _checkPermissions(self, request, view, user):
         if user and view.has_key("permissions"):
             if not user.has(view["permissions"]):
@@ -271,15 +278,17 @@ class Core:
             self._cleanupView(view)
             
         except Error.PrewikkaError, e:
-            dataset, template_name = self._setupError(e, request, user)
+            self._setupDataSet(e.dataset, request, user)
+            dataset, template_name = e.dataset, e.template
             
         except Exception, e:
             error = Error.SimpleError("prewikka internal error", str(e),
                                       display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
-            dataset, template_name = self._setupError(error, request, user)
+            init_dataset(error.dataset, self._env.config, request)
+            dataset, template_name = error.dataset, error.template
         
         #self._printDataSet(dataset)
-        template = self._setupTemplate(template_name, dataset)
+        template = load_template(template_name, dataset)
 
         request.content = str(template)
         request.sendResponse()

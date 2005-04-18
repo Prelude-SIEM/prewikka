@@ -18,11 +18,11 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import MyConfigParser
+from prewikka import MyConfigParser, siteconfig
 
 
 class Config:
-    def __init__(self, filename="prewikka.conf"):
+    def __init__(self, filename=siteconfig.conf_dir + "/prewikka.conf"):
         self.general = MyConfigParser.ConfigParserSection("general")
         self.interface = MyConfigParser.ConfigParserSection("interface")
         self.command = MyConfigParser.ConfigParserSection("command")

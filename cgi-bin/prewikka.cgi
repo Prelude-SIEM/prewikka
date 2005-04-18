@@ -25,7 +25,7 @@ import sys, os
 import copy
 import cgi
 
-from prewikka import Core, Request
+from prewikka import Core, Request, Error, Config
 
 
 class CGIRequest(Request.Request):
@@ -78,5 +78,15 @@ class CGIRequest(Request.Request):
 request = CGIRequest()
 request.init()
 
-core = Core.Core()
-core.process(request)
+config = Config.Config()
+
+try:
+    core = Core.Core(config)
+    core.process(request)
+except Exception, e:
+    error = Error.SimpleError("prewikka internal error", str(e),
+                              display_traceback=not config.general.has_key("display_error_traceback"))
+    Core.init_dataset(error.dataset, config, request)
+    template = Core.load_template(error.template, error.dataset)
+    request.content = str(template)
+    request.sendResponse()
