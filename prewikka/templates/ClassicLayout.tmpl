@@ -15,21 +15,19 @@ classic_body
     <div class='$class_'><a href="$link">$name</a></div>
   #end for
 
-  #if $prewikka.user.login or $prewikka.user.logout
-    <div class='topmenu_item_special'>
-    #if $prewikka.user.logout
-      <a href="$prewikka.user.logout">logout</a>
-    #end if
-    </div>
+  <div class='topmenu_item_special'>
+  #if $prewikka.logout_link
+    <a href="$prewikka.logout_link">logout</a>
   #end if
+  </div>
 
-  #if $prewikka.user.login
-    <div class="topmenu_item_info">&nbsp;
+  <div class="topmenu_item_info">&nbsp;
+    #if $prewikka.user
       <p style='vertical-align: inherit; display: inline;'>
         <b><a href="?view=user_settings_display">$prewikka.user.login</a></b> on $prewikka.date
       </p>
-    </div>
-       #end if
+    #end if
+  </div>
 </div>
 
 #def layout_start_hook

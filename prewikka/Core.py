@@ -191,9 +191,8 @@ class Core:
         dataset["interface.tabs"] = [ (tab, utils.create_link(views[0])) for tab, views in tabs ]
         dataset["interface.active_tab"] = active_tab
 
-        if user:
-            dataset["prewikka.user.login"] = user and user.login or None
-            dataset["prewikka.user.logout"] = self._env.auth.canLogout() and utils.create_link("logout") or None
+        dataset["prewikka.user"] = user
+        dataset["prewikka.logout_link"] = (user and self._env.auth.canLogout()) and utils.create_link("logout") or None
 
     def _printDataSet(self, dataset, level=0):
         for key, value in dataset.items():

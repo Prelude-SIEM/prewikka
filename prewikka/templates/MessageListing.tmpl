@@ -1,3 +1,4 @@
+#from prewikka import User
 #extends prewikka.templates.ClassicLayout
 
 #def layout_start_hook
@@ -30,7 +31,9 @@ $message_listing_header
         <tr class='$row_classes[$cnt%2]'>
           $message_fields
           <td class='static_content_column'>
-            <input type='checkbox' name='delete' value='$message.delete'/>
+            #if $prewikka.user.has(User.PERM_IDMEF_ALTER)
+              <input type='checkbox' name='delete' value='$message.delete'/>
+            #end if
           </td>
         </tr>
         #set $cnt += 1
@@ -39,7 +42,9 @@ $message_listing_header
     <tfoot>
     </tfoot>
   </table>
-  <div align="right"><input type='submit' value='Delete'/></div>
+  #if $prewikka.user.has(User.PERM_IDMEF_ALTER)
+    <div align="right"><input type='submit' value='Delete'/></div>
+  #end if
 #end block main_content
 
 
