@@ -138,7 +138,8 @@ class MyConfigParser:
                     if result:
                         name, value = result.group("name", "value")
                         name = name.strip()
-                        value = value.strip()
+                        if value:
+                            value = value.strip()
                         self._current_section[name] = ConfigParserOption(name, value, lineno, line)
                     else:
                         raise ParseError(file.name, lineno, line)

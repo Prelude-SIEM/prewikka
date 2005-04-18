@@ -242,6 +242,12 @@ class Core:
 
     def checkAuth(self, request):
         return self._env.auth.getUser(request)
+
+    def _setupError(self, error, request, user):
+        error.dataset["query"] = request.getQueryString()
+        self._setupDataSet(error.dataset, request, user)
+
+        return error.dataset, error.template
     
     def process(self, request):
         self._env.log(Log.EVENT_QUERY, request)
@@ -256,11 +262,8 @@ class Core:
             self._setupView(view, request, parameters, user)
 
             self._env.log(Log.EVENT_RENDER_VIEW, request, view, user)
-
-            try:
-                getattr(view["object"], view["handler"])()
-            except (prelude.PreludeError, preludedb.PreludeDBError), e:
-                raise Error.SimpleError("prelude internal error", str(e))
+            
+            getattr(view["object"], view["handler"])()
 
             dataset = view["object"].dataset
             template_name = view["template"]
@@ -268,11 +271,13 @@ class Core:
             self._cleanupView(view)
             
         except Error.PrewikkaError, e:
-            template_name = e.template
-            dataset = e.dataset
-            dataset["query"] = request.getQueryString()
-            self._setupDataSet(dataset, request, user)
-
+            dataset, template_name = self._setupError(e, request, user)
+            
+        except Exception, e:
+            error = Error.SimpleError("prewikka internal error", str(e),
+                                      display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
+            dataset, template_name = self._setupError(error, request, user)
+        
         #self._printDataSet(dataset)
         template = self._setupTemplate(template_name, dataset)
 

@@ -18,6 +18,9 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+import traceback
+import StringIO
+
 from prewikka import DataSet
 from prewikka.templates import ErrorTemplate
 
@@ -29,8 +32,16 @@ class PrewikkaError(Exception):
 
 
 class SimpleError(PrewikkaError):
-    def __init__(self, name, message):
+    def __init__(self, name, message, display_traceback=False):
         self.dataset = DataSet.DataSet()
         self.dataset["message"] = message
         self.dataset["name"] = name
+        if display_traceback:
+            output = StringIO.StringIO()
+            traceback.print_exc(file=output)
+            output.seek(0)
+            tmp = output.read()
+            self.dataset["traceback"] = tmp
+        else:
+            self.dataset["traceback"] = None
         self.template = "ErrorTemplate"
