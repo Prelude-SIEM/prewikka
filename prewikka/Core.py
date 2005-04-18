@@ -105,8 +105,8 @@ class Core:
             self._views.update(object.get())
         
     def _loadModule(self, type, name, config):
-        module = "prewikka/modules/%s/%s/%s" % (type, name, name)
-        return __import__(module).load(self._env, config)
+        module = __import__("prewikka.modules.%s.%s.%s" % (type, name, name), globals(), locals(), [ name ])
+        return module.load(self._env, config)
 
     def _loadModules(self):
         config = self._env.config
@@ -205,7 +205,7 @@ class Core:
                 print "%s: %s" % (key, value)
             
     def _setupTemplate(self, name, dataset):
-        template = getattr(__import__("prewikka/templates/" + name), name)()
+        template = getattr(__import__("prewikka.templates." + name, globals(), locals(), [ name ]), name)()
         
         for key, value in dataset.items():
             setattr(template, key, value)
