@@ -855,8 +855,14 @@ class AlertListing(MessageListing, view.View):
                 infos["display"] = message.createMessageLink(ident, "alert_summary")
                 message.setMessageClassificationReferences(infos, idmef)
             else:
+                parameters = self._createAggregationParameters(self.parameters["aggregated_source_values"][:],
+                                                               self.parameters["aggregated_target_values"][:])
+
+                parameters["aggregated_classification_value"] = classification
+                
                 infos["display"] = utils.create_link("alert_listing",
-                                                     self.parameters + { "aggregated_classification_value": classification } - [ "offset" ])
+                                                     self.parameters - [ "offset", "aggregated_source", "aggregated_target" ] + parameters)
+
             
             self.dataset["messages"].append(message)
 
