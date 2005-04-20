@@ -65,6 +65,10 @@ class SensorListing(view.View):
     view_parameters = SensorListingParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "SensorListing"
+
+    def init(self, env):
+        self._heartbeat_count = int(env.config.general.getOptionValue("heartbeat_count", 30))
+        self._heartbeat_error_margin = int(env.config.general.getOptionValue("heartbeat_error_margin", 3))
     
     def render(self):
         analyzers = [ ]
@@ -110,7 +114,7 @@ class SensorListing(view.View):
                                 get_analyzer_status_from_latest_heartbeat(analyzer["last_heartbeat_status"],
                                                                           analyzer["last_heartbeat_time"],
                                                                           analyzer["last_heartbeat_interval"],
-                                                                          3)
+                                                                          self._heartbeat_error_margin)
 
             analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(int(analyzer["last_heartbeat_time"]))) + \
                                               " %+.2d:%.2d" % utils.get_gmt_offset()
