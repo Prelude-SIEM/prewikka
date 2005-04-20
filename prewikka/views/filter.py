@@ -55,18 +55,19 @@ class AlertFilterEdition(view.View):
     def _setCommon(self):
         self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
         self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.ALERT_OBJECTS))
-        self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("==", "!=", "<", "<=", ">", ">=")))
+        self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("==", "!=", "<", "<=", ">", ">=", "substr")))
         self.dataset["elements"] = [ ]
         self.dataset["fltr.name"] = ""
         self.dataset["fltr.comment"] = ""
-        self.dataset["formula"] = ""
+        self.dataset["formula"] = "Example: (A AND B) OR (C AND D)"
 
     def _reload(self):
         for name, obj, operator, value in self.parameters.get("elements", [ ]):
             self.dataset["elements"].append(self._element(name, obj, operator, value))
 
-        self.dataset["fltr.name"] = self.parameters.get("filter_name", "")
+        self.dataset["fltr.name"] = self.parameters.get("save_as", "")
         self.dataset["fltr.comment"] = self.parameters.get("filter_comment", "")
+        self.dataset["formula"] = self.parameters["formula"]
         
     def _element(self, name, obj="", operator="", value=""):
         return {
