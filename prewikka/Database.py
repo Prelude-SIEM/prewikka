@@ -209,6 +209,10 @@ class Database:
         return map(lambda r: r[0], self.query("SELECT name FROM Prewikka_Filter WHERE login = %s" % self.escape(login)))
 
     def setFilter(self, login, filter):
+        if self.query("SELECT name FROM Prewikka_Filter WHERE login = %s AND name = %s" %
+                      (self.escape(login), self.escape(filter.name))):
+            self.deleteFilter(login, filter.name)
+        
         self.transaction_start()
         self.query("INSERT INTO Prewikka_Filter (login, name, comment, formula) VALUES (%s, %s, %s, %s)" %
                    (self.escape(login), self.escape(filter.name), self.escape(filter.comment), self.escape(filter.formula)))
