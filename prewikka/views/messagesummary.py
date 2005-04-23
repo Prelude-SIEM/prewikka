@@ -174,7 +174,8 @@ class AlertSummary(MessageSummary, view.View):
     def buildTarget(self, alert):
         self.beginSection("Target")
         self.buildDirection(alert, "target")
-        self.newSectionEntry("File", alert["target(0).file(0).name"])
+        self.newSectionEntry("Name", alert["target(0).file(0).name"])
+        self.newSectionEntry("Path", alert["target(0).file(0).path"])
         self.endSection()
 
     def render(self):
