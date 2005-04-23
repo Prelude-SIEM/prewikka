@@ -407,7 +407,9 @@ function ${name}_add_entry(object, value, num) {
   <ul id="popup_block">
     <li class="popup_title">
       #if $direction.service.value != None
-       <span>$direction.address.value</span>:$direction.service.value
+       <span>$direction.address.value:<a href="http://www.portsdb.org/bin/portsdb.cgi?portnumber=$direction.service.value">$direction.service.value</a>
+       </span>
+
 	#if $direction.service_extra.value != None
           ($direction.service_extra.value)
         #end if
