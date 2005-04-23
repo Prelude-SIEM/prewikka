@@ -407,12 +407,15 @@ function ${name}_add_entry(object, value, num) {
   <ul id="popup_block">
     <li class="popup_title">
       #if $direction.service.value != None
-       <span>$direction.address.value:<a href="http://www.portsdb.org/bin/portsdb.cgi?portnumber=$direction.service.value">$direction.service.value</a>
-       </span>
+       #set $proto = ""
+       #set $proto_str = ""
+       #if $direction.service_extra.value != None
+        #set $proto_str = "/" + $direction.service_extra.value.lower
+        #set $proto = "&protocol=" + $direction.service_extra.value 
+       #end if
 
-	#if $direction.service_extra.value != None
-          ($direction.service_extra.value)
-        #end if
+       <span>$direction.address.value:<a href="http://www.portsdb.org/bin/portsdb.cgi?portnumber=$direction.service.value$proto">$direction.service.value$proto_str</a>
+       </span>
       #else
           <span>$direction.address.value</span>
       #end if

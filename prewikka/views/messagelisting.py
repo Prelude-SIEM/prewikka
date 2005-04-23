@@ -377,7 +377,7 @@ class ListedAlert(ListedMessage):
 
         set_main_and_extra_values(dataset, message, "service",
                                   "alert.%s(0).service.port" % direction,
-                                  "alert.%s(0).service.name" % direction)
+                                  "alert.%s(0).service.protocol" % direction)
         
         if message["alert.%s(0).node.address(0).address" % direction]:
             address = message["alert.%s(0).node.address(0).address" % direction]
