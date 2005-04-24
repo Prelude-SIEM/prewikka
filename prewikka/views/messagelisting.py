@@ -125,6 +125,7 @@ class AlertListingParameters(MessageListingParameters):
         self.optional("aggregated_source_values", list, [ ])
         self.optional("aggregated_target", list, [ ])
         self.optional("aggregated_target_values", list, [ ])
+        self.optional("have_aggregated_classification_value", str)
         self.optional("aggregated_classification_value", str)
         self.optional("filter", str)
         self.optional("alert.classification.text", list, [ ])
@@ -819,7 +820,7 @@ class AlertListing(MessageListing, view.View):
             if value:
                 criterion = "%s == '%s'" % (path, value)
             else:
-                criterion = "! %s" % path
+                criterion = "(! %s || %s == '')" % (path, path)
             criteria.append(criterion)
             delete_base_criteria.append(criterion)
         
@@ -858,6 +859,7 @@ class AlertListing(MessageListing, view.View):
                 parameters = self._createAggregationParameters(self.parameters["aggregated_source_values"][:],
                                                                self.parameters["aggregated_target_values"][:])
 
+                parameters["have_aggregated_classification_value"] = "yes"
                 parameters["aggregated_classification_value"] = classification
                 
                 infos["display"] = utils.create_link("alert_listing",
@@ -911,7 +913,7 @@ class AlertListing(MessageListing, view.View):
                 if value:
                     criterion = "%s == '%s'" % (path, value)
                 else:
-                    criterion = "! %s" % path
+                    criterion = "(! %s || %s == '')" % (path, path)
 
                 criteria2.append(criterion)
                 delete_criteria.append(criterion)
@@ -964,18 +966,22 @@ class AlertListing(MessageListing, view.View):
                         
                         criteria3 = criteria2[:]
 
-                        for path, value in (("alert.classification.text", classification),
-                                            ("alert.assessment.impact.severity", severity),
-                                            ("alert.assessment.impact.completion", completion)):
+                        for path, value, is_string in (("alert.classification.text", classification, True),
+                                                       ("alert.assessment.impact.severity", severity, False),
+                                                       ("alert.assessment.impact.completion", completion, False)):
                             if value:
                                 criteria3.append("%s == '%s'" % (path, value))
                             else:
-                                criteria3.append("! %s" % path)
+                                if is_string:
+                                    criteria3.append("(! %s || %s == '')" % (path, path))
+                                else:
+                                    criteria3.append("! %s" % path)
 
                         ident = self.env.idmef_db.getAlertIdents(criteria3, limit=1)[0]
 
                         infos["display"] = message.createMessageLink(ident, "alert_summary")
                     else:
+                        parameters["have_aggregated_classification_value"] = "yes"
                         parameters["aggregated_classification_value"] = classification
                         infos["display"] = utils.create_link("alert_listing",
                                                              self.parameters - [ "offset", "aggregated_source", "aggregated_target" ] +
@@ -997,23 +1003,26 @@ class AlertListing(MessageListing, view.View):
         self.dataset["aggregated_target"] = self.parameters["aggregated_target"] or [ "none" ]
         self.dataset["aggregated_target_values"] = self.parameters["aggregated_target_values"]
 
-        if self.parameters["aggregated_source"] + self.parameters["aggregated_target"] and \
-               not self.parameters.has_key("aggregated_classification_value"):
-            self.dataset["delete_enabled"] = False
-            return self._setAggregatedMessages(criteria)
+        if not self.parameters.has_key("have_aggregated_classification_value"):
+            if self.parameters["aggregated_source"] + self.parameters["aggregated_target"]:
+                if self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]:
+                    return self._setAggregatedMessagesValues(criteria)
+                else:
+                    return self._setAggregatedMessagesNoValues(criteria)
         
-        self.dataset["delete_enabled"] = True
-
-        if self.parameters.has_key("aggregated_classification_value"):
+        if (self.parameters.has_key("aggregated_classification_value") or
+            self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]):
             criteria = criteria[:]
-            for path, value in zip(self.parameters["aggregated_source"] + self.parameters["aggregated_target"] +
-                                   [ "alert.classification.text" ],
-                                   self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"] +
-                                   [ self.parameters["aggregated_classification_value"] ]):
+            paths = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
+            values = self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]
+            if self.parameters.has_key("have_aggregated_classification_value"):
+                paths.append("alert.classification.text")
+                values.append(self.parameters.get("aggregated_classification_value"))
+            for path, value in zip(paths, values):
                 if value:
                     criteria.append("%s == '%s'" % (path, value))
                 else:
-                    criteria.append("! %s" % path)
+                    criteria.append("(! %s || %s == '')" % (path, path))
 
         for ident in self.env.idmef_db.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
             message = self.env.idmef_db.getAlert(ident)
@@ -1131,8 +1140,6 @@ class HeartbeatListing(MessageListing, view.View):
     def render(self):
         self._deleteMessages()
 
-        self.dataset["delete_enabled"] = True
-        
         start, end = self._getTimelineRange()
         
         criteria = [ "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'" % (str(start), str(end)) ]
