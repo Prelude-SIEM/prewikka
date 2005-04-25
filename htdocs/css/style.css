@@ -87,6 +87,8 @@ thead {
         z-index: 1;
         position: fixed;
         top: 0px;
+	left: 0px;
+	right: 0px;
         height: 56px;
         padding-top: 10px;
         padding-left: 10px;
@@ -203,7 +205,8 @@ thead {
  */
 #menu {
 	width: 160px;
-	top: 80px;
+	margin-top: 80px;
+	top: 0px;
 	bottom: 0px;
 	z-index: 1;
 	position: fixed;
@@ -258,9 +261,10 @@ thead {
         background: #999999; 
         font-size: 10px;
         width: 160px;
-        bottom: 43px;
         color: white;
-        position: fixed;
+	position: fixed;
+	bottom: 43px;
+	height: 163px;
 }
 
 .timeline_control_prev, .timeline_control_cur, .timeline_control_next {
@@ -269,6 +273,7 @@ thead {
         height: 20px;
         padding: 0px;
         border: 1px black solid;
+	text-align: center;
 }
 
 .timeline_control_cur {
@@ -299,9 +304,10 @@ thead {
 
 /* menu message nav */
 #message_list_nav {
-        position:fixed;
-        bottom: 0px;
+	position: fixed;
+	bottom: 0px;
         left: 0px;
+	height: 43px;
         width: 160px;
 }
 
