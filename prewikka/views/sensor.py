@@ -106,7 +106,7 @@ class SensorListing(view.View):
             for i in range(len(analyzer["node_addresses"])):
                 analyzer["node_addresses"][i] = "<a href='%s'>%s</a>" % \
                                                 (utils.create_link(self.view_name,
-                                                                   { "filter_path": "heartbeat.analyzer(-1).node.address(0).address",
+                                                                   { "filter_path": "heartbeat.analyzer(-1).node.address.address",
                                                                      "filter_value": analyzer["node_addresses"][i] }),
                                                  analyzer["node_addresses"][i])
 
