@@ -83,7 +83,7 @@ class Session:
             login, t = self.db.getSession(sessionid)
         except Database.DatabaseInvalidSessionError:
             self.log(Log.EVENT_INVALID_SESSIONID, request)
-            raise AuthError(request.arguments)
+            raise AuthError(request.arguments, message="")
 
         now = int(time.time())
 
