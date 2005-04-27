@@ -92,37 +92,84 @@ def convert_idmef_value(value):
             IDMEF_VALUE_TYPE_DOUBLE:        idmef_value_get_double,
             IDMEF_VALUE_TYPE_STRING:        idmef_value_get_string,
             IDMEF_VALUE_TYPE_DATA:          idmef_value_get_data,
+	    IDMEF_VALUE_TYPE_CLASS:	    idmef_value_get_object,
             IDMEF_VALUE_TYPE_ENUM:          get_enum,
             IDMEF_VALUE_TYPE_TIME:          get_time
             }[idmef_value_get_type(value)](value)
     except KeyError:
         return None
 
-
-
+    
 class Message:
     def __init__(self, res):
         self._res = res
-
+        self._value_list = None
+        
     def __del__(self):
         idmef_message_destroy(self._res)
 
+        if self._value_list:
+            idmef_value_destroy(self._value_list)
+
+    def __iter__(self):
+        if not self._value_list:
+            raise TypeError, "iteration over a non-sequence"
+        
+        self._list_iterator = 0
+        return self
+    
+    def next(self):
+        next = idmef_value_get_nth(self._value_list, self._list_iterate)
+        if not next:
+            raise StopIteration
+
+        value = self._convert_value(next, self._root + "(%d)" % self._list_iterate)
+        self._list_iterate += 1
+        
+        return value
+
+    def _convert_value(self, idmef_value, key):
+        if idmef_value_get_type(idmef_value) == IDMEF_VALUE_TYPE_LIST:
+            value = Message(idmef_message_ref(self._res))
+            value._root = key
+            value._list_iterate = 0
+            value._value_list = idmef_value
+            if self._value_list:
+                idmef_value_ref(idmef_value)
+                
+        elif idmef_value_get_type(idmef_value) != IDMEF_VALUE_TYPE_CLASS:
+            value = convert_idmef_value(idmef_value)
+            if not self._value_list:
+                idmef_value_destroy(idmef_value)
+            
+        else:
+            if not self._value_list:
+                idmef_value_destroy(idmef_value)
+                
+            value = Message(idmef_message_ref(self._res))
+            value._root = key
+
+        return value
+    
     def _get_raw_value(self, key):
         path = idmef_path_new_fast(key)
         idmef_value = idmef_path_get(path, self._res)
-        if idmef_value is None:
-            value = None
+        
+        if idmef_value:
+            ret = self._convert_value(idmef_value, key)
         else:
-            value = convert_idmef_value(idmef_value)
-            idmef_value_destroy(idmef_value)
+            if idmef_path_is_list(path, -1):
+                ret = []
+            else:
+                ret = None
+            
         idmef_path_destroy(path)
-
-        return value
+        return ret
 
     def __getitem__(self, key):
         if key.find("%s." % self._root) != 0:
             key = "%s." % self._root + key
-        
+
         return escape_value(self._get_raw_value(key))
 
     def match(self, criteria):
