@@ -649,26 +649,18 @@ class AlertListing(MessageListing, view.View):
     def _deleteMessage(self, ident):
         self.env.idmef_db.deleteAlert(ident)
 
-    def _applySimpleFilter(self, criteria, column, object):
-        if len(self.parameters[object]) > 0:
-            criteria.append(" || ".join(map(lambda value: "%s substr '%s'" % (object, value),
-                                            self.parameters[object])))
-            self.dataset[object] = dict([ (re.sub("\(-?\d+\)", "", path), value) for path, value in self.parameters[object] ])
-            self.dataset[column + "_filtered"] = True
-        else:
-            self.dataset[object] = [ "" ]
-
     def _applyOptionalEnumFilter(self, criteria, column, object, values):
+            
         def lists_have_same_content(l1, l2):
             l1 = copy.copy(l1)
             l2 = copy.copy(l2)
             l1.sort()
             l2.sort()
-            
+
             return l1 == l2
         
-        if (len(self.parameters[object]) != 0 and
-            not lists_have_same_content(self.parameters[object], values)):
+        if ( len(self.parameters[object]) != 0 and
+             not lists_have_same_content(self.parameters[object], values)):
 
             new = [ ]
             for value in self.parameters[object]:
@@ -685,9 +677,12 @@ class AlertListing(MessageListing, view.View):
 
     def _applyClassificationFilters(self, criteria):
         self.dataset["classification_filtered"] = False
+
         if len(self.parameters["alert.classification.text"]) > 0:
             criteria.append(" || ".join(map(lambda value: "alert.classification.text substr '%s'" % value,
                                             self.parameters["alert.classification.text"])))
+
+            self.dataset["classification_filtered"] = True
             self.dataset["alert.classification.text"] = self.parameters["alert.classification.text"]
             self.dataset["alert.classification.text_filtered"] = True
         else:
@@ -699,9 +694,11 @@ class AlertListing(MessageListing, view.View):
                                       ["failed", "succeeded", "none"])
         
     def _applyCheckboxFilters(self, criteria, type):
+            
         def get_operator(object):
             if object in ("alert.source.service.port", "alert.target.service.port"):
                 return "=="
+
             return "substr"
         
         if self.parameters[type]:
@@ -720,7 +717,7 @@ class AlertListing(MessageListing, view.View):
         self._applyCheckboxFilters(criteria, "target")
         self._applyCheckboxFilters(criteria, "analyzer")
 
-    def _setAggregatedMessagesValues(self, criteria):
+    def _setAggregatedMessagesValues(self, criteria):        
         aggregate_on = self.parameters["aggregated_source"] + self.parameters["aggregated_target"]
         aggregated_values = self.parameters["aggregated_source_values"] + self.parameters["aggregated_target_values"]
 
