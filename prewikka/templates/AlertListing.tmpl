@@ -4,6 +4,7 @@
 
 <thead>
 <script>
+
 function del_entry(link) {
 	row = link.parentNode.parentNode
 	table = row.parentNode
@@ -258,7 +259,7 @@ function ${name}_add_entry(object, value, num) {
       #end if
       <input type="checkbox" name="alert.assessment.impact.severity" value="high" $checked/> high
       
-      #if "high" in $alert.assessment.impact.severity
+      #if "none" in $alert.assessment.impact.severity
         #set $checked = "checked"
       #else
         #set $checked = ""
@@ -404,70 +405,72 @@ function ${name}_add_entry(object, value, num) {
 
 #for $name, $separator, $direction in ("source", "from", $message.source), ("target", "to", $message.target)
 <td>
-  <ul id="popup_block">
-    <li class="popup_title">
+      #set $service = ""
+      #set $proto_param = ""
+      #set $proto_str = ""
+
       #if $direction.service.value != None
-       #set $proto = ""
-       #set $proto_str = ""
        #if $direction.service_extra.value != None
         #set $proto_str = "/" + $direction.service_extra.value.lower
-        #set $proto = "&protocol=" + $direction.service_extra.value 
+        #set $proto_param = "&protocol=" + $direction.service_extra.value 
        #end if
 
-       <span>$direction.address.value:<a href="http://www.portsdb.org/bin/portsdb.cgi?portnumber=$direction.service.value$proto">$direction.service.value$proto_str</a>
-       </span>
-      #else
-          <span>$direction.address.value</span>
+       #set $service = ":<a href=http://www.portsdb.org/bin/portsdb.cgi?portnumber="
+       #set $service += $str($direction.service.value) + $proto_param + ">" + $str($direction.service.value) + $proto_str + "</a>"
       #end if
-      #if $direction.address_extra.value
-        <br/>($direction.address_extra.value)
-      #end if
-      #if $direction.addresses
-        <br/>
-        #for $address in $direction.addresses
-            <span>$address.value</span>
-        #end for
-      #end if
+   
+      #for $address in $direction.addresses
+       <ul id="popup_block">
+        <li class="popup_title">
+         <span>$address.value</span>$service
+
+	  <ul>
+           <li><a href="$address.inline_filter">Filter on this $name</a></li>
+           #for $name, $link in $address.host_commands
+           <li><a href="$link">$name</a></li>
+           #end for
+          </ul>
+	 </li>
+        </ul>
+       #end for
+
       #if $direction.users
         #if len($direction.users) > 1
-          <br/>users:
+          users:
         #else
-          <br/>user:
+          user:
         #end if
+
         #set $cnt = 0
         #for $user in $direction.users
           #if $cnt > 0
             ;&nbsp;
           #end if
-          $user.user.value
+          
+	  $user.user.value    
+
           #if $user.user_extra.value
             ($user.user_extra.value)
           #end if
+      
           #set $cnt = $cnt + 1
         #end for
       #end if
+
       #if $direction.process.value
-        <br/>process: $direction.process.value
+        process: $direction.process.value
         #if $direction.process_extra.value != None
           ($direction.process_extra.value)
         #end if
       #end if
+
      #if $direction.interface.value
-        <br/>interface: $direction.interface.value
+        interface: $direction.interface.value
      #end if
+
      #if $direction.empty
        n/a
      #end if
-     #if $direction.address.value
-        <ul>
-          <li><a href="$direction.address.inline_filter">Filter on this $name</a></li>
-          #for $name, $link in $direction.address.host_commands
-            <li><a href="$link">$name</a></li>
-          #end for
-        </ul>
-      #end if
-    </li>
-  </ul>
 </td>
 #end for
 
