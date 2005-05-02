@@ -521,8 +521,8 @@ function ${name}_add_entry(object, value, num) {
 
       #if $direction.service.value != None
        #if $direction.service_extra.value != None
-        #set $proto_str = "/" + $direction.service_extra.value.lower
-        #set $proto_param = "&amp;protocol=" + $direction.service_extra.value 
+        #set $proto_str = "/" + $direction.service_extra.value.lower()
+        #set $proto_param = "&amp;protocol=" + $direction.service_extra.value.upper() 
        #end if
 
        #set $service = ":<a href='http://www.portsdb.org/bin/portsdb.cgi?portnumber="
