@@ -1,10 +1,15 @@
+#from prewikka import User
 #extends prewikka.templates.MessageListing
 
 #block message_fields_header
 
-<thead>
-<script>
+#set $row_classes = ("table_row_even", "table_row_odd")
+#set $global_cnt = 0
 
+
+<script type="text/javascript">
+
+<!-- 
 function del_entry(link) {
 	row = link.parentNode.parentNode
 	table = row.parentNode
@@ -25,19 +30,21 @@ function simple_add_entry(table_name, object, value) {
 	row = document.createElement("tr")
 	table.appendChild(row)
 
-	field = document.createElement("td")
+	field = document.createElement("th")
 	row.appendChild(field)
+
 	input = document.createElement("input")
-	field.appendChild(input)
 	input.setAttribute("name", object)
 	input.setAttribute("value", value)
-	
-	field = document.createElement("td")
-	row.appendChild(field)
+	field.appendChild(input)
+
+//	field = document.createElement("td")
+//	row.appendChild(field)
 
 	if ( table.firstChild != table.lastChild ) {
 		link = document.createElement("a")
 		link.setAttribute("onclick", "del_entry(this)")
+		link.setAttribute("href", "")
 		content = document.createTextNode("-")
 		link.appendChild(content)
 		field.appendChild(link)		
@@ -48,17 +55,17 @@ function simple_add_entry(table_name, object, value) {
 
 	field = document.createElement("td")
 	row.appendChild(field)
+
 	link = document.createElement("a")
 	link.setAttribute("onclick", "simple_add_entry('" + table_name + "', '" + object + "', '')")
+	link.setAttribute("href", "")
+	
 	content = document.createTextNode("+")
 	link.appendChild(content)
 	field.appendChild(link)
 }
 
-#for $category, $aggregations in $available_aggregations.items()
-function aggregated_${category}_add_entry(path) {
-	table = document.getElementById("${category}_aggregation_table")
-
+function begin(table) {
 	if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
 		table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
 	}
@@ -66,15 +73,42 @@ function aggregated_${category}_add_entry(path) {
 	row = document.createElement("tr")
 	table.appendChild(row)
         
-        field = document.createElement("td")
+        field = document.createElement("th")
 	row.appendChild(field)
-        content = document.createTextNode("Filter on")
+        content = document.createTextNode("Group entry by")
         field.appendChild(content)
         
         field = document.createElement("td")
 	row.appendChild(field)
 	select = document.createElement("select")
-	field.appendChild(select)
+ 	field.appendChild(select)
+}
+
+function end(table) {
+	field = document.createElement("td")
+	row.appendChild(field)
+
+	if ( table.firstChild != table.lastChild ) {
+		link = document.createElement("a")
+		link.setAttribute("onclick", "del_entry(this)")
+		link.setAttribute("href", "")
+		content = document.createTextNode("-")
+		link.appendChild(content)
+		field.appendChild(link)		
+	} else {
+		content = document.createTextNode(" ")
+		field.appendChild(content)
+	}
+
+	field = document.createElement("td")
+	row.appendChild(field)
+}
+
+#for $category, $aggregations in $available_aggregations.items()
+function aggregated_${category}_add_entry(path) {
+	table = document.getElementById("${category}_aggregation_table")
+
+	begin(table);
 	select.setAttribute("name", "aggregated_${category}")
         
         #for $aggregation_name, $aggregated_path in $aggregations
@@ -96,6 +130,7 @@ function aggregated_${category}_add_entry(path) {
 	if ( table.firstChild != table.lastChild ) {
 		link = document.createElement("a")
 		link.setAttribute("onclick", "del_entry(this)")
+		link.setAttribute("href", "#")
 		content = document.createTextNode("-")
 		link.appendChild(content)
 		field.appendChild(link)		
@@ -104,10 +139,11 @@ function aggregated_${category}_add_entry(path) {
 		field.appendChild(content)
 	}
 
-	field = document.createElement("td")
-	row.appendChild(field)
+	end(table)
+
 	link = document.createElement("a")
 	link.setAttribute("onclick", "aggregated_${category}_add_entry('')")
+	link.setAttribute("href", "#")
 	content = document.createTextNode("+")
 	link.appendChild(content)
 	field.appendChild(link)
@@ -137,6 +173,7 @@ function simple_add_entry(table_name, object, value) {
 	if ( table.firstChild != table.lastChild ) {
 		link = document.createElement("a")
 		link.setAttribute("onclick", "del_entry(this)")
+		link.setAttribute("href", "#")
 		content = document.createTextNode("-")
 		link.appendChild(content)
 		field.appendChild(link)		
@@ -149,12 +186,43 @@ function simple_add_entry(table_name, object, value) {
 	row.appendChild(field)
 	link = document.createElement("a")
 	link.setAttribute("onclick", "simple_add_entry('" + table_name + "', '" + object + "', '')")
+	link.setAttribute("href", "")
 	content = document.createTextNode("+")
 	link.appendChild(content)
 	field.appendChild(link)
 }
 
-#for $name, $objects in (("analyzer", (("name", "alert.analyzer.name"), ("node location", "alert.analyzer.node.location"), ("node address", "alert.analyzer.node.address.address"), ("node name", "alert.analyzer.node.name"), ("manufacturer", "alert.analyzer.manufacturer"), ("model", "alert.analyzer.model"), ("class", "alert.analyzer.class"))), ("source", (("address", "alert.source.node.address.address"), ("name", "alert.source.node.name"), ("user", "alert.source.user.user_id.name"), ("process", "alert.source.process.name"), ("service", "alert.source.service.name"), ("port", "alert.source.service.port"), ("interface", "alert.source.interface"))), ("target", (("address", "alert.target.node.address.address"), ("name", "alert.target.node.name"), ("user", "alert.target.user.user_id.name"), ("process", "alert.target.process.name"), ("service", "alert.target.service.name"), ("port", "alert.target.service.port"), ("interface", "alert.target.interface"))))
+#for $name, $objects in (
+			  ("classification", (("text", "alert.classification.text"), )
+                          ),
+
+                          ("analyzer", (("name", "alert.analyzer.name"), 
+                                        ("node location", "alert.analyzer.node.location"), 
+                                        ("node address", "alert.analyzer.node.address.address"), 
+                                        ("node name", "alert.analyzer.node.name"), 
+                                        ("manufacturer", "alert.analyzer.manufacturer"), 
+                                        ("model", "alert.analyzer.model"), 
+                                        ("class", "alert.analyzer.class"))
+                          ), 
+
+                          ("source", (("address", "alert.source.node.address.address"), 
+                                      ("name", "alert.source.node.name"), 
+                                      ("user", "alert.source.user.user_id.name"), 
+                                      ("process", "alert.source.process.name"), 
+                                      ("service", "alert.source.service.name"), 
+                                      ("port", "alert.source.service.port"), 
+                                      ("interface", "alert.source.interface"))
+                          ), 
+ 
+                          ("target", (("address", "alert.target.node.address.address"), 
+                                      ("name", "alert.target.node.name"), 
+                                      ("user", "alert.target.user.user_id.name"), 
+                                      ("process", "alert.target.process.name"), 
+                                      ("service", "alert.target.service.name"), 
+                                      ("port", "alert.target.service.port"), 
+                                      ("interface", "alert.target.interface"))
+                          )
+)
 
 function ${name}_add_entry(object, value, num) {
 	table = document.getElementById('${name}_table')
@@ -166,13 +234,18 @@ function ${name}_add_entry(object, value, num) {
 	row = document.createElement("tr")
 	table.appendChild(row)
 
+	field = document.createElement("th")
+	content = document.createTextNode("Filter on:")
+	field.appendChild(content)
+	row.appendChild(field)
+	
 	field = document.createElement("td")
 	row.appendChild(field)
 	select = document.createElement("select")
 	field.appendChild(select)
 	select.setAttribute("name", "${name}_object_" + num)
         
-        #for $object_name, $object in $objects
+#for $object_name, $object in $objects
         
 	option = document.createElement("option")
 	option.setAttribute("value", '$object')
@@ -183,7 +256,7 @@ function ${name}_add_entry(object, value, num) {
 	option.appendChild(option_value)
 	select.appendChild(option)
         
-        #end for
+#end for
 
 	field = document.createElement("td")
 	row.appendChild(field)
@@ -199,6 +272,7 @@ function ${name}_add_entry(object, value, num) {
 		link = document.createElement("a")
 		link.setAttribute("onclick", "del_entry(this)")
 		content = document.createTextNode("-")
+		link.setAttribute("href", "#")
 		link.appendChild(content)
 		field.appendChild(link)
 	} else {
@@ -210,86 +284,115 @@ function ${name}_add_entry(object, value, num) {
 	row.appendChild(field)
 	link = document.createElement("a")
 	link.setAttribute("onclick", "${name}_add_entry('', '', '" + (num + 1) + "')")
+	link.setAttribute("href", "#")
 	content = document.createTextNode("+")
 	link.appendChild(content)
 	field.appendChild(link)
 }
 
 #end for
+-->
 
 </script>
+
+<thead>
 <tr>
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('classification');" href="#">Classification</a>
     <div id="classification">
-      <span style="float: left">Text: </span><table id="classification_text"></table>
-      <script>
-        #for $classification in $alert.classification.text
-          simple_add_entry('classification_text', 'alert.classification.text', '$classification')
+      <table id="classification_table" style="width: 100%;"></table>
+      <script type="text/javascript">
+        #set $cnt = 0
+        #for $object, $value in $classification
+          classification_add_entry('$object', '$value', $cnt)
+          #set $cnt = $cnt + 1
+	  #set $global_cnt = $global_cnt + 1
         #end for
       </script>
 
-      Severity:
+      <table id="classification_aggregation_table"></table>
+      <script type="text/javascript">
+      #if len($aggregated_classification) == 0
+        aggregated_classification_add_entry("")
+	#set $global_cnt = $global_cnt + 1
+      #else
+        #for $path in $aggregated_classification
+          aggregated_classification_add_entry('$path')
+	  #set $global_cnt = $global_cnt + 1
+        #end for
+      #end if
+      </script>
+
+      <table>
+      <tr>
+      #set $global_cnt += 1
+       <th>Severity:</th>
 
       #if "info" in $alert.assessment.impact.severity
-        #set $checked = "checked"
+        #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <input type="checkbox" name="alert.assessment.impact.severity" value="info" $checked/> info
+      <td><input type="checkbox" name="alert.assessment.impact.severity" value="info" $checked>info</input></td>
 
       #if "low" in $alert.assessment.impact.severity
-        #set $checked = "checked"
+        #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <input type="checkbox" name="alert.assessment.impact.severity" value="low" $checked/> low
+      <td><input type="checkbox" name="alert.assessment.impact.severity" value="low" $checked>low</input></td>
 
       #if "medium" in $alert.assessment.impact.severity
-        #set $checked = "checked"
+        #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <input type="checkbox" name="alert.assessment.impact.severity" value="medium" $checked/> medium
+      <td><input type="checkbox" name="alert.assessment.impact.severity" value="medium" $checked>medium</input></td>
 
       #if "high" in $alert.assessment.impact.severity
-        #set $checked = "checked"
+        #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <input type="checkbox" name="alert.assessment.impact.severity" value="high" $checked/> high
+      <td><input type="checkbox" name="alert.assessment.impact.severity" value="high" $checked>high</input></td>
       
       #if "none" in $alert.assessment.impact.severity
-        #set $checked = "checked"
+        #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <input type="checkbox" name="alert.assessment.impact.severity" value="none" $checked/> none
+      <td><input type="checkbox" name="alert.assessment.impact.severity" value="none" $checked>none</input></td>
 
-      <br/>      
-      Completion:
+      </tr>
+
+      <tr>
+      #set $global_cnt += 1
+       <th>Completion:</th>
+
+      <td>&nbsp;</td>
       
       #if "succeeded" in $alert.assessment.impact.completion
-        #set $checked = "checked"
+        #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <input type="checkbox" name="alert.assessment.impact.completion" value="succeeded" $checked> succeeded
+      <td colspan="2"><input type="checkbox" name="alert.assessment.impact.completion" value="succeeded" $checked>succeeded</input></td>
       
       #if "failed" in $alert.assessment.impact.completion
-        #set $checked = "checked"
+        #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <input type="checkbox" name="alert.assessment.impact.completion" value="failed" $checked> failed
+      <td><input type="checkbox" name="alert.assessment.impact.completion" value="failed" $checked>failed</input></td>
 
       #if "none" in $alert.assessment.impact.completion
-        #set $checked = "checked"
+        #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <input type="checkbox" name="alert.assessment.impact.completion" value="none" $checked> none
-      
+      <td><input type="checkbox" name="alert.assessment.impact.completion" value="none" $checked>none</input></td>
+    </tr>
+    </table>
     </div>
 
     #if $classification_filtered
@@ -301,20 +404,22 @@ function ${name}_add_entry(object, value, num) {
     <a onclick="javascript:toggleFilteredColumnVisibility('source');" href="#">Source</a>
     <div id="source">
       <table id="source_table"></table>
-      <script>
+      <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $source
           source_add_entry('$object', '$value', $cnt)
-          #set $cnt = $cnt + 1
+          #set $global_cnt = $global_cnt + 1
         #end for
       </script>
       <table id="source_aggregation_table"></table>
-      <script>
+      <script type="text/javascript">
       #if len($aggregated_source) == 0
         aggregated_source_add_entry("")
+	#set $global_cnt = $global_cnt + 1
       #else
         #for $path in $aggregated_source
           aggregated_source_add_entry('$path')
+	  #set $global_cnt = $global_cnt + 1
         #end for
       #end if
       </script>
@@ -328,20 +433,23 @@ function ${name}_add_entry(object, value, num) {
     <a onclick="javascript:toggleFilteredColumnVisibility('target');" href="#">Target</a>
     <div id="target">
       <table id="target_table"></table>
-      <script>
+      <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $target
           target_add_entry('$object', '$value', $cnt)
+	  #set $global_cnt += 1
           #set $cnt = $cnt + 1
         #end for
       </script>
       <table id="target_aggregation_table"></table>
-      <script>
+      <script type="text/javascript">
       #if len($aggregated_target) == 0
         aggregated_target_add_entry("")
+	#set $global_cnt += 1
       #else
         #for $path in $aggregated_target
           aggregated_target_add_entry('$path')
+	  #set $global_cnt += 1
         #end for
       #end if
       </script>
@@ -355,10 +463,11 @@ function ${name}_add_entry(object, value, num) {
     <a onclick="javascript:toggleFilteredColumnVisibility('analyzer');" href="#">Sensor</a>
     <div id="analyzer">
     <table id="analyzer_table"></table>
-        <script>
+        <script  type="text/javascript">
           #set $cnt = 0
           #for $object, $value in $analyzer
             analyzer_add_entry('$object', '$value', $cnt)
+	    #set $global_cnt += 1
             #set $cnt = $cnt + 1
           #end for
         </script>
@@ -371,11 +480,12 @@ function ${name}_add_entry(object, value, num) {
   <td>Time</td>
 
   <td>
-    <input src="prewikka/images/search.png" type="image" style="border: 0"/>
+    <input src="prewikka/images/search.png" type="image" style="border: 0;" />
   </td>
 </tr>
 </thead>
 #end block message_fields_header
+
 
 #block message_fields
 
@@ -412,15 +522,15 @@ function ${name}_add_entry(object, value, num) {
       #if $direction.service.value != None
        #if $direction.service_extra.value != None
         #set $proto_str = "/" + $direction.service_extra.value.lower
-        #set $proto_param = "&protocol=" + $direction.service_extra.value 
+        #set $proto_param = "&amp;protocol=" + $direction.service_extra.value 
        #end if
 
-       #set $service = ":<a href=http://www.portsdb.org/bin/portsdb.cgi?portnumber="
-       #set $service += $str($direction.service.value) + $proto_param + ">" + $str($direction.service.value) + $proto_str + "</a>"
+       #set $service = ":<a href='http://www.portsdb.org/bin/portsdb.cgi?portnumber="
+       #set $service += $str($direction.service.value) + $proto_param + "'>" + $str($direction.service.value) + $proto_str + "</a>"
       #end if
    
       #for $address in $direction.addresses
-       <ul id="popup_block">
+       <ul class="popup_block">
         <li class="popup_title">
          <span>$address.value</span>$service
 
@@ -498,6 +608,7 @@ function ${name}_add_entry(object, value, num) {
     #end if
   #end if
 </td>
+
 #end block message_fields
 
 #block timeline_extra_content
@@ -508,11 +619,13 @@ function ${name}_add_entry(object, value, num) {
   <option value=""/>
   #for $fltr in $filters
     #if $fltr == $current_filter
-      #set $selected = "selected"
+      #set $selected = "selected='selected'"
     #else
       #set $selected = ""
     #end if
-    <option value='$fltr' $selected/>$fltr
+    <option value='$fltr' $selected>$fltr</option>
   #end for
+  </select>
   </td>
+</tr>
 #end block

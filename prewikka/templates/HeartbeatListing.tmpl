@@ -39,7 +39,7 @@
 #block message_fields
 
 <td>
-  <ul id="popup_block">
+  <ul class="popup_block">
     <li class="popup_title"><span>$message.agent.value</span>
       <ul>
         <li><a href="$message.summary">Heartbeat summary</a></li>
@@ -52,7 +52,7 @@
 <td>
   #if len($message.node_addresses) > 0
     #for $address in $message.node_addresses
-    <ul id="popup_block">
+    <ul class="popup_block">
       <li class="popup_title"><span>$address.value</span>
         <ul>
           <li><a href="$address.inline_filter">Filter on address</a></li>

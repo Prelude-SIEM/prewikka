@@ -53,6 +53,7 @@ input {
 }
 
 select {
+	padding: 0px;
         font-size: inherit;
         font-family: inherit;
 }
@@ -619,22 +620,22 @@ thead {
 /*
  * popup
  */
-#popup_block {
+.popup_block {
 	padding: 0px;
 	margin: 0;
 }
 
-ul#popup_block ul {
+ul.popup_block ul {
 	display: none;
 	padding: 0px;
 }
 
-ul#popup_block li {
+ul.popup_block li {
 	list-style-type: none;
 	position: relative;
 }
 
-ul#popup_block li:hover > ul {
+ul.popup_block li:hover > ul {
 	display: block;
 	position: absolute;
 }
@@ -652,19 +653,19 @@ ul#popup_block li:hover > ul {
 }
 
 
-ul#popup_block li a:link, ul#popup_block li a:visited {
+ul.popup_block li a:link, ul.popup_block li a:visited {
 	color: grey;
 	list-style-type: circle;
 	white-space: nowrap;
 }
 
-ul#popup_block li a:hover {
+ul.popup_block li a:hover {
         color: grey;
         list-style-type: circle;
         white-space: nowrap;
 }
 
-ul#popup_block > li:hover > ul {
+ul.popup_block > li:hover > ul {
 	list-style-type: circle;
 	padding-left: 5px;
 	padding-right: 20px; 
@@ -693,18 +694,19 @@ ul#popup_block > li:hover > ul {
 .filter_popup div {
 	display: none;
 	margin-top: 15px;
+/*	width: 360px; */
 	padding: 3px;
         border: dotted black;
         border-width: 1px 1px 1px 1px;
 	background: #E2EBF5;
 	text-align: left;
 	white-space: nowrap;
-	position: absolute;
+	position: absolute; 
 	z-index: 1;
 }
 
 .filtered_column div {
-	float: left;
+	float: left; 
 }
 
 .filtered_column span {
@@ -758,7 +760,6 @@ ul#popup_block > li:hover > ul {
 /*
  * misc
  */
-
 #fieldset_heading {
 	background: #E2EBF5;
 	border: 1px outset #996;
@@ -769,13 +770,31 @@ ul#popup_block > li:hover > ul {
 #fieldset_heading h1, #fieldset_heading h2 { margin: 0 }  
 #fieldset_heading h2 { font-weight: normal; font-size: 150%; margin-bottom: 1em }
 #fieldset_heading .date { color: #996; font-size: 130%; float: right; position: relative }  
-  	
-#fieldset_heading table { border-collapse: collapse; width: 100%; }
-#fieldset_heading tr { border-bottom: 1px dashed white; }  
+ 
+#classification table, #source table, #target table, #analyzer table { 
+	border-collapse: collapse; width: 360px; 
+}
+ 	
+
+#classification { width: 400px; }
+#source, #target { width: 300px; }
+#analyzer { width: 330px; right: 10px;}
+
+#fieldset_heading table, #classification table, #source table, #target table, #analyzer table { 
+	border-collapse: collapse; width: 100%; 
+}
+
+#fieldset_heading tr, #classification tr, #source tr, #target tr, #analyzer tr { border-bottom: 1px dashed white; }  
 #fieldset_heading .nodash { border-bottom: 0px; }  
 
-#fieldset_heading td, #fieldset_heading th { font-size: 90%; padding: .5em 1em; vertical-align: top }
-#fieldset_heading th { color: #950; font-weight: normal; text-align: left; }  
+#fieldset_heading td, #classification td, #source td, #target td, #analyzer td { 
+	text-align: right; width: 100%; font-size: 8px; padding: .5em 1em;
+}
+
+#fieldset_heading th, #classification th, #source th, #target th, #analyzer th { 
+	font-size: 10px; color: #950; font-weight: normal; text-align: left; 
+}  
+
 #fieldset_heading hr { color: #dd9; border-color: black; border-width: 1px 0 0; height: 1px; margin: .5em 0 0 }
 
 #fieldset_page { max-width: 700px; }  

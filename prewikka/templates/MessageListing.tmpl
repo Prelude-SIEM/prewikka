@@ -2,13 +2,11 @@
 #extends prewikka.templates.ClassicLayout
 
 #def layout_start_hook
-<form>
+<form action="?">
 #for $name, $value in $hidden_parameters
   <input type="hidden" name="$name" value="$value"/>
 #end for
 #end def
-
-
 
 #def layout_end_hook
 </form>
@@ -39,8 +37,6 @@ $message_listing_header
         #set $cnt += 1
       #end for
     </tbody>
-    <tfoot>
-    </tfoot>
   </table>
   #if $prewikka.user.has(User.PERM_IDMEF_ALTER)
     <div align="right"><input type='submit' value='Delete'/></div>
@@ -64,11 +60,11 @@ $message_listing_header
 
    <td id="timeline_unit">
     <select name="timeline_unit">
-     <option value="min" $timeline.min_selected>Minutes
-     <option value="hour" $timeline.hour_selected>Hours
-     <option value="day" $timeline.day_selected>Days
-     <option value="month" $timeline.month_selected>Months
-     <option value="year" $timeline.year_selected>Years
+     <option value="min" $timeline.min_selected>Minutes</option>
+     <option value="hour" $timeline.hour_selected>Hours</option>
+     <option value="day" $timeline.day_selected>Days</option>
+     <option value="month" $timeline.month_selected>Months</option>
+     <option value="year" $timeline.year_selected>Years</option>
     </select>
    </td>
   </tr>
@@ -77,9 +73,9 @@ $message_listing_header
     <td id="timezone_control_label">Tz:</td>
     <td colspan="2">
       <select class="timezone_control_select" name="timezone">
-        <option value="frontend_localtime" $timeline.frontend_localtime_selected>Frontend localtime
-	<option value="sensor_localtime" $timeline.sensor_localtime_selected>Sensor localtime
-	<option value="utc" $timeline.utc_selected>UTC
+        <option value="frontend_localtime" $timeline.frontend_localtime_selected>Frontend localtime</option>
+	<option value="sensor_localtime" $timeline.sensor_localtime_selected>Sensor localtime</option>
+	<option value="utc" $timeline.utc_selected>UTC</option>
        </select>
      </td>
   </tr>
@@ -91,16 +87,16 @@ $message_listing_header
    </td>
 
    <td id="timeline_submit">
-    <input type="submit" value="apply">
+    <input type="submit" value="apply" />
    </td>
   </tr>
 
  <tr><td colspan="3" class="timeline_range">$timeline.start</td></tr>
  <tr><td colspan="3" class="timeline_range">$timeline.end</td></tr>
- <tr><td colspan="3" class="timeline_range">$timeline.range_timezone</td><tr>
+ <tr><td colspan="3" class="timeline_range">$timeline.range_timezone</td></tr>
 
  <tr>
-  <td colspan=3 style="text-align: center;">
+  <td colspan="3" style="text-align: center;">
    <table><tr>
     <td class="timeline_control_prev"><a href="$timeline.prev"><b>prev</b></a></td>
     <td class="timeline_control_cur"><a href="$timeline.current"><b>current</b></a></td>
