@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import view, Filter
+from prewikka import view, Filter, Error
 
 
 class AlertFilterEditionParameters(view.Parameters):
@@ -60,7 +60,7 @@ class AlertFilterEdition(view.View):
         self.dataset["fltr.name"] = ""
         self.dataset["fltr.comment"] = ""
         self.dataset["formula"] = "Example: (A AND B) OR (C AND D)"
-
+        
     def _reload(self):
         for name, obj, operator, value in self.parameters.get("elements", [ ]):
             self.dataset["elements"].append(self._element(name, obj, operator, value))
@@ -105,9 +105,18 @@ class AlertFilterEdition(view.View):
         
     def render_alert_filter_save(self):
         elements = { }
-        for name, obj, operator, value in self.parameters["elements"]:
-            elements[name] = (obj, operator, value)
 
+        for name, obj, operator, value in self.parameters["elements"]:
+            elements[name] = (obj, operator, value)    
+            if name not in self.parameters["formula"]:
+                raise Error.SimpleError("Could not save Filter", "No valid filter formula provided")
+
+        if not self.parameters.has_key("save_as"):
+            raise Error.SimpleError("Could not save Filter", "No name for this filter was provided")
+        
+        if "Example" in self.parameters["formula"]:
+            raise Error.SimpleError("Could not save Filter", "No valid filter formula provided")
+        
         filter = Filter.AlertFilter(self.parameters["save_as"],
                                     self.parameters.get("filter_comment", ""),
                                     elements,
