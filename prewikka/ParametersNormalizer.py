@@ -24,17 +24,17 @@ class Error(Exception):
 
 class InvalidParameterError(Error):
     def __init__(self, name):
-        Error.__init__(self, "invalid parameter '%s'" % name)
+        Error.__init__(self, "Invalid parameter '%s'" % name)
 
 
 class InvalidValueError(Error):
     def __init__(self, name, value):
-        Error.__init__(self, "invalid value '%s' for parameter '%s'" % (value, name))
+        Error.__init__(self, "Invalid value '%s' for parameter '%s'" % (value, name))
 
 
 class MissingParameterError(Error):
     def __init__(self, name):
-        Error.__init__(self, "parameter '%s' is missing" % name)
+        Error.__init__(self, "Missing parameter '%s'" % name)
     
 
 class ParametersNormalizer:
