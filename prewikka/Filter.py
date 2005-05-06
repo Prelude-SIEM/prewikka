@@ -235,8 +235,13 @@ class _Filter:
         element = element.group(1)
         if element in ("and", "AND", "&&"):
             return "&&"
+
         if element in ("or", "OR", "||"):
             return "||"
+
+        if not self.elements.has_key(element):
+            raise Error("Invalid filter element '%s' referenced from filter formula" % element)
+        
         return "%s %s '%s'" % tuple(self.elements[element])
 
     def __str__(self):
