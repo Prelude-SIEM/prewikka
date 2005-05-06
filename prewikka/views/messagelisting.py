@@ -216,8 +216,10 @@ class ListedMessage(dict):
         if t:
             if timezone == "utc":
                 t = time.gmtime(t)
+                
             elif timezone == "sensor_localtime":
                 t = time.gmtime(int(t) + t.gmt_offset)
+
             else: # timezone == "frontend_localtime"
                 t = time.localtime(t)
             
@@ -744,9 +746,9 @@ class AlertListing(MessageListing, view.View):
             self.dataset["%s_filtered" % type] = False
         
     def _applyFilters(self, criteria):
+        self._applyCheckboxFilters(criteria, "classification")
         self._applyClassificationFilters(criteria)
         
-        self._applyCheckboxFilters(criteria, "classification")
         self._applyCheckboxFilters(criteria, "source")
         self._applyCheckboxFilters(criteria, "target")
         self._applyCheckboxFilters(criteria, "analyzer")
