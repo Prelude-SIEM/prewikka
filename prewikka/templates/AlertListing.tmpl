@@ -494,8 +494,8 @@ function ${name}_add_entry(object, value, num) {
 
 	  <ul>
            <li><a href="$address.inline_filter">Filter on this $name</a></li>
-           #for $name, $link in $address.host_commands
-           <li><a href="$link">$name</a></li>
+           #for $cmdname, $link in $address.host_commands
+           <li><a href="$link">$cmdname</a></li>
            #end for
           </ul>
 	 </li>
