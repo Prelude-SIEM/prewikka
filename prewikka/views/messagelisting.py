@@ -211,7 +211,18 @@ class ListedMessage(dict):
         self.env = env
         self.parameters = parameters
         self.timezone = parameters["timezone"]
-    
+
+    def createInlineFilteredField(self, object, value, type=None):
+        if not value:
+            return { "value": None, "inline_filter": None }
+
+        if type:
+            extra = { "%s_object_0" % type: object, "%s_value_0" % type: value }
+        else:
+            extra = { object: value }
+
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
+
     def createTimeField(self, t, timezone=None):
         if t:
             if timezone == "utc":
@@ -233,17 +244,6 @@ class ListedMessage(dict):
             t = "n/a"
 
         return { "value": t }
-
-    def createInlineFilteredField(self, object, value, type=None):
-        if not value:
-            return { "value": None, "inline_filter": None }
-
-        if type:
-            extra = { "%s_object_0" % type: object, "%s_value_0" % type: value }
-        else:
-            extra = { object: value }
-
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
 
     def createHostField(self, object, value, type=None):
         field = self.createInlineFilteredField(object, value, type)
@@ -296,37 +296,7 @@ class ListedAlert(ListedMessage):
 
     def __init__(self, *args, **kwargs):
         apply(ListedMessage.__init__, (self, ) + args, kwargs)
-        self["sensors"] = [ ]
-    
-    def createHostField(self, object, value, type=None):
-        field = { "value": value }
-
-        if not value:
-            return field
-
-        parameters = self.parameters - [ "classification", "source", "target", "analyzer" ]
-        i = 0
-        while True:
-            if not parameters.has_key("%s_object_%d" % (type, i)):
-                break
-
-            del parameters["%s_object_%d" % (type, i)]
-
-            if self.parameters.has_key("%s_value_%d" % (type, i)):
-                del parameters["%s_value_%d" % (type, i)]
-
-        parameters["%s_object_0" % type] = object
-        parameters["%s_value_0" % type] = value
-        field["inline_filter"] = utils.create_link(self.view_name, parameters)
-        
-        field["host_commands"] = [ ]
-        for command in "whois", "traceroute":
-            if self.env.host_commands.has_key(command):
-                field["host_commands"].append((command.capitalize(),
-                                               utils.create_link(command,
-                                                                 { "origin": self.view_name, "host": value })))
-
-        return field
+        self["sensors"] = [ ]    
     
     def _setMessageDirection(self, dataset, message, direction):
         empty = True
@@ -489,19 +459,7 @@ class ListedSensorAggregatedAlert(ListedAggregatedAlert):
 
 
 
-class MessageListing:
-    
-    def createInlineFilteredField(self, object, value, type=None):
-        if not value:
-            return { "value": None, "inline_filter": None }
-
-        if type:
-            extra = { "%s_object_0" % type: object, "%s_value_0" % type: value }
-        else:
-            extra = { object: value }
-
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
-    
+class MessageListing:    
     def _adjustCriteria(self, criteria):
         pass
     
