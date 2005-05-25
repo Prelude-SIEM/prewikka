@@ -52,3 +52,13 @@ function toggleFilteredColumnVisibility(column_id) {
 		}
 	}
 }
+
+function checkBoxByName(name, value) {
+	for (var i = 0; i < document.forms[0].elements.length; i++ ) {
+ 		var elem = document.forms[0].elements[i];
+ 		
+		if ( elem.name == name ) {
+ 			elem.checked = value;
+ 		}
+ 	}
+}

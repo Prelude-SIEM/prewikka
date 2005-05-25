@@ -2,7 +2,7 @@
 #extends prewikka.templates.ClassicLayout
 
 #def layout_start_hook
-<form action="?">
+<form method="POST" action="?">
 #for $name, $value in $hidden_parameters
   <input type="hidden" name="$name" value="$value"/>
 #end for
@@ -31,16 +31,28 @@ $message_listing_header
           <td class='static_content_column'>
             #if $prewikka.user.has(User.PERM_IDMEF_ALTER)
               <input type='checkbox' name='delete' value='$message.delete'/>
+	    #else
+	      &nbsp;
             #end if
           </td>
         </tr>
         #set $cnt += 1
       #end for
     </tbody>
+
+#if $prewikka.user.has(User.PERM_IDMEF_ALTER) and $cnt
+    <tfoot>
+     <tr>
+      <td colspan="4">&nbsp;</td>
+      <td style="text-align: right;"><input type='submit' value='Delete'/></td>
+      <td class='static_content_column'>
+       <input type="checkbox" value="on" name="allbox" onclick="checkBoxByName('delete', document.forms[0].allbox.checked);"/>
+      </td>
+     </tr>
+    </tfoot>
+#end if
+
   </table>
-  #if $prewikka.user.has(User.PERM_IDMEF_ALTER)
-    <div align="right"><input type='submit' value='Delete'/></div>
-  #end if
 #end block main_content
 
 
