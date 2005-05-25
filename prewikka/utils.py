@@ -76,7 +76,7 @@ def escape_html_char(c):
             "<": "&lt;",
             "&": "&amp;",
             "\"": "&quot;",
-            "'": "&acute;"
+            "'": "&#39;"
             }[c]
     except KeyError:
         return c
