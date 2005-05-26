@@ -83,9 +83,9 @@ class my_install(install):
         install.finalize_options(self)
 
     def install_conf(self):
-        self.mkpath(self.conf_prefix)
+        self.mkpath(self.root + self.conf_prefix)
         for file in self.distribution.conf_files:
-            dest = self.conf_prefix + "/" + os.path.basename(file)
+            dest = self.root + self.conf_prefix + "/" + os.path.basename(file)
             if os.path.exists(dest):
                 dest += "-dist"
             self.copy_file(file, dest)
@@ -108,8 +108,8 @@ class my_install(install):
                     "share/prewikka/htdocs",
                     "share/prewikka/htdocs/images", "share/prewikka/htdocs/js", "share/prewikka/htdocs/css",
                     "share/prewikka/database", "share/prewikka/cgi-bin"):
-            os.chmod(self.prefix + "/" + dir, 0755)
-        os.chmod(self.conf_prefix, 0755)
+            os.chmod(self.root + self.prefix + "/" + dir, 0755)
+        os.chmod(self.root + self.conf_prefix, 0755)
         
         if not self.dry_run:
             for filename in self.get_outputs():
