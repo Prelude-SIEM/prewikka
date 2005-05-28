@@ -26,6 +26,9 @@ from prewikka import DataSet
 from prewikka.templates import ErrorTemplate
 
 
+def escape_criteria(criteria):
+    return criteria.replace("'", "\\'")
+
 def time_to_hms(t):
     return time.strftime("%H:%M:%S", t)
 

@@ -657,7 +657,7 @@ class AlertListing(MessageListing, view.View):
                 if value == "none":
                     new.append("! %s" % object)
                 else:
-                    new.append("%s == '%s'" % (object, value))
+                    new.append("%s == '%s'" % (object, utils.escape_criteria(value)))
 
             criteria.append("(" + " || ".join(new) + ")")
             self.dataset[object] = self.parameters[object]
@@ -669,8 +669,8 @@ class AlertListing(MessageListing, view.View):
         self.dataset["classification_filtered"] = False
 
         if len(self.parameters["alert.classification.text"]) > 0:
-            criteria.append(" || ".join(map(lambda value: "alert.classification.text substr '%s'" % value,
-                                            self.parameters["alert.classification.text"])))
+            criteria.append(" || ".join(map(lambda value: "alert.classification.text substr '%s'"
+                                            % value, utils.escape_criteria(self.parameters["alert.classification.text"]))))
 
             self.dataset["classification_filtered"] = True
             self.dataset["alert.classification.text"] = self.parameters["alert.classification.text"]
@@ -695,7 +695,7 @@ class AlertListing(MessageListing, view.View):
         
         if self.parameters[type]:
             criteria.append("(" + " || ".join(map(lambda (object, value): "%s %s '%s'" %
-                                                  (object, get_operator(object), value),
+                                                  (object, get_operator(object), utils.escape_criteria(value)),
                                                   self.parameters[type])) + ")")
             self.dataset[type] = self.parameters[type]
             self.dataset["%s_filtered" % type] = True
@@ -781,7 +781,7 @@ class AlertListing(MessageListing, view.View):
                     target_address = value
 
                 if value:
-                    criterion = "%s == '%s'" % (path, value)
+                    criterion = "%s == '%s'" % (path, utils.escape_criteria(value))
                 else:
                     criterion = "(! %s || %s == '')" % (path, path)
 
@@ -855,7 +855,7 @@ class AlertListing(MessageListing, view.View):
                                                        ("alert.assessment.impact.severity", severity, False),
                                                        ("alert.assessment.impact.completion", completion, False)):
                             if value:
-                                criteria3.append("%s == '%s'" % (path, value))
+                                criteria3.append("%s == '%s'" % (path, utils.escape_criteria(value)))
                             else:
                                 if is_string:
                                     criteria3.append("(! %s || %s == '')" % (path, path))
@@ -1043,7 +1043,7 @@ class HeartbeatListing(MessageListing, view.View):
             self.dataset[column + "_filtered"] = False
             if not filter_found:
                 if self.parameters.has_key(path):
-                    criteria.append("%s == '%s'" % (path, self.parameters[path]))
+                    criteria.append("%s == '%s'" % (path, utils.escape_criteria(self.parameters[path])))
                     self.dataset[column + "_filtered"] = True
                     filter_found = True
         
