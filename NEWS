@@ -1,3 +1,53 @@
+* 2005-06-01, prewikka-0.9.0-rc6:
+
+	- Implement alert/heartbeat select all for deletion.
+
+	- Fix handling of alert without classification.
+
+	- Fix HTML code problem. Try to make the W3C validator happy.
+	  Fix Javascript warnings. Correct URL escaping. Make it work
+	  better in Apple's Safari browser.
+
+	- More error checking when saving custom filter. Error out in case a 
+	  filter reference non existing criteria. Add the substr operator.
+
+	- Fix bug in the whole alert/heartbeat navigation system, simplify 
+	  and cleanup the code, always report the current filtered field 'action' to 
+	  the user.
+
+	- Make the mouse pointer behave like it does for javascript links on Alert 
+	  listing table head.
+
+	- Fix alert mixup when expanding an aggregated classification with different 
+	  severity.
+	
+	- Fix low/mid/high/none severity filtering.
+
+	- Fix a bug where agents with multiple address would disappear.
+
+	- Avoid Authentication Failed message when the user didn't try to authenticate
+	  (the session does not exist).
+
+	- UI tweak for the detailed alert/heartbeat view.
+
+	- Link source and destination port to portdb.
+
+	- Add an heartbeat_error_margin configuration keyword.
+
+	- Saving modification to an existing filter now work.
+	
+	- Make prewikka.cgi catch exceptions that are raised during the prewikka 
+	  initialization step and display an error screen to the user instead of
+	  a server internal error.
+
+	- Don't display message checkbox and delete button if the user don't
+	  have the PERM_IDMEF_ALTER permission
+
+	- Fix module importation on MacOSX.
+
+	- Various bugfix.
+
+
 * 2005-04-17, prewikka-0.9.0-rc5:
 
 	- Fix classification filters in the alert listing.
