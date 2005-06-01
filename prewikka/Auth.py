@@ -41,6 +41,18 @@ class AuthError(PrewikkaError):
 
 
 
+class AuthSessionInvalid(AuthError):
+    def __init__(self, arguments={}, message=""):
+        AuthError.__init__(self, arguments, message)
+
+
+
+class AuthSessionExpired(AuthError):
+    def __init__(self, arguments={}, message="Session expired"):
+        AuthError.__init__(self, arguments, message)
+
+
+
 class Auth:
     def __init__(self, env):
         self.db = env.db
@@ -71,11 +83,11 @@ class Session:
 
     def setSession(self, request, sessionid):
         request.output_cookie["sessionid"] = sessionid
-        request.output_cookie["sessionid"]["expires"] = self._expiration
+        request.output_cookie["sessionid"]["expires"] = self._expiration * 3;
     
     def checkSession(self, request):
         if not request.input_cookie.has_key("sessionid"):
-            raise AuthError(arguments=request.arguments)
+            raise AuthSessionInvalid()
         
         sessionid = request.input_cookie["sessionid"].value
 
@@ -83,14 +95,14 @@ class Session:
             login, t = self.db.getSession(sessionid)
         except Database.DatabaseInvalidSessionError:
             self.log(Log.EVENT_INVALID_SESSIONID, request)
-            raise AuthError(request.arguments, message="")
+            raise AuthSessionInvalid()
 
         now = int(time.time())
 
         if now - t > self._expiration:
             self.db.deleteSession(sessionid)
             self.log(Log.EVENT_SESSION_EXPIRED, request)
-            raise AuthError(request.arguments)
+            raise AuthSessionExpired()
 
         self.db.updateSession(sessionid, now)
         self.setSession(request, sessionid)
@@ -128,7 +140,7 @@ class LoginPasswordAuth(Auth, Session):
                 self.checkPassword(login, password)
             except AuthError, e:
                 e.dataset["arguments"] = request.arguments.items()
-                raise AuthError()
+                raise AuthError(message="Invalid username/password")
             self.createSession(request, login)
         else:
             login = self.checkSession(request)
@@ -137,7 +149,7 @@ class LoginPasswordAuth(Auth, Session):
 
     def logout(self, request):
         self.deleteSession(request)
-        raise AuthError(message="")
+        raise AuthSessionInvalid(message="Logged out")
 
 
 
