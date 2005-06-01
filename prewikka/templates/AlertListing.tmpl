@@ -262,9 +262,10 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $classification
-          classification_add_entry('$object', '$value', $cnt)
+        #set $escaped_value = utils.escape_attribute($value)
+          classification_add_entry('$object', '$escaped_value', $cnt)
           #set $cnt = $cnt + 1
-	  #set $global_cnt = $global_cnt + 1
+          #set $global_cnt = $global_cnt + 1
         #end for
       </script>
 
@@ -272,11 +273,11 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
       #if len($aggregated_classification) == 0
         aggregated_classification_add_entry("")
-	#set $global_cnt = $global_cnt + 1
+        #set $global_cnt = $global_cnt + 1
       #else
         #for $path in $aggregated_classification
           aggregated_classification_add_entry('$path')
-	  #set $global_cnt = $global_cnt + 1
+          #set $global_cnt = $global_cnt + 1
         #end for
       #end if
       </script>
@@ -365,7 +366,8 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $source
-          source_add_entry('$object', '$value', $cnt)
+        #set $escaped_value = utils.escape_attribute($value)
+          source_add_entry('$object', '$escaped_value', $cnt)
           #set $global_cnt = $global_cnt + 1
         #end for
       </script>
@@ -373,7 +375,7 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
       #if len($aggregated_source) == 0
         aggregated_source_add_entry("")
-	#set $global_cnt = $global_cnt + 1
+        #set $global_cnt = $global_cnt + 1
       #else
         #for $path in $aggregated_source
           aggregated_source_add_entry('$path')
@@ -394,8 +396,9 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $target
-          target_add_entry('$object', '$value', $cnt)
-	  #set $global_cnt += 1
+        #set $escaped_value = utils.escape_attribute($value)
+          target_add_entry('$object', '$escaped_value', $cnt)
+          #set $global_cnt += 1
           #set $cnt = $cnt + 1
         #end for
       </script>
@@ -403,11 +406,11 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
       #if len($aggregated_target) == 0
         aggregated_target_add_entry("")
-	#set $global_cnt += 1
+        #set $global_cnt += 1
       #else
         #for $path in $aggregated_target
           aggregated_target_add_entry('$path')
-	  #set $global_cnt += 1
+          #set $global_cnt += 1
         #end for
       #end if
       </script>
@@ -424,8 +427,9 @@ function ${name}_add_entry(object, value, num) {
         <script  type="text/javascript">
           #set $cnt = 0
           #for $object, $value in $analyzer
-            analyzer_add_entry('$object', '$value', $cnt)
-	    #set $global_cnt += 1
+          #set $escaped_value = utils.escape_attribute($value)
+            analyzer_add_entry('$object', '$escaped_value', $cnt)
+            #set $global_cnt += 1
             #set $cnt = $cnt + 1
           #end for
         </script>
