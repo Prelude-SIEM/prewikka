@@ -670,7 +670,7 @@ class AlertListing(MessageListing, view.View):
 
         if len(self.parameters["alert.classification.text"]) > 0:
             criteria.append(" || ".join(map(lambda value: "alert.classification.text substr '%s'"
-                                            % value, utils.escape_criteria(self.parameters["alert.classification.text"]))))
+                                            % utils.escape_criteria(value), self.parameters["alert.classification.text"])))
 
             self.dataset["classification_filtered"] = True
             self.dataset["alert.classification.text"] = self.parameters["alert.classification.text"]
