@@ -1,6 +1,12 @@
 /*
  * global
  */
+html {
+    margin      : 0;
+    padding     : 0;
+    width       : 100%;
+    height      : 100%;
+}
 
 body {
         margin-left: 0px;
@@ -11,8 +17,16 @@ body {
         font-size: 10px;
         color: #333333;
         background-color: #d6d6d6;
-}
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	overflow-y: hidden;
+	overflow-x: hidden;
+	top: 0;
+	left: 0;
+	right: 0;
 
+}
 
 a {
 	color: #6865a6;
@@ -205,6 +219,7 @@ thead {
 /*
  * menu
  */
+
 #menu {
 	width: 160px;
 	margin-top: 80px;
@@ -218,6 +233,7 @@ thead {
 	border-color: white; 
 	border-style: solid;
 	background: #acacac;
+	height: 100%;
 }
 
 #menu p:hover a {
@@ -266,6 +282,7 @@ thead {
         width: 160px;
         color: white;
 	position: fixed;
+	_position: absolute;
 	bottom: 43px;
 	height: 163px;
 }
@@ -308,6 +325,7 @@ thead {
 /* menu message nav */
 #message_list_nav {
 	position: fixed;
+	_position: absolute;
 	bottom: 0px;
         left: 0px;
 	height: 43px;
