@@ -131,6 +131,7 @@ thead {
 #topmenu {
         z-index: 1;
         position: fixed;
+	_position: absolute;
         top: 58px;
         left: 160px;
         right: 0px;
@@ -211,6 +212,7 @@ thead {
 	bottom: 0px;
 	z-index: 1;
 	position: fixed;
+	_position: absolute;
 	border-width: 0 0px 0 0;
 	border-width: 0 1px 0 0; 
 	border-color: white; 
@@ -318,34 +320,44 @@ thead {
 }
 
 #message_list_nav td {
-        width: 50px;
-        height: 15px;
         text-align: center;
         font-size: 10px;
         /*font-weight: bold;*/
 }
 
-.message_list_nav_button, .message_list_nav_infos {
+.message_list_nav_infos {
         background: #E2EBF5;
-        border-width: 1px;
-        border-style: solid;
+	border: 1px solid black;
+}
+
+.message_list_nav_button {
+        width: 50px;
+	height: 15px;
+        background: #E2EBF5;
+	border: 1px solid black;
 }
 
 .message_list_nav_button_empty {
+        width: 50px;
+	height: 15px;
 	background: #d6d6d6;
+	border: 1px solid black;
 }
 
 /*
  * main screen
  */
 #main {
-        padding: 10px;
 	font-size: 100%;
         position: absolute;
-        left: 160px;
-        top: 80px;
-/*	right: 0px; 
-	bottom: 0px;*/
+
+	left: 0px;
+	right: 0px;
+
+	padding-top: 10px;
+	padding-left: 170px;
+	padding-right: 10px;
+	padding-bottom: 10px;
 }
 
 /*
