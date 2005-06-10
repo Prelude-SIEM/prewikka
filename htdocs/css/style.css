@@ -351,8 +351,8 @@ thead {
 	font-size: 100%;
         position: absolute;
 
+	top: 0px;
 	left: 0px;
-	right: 0px;
 
 	padding-top: 90px;
 	padding-left: 170px;
