@@ -2,8 +2,8 @@
 
 #block main_content
 #if len($analyzers) > 0
-  <form>
-  <input type="hidden" name="view" value="sensor_messages_delete">
+  <form action="?" method="post">
+  <input type="hidden" name="view" value="sensor_messages_delete" />
 #end if
 <table>
   <thead>
@@ -51,7 +51,7 @@
         </td>
         <td>$analyzer.last_heartbeat_time</td>
         <td class='heartbeat_analyze_sensor_status_$analyzer.status'><b>$analyzer.status_meaning</b></td>
-        <td><input type="checkbox" name="analyzerid" value="$analyzer.analyzerid"></td>
+        <td><input type="checkbox" name="analyzerid" value="$analyzer.analyzerid" /></td>
       </tr>
       #set $cnt += 1
     #end for
@@ -65,8 +65,8 @@
 
 #if len($analyzers) > 0
   <div style="text-align: right; vertical-align: bottom;">
-    <input type="checkbox" name="alerts"><b>Alerts</b></input>
-    <input type="checkbox" name="heartbeats"><b>Heartbeats</b></input>
+    <input type="checkbox" name="alerts" /><b>Alerts</b>
+    <input type="checkbox" name="heartbeats" /><b>Heartbeats</b>
     &nbsp;<input type="submit" value="Delete" />
   </div>
 #end if
