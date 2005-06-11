@@ -1,7 +1,7 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
-<script>
+<script type="text/javascript"><!--
 function newFilterElement(name, object, operator, object_value) {
 	objects = new Array($objects)
 	operators = new Array($operators)
@@ -83,7 +83,7 @@ function newFilterElement(name, object, operator, object_value) {
 	value = document.createTextNode("-")
 	link.appendChild(value)
 }
-</script>
+//--></script>
 
 <div id="fieldset_page">
 
@@ -98,7 +98,7 @@ function newFilterElement(name, object, operator, object_value) {
     #else
       #set $selected =""
     #end if
-    <option value="$f" $selected>$f
+    <option value="$f" $selected>$f</option>
   #end for
   </select>
 
@@ -117,11 +117,11 @@ function newFilterElement(name, object, operator, object_value) {
 <table id="elements">
 </table>
 
-<script>
+<script type="text/javascript"><!--
 #for $element in $elements
 	newFilterElement("$element.name", "$element.object", "$element.operator", "$element.value");
 #end for
-</script>
+//--></script>
 
 <a style="float: right;" href="javascript:newFilterElement('', '', '', '')">+</a>
 
@@ -140,13 +140,13 @@ function newFilterElement(name, object, operator, object_value) {
   </tr>
   <tr>
    <th style="vertical-align: top;">comment:</th>
-   <td><textarea style="width: 400px;" type='textarea' name='filter_comment'>$fltr.comment</textarea></td>
+   <td><textarea style="width: 400px;" name='filter_comment'>$fltr.comment</textarea></td>
   </tr>
   </table>
 
   <input style="float: right;" type='submit' name='mode' value='Save'/>
-</form>
 </fieldset>
+</form>
 
 </div>
 #end block main_content
