@@ -13,7 +13,7 @@
   <table>
     <tr>
       <th>Login:</th>
-      <td style="text-align: center;">$user.login</td>
+      <td style="text-align: right;">$user.login</td>
     </tr>
   </table>
 
@@ -28,17 +28,17 @@
           #set $cnt = 0
           #for $perm, $value in $user.permissions
           <tr class="$row_classes[$cnt%2]">
-            <td>$perm</td>
+            <td style="text-align: left;">$perm</td>
             <td>
               #if $value
-                #set $checked = "checked"
+                #set $checked = "checked=\"checked\""
               #else
                 #set $checked = ""
               #end if
               #if $can_manage_user
                 #set $disabled = ""
               #else
-                #set $disabled = "disabled"
+                #set $disabled = "disabled=\"disabled\""
               #end if
               <input type="checkbox" name="$perm" $checked $disabled/>
             </td>
@@ -67,7 +67,7 @@
       <td><input type="password" name="password_new"/></td>
     </tr>
     <tr>
-      <th>Confirm new password:</td>
+      <th>Confirm new password:</th>
       <td><input type="password" name="password_new_confirmation"/></td>
     </tr>
   </table>
