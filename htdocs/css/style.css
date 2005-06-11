@@ -6,6 +6,8 @@ html {
     padding     : 0;
     width       : 100%;
     height      : 100%;
+    overflow: hidden;
+    overflow: auto;
 }
 
 body {
@@ -374,9 +376,9 @@ thead {
 
 	padding-top: 10px;
 	margin-top: 80px;
-
 	padding-left: 170px;
 	padding-right: 10px;
+	_padding-right: 25px;
 }
 
 /*
