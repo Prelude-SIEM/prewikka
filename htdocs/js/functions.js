@@ -1,37 +1,29 @@
-/*function toggleVisibility(parent_id) {
- 	top_section = document.getElementById(parent_id)
-	child_nodes = top_section.childNodes
-	child_divs = [ ]
-	sections = top_section.getElementsByTagName("div")
- 	
-	for ( var i = 0; i < child_nodes.length; i++ ) {
-		if ( child_nodes[i].className == "section" ) {
-			child_divs.push(child_nodes[i])
-		}
-	}
-
-	if ( child_divs[0]) {
-		if  ( child_divs[0].style.display == 'none' ) {
-			new_display = 'block';
-		} else {
-			new_display = 'none';
-		}
-	}
-	
-	for ( var i = 0; i < child_divs.length; i++ ) {
-		child_divs[i].style.display = new_display;
-	}
-}
-*/
+var cur_visible = null;
 
 function toggleVisibility(section_id) {
 	section = document.getElementById(section_id);
 	
-	if ( section.style.display == 'none' ) {
+	if ( section.style.display != 'block' ) {
+		cur_visible = section;
 		section.style.display = 'block';
 	} else {
 		section.style.display = 'none';
 	}
+}
+
+
+function toggleVisibilityUnique(section_id) 
+{
+	if ( cur_visible )
+		section.style.display = 'none';
+
+	section = document.getElementById(section_id);
+	if ( section == cur_visible ) {
+		cur_visible = null;
+		return;
+	}
+
+	toggleVisibility(section_id);
 }
 
 
@@ -42,7 +34,7 @@ function toggleFilteredColumnVisibility(column_id) {
 		popup = document.getElementById(columns[i]);
 
 		if ( column_id == columns[i] ) {
-			if ( popup.style.display == 'none' ) {
+			if ( popup.style.display != 'block' ) {
 				popup.style.display = 'block';
 			} else {
 				popup.style.display = 'none';

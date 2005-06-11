@@ -2,10 +2,7 @@
 #extends prewikka.templates.MessageListing
 
 #block message_fields_header
-
-#set $row_classes = ("table_row_even", "table_row_odd")
-#set $global_cnt = 0
-
+#set global $address_cnt = 0
 
 <thead>
 <script type="text/javascript">
@@ -265,7 +262,6 @@ function ${name}_add_entry(object, value, num) {
         #set $escaped_value = utils.escape_attribute($value)
           classification_add_entry('$object', '$escaped_value', $cnt)
           #set $cnt = $cnt + 1
-          #set $global_cnt = $global_cnt + 1
         #end for
       </script>
 
@@ -273,18 +269,15 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
       #if len($aggregated_classification) == 0
         aggregated_classification_add_entry("")
-        #set $global_cnt = $global_cnt + 1
       #else
         #for $path in $aggregated_classification
           aggregated_classification_add_entry('$path')
-          #set $global_cnt = $global_cnt + 1
         #end for
       #end if
       </script>
 
       <table>
       <tr>
-      #set $global_cnt += 1
        <th>Severity:</th>
 
       #if "info" in $alert.assessment.impact.severity
@@ -325,7 +318,6 @@ function ${name}_add_entry(object, value, num) {
       </tr>
 
       <tr>
-      #set $global_cnt += 1
        <th>Completion:</th>
 
       <td>&nbsp;</td>
@@ -368,18 +360,15 @@ function ${name}_add_entry(object, value, num) {
         #for $object, $value in $source
         #set $escaped_value = utils.escape_attribute($value)
           source_add_entry('$object', '$escaped_value', $cnt)
-          #set $global_cnt = $global_cnt + 1
         #end for
       </script>
       <table id="source_aggregation_table"></table>
       <script type="text/javascript">
       #if len($aggregated_source) == 0
         aggregated_source_add_entry("")
-        #set $global_cnt = $global_cnt + 1
       #else
         #for $path in $aggregated_source
           aggregated_source_add_entry('$path')
-	  #set $global_cnt = $global_cnt + 1
         #end for
       #end if
       </script>
@@ -398,7 +387,6 @@ function ${name}_add_entry(object, value, num) {
         #for $object, $value in $target
         #set $escaped_value = utils.escape_attribute($value)
           target_add_entry('$object', '$escaped_value', $cnt)
-          #set $global_cnt += 1
           #set $cnt = $cnt + 1
         #end for
       </script>
@@ -406,11 +394,9 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
       #if len($aggregated_target) == 0
         aggregated_target_add_entry("")
-        #set $global_cnt += 1
       #else
         #for $path in $aggregated_target
           aggregated_target_add_entry('$path')
-          #set $global_cnt += 1
         #end for
       #end if
       </script>
@@ -429,7 +415,6 @@ function ${name}_add_entry(object, value, num) {
           #for $object, $value in $analyzer
           #set $escaped_value = utils.escape_attribute($value)
             analyzer_add_entry('$object', '$escaped_value', $cnt)
-            #set $global_cnt += 1
             #set $cnt = $cnt + 1
           #end for
         </script>
@@ -492,18 +477,16 @@ function ${name}_add_entry(object, value, num) {
       #end if
    
       #for $address in $direction.addresses
-       <ul class="popup_block">
-        <li class="popup_title">
-         <span>$address.value</span>$service
+       <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$address_cnt');">$address.value</a>$service<br />
+       <span id="menu_$address_cnt" class="popup_menu">
+       #set global $address_cnt += 1
 
-	  <ul>
-           <li><a href="$address.inline_filter">Filter on this $name</a></li>
-           #for $cmdname, $link in $address.host_commands
-           <li><a href="$link">$cmdname</a></li>
-           #end for
-          </ul>
-	 </li>
-        </ul>
+         - <a href="$address.inline_filter">Filter on this $name</a><br />
+          #for $cmdname, $link in $address.host_commands
+         - <a href="$link">$cmdname</a><br />
+          #end for
+
+       </span>
        #end for
 
       #if $direction.users

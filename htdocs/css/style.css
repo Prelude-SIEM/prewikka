@@ -101,7 +101,7 @@ thead {
 }
 
 #top_view_header {
-        z-index: 1;
+        z-index: 3;
         position: fixed;
         top: 0px;
 	left: 0px;
@@ -145,7 +145,7 @@ thead {
  * top menu
  */
 #topmenu {
-        z-index: 1;
+        z-index: 3;
         position: fixed;
 	_position: absolute;
         top: 58px;
@@ -653,63 +653,18 @@ thead {
 /*
  * popup
  */
-.popup_block {
-	padding: 0px;
-	margin: 0;
-}
-
-ul.popup_block ul {
-	display: none;
-	padding: 0px;
-}
-
-ul.popup_block li {
-	list-style-type: none;
-	position: relative;
-}
-
-ul.popup_block li:hover > ul {
-	display: block;
-	position: absolute;
-}
-
-.popup_title {
-	display: block;
-}
-
-.popup_title span {
-	color: #6865a6;
-}
-
-.popup_title:hover span {
-        text-decoration: none;
+.popup_menu {
+        border: 1px solid red;
+        background: #E2EBF5;
+        z-index: 1;
+        display: none;
+        position: absolute;
+        padding: 5px;
+	margin: 0px;
+	_width: 150px;
 }
 
 
-ul.popup_block li a:link, ul.popup_block li a:visited {
-	color: grey;
-	list-style-type: circle;
-	white-space: nowrap;
-}
-
-ul.popup_block li a:hover {
-        color: grey;
-        list-style-type: circle;
-        white-space: nowrap;
-}
-
-ul.popup_block > li:hover > ul {
-	list-style-type: circle;
-	padding-left: 5px;
-	padding-right: 20px; 
-        border: dotted black;
-        border-width: 1px 1px 1px 1px;
-	background: #E2EBF5;
-	text-align: left;
-	z-index: 1;
-	white-space: nowrap;
-	width: 120px;
-}
 
 /*
  * Filter popup
@@ -735,7 +690,7 @@ ul.popup_block > li:hover > ul {
 	text-align: left;
 	white-space: nowrap;
 	position: absolute; 
-	z-index: 1;
+	z-index: 2;
 }
 
 .filtered_column div {

@@ -1,6 +1,9 @@
 #extends prewikka.templates.MessageListing
 
 #block message_fields_header
+
+#set global $cnt = 0
+
 <thead>
 <tr>
 <td class="filtered_column">
@@ -41,29 +44,27 @@
 #block message_fields
 
 <td>
-  <ul class="popup_block">
-    <li class="popup_title"><span>$message.agent.value</span>
-      <ul>
-        <li><a href="$message.summary">Heartbeat summary</a></li>
-        <li><a href="$message.agent.inline_filter">Filter on agent</a></li>
-      </ul>
-    </li>
-  </ul>
+  <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt');">$message.agent.value</a>
+  <span id="menu_$cnt" class="popup_menu">
+  #set global $cnt += 1
+   - <a href="$message.summary">Heartbeat summary</a><br />
+   - <a href="$message.agent.inline_filter">Filter on agent</a>
+  </span>
 </td>
 
 <td>
   #if len($message.node_addresses) > 0
     #for $address in $message.node_addresses
-    <ul class="popup_block">
-      <li class="popup_title"><span>$address.value</span>
-        <ul>
-          <li><a href="$address.inline_filter">Filter on address</a></li>
-          #for $name, $link in $address.host_commands
-            <li><a href="$link">$name</a></li>
-          #end for
-        </ul>
-      </li>
-    </ul>
+    <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt');">$address.value</a><br/>
+    <span id="menu_$cnt" class="popup_menu">
+    #set global $cnt += 1
+
+      - <a href="$address.inline_filter">Filter on address</a><br/ >
+      #for $name, $link in $address.host_commands
+      - <a href="$link">$name</a><br />
+      #end for
+
+    </span>
     #end for
   #else
     n/a
@@ -79,4 +80,6 @@
 </td>
 
 <td>$message.time.value</td>
+
+#set global $cnt += 1
 #end block message_fields

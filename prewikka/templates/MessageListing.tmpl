@@ -24,9 +24,10 @@ $message_listing_header
   <tbody>
     #set $row_classes = ("table_row_even", "table_row_odd")
     #set $cnt = 0
+
     #for $message in $messages
       #set global $message = $message
-        <tr class='$row_classes[$cnt%2]'>
+        <tr class='$row_classes[$cnt % 2]'>
           $message_fields
           <td class='static_content_column'>
             #if $prewikka.user.has(User.PERM_IDMEF_ALTER)

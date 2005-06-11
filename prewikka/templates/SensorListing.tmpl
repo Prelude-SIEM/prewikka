@@ -26,15 +26,12 @@
       #set $row_class = $row_classes[$cnt%2]
       <tr class="$row_class">
         <td>
-          <ul class="popup_block">
-            <li class="popup_title"><span>$analyzer.name</span>
-              <ul>
-                <li><a href="$analyzer.alert_listing">Alert listing</a></li>
-                <li><a href="$analyzer.heartbeat_listing">Heartbeat listing</a></li>
-                <li><a href="$analyzer.heartbeat_analyze">Heartbeat analyzis</a></li>
-              </ul>
-            </li>
-          </ul>
+	  <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt');">$analyzer.name</a>
+	  <span id="menu_$cnt" class="popup_menu">
+            - <a href="$analyzer.alert_listing">Alert listing</a><br />
+            - <a href="$analyzer.heartbeat_listing">Heartbeat listing</a><br />
+            - <a href="$analyzer.heartbeat_analyze">Heartbeat analyzis</a><br />
+          </span>
         </td>
         <td>$analyzer.model $analyzer.version</td>
         <td>$analyzer.ostype $analyzer.osversion</td>
