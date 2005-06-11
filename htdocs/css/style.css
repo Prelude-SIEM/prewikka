@@ -62,16 +62,16 @@ table {
 
 
 input {
-	border: 1px outset black;
-        padding:0px;
-        font-size: inherit;
-        font-family: inherit;
+	padding: 0px;
+	border: 1px outset #996;
+	font-size: 10px;
+	font-family: Verdana;
 }
 
 select {
 	padding: 0px;
-        font-size: inherit;
-        font-family: inherit;
+        font-size: 10px;
+        font-family: Verdana;
 }
 
 form {
