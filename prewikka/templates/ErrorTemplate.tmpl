@@ -14,7 +14,7 @@
 
    <br/><br/>
    
-   <form action="?" method="GET">
+   <form action="?" method="get">
      #for $param, $values in $prewikka.url.referer.items()
        #for $value in $values
          <input type="hidden" name="$param" value="$value"/>
@@ -23,7 +23,7 @@
      <input style="float: left; position: relative;" type="submit" value="Back"/>
    </form>
 
-   <form action="?" method="GET">
+   <form action="?" method="get">
      #for $param, $values in $prewikka.url.current.items()
        #for $value in $values
          <input type="hidden" name="$param" value="$value"/>

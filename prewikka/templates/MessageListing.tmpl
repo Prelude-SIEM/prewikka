@@ -2,7 +2,7 @@
 #extends prewikka.templates.ClassicLayout
 
 #def layout_start_hook
-<form method="POST" action="?">
+<form method="post" action="?">
 #for $name, $value in $hidden_parameters
   <input type="hidden" name="$name" value="$value"/>
 #end for
