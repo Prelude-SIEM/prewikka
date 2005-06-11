@@ -172,7 +172,7 @@ p {
 
 .topmenu_item_active a:visited, .topmenu_item_active a:link,
 .topmenu_item_special a:visited, .topmenu_item_special a:link {
-        color: black;
+        color: #333333;
         text-decoration: none;
 }
 
@@ -220,6 +220,7 @@ p {
         border-right: 1px white solid;
 	background-color: #d6d6d6;
         text-decoration: none;
+	color: #333333;
 }
 
 .topmenu_item_special {
@@ -253,13 +254,13 @@ p {
 	height: 100%;
 }
 
-#menu p:hover a {
-	color: black;
+#menu a {
+/*	color: black; */
 	text-decoration: none;
 }
 
-#menu p:hover {
-/*	background: #E2EBF5; */
+#menu a:hover {
+	color: #333333;
 	background: #d6d6d6;
 	text-decoration: none;
 }
@@ -272,6 +273,8 @@ p {
 	border-style: solid;
 	text-align: center;
 	font-weight: bold;
+	width: 100%;
+	display: block;
 	height: 22px;
 	font-size: 13px;
 }
@@ -279,17 +282,17 @@ p {
 .menu_item_inactive {
 	background: #999999;
 	text-decoration: none;
+	color: white;
 }
 
 .menu_item_inactive a:link, .menu_item_inactive a:visited {
 	text-decoration: none;
-	color: white;
 	font-weight: bold;
 }
 
 .menu_item_active {
+	color: #333333;
 	background-color: #d6d6d6;
-	/* background-color: #E2EBF5; */
 }
 
 /* menu timeline control */

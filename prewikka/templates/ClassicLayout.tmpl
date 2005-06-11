@@ -38,9 +38,8 @@ $layout_start_hook
       #set $class_ = 'menu_item_active'
     #else
       #set $class_ = 'menu_item_inactive'
-      #set $name = "<a href='%s'>%s</a>" % ($link, $name)
     #end if
-    <p class='$class_'>$name</p>
+    <a class='$class_' href="$link">$name</a>
   #end for
   #def menu_extra_content
   #end def
