@@ -83,6 +83,11 @@ thead {
         background-color: #E2EBF5;
 }
 
+p {
+        margin: 0;
+        padding: 0;
+}
+
 .fixed {
         font-family: Courier;
         font-weight: bold;
@@ -152,13 +157,18 @@ thead {
         left: 160px;
         right: 0px;
         background: #999999;
-        height: 21px;
+        height: 21px; 
         border: 1px white solid;
         font-size: 13px;
         font-weight: bold;
         text-align: center;
         text-decoration: none;
 }
+
+#topmenu p {
+	line-height: 18px; 
+}
+
 
 .topmenu_item_active a:visited, .topmenu_item_active a:link,
 .topmenu_item_special a:visited, .topmenu_item_special a:link {
@@ -177,6 +187,7 @@ thead {
 }
 
 .topmenu_item_info {
+	margin: 0;
         padding: 0 10px 0 0;
         height: 21px;
         min-width: 45px;
@@ -190,6 +201,7 @@ thead {
 
 
 .topmenu_item_inactive {
+	margin: 0;
         padding: 0 10px 0 10px;
         height: 21px;
         min-width: 45px;
@@ -199,8 +211,10 @@ thead {
 }
 
 .topmenu_item_active {
+	margin: 0;
         padding: 0 10px 0 10px;
         height: 22px;
+	_height: 21px; 
         min-width: 45px;
         float: left;
         border-right: 1px white solid;
@@ -209,6 +223,7 @@ thead {
 }
 
 .topmenu_item_special {
+	margin: 0;
         padding: 0 10px 0 10px;
         float: right;
         min-width: 45px;

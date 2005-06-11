@@ -12,20 +12,18 @@ classic_body
     #else
       #set $class_ = 'topmenu_item_inactive'
     #end if
-    <div class='$class_'><a href="$link">$name</a></div>
+    <div class='$class_'><p><a href="$link">$name</a></p></div>
   #end for
 
   <div class='topmenu_item_special'>
   #if $prewikka.logout_link
-    <a href="$prewikka.logout_link">logout</a>
+    <p><a href="$prewikka.logout_link">logout</a></p>
   #end if
   </div>
 
-  <div class="topmenu_item_info">&nbsp;
+  <div class="topmenu_item_info">
     #if $prewikka.user
-      <p style='vertical-align: inherit; display: inline;'>
-        <b><a href="?view=user_settings_display">$prewikka.user.login</a></b> on $prewikka.date
-      </p>
+     <p><b><a href="?view=user_settings_display">$prewikka.user.login</a></b> on $prewikka.date</p>
     #end if
   </div>
 </div>
