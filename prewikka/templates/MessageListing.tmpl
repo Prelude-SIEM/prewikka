@@ -39,10 +39,8 @@ $message_listing_header
         </tr>
         #set $cnt += 1
       #end for
-    </tbody>
 
 #if $prewikka.user.has(User.PERM_IDMEF_ALTER) and $cnt
-    <tfoot>
      <tr>
       <td colspan="4">&nbsp;</td>
       <td style="text-align: right;"><input type='submit' value='Delete'/></td>
@@ -50,7 +48,7 @@ $message_listing_header
        <input type="checkbox" value="on" name="allbox" onclick="checkBoxByName('delete', document.forms[0].allbox.checked);"/>
       </td>
      </tr>
-    </tfoot>
+    </tbody>
 #end if
 
   </table>
