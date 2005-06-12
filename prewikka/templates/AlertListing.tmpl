@@ -183,7 +183,7 @@ function ${name}_add_entry(object, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('classification');" href="#">Classification</a>
     <div id="classification">
-      <table><tbody id="classification_table" style="width: 100%;"></tbody></table>
+      <table style="width: 100%;"><tbody id="classification_table" style="width: 100%;"></tbody></table>
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $classification
@@ -193,7 +193,7 @@ function ${name}_add_entry(object, value, num) {
         #end for
       </script>
 
-      <table><tbody id="classification_aggregation_table"></tbody></table>
+      <table style="width: 100%;"><tbody id="classification_aggregation_table"></tbody></table>
       <script type="text/javascript">
       #if len($aggregated_classification) == 0
         aggregated_classification_add_entry("")
@@ -204,7 +204,7 @@ function ${name}_add_entry(object, value, num) {
       #end if
       </script>
 
-      <table>
+      <table style="width: 100%;">
       <tr>
        <th>Severity:</th>
 
@@ -282,7 +282,7 @@ function ${name}_add_entry(object, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('source');" href="#">Source</a>
     <div id="source">
-      <table><tbody id="source_table"></tbody></table>
+      <table style="width: 100%;"><tbody id="source_table"></tbody></table>
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $source
@@ -290,7 +290,7 @@ function ${name}_add_entry(object, value, num) {
           source_add_entry('$object', '$escaped_value', $cnt)
         #end for
       </script>
-      <table><tbody id="source_aggregation_table"></tbody></table>
+      <table style="width: 100%;"><tbody id="source_aggregation_table"></tbody></table>
       <script type="text/javascript">
       #if len($aggregated_source) == 0
         aggregated_source_add_entry("")
@@ -309,7 +309,7 @@ function ${name}_add_entry(object, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('target');" href="#">Target</a>
     <div id="target">
-      <table><tbody id="target_table"></tbody></table>
+      <table style="width: 100%;"><tbody id="target_table"></tbody></table>
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $target
@@ -318,7 +318,7 @@ function ${name}_add_entry(object, value, num) {
           #set $cnt = $cnt + 1
         #end for
       </script>
-      <table><tbody id="target_aggregation_table"></tbody></table>
+      <table style="width: 100%;"><tbody id="target_aggregation_table"></tbody></table>
       <script type="text/javascript">
       #if len($aggregated_target) == 0
         aggregated_target_add_entry("")
@@ -337,7 +337,7 @@ function ${name}_add_entry(object, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('analyzer');" href="#">Sensor</a>
     <div id="analyzer">
-    <table><tbody id="analyzer_table"></tbody></table>
+    <table style="width: 100%;"><tbody id="analyzer_table"></tbody></table>
         <script  type="text/javascript">
           #set $cnt = 0
           #for $object, $value in $analyzer
