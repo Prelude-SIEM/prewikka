@@ -114,6 +114,10 @@ p {
         padding: 0;
 }
 
+.checkbox {
+	border: none;
+}
+
 .fixed {
         font-family: Courier;
         font-weight: bold;

@@ -285,35 +285,35 @@ function ${name}_add_entry(object, value, num) {
       #else
         #set $checked = ""
       #end if
-      <td><input type="checkbox" name="alert.assessment.impact.severity" value="info" $checked />info</td>
+      <td><input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="info" $checked />info</td>
 
       #if "low" in $alert.assessment.impact.severity
         #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <td><input type="checkbox" name="alert.assessment.impact.severity" value="low" $checked />low</td>
+      <td><input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="low" $checked />low</td>
 
       #if "medium" in $alert.assessment.impact.severity
         #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <td><input type="checkbox" name="alert.assessment.impact.severity" value="medium" $checked />medium</td>
+      <td><input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="medium" $checked />medium</td>
 
       #if "high" in $alert.assessment.impact.severity
         #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <td><input type="checkbox" name="alert.assessment.impact.severity" value="high" $checked />high</td>
+      <td><input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="high" $checked />high</td>
       
       #if "none" in $alert.assessment.impact.severity
         #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <td><input type="checkbox" name="alert.assessment.impact.severity" value="none" $checked />none</td>
+      <td><input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="none" $checked />none</td>
 
       </tr>
 
@@ -327,21 +327,21 @@ function ${name}_add_entry(object, value, num) {
       #else
         #set $checked = ""
       #end if
-      <td colspan="2"><input type="checkbox" name="alert.assessment.impact.completion" value="succeeded" $checked />succeeded</td>
+      <td colspan="2"><input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="succeeded" $checked />succeeded</td>
       
       #if "failed" in $alert.assessment.impact.completion
         #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <td><input type="checkbox" name="alert.assessment.impact.completion" value="failed" $checked />failed</td>
+      <td><input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="failed" $checked />failed</td>
 
       #if "none" in $alert.assessment.impact.completion
         #set $checked = "checked='checked'"
       #else
         #set $checked = ""
       #end if
-      <td><input type="checkbox" name="alert.assessment.impact.completion" value="none" $checked />none</td>
+      <td><input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="none" $checked />none</td>
     </tr>
     </table>
     </div>
