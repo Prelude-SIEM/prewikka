@@ -828,11 +828,11 @@ p {
 #analyzer { width: 400px; right: 80px;}
 
 #classification td, #source td, #target td, #analyzer td {
-	text-align: right; font-size: 8px; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white;
+	text-align: right; font-size: 8px; padding: .5em 1em; border-bottom: 1px dashed white;
 }
 
 #classification th, #source th, #target th, #analyzer th {
-	font-size: 10px; color: #950; font-weight: normal; text-align: left; vertical-align: top; border-bottom: 1px dashed white;
+	font-size: 10px; color: #950; font-weight: normal; text-align: left; border-bottom: 1px dashed white;
 }
 
 #fieldset_heading table, #classification table, #source table, #target table, #analyzer table { 
@@ -847,11 +847,11 @@ p {
 
 
 #classification td, #source td, #target td, #analyzer td { 
-	text-align: right; font-size: 8px; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white;
+	text-align: right; font-size: 8px; padding: .5em 1em; border-bottom: 1px dashed white;
 }
 
 #classification th, #source th, #target th, #analyzer th { 
-	font-size: 10px; color: #950; font-weight: normal; text-align: left; vertical-align: top; border-bottom: 1px dashed white;
+	font-size: 10px; color: #950; font-weight: normal; text-align: left; border-bottom: 1px dashed white;
 }  
 
 #fieldset_heading hr { color: #999999; background: #999999; border: 0; height: 1px; }
