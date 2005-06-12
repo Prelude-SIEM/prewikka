@@ -65,13 +65,14 @@ textarea, input {
        padding: 0px;
        font-size: 10px;
        font-family: Verdana;
-       overflow: auto;
-
        border: 1px solid black;
        border-top-color: #b5b5b5;
        border-left-color: #b5b5b5;
 }
 
+textarea {
+	overflow: auto;
+}
 
 select {
 	padding: 0px;
