@@ -826,6 +826,14 @@ p {
 #source, #target { width: 400px; }
 #analyzer { width: 400px; right: 80px;}
 
+#classification td, #source td, #target td, #analyzer td {
+	text-align: right; font-size: 8px; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white;
+}
+
+#classification th, #source th, #target th, #analyzer th {
+	font-size: 10px; color: #950; font-weight: normal; text-align: left; vertical-align: top; border-bottom: 1px dashed white;
+}
+
 #fieldset_heading table, #classification table, #source table, #target table, #analyzer table { 
 	border-collapse: collapse; width: 100%; 
 }
@@ -833,11 +841,15 @@ p {
 #fieldset_heading tr, #classification tr, #source tr, #target tr, #analyzer tr { border-bottom: 1px dashed white; }  
 #fieldset_heading .nodash { border-bottom: 0px; }  
 
-#fieldset_heading td, #classification td, #source td, #target td, #analyzer td { 
+#fieldset_heading td, #fieldset_heading th { font-size: 90%; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white; }
+#fieldset_heading th { color: #950; font-weight: normal; text-align: left; }
+
+
+#classification td, #source td, #target td, #analyzer td { 
 	text-align: right; font-size: 8px; padding: .5em 1em;
 }
 
-#fieldset_heading th, #classification th, #source th, #target th, #analyzer th { 
+#classification th, #source th, #target th, #analyzer th { 
 	font-size: 10px; color: #950; font-weight: normal; text-align: left; 
 }  
 
