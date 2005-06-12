@@ -20,6 +20,7 @@ function del_entry(link) {
 
 function end(row) {
 	field = document.createElement("td")
+	field.setAttribute("width", "11px")
 	row.appendChild(field)
 
 	if ( row.firstChild != row.lastChild ) {
@@ -48,7 +49,7 @@ function aggregated_${category}_add_entry(path) {
 
         field = document.createElement("th")
         row.appendChild(field)
-        content = document.createTextNode("Group entry by")
+        content = document.createTextNode("Group entry by:")
         field.appendChild(content)
 
         field = document.createElement("td")
@@ -73,6 +74,7 @@ function aggregated_${category}_add_entry(path) {
 
 	end(row)
 	field = document.createElement("td")
+	field.setAttribute("width", "11px")
 	row.appendChild(field)
 
 	link = document.createElement("a")
@@ -160,6 +162,7 @@ function ${name}_add_entry(object, value, num) {
 	end(row)
 	
 	field = document.createElement("td")
+	field.setAttribute("width", "11px")
 	row.appendChild(field)
 	link = document.createElement("a")
 	link.onclick = function(){ ${name}_add_entry('', '', '" + (num + 1) + "') };

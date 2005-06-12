@@ -834,7 +834,7 @@ p {
 #fieldset_heading .nodash { border-bottom: 0px; }  
 
 #fieldset_heading td, #classification td, #source td, #target td, #analyzer td { 
-	text-align: right; width: 100%; font-size: 8px; padding: .5em 1em;
+	text-align: right; font-size: 8px; padding: .5em 1em;
 }
 
 #fieldset_heading th, #classification th, #source th, #target th, #analyzer th { 
