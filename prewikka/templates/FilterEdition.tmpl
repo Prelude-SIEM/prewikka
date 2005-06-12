@@ -77,8 +77,9 @@ function newFilterElement(name, object, operator, object_value) {
 	field = document.createElement("td")
 	row.appendChild(field)
 	link = document.createElement("a")
+	link.setAttribute("href", "#")
 	field.appendChild(link)
-	link.setAttribute("onclick", "javascript:this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode)")
+	link.onclick = function() { this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode) }
 	link.setAttribute("style", "position: relative; float: right;")
 	value = document.createTextNode("-")
 	link.appendChild(value)
@@ -114,7 +115,12 @@ function newFilterElement(name, object, operator, object_value) {
 
 <fieldset>
 <legend>Edition</legend>
-<table id="elements">
+<table>
+ <tfoot>
+  <td style="width: 100%;" colspan="4">&nbsp;</td>
+  <td><a style="text-align: right;" href="javascript:newFilterElement('', '', '', '')">+</a></td>
+ </tfoot>
+ <tbody id="elements"></tbody>
 </table>
 
 <script type="text/javascript"><!--
@@ -122,8 +128,6 @@ function newFilterElement(name, object, operator, object_value) {
 	newFilterElement("$element.name", "$element.object", "$element.operator", "$element.value");
 #end for
 //--></script>
-
-<a style="float: right;" href="javascript:newFilterElement('', '', '', '')">+</a>
 
 <br />
 
