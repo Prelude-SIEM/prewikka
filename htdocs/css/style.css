@@ -83,6 +83,10 @@ thead {
         background-color: #E2EBF5;
 }
 
+legend {
+       color: #333333;
+}
+
 p {
         margin: 0;
         padding: 0;
@@ -772,6 +776,9 @@ p {
 	padding: 1em;
 	position: relative;
 }
+
+#fieldset_heading .description_title { font-size: 13px; font-weight: bold; padding-bottom: 5px; }
+#fieldset_heading .description { }
 
 #fieldset_heading h1, #fieldset_heading h2 { margin: 0 }  
 #fieldset_heading h2 { font-weight: normal; font-size: 150%; margin-bottom: 1em }
