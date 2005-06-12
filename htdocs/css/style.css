@@ -823,8 +823,8 @@ p {
  	
 
 #classification { width: 400px; }
-#source, #target { width: 300px; }
-#analyzer { width: 330px; right: 10px;}
+#source, #target { width: 400px; }
+#analyzer { width: 400px; right: 80px;}
 
 #fieldset_heading table, #classification table, #source table, #target table, #analyzer table { 
 	border-collapse: collapse; width: 100%; 
