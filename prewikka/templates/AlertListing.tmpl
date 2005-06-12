@@ -18,50 +18,6 @@ function del_entry(link) {
 	table.removeChild(row)	
 }
 
-function simple_add_entry(table_name, object, value) {
-	table = document.getElementById(table_name)
-
-	if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
-		table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
-	}
-
-	row = document.createElement("tr")
-	table.appendChild(row)
-
-	field = document.createElement("th")
-	row.appendChild(field)
-
-	input = document.createElement("input")
-	input.setAttribute("name", object)
-	input.setAttribute("value", value)
-	field.appendChild(input)
-
-//	field = document.createElement("td")
-//	row.appendChild(field)
-
-	if ( table.firstChild != table.lastChild ) {
-		link = document.createElement("a")
-		link.setAttribute("onclick", "del_entry(this)")
-		link.setAttribute("href", "")
-		content = document.createTextNode("-")
-		link.appendChild(content)
-		field.appendChild(link)		
-	} else {
-		content = document.createTextNode(" ")
-		field.appendChild(content)
-	}
-
-	field = document.createElement("td")
-	row.appendChild(field)
-
-	link = document.createElement("a")
-	link.setAttribute("onclick", "simple_add_entry('" + table_name + "', '" + object + "', '')")
-	link.setAttribute("href", "")
-	
-	content = document.createTextNode("+")
-	link.appendChild(content)
-	field.appendChild(link)
-}
 
 function begin(table) {
 	if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
@@ -88,8 +44,8 @@ function end(table) {
 
 	if ( table.firstChild != table.lastChild ) {
 		link = document.createElement("a")
-		link.setAttribute("onclick", "del_entry(this)")
-		link.setAttribute("href", "")
+		link.onclick = function(){ del_entry(this) }
+		link.setAttribute("href", "#")
 		content = document.createTextNode("-")
 		link.appendChild(content)
 		field.appendChild(link)		
@@ -121,26 +77,13 @@ function aggregated_${category}_add_entry(path) {
 	select.appendChild(option)
         
         #end for
-	
+
+	end(row)
 	field = document.createElement("td")
 	row.appendChild(field)
 
-	if ( table.firstChild != table.lastChild ) {
-		link = document.createElement("a")
-		link.setAttribute("onclick", "del_entry(this)")
-		link.setAttribute("href", "#")
-		content = document.createTextNode("-")
-		link.appendChild(content)
-		field.appendChild(link)		
-	} else {
-		content = document.createTextNode(" ")
-		field.appendChild(content)
-	}
-
-	end(table)
-
 	link = document.createElement("a")
-	link.setAttribute("onclick", "aggregated_${category}_add_entry('')")
+	link.onclick = function(){ aggregated_${category}_add_entry('') }
 	link.setAttribute("href", "#")
 	content = document.createTextNode("+")
 	link.appendChild(content)
@@ -221,25 +164,12 @@ function ${name}_add_entry(object, value, num) {
 	input.setAttribute("name", '${name}_value_' + num)
 	input.setAttribute("value", value)
 
-	field = document.createElement("td")
-	row.appendChild(field)
-
-	if ( table.firstChild != table.lastChild ) {
-		link = document.createElement("a")
-		link.setAttribute("onclick", "del_entry(this)")
-		content = document.createTextNode("-")
-		link.setAttribute("href", "#")
-		link.appendChild(content)
-		field.appendChild(link)
-	} else {
-		content = document.createTextNode(" ")
-		field.appendChild(content)
-	}
-
+	end(row)
+	
 	field = document.createElement("td")
 	row.appendChild(field)
 	link = document.createElement("a")
-	link.setAttribute("onclick", "${name}_add_entry('', '', '" + (num + 1) + "')")
+	link.onclick = function(){ ${name}_add_entry('', '', '" + (num + 1) + "') };
 	link.setAttribute("href", "#")
 	content = document.createTextNode("+")
 	link.appendChild(content)
@@ -247,15 +177,13 @@ function ${name}_add_entry(object, value, num) {
 }
 
 #end for
--->
-
-</script>
+//--></script>
 
 <tr>
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('classification');" href="#">Classification</a>
     <div id="classification">
-      <table id="classification_table" style="width: 100%;"></table>
+      <table><tbody id="classification_table" style="width: 100%;"></tbody></table>
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $classification
@@ -265,7 +193,7 @@ function ${name}_add_entry(object, value, num) {
         #end for
       </script>
 
-      <table id="classification_aggregation_table"></table>
+      <table><tbody id="classification_aggregation_table"></tbody></table>
       <script type="text/javascript">
       #if len($aggregated_classification) == 0
         aggregated_classification_add_entry("")
@@ -354,7 +282,7 @@ function ${name}_add_entry(object, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('source');" href="#">Source</a>
     <div id="source">
-      <table id="source_table"></table>
+      <table><tbody id="source_table"></tbody></table>
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $source
@@ -362,7 +290,7 @@ function ${name}_add_entry(object, value, num) {
           source_add_entry('$object', '$escaped_value', $cnt)
         #end for
       </script>
-      <table id="source_aggregation_table"></table>
+      <table><tbody id="source_aggregation_table"></tbody></table>
       <script type="text/javascript">
       #if len($aggregated_source) == 0
         aggregated_source_add_entry("")
@@ -381,7 +309,7 @@ function ${name}_add_entry(object, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('target');" href="#">Target</a>
     <div id="target">
-      <table id="target_table"></table>
+      <table><tbody id="target_table"></tbody></table>
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $target
@@ -390,7 +318,7 @@ function ${name}_add_entry(object, value, num) {
           #set $cnt = $cnt + 1
         #end for
       </script>
-      <table id="target_aggregation_table"></table>
+      <table><tbody id="target_aggregation_table"></tbody></table>
       <script type="text/javascript">
       #if len($aggregated_target) == 0
         aggregated_target_add_entry("")
@@ -409,7 +337,7 @@ function ${name}_add_entry(object, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('analyzer');" href="#">Sensor</a>
     <div id="analyzer">
-    <table id="analyzer_table"></table>
+    <table><tbody id="analyzer_table"></tbody></table>
         <script  type="text/javascript">
           #set $cnt = 0
           #for $object, $value in $analyzer
