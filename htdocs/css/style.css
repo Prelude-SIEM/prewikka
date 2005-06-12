@@ -61,6 +61,7 @@ table {
 }
 
 
+
 input {
 	padding: 0px;
 	border: 1px outset #996;
@@ -83,8 +84,29 @@ thead {
         background-color: #E2EBF5;
 }
 
+
+fieldset {
+       position: relative;
+       top: 1em;
+
+       border: 1px solid black;
+       border-top-color: #b5b5b5;
+       border-left-color: #b5b5b5;
+
+       padding: 0 0.5em 1em 0.5em;
+}
+
+html>body fieldset {
+	padding-top: 1em;
+	top: 0;
+}
+
+
 legend {
-       color: #333333;
+	position: relative;
+	top: -1em;
+	padding: 0.4em;
+	color: #333333;
 }
 
 p {
@@ -772,9 +794,6 @@ p {
  */
 #fieldset_heading {
 	background: #E2EBF5;
-	border: 1px outset #996;
-	padding: 1em;
-	position: relative;
 }
 
 #fieldset_heading .description_title { font-size: 13px; font-weight: bold; padding-bottom: 5px; }
@@ -808,12 +827,11 @@ p {
 	font-size: 10px; color: #950; font-weight: normal; text-align: left; 
 }  
 
-#fieldset_heading hr { color: #dd9; border-color: black; border-width: 1px 0 0; height: 1px; margin: .5em 0 0 }
+#fieldset_heading hr { color: #999999; background: #999999; border: 0; height: 1px; }
 
 #fieldset_page { max-width: 700px; }  
 #fieldset_page textarea { border: 1px outset black; }  
 #fieldset_page input { border: 1px outset black; }  
-#fieldset_page fieldset { border: 1px outset black; padding: 1em }  
 #fieldset_page legend { font-size: 13px; font-weight: bold; }  
 
 .not_available {
