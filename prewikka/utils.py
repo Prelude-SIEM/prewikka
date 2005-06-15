@@ -50,6 +50,9 @@ def get_gmt_offset():
     return (offset / 3600, offset % 3600 / 60)
 
 
+def urlencode(parameters, doseq=False):
+    return urllib.urlencode(parameters, doseq).replace('&', '&amp;')
+
 
 def create_link(action_name, parameters=None):
     link = "?view=%s" % action_name
