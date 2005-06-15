@@ -92,6 +92,8 @@ function newFilterElement(name, object, operator, object_value) {
 <legend>Available filters</legend>
 <form action="?" method="post">
   <input type="hidden" name="view" value="filter_edition"/>
+
+ #if $filters
   <select style="min-width: 100px;" name="filter_name">
   #for $f in $filters
     #if $f == $fltr.name
@@ -102,6 +104,7 @@ function newFilterElement(name, object, operator, object_value) {
     <option value="$f" $selected>$f</option>
   #end for
   </select>
+ #end if
 
   <input type='submit' name="mode" value='Load'/>
   <input type='submit' name="mode" value='Delete'/>
@@ -146,7 +149,7 @@ function newFilterElement(name, object, operator, object_value) {
   </tr>
   <tr>
    <th style="vertical-align: top;">comment:</th>
-   <td><textarea style="width: 400px;" name='filter_comment'>$fltr.comment</textarea></td>
+   <td><textarea style="width: 400px;" name='filter_comment' rows=4 cols=55>$fltr.comment</textarea></td>
   </tr>
   </table>
 
