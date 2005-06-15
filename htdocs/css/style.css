@@ -64,7 +64,7 @@ table {
 textarea, input {
        padding: 0px;
        font-size: 10px;
-       font-family: Verdana;
+       font-family: Verdana, Arial, Helvetica, sans-serif;
        border: 1px solid black;
        border-top-color: #b5b5b5;
        border-left-color: #b5b5b5;
@@ -77,7 +77,7 @@ textarea {
 select {
 	padding: 0px;
         font-size: 10px;
-        font-family: Verdana;
+	font-family: Verdana, Arial, Helvetica, sans-serif;
 }
 
 form {
@@ -634,7 +634,7 @@ p {
 }
 
 .heartbeat_analyzer_event_unexpected_restart, .heartbeat_analyzer_event_abnormal_heartbeat_interval {
-	color: orange;
+	color: rgb(255,165,0);
 }
 
 .heartbeat_analyzer_event_down {
@@ -861,4 +861,4 @@ p {
 
 .not_available {
         background-color: #e0e0e0;
-};
+}
