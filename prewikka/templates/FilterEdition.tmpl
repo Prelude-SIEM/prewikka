@@ -95,7 +95,7 @@ function newFilterElement(name, object, operator, object_value) {
   <select style="min-width: 100px;" name="filter_name">
   #for $f in $filters
     #if $f == $fltr.name
-      #set $selected = "selected"
+      #set $selected = "selected=\"selected\""
     #else
       #set $selected =""
     #end if
@@ -117,8 +117,10 @@ function newFilterElement(name, object, operator, object_value) {
 <legend>Edition</legend>
 <table>
  <tfoot>
-  <td style="width: 100%;" colspan="4">&nbsp;</td>
-  <td><a style="text-align: right;" href="javascript:newFilterElement('', '', '', '')">+</a></td>
+  <tr>
+   <td style="width: 100%;" colspan="4">&nbsp;</td>
+   <td><a style="text-align: right;" href="javascript:newFilterElement('', '', '', '')">+</a></td>
+  </tr>
  </tfoot>
  <tbody id="elements"></tbody>
 </table>
