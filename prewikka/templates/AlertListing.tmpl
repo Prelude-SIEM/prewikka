@@ -1,10 +1,8 @@
 #from prewikka import User, utils
 #extends prewikka.templates.MessageListing
 
-#block message_fields_header
-#set global $address_cnt = 0
+#block head_extra_content
 
-<thead>
 <script type="text/javascript">
 
 <!-- 
@@ -175,6 +173,13 @@ function ${name}_add_entry(object, value, num) {
 #end for
 //--></script>
 
+#end block
+
+
+#block message_fields_header
+#set global $address_cnt = 0
+
+<thead>
 <tr>
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('classification');" href="#">Classification</a>
