@@ -1,3 +1,15 @@
+* 2005-06-16, prewikka-0.9.0-rc7:
+
+	- Prewikka now work and render perfectly with IE 6.0.
+
+	- XHTML conformance in most of the code.
+
+	- Fix possible exception with filtered classification text.
+	
+	- Allow filtering on heartbeat.analyzer.name.
+
+
+
 * 2005-06-01, prewikka-0.9.0-rc6:
 
 	- Implement alert/heartbeat select all for deletion.
