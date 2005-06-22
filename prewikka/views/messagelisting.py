@@ -854,21 +854,23 @@ class AlertListing(MessageListing, view.View):
 
                         infos["display"] = message.createMessageLink(ident, "alert_summary")
                     else:
+                        entry_param = {}
+                        
                         if classification:
-                            parameters["classification_object_0"] = "alert.classification.text"
-                            parameters["classification_value_0"] = classification
+                            entry_param["classification_object_0"] = "alert.classification.text"
+                            entry_param["classification_value_0"] = classification
 
                         if severity:
-                            parameters["alert.assessment.impact.severity"] = severity
+                            entry_param["alert.assessment.impact.severity"] = severity
 
                         if completion:
-                            parameters["alert.assessment.impact.completion"] = completion
+                            entry_param["alert.assessment.impact.completion"] = completion
              
                         infos["display"] = utils.create_link("alert_listing",
                                                              self.parameters - [ "offset",
                                                                                  "aggregated_classification",
                                                                                  "aggregated_source", "aggregated_target" ] +
-                                                             parameters)
+                                                             parameters + entry_param)
                 
 
         return total_results
