@@ -1,6 +1,8 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
+#filter CleanOutput
+
 #if len($analyzers) > 0
   <form action="?" method="post">
   <input type="hidden" name="view" value="sensor_messages_delete" />
@@ -30,7 +32,7 @@
 	  <span id="menu_$cnt" class="popup_menu">
             - <a href="$analyzer.alert_listing">Alert listing</a><br />
             - <a href="$analyzer.heartbeat_listing">Heartbeat listing</a><br />
-            - <a href="$analyzer.heartbeat_analyze">Heartbeat analyzis</a><br />
+            - <a href="$analyzer.heartbeat_analyze">Heartbeat analysis</a><br />
           </span>
         </td>
         <td>$analyzer.model $analyzer.version</td>
