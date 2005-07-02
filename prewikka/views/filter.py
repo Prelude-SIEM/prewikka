@@ -113,8 +113,8 @@ class AlertFilterEdition(view.View):
 
         if not self.parameters.has_key("save_as"):
             raise Error.SimpleError("Could not save Filter", "No name for this filter was provided")
-        
-        if "Example" in self.parameters["formula"]:
+
+        if self.parameters["formula"].find("Example") != -1:
             raise Error.SimpleError("Could not save Filter", "No valid filter formula provided")
         
         filter = Filter.AlertFilter(self.parameters["save_as"],
