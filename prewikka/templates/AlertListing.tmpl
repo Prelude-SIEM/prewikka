@@ -497,7 +497,7 @@ function ${name}_add_entry(object, value, num) {
     #else
       #set $selected = ""
     #end if
-    <option value='$fltr' $selected>$fltr</option>
+    <option value="$utils.escape_attribute($fltr)" $selected>$fltr</option>
   #end for
   </select>
   </td>

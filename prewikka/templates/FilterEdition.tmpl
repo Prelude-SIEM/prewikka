@@ -1,3 +1,4 @@
+#from prewikka import utils
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
@@ -133,7 +134,7 @@ function newFilterElement(name, object, operator, object_value) {
 #end filter
 <script type="text/javascript"><!--
 #for $element in $elements
-	newFilterElement("$element.name", "$element.object", "$element.operator", "$element.value");
+	newFilterElement("$utils.escape_attribute($element.name)", "$utils.escape_attribute($element.object)", "$utils.escape_attribute($element.operator)", "$utils.escape_attribute($element.value)");
 #end for
 //--></script>
 #filter CleanOutput
