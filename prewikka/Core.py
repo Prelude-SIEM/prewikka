@@ -29,10 +29,10 @@ import urllib
 import cgi
 
 import prelude, preludedb
+import CheetahFilters
 
 from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer, \
      User, Auth, DataSet, Error, utils, siteconfig
-
 
 
 class InvalidQueryError(Error.SimpleError):
@@ -64,7 +64,7 @@ def init_dataset(dataset, config, request):
 
 
 def load_template(name, dataset):
-    template = getattr(__import__("prewikka.templates." + name, globals(), locals(), [ name ]), name)()
+    template = getattr(__import__("prewikka.templates." + name, globals(), locals(), [ name ]), name)(filtersLib=CheetahFilters)
         
     for key, value in dataset.items():
         setattr(template, key, value)
