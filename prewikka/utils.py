@@ -92,7 +92,7 @@ def escape_html_char(c):
 
 
 def escape_html_string(s):
-    return "".join(map(lambda c: escape_html_char(c), s))
+    return "".join(map(lambda c: escape_html_char(c), str(s)))
 
 
 def hexdump(content):
