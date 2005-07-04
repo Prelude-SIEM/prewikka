@@ -86,6 +86,8 @@ function newFilterElement(name, object, operator, object_value) {
 }
 //--></script>
 
+#filter CleanOutput
+
 <div id="fieldset_page">
 
 <fieldset id="fieldset_heading">
@@ -128,13 +130,16 @@ function newFilterElement(name, object, operator, object_value) {
  <tbody id="elements"></tbody>
 </table>
 
+#end filter
 <script type="text/javascript"><!--
 #for $element in $elements
 	newFilterElement("$element.name", "$element.object", "$element.operator", "$element.value");
 #end for
 //--></script>
+#filter CleanOutput
 
 <br />
+
 
 <table>
  <tr>
@@ -158,4 +163,5 @@ function newFilterElement(name, object, operator, object_value) {
 </form>
 
 </div>
+#end filter
 #end block main_content

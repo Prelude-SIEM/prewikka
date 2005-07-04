@@ -1,6 +1,7 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
+#filter CleanOutput
 
 #if len($analyzers) > 0
   <form action="?" method="post">
