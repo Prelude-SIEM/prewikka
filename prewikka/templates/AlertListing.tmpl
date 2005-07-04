@@ -189,7 +189,7 @@ function ${name}_add_entry(object, value, num) {
         #set $cnt = 0
         #for $object, $value in $classification
         #set $escaped_value = utils.escape_attribute($value)
-          classification_add_entry('$object', '$escaped_value', $cnt)
+          classification_add_entry("$object", "$escaped_value", $cnt)
           #set $cnt = $cnt + 1
         #end for
       </script>
@@ -288,7 +288,7 @@ function ${name}_add_entry(object, value, num) {
         #set $cnt = 0
         #for $object, $value in $source
         #set $escaped_value = utils.escape_attribute($value)
-          source_add_entry('$object', '$escaped_value', $cnt)
+          source_add_entry("$object", "$escaped_value", $cnt)
         #end for
       </script>
       <table style="width: 100%;"><tbody id="source_aggregation_table"></tbody></table>
@@ -315,7 +315,7 @@ function ${name}_add_entry(object, value, num) {
         #set $cnt = 0
         #for $object, $value in $target
         #set $escaped_value = utils.escape_attribute($value)
-          target_add_entry('$object', '$escaped_value', $cnt)
+          target_add_entry("$object", "$escaped_value", $cnt)
           #set $cnt = $cnt + 1
         #end for
       </script>
@@ -343,7 +343,7 @@ function ${name}_add_entry(object, value, num) {
           #set $cnt = 0
           #for $object, $value in $analyzer
           #set $escaped_value = utils.escape_attribute($value)
-            analyzer_add_entry('$object', '$escaped_value', $cnt)
+            analyzer_add_entry("$object", "$escaped_value", $cnt)
             #set $cnt = $cnt + 1
           #end for
         </script>

@@ -25,9 +25,8 @@ import urllib
 from prewikka import DataSet
 from prewikka.templates import ErrorTemplate
 
-
 def escape_attribute(value):
-    return value.replace("'", "\\'").replace("\"", "\\\"")
+    return value.replace("\"", "\\\"")
 
 def escape_criteria(criteria):
     return criteria.replace("'", "\\'")
