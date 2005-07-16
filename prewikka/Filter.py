@@ -19,6 +19,7 @@
 
 
 import re
+from prewikka import utils
 
 class Error(Exception):
     pass
@@ -244,8 +245,9 @@ class _Filter:
 
         if not self.elements.has_key(element):
             raise Error("Invalid filter element '%s' referenced from filter formula" % element)
-        
-        return "%s %s '%s'" % tuple(self.elements[element])
+
+        criteria, operator, value = self.elements[element]
+        return "%s %s '%s'" % (criteria, operator, utils.escape_criteria(value))
 
     def __str__(self):
         return re.sub("(\w+)", self._replace, self.formula)
