@@ -1,3 +1,19 @@
+* 2005-06-17, prewikka-0.9.0-rc7:
+
+	- Use relative path everywhere.
+
+	- Some escaping fixes.
+
+	- Fix Filter formula check.
+
+	- Ability to filter on alert.classification.ident.
+
+	- Fix aggregated classification link in expanded list entry.
+
+	- Various bugfix, English typo.
+
+
+
 * 2005-06-16, prewikka-0.9.0-rc7:
 
 	- Prewikka now work and render perfectly with IE 6.0.
