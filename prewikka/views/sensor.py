@@ -75,7 +75,8 @@ class SensorListing(view.View):
 
         criteria = None
         if self.parameters.has_key("filter_path"):
-            criteria = "%s == '%s'" % (self.parameters["filter_path"], self.parameters["filter_value"])
+            criteria = "%s == '%s'" % (self.parameters["filter_path"],
+                                       utils.escape_criteria(self.parameters["filter_value"]))
         
         for analyzer_path in self.env.idmef_db.getAnalyzerPaths(criteria):
             analyzerid = analyzer_path[-1]
@@ -86,7 +87,7 @@ class SensorListing(view.View):
             analyzer["heartbeat_analyze"] = utils.create_link("heartbeat_analyze", parameters)
 
             if analyzer["node_name"]:
-                analyzer["node_name"] = "<a href='%s'>%s</a>" % \
+                analyzer["node_name"] = '<a href="%s">%s</a>' % \
                                         (utils.create_link(self.view_name,
                                                            { "filter_path": "heartbeat.analyzer(-1).node.name",
                                                              "filter_value": analyzer["node_name"] }),
