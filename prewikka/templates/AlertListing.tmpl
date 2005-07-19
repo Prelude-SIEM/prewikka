@@ -401,8 +401,8 @@ function ${name}_add_entry(object, value, num) {
         #set $proto_param = "&amp;protocol=" + $direction.service_extra.value.upper() 
        #end if
 
-       #set $service = ":<a href='http://www.portsdb.org/bin/portsdb.cgi?portnumber="
-       #set $service += $str($direction.service.value) + $proto_param + "'>" + $str($direction.service.value) + $proto_str + "</a>"
+       #set $service = ":<a href=\"http://www.portsdb.org/bin/portsdb.cgi?portnumber="
+       #set $service += $str($direction.service.value) + $proto_param + "\">" + $str($direction.service.value) + $proto_str + "</a>"
       #end if
    
       #for $address in $direction.addresses
@@ -460,7 +460,7 @@ function ${name}_add_entry(object, value, num) {
 
 <td>
   #for $sensor in $message.sensors
-    <a href='$sensor.name.inline_filter'>$sensor.name.value</a>
+    <a href="$sensor.name.inline_filter">$sensor.name.value</a>
     #if $sensor.node_name.value
       ($sensor.node_name.value)
     #end if
@@ -488,12 +488,12 @@ function ${name}_add_entry(object, value, num) {
 #block timeline_extra_content
 <tr>
   <td id="filter_control_label">Filter: </td>
-  <td colspan='2'>
-  <select name='filter' size="1" class="filter_control_select">
+  <td colspan="2">
+  <select name="filter" size="1" class="filter_control_select">
   <option value=""/>
   #for $fltr in $filters
     #if $fltr == $current_filter
-      #set $selected = "selected='selected'"
+      #set $selected = "selected=\"selected\""
     #else
       #set $selected = ""
     #end if

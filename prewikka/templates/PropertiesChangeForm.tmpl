@@ -1,9 +1,9 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
-<form action='?' method='post'>
+<form action="?" method="post">
 #for $name, $value in $hiddens
-	<input type='hidden' name='$name' value='$value'/>
+	<input type="hidden" name="$name" value="$value"/>
 #end for
         <table class="properties_change_table">
 	#set $row_classes = ("table_row_even", "table_row_odd")
@@ -20,12 +20,12 @@
 			#else
 				#set $value = ""
 			#end if
-			<td><input type='$property.type' name='$property.parameter' $value/></td>
+			<td><input type="$property.type" name="$property.parameter" $value/></td>
 		</tr>
 		#set $cnt += 1
 	#end for
 	</table>
 	<br/>
-	<input type='submit' value='$submit'/>
+	<input type="submit" value="$submit"/>
 </form>
 #end block main_content

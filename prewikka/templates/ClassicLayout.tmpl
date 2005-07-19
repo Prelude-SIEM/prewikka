@@ -12,10 +12,10 @@ classic_body
     #else
       #set $class_ = 'topmenu_item_inactive'
     #end if
-    <div class='$class_'><p><a href="$link">$name</a></p></div>
+    <div class="$class_"><p><a href="$link">$name</a></p></div>
   #end for
 
-  <div class='topmenu_item_special'>
+  <div class="topmenu_item_special">
   #if $prewikka.logout_link
     <p><a href="$prewikka.logout_link">logout</a></p>
   #end if
@@ -39,14 +39,14 @@ $layout_start_hook
     #else
       #set $class_ = 'menu_item_inactive'
     #end if
-    <a class='$class_' href="$link">$name</a>
+    <a class="$class_" href="$link">$name</a>
   #end for
   #def menu_extra_content
   #end def
   $menu_extra_content
 </div>
 		
-<div id='main'>$main_content</div>
+<div id="main">$main_content</div>
 
 #def layout_end_hook
 #end def

@@ -27,11 +27,11 @@ $message_listing_header
 
     #for $message in $messages
       #set global $message = $message
-        <tr class='$row_classes[$cnt % 2]'>
+        <tr class="$row_classes[$cnt % 2]">
           $message_fields
-          <td class='static_content_column'>
+          <td class="static_content_column">
             #if $prewikka.user.has(User.PERM_IDMEF_ALTER)
-              <input class="checkbox" type='checkbox' name='delete' value='$message.delete'/>
+              <input class="checkbox" type="checkbox" name="delete" value="$message.delete"/>
 	    #else
 	      &nbsp;
             #end if
@@ -43,8 +43,8 @@ $message_listing_header
 #if $prewikka.user.has(User.PERM_IDMEF_ALTER) and $cnt
      <tr>
       <td colspan="4">&nbsp;</td>
-      <td style="text-align: right;"><input type='submit' value='Delete'/></td>
-      <td class='static_content_column'>
+      <td style="text-align: right;"><input type="submit" value="Delete"/></td>
+      <td class="static_content_column">
        <input class="checkbox" type="checkbox" value="on" name="allbox" onclick="checkBoxByName('delete', document.forms[0].allbox.checked);"/>
       </td>
      </tr>
@@ -94,7 +94,7 @@ $message_listing_header
   <tr>
    <td id="timeline_limit_label">Limit: </td>
    <td>
-    <input id="timeline_limit_value" type='text' size="2" name='limit' value='$limit'/>
+    <input id="timeline_limit_value" type="text" size="2" name="limit" value="$limit"/>
    </td>
 
    <td id="timeline_submit">
@@ -121,15 +121,15 @@ $message_listing_header
 <table id="message_list_nav">
   <tr>
     #if $nav.prev
-      <td class="message_list_nav_button"><a href='$nav.first'>&lt;&lt;</a></td>
-      <td class="message_list_nav_button"><a href='$nav.prev'>&lt;</a></td>
+      <td class="message_list_nav_button"><a href="$nav.first">&lt;&lt;</a></td>
+      <td class="message_list_nav_button"><a href="$nav.prev">&lt;</a></td>
     #else
       <td class="message_list_nav_button_empty">&lt;&lt;</td>
       <td class="message_list_nav_button_empty">&lt;</td>
     #end if
     #if $nav.next
-      <td class="message_list_nav_button"><a href='$nav.next'>&gt;</a></td>
-      <td class="message_list_nav_button"><a href='$nav.last'>&gt;&gt;</a></td>
+      <td class="message_list_nav_button"><a href="$nav.next">&gt;</a></td>
+      <td class="message_list_nav_button"><a href="$nav.last">&gt;&gt;</a></td>
     #else
       <td class="message_list_nav_button_empty">&gt;</td>
       <td class="message_list_nav_button_empty">&gt;&gt;</td>
