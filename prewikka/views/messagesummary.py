@@ -74,6 +74,7 @@ class MessageSummary:
                 self.newSectionEntry("Address", address)
                 i += 1
             self.newSectionEntry("Process", alert["analyzer(%d).process.name" % index])
+            self.newSectionEntry("Path", alert["analyzer(%d).process.path" % index])
             self.newSectionEntry("Pid", alert["analyzer(%d).process.pid" % index])
             self.endSection()
 
@@ -118,6 +119,7 @@ class AlertSummary(MessageSummary, view.View):
 
         self.beginSection("Classification")
         self.newSectionEntry("Text", alert["classification.text"])
+        self.newSectionEntry("Ident", alert["classification.ident"])
 
         cnt = 0
 
