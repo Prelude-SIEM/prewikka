@@ -25,11 +25,12 @@ import urllib
 from prewikka import DataSet
 from prewikka.templates import ErrorTemplate
 
-def escape_attribute(value):
-    return value.replace("\"", "\\\"")
+def escape_attribute(value):   
+    # Escape '\' since it's a valid js escape.
+    return value.replace("\\", "\\\\").replace("\"", "\\\"")
 
 def escape_criteria(criteria):
-    return criteria.replace("'", "\\'")
+    return criteria.replace("\\", "\\\\").replace("'", "\\'")
 
 def time_to_hms(t):
     return time.strftime("%H:%M:%S", t)
@@ -83,8 +84,7 @@ def escape_html_char(c):
             ">": "&gt;",
             "<": "&lt;",
             "&": "&amp;",
-            "\"": "&quot;",
-            "'": "&#39;"
+            "\"": "&quot;"
             }[c]
     except KeyError:
         return c
@@ -114,4 +114,4 @@ def hexdump(content):
 
         i += 16
 
-    return "<div class='fixed'>" + content + "</div>"
+    return "<div class=\"fixed\">" + content + "</div>"
