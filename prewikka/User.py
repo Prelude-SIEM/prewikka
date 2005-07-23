@@ -37,11 +37,10 @@ ALL_PERMISSIONS = [ PERM_IDMEF_VIEW,
 
 ADMIN_LOGIN = "admin"
 
-
 class PermissionDeniedError(Error.SimpleError):
     def __init__(self, user, action_name):
-        Error.SimpleError.__init__(self, "permission denied",
-                                   "user %s cannot access action %s" % (user, action_name))
+        Error.SimpleError.__init__(self, "Permission Denied",
+                                   "User %s cannot access action %s" % (user, action_name))
 
 
 
@@ -53,4 +52,5 @@ class User:
     def has(self, perm):
         if type(perm) in (list, tuple):
             return filter(lambda p: self.has(p), perm) == perm
+
         return perm in self.permissions
