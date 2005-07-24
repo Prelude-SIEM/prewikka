@@ -96,8 +96,8 @@ function newFilterElement(name, object, operator, object_value) {
 <form action="?" method="post">
   <input type="hidden" name="view" value="filter_edition"/>
 
- #if $filters
   <select style="min-width: 100px;" name="filter_name">
+    <option></option>
   #for $f in $filters
     #if $f == $fltr.name
       #set $selected = "selected=\"selected\""
@@ -107,7 +107,6 @@ function newFilterElement(name, object, operator, object_value) {
     <option value="$f" $selected>$f</option>
   #end for
   </select>
- #end if
 
   <input type="submit" name="mode" value="Load"/>
   <input type="submit" name="mode" value="Delete"/>
