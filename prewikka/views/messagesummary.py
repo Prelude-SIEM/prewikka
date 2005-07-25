@@ -66,6 +66,7 @@ class MessageSummary:
             self.newSectionEntry("Operating System", "%s %s" %
                                  (alert["analyzer(%d).ostype" % index], alert["analyzer(%d).osversion" % index]))
             self.newSectionEntry("Node name", alert["analyzer(%d).node.name" % index])
+            self.newSectionEntry("Node location", alert["analyzer(%d).node.location" % index])
             i = 0
             while True:
                 address = alert["analyzer(%d).node.address(%d).address" % (index, i)]
