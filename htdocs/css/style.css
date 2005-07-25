@@ -856,7 +856,11 @@ p {
 
 #fieldset_heading hr { color: #999999; background: #999999; border: 0; height: 1px; }
 
-#fieldset_page { max-width: 700px; }  
+#fieldset_page { 
+	max-width: 700px; 
+	width:expression(document.body.clientWidth > 540 ? "540px": "auto" );
+}  
+
 #fieldset_page legend { font-size: 13px; font-weight: bold; }  
 
 .not_available {
