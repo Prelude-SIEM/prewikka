@@ -228,7 +228,7 @@ class _Filter:
     def __init__(self, name, comment, elements, formula):
         for element in elements.values():
             if not element[0] in self._objects:
-                raise Error("invalid object %s" % element[0])
+                raise Error("Invalid filter object: %s" % element[0])
         
         self.name = name
         self.comment = comment
