@@ -105,8 +105,11 @@ class Database:
                 table.append(row)
                 for col in range(columns):
                     _field = preludedb_sql_row_fetch_field(_row, col)
-                    row.append(_field and preludedb_sql_field_to_string(_field) or None)
-
+                    if _field:                
+                        row.append(preludedb_sql_field_to_string(_field))
+                    else:
+                        row.append(None)
+                
             preludedb_sql_table_destroy(_table)
         
         except PreludeDBError, e:
