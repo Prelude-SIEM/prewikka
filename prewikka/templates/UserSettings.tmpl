@@ -1,54 +1,98 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
-<div id="fieldset_page">
+
+
+<div id="fieldset_page" style="width: 430px;">
 
 <form action="?" method="post">
+#if $user.login
 <input type="hidden" name="view" value="user_settings_modify"/>
+#else
+<input type="hidden" name="view" value="user_settings_add"/>
+#end if
+
 <input type="hidden" name="login" value="$user.login"/>
 
 <fieldset id="fieldset_heading">
-  <legend>Account informations</legend>
+ <legend>Account informations</legend>
 
   <table>
-    <tr>
-      <th>Login:</th>
-      <td style="text-align: right;">$user.login</td>
-    </tr>
-  </table>
-
-  <table>
-     <tr class="nodash">  
-       <th>Permissions:</th>  
-    </tr>
-    <tr>
-      <td>
-        <table>
-          #set $row_classes = ("table_row_even", "table_row_odd")
-          #set $cnt = 0
-          #for $perm, $value in $user.permissions
-          <tr class="$row_classes[$cnt%2]">
-            <td style="text-align: left;">$perm</td>
-            <td>
-              #if $value
-                #set $checked = "checked=\"checked\""
-              #else
-                #set $checked = ""
-              #end if
-              #if $can_manage_user
-                #set $disabled = ""
-              #else
-                #set $disabled = "disabled=\"disabled\""
-              #end if
-              <input class="checkbox" type="checkbox" name="$perm" $checked $disabled/>
-            </td>
-          </tr>
-          #set $cnt += 1
-        #end for
-      </table>
+#if $user.login
+   <tr>
+    <th style="vertical-align: middle;">Login:</th>
+    <td style="text-align:right; vertical-align: middle;">
+     <h2 style="vertical-align: middle; padding:0px; margin:0px;"><b>$user.login</b></h2>
     </td>
-  </tr>
-  </table>
+   </tr>
+#else
+
+   #if $errmsg
+   <tr>
+	<td colspan=2><font style="color: red;">$errmsg</font></td>
+   </tr>
+   #end if
+
+   <tr>
+    <th>Login:</th>
+    <td style="text-align: right;"><input type="text" name="login"/></td>
+   </tr>
+#end if
+
+
+#set $row_classes = ("table_row_even", "table_row_odd")
+
+<tr class="nodash" style="padding:0; margin:0;">
+ <th class="nodash">Permissions:</th>
+ <td class="nodash"></td>
+</tr>
+
+<tr style="padding:0; margin:0;">
+ <td colspan=2>
+ <table>
+
+#set $cnt = 0
+#set $checked_cnt = 0
+
+#if $can_manage_user
+ #set $disabled = ""
+#else
+ #set $disabled = "disabled=\"disabled\""
+#end if
+
+      #for $perm, $value in $user.permissions
+      <tr class="$row_classes[$cnt%2]">
+       <td style="text-align: left;">$perm</td>
+       <td style="text-align: right;">
+        #if $value
+         #set $checked_cnt += 1
+         #set $checked = "checked=\"checked\""
+        #else
+         #set $checked = ""
+        #end if
+        <input class="checkbox" type="checkbox" name="permissions" value="$perm" $checked $disabled />
+       </td>
+      </tr>
+      #set $cnt += 1
+      #end for
+<tr class="nodash">
+ <td class="nodash">&nbsp;</td>
+
+#if $cnt == $checked_cnt
+ #set $checked = "checked=\"checked\""
+#else
+  #set $checked = ""
+#end if
+
+ <td class="nodash"style="text-align: right;"><b>Check All</b>
+  <input $checked $disabled class="checkbox" type="checkbox" id="allbox" onclick="checkBoxByName('permissions', document.forms[0].allbox.checked);"/>
+ </td>
+</tr>
+
+     </table>
+</td></tr>
+
+</table>
 </fieldset>
 <br/>
 
@@ -75,7 +119,7 @@
 <br/>
 #end if
 
-<input type="submit" value="submit changes"/>
+<input type="submit" value="Submit Changes"/>
 
 </form>
 </div>

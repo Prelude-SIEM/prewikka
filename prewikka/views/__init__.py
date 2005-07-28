@@ -34,8 +34,8 @@ objects = messagelisting.AlertListing(), \
           commands.Whois(), commands.Traceroute(), \
           filter.AlertFilterEdition(), \
           usermanagement.UserListing(), \
-          usermanagement.UserAddForm(), usermanagement.UserAdd(), usermanagement.UserDelete(), \
-          usermanagement.UserSettingsDisplay(), usermanagement.UserSettingsModify(), \
+          usermanagement.UserAddForm(), usermanagement.UserDelete(), \
+          usermanagement.UserSettingsDisplay(), usermanagement.UserSettingsModify(), usermanagement.UserSettingsAdd(), \
           misc.About()
 
 

@@ -29,49 +29,6 @@ import prewikka.Error
 from prewikka import utils
 
 
-class PermissionsParameters:
-    def register(self):
-        for perm in User.ALL_PERMISSIONS:
-            self.optional(perm, str)
-            
-    def normalize(self):
-        for perm in User.ALL_PERMISSIONS:
-            if self.has_key(perm) and self[perm] != "on":
-                raise view.InvalidParameterValueError(perm, self[perm])
-
-
-
-class PasswordParameters:
-    def register(self):
-        self.mandatory("password1", str)
-        self.mandatory("password2", str)
-
-    def normalize(self):
-        if self["password1"] != self["password2"]:
-            raise view.ParameterError("passwords mismatch")
-        self["password"] = self["password1"]
-
-
-
-class UserParameters(view.Parameters):
-    def register(self):
-        self.mandatory("login", str)
-
-
-
-class UserAddParameters(UserParameters, PermissionsParameters, PasswordParameters):
-    def register(self):
-        UserParameters.register(self)
-        PermissionsParameters.register(self)
-        PasswordParameters.register(self)
-
-    def normalize(self):
-        UserParameters.normalize(self)
-        PermissionsParameters.normalize(self)
-        PasswordParameters.normalize(self)
-
-
-
 class UserSettingsParameters(view.Parameters):
     def register(self):
         self.optional("login", str)
@@ -82,20 +39,13 @@ class UserSettingsModifyParameters(UserSettingsParameters):
     def register(self):
 
         UserSettingsParameters.register(self)
-        self.optional("login", str)
-        for perm in User.ALL_PERMISSIONS:
-            self.optional(perm, str)
-
+        self.optional("permissions", list, [])
         self.optional("password_current", str)
         self.optional("password_new", str)
         self.optional("password_new_confirmation", str)
 
     def normalize(self):
-        self["permissions"] = [ ]
-        for perm in User.ALL_PERMISSIONS:
-            if self.get(perm) == "on":
-                self["permissions"].append(perm)
-        
+        view.Parameters.normalize(self)
 
 
 class UserDeleteParameters(view.Parameters):
@@ -132,10 +82,20 @@ class UserAddForm(view.View):
     view_name = "user_add_form"
     view_parameters = view.Parameters
     view_permissions = [ User.PERM_USER_MANAGEMENT ]
-    view_template = "PropertiesChangeForm"
+    view_template = "UserSettings"
 
-    def render(self):
-        self.dataset["submit"] = "add"
+    def render(self, errmsg=None):
+        self.dataset["user.login"] = None
+
+        self.dataset["user.permissions"] = []
+        for perm in User.ALL_PERMISSIONS:
+            self.dataset["user.permissions"] += [(perm, False)]
+        
+        self.dataset["errmsg"] = errmsg
+        self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
+        self.dataset["can_change_password"] = self.env.auth.canSetPassword()
+        self.dataset["ask_current_password"] = False
+        
         self.dataset["hiddens"] = [ ("view", "user_add") ]
         self.dataset["properties"] = [ utils.text_property("Login", "login") ]
         if self.env.auth.canSetPassword():
@@ -143,26 +103,6 @@ class UserAddForm(view.View):
                                                utils.password_property("Password confirmation", "password2")))
         for perm in User.ALL_PERMISSIONS:
             self.dataset["properties"].append(utils.boolean_property(perm, perm))
-
-
-
-class UserAdd(UserListing):
-    view_name = "user_add"
-    view_parameters = UserAddParameters
-
-    def render(self):
-        login = self.parameters["login"]
-
-        self.env.db.createUser(login)
-        
-        if self.env.auth.canSetPassword():
-            self.env.auth.setPassword(login, self.parameters["password"])
-        
-        permissions = filter(lambda perm: self.parameters.has_key(perm), User.ALL_PERMISSIONS)
-        self.env.db.setPermissions(login, permissions)
-
-        self.parameters.clear()
-        UserListing.render(self)
 
 
 
@@ -194,7 +134,6 @@ class UserSettingsDisplay(view.View):
         self.dataset["ask_current_password"] = (login == self.user.login)
         self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
         self.dataset["can_change_password"] = self.env.auth.canSetPassword()
-        self.dataset["current_user"] = self.user.login
         self.dataset["user.login"] = login
         self.dataset["user.permissions"] = [ ]
         permissions = self.env.db.getPermissions(login)
@@ -203,10 +142,10 @@ class UserSettingsDisplay(view.View):
 
 
 
-class UserSettingsModify(UserSettingsDisplay):
+class UserSettingsModify(UserListing):
     view_name = "user_settings_modify"
     view_parameters = UserSettingsModifyParameters
-    view_permissions = [ ]
+    view_permissions = [ User.PERM_USER_MANAGEMENT ]
 
     def render(self):
         login = self.parameters.get("login", self.user.login)
@@ -216,7 +155,7 @@ class UserSettingsModify(UserSettingsDisplay):
         
         if self.user.has(User.PERM_USER_MANAGEMENT):
             self.env.db.setPermissions(login, self.parameters["permissions"])
-            if login == self.user.permissions:
+            if login == self.user.login:
                 self.user.permissions = self.parameters["permissions"]
 
         if self.parameters.has_key("password_new") and self.parameters.has_key("password_new_confirmation"):
@@ -231,4 +170,21 @@ class UserSettingsModify(UserSettingsDisplay):
 
             self.env.auth.setPassword(login, self.parameters["password_new"])
 
-        UserSettingsDisplay.render(self)
+        self.parameters.clear()
+        return UserListing.render(self)
+
+
+class UserSettingsAdd(UserSettingsModify, UserAddForm):
+    view_name = "user_settings_add"
+    view_parameters =  UserSettingsModifyParameters
+    view_permissions = [ User.PERM_USER_MANAGEMENT ]
+
+    def render(self):
+        login = self.parameters.get("login", self.user.login)
+        if self.env.db.hasUser(login):
+            UserAddForm.render(self, "User %s already exist" % login)
+        else:
+            self.env.db.createUser(login)
+            permissions = filter(lambda perm: self.parameters.has_key(perm), User.ALL_PERMISSIONS)
+            self.env.db.setPermissions(login, permissions)
+            UserSettingsModify.render(self)
