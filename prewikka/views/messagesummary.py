@@ -53,20 +53,24 @@ class MessageSummary:
     def buildAnalyzer(self, alert):
         index = 0
         
-        while True:
-            if not alert["analyzer(%d).analyzerid" % index]:
-                break
-        
+        while alert["analyzer(%d)" % index] :
+            analyzer = alert["analyzer(%d)" % index]
+            
             self.beginSection("Analyzer")
-            self.newSectionEntry("Analyzerid", alert["analyzer(%d).analyzerid" % index])
-            self.newSectionEntry("Manufacturer", alert["analyzer(%d).manufacturer" % index])
-            self.newSectionEntry("Model", alert["analyzer(%d).model" % index], emphase=True)
-            self.newSectionEntry("Version", alert["analyzer(%d).version" % index])
-            self.newSectionEntry("Class", alert["analyzer(%d).class" % index])
-            self.newSectionEntry("Operating System", "%s %s" %
-                                 (alert["analyzer(%d).ostype" % index], alert["analyzer(%d).osversion" % index]))
-            self.newSectionEntry("Node name", alert["analyzer(%d).node.name" % index])
-            self.newSectionEntry("Node location", alert["analyzer(%d).node.location" % index])
+            self.newSectionEntry("Analyzerid", analyzer["analyzerid"])
+            self.newSectionEntry("Name", analyzer["name"], emphase=True)
+            self.newSectionEntry("Model", analyzer["model"], emphase=True)
+            self.newSectionEntry("Version", analyzer["version"])
+            self.newSectionEntry("Class", analyzer["class"])
+            self.newSectionEntry("Manufacturer", analyzer["manufacturer"])
+
+            if analyzer["ostype"] or analyzer["osversion"]:
+                self.newSectionEntry("Operating System", "%s %s" %
+                                     (analyzer["ostype"] or "", analyzer["osversion"] or ""))
+                
+            self.newSectionEntry("Node name", analyzer["node.name"])
+            self.newSectionEntry("Node location", analyzer["node.location"])
+
             i = 0
             while True:
                 address = alert["analyzer(%d).node.address(%d).address" % (index, i)]
@@ -74,6 +78,7 @@ class MessageSummary:
                     break
                 self.newSectionEntry("Address", address)
                 i += 1
+                
             self.newSectionEntry("Process", alert["analyzer(%d).process.name" % index])
             self.newSectionEntry("Path", alert["analyzer(%d).process.path" % index])
             self.newSectionEntry("Pid", alert["analyzer(%d).process.pid" % index])
