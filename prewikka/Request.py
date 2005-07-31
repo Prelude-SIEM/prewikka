@@ -34,14 +34,24 @@ class Request:
         self.input_headers = { }
         self.output_headers = { }
         self.output_headers = { }
+
         cookie = Cookie.SimpleCookie(self.getCookieString())
         self.input_cookie = { }
         for key, value in cookie.items():
             self.input_cookie[key] = value
-        self.output_cookie = Cookie.SimpleCookie()
+
+        self.output_cookie = None
+
         self.content = None
         self.user = None
-        
+      
+    def addCookie(self, param, value, expires):
+    	if not self.output_cookie:
+		self.output_cookie = Cookie.SimpleCookie()
+
+    	self.output_cookie[param] = value
+	self.output_cookie[param]["expires"] = expires
+	
     def read(self, *args):
         pass
 

@@ -82,8 +82,7 @@ class Session:
         self._expiration = expiration
 
     def setSession(self, request, sessionid):
-        request.output_cookie["sessionid"] = sessionid
-        request.output_cookie["sessionid"]["expires"] = self._expiration * 3;
+        request.addCookie("sessionid", sessionid,  self._expiration * 3)
     
     def checkSession(self, request):
         if not request.input_cookie.has_key("sessionid"):
