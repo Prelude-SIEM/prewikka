@@ -99,6 +99,7 @@ fieldset {
        border-left-color: #b5b5b5;
 
        padding: 0 0.5em 1em 0.5em;
+       _margin-bottom: 15px;
 }
 
 html>body fieldset {
@@ -125,7 +126,7 @@ p {
 
 .fixed {
         font-family: Courier;
-        font-weight: bold;
+        font-size: 10px;
 }
 
 /*
