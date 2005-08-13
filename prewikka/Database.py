@@ -61,13 +61,13 @@ class Database:
                               ("port", None),
                               ("name", "prewikka"),
                               ("user", "prewikka"),
-                              ("pass", "prewikka")):
+                              ("pass", None)):
             value = config.get(name, default)
             if value:
                 preludedb_sql_settings_set(settings, name, value)
 
         db_type = config.get("type", "mysql")
-
+        
         self._sql = preludedb_sql_new(db_type, settings)
 
         if config.has_key("log"):
