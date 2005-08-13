@@ -23,7 +23,7 @@
      <input style="float: left; position: relative;" type="submit" value="Back"/>
    </form>
 
-   <form action="?" method="get">
+   <form action="?" method="post">
      #for $param, $values in $prewikka.url.current.items()
        #for $value in $values
          <input type="hidden" name="$param" value="$value"/>
