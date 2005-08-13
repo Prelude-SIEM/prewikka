@@ -111,7 +111,7 @@ class MyConfigParser:
     
     EMPTY_LINE_REGEXP = re.compile("^\s*(\#.*)?$")
     SECTION_REGEXP = re.compile("\[(?P<name>.+)]")
-    OPTION_REGEXP = re.compile("^\s*(?P<name>\S+)\s*(\:\s*(?P<value>.+))?$")
+    OPTION_REGEXP = re.compile("^\s*(?P<name>[^\s:]+)(\:\s*(?P<value>.+))?$")
 
     def __init__(self, filename):
         self.filename = filename
