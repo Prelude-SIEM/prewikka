@@ -112,7 +112,8 @@ function aggregated_${category}_add_entry(path) {
                                       ("process", "alert.target.process.name"), 
                                       ("service", "alert.target.service.name"), 
                                       ("port", "alert.target.service.port"), 
-                                      ("interface", "alert.target.interface"))
+                                      ("interface", "alert.target.interface"),
+				      ("file path", "alert.target.file.path"))
                           )
 )
 
@@ -451,6 +452,16 @@ function ${name}_add_entry(object, value, num) {
      #if $direction.interface.value
         interface: $direction.interface.value
      #end if
+
+     #set $cnt = 0
+     #for $file in $direction.files
+       #if $cnt > 0
+         <br />
+       #end if
+
+       <a href="$file.inline_filter">$file.value</a>
+       #set $cnt = $cnt + 1
+     #end for
 
      #if $direction.empty
        n/a

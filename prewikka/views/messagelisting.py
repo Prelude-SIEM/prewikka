@@ -342,6 +342,7 @@ class ListedAlert(ListedMessage):
                                   "alert.%s(0).service.port" % direction,
                                   "alert.%s(0).service.protocol" % direction)
 
+        dataset["files"] = []
         dataset["empty"] = empty
 
     def setMessageSource(self, message):
@@ -351,6 +352,21 @@ class ListedAlert(ListedMessage):
     def setMessageTarget(self, message):
         self["target"] = { }
         self._setMessageDirection(self["target"], message, "target")
+
+        flist = []
+        empty = self["target"]["empty"]
+        
+        for f in message["alert.target(0).file"]:
+            if f["path"] in flist:
+                continue
+
+            empty = False
+            flist.append(f["path"])
+            self["target"]["files"].append(self.createInlineFilteredField("alert.target.file.path",
+                                                                          f["path"], type="target"))
+
+        self["target"]["empty"] = empty
+        
 
     def setMessageClassificationReferences(self, dataset, message):
         urls = [ ]
