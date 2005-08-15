@@ -55,7 +55,11 @@ class AlertFilterEdition(view.View):
     def _setCommon(self):
         self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
         self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.ALERT_OBJECTS))
-        self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("==", "!=", "<", "<=", ">", ">=", "substr")))
+        
+        self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("=", "=*", "!=", "!=*",
+                                                                        "~", "~*", "!~", "!~*",
+                                                                        "<", "<=", ">", ">=",
+                                                                        "<>", "<>*", "!<>", "!<>*")))
         self.dataset["elements"] = [ ]
         self.dataset["fltr.name"] = ""
         self.dataset["fltr.comment"] = ""
