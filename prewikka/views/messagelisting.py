@@ -677,9 +677,9 @@ class AlertListing(MessageListing, view.View):
             
         def get_operator(object):
             if object in ("alert.source.service.port", "alert.target.service.port"):
-                return "=="
+                return "="
 
-            return "substr"
+            return "<>*"
         
         if self.parameters[type]:
             criteria.append("(" + " || ".join(map(lambda (object, value): "%s %s '%s'" %
