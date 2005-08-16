@@ -199,7 +199,7 @@ class AlertSummary(MessageSummary, view.View):
 
         user_str = self._joinUserInfos(fa["user_id.name"], fa["user_id.number"])
         if user_str:
-            user_str = "=" + user_str
+            user_str = " " + user_str
 
         self.newSectionEntry(fa["user_id.type"] + user_str, pstr)
 
