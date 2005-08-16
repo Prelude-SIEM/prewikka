@@ -84,8 +84,8 @@ class MessageSummary:
                 self.newSectionEntry("Address", address)
                 i += 1
 
-            if alert["analyzer(%d).process"]:
-                self.buildProcess(alert["analyzer(%d).process"])
+            if alert["analyzer(%d).process" % index]:
+                self.buildProcess(alert["analyzer(%d).process" % index])
                 
             self.endSection()
 
