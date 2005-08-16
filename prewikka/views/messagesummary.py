@@ -50,6 +50,11 @@ class MessageSummary:
         if self._current_section["entries"]:
             self.dataset["sections"].append(self._current_section)
 
+    def buildProcess(self, process):
+        self.newSectionEntry("Process", process["name"])
+        self.newSectionEntry("Process Path", process["path"])
+        self.newSectionEntry("Process Pid", process["pid"])
+            
     def buildAnalyzer(self, alert):
         index = 0
         
@@ -78,10 +83,10 @@ class MessageSummary:
                     break
                 self.newSectionEntry("Address", address)
                 i += 1
+
+            if alert["analyzer(%d).process"]:
+                self.buildProcess(alert["analyzer(%d).process"])
                 
-            self.newSectionEntry("Process", alert["analyzer(%d).process.name" % index])
-            self.newSectionEntry("Path", alert["analyzer(%d).process.path" % index])
-            self.newSectionEntry("Pid", alert["analyzer(%d).process.pid" % index])
             self.endSection()
 
             index += 1
@@ -158,21 +163,101 @@ class AlertSummary(MessageSummary, view.View):
         self.newSectionEntry("Completion", alert["assessment.impact.completion"])
         self.endSection()
 
+
+    def buildChecksum(self, checksum):
+        self.newSectionEntry(checksum["algorithm"], checksum["value"])
+        self.newSectionEntry("%s key" % checksum["algorithm"], checksum["key"])
+
+
+    def _joinUserInfos(self, user, number, tty=None):
+        user_str = user or ""
+        if user != None and number != None:
+            user_str += "(%d)" % number
+
+        elif number:
+            user_str = str(number)
+
+        if tty:
+            user_str += " on tty " + tty
+            
+        return user_str
+    
+    def buildUser(self, user):
+        self.newSectionEntry(user["category"])
+
+        for user_id in user["user_id"]:
+            user_str = self._joinUserInfos(user_id["name"], user_id["number"], user_id["tty"])
+            self.newSectionEntry(user_id["type"], user_str)
+        
+    def buildFileAccess(self, fa):
+        pstr = ""
+        for perm in fa["permission"]:
+            if pstr:
+                pstr += ", "
+                
+            pstr += perm
+
+        user_str = self._joinUserInfos(fa["user_id.name"], fa["user_id.number"])
+        if user_str:
+            user_str = "=" + user_str
+
+        self.newSectionEntry(fa["user_id.type"] + user_str, pstr)
+
+    def buildInode(self, inode):
+        self.newSectionEntry("Change time", inode["change_time"])
+        self.newSectionEntry("Inode Number", inode["number"])
+        self.newSectionEntry("Major device", inode["major_device"])
+        self.newSectionEntry("Minor device", inode["minor_device"])
+        self.newSectionEntry("C Major device", inode["c_major_device"])
+        self.newSectionEntry("C Minor device", inode["c_minor_device"])
+        
+    def buildFile(self, file):
+        self.beginSection("Target file %s" % file["category"])
+        self.newSectionEntry("Name", file["name"])
+        self.newSectionEntry("Path", file["path"])
+        self.newSectionEntry("Create time", file["create_time"])
+        self.newSectionEntry("Modify time", file["modify_time"])
+        self.newSectionEntry("Access time", file["access_time"])
+        self.newSectionEntry("Data size", file["data_size"])
+        self.newSectionEntry("Disk size", file["disk_size"])
+
+        for checksum in file["checksum"]:
+            self.buildChecksum(checksum)
+
+        for fa in file["file_access"]:
+            self.buildFileAccess(fa)
+
+        if file["inode"]:
+            self.buildInode(file["inode"])
+            
+        self.endSection()
+
     def buildDirection(self, alert, direction):
-        address = alert["%s(0).node.address(0).address" % direction]
-        if address:
+        for addr in alert["%s(0).node.address" % direction]:
+
+            address = addr["address"]
+            if not address:
+                continue
+            
             port = alert["%s(0).service.port" % direction]
             if port != None:
                 address += ":%d" % port
+
             protocol = alert["%s(0).service.protocol" % direction]
             if protocol:
                 address += " (%s)" % protocol
+
             self.newSectionEntry("Address", address, emphase=True)
 
         self.newSectionEntry("Interface", alert["%s(0).interface" % direction])
         self.newSectionEntry("User", alert["%s(0).user.user_id(0).name" % direction])
         self.newSectionEntry("Uid", alert["%s(0).user.user_id(0).number" % direction])
-        self.newSectionEntry("Process", alert["%s(0).process.name" % direction])
+
+        if alert["%s(0).user" % direction]:
+            self.buildUser(alert["%s(0).user"])
+
+        if alert["%s(0).process" % direction]:
+            self.buildProcess(alert["%s(0).process"])
 
     def buildSource(self, alert):
         self.beginSection("Source")
@@ -182,9 +267,10 @@ class AlertSummary(MessageSummary, view.View):
     def buildTarget(self, alert):
         self.beginSection("Target")
         self.buildDirection(alert, "target")
-        self.newSectionEntry("Name", alert["target(0).file(0).name"])
-        self.newSectionEntry("Path", alert["target(0).file(0).path"])
         self.endSection()
+        
+        for f in alert["target(0).file"]:
+            self.buildFile(f)
 
     def render(self):
         alert = self.env.idmef_db.getAlert(self.parameters["ident"])
