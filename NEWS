@@ -1,3 +1,15 @@
+* 2005-08-17, prewikka-0.9.0-rc10:
+
+	- Allow configuration entry without space after the ':' separator.
+
+	- More operator (case insensitive operator, regex operator).
+
+	- Show target file in the message listing.
+
+	- Much more information in the alert summary view. 
+	  Especially useful for users of integrity checker.
+
+
 * 2005-08-02, prewikka-0.9.0-rc9:
 
 	- New experimental mod_python handler.
