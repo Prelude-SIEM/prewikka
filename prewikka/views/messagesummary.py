@@ -250,9 +250,7 @@ class AlertSummary(MessageSummary, view.View):
             self.newSectionEntry("Address", address, emphase=True)
 
         self.newSectionEntry("Interface", alert["%s(0).interface" % direction])
-        self.newSectionEntry("User", alert["%s(0).user.user_id(0).name" % direction])
-        self.newSectionEntry("Uid", alert["%s(0).user.user_id(0).number" % direction])
-
+        
         user = alert["%s(0).user" % direction]
         if user:
             self.buildUser(user)
