@@ -183,7 +183,7 @@ class AlertSummary(MessageSummary, view.View):
         return user_str
     
     def buildUser(self, user):
-        self.newSectionEntry(user["category"])
+        self.newSectionEntry("User category", user["category"])
 
         for user_id in user["user_id"]:
             user_str = self._joinUserInfos(user_id["name"], user_id["number"], user_id["tty"])
