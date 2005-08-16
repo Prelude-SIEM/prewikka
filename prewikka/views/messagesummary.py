@@ -253,11 +253,13 @@ class AlertSummary(MessageSummary, view.View):
         self.newSectionEntry("User", alert["%s(0).user.user_id(0).name" % direction])
         self.newSectionEntry("Uid", alert["%s(0).user.user_id(0).number" % direction])
 
-        if alert["%s(0).user" % direction]:
-            self.buildUser(alert["%s(0).user"])
+        user = alert["%s(0).user" % direction]
+        if user:
+            self.buildUser(user)
 
-        if alert["%s(0).process" % direction]:
-            self.buildProcess(alert["%s(0).process"])
+        process = alert["%s(0).process" % direction]
+        if process:
+            self.buildProcess(process)
 
     def buildSource(self, alert):
         self.beginSection("Source")
