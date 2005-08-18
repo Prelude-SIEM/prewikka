@@ -30,7 +30,13 @@ class LogStderr(Log.LogBackend):
         separator = ""
         
         if request:
-            message += "peer %s:%d" % (request.getClientAddr(), request.getClientPort())
+            addr = request.getClientAddr()
+            message += "peer %s" % addr
+
+            port = request.getClientPort()
+            if port:
+                message += ":%d" % port
+
             separator = "; "
 
         if user:
