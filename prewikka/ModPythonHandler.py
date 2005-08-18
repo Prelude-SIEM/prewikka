@@ -52,8 +52,10 @@ class ModPythonRequest(Request.Request):
 	return self._req.headers_in.get('cookie', '')
 
     def getReferer(self):
-        return self._req.headers_in.get('Referer', '')
-	
+        return self._req.headers_in.get('Referer', '')	
+
+    def getClientAddr(self):
+        return self._req.get_remote_host(apache.REMOTE_NOLOOKUP)
 
 
 core = Core.Core()
