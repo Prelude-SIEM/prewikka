@@ -288,8 +288,9 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $source
-        #set $escaped_value = utils.escape_attribute($value)
+          #set $escaped_value = utils.escape_attribute($value)
           source_add_entry("$object", "$escaped_value", $cnt)
+	  #set $cnt += 1
         #end for
       </script>
       <table style="width: 100%;"><tbody id="source_aggregation_table"></tbody></table>
