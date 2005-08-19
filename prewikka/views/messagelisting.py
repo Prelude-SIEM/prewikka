@@ -698,9 +698,31 @@ class AlertListing(MessageListing, view.View):
             return "<>*"
         
         if self.parameters[type]:
-            criteria.append("(" + " || ".join(map(lambda (object, value): "%s %s '%s'" %
-                                                  (object, get_operator(object), utils.escape_criteria(value)),
-                                                  self.parameters[type])) + ")")
+
+            # If one object is specified more than one time, and since this object
+            # can not have two different value, we want to apply an OR operator.
+            #
+            # We apply an AND operator between the different objects.
+            
+            merge = { }
+            for obj in self.parameters[type]:
+                if merge.has_key(obj[0]):
+                    merge[obj[0]] += [ obj ]
+                else:
+                    merge[obj[0]] =  [ obj ]
+
+            newcrit = ""
+            for key in iter(merge):
+                if len(newcrit) > 0:
+                    newcrit += " && "
+
+                newcrit += "(" + " || ".join(map(lambda (object, value): "%s %s '%s'" %
+                                                 (object, get_operator(object), utils.escape_criteria(value)),
+                                                 merge[key])) + ")"
+
+            if newcrit:
+                criteria.append(newcrit)
+
             self.dataset[type] = self.parameters[type]
             self.dataset["%s_filtered" % type] = True
         else:
