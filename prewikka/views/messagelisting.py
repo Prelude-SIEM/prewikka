@@ -218,7 +218,7 @@ class SensorAlertListingParameters(AlertListingParameters):
 
     def normalize(self):
         AlertListingParameters.normalize(self)
-        self["analyzer"] = [("alert.analyzer.analyzerid", str(self["analyzerid"]))]
+        self["analyzer"].insert(0, ("alert.analyzer.analyzerid", str(self["analyzerid"])))
 
 
 class SensorHeartbeatListingParameters(HeartbeatListingParameters):
