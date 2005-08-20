@@ -377,13 +377,13 @@ function ${name}_add_entry(object, value, num) {
     #if $message.aggregated and (len($message.infos) > 1 or $info.count > 1)
       $info.count x
     #end if
-     <a class="impact_severity_$info.severity.value" href="$info.display">
-     #if $info.classification.value
-       $info.classification.value
-     #else
-       n/a
-     #end if
-     </a>
+     
+    #if $info.classification.value
+      <a class="impact_severity_$info.severity.value" href="$info.display">$info.classification.value</a>
+    #else
+      <a class="impact_severity_$info.severity.value" href="$info.display">n/a</a>
+    #end if
+
     #if $info.completion.value
       (<span class="impact_completion_$info.completion.value">$info.completion.value</span>)
     #end if
