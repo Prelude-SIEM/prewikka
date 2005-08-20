@@ -169,9 +169,9 @@ class AlertListingParameters(MessageListingParameters):
                     sorted.append((num, object, self["%s_value_%s" % (column, num)]))
                 except KeyError:
                     pass # ignore empty inputs
-
-             sorted.sort()
-             self[column] = [ (i[1], i[2]) for i in sorted ]
+            
+            sorted.sort()
+            self[column] = [ (i[1], i[2]) for i in sorted ]
                                          
             
         for category in "classification", "source", "target":
