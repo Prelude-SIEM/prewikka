@@ -139,8 +139,10 @@ class AlertListingParameters(MessageListingParameters):
     def normalize(self):
         #
         # Default to aggregated view
-        if len(self) == 0:
-            self["aggregated_source"] =[ "alert.source(0).node.address(0).address" ]
+        if not self.has_key("aggregated_source"):
+            self["aggregated_source"] = [ "alert.source(0).node.address(0).address" ]
+            
+        if not self.has_key("aggregated_target"):
             self["aggregated_target"] = [ "alert.target(0).node.address(0).address" ]
             
         MessageListingParameters.normalize(self)
@@ -214,6 +216,9 @@ class SensorAlertListingParameters(AlertListingParameters):
         AlertListingParameters.register(self)
         self.mandatory("analyzerid", long)
 
+    def normalize(self):
+        AlertListingParameters.normalize(self)
+        self["analyzer"] = [("alert.analyzer.analyzerid", str(self["analyzerid"]))]
 
 
 class SensorHeartbeatListingParameters(HeartbeatListingParameters):
@@ -853,7 +858,7 @@ class AlertListing(MessageListing, view.View):
 
                 message["aggregated_classifications_total"] = aggregated_count
                 message["aggregated_classifications_hidden"] = aggregated_count
-                message["aggregated_classifications_hidden_expand"] = utils.create_link("alert_listing",
+                message["aggregated_classifications_hidden_expand"] = utils.create_link(self.view_name,
                                                                                         self.parameters -
                                                                                         [ "offset",
                                                                                           "aggregated_source",
@@ -910,8 +915,12 @@ class AlertListing(MessageListing, view.View):
 
                         if completion:
                             entry_param["alert.assessment.impact.completion"] = completion
-             
-                        infos["display"] = utils.create_link("alert_listing",
+
+                        entry_param["aggregated_target"] = \
+                        entry_param["aggregated_source"] = \
+                        entry_param["aggregated_classification"] = "none"
+                        
+                        infos["display"] = utils.create_link(self.view_name,
                                                              self.parameters - [ "offset",
                                                                                  "aggregated_classification",
                                                                                  "aggregated_source", "aggregated_target" ] +
@@ -1120,9 +1129,6 @@ class SensorAlertListing(AlertListing, view.View):
 
     listed_alert = ListedSensorAlert
     listed_aggregated_alert = ListedSensorAggregatedAlert
-
-    def _adjustCriteria(self, criteria):
-        criteria.append("alert.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
 
     def _setHiddenParameters(self):
         AlertListing._setHiddenParameters(self)
