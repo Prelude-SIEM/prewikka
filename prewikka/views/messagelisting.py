@@ -501,18 +501,7 @@ class MessageListing:
         self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
         if self.parameters.has_key("timeline_end"):
             self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
-        
-    def _setInlineFilter(self):
-        if self.parameters.has_key("inline_filter_object"):
-            self.dataset["active_inline_filter"] = self.inline_filters[self.parameters["inline_filter_object"]]
-        else:
-            self.dataset["active_inline_filter"] = ""
-        self.dataset["remove_active_inline_filter"] = utils.create_link(self.view_name,
-                                                                        self.parameters - \
-                                                                        [ "inline_filter_object",
-                                                                          "inline_filter_value",
-                                                                          "offset"])
-
+    
     def _setTimelineNext(self, next):
         parameters = self.parameters - [ "offset" ] + { "timeline_end": int(next) }
         self.dataset["timeline.next"] = utils.create_link(self.view_name, parameters)
@@ -913,8 +902,8 @@ class AlertListing(MessageListing, view.View):
                         entry_param = {}
                         
                         if classification:
-                            entry_param["classification_object_0"] = "alert.classification.text"
-                            entry_param["classification_value_0"] = classification
+                            entry_param["classification_object_%d" % self.parameters.max_index] = "alert.classification.text"
+                            entry_param["classification_value_%d" % self.parameters.max_index] = classification
 
                         if severity:
                             entry_param["alert.assessment.impact.severity"] = severity
@@ -935,7 +924,7 @@ class AlertListing(MessageListing, view.View):
     def _createAggregationParameters(self, aggregated_classification_values, aggregated_source_values, aggregated_target_values):
         parameters = { }
                 
-        i = 0
+        i = self.parameters.max_index
         for value in aggregated_classification_values:
             if value == None:
                 continue
@@ -944,7 +933,7 @@ class AlertListing(MessageListing, view.View):
             parameters["classification_value_%d" % i] = value
             i += 1
             
-        i = 0
+        i = self.parameters.max_index
         for value in aggregated_source_values:
             if value == None:
                 continue
@@ -953,7 +942,7 @@ class AlertListing(MessageListing, view.View):
             parameters["source_value_%d" % i] = value
             i += 1
         
-        i = 0
+        i = self.parameters.max_index
         for value in aggregated_target_values:
             if value == None:
                 continue
@@ -1023,7 +1012,6 @@ class AlertListing(MessageListing, view.View):
 
         self._adjustCriteria(criteria)
 
-        self._setInlineFilter()
         self._setTimeline(start, end)
         self._setNavPrev(self.parameters["offset"])
 
@@ -1105,7 +1093,6 @@ class HeartbeatListing(MessageListing, view.View):
         self._applyInlineFilters(criteria)
         self._adjustCriteria(criteria)
 
-        self._setInlineFilter()
         self._setTimeline(start, end)
         self._setNavPrev(self.parameters["offset"])
 
