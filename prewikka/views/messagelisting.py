@@ -157,18 +157,23 @@ class AlertListingParameters(MessageListingParameters):
                 raise view.InvalidParameterValueError("alert.assessment.impact.type", type)
         
         for column in "classification", "source", "target", "analyzer":
-            self[column] = [ ]
+            sorted = [ ]
             for parameter, object in self.items():
                 idx = parameter.find(column + "_object_")
                 if idx == -1:
                     continue
-                num = parameter.replace(column + "_object_", "", 1)
-
+                
+                num = int(parameter.replace(column + "_object_", "", 1))
+                
                 try:
-                    self[column].append((object, self["%s_value_%s" % (column, num)]))
+                    sorted.append((num, object, self["%s_value_%s" % (column, num)]))
                 except KeyError:
                     pass # ignore empty inputs
-        
+
+             sorted.sort()
+             self[column] = [ (i[1], i[2]) for i in sorted ]
+                                         
+            
         for category in "classification", "source", "target":
             i = 0
             for path in self["aggregated_%s" % category]:
