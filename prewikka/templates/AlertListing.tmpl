@@ -164,7 +164,7 @@ function ${name}_add_entry(object, value, num) {
 	field.setAttribute("width", "11px")
 	row.appendChild(field)
 	link = document.createElement("a")
-	link.onclick = function(){ ${name}_add_entry('', '', '" + (num + 1) + "') };
+	link.onclick = function(){ ${name}_add_entry('', '', (num + 1)) };
 	link.setAttribute("href", "#")
 	content = document.createTextNode("+")
 	link.appendChild(content)
