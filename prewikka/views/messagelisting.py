@@ -345,12 +345,12 @@ class ListedAlert(ListedMessage):
         if name != None:
             empty = False
             dataset["addresses"].append(
-                self.createHostField("alert.%s(0).node.name" % direction, name, type=direction))
+                self.createHostField("alert.%s.node.name" % direction, name, type=direction))
         
         for addr in message["alert.%s(0).node.address" % direction]:
             empty = False
             dataset["addresses"].append(
-                self.createHostField("alert.%s(0).node.address.address" % direction, addr["address"], type=direction))
+                self.createHostField("alert.%s.node.address.address" % direction, addr["address"], type=direction))
             
         set_main_and_extra_values(dataset, message, "process",
                                   "alert.%s(0).process.name" % direction,
