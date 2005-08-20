@@ -121,6 +121,7 @@ class AlertListingParameters(MessageListingParameters):
     allow_extra_parameters = True
 
     def register(self):
+        self.max_index = 0
         MessageListingParameters.register(self)
         self.optional("aggregated_source", list, [ ])
         self.optional("aggregated_source_values", list, [ ])
@@ -164,12 +165,23 @@ class AlertListingParameters(MessageListingParameters):
                     continue
                 
                 num = int(parameter.replace(column + "_object_", "", 1))
-                
+                if num >= self.max_index:
+                    self.max_index = num + 1
+
                 try:
-                    sorted.append((num, object, self["%s_value_%s" % (column, num)]))
+                    value = self["%s_value_%s" % (column, num)]
                 except KeyError:
-                    pass # ignore empty inputs
-            
+                    continue
+                
+                do_append = True
+                for tmp in sorted:
+                    if tmp[1] == object and tmp[2] == value:
+                        do_append = False
+                        break
+
+                if do_append:
+                    sorted.append((num, object, value))
+                
             sorted.sort()
             self[column] = [ (i[1], i[2]) for i in sorted ]
                                          
@@ -222,7 +234,8 @@ class ListedMessage(dict):
             return { "value": None, "inline_filter": None }
 
         if type:
-            extra = { "%s_object_0" % type: object, "%s_value_0" % type: value }
+            index = self.parameters.max_index
+            extra = { "%s_object_%d" % (type, index): object, "%s_value_%d" % (type, index): value }
         else:
             extra = { object: value }
 
