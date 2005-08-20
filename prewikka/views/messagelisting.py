@@ -972,7 +972,7 @@ class AlertListing(MessageListing, view.View):
             aggregated_on += self.parameters["aggregated_classification"]
 
         if len(aggregated_on) > 0:
-            return self._setAggregatedMessagesNoValues(criteria)
+            return self._setAggregatedMessagesNoValues(criteria, aggregated_on)
         
         for ident in self.env.idmef_db.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
             message = self.env.idmef_db.getAlert(ident)
