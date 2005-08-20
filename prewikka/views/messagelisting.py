@@ -124,12 +124,8 @@ class AlertListingParameters(MessageListingParameters):
         self.max_index = 0
         MessageListingParameters.register(self)
         self.optional("aggregated_source", list, [ ])
-        self.optional("aggregated_source_values", list, [ ])
         self.optional("aggregated_target", list, [ ])
-        self.optional("aggregated_target_values", list, [ ])
         self.optional("aggregated_classification", list, [ ])
-        self.optional("aggregated_severity_value", str)
-        self.optional("aggregated_classification_value", str)
         self.optional("filter", str)
         self.optional("alert.classification.text", list, [ ])
         self.optional("alert.assessment.impact.severity", list, [ ])
@@ -138,13 +134,16 @@ class AlertListingParameters(MessageListingParameters):
         
     def normalize(self):
         #
-        # Default to aggregated view
+        # Default to aggregated source/target
         if not self.has_key("aggregated_source"):
             self["aggregated_source"] = [ "alert.source(0).node.address(0).address" ]
             
         if not self.has_key("aggregated_target"):
             self["aggregated_target"] = [ "alert.target(0).node.address(0).address" ]
-            
+
+        if not self.has_key("aggregated_classification"):
+            self["aggregated_classification"] = [ "none" ]
+
         MessageListingParameters.normalize(self)
 
         for severity in self["alert.assessment.impact.severity"]:
@@ -191,12 +190,9 @@ class AlertListingParameters(MessageListingParameters):
         for category in "classification", "source", "target":
             i = 0
             for path in self["aggregated_%s" % category]:
-                if path == "none":
-                    del self["aggregated_%s" % category][i]
-
                 if path[0] == "!":
                     self["aggregated_%s" % category][i] = path[1:]
-                    self["aggregated_%s_values" % category].insert(i, None)
+                    
                 i += 1
                 
 
@@ -749,7 +745,7 @@ class AlertListing(MessageListing, view.View):
         self._applyCheckboxFilters(criteria, "target")
         self._applyCheckboxFilters(criteria, "analyzer")
 
-    def _setAggregatedMessagesNoValues(self, criteria):
+    def _setAggregatedMessagesNoValues(self, criteria, aggregated_on):
         filter_on = []
         filter_values = []
 
@@ -758,10 +754,6 @@ class AlertListing(MessageListing, view.View):
                 for item in self.parameters[column]:
                       filter_on.append(item[0])
                       filter_values.append(item[1])
-                    
-        aggregated_on = self.parameters["aggregated_source"] + \
-                        self.parameters["aggregated_target"] + \
-                        self.parameters["aggregated_classification"]
 
         selection = [ "%s/group_by" % path for path in aggregated_on ] + \
                     [ "count(alert.create_time)", "max(alert.create_time)/order_desc" ]
@@ -775,16 +767,16 @@ class AlertListing(MessageListing, view.View):
             aggregated_target_values = []
             aggregated_classification_values = []
             
-            if len(self.parameters["aggregated_source"]):
+            if self.parameters["aggregated_source"] != ["none"]:
                 start = len(self.parameters["aggregated_source"])
                 aggregated_source_values = values[:len(self.parameters["aggregated_source"])]
 
-            if len(self.parameters["aggregated_target"]):
+            if self.parameters["aggregated_target"] != ["none"]:
                 last = start + len(self.parameters["aggregated_target"])
                 aggregated_target_values = values[start:last]
                 start = last
 
-            if len(self.parameters["aggregated_classification"]):
+            if self.parameters["aggregated_classification"] != ["none"]:
                 last = start + len(self.parameters["aggregated_classification"])
                 if values[start:last]:
                     aggregated_classification_values = values[start:last]
@@ -965,15 +957,21 @@ class AlertListing(MessageListing, view.View):
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
 
-        self.dataset["aggregated_source"] = self.parameters["aggregated_source"] or [ "none" ]
-        self.dataset["aggregated_source_values"] = self.parameters["aggregated_source_values"]
-        self.dataset["aggregated_target"] = self.parameters["aggregated_target"] or [ "none" ]
-        self.dataset["aggregated_target_values"] = self.parameters["aggregated_target_values"]
-        self.dataset["aggregated_classification"] = self.parameters["aggregated_classification"] or [ "none"]
+        self.dataset["aggregated_source"] = self.parameters["aggregated_source"]
+        self.dataset["aggregated_target"] = self.parameters["aggregated_target"]
+        self.dataset["aggregated_classification"] = self.parameters["aggregated_classification"]
 
-        if self.parameters["aggregated_source"] + \
-           self.parameters["aggregated_target"] + \
-           self.parameters["aggregated_classification"]:
+        aggregated_on = []
+        if self.parameters["aggregated_source"] != ["none"]:
+            aggregated_on += self.parameters["aggregated_source"]
+
+        if self.parameters["aggregated_target"] != ["none"]:
+            aggregated_on += self.parameters["aggregated_target"]
+
+        if self.parameters["aggregated_classification"] != ["none"]:
+            aggregated_on += self.parameters["aggregated_classification"]
+
+        if len(aggregated_on) > 0:
             return self._setAggregatedMessagesNoValues(criteria)
         
         for ident in self.env.idmef_db.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
