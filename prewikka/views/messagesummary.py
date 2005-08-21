@@ -121,6 +121,42 @@ class AlertSummary(MessageSummary, view.View):
         self.newSectionEntry("Analyzer time", alert["analyzer_time"])
         self.endSection()
 
+    def buildCorrelationAlert(self, alert):
+        ca = alert["correlation_alert"]
+        if not ca:
+            return
+
+        self.beginSection("Correlation Alert")
+        self.newSectionEntry("Reason", ca["name"])
+
+        for alertident in ca["alertident"]:
+        
+            # IDMEF draft 14 page 27
+            # If the "analyzerid" is not provided, the alert is assumed to have come
+            # from the same analyzer that is sending the CorrelationAlert.
+
+            analyzerid = alertident["analyzerid"]
+            if not analyzerid:
+                analyzerid = alert["analyzer(-1).analyzerid"]
+
+            criteria = ""
+            if analyzerid:
+                criteria += "alert.analyzer.analyzerid = %s && " % analyzerid
+            
+            criteria += "alert.messageid = %s" % alertident["alertident"]
+                        
+            results = self.env.idmef_db.getAlertIdents(criteria)
+            if len(results) == 0:
+                text = "Invalid analyzerid:messageid pair: %s:%s" % (analyzerid, alertident["alertident"])
+            else:
+                alert = self.env.idmef_db.getAlert(results[0])
+                link = utils.create_link("alert_summary", { "origin": "alert_summary", "ident": results[0] })
+                text = "%s: <a href=\"%s\">%s</a>" % (alert["analyzer(-1).name"], link, alert["classification.text"])
+                
+            self.newSectionEntry("Correlated", text)
+
+        self.endSection()
+        
     def buildClassification(self, alert):
         if not alert["classification.text"]:
             return
@@ -274,6 +310,7 @@ class AlertSummary(MessageSummary, view.View):
         self.dataset["sections"] = [ ]
         self.buildTime(alert)
         self.buildClassification(alert)
+        self.buildCorrelationAlert(alert)
         self.buildImpact(alert)
         self.buildSource(alert)
         self.buildTarget(alert)
