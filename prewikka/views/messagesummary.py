@@ -94,20 +94,18 @@ class MessageSummary:
     def buildAdditionalData(self, alert):
         self.beginSection("Additional Data")
         
-        i= 0
-        while True:
-            meaning = alert["additional_data(%d).meaning" % i]
-            if not meaning:
-                break
+        for ad in alert["additional_data"]:
+            value = None
+            meaning = ad["meaning"]
             
-            if alert["additional_data(%d).type" % i] == "byte-string":
-                value = utils.hexdump(alert.get("additional_data(%d).data" % i, escape=False))
-            else:
-                value = alert.get("additional_data(%d).data" % i)
-                
-            emphase = (alert["analyzer.model"] == "Prelude LML" and
-                       alert["additional_data(%d).meaning" % i] == "Original Log")
-            self.newSectionEntry(meaning, value, emphase)
+            if ad["data"]:
+                if ad["type"] == "byte-string":
+                    value = utils.hexdump(ad.get("data", escape=False))
+                else:
+                    value = ad.get("data")
+            
+            emphase = (alert["analyzer.model"] == "Prelude LML" and meaning == "Original Log")
+            self.newSectionEntry(meaning or "Data content", value, emphase)
             i += 1
         
         self.endSection()
