@@ -106,7 +106,6 @@ class MessageSummary:
             
             emphase = (alert["analyzer.model"] == "Prelude LML" and meaning == "Original Log")
             self.newSectionEntry(meaning or "Data content", value, emphase)
-            i += 1
         
         self.endSection()
 
