@@ -425,7 +425,7 @@ class ListedAlert(ListedMessage):
 
         dataset["count"] = 1
         dataset["display"] = self.createMessageLink(ident, "alert_summary")
-        dataset["severity"] = { "value": message.get("alert.assessment.impact.severity", "low") }
+        dataset["severity"] = { "value": message.get("alert.assessment.impact.severity") }
         dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
         self.setMessageClassification(dataset, message)
 
@@ -646,6 +646,7 @@ class AlertListing(MessageListing, view.View):
 
     def _fetchMessage(self, ident):
         return self.env.idmef_db.getAlert(ident)
+
     def _setMessage(self, message, ident):
         msg = self.listed_alert(self.env, self.parameters)
         msg.setMessage(message, ident)
