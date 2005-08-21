@@ -57,10 +57,14 @@ def init_dataset(dataset, config, request):
     dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
     dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
     dataset["prewikka.url.referer"] = cgi.parse_qs(urllib.splitquery(request.getReferer())[1] or "")
-    dataset["prewikka.url.current"] = cgi.parse_qs(request.getQueryString()[2:])
     dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
     dataset["prewikka.query_string"] = request.getQueryString()
 
+    qstring = request.getQueryString()
+    if qstring[0:2] == "/?":
+        qstring = qstring[2:]
+
+    dataset["prewikka.url.current"] = cgi.parse_qs(qstring)
 
 
 def load_template(name, dataset):
