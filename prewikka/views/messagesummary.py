@@ -144,13 +144,13 @@ class AlertSummary(MessageSummary, view.View):
                 criteria += "alert.analyzer.analyzerid = %s && " % analyzerid
             
             criteria += "alert.messageid = %s" % alertident["alertident"]
-                        
+            
             results = self.env.idmef_db.getAlertIdents(criteria)
             if len(results) == 0:
                 text = "Invalid analyzerid:messageid pair: %s:%s" % (analyzerid, alertident["alertident"])
             else:
                 alert = self.env.idmef_db.getAlert(results[0])
-                link = utils.create_link("alert_summary", { "origin": "alert_summary", "ident": results[0] })
+                link = utils.create_link("alert_summary", { "origin": "alert_listing", "ident": results[0] })
                 text = "%s: <a href=\"%s\">%s</a>" % (alert["analyzer(-1).name"], link, alert["classification.text"])
                 
             self.newSectionEntry("Correlated", text)
