@@ -48,6 +48,7 @@ class Parameters(dict):
         apply(dict.__init__, (self, ) + args, kwargs)
         self._parameters = { }
         self.register()
+        self.optional("_error_back", str)
         
     def register(self):
         pass
@@ -75,13 +76,14 @@ class Parameters(dict):
                 value = parameter_type(value)
             except (ValueError, TypeError):
                 raise InvalidParameterValueError(name, value)
-        
+
             self[name] = value
 
         for name in self._parameters.keys():
             if not self.has_key(name):
                 if self._parameters[name]["mandatory"]:
                     raise MissingParameterError(name)
+
                 elif self._parameters[name]["default"] != None:
                     self[name] = self._parameters[name]["default"]
 

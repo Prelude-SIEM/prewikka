@@ -15,20 +15,37 @@
    <br/><br/>
    
    <form action="?" method="get">
-     #for $param, $values in $prewikka.url.referer.items()
-       #for $value in $values
+     #if $prewikka.url.current.has_key('_error_back')
+         #set $md = $eval($prewikka.url.current['_error_back'][0], {"__builtins__": {}})
+     #else
+	 #set $md = $prewikka.url.referer
+     #end if
+
+     #for $param, $values in $md.items()
+      #for $value in $values
          <input type="hidden" name="$param" value="$value"/>
-       #end for
+      #end for
      #end for
      <input style="float: left; position: relative;" type="submit" value="Back"/>
    </form>
 
    <form action="?" method="post">
+     #set $have_back = False
+
      #for $param, $values in $prewikka.url.current.items()
+       #if $param == "_error_back"
+	#set $have_back = True
+       #end if
+
        #for $value in $values
          <input type="hidden" name="$param" value="$value"/>
        #end for
      #end for
+
+#if not $have_back and $len($prewikka.url.referer) > 0
+     <input type="hidden" name="_error_back" value="$prewikka.url.referer"/>
+#end if
+
      <input style="float: right; position: relative;" type="submit" value="Retry"/>
    </form>
 
