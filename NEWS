@@ -1,3 +1,24 @@
+* 2005-08-25, prewikka-0.9.0-rc11:
+
+	- The Summary view now support showing CorrelationAlert.
+
+	- Avoid mangling URL query string on form input.
+
+	- Handle possibly null AdditionalData properly.
+
+	- Don't default to 'low' severity.
+
+	- Allow the user to set analyzerID inline filter.
+
+	- Make sure we keep aggregation in per analyzer view.
+
+	- Keep inline filter object sorted, and merge them if there are duplicate.
+
+	- When the same object is specified more than once, OR both.
+
+	- Various cleanup, bugfix.
+
+
 * 2005-08-17, prewikka-0.9.0-rc10:
 
 	- Allow configuration entry without space after the ':' separator.
