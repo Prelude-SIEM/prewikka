@@ -1028,8 +1028,6 @@ class AlertListing(MessageListing, view.View):
         self.dataset["messages"] = [ ]
         total = self._setMessages(criteria)
 
-        if self.parameters.has_key("timeline_start"):
-            self.dataset["hidden_parameters"].append(("timeline_start", self.parameters["timeline_start"]))
         self.dataset["nav.from"] = self.parameters["offset"] + 1
         self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
         self.dataset["limit"] = self.parameters["limit"]
