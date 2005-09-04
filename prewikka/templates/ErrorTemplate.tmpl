@@ -1,9 +1,8 @@
 #extends prewikka.templates.TopLayout
 
 #block toplayout_content
-
- <div id="fieldset_page" style="position: relative; margin: 0px auto; margin-top: 150px; width:600px; height: 300px;">
-  <fieldset style="text-align: center; vertical-align: middle;">
+<div id="fieldset_page" style="position: absolute; top: 25%; left: 50%; width:600px; margin-left:-300px;">
+  <fieldset style="text-align: center; vertical-align: middle;"> 
    <legend class="error_name">$name</legend>
    <p><b>$message</b></p>
    Failed query: <input type="text" value="$prewikka.query_string" style="width: 200px;" />

@@ -6,8 +6,8 @@ html {
     padding     : 0;
     width       : 100%;
     height      : 100%;
-    overflow: hidden;
-    overflow: auto;
+    _overflow: hidden;
+    _overflow: auto;
 }
 
 body {
@@ -22,8 +22,8 @@ body {
 	position: absolute;
 	width: 100%;
 	height: 100%;
-	overflow-y: hidden;
-	overflow-x: hidden;
+	_overflow-y: hidden;
+	_overflow-x: hidden;
 	top: 0;
 	left: 0;
 	right: 0;
@@ -110,7 +110,7 @@ html>body fieldset {
 
 legend {
 	position: relative;
-	top: -1em;
+	_top: -1em;
 	padding: 0.4em;
 	color: #333333;
 }
@@ -422,11 +422,11 @@ p {
  */
 #main {
 	font-size: 100%;
-        position: absolute;
 
-	top: 0px;
-	left: 0px;
-
+	_position: absolute; 
+	_top: 0px;
+	_left: 0px;
+	
 	padding-top: 10px;
 	margin-top: 80px;
 	padding-left: 170px;
@@ -690,7 +690,6 @@ p {
 .error_name {
 	font-size:60px;
 	color: red;
-	margin-top: 150px;
 }
 
 .error_message {
@@ -857,6 +856,7 @@ p {
 .fieldset_heading hr { color: #999999; background: #999999; border: 0; height: 1px; }
 
 #fieldset_page { 
+	display: table-cell;
 	max-width: 700px; 
 	width:expression(document.body.clientWidth > 540 ? "540px": "auto" );
 }  
