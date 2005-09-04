@@ -123,7 +123,7 @@ function newFilterElement(name, object, operator, object_value) {
 <table>
  <tfoot>
   <tr>
-   <td style="width: 100%;" colspan="4">&nbsp;</td>
+   <td style="text-align: right;" colspan="4">&nbsp;</td>
    <td><a style="text-align: right;" href="javascript:newFilterElement('', '', '', '')">+</a></td>
   </tr>
  </tfoot>
@@ -144,21 +144,19 @@ function newFilterElement(name, object, operator, object_value) {
 <table>
  <tr>
   <th>Formula:</th>
-  <td>
-  <input style="width: 400px;" type="text" name="formula" value="$formula"/>
-  </td>
+  <td><input style="width: 400px;" type="text" name="formula" value="$formula"/></td>
  </tr>
  <tr>
   <th>name:</th>
-   <td><input style="width: 400px;" type="text" name="save_as" value="$fltr.name"/></td>
-  </tr>
-  <tr>
-   <th style="vertical-align: top;">comment:</th>
-   <td><textarea style="width: 400px;" name="filter_comment" rows="4" cols="55">$fltr.comment</textarea></td>
-  </tr>
-  </table>
+  <td><input style="width: 400px;" type="text" name="save_as" value="$fltr.name"/></td>
+ </tr>
+ <tr>
+  <th style="vertical-align: top;">comment:</th>
+  <td><textarea style="width: 400px;" name="filter_comment" rows="4" cols="55">$fltr.comment</textarea></td>
+ </tr>
+</table>
 
-  <input style="float: right;" type="submit" name="mode" value="Save"/>
+<input style="float: right;" type="submit" name="mode" value="Save"/> 
 </fieldset>
 </form>
 
