@@ -10,4 +10,5 @@ include *.py
 include NEWS
 include AUTHORS
 include README
+include HACKING.README
 recursive-include prewikka *.py *.tmpl
