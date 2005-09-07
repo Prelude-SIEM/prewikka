@@ -124,7 +124,10 @@ class my_install(install):
 
 
 setup(name="prewikka",
-      version="0.9.0-rc11",
+      version="0.9.0-rc12",
+      maintainer = "Yoann Vandoorselaere",
+      maintainer_email = "yoann.v@prelude-ids.com",
+      url = "http://www.prelude-ids.org",
       packages=[ 'prewikka', 'prewikka.views', 'prewikka.templates',
                  'prewikka.modules',
                  'prewikka.modules.log', 'prewikka.modules.log.stderr',
