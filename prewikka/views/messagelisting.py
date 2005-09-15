@@ -356,10 +356,13 @@ class ListedAlert(ListedMessage):
         set_main_and_extra_values(dataset, message, "process",
                                   "alert.%s(0).process.name" % direction,
                                   "alert.%s(0).process.pid" % direction)
-
+        
+        proto = "alert.%s(0).service.iana_protocol_name" % direction
+        if not message[proto]:
+            proto = "alert.%s(0).service.protocol" % direction
+            
         set_main_and_extra_values(dataset, message, "service",
-                                  "alert.%s(0).service.port" % direction,
-                                  "alert.%s(0).service.protocol" % direction)
+                                  "alert.%s(0).service.port" % direction, proto)
 
         dataset["files"] = []
         dataset["empty"] = empty
