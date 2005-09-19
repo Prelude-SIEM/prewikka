@@ -27,6 +27,37 @@ import re
 from prewikka import view, User, utils
 
 
+port_dict = {}
+read_done = False
+
+
+def map_protocol_number():
+    global port_dict
+    global read_done
+    
+    if read_done:
+        return port_dict
+
+    read_done = True
+    sreg = re.compile("^\s*(?P<name>[^#]\w+)\s*(?P<number>\d+)\s*(?P<alias>\w+)")
+
+    try: fd = open("/etc/protocols", "r")
+    except IOError:
+        return port_dict
+	
+    for line in fd.readlines():
+	
+        ret = sreg.match(line)
+        if not ret:
+            continue
+
+        name, number, alias = ret.group("name", "number", "alias")
+        port_dict[number] = (name, alias)
+
+    return port_dict
+
+
+
 class _MyTime:
     def __init__(self, t=None):
         self._t = t or time.time()
@@ -320,12 +351,12 @@ class ListedAlert(ListedMessage):
     def _setMessageDirection(self, dataset, message, direction):
         empty = True
         
-        def set_main_and_extra_values(dataset, message, name, object_main, object_extra):
-            if message[object_main] != None:
-                dataset[name] = { "value": message[object_main] }
-                dataset[name + "_extra"] = { "value": message[object_extra] }
+        def set_main_and_extra_values(dataset, name, object_main, object_extra):
+            if object_main != None:
+                dataset[name] = { "value": object_main }
+                dataset[name + "_extra"] = { "value": object_extra }
             else:
-                dataset[name] = { "value": message[object_extra] }
+                dataset[name] = { "value": object_extra }
                 dataset[name + "_extra"] = { "value": None }
 
             if dataset[name]["value"] != None:
@@ -338,7 +369,7 @@ class ListedAlert(ListedMessage):
             user = { }
             empty = False
             dataset["users"].append(user)
-            set_main_and_extra_values(user, userid, "user", "name", "number")
+            set_main_and_extra_values(user, "user", userid["name"], userid["number"])
 
         
         dataset["addresses"] = [ ]
@@ -353,16 +384,26 @@ class ListedAlert(ListedMessage):
             dataset["addresses"].append(
                 self.createHostField("alert.%s.node.address.address" % direction, addr["address"], type=direction))
             
-        set_main_and_extra_values(dataset, message, "process",
-                                  "alert.%s(0).process.name" % direction,
-                                  "alert.%s(0).process.pid" % direction)
-        
-        proto = "alert.%s(0).service.iana_protocol_name" % direction
-        if not message[proto]:
-            proto = "alert.%s(0).service.protocol" % direction
+        set_main_and_extra_values(dataset, "process",
+                                  message["alert.%s(0).process.name" % direction],
+                                  message["alert.%s(0).process.pid" % direction])
+
+
+        proto = None
+        if message["alert.%s(0).service.iana_protocol_name" % direction]:
+            proto = message["alert.%s(0).service.iana_protocol_name" % direction]
             
-        set_main_and_extra_values(dataset, message, "service",
-                                  "alert.%s(0).service.port" % direction, proto)
+        elif message["alert.%s(0).service.iana_protocol_number" % direction]:
+            num = str(message["alert.%s(0).service.iana_protocol_number" % direction])
+
+            if map_protocol_number().has_key(num):
+                proto = map_protocol_number()[num][0]
+
+        if not proto:
+            proto = message["alert.%s(0).service.protocol" % direction]
+            
+        set_main_and_extra_values(dataset, "service",
+                                  message["alert.%s(0).service.port" % direction], proto)
 
         dataset["files"] = []
         dataset["empty"] = empty
