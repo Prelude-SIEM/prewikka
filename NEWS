@@ -1,3 +1,13 @@
+* 2005-09-20, prewikka-0.9.0:
+
+	- 0.9.0 final.
+
+	- Minor rendering fix.
+
+	- Handle service.iana_protocol_name / service.iana_protocol_number 
+	  as well as service.protocol.
+
+
 * 2005-09-05, prewikka-0.9.0-rc12:
 
 	- Correct Konqueror rendering.
