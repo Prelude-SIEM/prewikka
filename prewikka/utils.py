@@ -21,9 +21,48 @@
 import time, calendar
 import struct
 import urllib
+import re
 
 from prewikka import DataSet
 from prewikka.templates import ErrorTemplate
+
+port_dict = {}
+read_done = False
+
+
+def _load_protocol():
+    global port_dict
+    global read_done
+    
+    if read_done:
+        return port_dict
+
+    read_done = True
+    sreg = re.compile("^\s*(?P<name>[^#]\w+)\s*(?P<number>\d+)\s*(?P<alias>\w+)")
+
+    try: fd = open("/etc/protocols", "r")
+    except IOError:
+        return port_dict
+	
+    for line in fd.readlines():
+	
+        ret = sreg.match(line)
+        if not ret:
+            continue
+
+        name, number, alias = ret.group("name", "number", "alias")
+        port_dict[int(number)] = (name, alias)
+
+    return port_dict
+
+
+def protocol_number_to_name(num):
+     port_dict = _load_protocol()
+
+     if port_dict.has_key(num):
+         return port_dict[num][0]
+
+     return None
 
 def escape_attribute(value):   
     # Escape '\' since it's a valid js escape.

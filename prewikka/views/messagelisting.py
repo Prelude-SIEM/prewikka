@@ -27,37 +27,6 @@ import re
 from prewikka import view, User, utils
 
 
-port_dict = {}
-read_done = False
-
-
-def map_protocol_number():
-    global port_dict
-    global read_done
-    
-    if read_done:
-        return port_dict
-
-    read_done = True
-    sreg = re.compile("^\s*(?P<name>[^#]\w+)\s*(?P<number>\d+)\s*(?P<alias>\w+)")
-
-    try: fd = open("/etc/protocols", "r")
-    except IOError:
-        return port_dict
-	
-    for line in fd.readlines():
-	
-        ret = sreg.match(line)
-        if not ret:
-            continue
-
-        name, number, alias = ret.group("name", "number", "alias")
-        port_dict[number] = (name, alias)
-
-    return port_dict
-
-
-
 class _MyTime:
     def __init__(self, t=None):
         self._t = t or time.time()
@@ -394,16 +363,14 @@ class ListedAlert(ListedMessage):
             proto = message["alert.%s(0).service.iana_protocol_name" % direction]
             
         elif message["alert.%s(0).service.iana_protocol_number" % direction]:
-            num = str(message["alert.%s(0).service.iana_protocol_number" % direction])
-
-            if map_protocol_number().has_key(num):
-                proto = map_protocol_number()[num][0]
+            num = message["alert.%s(0).service.iana_protocol_number" % direction]
+            proto = utils.protocol_number_to_name(num)
 
         if not proto:
             proto = message["alert.%s(0).service.protocol" % direction]
-            
-        set_main_and_extra_values(dataset, "service",
-                                  message["alert.%s(0).service.port" % direction], proto)
+       
+        set_main_and_extra_values(dataset, "protocol", proto, None)
+        set_main_and_extra_values(dataset, "service", message["alert.%s(0).service.port" % direction], None)
 
         dataset["files"] = []
         dataset["empty"] = empty

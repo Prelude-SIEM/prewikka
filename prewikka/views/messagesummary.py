@@ -276,9 +276,15 @@ class AlertSummary(MessageSummary, view.View):
             if port != None:
                 address += ":%d" % port
 
-            protocol = alert["%s(0).service.protocol" % direction]
-            if protocol:
-                address += " (%s)" % protocol
+            ipn = alert["%s(0).service.iana_protocol_number" % direction]
+            if ipn and utils.protocol_number_to_name(ipn) != None:
+                address += " (%s)" % utils.protocol_number_to_name(ipn)
+
+            elif alert["%s(0).service.iana_protocol_name" % direction]:
+                address += " (%s)" % alert["%s(0).service.iana_protocol_name" % direction]
+
+            elif alert["%s(0).service.protocol" % direction]:
+                address += " (%s)" % alert["%s(0).service.protocol" % direction]               
 
             self.newSectionEntry("Address", address, emphase=True)
 
