@@ -399,15 +399,15 @@ function ${name}_add_entry(object, value, num) {
       #set $proto_str = ""
 
       #if $direction.protocol.value != None
-       #set $proto_str = "/" + $direction.protocol.value.lower()
+       #set $proto_str = $direction.protocol.value.lower()
        #set $proto_param = "&amp;protocol=" + $direction.protocol.value.upper() 
       #end if
 
       #if $direction.service.value != None
        #set $service = ":<a href=\"http://www.portsdb.org/bin/portsdb.cgi?portnumber="
-       #set $service += $str($direction.service.value) + $proto_param + "\">" + $str($direction.service.value) + $proto_str + "</a>"
+       #set $service += $str($direction.service.value) + $proto_param + "\">" + $str($direction.service.value) + "/" + $proto_str + "</a>"
       #else
-        #set $service += $proto_str
+        #set $service += ":" + $proto_str
       #end if
    
       #for $address in $direction.addresses
