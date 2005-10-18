@@ -43,10 +43,49 @@ class PermissionDeniedError(Error.SimpleError):
 
 
 class User:
-    def __init__(self, login, permissions):
+    def __init__(self, db, login, permissions, configuration):
+        self._db = db
         self.login = login
         self.permissions = permissions
+        self.configuration = configuration    
+        
+    def delConfigValue(self, key):
+        login = self._db.escape(self.login)
 
+        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE login = %s AND name = %s" %
+                       (login, self._db.escape(key)))
+
+        try: self.configuration.pop(key)
+        except KeyError: pass
+
+    def delConfigValueMatch(self, key):
+        login = self._db.escape(self.login)
+
+        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE login = %s AND name LIKE %s"
+                       % (login, self._db.escape(key)))
+
+        for k in self.configuration.keys():
+            if k.find(key) != -1:
+                self.configuration.pop(key)
+    
+    def getConfigValue(self, key):
+        return self.configuration[key]
+    
+    def setConfigValue(self, key, value):
+        k = self._db.escape(key)
+        login = self._db.escape(self.login)
+        
+        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE login = %s AND name = %s" % (login, k))
+        if not type(value) is list:
+            self._db.query("INSERT INTO Prewikka_User_Configuration (login, name, value) VALUES (%s,%s,%s)" %
+                           (login, k, self._db.escape(str(value))))
+        else:
+            for v in value:
+                self._db.query("INSERT INTO Prewikka_User_Configuration (login, name, value) VALUES (%s,%s,%s)" %
+                           (login, k, self._db.escape(v)))
+
+        self.configuration[key] = value
+        
     def has(self, perm):
         if type(perm) in (list, tuple):
             return filter(lambda p: self.has(p), perm) == perm

@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS Prewikka_Version;
 CREATE TABLE Prewikka_Version (
 	version VARCHAR(255) NOT NULL
 );
-INSERT INTO Prewikka_Version (version) VALUES('0.9.0');
+INSERT INTO Prewikka_Version (version) VALUES('0.9.1');
 
 
 
@@ -61,3 +61,14 @@ CREATE TABLE Prewikka_Filter_Criterion (
 	operator VARCHAR(8) NULL,
 	value VARCHAR(255) NULL
 );
+
+
+
+DROP TABLE IF EXISTS Prewikka_User_Configuration;
+CREATE TABLE Prewikka_User_Configuration (
+	login VARCHAR(32) NOT NULL,
+	name  VARCHAR(255) NOT NULL,
+	value VARCHAR(255) NULL
+);
+
+CREATE INDEX prewikka_user_configuration_index ON Prewikka_User_Configuration (name, login);

@@ -49,26 +49,28 @@ class Parameters(dict):
         self._parameters = { }
         self.register()
         self.optional("_error_back", str)
+        self.optional("_load_save_allowed", str)
         
     def register(self):
         pass
     
     def mandatory(self, name, type):
-        self._parameters[name] = { "type": type, "mandatory": True }
+        self._parameters[name] = { "type": type, "mandatory": True, "save": False }
 
-    def optional(self, name, type, default=None):
-        self._parameters[name] = { "type": type, "mandatory": False, "default": default }
+    def optional(self, name, type, default=None, save=False):
+        self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
-    def normalize(self):
+    def normalize(self, user):        
         for name, value in self.items():
             try:
                 parameter_type = self._parameters[name]["type"]
             except KeyError:
                 if self.allow_extra_parameters:
                     continue
-                else:
-                    raise InvalidParameterError(name)
-        
+                
+                raise InvalidParameterError(name)
+                
+                
             if parameter_type is list and not type(value) is list:
                 value = [ value ]
             
@@ -77,16 +79,39 @@ class Parameters(dict):
             except (ValueError, TypeError):
                 raise InvalidParameterValueError(name, value)
 
+            if self._parameters[name]["save"] and self.has_key("_load_save_allowed"):
+                user.setConfigValue(name, value)
+
             self[name] = value
 
+        # Go through unset parameters.
+        # - Error out on mandatory parameters,
+        # - Load default value for optional parameters that got one.
+        # - Load last user value for parameter.
+
         for name in self._parameters.keys():
-            if not self.has_key(name):
-                if self._parameters[name]["mandatory"]:
-                    raise MissingParameterError(name)
+            if self.has_key(name):
+                continue
+            
+            if self._parameters[name]["mandatory"]:
+                raise MissingParameterError(name)
+                
+            elif self._parameters[name]["default"] != None:
+                self[name] = self._parameters[name]["default"]
 
-                elif self._parameters[name]["default"] != None:
-                    self[name] = self._parameters[name]["default"]
-
+            if self._parameters[name]["save"] and self.has_key("_load_save_allowed"):
+                try:
+                    value = user.getConfigValue(name)
+                    
+                    parameter_type = self._parameters[name]["type"]
+                    if parameter_type is list and not type(value) is list:
+                        value = [ value ]
+                            
+                    self[name] = parameter_type(value)
+                                            
+                except KeyError:
+                    pass
+        
     def __add__(self, src):
         dst = copy(self)
         dst.update(src)

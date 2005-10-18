@@ -55,6 +55,8 @@ class DatabaseInvalidFilterError(_DatabaseInvalidError):
 
 
 class Database:
+    required_version = "0.9.1"
+    
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
         for name, default in (("host", "localhost"),
@@ -75,19 +77,23 @@ class Database:
 
         # check if the database has been created
         try:
-            self.query("SELECT * FROM Prewikka_Version")
+            version = self.query("SELECT * FROM Prewikka_Version")[0][0]
         except PreludeDBError, e:
             print >> sys.stderr, e
             print >> sys.stderr, "The Prewikka database does not seem to have been created."
             sys.exit(1)
-            
+
+        if version != self.required_version:
+            print >> sys.stderr, "Database schema version %s found when %s was required." % (version, self.required_version)
+            sys.exit(1)
+        
     def queries_from_file(self, filename):
         content = open(filename).read()
         for query in content.split(";"):
             query = query.strip()
             if len(query) > 0:
                 self.query(query)
-        
+
     def query(self, query):
         try:
             _table = preludedb_sql_query(self._sql, query)
@@ -151,12 +157,29 @@ class Database:
                    "WHERE Prewikka_Filter.login = %s AND Prewikka_Filter.id = Prewikka_Filter_Criterion.id" % login)
         self.query("DELETE FROM Prewikka_Filter WHERE login = %s" % login)
         self.transaction_end()
+        
+    def getConfiguration(self, login):
+    
+        login = self.escape(login)
+        rows = self.query("SELECT name, value FROM Prewikka_User_Configuration WHERE login = %s" % login)
 
+        config = { }
+        for name, value in rows:
+            if not config.has_key(name):
+                config[name] = value
+            else:
+                if type(config[name]) is str:
+                    config[name] = [ config[name] ]
+                    
+                config[name] = config[name] + [ value ]
+
+        return config
+    
     def getUserLogins(self):
         return map(lambda r: r[0], self.query("SELECT login FROM Prewikka_User"))
-
+        
     def getUser(self, login):
-        return User.User(login, self.getPermissions(login))
+        return User.User(self, login, self.getPermissions(login), self.getConfiguration(login))
 
     def setPassword(self, login, password):
         self.query("UPDATE Prewikka_User SET password=%s WHERE login = %s" % (self.escape(password), self.escape(login)))
@@ -180,9 +203,6 @@ class Database:
 
     def getPermissions(self, login):
         return map(lambda r: r[0], self.query("SELECT permission FROM Prewikka_Permission WHERE login = %s" % self.escape(login)))
-
-    def getUser(self, login):
-        return User.User(login, self.getPermissions(login))
 
     def createSession(self, sessionid, login, time):
         self.query("INSERT INTO Prewikka_Session VALUES(%s,%s,%s)" %

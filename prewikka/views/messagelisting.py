@@ -85,21 +85,21 @@ class _MyTime:
 
 class MessageListingParameters(view.Parameters):
     def register(self):
-        self.optional("timeline_value", int, default=1)
-        self.optional("timeline_unit", str, default="hour")
+        self.optional("timeline_value", int, default=1, save=True)
+        self.optional("timeline_unit", str, default="hour", save=True)
         self.optional("timeline_end", int)
         self.optional("timeline_start", int)
         self.optional("offset", int, default=0)
-        self.optional("limit", int, default=50)
-        self.optional("timezone", str, "frontend_localtime")
+        self.optional("limit", int, default=50, save=True)
+        self.optional("timezone", str, "frontend_localtime", save=True)
         self.optional("delete", list, [ ])
         # submit with an image passes the x and y coordinate values
         # where the image was clicked
         self.optional("x", int)
         self.optional("y", int)
         
-    def normalize(self):
-        view.Parameters.normalize(self)
+    def normalize(self, user):
+        view.Parameters.normalize(self, user)
         
         for p1, p2 in [ ("timeline_value", "timeline_unit") ]:
             if self.has_key(p1) ^ self.has_key(p2):
@@ -123,28 +123,67 @@ class AlertListingParameters(MessageListingParameters):
     def register(self):
         self.max_index = 0
         MessageListingParameters.register(self)
-        self.optional("aggregated_source", list, [ ])
-        self.optional("aggregated_target", list, [ ])
-        self.optional("aggregated_classification", list, [ ])
-        self.optional("filter", str)
-        self.optional("alert.classification.text", list, [ ])
-        self.optional("alert.assessment.impact.severity", list, [ ])
-        self.optional("alert.assessment.impact.completion", list, [ ])
-        self.optional("alert.assessment.impact.type", list, [ ])
+        self.optional("aggregated_source", list, [ "alert.source(0).node.address(0).address" ], save=True)
+        self.optional("aggregated_target", list, [ "alert.target(0).node.address(0).address" ], save=True)
+        self.optional("aggregated_classification", list, [ "none" ], save=True)
+        self.optional("filter", str, save=True)
+        self.optional("alert.classification.text", list, [ ], save=True)
+        self.optional("alert.assessment.impact.severity", list, [ ], save=True)
+        self.optional("alert.assessment.impact.completion", list, [ ], save=True)
+        self.optional("alert.assessment.impact.type", list, [ ], save=True)
+
+    def _loadColumnParam(self, user, paramlist, column):
+        ret = False
+        sorted = [ ]
         
-    def normalize(self):
-        #
-        # Default to aggregated source/target
-        if not self.has_key("aggregated_source"):
-            self["aggregated_source"] = [ "alert.source(0).node.address(0).address" ]
+        for parameter, object in paramlist.items():
+            idx = parameter.find(column + "_object_")
+            if idx == -1:
+                continue
             
-        if not self.has_key("aggregated_target"):
-            self["aggregated_target"] = [ "alert.target(0).node.address(0).address" ]
+            num = int(parameter.replace(column + "_object_", "", 1))
+            if num >= self.max_index:
+                self.max_index = num + 1
 
-        if not self.has_key("aggregated_classification"):
-            self["aggregated_classification"] = [ "none" ]
+            ret = True
+            
+            try:
+                value = paramlist["%s_value_%s" % (column, num)]
+            except KeyError:
+                continue
+                
+            do_append = True
+            for tmp in sorted:
+                if tmp[1] == object and tmp[2] == value:
+                    do_append = False
+                    break
 
-        MessageListingParameters.normalize(self)
+            if do_append:
+                sorted.append((num, object, value))
+
+        sorted.sort()
+        self[column] = [ (i[1], i[2]) for i in sorted ]
+
+
+        if self.parameters.has_key("_load_save_allowed"):
+            user.delConfigValueMatch("%s_object_%%" % (column))
+            user.delConfigValueMatch("%s_value_%%" % (column))
+
+            for num, obj, value in sorted:
+                user.setConfigValue("%s_object_%d" % (column, num), obj)
+                user.setConfigValue("%s_value_%d" % (column, num), value)
+
+        return ret
+    
+    def normalize(self, user):        
+        if len(self) == 0 or self.has_key("_load_save_allowed"):
+            self["_load_save_allowed"] = True
+
+            filter_set = self.has_key("filter")
+            if not filter_set and self.has_key("timeline_value"):
+                user.delConfigValue("filter")
+        
+        MessageListingParameters.normalize(self, user)
 
         for severity in self["alert.assessment.impact.severity"]:
             if not severity in ("info", "low", "medium", "high", "none"):
@@ -157,45 +196,28 @@ class AlertListingParameters(MessageListingParameters):
         for type in self["alert.assessment.impact.type"]:
             if not type in ("other", "admin", "dos", "file", "recon", "user"):
                 raise view.InvalidParameterValueError("alert.assessment.impact.type", type)
-        
+
+        load_saved = True
         for column in "classification", "source", "target", "analyzer":
-            sorted = [ ]
-            for parameter, object in self.items():
-                idx = parameter.find(column + "_object_")
-                if idx == -1:
-                    continue
-                
-                num = int(parameter.replace(column + "_object_", "", 1))
-                if num >= self.max_index:
-                    self.max_index = num + 1
-
-                try:
-                    value = self["%s_value_%s" % (column, num)]
-                except KeyError:
-                    continue
-                
-                do_append = True
-                for tmp in sorted:
-                    if tmp[1] == object and tmp[2] == value:
-                        do_append = False
-                        break
-
-                if do_append:
-                    sorted.append((num, object, value))
-                
-            sorted.sort()
-            self[column] = [ (i[1], i[2]) for i in sorted ]
-                                         
+            ret = self._loadColumnParam(user, self, column)
+            if ret:
+                load_saved = False
+        
+        if load_saved and self.parameters.has_key("_load_save_allowed"):
+            for column in "classification", "source", "target", "analyzer":
+                self._loadColumnParam(user, user.configuration, column)
             
         for category in "classification", "source", "target":
             i = 0
             for path in self["aggregated_%s" % category]:
+                
+                if self["aggregated_%s" % category].count(path) > 1:
+                    self["aggregated_%s" % category].remove(path)
+                    
                 if path[0] == "!":
                     self["aggregated_%s" % category][i] = path[1:]
-                    
-                i += 1
                 
-
+                i += 1
 
 class HeartbeatListingParameters(MessageListingParameters):
     def register(self):
@@ -212,8 +234,8 @@ class SensorAlertListingParameters(AlertListingParameters):
         AlertListingParameters.register(self)
         self.mandatory("analyzerid", long)
 
-    def normalize(self):
-        AlertListingParameters.normalize(self)
+    def normalize(self, user):
+        AlertListingParameters.normalize(self, user)
         self["analyzer"].insert(0, ("alert.analyzer.analyzerid", str(self["analyzerid"])))
 
 
@@ -513,7 +535,10 @@ class MessageListing:
         self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
         if self.parameters.has_key("timeline_end"):
             self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
-    
+
+        if self.parameters.has_key("_load_save_allowed"):
+            self.dataset["hidden_parameters"].append(("_load_save_allowed", ""))
+            
     def _setTimelineNext(self, next):
         parameters = self.parameters - [ "offset" ] + { "timeline_end": int(next) }
         self.dataset["timeline.next"] = utils.create_link(self.view_name, parameters)
@@ -522,7 +547,7 @@ class MessageListing:
         parameters = self.parameters - [ "offset" ] + { "timeline_end": int(prev) }
         self.dataset["timeline.prev"] = utils.create_link(self.view_name, parameters)
         
-    def _getTimelineRange(self):  
+    def _getTimelineRange(self):
         if self.parameters.has_key("timeline_start"):  
             start = _MyTime(self.parameters["timeline_start"])  
             end = start[self.parameters["timeline_unit"]] + self.parameters["timeline_value"]  
@@ -534,7 +559,7 @@ class MessageListing:
             if not self.parameters["timeline_unit"] in ("min", "hour"):  
                 end.round(self.parameters["timeline_unit"])  
             start = end[self.parameters["timeline_unit"]] - self.parameters["timeline_value"]  
-                    
+
         return start, end
         
     def _setTimeline(self, start, end):
@@ -1012,8 +1037,8 @@ class AlertListing(MessageListing, view.View):
             
     def render(self):
         self._deleteMessages()
-        
         self._setDatasetConstants()
+        
         self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
         self.dataset["current_filter"] = self.parameters.get("filter", "")
         

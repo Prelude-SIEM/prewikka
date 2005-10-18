@@ -234,7 +234,7 @@ class Core:
         parameters = view["parameters"](request.arguments) - [ "view" ]
 
         try:
-            parameters.normalize()
+            parameters.normalize(user)
         except ParameterError, e:
                 self._env.log(Log.EVENT_INVALID_PARAMETERS, request, view, details=str(e))
                 raise InvalidQueryError(request.getQueryString())
