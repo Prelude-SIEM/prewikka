@@ -165,7 +165,7 @@ class AlertListingParameters(MessageListingParameters):
         self[column] = [ (i[1], i[2]) for i in sorted ]
 
 
-        if self.parameters.has_key("_load_save_allowed"):
+        if self.has_key("_load_save_allowed"):
             user.delConfigValueMatch("%s_object_%%" % (column))
             user.delConfigValueMatch("%s_value_%%" % (column))
 
@@ -203,7 +203,7 @@ class AlertListingParameters(MessageListingParameters):
             if ret:
                 load_saved = False
         
-        if load_saved and self.parameters.has_key("_load_save_allowed"):
+        if load_saved and self.has_key("_load_save_allowed"):
             for column in "classification", "source", "target", "analyzer":
                 self._loadColumnParam(user, user.configuration, column)
             
