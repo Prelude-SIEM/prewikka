@@ -537,7 +537,7 @@ class MessageListing:
             self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
 
         if self.parameters.has_key("_load_save_allowed"):
-            self.dataset["hidden_parameters"].append(("_load_save_allowed", ""))
+            self.dataset["hidden_parameters"].append(("_load_save_allowed", "True"))
             
     def _setTimelineNext(self, next):
         parameters = self.parameters - [ "offset" ] + { "timeline_end": int(next) }
