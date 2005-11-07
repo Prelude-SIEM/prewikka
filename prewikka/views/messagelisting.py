@@ -262,7 +262,7 @@ class ListedMessage(dict):
         else:
             extra = { object: value }
 
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters - ["_load_save_allowed"] + extra) }
 
     def createTimeField(self, t, timezone=None):
         if t:
@@ -952,7 +952,8 @@ class AlertListing(MessageListing, view.View):
                         infos["display"] = utils.create_link(self.view_name,
                                                              self.parameters - [ "offset",
                                                                                  "aggregated_classification",
-                                                                                 "aggregated_source", "aggregated_target" ] +
+                                                                                 "aggregated_source", "aggregated_target",
+                                                                                 "_load_save_allowed" ] +
                                                              parameters + entry_param)
                 
 
