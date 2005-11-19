@@ -369,6 +369,10 @@ function ${name}_add_entry(object, value, num) {
 #block message_fields
 
 <td>
+  #if $message.correlation_alert_name
+    <b>Correlation Alert:</b><i>$message.correlation_alert_name</i><br/>
+  #end if
+
   #if $message.aggregated and $message.aggregated_classifications_hidden > 0
     <b>($message.aggregated_classifications_hidden/$message.aggregated_classifications_total alerts not shown...
     <a href="$message.aggregated_classifications_hidden_expand">expand</a>)</b>

@@ -497,6 +497,12 @@ class ListedAlert(ListedMessage):
 	    self["analyzer_time"] = { "value": None }
 
     def setMessageCommon(self, message):
+
+        if message["alert.correlation_alert.name"]:
+            self["correlation_alert_name"] = message["alert.correlation_alert.name"]
+        else:
+            self["correlation_alert_name"] = False
+            
         self.setMessageSource(message)
         self.setMessageTarget(message)
 
