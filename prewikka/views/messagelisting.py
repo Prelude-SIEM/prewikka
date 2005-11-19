@@ -69,7 +69,27 @@ class _MyTime:
         t = time.localtime(self._t)
         t = list(t)
         t[self._index] += value
-        t = time.mktime(t)
+
+        try:
+            t = time.mktime(t)
+            
+        # Implementation specific: mktime might trigger an OverflowError
+        # or a ValueError exception if the year member is out of range.
+        # If this happen, we adjust the setting to a year known to work.
+
+        except (OverflowError, ValueError):
+            if t[0] >= 2038:
+                # 2 ^ 31 - 1
+                t = time.mktime(time.gmtime(2147483647))
+
+            elif t[0] <= 1970:
+                # Some implementation will fail with negative integer, we thus
+                # set the minimum value to be the Epoch.  
+                t = time.mktime(time.gmtime(0)) 
+
+            else:
+                raise OverflowError
+        
         return _MyTime(t)
 
     def __sub__(self, value):
