@@ -856,7 +856,6 @@ p {
 .fieldset_heading hr { color: #999999; background: #999999; border: 0; height: 1px; }
 
 #fieldset_page { 
-	/* display: table-cell; */
 	max-width: 700px; 
 	width:expression(document.body.clientWidth > 540 ? "540px": "auto" );
 }  
@@ -865,4 +864,10 @@ p {
 
 .not_available {
         background-color: #e0e0e0;
+}
+
+
+.filter_enabled_marker {
+       font-weight: bold;
+       color: red;
 }
