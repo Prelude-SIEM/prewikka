@@ -81,7 +81,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
     def _processStatic(self):
         filename = os.path.abspath(siteconfig.htdocs_dir + "/" + urllib.unquote(self.path[len("prewikka/"):]))
         if filename.find(os.path.abspath(siteconfig.htdocs_dir)) != 0:
-            self.send_error(403, filename)
+            self.send_error(403, "Request Forbidden")
             return
         
         # the following piece of code is from tracd of the trac project
@@ -89,7 +89,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         try:
             f = open(filename, 'r')
         except IOError:
-            self.send_error(404, filename)
+            self.send_error(404, "File not found")
             return
         
         self.send_response(200)
