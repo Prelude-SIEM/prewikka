@@ -31,8 +31,8 @@ class AlertFilterEditionParameters(view.Parameters):
         self.optional("formula", str, default="")
         self.optional("save_as", str)
         
-    def normalize(self, user):
-        view.Parameters.normalize(self, user)
+    def normalize(self, view_name, user):
+        view.Parameters.normalize(self, view_name, user)
         
         self["elements"] = [ ]
         for parameter in self.keys():

@@ -161,17 +161,20 @@ class Database:
     def getConfiguration(self, login):
     
         login = self.escape(login)
-        rows = self.query("SELECT name, value FROM Prewikka_User_Configuration WHERE login = %s" % login)
-
+        rows = self.query("SELECT view, name, value FROM Prewikka_User_Configuration WHERE login = %s" % login)
+        
         config = { }
-        for name, value in rows:
-            if not config.has_key(name):
-                config[name] = value
+        for view, name, value in rows:
+            if not config.has_key(view):
+                config[view] = { }
+                
+            if not config[view].has_key(name):
+                config[view][name] = value
             else:
-                if type(config[name]) is str:
-                    config[name] = [ config[name] ]
+                if type(config[view][name]) is str:
+                    config[view][name] = [ config[view][name] ]
                     
-                config[name] = config[name] + [ value ]
+                config[view][name] = config[view][name] + [ value ]
 
         return config
     

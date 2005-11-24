@@ -61,7 +61,7 @@ class Parameters(dict):
     def optional(self, name, type, default=None, save=False):
         self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
-    def normalize(self, user):                
+    def normalize(self, view, user):                
         for name, value in self.items():
             try:
                 parameter_type = self._parameters[name]["type"]
@@ -81,7 +81,7 @@ class Parameters(dict):
                 raise InvalidParameterValueError(name, value)
             
             if self._parameters[name]["save"] and self.has_key("_save"):
-                user.setConfigValue(name, value)
+                user.setConfigValue(view, name, value)
 
             self[name] = value
 
@@ -102,7 +102,7 @@ class Parameters(dict):
 
             if self._parameters[name]["save"] and self.has_key("_load"):
                 try:
-                    value = user.getConfigValue(name)
+                    value = user.getConfigValue(view, name)
                     
                     parameter_type = self._parameters[name]["type"]
                     if parameter_type is list and not type(value) is list:

@@ -120,8 +120,11 @@ class MessageListingParameters(view.Parameters):
         self.optional("x", int)
         self.optional("y", int)
         
-    def normalize(self, user):
-        view.Parameters.normalize(self, user)
+    def normalize(self, view_name, user):
+        if len(self) == 0 or self.has_key("_load"):
+            self["_load"] = True
+            
+        view.Parameters.normalize(self, view_name, user)
         
         for p1, p2 in [ ("timeline_value", "timeline_unit") ]:
             if self.has_key(p1) ^ self.has_key(p2):
@@ -154,15 +157,15 @@ class AlertListingParameters(MessageListingParameters):
         self.optional("alert.assessment.impact.completion", list, [ ], save=True)
         self.optional("alert.assessment.impact.type", list, [ ], save=True)
 
-    def _loadColumnParam(self, user, paramlist, column):
+    def _loadColumnParam(self, view_name, user, paramlist, column):
         ret = False
         sorted = [ ]
-        
+
         for parameter, object in paramlist.items():
             idx = parameter.find(column + "_object_")
             if idx == -1:
                 continue
-            
+
             num = int(parameter.replace(column + "_object_", "", 1))
             if num >= self.max_index:
                 self.max_index = num + 1
@@ -173,7 +176,7 @@ class AlertListingParameters(MessageListingParameters):
                 value = paramlist["%s_value_%s" % (column, num)]
             except KeyError:
                 continue
-                
+
             do_append = True
             for tmp in sorted:
                 if tmp[1] == object and tmp[2] == value:
@@ -188,24 +191,24 @@ class AlertListingParameters(MessageListingParameters):
 
 
         if self.has_key("_save"):
-            user.delConfigValueMatch("%s_object_%%" % (column))
-            user.delConfigValueMatch("%s_value_%%" % (column))
+            user.delConfigValueMatch(view_name, "%s_object_%%" % (column))
+            user.delConfigValueMatch(view_name, "%s_value_%%" % (column))
 
             for num, obj, value in sorted:
-                user.setConfigValue("%s_object_%d" % (column, num), obj)
-                user.setConfigValue("%s_value_%d" % (column, num), value)
+                user.setConfigValue(view_name, "%s_object_%d" % (column, num), obj)
+                user.setConfigValue(view_name, "%s_value_%d" % (column, num), value)
 
         return ret
     
-    def normalize(self, user):
+    def normalize(self, view_name, user):
         if len(self) == 0 or self.has_key("_load"):
             self["_load"] = True
-
+            
             filter_set = self.has_key("filter")
             if not filter_set and self.has_key("timeline_value"):
-                user.delConfigValue("filter")
+                user.delConfigValue(view_name, "filter")
         
-        MessageListingParameters.normalize(self, user)
+        MessageListingParameters.normalize(self, view_name, user)
 
         for severity in self["alert.assessment.impact.severity"]:
             if not severity in ("info", "low", "medium", "high", "none"):
@@ -221,13 +224,13 @@ class AlertListingParameters(MessageListingParameters):
 
         load_saved = True
         for column in "classification", "source", "target", "analyzer":
-            ret = self._loadColumnParam(user, self, column)
+            ret = self._loadColumnParam(view_name, user, self, column)
             if ret:
                 load_saved = False
         
         if load_saved and self.has_key("_load"):
             for column in "classification", "source", "target", "analyzer":
-                self._loadColumnParam(user, user.configuration, column)
+                self._loadColumnParam(view_name, user, user.configuration[view_name], column)
             
         for category in "classification", "source", "target":
             i = 0
@@ -257,7 +260,7 @@ class SensorAlertListingParameters(AlertListingParameters):
         self.mandatory("analyzerid", long)
 
     def normalize(self, user):
-        AlertListingParameters.normalize(self, user)
+        AlertListingParameters.normalize(self, view, user)
         self["analyzer"].insert(0, ("alert.analyzer.analyzerid", str(self["analyzerid"])))
 
 

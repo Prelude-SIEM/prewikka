@@ -49,42 +49,46 @@ class User:
         self.permissions = permissions
         self.configuration = configuration    
         
-    def delConfigValue(self, key):
+    def delConfigValue(self, view, key):
         login = self._db.escape(self.login)
+        
+        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s AND name = %s" %
+                       (self._db.escape(view), login, self._db.escape(key)))
 
-        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE login = %s AND name = %s" %
-                       (login, self._db.escape(key)))
-
-        try: self.configuration.pop(key)
+        try: self.configuration[view].pop(key)
         except KeyError: pass
 
-    def delConfigValueMatch(self, key):
+    def delConfigValueMatch(self, view, key):
         login = self._db.escape(self.login)
+        
+        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s AND name LIKE %s"
+                       % (self._db.escape(view), login, self._db.escape(key)))
 
-        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE login = %s AND name LIKE %s"
-                       % (login, self._db.escape(key)))
-
-        for k in self.configuration.keys():
+        for k in self.configuration[view].keys():
             if k.find(key) != -1:
                 self.configuration.pop(key)
     
-    def getConfigValue(self, key):
-        return self.configuration[key]
+    def getConfigValue(self, view, key):
+        return self.configuration[view][key]
     
-    def setConfigValue(self, key, value):
+    def setConfigValue(self, view, key, value):
         k = self._db.escape(key)
+        v = self._db.escape(view)
         login = self._db.escape(self.login)
         
-        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE login = %s AND name = %s" % (login, k))
+        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s AND name = %s" % (v, login, k))
         if not type(value) is list:
-            self._db.query("INSERT INTO Prewikka_User_Configuration (login, name, value) VALUES (%s,%s,%s)" %
-                           (login, k, self._db.escape(str(value))))
+            self._db.query("INSERT INTO Prewikka_User_Configuration (view, login, name, value) VALUES (%s,%s,%s,%s)" %
+                           (v, login, k, self._db.escape(str(value))))
         else:
-            for v in value:
-                self._db.query("INSERT INTO Prewikka_User_Configuration (login, name, value) VALUES (%s,%s,%s)" %
-                           (login, k, self._db.escape(v)))
+            for val in value:
+                self._db.query("INSERT INTO Prewikka_User_Configuration (view, login, name, value) VALUES (%s, %s,%s,%s)" %
+                           (v, login, k, self._db.escape(val)))
 
-        self.configuration[key] = value
+        if not self.configuration.has_key(view):
+            self.configuration[view] = { }
+        
+        self.configuration[view][key] = value
         
     def has(self, perm):
         if type(perm) in (list, tuple):
