@@ -49,7 +49,8 @@ class Parameters(dict):
         self._parameters = { }
         self.register()
         self.optional("_error_back", str)
-        self.optional("_load_save_allowed", str)
+        self.optional("_save", str)
+        self.optional("_load", str)
         
     def register(self):
         pass
@@ -60,7 +61,7 @@ class Parameters(dict):
     def optional(self, name, type, default=None, save=False):
         self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
-    def normalize(self, user):        
+    def normalize(self, user):                
         for name, value in self.items():
             try:
                 parameter_type = self._parameters[name]["type"]
@@ -78,8 +79,8 @@ class Parameters(dict):
                 value = parameter_type(value)
             except (ValueError, TypeError):
                 raise InvalidParameterValueError(name, value)
-
-            if self._parameters[name]["save"] and self.has_key("_load_save_allowed"):
+            
+            if self._parameters[name]["save"] and self.has_key("_save"):
                 user.setConfigValue(name, value)
 
             self[name] = value
@@ -99,7 +100,7 @@ class Parameters(dict):
             elif self._parameters[name]["default"] != None:
                 self[name] = self._parameters[name]["default"]
 
-            if self._parameters[name]["save"] and self.has_key("_load_save_allowed"):
+            if self._parameters[name]["save"] and self.has_key("_load"):
                 try:
                     value = user.getConfigValue(name)
                     

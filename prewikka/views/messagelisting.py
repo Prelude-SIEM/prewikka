@@ -185,7 +185,7 @@ class AlertListingParameters(MessageListingParameters):
         self[column] = [ (i[1], i[2]) for i in sorted ]
 
 
-        if self.has_key("_load_save_allowed"):
+        if self.has_key("_save"):
             user.delConfigValueMatch("%s_object_%%" % (column))
             user.delConfigValueMatch("%s_value_%%" % (column))
 
@@ -195,9 +195,9 @@ class AlertListingParameters(MessageListingParameters):
 
         return ret
     
-    def normalize(self, user):        
-        if len(self) == 0 or self.has_key("_load_save_allowed"):
-            self["_load_save_allowed"] = True
+    def normalize(self, user):
+        if len(self) == 0 or self.has_key("_load"):
+            self["_load"] = True
 
             filter_set = self.has_key("filter")
             if not filter_set and self.has_key("timeline_value"):
@@ -223,7 +223,7 @@ class AlertListingParameters(MessageListingParameters):
             if ret:
                 load_saved = False
         
-        if load_saved and self.has_key("_load_save_allowed"):
+        if load_saved and self.has_key("_load"):
             for column in "classification", "source", "target", "analyzer":
                 self._loadColumnParam(user, user.configuration, column)
             
@@ -282,7 +282,7 @@ class ListedMessage(dict):
         else:
             extra = { object: value }
 
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters - ["_load_save_allowed"] + extra) }
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
 
     def createTimeField(self, t, timezone=None):
         if t:
@@ -562,9 +562,9 @@ class MessageListing:
         if self.parameters.has_key("timeline_end"):
             self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
 
-        if self.parameters.has_key("_load_save_allowed"):
-            self.dataset["hidden_parameters"].append(("_load_save_allowed", "True"))
-            
+        if self.parameters.has_key("_load"):
+            self.dataset["hidden_parameters"].append(("_load", "True"))
+
     def _setTimelineNext(self, next):
         parameters = self.parameters - [ "offset" ] + { "timeline_end": int(next) }
         self.dataset["timeline.next"] = utils.create_link(self.view_name, parameters)
@@ -978,8 +978,7 @@ class AlertListing(MessageListing, view.View):
                         infos["display"] = utils.create_link(self.view_name,
                                                              self.parameters - [ "offset",
                                                                                  "aggregated_classification",
-                                                                                 "aggregated_source", "aggregated_target",
-                                                                                 "_load_save_allowed" ] +
+                                                                                 "aggregated_source", "aggregated_target", "_load" ] +
                                                              parameters + entry_param)
                 
 

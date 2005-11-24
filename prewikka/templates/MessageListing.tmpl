@@ -69,7 +69,7 @@ $message_listing_header
     <input name="timeline_value" type="text" size="2" value="$timeline.value"/>
    </td>
 
-   <td id="timeline_unit">
+   <td colspan=2 id="timeline_unit">
     <select name="timeline_unit">
      <option value="min" $timeline.min_selected>Minutes</option>
      <option value="hour" $timeline.hour_selected>Hours</option>
@@ -82,7 +82,7 @@ $message_listing_header
 
   <tr>
     <td id="timezone_control_label">Tz:</td>
-    <td colspan="2">
+    <td colspan="3">
       <select class="timezone_control_select" name="timezone">
         <option value="frontend_localtime" $timeline.frontend_localtime_selected>Frontend localtime</option>
 	<option value="sensor_localtime" $timeline.sensor_localtime_selected>Sensor localtime</option>
@@ -92,22 +92,27 @@ $message_listing_header
   </tr>
 	
   <tr>
-   <td id="timeline_limit_label">Limit: </td>
+   <td id="timeline_limit_label">Limit:</td>
+
    <td>
-    <input id="timeline_limit_value" type="text" size="2" name="limit" value="$limit"/>
+    <input style="display: inline;" id="timeline_limit_value" type="text" size="2" name="limit" value="$limit"/>
    </td>
 
    <td id="timeline_submit">
-    <input type="submit" value="apply" />
+ 	<input style="display:inline;" type="submit" name="apply" value="Apply" />
+   </td>
+
+   <td id="timeline_submit">
+      <input style="display:inline;" type="submit" name="_save" value="Save" />
    </td>
   </tr>
 
- <tr><td colspan="3" class="timeline_range">$timeline.start</td></tr>
- <tr><td colspan="3" class="timeline_range">$timeline.end</td></tr>
- <tr><td colspan="3" class="timeline_range">$timeline.range_timezone</td></tr>
+ <tr><td colspan="4" class="timeline_range">$timeline.start</td></tr>
+ <tr><td colspan="4" class="timeline_range">$timeline.end</td></tr>
+ <tr><td colspan="4" class="timeline_range">$timeline.range_timezone</td></tr>
 
  <tr>
-  <td colspan="3" style="text-align: center;">
+  <td colspan="4" style="text-align: center;">
    <table><tr>
     <td class="timeline_control_prev"><a href="$timeline.prev"><b>prev</b></a></td>
     <td class="timeline_control_cur"><a href="$timeline.current"><b>current</b></a></td>
