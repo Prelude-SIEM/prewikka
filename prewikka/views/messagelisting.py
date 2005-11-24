@@ -228,7 +228,7 @@ class AlertListingParameters(MessageListingParameters):
             if ret:
                 load_saved = False
         
-        if load_saved and self.has_key("_load"):
+        if load_saved and self.has_key("_load") and user.configuration.has_key(view_name):
             for column in "classification", "source", "target", "analyzer":
                 self._loadColumnParam(view_name, user, user.configuration[view_name], column)
             
