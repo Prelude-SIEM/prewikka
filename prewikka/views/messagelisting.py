@@ -113,6 +113,8 @@ class MessageListingParameters(view.Parameters):
         self.optional("limit", int, default=50, save=True)
         self.optional("timezone", str, "frontend_localtime", save=True)
         self.optional("delete", list, [ ])
+        self.optional("apply", str)
+        
         # submit with an image passes the x and y coordinate values
         # where the image was clicked
         self.optional("x", int)
@@ -282,7 +284,7 @@ class ListedMessage(dict):
         else:
             extra = { object: value }
 
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters - ["_load"] + extra) }
 
     def createTimeField(self, t, timezone=None):
         if t:
