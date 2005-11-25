@@ -44,8 +44,8 @@ class UserSettingsModifyParameters(UserSettingsParameters):
         self.optional("password_new", str)
         self.optional("password_new_confirmation", str)
 
-    def normalize(self, user):
-        view.Parameters.normalize(self, user)
+    def normalize(self, view_name, user):
+        view.Parameters.normalize(self, view_name, user)
 
 
 class UserDeleteParameters(view.Parameters):
