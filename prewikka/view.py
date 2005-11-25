@@ -62,6 +62,10 @@ class Parameters(dict):
         self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
     def normalize(self, view, user):                
+        if len(self) == 0:
+            # Load settings from database
+            self["_load"] = True
+            
         for name, value in self.items():
             try:
                 parameter_type = self._parameters[name]["type"]
