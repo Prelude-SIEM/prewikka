@@ -141,18 +141,18 @@ def usage():
 
 
 if __name__ == "__main__":
-	addr, port = "0.0.0.0", 8000
+    addr, port = "0.0.0.0", 8000
 
-	opts, args = getopt.getopt(sys.argv[1:], "ha:p:", ["help", "address=", "port="])
-	for opt, arg in opts:
-            if opt in ("-h", "--help"):
-                usage()
+    opts, args = getopt.getopt(sys.argv[1:], "ha:p:", ["help", "address=", "port="])
+    for opt, arg in opts:
+        if opt in ("-h", "--help"):
+            usage()
 
-            elif opt in ("-a", "--address"):
-                addr = arg
+        elif opt in ("-a", "--address"):
+            addr = arg
 		
-            elif opt in ("-p", "--port"):
-                port = int(arg)
+        elif opt in ("-p", "--port"):
+            port = int(arg)
 
-	server = PrewikkaServer((addr, port), PrewikkaRequestHandler)
-	server.serve_forever()
+    server = PrewikkaServer((addr, port), PrewikkaRequestHandler)
+    server.serve_forever()
