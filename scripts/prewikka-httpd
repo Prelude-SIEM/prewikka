@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Copyright (C) 2004,2005 PreludeIDS Technologies. All Rights Reserved.
 # Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
