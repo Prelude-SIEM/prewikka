@@ -135,7 +135,7 @@ def usage():
     print
     print "Options:"
     print "-p --port [port]\tPort number to use (default: 8000)"
-    print "-h --address [address]\tIP to bind to (default: 0.0.0.0)"
+    print "-a --address [address]\tIP to bind to (default: 0.0.0.0)"
     print
     sys.exit(1)
 
