@@ -1,3 +1,30 @@
+* 2005-11-30, prewikka-0.9.1:
+
+	- Resolve the protocol number from the message summary view. 
+
+	- Separate port and protocol value, so that we don't end up 
+	  linking the protocol to portdb if there is no port.
+
+	- Ability to setup IDMEF filter using iana_protocol_name and iana_protocol_number.
+
+	- Sanitize timeline years value on system which does not support time
+	  exceeding 2^31-1. Fix #104.
+
+	- Mark CorrelationAlert explicitly in the AlertListing. 
+
+	- Make inline filter mark more visible. 
+
+	- Ability for the user to save settings for the current view.
+
+	- New --address and --port option to prewikka-httpd.
+
+	- Fix a bug where clicking the IP address popup would cause
+	  Firefox to go back to the top of the page. Fix #112.
+
+	- Don't hardcode path to /usr/bin/python, but resort to 
+	  /usr/bin/env to find it.
+
+
 * 2005-09-20, prewikka-0.9.0:
 
 	- 0.9.0 final.
