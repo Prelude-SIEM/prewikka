@@ -85,7 +85,8 @@ function aggregated_${category}_add_entry(path) {
 #end for
 
 #for $name, $objects in (
-			  ("classification", (("text", "alert.classification.text"), )
+			  ("classification", (("text", "alert.classification.text"), 
+					      ("messageid", "alert.messageid"))
                           ),
 
                           ("analyzer", (("name", "alert.analyzer.name"), 
@@ -370,7 +371,7 @@ function ${name}_add_entry(object, value, num) {
 
 <td>
   #if $message.correlation_alert_name
-    <b>Correlation Alert:</b><i>$message.correlation_alert_name</i><br/>
+    <b>Correlation Alert:</b> <i>$message.correlation_alert_name</i><br/>
   #end if
 
   #if $message.aggregated and $message.aggregated_classifications_hidden > 0
