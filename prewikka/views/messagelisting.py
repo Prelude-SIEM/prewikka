@@ -980,13 +980,32 @@ class AlertListing(MessageListing, view.View):
                         entry_param["aggregated_source"] = \
                         entry_param["aggregated_classification"] = "none"
                         
-                        infos["display"] = utils.create_link(self.view_name,
-                                                             self.parameters - [ "offset",
-                                                                                 "aggregated_classification",
-                                                                                 "aggregated_source", "aggregated_target", "_load" ] +
-                                                             parameters + entry_param)
-                
+                        if not idmef["alert.correlation_alert.name"]:
+                            infos["display"] = utils.create_link(self.view_name, self.parameters -
+                                                                 [ "offset", "aggregated_classification",
+                                                                   "aggregated_source", "aggregated_target", "_load" ] +
+                                                                 parameters + entry_param)
+                        else:
+                            i = 0
+                            ca_params = { }
+                            for alertident in idmef["alert.correlation_alert.alertident"]:
+                                # IDMEF draft 14 page 27
+                                # If the "analyzerid" is not provided, the alert is assumed to have come
+                                # from the same analyzer that is sending the CorrelationAlert.
+                                
+                                analyzerid = alertident["analyzerid"]
+                                if not analyzerid:
+                                    analyzerid = idmef["alert.analyzer(-1).analyzerid"]
 
+                                ca_params["analyzer_object_%d" % i] = "alert.analyzer(-1).analyzerid"
+                                ca_params["analyzer_value_%d" % i] = analyzerid
+
+                                ca_params["classification_object_%d" % i] = "alert.messageid"
+                                ca_params["classification_value_%d" % i] = alertident["alertident"]
+                                i += 1
+
+                            infos["display"] = utils.create_link(self.view_name, ca_params)
+                        
         return total_results
     
 
