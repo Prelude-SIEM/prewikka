@@ -481,7 +481,6 @@ class ListedAlert(ListedMessage):
         self["infos"] = [ { } ]
 
         dataset = self["infos"][0]
-        dataset["correlated_alert_display"] = None
 
         if message["alert.correlation_alert"]:
             i = 0
@@ -531,7 +530,8 @@ class ListedAlert(ListedMessage):
 	    self["analyzer_time"] = { "value": None }
 
     def setMessageCommon(self, message):
-
+        self["correlated_alert_display"] = None
+        
         if message["alert.correlation_alert.name"]:
             self["correlation_alert_name"] = message["alert.correlation_alert.name"]
         else:
