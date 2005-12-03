@@ -287,7 +287,7 @@ class ListedMessage(dict):
         else:
             extra = { object: value }
 
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters - ["_load" - "_save"] + extra) }
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters - ["_load", "_save"] + extra) }
 
     def createTimeField(self, t, timezone=None):
         if t:
