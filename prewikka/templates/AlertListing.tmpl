@@ -379,6 +379,7 @@ function ${name}_add_entry(object, value, num) {
     <a href="$message.aggregated_classifications_hidden_expand">expand</a>)</b>
     <br/>
   #end if
+
   #for $info in $message.infos
     #if $message.aggregated and (len($message.infos) > 1 or $info.count > 1)
       $info.count x
@@ -393,6 +394,16 @@ function ${name}_add_entry(object, value, num) {
     #if $info.completion.value
       (<span class="impact_completion_$info.completion.value">$info.completion.value</span>)
     #end if
+
+    #if $message.correlated_alert_display
+      #set plural = ""
+      #if $message.correlated_alert_number > 1:
+          #set plural = "s"
+      #end if
+
+      <b>(<a href="$message.correlated_alert_display">$message.correlated_alert_number</a> alert$plural)</b>
+    #end if
+
       <br/>$info.classification_references
   #end for
 </td>

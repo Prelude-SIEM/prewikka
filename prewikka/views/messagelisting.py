@@ -287,7 +287,7 @@ class ListedMessage(dict):
         else:
             extra = { object: value }
 
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters - ["_load"] + extra) }
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters - ["_load" - "_save"] + extra) }
 
     def createTimeField(self, t, timezone=None):
         if t:
@@ -479,7 +479,36 @@ class ListedAlert(ListedMessage):
                                                                    message["alert.classification.text"])
     def setMessageInfo(self, message, ident):
         self["infos"] = [ { } ]
+
         dataset = self["infos"][0]
+        dataset["correlated_alert_display"] = None
+
+        if message["alert.correlation_alert"]:
+            i = 0
+            ca_params = { }
+            for alertident in message["alert.correlation_alert.alertident"]:
+                # IDMEF draft 14 page 27
+                # If the "analyzerid" is not provided, the alert is assumed to have come
+                # from the same analyzer that is sending the CorrelationAlert.
+                
+                analyzerid = alertident["analyzerid"]
+                if not analyzerid:
+                    analyzerid = message["alert.analyzer(-1).analyzerid"]
+                    
+                ca_params["analyzer_object_%d" % i] = "alert.analyzer(-1).analyzerid"
+                ca_params["analyzer_value_%d" % i] = analyzerid
+
+                ca_params["classification_object_%d" % i] = "alert.messageid"
+                ca_params["classification_value_%d" % i] = alertident["alertident"]
+                i += 1
+
+            ca_params["timeline_unit"] = "year"
+            self["correlated_alert_number"] = i
+            self["correlated_alert_display"] = utils.create_link(self.view_name,
+                                                                 self.parameters -
+                                                                 [ "timeline_unit", "timeline_value", "_load", "_save",
+                                                                   "alert.assessment.impact.severity",
+                                                                   "alert.assessment.impact.completion" ] + ca_params)
 
         dataset["count"] = 1
         dataset["display"] = self.createMessageLink(ident, "alert_summary")
@@ -939,7 +968,7 @@ class AlertListing(MessageListing, view.View):
                         result_count += 1
                         continue
                     result_count += 1
-                    
+
                     message["aggregated_classifications_hidden"] -= count
                     infos = message.setInfos(count, classification, severity, completion)
                     
@@ -961,7 +990,6 @@ class AlertListing(MessageListing, view.View):
                                     criteria3.append("! %s" % path)
 
                         ident = self.env.idmef_db.getAlertIdents(criteria3, limit=1)[0]
-
                         infos["display"] = message.createMessageLink(ident, "alert_summary")
                     else:
                         entry_param = {}
@@ -980,31 +1008,10 @@ class AlertListing(MessageListing, view.View):
                         entry_param["aggregated_source"] = \
                         entry_param["aggregated_classification"] = "none"
                         
-                        if not idmef["alert.correlation_alert.name"]:
-                            infos["display"] = utils.create_link(self.view_name, self.parameters -
-                                                                 [ "offset", "aggregated_classification",
-                                                                   "aggregated_source", "aggregated_target", "_load" ] +
-                                                                 parameters + entry_param)
-                        else:
-                            i = 0
-                            ca_params = { }
-                            for alertident in idmef["alert.correlation_alert.alertident"]:
-                                # IDMEF draft 14 page 27
-                                # If the "analyzerid" is not provided, the alert is assumed to have come
-                                # from the same analyzer that is sending the CorrelationAlert.
-                                
-                                analyzerid = alertident["analyzerid"]
-                                if not analyzerid:
-                                    analyzerid = idmef["alert.analyzer(-1).analyzerid"]
-
-                                ca_params["analyzer_object_%d" % i] = "alert.analyzer(-1).analyzerid"
-                                ca_params["analyzer_value_%d" % i] = analyzerid
-
-                                ca_params["classification_object_%d" % i] = "alert.messageid"
-                                ca_params["classification_value_%d" % i] = alertident["alertident"]
-                                i += 1
-
-                            infos["display"] = utils.create_link(self.view_name, ca_params)
+                        infos["display"] = utils.create_link(self.view_name, self.parameters -
+                                                             [ "offset", "aggregated_classification",
+                                                               "aggregated_source", "aggregated_target", "_load", "_save" ] +
+                                                             parameters + entry_param)
                         
         return total_results
     
