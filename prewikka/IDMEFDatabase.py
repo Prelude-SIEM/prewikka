@@ -311,11 +311,14 @@ class IDMEFDatabase:
 
     def getValues(self, selection, criteria=None, distinct=0, limit=-1, offset=-1):
         if type(criteria) is list:
-            criteria = " && ".join(criteria)
-        
+            if len(criteria) == 0:
+                criteria = None
+            else:
+                criteria = " && ".join(criteria)
+                            
         if criteria:
             criteria = idmef_criteria_new_from_string(criteria)
-
+            
         my_selection = preludedb_path_selection_new()
         for selected in selection:
             my_selected = preludedb_selected_path_new_string(selected)

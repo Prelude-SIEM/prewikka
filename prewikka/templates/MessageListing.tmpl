@@ -70,12 +70,13 @@ $message_listing_header
    </td>
 
    <td colspan=2 id="timeline_unit">
-    <select name="timeline_unit">
+    <select class="timeline_unit_select" name="timeline_unit">
      <option value="min" $timeline.min_selected>Minutes</option>
      <option value="hour" $timeline.hour_selected>Hours</option>
      <option value="day" $timeline.day_selected>Days</option>
      <option value="month" $timeline.month_selected>Months</option>
      <option value="year" $timeline.year_selected>Years</option>
+     <option value="unlimited" $timeline.unlimited_selected>Unlimited</option>
     </select>
    </td>
   </tr>
@@ -107,19 +108,40 @@ $message_listing_header
    </td>
   </tr>
 
+#if not $timeline.start
+ <tr><td colspan="4" class="timeline_range">Unlimited</td></tr>
+ <tr><td colspan="4" class="timeline_range">-</td></tr>
+#else
  <tr><td colspan="4" class="timeline_range">$timeline.start</td></tr>
  <tr><td colspan="4" class="timeline_range">$timeline.end</td></tr>
+#end if
  <tr><td colspan="4" class="timeline_range">$timeline.range_timezone</td></tr>
 
  <tr>
   <td colspan="4" style="text-align: center;">
    <table><tr>
-    <td class="timeline_control_prev"><a href="$timeline.prev"><b>prev</b></a></td>
-    <td class="timeline_control_cur"><a href="$timeline.current"><b>current</b></a></td>
-    <td class="timeline_control_next"><a href="$timeline.next"><b>next</b></a></td>
+    #if $timeline.prev
+     <td class="timeline_control_prev"><a href="$timeline.prev"><b>prev</b></a></td>
+    #else
+     <td class="timeline_control_inactive"><b>prev</b></td>
+    #end if
+
+    #if $timeline.current
+     <td class="timeline_control_cur"><a href="$timeline.current"><b>current</b></a></td>
+    #else
+     <td class="timeline_control_cur_inactive"><b>current</b></td>
+    #end if
+
+    #if $timeline.next
+     <td class="timeline_control_next"><a href="$timeline.next"><b>next</b></a></td>
+    #else 
+     <td class="timeline_control_inactive"><b>next</b></td>
+    #end if
+
    </tr></table>
   </td>
  </tr>
+
  </table>
 
 

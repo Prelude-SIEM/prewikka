@@ -351,6 +351,20 @@ p {
 	text-align: center;
 }
 
+.timeline_control_inactive, .timeline_control_cur_inactive {
+	background: #d6d6d6;
+        width: 53px;
+        height: 20px;
+	color: black;
+	border: 1px solid black;
+	padding: 0px;
+	text-align: center;
+}
+
+.timeline_control_cur_inactive {
+        width: 54px;
+}
+
 .timeline_control_cur {
         width: 54px;
 }
@@ -369,6 +383,11 @@ p {
 .filter_control_select, .timezone_control_select {
 	width: 107px;
 	max-width: 107px;
+}
+
+.timeline_unit_select {
+	width: 74px;
+	max-width: 74px;
 }
 
 .timeline_range {

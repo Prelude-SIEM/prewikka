@@ -501,7 +501,7 @@ class ListedAlert(ListedMessage):
                 ca_params["classification_value_%d" % i] = alertident["alertident"]
                 i += 1
 
-            ca_params["timeline_unit"] = "year"
+            ca_params["timeline_unit"] = "unlimited"
             self["correlated_alert_number"] = i
             self["correlated_alert_display"] = utils.create_link(self.view_name,
                                                                  self.parameters -
@@ -623,22 +623,25 @@ class MessageListing:
         return start, end
         
     def _setTimeline(self, start, end):
-        for unit in "min", "hour", "day", "month", "year":
+        for unit in "min", "hour", "day", "month", "year", "unlimited":
             self.dataset["timeline.%s_selected" % unit] = ""
-        
-        self.dataset["timeline.current"] = utils.create_link(self.view_name, self.parameters - ["timeline_end"])
 
         self.dataset["timeline.value"] = self.parameters["timeline_value"]
         self.dataset["timeline.%s_selected" % self.parameters["timeline_unit"]] = "selected='selected'"
 
         if self.parameters["timezone"] == "utc":
-            self.dataset["timeline.start"] = utils.time_to_ymdhms(time.gmtime(int(start)))
-            self.dataset["timeline.end"] = utils.time_to_ymdhms(time.gmtime(int(end)))
+            func = time.gmtime
             self.dataset["timeline.range_timezone"] = "UTC"
         else:
-            self.dataset["timeline.start"] = utils.time_to_ymdhms(time.localtime(int(start)))
-            self.dataset["timeline.end"] = utils.time_to_ymdhms(time.localtime(int(end)))
+            func = time.localtime
             self.dataset["timeline.range_timezone"] = "%+.2d:%.2d" % utils.get_gmt_offset()
+
+        if not start and not end:
+            return
+        
+        self.dataset["timeline.start"] = utils.time_to_ymdhms(func(int(start)))
+        self.dataset["timeline.end"] = utils.time_to_ymdhms(func(int(end)))
+        self.dataset["timeline.current"] = utils.create_link(self.view_name, self.parameters - ["timeline_end"])        
 
         if not self.parameters.has_key("timeline_end") and self.parameters["timeline_unit"] in ("min", "hour"):
             tmp = copy.copy(end)
@@ -996,7 +999,7 @@ class AlertListing(MessageListing, view.View):
                         
                         if classification:
                             entry_param["classification_object_%d" % self.parameters.max_index] = "alert.classification.text"
-                            entry_param["classification_value_%d" % self.parameters.max_index] = classification
+                            entry_param["classification_value_%d" % self.parameters.max_index] = utils.escape_criteria(classification)
 
                         if severity:
                             entry_param["alert.assessment.impact.severity"] = severity
@@ -1105,12 +1108,12 @@ class AlertListing(MessageListing, view.View):
             filter = self.env.db.getAlertFilter(self.user.login, self.parameters["filter"])
             criteria.append("(%s)" % str(filter))
 
+        start = end = None
+        if self.parameters.has_key("timeline_unit") and self.parameters["timeline_unit"] != "unlimited":
+            start, end = self._getTimelineRange()
+            criteria.append("alert.create_time >= '%s' && alert.create_time < '%s'" % (str(start), str(end)))
+        
         self._applyFilters(criteria)
-        
-        start, end = self._getTimelineRange()
-        
-        criteria.append("alert.create_time >= '%s' && alert.create_time < '%s'" % (str(start), str(end)))
-
         self._adjustCriteria(criteria)
 
         self._setTimeline(start, end)
