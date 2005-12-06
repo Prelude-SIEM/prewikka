@@ -494,7 +494,7 @@ class ListedAlert(ListedMessage):
                 if not analyzerid:
                     analyzerid = message["alert.analyzer(-1).analyzerid"]
                     
-                ca_params["analyzer_object_%d" % i] = "alert.analyzer(-1).analyzerid"
+                ca_params["analyzer_object_%d" % i] = "alert.analyzer.analyzerid"
                 ca_params["analyzer_value_%d" % i] = analyzerid
 
                 ca_params["classification_object_%d" % i] = "alert.messageid"
