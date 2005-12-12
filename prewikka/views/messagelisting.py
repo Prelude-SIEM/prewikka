@@ -1188,10 +1188,12 @@ class HeartbeatListing(MessageListing, view.View):
 
     def render(self):
         self._deleteMessages()
-
-        start, end = self._getTimelineRange()
+        criteria = [ ]
+        start = end = None
         
-        criteria = [ "heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'" % (str(start), str(end)) ]
+        if self.parameters.has_key("timeline_unit") and self.parameters["timeline_unit"] != "unlimited":
+            start, end = self._getTimelineRange()
+            criteria.append("heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'" % (str(start), str(end)))
         self._applyInlineFilters(criteria)
         self._adjustCriteria(criteria)
 

@@ -251,8 +251,11 @@ class IDMEFDatabase:
 
     def _getMessageIdents(self, get_message_idents, criteria, limit, offset):
         if type(criteria) is list:
-            criteria = " && ".join(criteria)
-        
+            if len(criteria) == 0:
+                criteria = None
+            else:
+                criteria = " && ".join(criteria)
+                
         if criteria:
             criteria = idmef_criteria_new_from_string(criteria)
 
