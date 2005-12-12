@@ -124,6 +124,11 @@ class MessageListingParameters(view.Parameters):
         if len(self) == 0 or self.has_key("_load"):
             self["_load"] = True
             
+            filter_set = self.has_key("filter")
+            if not filter_set and self.has_key("timeline_value"):
+                user.delConfigValue(view_name, "filter")
+        
+
         view.Parameters.normalize(self, view_name, user)
         
         for p1, p2 in [ ("timeline_value", "timeline_unit") ]:
@@ -201,13 +206,6 @@ class AlertListingParameters(MessageListingParameters):
         return ret
     
     def normalize(self, view_name, user):
-        if len(self) == 0 or self.has_key("_load"):
-            self["_load"] = True
-            
-            filter_set = self.has_key("filter")
-            if not filter_set and self.has_key("timeline_value"):
-                user.delConfigValue(view_name, "filter")
-        
         MessageListingParameters.normalize(self, view_name, user)
 
         for severity in self["alert.assessment.impact.severity"]:
