@@ -59,7 +59,8 @@ class Database:
     
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
-        for name, default in (("host", "localhost"),
+        for name, default in (("file", None),
+                              ("host", "localhost"),
                               ("port", None),
                               ("name", "prewikka"),
                               ("user", "prewikka"),
