@@ -129,7 +129,7 @@ class MessageListingParameters(view.Parameters):
                 user.delConfigValue(view_name, "filter")
 
         # Filter out invalid limit which would trigger an exception.
-        if int(self["limit"]) <= 0:
+        if self.has_key("limit") and int(self["limit"]) <= 0:
             self.pop("limit")
             
         view.Parameters.normalize(self, view_name, user)
