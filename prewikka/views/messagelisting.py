@@ -127,8 +127,11 @@ class MessageListingParameters(view.Parameters):
             filter_set = self.has_key("filter")
             if not filter_set and self.has_key("timeline_value"):
                 user.delConfigValue(view_name, "filter")
-        
 
+        # Filter out invalid limit which would trigger an exception.
+        if int(self["limit"]) <= 0:
+            self.pop("limit")
+            
         view.Parameters.normalize(self, view_name, user)
         
         for p1, p2 in [ ("timeline_value", "timeline_unit") ]:
