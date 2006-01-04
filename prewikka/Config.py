@@ -22,7 +22,10 @@ from prewikka import MyConfigParser, siteconfig
 
 
 class Config:
-    def __init__(self, filename=siteconfig.conf_dir + "/prewikka.conf"):
+    def __init__(self, filename=None):
+        if not filename:
+            filename=siteconfig.conf_dir + "/prewikka.conf"
+            
         self.general = MyConfigParser.ConfigParserSection("general")
         self.interface = MyConfigParser.ConfigParserSection("interface")
         self.command = MyConfigParser.ConfigParserSection("command")
