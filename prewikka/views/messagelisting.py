@@ -455,7 +455,7 @@ class ListedAlert(ListedMessage):
             url = ref["url"]
             if url:
                 external_link_new_window = self.env.config.general.getOptionValue("external_link_new_window", "true")
-                if self.env.config.general.has_key("external_link_new_window") and \
+                if (not external_link_new_window and self.env.config.general.has_key("external_link_new_window")) or \
                    (external_link_new_window == None or external_link_new_window.lower() in [ "true", "yes" ]):
                     target = "_blank"
                 else:
