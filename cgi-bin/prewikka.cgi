@@ -25,7 +25,7 @@ import sys, os
 import copy
 import cgi
 
-from prewikka import Core, Request, Error, siteconfig
+from prewikka import Core, Request, Error
 
 
 class CGIRequest(Request.Request):

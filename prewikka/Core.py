@@ -90,6 +90,9 @@ else:
 def get_core_from_config(path, threaded=False):    
     global _core_cache
 
+    if not path:
+        path = siteconfig.conf_dir + "/prewikka.conf"
+
     if _has_threads and threaded:
         _core_cache_lock.acquire()
     

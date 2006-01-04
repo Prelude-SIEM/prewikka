@@ -18,8 +18,8 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
+from prewikka import Core, Request
 from mod_python import apache, util, Cookie
-from prewikka import Core, Request, siteconfig
 
 
 class ModPythonRequest(Request.Request):
