@@ -25,7 +25,7 @@ import sys, os
 import copy
 import cgi
 
-from prewikka import Core, Request, Error, Config
+from prewikka import Core, Request, Error, siteconfig
 
 
 class CGIRequest(Request.Request):
@@ -74,10 +74,8 @@ class CGIRequest(Request.Request):
         return os.environ.get("HTTP_REFERER", "").strip()
 
 
-
 request = CGIRequest()
 request.init()
 
-config = Config.Config()
-core = Core.Core(config)
+core = Core.get_core_from_config(os.environ.get("PREWIKKA_CONFIG", None), threaded=False)
 core.process(request)

@@ -37,8 +37,8 @@ from prewikka import Core, Request, siteconfig
 
 
 class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
-    def __init__(self, *args, **kwargs):
-        self.core = Core.Core()
+    def __init__(self, config, *args, **kwargs):
+        self.core = Core.get_core_from_config(config, threaded=True)
         apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
         
 
@@ -134,6 +134,7 @@ def usage():
     print "Usage: %s [options]" % sys.argv[0]
     print
     print "Options:"
+    print "-c --config [config]\tConfiguration file to use (default: %s/prewikka.conf)" % siteconfig.conf_dir
     print "-p --port [port]\tPort number to use (default: 8000)"
     print "-a --address [address]\tIP to bind to (default: 0.0.0.0)"
     print
@@ -141,9 +142,10 @@ def usage():
 
 
 if __name__ == "__main__":
+    config = None
     addr, port = "0.0.0.0", 8000
-
-    opts, args = getopt.getopt(sys.argv[1:], "ha:p:", ["help", "address=", "port="])
+    
+    opts, args = getopt.getopt(sys.argv[1:], "hc:a:p:", ["help", "config=", "address=", "port="])
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()
@@ -154,5 +156,8 @@ if __name__ == "__main__":
         elif opt in ("-p", "--port"):
             port = int(arg)
 
-    server = PrewikkaServer((addr, port), PrewikkaRequestHandler)
+        elif opt in ("-c", "--config"):
+            config = arg
+
+    server = PrewikkaServer(config, (addr, port), PrewikkaRequestHandler)
     server.serve_forever()

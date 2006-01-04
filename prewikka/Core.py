@@ -76,12 +76,38 @@ def load_template(name, dataset):
     return template
 
 
+_core_cache = { }
+
+try:
+    import threading
+except ImportError:
+    _has_threads = False
+else:
+    _has_threads = True
+    _core_cache_lock = threading.Lock()
+
+
+def get_core_from_config(path, threaded=False):    
+    global _core_cache
+
+    if _has_threads and threaded:
+        _core_cache_lock.acquire()
+    
+    if not _core_cache.has_key(path):
+        _core_cache[path] = Core(path)
+
+    if _has_threads and threaded:
+        _core_cache_lock.release()
+    
+    return _core_cache[path]
+
+
 
 class Core:
     def __init__(self, config=None):
         class Env: pass
         self._env = Env()
-        self._env.config = config or Config.Config()
+        self._env.config = Config.Config(config)
         preludedb.preludedb_init()
         self._initDatabase()
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)

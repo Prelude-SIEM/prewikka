@@ -18,8 +18,8 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import Core, Request
 from mod_python import apache, util, Cookie
+from prewikka import Core, Request, siteconfig
 
 
 class ModPythonRequest(Request.Request):
@@ -57,16 +57,19 @@ class ModPythonRequest(Request.Request):
     def getClientAddr(self):
         return self._req.get_remote_host(apache.REMOTE_NOLOOKUP)
 
-
-core = Core.Core()
-
 	
 def handler(req):
-    global core
-
+    options = req.get_options()
     request = ModPythonRequest()
-    request.init(req)
+
+    if "PrewikkaConfig" in options:
+        config = options["PrewikkaConfig"]
+    else:
+        config = None
+
+    core = Core.get_core_from_config(config, threaded=True)
     
+    request.init(req)
     req.content_type = 'text/html'
     req.send_http_header()
 
