@@ -29,5 +29,7 @@ class CleanOutput(Cheetah.Filters.Filter):
     def filter(self, val, **kw):        
         if val:
             val = utils.escape_html_string(val)
-
+        else:
+            val = ""
+            
         return val
