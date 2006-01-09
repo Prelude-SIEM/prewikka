@@ -58,7 +58,7 @@ def init_dataset(dataset, config, request):
     dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
     dataset["prewikka.url.referer"] = cgi.parse_qs(urllib.splitquery(request.getReferer())[1] or "")
     dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
-    dataset["prewikka.query_string"] = request.getQueryString()
+    dataset["prewikka.query_string"] = utils.urlencode(request.arguments)
 
     qstring = request.getQueryString()
     if qstring[0:2] == "/?":
@@ -298,7 +298,7 @@ class Core:
             view = self._getView(request, user)
             self._checkPermissions(request, view, user)
             parameters = self._getParameters(request, view, user)
-            
+
             self._setupView(view, request, parameters, user)
 
             self._env.log(Log.EVENT_RENDER_VIEW, request, view, user)
