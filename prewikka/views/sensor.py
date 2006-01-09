@@ -158,8 +158,8 @@ class HeartbeatAnalyze(view.View):
     view_template = "HeartbeatAnalyze"
 
     def init(self, env):
-        self._heartbeat_count = env.config.general.getOptionValue("heartbeat_count", 30)
-        self._heartbeat_error_margin = env.config.general.getOptionValue("heartbeat_error_margin", 3)
+        self._heartbeat_count = int(env.config.general.getOptionValue("heartbeat_count", 30))
+        self._heartbeat_error_margin = int(env.config.general.getOptionValue("heartbeat_error_margin", 3))
     
     def render(self):
         analyzerid = self.parameters["analyzerid"]
