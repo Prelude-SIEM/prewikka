@@ -21,10 +21,10 @@ DROP TABLE IF EXISTS Prewikka_Permission;
 
 CREATE TABLE Prewikka_Permission (
 	login VARCHAR(32) NOT NULL,
-	INDEX(login),
 	permission VARCHAR(32) NOT NULL
 );
 
+CREATE INDEX prewikka_permission_index_login ON Prewikka_Permission (login);
 
 
 DROP TABLE IF EXISTS Prewikka_Session;
@@ -32,36 +32,36 @@ DROP TABLE IF EXISTS Prewikka_Session;
 CREATE TABLE Prewikka_Session (
 	sessionid VARCHAR(128) NOT NULL PRIMARY KEY,
 	login VARCHAR(32) NOT NULL,
-	INDEX(login),
 	time DATETIME NOT NULL
 );
 
+CREATE INDEX prewikka_session_index_login ON Prewikka_Session (login);
 
 
 DROP TABLE IF EXISTS Prewikka_Filter;
 
 CREATE TABLE Prewikka_Filter (
-	id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+	id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
 	login VARCHAR(32) NOT NULL,
 	name VARCHAR(64) NOT NULL,
-	UNIQUE INDEX(login, name),
 	comment VARCHAR(255) NULL,
 	formula VARCHAR(255) NOT NULL
 );
 
+CREATE UNIQUE INDEX prewikka_filter_index_login_name ON Prewikka_Filter (login, name);
 
 
 DROP TABLE IF EXISTS Prewikka_Filter_Criterion;
 
 CREATE TABLE Prewikka_Filter_Criterion (
 	id BIGINT UNSIGNED NOT NULL,
-	INDEX(id),
 	name VARCHAR(16) NOT NULL,
 	path VARCHAR(255) NOT NULL,
 	operator VARCHAR(8) NULL,
 	value VARCHAR(255) NULL
 );
 
+CREATE INDEX prewikka_filter_criterion_index_id ON Prewikka_Filter_Criterion (id);
 
 
 DROP TABLE IF EXISTS Prewikka_User_Configuration;
