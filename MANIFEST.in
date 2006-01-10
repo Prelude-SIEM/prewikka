@@ -1,3 +1,4 @@
+include database/*.sh
 include database/*.sql
 include cgi-bin/*.cgi
 include scripts/*

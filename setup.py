@@ -66,10 +66,16 @@ class my_build_py(build_py):
 
 
 class MyDistribution(Distribution):
+    def mysql2sqlite(self):
+        sqlite = open("database/sqlite.sql", "w")            
+        for line in os.popen("database/mysql2sqlite.sh database/mysql.sql"):
+            print >> sqlite, line
+        sqlite.close()
+
     def __init__(self, attrs):
         self.conf_files = [ ]
+        self.mysql2sqlite()
         Distribution.__init__(self, attrs)
-
 
 
 class my_install(install):
@@ -89,7 +95,7 @@ class my_install(install):
             if os.path.exists(dest):
                 dest += "-dist"
             self.copy_file(file, dest)
-            
+
     def init_siteconfig(self):
         config = open("prewikka/siteconfig.py", "w")
         print >> config, "htdocs_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/htdocs"))
@@ -124,7 +130,7 @@ class my_install(install):
 
 
 setup(name="prewikka",
-      version="0.9.2",
+      version="0.9.3",
       maintainer = "Yoann Vandoorselaere",
       maintainer_email = "yoann.v@prelude-ids.com",
       url = "http://www.prelude-ids.org",
@@ -136,7 +142,7 @@ setup(name="prewikka",
                    ("share/prewikka/htdocs/images", glob.glob("htdocs/images/*")),
                    ("share/prewikka/htdocs/css", glob.glob("htdocs/css/*.css")),
                    ("share/prewikka/htdocs/js", glob.glob("htdocs/js/*.js")),
-                   ("share/prewikka/database", glob.glob("database/*.sql")) ],
+                   ("share/prewikka/database", glob.glob("database/*.sql") + glob.glob("database/*.sh") )],
       scripts=[ "scripts/prewikka-httpd" ],
       conf_files=[ "conf/prewikka.conf" ],
       cmdclass={ 'build_py': my_build_py,
