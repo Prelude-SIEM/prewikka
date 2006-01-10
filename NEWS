@@ -1,3 +1,31 @@
+* 2005-01-10, prewikka-0.9.3:
+
+	- Distribute SQLite schema.
+
+	- Fix exception in the heartbeat analysis view when the heartbeat_count
+	  or heartbeat_error_margin settings are explicitly set (#124). 
+
+	- Fix Cheetah 1.0 heartbeat listing exception (#119). 
+
+	- Open external link in new windows by default. Add a configuration option
+	  to disable opening external link in new window (#61).
+
+	- Provide the ability to specify the configuration file that Prewikka 
+	  use (#117).
+
+	- Sanitize the limit parameter in case the input value is not correct
+	  instead of triggering an exception (#118). 
+
+	- Handle the preludeDB "file" setting (for use with SQLite like database). 
+
+	- Fix filter saving issue in the heartbeat listing.
+
+	- Fix unlimited timeline option in heartbeat listing.
+
+	- Various bug fixes.
+
+
+
 * 2005-12-07, prewikka-0.9.2:
 
 	- Correct Analyzer path when unwiding aggregated alert.
