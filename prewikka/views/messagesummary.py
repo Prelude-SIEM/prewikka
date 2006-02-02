@@ -38,7 +38,7 @@ class SubTable:
     def register_func(self, name, field, func, extra, mask=None):
         self.field_list.append((field, name, None, func, extra, mask))
 
-    def register(self, name, field, mask=None)
+    def register(self, name, field, mask=None):
         self.field_list.append((field, name, static, func, extra, mask))
         
     def get_string(self, dataset, style=""):
