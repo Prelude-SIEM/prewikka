@@ -890,3 +890,16 @@ p {
        font-weight: bold;
        color: red;
 }
+
+
+.network_centric {
+        border: 1px solid black;
+}
+
+.network_centric th {
+        border: 1px solid black;
+}
+
+.network_centric td {
+        border: 1px solid black;
+}

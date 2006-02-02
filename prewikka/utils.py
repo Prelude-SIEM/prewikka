@@ -140,8 +140,11 @@ def hexdump(content):
 
     while i < len(decoded):
         chunk = decoded[i:i+16]
-        
-        content += " ".join(map(lambda b: "%02x" % b, chunk)) + " "
+        content += "%.4x:&nbsp;&nbsp;&nbsp;&nbsp;" % i
+        content += " ".join(map(lambda b: "%02x" % b, chunk))
+
+        content += "&nbsp;&nbsp;&nbsp;" * (16 - len(chunk))
+        content += "&nbsp;&nbsp;&nbsp;&nbsp;"
         
         for b in chunk:
             if b >= 32 and b < 127:
@@ -153,4 +156,4 @@ def hexdump(content):
 
         i += 16
 
-    return "<div class=\"fixed\">" + content + "</div>"
+    return "<span class='fixed'>%s</span>" % content

@@ -21,6 +21,57 @@
 from prewikka import view, User, utils
 
 
+def isFlagSet(bits, flag):
+    if bits & flag:
+        return "X"
+    else:
+        return "&nbsp;"
+
+
+class SubTable:
+    def __init__(self):
+        self.field_list = [ ]
+
+    def register_static(self, name, static):
+        self.field_list.append((None, name, static, None, None))
+
+    def register_func(self, name, field, func, extra):
+        self.field_list.append((field, name, None, func, extra))
+
+    def register(self, name, field, static=None, func=None, extra=None):
+        self.field_list.append((field, name, static, func, extra))
+        
+    def get_string(self, dataset, style=""):
+        content = ""
+        hdr_content = ""
+        from_dataset = False
+
+        
+        for field in self.field_list:
+                    
+            if not dataset.has_key(field[0]) and not field[2]:
+                continue
+
+            if field[3]:
+                # use func
+                s = field[3](dataset[field[0]], field[4])
+
+            elif field[2]:
+                s = field[2]
+
+            else:
+                from_dataset = True
+                s = dataset[field[0]]
+
+            content += "<td>%s</td>" % s            
+            hdr_content += "<th>%s</th>" % field[1]
+
+        if not from_dataset:
+            return None
+        
+        return "<table class='%s'><tr>" % style + hdr_content + "</tr><tr>" + content + "</tr></table>"
+        
+
 class MessageParameters(view.RelativeViewParameters):
     def register(self):
         view.RelativeViewParameters.register(self)
@@ -91,26 +142,80 @@ class MessageSummary:
 
             index += 1
 
-    def buildAdditionalData(self, alert):
+    def buildAdditionalData(self, alert, ignore=[], ignored={}):
         self.beginSection("Additional Data")
         
         for ad in alert["additional_data"]:
             value = None
             meaning = ad["meaning"]
-
+            
             if ad["data"] != None:
                 if ad["type"] == "byte-string":
                     value = utils.hexdump(ad.get("data", escape=False))
                 else:
                     value = ad.get("data")
 
-            emphase = (alert["analyzer.model"] == "Prelude LML" and meaning == "Original Log")
-            self.newSectionEntry(meaning or "Data content", value, emphase)
+            for field in ignore:
+                if meaning == field[0]:
+                    ignored[meaning] = value
+                    break
+
+            if not ignored.has_key(meaning):
+                emphase = (alert["analyzer.model"] == "Prelude LML" and meaning == "Original Log")
+                self.newSectionEntry(meaning or "Data content", value, emphase)
         
         self.endSection()
 
+    def buildIpHeaderTable(self, alert):
+        ip = SubTable()
+        ip.register("Version", "ip_ver")
+        ip.register("Header length", "ip_hlen")
+        ip.register("TOS", "ip_tos")
+        ip.register("Length", "ip_len")
+        ip.register("Id", "ip_id")
+        ip.register_func("M<br/>F", "ip_flags", isFlagSet, 0x1000)
+        ip.register_func("D<br/>F", "ip_flags", isFlagSet, 0x2000)
+        ip.register_func("R<br/>F", "ip_flags", isFlagSet, 0x4000)
+        ip.register("Offset", "ip_off")
+        ip.register("TTL", "ip_ttl")
+        ip.register("Protocol", "ip_proto")
+        ip.register("Checksum", "ip_csum")
+        ip.register_static("Source address", alert["source(0).node.address(0).address"])
+        ip.register_static("Target address", alert["target(0).node.address(0).address"])
+        return ip
+        
+    def buildTcpHeaderTable(self, alert):
+        tcp = SubTable()
+        tcp.register_static("Source port", alert["source(0).service.port"])
+        tcp.register_static("Target port", alert["target(0).service.port"])
+        tcp.register("Seq #", "th_seq")
+        tcp.register("Ack #", "th_ack")
+        tcp.register("Header length", "tcp_off")
+        tcp.register_func("U<br/>R<br/>G", "tcp_flags", isFlagSet, 0x20)
+        tcp.register_func("A<br/>C<br/>K", "tcp_flags", isFlagSet, 0x10)
+        tcp.register_func("P<br/>S<br/>H", "tcp_flags", isFlagSet, 0x08)
+        tcp.register_func("R<br/>S<br/>T", "tcp_flags", isFlagSet, 0x04)
+        tcp.register_func("S<br/>Y<br/>N", "tcp_flags", isFlagSet, 0x02)
+        tcp.register_func("F<br/>I<br/>N", "tcp_flags", isFlagSet, 0x01)
+        tcp.register("Window", "tcp_win")
+        tcp.register("Checksum", "tcp_sum")
+        tcp.register("URP", "tcp_urp")
+        return tcp
+    
+    def buildUdpHeaderTable(self, alert):
+        udp = SubTable()
+        udp.register_static("Source port", alert["source(0).service.port"])
+        udp.register_static("Target port", alert["target(0).service.port"])
+        udp.register("Length", "udp_len")
+        udp.register("Checksum", "udp_chk")
+        return udp 
 
+    def buildPayloadTable(self, alert):
+        data = SubTable()
+        data.register("Payload", "payload")
+        return data
 
+    
 class AlertSummary(MessageSummary, view.View):
     view_name = "alert_summary"
     
@@ -321,9 +426,25 @@ class AlertSummary(MessageSummary, view.View):
         self.buildSource(alert)
         self.buildTarget(alert)
         self.buildAnalyzer(alert)
-        self.buildAdditionalData(alert)
 
+        ip = self.buildIpHeaderTable(alert)
+        tcp = self.buildTcpHeaderTable(alert)
+        udp = self.buildUdpHeaderTable(alert)
+        data = self.buildPayloadTable(alert)
+        
+        ignored_value = {}
 
+        group = ip.field_list + tcp.field_list + udp.field_list + data.field_list
+        self.buildAdditionalData(alert, ignore=group, ignored=ignored_value)
+        
+        if len(ignored_value.keys()) > 0:
+            self.beginSection("Network centric information")
+            self.newSectionEntry("IP", ip.get_string(ignored_value, "network_centric"))
+            self.newSectionEntry("TCP", tcp.get_string(ignored_value, "network_centric"))
+            self.newSectionEntry("UDP", udp.get_string(ignored_value, "network_centric"))
+            self.newSectionEntry("Payload", data.get_string(ignored_value, "network_centric"))
+            self.endSection()
+            
 
 class HeartbeatSummary(MessageSummary, view.View):
     view_name = "heartbeat_summary"
