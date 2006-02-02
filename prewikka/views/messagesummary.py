@@ -32,14 +32,14 @@ class SubTable:
     def __init__(self):
         self.field_list = [ ]
 
-    def register_static(self, name, static):
-        self.field_list.append((None, name, static, None, None))
+    def register_static(self, name, static, mask=None):
+        self.field_list.append((None, name, static, None, None, mask))
 
-    def register_func(self, name, field, func, extra):
-        self.field_list.append((field, name, None, func, extra))
+    def register_func(self, name, field, func, extra, mask=None):
+        self.field_list.append((field, name, None, func, extra, mask))
 
-    def register(self, name, field, static=None, func=None, extra=None):
-        self.field_list.append((field, name, static, func, extra))
+    def register(self, name, field, mask=None)
+        self.field_list.append((field, name, static, func, extra, mask))
         
     def get_string(self, dataset, style=""):
         content = ""
@@ -52,16 +52,23 @@ class SubTable:
             if not dataset.has_key(field[0]) and not field[2]:
                 continue
 
+            if field[2]:
+                # static
+                s = field[2]
+                continue
+
+            if field[5]: #mask
+                value = dataset[field[0]] & field[5]
+            else:
+                value = dataset[field[0]]
+
             if field[3]:
                 # use func
-                s = field[3](dataset[field[0]], field[4])
-
-            elif field[2]:
-                s = field[2]
+                s = field[3](value, field[4])
 
             else:
                 from_dataset = True
-                s = dataset[field[0]]
+                s = value
 
             content += "<td>%s</td>" % s            
             hdr_content += "<th>%s</th>" % field[1]
@@ -173,10 +180,10 @@ class MessageSummary:
         ip.register("TOS", "ip_tos")
         ip.register("Length", "ip_len")
         ip.register("Id", "ip_id")
-        ip.register_func("M<br/>F", "ip_flags", isFlagSet, 0x1000)
-        ip.register_func("D<br/>F", "ip_flags", isFlagSet, 0x2000)
-        ip.register_func("R<br/>F", "ip_flags", isFlagSet, 0x4000)
-        ip.register("Offset", "ip_off")
+        ip.register_func("M<br/>F", "ip_flags", isFlagSet, 0x2000, mask=0xe000)
+        ip.register_func("D<br/>F", "ip_flags", isFlagSet, 0x4000, mask=0xe000)
+        ip.register_func("R<br/>F", "ip_flags", isFlagSet, 0x8000, mask=0xe000)
+        ip.register_func("Offset", "ip_off", )
         ip.register("TTL", "ip_ttl")
         ip.register("Protocol", "ip_proto")
         ip.register("Checksum", "ip_csum")
@@ -188,8 +195,8 @@ class MessageSummary:
         tcp = SubTable()
         tcp.register_static("Source port", alert["source(0).service.port"])
         tcp.register_static("Target port", alert["target(0).service.port"])
-        tcp.register("Seq #", "th_seq")
-        tcp.register("Ack #", "th_ack")
+        tcp.register("Seq #", "tcp_seq")
+        tcp.register("Ack #", "tcp_ack")
         tcp.register("Header length", "tcp_off")
         tcp.register_func("U<br/>R<br/>G", "tcp_flags", isFlagSet, 0x20)
         tcp.register_func("A<br/>C<br/>K", "tcp_flags", isFlagSet, 0x10)
@@ -210,6 +217,16 @@ class MessageSummary:
         udp.register("Checksum", "udp_chk")
         return udp 
 
+    def buildIcmpHeaderTable(self, alert):
+        icmp = SubTable()
+        icmp.register("Type", "icmp_type")
+        icmp.register("Code", "icmp_code")
+        icmp.register("Checksum", "icmp_sum")
+        icmp.register("Id", "icmp_id")
+        icmp.register("Seq #", "icmp_seq")
+        
+        return icmp
+    
     def buildPayloadTable(self, alert):
         data = SubTable()
         data.register("Payload", "payload")
@@ -430,11 +447,12 @@ class AlertSummary(MessageSummary, view.View):
         ip = self.buildIpHeaderTable(alert)
         tcp = self.buildTcpHeaderTable(alert)
         udp = self.buildUdpHeaderTable(alert)
+        icmp = self.buildIcmpHeaderTable(alert)
         data = self.buildPayloadTable(alert)
         
         ignored_value = {}
 
-        group = ip.field_list + tcp.field_list + udp.field_list + data.field_list
+        group = ip.field_list + tcp.field_list + udp.field_list + icmp.field_list + data.field_list
         self.buildAdditionalData(alert, ignore=group, ignored=ignored_value)
         
         if len(ignored_value.keys()) > 0:
@@ -442,6 +460,7 @@ class AlertSummary(MessageSummary, view.View):
             self.newSectionEntry("IP", ip.get_string(ignored_value, "network_centric"))
             self.newSectionEntry("TCP", tcp.get_string(ignored_value, "network_centric"))
             self.newSectionEntry("UDP", udp.get_string(ignored_value, "network_centric"))
+            self.newSectionEntry("ICMP", icmp.get_string(ignored_value, "network_centric"))
             self.newSectionEntry("Payload", data.get_string(ignored_value, "network_centric"))
             self.endSection()
             
