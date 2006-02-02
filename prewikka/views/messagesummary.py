@@ -97,13 +97,13 @@ class MessageSummary:
         for ad in alert["additional_data"]:
             value = None
             meaning = ad["meaning"]
-            
-            if ad["data"]:
+
+            if ad["data"] != None:
                 if ad["type"] == "byte-string":
                     value = utils.hexdump(ad.get("data", escape=False))
                 else:
                     value = ad.get("data")
-            
+
             emphase = (alert["analyzer.model"] == "Prelude LML" and meaning == "Original Log")
             self.newSectionEntry(meaning or "Data content", value, emphase)
         
