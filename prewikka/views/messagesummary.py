@@ -212,7 +212,7 @@ class MessageSummary:
         udp.register_static("Source port", alert["source(0).service.port"])
         udp.register_static("Target port", alert["target(0).service.port"])
         udp.register("Length", "udp_len")
-        udp.register("Checksum", "udp_chk")
+        udp.register("Checksum", "udp_sum")
         return udp 
 
     def buildIcmpHeaderTable(self, alert):
