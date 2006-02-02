@@ -39,7 +39,7 @@ class SubTable:
         self.field_list.append((field, name, None, func, extra, mask))
 
     def register(self, name, field, mask=None):
-        self.field_list.append((field, name, static, func, extra, mask))
+        self.field_list.append((field, name, None, None, None, mask))
         
     def get_string(self, dataset, style=""):
         content = ""
@@ -183,7 +183,6 @@ class MessageSummary:
         ip.register_func("M<br/>F", "ip_flags", isFlagSet, 0x2000, mask=0xe000)
         ip.register_func("D<br/>F", "ip_flags", isFlagSet, 0x4000, mask=0xe000)
         ip.register_func("R<br/>F", "ip_flags", isFlagSet, 0x8000, mask=0xe000)
-        ip.register_func("Offset", "ip_off", )
         ip.register("TTL", "ip_ttl")
         ip.register("Protocol", "ip_proto")
         ip.register("Checksum", "ip_csum")
