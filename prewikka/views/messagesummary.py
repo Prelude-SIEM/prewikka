@@ -55,20 +55,19 @@ class SubTable:
             if field[2]:
                 # static
                 s = field[2]
-                continue
-
-            if field[5]: #mask
-                value = dataset[field[0]] & field[5]
             else:
-                value = dataset[field[0]]
+                if field[5]: #mask
+                    value = dataset[field[0]] & field[5]
+                else:
+                    value = dataset[field[0]]
 
-            if field[3]:
-                # use func
-                s = field[3](value, field[4])
+                if field[3]:
+                    # use func
+                    s = field[3](value, field[4])
 
-            else:
-                from_dataset = True
-                s = value
+                else:
+                    from_dataset = True
+                    s = value
 
             content += "<td>%s</td>" % s            
             hdr_content += "<th>%s</th>" % field[1]
