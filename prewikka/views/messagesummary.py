@@ -182,7 +182,7 @@ class MessageSummary:
         #ip.register_func("M<br/>F", "ip_flags", isFlagSet, 0x2000, mask=0xe000)
         #ip.register_func("D<br/>F", "ip_flags", isFlagSet, 0x4000, mask=0xe000)
         #ip.register_func("R<br/>F", "ip_flags", isFlagSet, 0x8000, mask=0xe000)
-        ip.register("Offset", "ip_flags")
+        ip.register("Flags", "ip_flags")
         ip.register("Offset", "ip_off")
         ip.register("TTL", "ip_ttl")
         ip.register("Protocol", "ip_proto")
