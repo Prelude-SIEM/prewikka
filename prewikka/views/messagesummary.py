@@ -196,6 +196,7 @@ class MessageSummary:
         tcp.register("Seq #", "tcp_seq")
         tcp.register("Ack #", "tcp_ack")
         tcp.register("Header length", "tcp_off")
+        tcp.register("Reserved", "tcp_res")
         tcp.register_func("U<br/>R<br/>G", "tcp_flags", isFlagSet, 0x20)
         tcp.register_func("A<br/>C<br/>K", "tcp_flags", isFlagSet, 0x10)
         tcp.register_func("P<br/>S<br/>H", "tcp_flags", isFlagSet, 0x08)
