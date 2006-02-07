@@ -21,25 +21,26 @@
 from prewikka import view, User, utils
 
 
-def isFlagSet(bits, flag):
-    if bits & flag:
+def isFlagSet(bits, flag, shift=0):    
+    if (bits & flag) >> shift:
         return "X"
     else:
         return "&nbsp;"
+
+
+def getWithMask(value, mask):
+    return value & mask
 
 
 class SubTable:
     def __init__(self):
         self.field_list = [ ]
 
-    def register_static(self, name, static, mask=None):
-        self.field_list.append((None, name, static, None, None, mask))
+    def register_static(self, name, static):
+        self.field_list.append((None, name, static, None, None))
 
-    def register_func(self, name, field, func, extra, mask=None):
-        self.field_list.append((field, name, None, func, extra, mask))
-
-    def register(self, name, field, mask=None):
-        self.field_list.append((field, name, None, None, None, mask))
+    def register(self, name, field, func=None, arguments=None):
+        self.field_list.append((field, name, None, func, arguments))
         
     def get_string(self, dataset, style=""):
         content = ""
@@ -56,14 +57,11 @@ class SubTable:
                 # static
                 s = field[2]
             else:
-                if field[5]: #mask
-                    value = dataset[field[0]] & field[5]
-                else:
-                    value = dataset[field[0]]
+                value = dataset[field[0]]
 
                 if field[3]:
                     # use func
-                    s = field[3](value, field[4])
+                    s = field[3](value, *field[4])
 
                 else:
                     from_dataset = True
@@ -165,7 +163,7 @@ class MessageSummary:
                 if meaning == field[0]:
                     ignored[meaning] = value
                     break
-
+                
             if not ignored.has_key(meaning):
                 emphase = (alert["analyzer.model"] == "Prelude LML" and meaning == "Original Log")
                 self.newSectionEntry(meaning or "Data content", value, emphase)
@@ -179,18 +177,17 @@ class MessageSummary:
         ip.register("TOS", "ip_tos")
         ip.register("Length", "ip_len")
         ip.register("Id", "ip_id")
-        #ip.register_func("M<br/>F", "ip_flags", isFlagSet, 0x2000, mask=0xe000)
-        #ip.register_func("D<br/>F", "ip_flags", isFlagSet, 0x4000, mask=0xe000)
-        #ip.register_func("R<br/>F", "ip_flags", isFlagSet, 0x8000, mask=0xe000)
-        ip.register("Flags", "ip_flags")
-        ip.register("Offset", "ip_off")
+        ip.register("R<br/>F", "ip_off", isFlagSet, (0x8000, 15))
+        ip.register("D<br/>F", "ip_off", isFlagSet, (0x4000, 14))
+        ip.register("M<br/>F", "ip_off", isFlagSet, (0x2000, 13))
+        ip.register("Ip offset", "ip_off", getWithMask, (0x1FFF,))
         ip.register("TTL", "ip_ttl")
         ip.register("Protocol", "ip_proto")
         ip.register("Checksum", "ip_csum")
         ip.register_static("Source address", alert["source(0).node.address(0).address"])
         ip.register_static("Target address", alert["target(0).node.address(0).address"])
         return ip
-        
+
     def buildTcpHeaderTable(self, alert):
         tcp = SubTable()
         tcp.register_static("Source port", alert["source(0).service.port"])
@@ -199,12 +196,14 @@ class MessageSummary:
         tcp.register("Ack #", "tcp_ack")
         tcp.register("Header length", "tcp_off")
         tcp.register("Reserved", "tcp_res")
-        tcp.register_func("U<br/>R<br/>G", "tcp_flags", isFlagSet, 0x20)
-        tcp.register_func("A<br/>C<br/>K", "tcp_flags", isFlagSet, 0x10)
-        tcp.register_func("P<br/>S<br/>H", "tcp_flags", isFlagSet, 0x08)
-        tcp.register_func("R<br/>S<br/>T", "tcp_flags", isFlagSet, 0x04)
-        tcp.register_func("S<br/>Y<br/>N", "tcp_flags", isFlagSet, 0x02)
-        tcp.register_func("F<br/>I<br/>N", "tcp_flags", isFlagSet, 0x01)
+        tcp.register("R<br/>1", "tcp_flags", isFlagSet, (0x80,))
+        tcp.register("R<br/>2", "tcp_flags", isFlagSet, (0x40,))
+        tcp.register("U<br/>R<br/>G", "tcp_flags", isFlagSet, (0x20,))
+        tcp.register("A<br/>C<br/>K", "tcp_flags", isFlagSet, (0x10,))
+        tcp.register("P<br/>S<br/>H", "tcp_flags", isFlagSet, (0x08,))
+        tcp.register("R<br/>S<br/>T", "tcp_flags", isFlagSet, (0x04,))
+        tcp.register("S<br/>Y<br/>N", "tcp_flags", isFlagSet, (0x02,))
+        tcp.register("F<br/>I<br/>N", "tcp_flags", isFlagSet, (0x01,))
         tcp.register("Window", "tcp_win")
         tcp.register("Checksum", "tcp_sum")
         tcp.register("URP", "tcp_urp")
