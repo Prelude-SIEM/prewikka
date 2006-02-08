@@ -120,7 +120,7 @@ class Database:
             preludedb_sql_table_destroy(_table)
         
         except PreludeDBError, e:
-            raise PreludeDBError(e.errno, preludedb_sql_get_plugin_error(self._sql))
+            raise PreludeDBError(e.errno)
 
         return table
 
