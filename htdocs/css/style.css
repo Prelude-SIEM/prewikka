@@ -897,9 +897,11 @@ p {
 }
 
 .network_centric th {
-        border: 1px solid black;
+	padding: 3px;
+	border: 1px solid black;
 }
 
 .network_centric td {
-        border: 1px solid black;
+     padding: 3px;
+     border: 1px solid black;
 }
