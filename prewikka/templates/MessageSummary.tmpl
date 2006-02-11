@@ -1,31 +1,86 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
+#set global $section_cnt = 0
+#set global $row_classes = ("table_row_even", "table_row_odd")
+#set global $entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_value_emphasis")
 
-<div id="fieldset_page" style="width: 700px;">
+#def display_table($section, $display, $name, $depth)
 
+ 		#set $table_cnt = 0
+		#for table in $section.tables
+		
+		#if $depth == 0 and $table_cnt > 0 and $table.style.find("inline") == -1:
+		  <br/>
+		#end if
+
+                #if $table.odd_even:
+		<table id="$name" class="$table.class $row_classes[$table_cnt % 2] message_summary" style="$table.style display:$display;">
+		#else
+		<table id="$name" class="$table.class message_summary" style="$table.style display:$display;">
+		#end if
+
+		#set $table_cnt += 1
+#set $row_class=""
+		 #for row in $table.rows
+		  <tr class="$row_class" style="">
+		   #for col in row
+		    #if $col.header
+		     <th>$col.name</th>
+                     #set $row_class="table_row_even"
+		    #elif $col.tables
+		     <td>$display_table($col, "table", $name, $depth + 1)</td>
+                     #set $row_class=""		  
+                    #else
+		     <td class="$col.class">$col.name</td>
+		    #end if
+		   #end for
+		  </tr>
+		 #end for
+		</table>
+		#end for
+#end def
+
+
+#def display_node($sections)
 #for $section in $sections
         <fieldset class="fieldset_heading">
-		<legend>$section.title</legend>
-		
-		<table class="section_alert_entries">
-			#set $row_classes = ("table_row_even", "table_row_odd")
-			#set $entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_value_emphasis")
-			#set $cnt = 0
+		#set name = "section_" + $str($section_cnt) + ".id"
+		<legend><a href="javascript:toggleVisibility('$name', 'table')">$section.title</a></legend>
 
+		$display_table($section, $section.display, $name, 0)
+
+		#if $section.entries
+		<table class="section_alert_entries" id="$name" style="display: $section.display;">
+			
+			#set $cnt = 0
 			#for $entry in $section.entries
 
+                             
 				<tr class="section_alert_entry $row_classes[$cnt % 2]">
-				<th style="text-align: left; width:150px;">$entry.name</th>
-				<td class="$entry_value_classes[$entry.emphase]">$entry.value</td>
+		                #if $entry.name				
+                                 <th style="text-align: left; width:150px;">$entry.name</th>
+                                #end if
+				 <td class="$entry_value_classes[$entry.emphase]">$entry.value</td>
 				</tr>
 
 				#set $cnt += 1
 			#end for
 		</table>
+		#end if
+
+		#set global $section_cnt += 1
+
+		#if $section.sections
+		    $display_node($section.sections)
+		#end if
+
 	</fieldset>
 #end for
+#end def
 
+<div id="fieldset_page">
+$display_node($sections)
 </div>
 
 #end block main_content

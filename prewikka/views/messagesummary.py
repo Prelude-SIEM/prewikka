@@ -17,7 +17,9 @@
 # along with this program; see the file COPYING.  If not, write to
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
+import time
+import struct
+import socket
 from prewikka import view, User, utils
 
 
@@ -27,32 +29,234 @@ def isFlagSet(bits, flag, shift=0):
     else:
         return "&nbsp;"
 
+def decodeOption8(data):
+    return str(struct.unpack(">B", data)[0])
 
-def getWithMask(value, mask):
-    return value & mask
+def decodeOption16(data):
+    return str(struct.unpack(">H", data)[0])
+
+def decodeOption32(data):
+    return str(struct.unpack(">L", data)[0])
+
+def decodeOptionTimestamp(data):
+    x = struct.unpack(">LL", data)
+    return "TS Value (%d)<br/>TS Echo Reply (%d)" % (x[0], x[1])
+
+def decodeOptionSack(data):
+    x = struct.unpack(">" + "L" * (len(data) / 4), data)
+
+    s = ""
+    for i in x:
+        if len(s):
+            s += "<br/>"
+
+        s += str(i)
+
+    return s
 
 
-class SubTable:
+def decodeOptionMd5(data):
+    md = md5.md5(struct.unpack("B" * 16, data)[0])
+    return md.hexdigest()
+
+def decodeOptionPartialOrderProfile(data):
+    x = struct.unpack("B", data)
+    return "Start_Flags=%d End_Flags=%d" % (data & 0x80, data & 0x40)
+
+def decodeOptionTcpAltChecksumRequest(data):
+    x = struct.unpack("B", data)
+    if x == 0:
+        return "TCP checksum"
+
+    elif x == 1:
+        return "8-bit  Fletcher's algorithm"
+
+    elif x == 2:
+        return "16-bit  Fletcher's algorithm"
+
+    else:
+        return "%d (Invalid)" % x
+
+    
+def tcp_option_to_name(opt):
+    h = {}
+    h[0] = ("End of Option List", 0)
+    h[1] = ("No-Option", 0)
+    h[2] = ("Maximum Segment Size", 2, decodeOption16)
+    h[3] = ("Window Scaling", 1, decodeOption8)
+    h[4] = ("Sack Permitted", 0)
+    h[5] = ("Sack", -1, decodeOptionSack)
+    h[6] = ("Echo", 4, decodeOption32)
+    h[7] = ("Echo Reply", 4, decodeOption32)
+    h[8] = ("Timestamp", 8, decodeOptionTimestamp)
+    h[9] = ("Partial Order Permitted", 0)
+    h[10] = ("Partial Order Profile", 1, decodeOptionPartialOrderProfile)
+    h[11] = ("Connection Count", 4, decodeOption32)
+    h[12] = ("Connection Count New", 4, decodeOption32)
+    h[13] = ("Connection Count Echo", 4, decodeOption32)
+    h[14] = ("TCP Alternate Checksum Request", 1, decodeOptionTcpAltChecksumRequest)
+    h[15] = ("TCP Alternate Checksum",)
+    h[16] = ("Skeeter",)
+    h[17] = ("Bubba",)
+    h[18] = ("Trailer Checksum",)
+    h[19] = ("MD5 Signature", 16, decodeOptionMd5)
+    h[20] = ("Capabilities",)
+    h[21] = ("Selective Negative Acknowledgements",)
+    h[22] = ("Record Boundaries",)
+    h[23] = ("Corruption experienced",)
+    h[24] = ("Snap",)
+    h[25] = ("Unassigned",)
+    h[26] = ("TCP Compression Filter",)
+
+    return h.get(opt, ("Unknown",))
+
+
+def ip_option_to_name(opt):
+    h = {}
+    h[0] = ("End of Option List", 0)
+    h[1] = ("No-Option", 0)
+    h[7] = ("RR",)
+    h[20] = ("RTRALT",)
+    h[68] = ("Timestamp",)
+    h[130] = ("Security", )
+    h[131] = ("LSRR", 0)
+    h[132] = ("LSRR_E", 0)
+    h[136] = ("SATID", 0)
+    h[137] = ("SSRR", 0)
+    
+    return h.get(opt, ("Unknown",))
+
+
+class Table:
+    def __init__(self):
+        self._current_table = None
+        self._current_section = None
+
+    def getCurrentSection(self):
+        return self._current_section
+    
+    def beginSection(self, title, display="table"):    
+        _current_section = { }
+        _current_section["title"] = title
+        _current_section["entries"] = [ ]
+        _current_section["tables"] = [ ]
+        _current_section["display"] = display
+        _current_section["sections"] = []
+        _current_section["parent"] = self._current_section
+        
+        self._current_section = _current_section
+            
+    def endSection(self):
+        parent = self._current_section["parent"]
+
+        if len(self._current_section["tables"]) == 0 and \
+           len(self._current_section["sections"]) == 0:
+            self._current_section = parent
+            return
+        
+        if not parent:
+            self.dataset["sections"].append(self._current_section)
+            self._current_section = None
+        else:
+            parent["sections"].append(self._current_section)
+            self._current_section = parent                
+        
+    def newSectionEntry(self, name, value, emphase=False):
+        if value is None or value == "":
+            return
+
+        self._current_section["entries"].append({ "name": name,
+                                                  "value": value,
+                                                  "emphase": emphase })
+
+    def beginTable(self, cl="", style="", odd_even=False):
+        table = {}
+        table["rows"] = []
+        table["odd_even"] = odd_even
+        table["class"] = cl
+        table["style"] = style
+        table["parent"] = self._current_table or self._current_section
+        self._current_table = table
+
+        
+    def endTable(self):
+        parent = self._current_table["parent"]
+        has_data = False
+        
+        if len(self._current_table["rows"]) <= 1 :
+            if not parent or not parent.has_key("rows"):
+                self._current_table = None
+            else:
+                self._current_table = parent
+            return
+                
+        if not parent:
+            self._current_section["tables"].append(self._current_table)
+            self._current_table = None
+        else:
+            if parent.has_key("rows"):                    
+                col = { "name": None, "header": None, "emphase": None, "tables": [ self._current_table ] }
+                if len(parent["rows"]):
+                    parent["rows"][-1] += [col]
+                else:
+                    parent["rows"].append([col])
+                self._current_table = parent
+            else:
+                parent["tables"].append(self._current_table)     
+                self._current_table = None        
+
+    def newTableRow(self):
+        if len(self._current_table["rows"]) and self._current_table["rows"][-1] != []:
+            self._current_table["rows"].append([])
+
+        return len(self._current_table["rows"])
+    
+    def newTableCol(self, row_index, name, cl="", header=False, emphase=None):
+        col = { "name": name, "header": header, "class": cl, "tables": [], "emphase": None }
+
+        if row_index == -1:
+            self._current_table["rows"].append([col])
+           
+        elif len(self._current_table["rows"]) <= row_index:
+            self._current_table["rows"].insert(row_index, [col])
+
+        else:            
+            self._current_table["rows"][row_index] += [col]
+                        
+    def newTableEntry(self, name, value, cl="", emphase=False):        
+        if not value:
+            return
+                    
+        self.newTableCol(0, name, cl=cl, header=True)
+        self.newTableCol(1, value, cl=cl, header=False, emphase=emphase)
+        
+
+
+class HeaderTable(Table):
     def __init__(self):
         self.field_list = [ ]
-
+                
     def register_static(self, name, static):
         self.field_list.append((None, name, static, None, None))
 
-    def register(self, name, field, func=None, arguments=None):
+    def register(self, name, field, func=None, arguments=()):
         self.field_list.append((field, name, None, func, arguments))
-        
-    def get_string(self, dataset, style=""):
-        content = ""
-        hdr_content = ""
-        from_dataset = False
 
+    def render_table(self, section, name, dataset):
+        self._current_section = section._current_section
+        self._current_table = section._current_table
+
+        from_dataset = False
+        self.newTableRow()
+        self.newTableCol(-1, name, header=True)
+        
+        self.beginTable()
         
         for field in self.field_list:
                     
             if not dataset.has_key(field[0]) and not field[2]:
                 continue
-
+                
             if field[2]:
                 # static
                 s = field[2]
@@ -67,15 +271,16 @@ class SubTable:
                     from_dataset = True
                     s = value
 
-            content += "<td>%s</td>" % s            
-            hdr_content += "<th>%s</th>" % field[1]
+            self.newTableEntry(field[1], s)
 
         if not from_dataset:
-            return None
-        
-        return "<table class='%s'><tr>" % style + hdr_content + "</tr><tr>" + content + "</tr></table>"
+            section._current_table["rows"].pop()
+            self._current_table = section._current_table
+        else:
+            self.endTable()
         
 
+        
 class MessageParameters(view.RelativeViewParameters):
     def register(self):
         view.RelativeViewParameters.register(self)
@@ -83,76 +288,160 @@ class MessageParameters(view.RelativeViewParameters):
 
 
 
-class MessageSummary:
+class MessageSummary(Table):
     view_parameters = MessageParameters
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "MessageSummary"
+
+    def getUrlLink(self, url):
+        if not url:
+            return None
+        
+        external_link_new_window = self.env.config.general.getOptionValue("external_link_new_window", "true")
+
+        if (not external_link_new_window and self.env.config.general.has_key("external_link_new_window")) or \
+               (external_link_new_window == None or external_link_new_window.lower() in [ "true", "yes" ]):
+            target = "_blank"
+        else:
+            target = "_self"
+                
+        return "<a target='%s' href='%s'>%s</a>" % (target, url, url)
+                
+    def getTime(self, t):
+        if not t:
+            return None
+
+        s = t.toYMDHMS()
+        if t.usec:
+            s += ".%d" % t.usec
+
+        if t.gmt_offset:
+            s += " %+.2d:00" % (t.gmt_offset / (60 * 60))
+
+        return s
     
-    def beginSection(self, title):
-        self._current_section = { }
-        self._current_section["title"] = title
-        self._current_section["entries"] = [ ]
+    def buildTime(self, msg):
+        self.beginTable()
 
-    def newSectionEntry(self, name, value, emphase=False):
-        if value is None or value == "":
-            return
+        self.newTableEntry("Create time", self.getTime(msg["create_time"]))
 
-        self._current_section["entries"].append({ "name": name,
-                                                  "value": value,
-                                                  "emphase": emphase })
-
-    def endSection(self):
-        if self._current_section["entries"]:
-            self.dataset["sections"].append(self._current_section)
+        try:
+            self.newTableEntry("Detect time", self.getTime(msg["detect_time"]), cl="section_alert_entry_value_emphasis")
+        except:
+            pass
+        
+        if msg["analyzer_time"]:
+            self.newTableEntry("Analyzer time", self.getTime(msg["analyzer_time"]))
+            
+        self.endTable()
 
     def buildProcess(self, process):
-        self.newSectionEntry("Process", process["name"])
-        self.newSectionEntry("Process Path", process["path"])
-        self.newSectionEntry("Process Pid", process["pid"])
-            
-    def buildAnalyzer(self, alert):
-        index = 0
+        self.beginTable()
+        self.newTableEntry("Process", process["name"])
+        self.newTableEntry("Process Path", process["path"])
+        self.newTableEntry("Process Pid", process["pid"])
+        self.endTable()
+
         
-        while alert["analyzer(%d)" % index] :
-            analyzer = alert["analyzer(%d)" % index]
-            
-            self.beginSection("Analyzer")
-            self.newSectionEntry("Analyzerid", analyzer["analyzerid"])
-            self.newSectionEntry("Name", analyzer["name"], emphase=True)
-            self.newSectionEntry("Model", analyzer["model"], emphase=True)
-            self.newSectionEntry("Version", analyzer["version"])
-            self.newSectionEntry("Class", analyzer["class"])
-            self.newSectionEntry("Manufacturer", analyzer["manufacturer"])
-
-            if analyzer["ostype"] or analyzer["osversion"]:
-                self.newSectionEntry("Operating System", "%s %s" %
-                                     (analyzer["ostype"] or "", analyzer["osversion"] or ""))
-                
-            self.newSectionEntry("Node name", analyzer["node.name"])
-            self.newSectionEntry("Node location", analyzer["node.location"])
-
-            i = 0
-            while True:
-                address = alert["analyzer(%d).node.address(%d).address" % (index, i)]
-                if not address:
-                    break
-                self.newSectionEntry("Address", address)
-                i += 1
-
-            if alert["analyzer(%d).process" % index]:
-                self.buildProcess(alert["analyzer(%d).process" % index])
-                
-            self.endSection()
-
-            index += 1
-
-    def buildAdditionalData(self, alert, ignore=[], ignored={}):
-        self.beginSection("Additional Data")
+    def buildNode(self, node):
+        if not node:
+            return
         
+        self.newTableEntry("Node name", node["name"])
+        self.newTableEntry("Node location", node["location"])
+        
+        addr_list = ""
+        for addr in node["address"]:
+            address = addr["address"]
+            if not address:
+                continue
+
+            if len(addr_list) > 0:
+                addr_list += "<br/>"
+                
+            addr_list += address
+                        
+        self.newTableEntry("Node address", addr_list)
+                
+    def buildAnalyzer(self, analyzer):
+        self.beginTable()
+        
+        self.beginTable()
+        self.newTableEntry("Model", analyzer["model"], cl="section_alert_entry_value_emphasis")
+        self.newTableEntry("Name", analyzer["name"], cl="section_alert_entry_value_emphasis")
+        self.newTableEntry("Analyzerid", analyzer["analyzerid"])
+        self.newTableEntry("Version", analyzer["version"])
+        self.newTableEntry("Class", analyzer["class"])
+            
+        self.newTableEntry("Manufacturer", self.getUrlLink(analyzer["manufacturer"]))                
+        self.endTable()
+        self.newTableRow()
+                
+        self.beginTable()
+        
+        self.buildNode(analyzer["node"])
+        if analyzer["ostype"] or analyzer["osversion"]:
+                self.newTableEntry("Operating System", "%s %s" % (analyzer["ostype"] or "", analyzer["osversion"] or ""))
+
+        self.endTable()
+        self.newTableRow()
+        
+        if analyzer["process"]:
+            self.buildProcess(analyzer["process"])
+            self.newTableRow()
+
+        self.endTable()
+        
+    def buildAnalyzerList(self, alert):
+        l = []
+        for analyzer in alert["analyzer"]:
+            l.insert(0, analyzer)
+
+        l.pop(0)
+
+        self.beginSection("Analyzer Path (%d not shown)" % len(l), display="none")
+        
+        self.beginTable()
+        i = 1
+        for analyzer in l:
+            self.newTableCol(i - 1, "Analyzer #%d" % i, None, header=True)
+            self.buildAnalyzer(analyzer)
+            self.newTableRow()
+            i += 1
+
+        self.endTable()
+        self.endSection()
+        
+    def buildAdditionalData(self, alert, ignore=[], ignored={}, ip_options=[], tcp_options=[]):
+        self.beginSection("Additional data")
+        
+        self.beginTable()
+        self.newTableCol(0, "Meaning", header=True)
+        self.newTableCol(0, "Value", header=True)
+        
+        index = 1
         for ad in alert["additional_data"]:
             value = None
             meaning = ad["meaning"]
             
+            if meaning == "ip_option_code":
+                ip_options.append((ad["data"], 0, None))
+                ignored[meaning] = ""
+                
+            if meaning == "ip_option_data":
+                data = ad["data"]
+                ip_options[-1] = (ip_options[-1][0], len(data), data)
+                ignored[meaning] = ""
+                
+            if meaning == "tcp_option_code":
+                tcp_options.append((ad["data"], 0, None))
+                ignored[meaning] = ""
+                
+            if meaning == "tcp_option_data":
+                data = ad["data"]
+                tcp_options[-1] = (tcp_options[-1][0], len(data), data)
+                ignored[meaning] = ""
+                
             if ad["data"] != None:
                 if ad["type"] == "byte-string":
                     value = utils.hexdump(ad.get("data", escape=False))
@@ -165,13 +454,15 @@ class MessageSummary:
                     break
                 
             if not ignored.has_key(meaning):
-                emphase = (alert["analyzer.model"] == "Prelude LML" and meaning == "Original Log")
-                self.newSectionEntry(meaning or "Data content", value, emphase)
-        
+                self.newTableCol(index, meaning or "Data content")
+                self.newTableCol(index, value)
+                index += 1
+                
+        self.endTable()
         self.endSection()
-
+        
     def buildIpHeaderTable(self, alert):
-        ip = SubTable()
+        ip = HeaderTable()
         ip.register("Version", "ip_ver")
         ip.register("Header length", "ip_hlen")
         ip.register("TOS", "ip_tos")
@@ -180,7 +471,7 @@ class MessageSummary:
         ip.register("R<br/>F", "ip_off", isFlagSet, (0x8000, 15))
         ip.register("D<br/>F", "ip_off", isFlagSet, (0x4000, 14))
         ip.register("M<br/>F", "ip_off", isFlagSet, (0x2000, 13))
-        ip.register("Ip offset", "ip_off", getWithMask, (0x1FFF,))
+        ip.register("Ip offset", "ip_off", (lambda x: x & 0x1fff))
         ip.register("TTL", "ip_ttl")
         ip.register("Protocol", "ip_proto")
         ip.register("Checksum", "ip_csum")
@@ -189,7 +480,7 @@ class MessageSummary:
         return ip
 
     def buildTcpHeaderTable(self, alert):
-        tcp = SubTable()
+        tcp = HeaderTable()
         tcp.register_static("Source port", alert["source(0).service.port"])
         tcp.register_static("Target port", alert["target(0).service.port"])
         tcp.register("Seq #", "tcp_seq")
@@ -210,7 +501,7 @@ class MessageSummary:
         return tcp
     
     def buildUdpHeaderTable(self, alert):
-        udp = SubTable()
+        udp = HeaderTable()
         udp.register_static("Source port", alert["source(0).service.port"])
         udp.register_static("Target port", alert["target(0).service.port"])
         udp.register("Length", "udp_len")
@@ -218,7 +509,7 @@ class MessageSummary:
         return udp 
 
     def buildIcmpHeaderTable(self, alert):
-        icmp = SubTable()
+        icmp = HeaderTable()
         icmp.register("Type", "icmp_type")
         icmp.register("Code", "icmp_code")
         icmp.register("Checksum", "icmp_sum")
@@ -228,21 +519,14 @@ class MessageSummary:
         return icmp
     
     def buildPayloadTable(self, alert):
-        data = SubTable()
+        data = HeaderTable()
         data.register("Payload", "payload")
         return data
 
     
 class AlertSummary(MessageSummary, view.View):
     view_name = "alert_summary"
-    
-    def buildTime(self, alert):
-        self.beginSection("Dates")
-        self.newSectionEntry("Create time", alert["create_time"])
-        self.newSectionEntry("Detect time", alert["detect_time"], emphase=True)
-        self.newSectionEntry("Analyzer time", alert["analyzer_time"])
-        self.endSection()
-
+            
     def buildCorrelationAlert(self, alert):
         ca = alert["correlation_alert"]
         if not ca:
@@ -283,46 +567,41 @@ class AlertSummary(MessageSummary, view.View):
         if not alert["classification.text"]:
             return
 
-        self.beginSection("Classification")
-        self.newSectionEntry("Text", alert["classification.text"])
-        self.newSectionEntry("Ident", alert["classification.ident"])
+        self.newTableEntry("Text", alert["classification.text"],
+                           cl="section_alert_entry_value_emphasis impact_severity_%s" % alert["assessment.impact.severity"])
+        self.newTableEntry("Ident", alert["classification.ident"])
+        
+    def buildReference(self, alert):
+        self.beginTable()
 
-        cnt = 0
+        self.newTableCol(0, "Origin", header=True)
+        self.newTableCol(0, "Name", header=True)
+        self.newTableCol(0, "Meaning", header=True)
+        self.newTableCol(0, "Url", header=True)
 
-        while True:
-            origin = alert["classification.reference(%d).origin" % cnt]
-            if origin == None:
-                break
-
-            content = alert["classification.reference(%d).name" % cnt]
+        index = 1
+        for reference in alert["classification.reference"]:                
+            self.newTableCol(index, reference["origin"])
+            self.newTableCol(index, reference["name"])
+            self.newTableCol(index, reference["meaning"])
+            self.newTableCol(index, self.getUrlLink(reference["url"]))
+            index += 1
             
-            meaning = alert["classification.reference(%d).meaning" % cnt]
-            if meaning:
-                content += " (%s)" % meaning
+        self.endTable()
+        
+    def buildImpact(self, alert):        
+        self.newTableEntry("Severity", alert["assessment.impact.severity"],
+                           cl="impact_severity_%s" % alert["assessment.impact.severity"])
 
-            url = alert["classification.reference(%d).url" % cnt]
-            if url:
-                content += " <a href='%s'>%s</a>" % (url, url)
-
-            self.newSectionEntry(origin, content)
-
-            cnt += 1
-
-        self.endSection()
-
-    def buildImpact(self, alert):
-        self.beginSection("Impact")
-        self.newSectionEntry("Description", alert["assessment.impact.description"], emphase=True)
-        self.newSectionEntry("Severity", alert["assessment.impact.severity"])
-        self.newSectionEntry("Type", alert["assessment.impact.type"])
-        self.newSectionEntry("Completion", alert["assessment.impact.completion"])
-        self.endSection()
-
-
+        self.newTableEntry("Completion", alert["assessment.impact.completion"],
+                           cl="impact_completion_%s" % alert["assessment.impact.completion"])
+        
+        self.newTableEntry("Type", alert["assessment.impact.type"])
+        self.newTableEntry("Description", alert["assessment.impact.description"])
+        
     def buildChecksum(self, checksum):
-        self.newSectionEntry(checksum["algorithm"], checksum["value"])
-        self.newSectionEntry("%s key" % checksum["algorithm"], checksum["key"])
-
+        self.newTableEntry(checksum["algorithm"], checksum["value"])
+        self.newTableEntry("%s key" % checksum["algorithm"], checksum["key"])
 
     def _joinUserInfos(self, user, number, tty=None):
         user_str = user or ""
@@ -338,112 +617,162 @@ class AlertSummary(MessageSummary, view.View):
         return user_str
     
     def buildUser(self, user):
-        self.newSectionEntry("User category", user["category"])
+        self.beginTable()  
+        self.newTableEntry("User category", user["category"])
 
-        for user_id in user["user_id"]:
-            user_str = self._joinUserInfos(user_id["name"], user_id["number"], user_id["tty"])
-            self.newSectionEntry(user_id["type"], user_str)
+        self.beginTable()
+        self.newTableCol(0, "Type", header=True)
+        self.newTableCol(0, "Name", header=True)
+        self.newTableCol(0, "Number", header=True)
+        self.newTableCol(0, "Tty", header=True)
         
-    def buildFileAccess(self, fa):
-        pstr = ""
-        for perm in fa["permission"]:
-            if pstr:
-                pstr += ", "
+        index = 1
+        for user_id in user["user_id"]:
+            #user_str = self._joinUserInfos(user_id["name"], user_id["number"], user_id["tty"])
+            self.newTableCol(index, user_id["type"])
+            self.newTableCol(index, user_id["name"])
+            self.newTableCol(index, user_id["number"])
+            self.newTableCol(index, user_id["tty"])
+            index += 1
+            
+        self.endTable()
+        self.endTable()
+        
+    def buildFileAccess(self, file):
+        self.beginTable()
+        self.newTableCol(0, "Type", header=True)
+        self.newTableCol(0, "Name", header=True)
+        self.newTableCol(0, "Number", header=True)
+        self.newTableCol(0, "Permission", header=True)
+
+        index = 1
+        for fa in file["file_access"]:
+            pstr = ""
+            for perm in fa["permission"]:
+                if pstr:
+                    pstr += ", "
                 
-            pstr += perm
+                pstr += perm
+                
+            self.newTableCol(index, fa["user_id.type"])
+            self.newTableCol(index, fa["user_id.name"])
+            self.newTableCol(index, fa["user_id.number"])
+            self.newTableCol(index, perm)
 
-        user_str = self._joinUserInfos(fa["user_id.name"], fa["user_id.number"])
-        if user_str:
-            user_str = " " + user_str
-
-        self.newSectionEntry(fa["user_id.type"] + user_str, pstr)
-
+            index += 1
+            
+        self.endTable()
+        
     def buildInode(self, inode):
-        self.newSectionEntry("Change time", inode["change_time"])
-        self.newSectionEntry("Inode Number", inode["number"])
-        self.newSectionEntry("Major device", inode["major_device"])
-        self.newSectionEntry("Minor device", inode["minor_device"])
-        self.newSectionEntry("C Major device", inode["c_major_device"])
-        self.newSectionEntry("C Minor device", inode["c_minor_device"])
+        self.beginTable()
+        self.newTableEntry("Change time", self.getTime(inode["change_time"]))
+        self.newTableEntry("Inode Number", inode["number"])
+        self.newTableEntry("Major device", inode["major_device"])
+        self.newTableEntry("Minor device", inode["minor_device"])
+        self.newTableEntry("C Major device", inode["c_major_device"])
+        self.newTableEntry("C Minor device", inode["c_minor_device"])
+        self.endTable()
         
     def buildFile(self, file):
         self.beginSection("Target file %s" % file["category"])
-        self.newSectionEntry("Name", file["name"])
-        self.newSectionEntry("Path", file["path"])
-        self.newSectionEntry("Create time", file["create_time"])
-        self.newSectionEntry("Modify time", file["modify_time"])
-        self.newSectionEntry("Access time", file["access_time"])
-        self.newSectionEntry("Data size", file["data_size"])
-        self.newSectionEntry("Disk size", file["disk_size"])
+        
+        self.beginTable()
+        self.newTableEntry("Name", file["name"])
+        self.newTableEntry("Path", file["path"])
+        self.newTableEntry("Create time", self.getTime(file["create_time"]))
+        self.newTableEntry("Modify time", self.getTime(file["modify_time"]))
+        self.newTableEntry("Access time", self.getTime(file["access_time"]))
+        self.newTableEntry("Data size", file["data_size"])
+        self.newTableEntry("Disk size", file["disk_size"])
+        self.endTable()
 
+        self.beginTable()
         for checksum in file["checksum"]:
             self.buildChecksum(checksum)
-
-        for fa in file["file_access"]:
-            self.buildFileAccess(fa)
-
+        self.endTable()
+        
+        self.buildFileAccess(file)
+        
         if file["inode"]:
             self.buildInode(file["inode"])
             
         self.endSection()
 
+    def buildService(self, service):
+        if not service:
+            return
+        
+        if service["port"]:
+            self.newTableEntry("Port", str(service["port"]))
+
+        ipn = service["iana_protocol_number"]
+        if ipn and utils.protocol_number_to_name(ipn) != None:
+            self.newTableEntry("Protocol", utils.protocol_number_to_name(ipn))
+
+        elif service["iana_protocol_name"]:
+             self.newTableEntry("Protocol", service["iana_protocol_name"])
+                             
+        elif service["protocol"]:
+            self.newTableEntry("Protocol", service["protocol"])
+                    
     def buildDirection(self, alert, direction):
-        for addr in alert["%s(0).node.address" % direction]:
-
-            address = addr["address"]
-            if not address:
-                continue
-            
-            port = alert["%s(0).service.port" % direction]
-            if port != None:
-                address += ":%d" % port
-
-            ipn = alert["%s(0).service.iana_protocol_number" % direction]
-            if ipn and utils.protocol_number_to_name(ipn) != None:
-                address += " (%s)" % utils.protocol_number_to_name(ipn)
-
-            elif alert["%s(0).service.iana_protocol_name" % direction]:
-                address += " (%s)" % alert["%s(0).service.iana_protocol_name" % direction]
-
-            elif alert["%s(0).service.protocol" % direction]:
-                address += " (%s)" % alert["%s(0).service.protocol" % direction]               
-
-            self.newSectionEntry("Address", address, emphase=True)
-
-        self.newSectionEntry("Interface", alert["%s(0).interface" % direction])
+        self.beginTable()
+        self.buildNode(alert["%s(0).node" % direction])
+        self.buildService(alert["%s(0).service" % direction])
+        self.endTable()
         
         user = alert["%s(0).user" % direction]
         if user:
             self.buildUser(user)
-
+        
         process = alert["%s(0).process" % direction]
         if process:
             self.buildProcess(process)
-
+        
     def buildSource(self, alert):
-        self.beginSection("Source")
         self.buildDirection(alert, "source")
-        self.endSection()
 
     def buildTarget(self, alert):
-        self.beginSection("Target")
         self.buildDirection(alert, "target")
-        self.endSection()
-        
+
         for f in alert["target(0).file"]:
             self.buildFile(f)
 
+    def buildSourceTarget(self, alert):
+        self.beginSection("Source")
+        self.buildSource(alert)
+        self.endSection()
+
+        self.beginSection("Target")
+        self.buildTarget(alert)
+        self.endSection()
+        
     def render(self):
         alert = self.env.idmef_db.getAlert(self.parameters["ident"])
         self.dataset["sections"] = [ ]
-        self.buildTime(alert)
-        self.buildClassification(alert)
-        self.buildCorrelationAlert(alert)
-        self.buildImpact(alert)
-        self.buildSource(alert)
-        self.buildTarget(alert)
-        self.buildAnalyzer(alert)
 
+        self.beginSection(alert["classification.text"])
+
+        self.buildTime(alert)
+
+        self.beginTable()
+        self.buildClassification(alert)
+        self.buildImpact(alert)
+        self.endTable()
+        
+        self.buildReference(alert)
+
+        self.beginSection("Analyzer #0")
+        self.buildAnalyzer(alert["analyzer(-1)"])
+                
+        self.buildAnalyzerList(alert)
+        self.endSection()
+        
+        self.endSection()
+        
+        self.buildCorrelationAlert(alert)
+        self.buildSourceTarget(alert)
+        
         ip = self.buildIpHeaderTable(alert)
         tcp = self.buildTcpHeaderTable(alert)
         udp = self.buildUdpHeaderTable(alert)
@@ -451,32 +780,77 @@ class AlertSummary(MessageSummary, view.View):
         data = self.buildPayloadTable(alert)
         
         ignored_value = {}
+        ip_options = []
+        tcp_options = []
 
         group = ip.field_list + tcp.field_list + udp.field_list + icmp.field_list + data.field_list
-        self.buildAdditionalData(alert, ignore=group, ignored=ignored_value)
+        self.buildAdditionalData(alert, ignore=group, ignored=ignored_value, ip_options=ip_options, tcp_options=tcp_options)
         
         if len(ignored_value.keys()) > 0:
             self.beginSection("Network centric information")
-            self.newSectionEntry("IP", ip.get_string(ignored_value, "network_centric"))
-            self.newSectionEntry("TCP", tcp.get_string(ignored_value, "network_centric"))
-            self.newSectionEntry("UDP", udp.get_string(ignored_value, "network_centric"))
-            self.newSectionEntry("ICMP", icmp.get_string(ignored_value, "network_centric"))
-            self.newSectionEntry("Payload", data.get_string(ignored_value, "network_centric"))
+
+            self.beginTable()
+            ip.render_table(self, "IP", ignored_value)
+            tcp.render_table(self, "TCP", ignored_value)
+
+            if ip_options:
+                self.newTableRow()
+                self.newTableCol(-1, "IP options", header=True)
+                
+            if tcp_options:
+                self.newTableRow()
+                self.newTableCol(-1, "TCP options", header=True)
+
+                self.beginTable()
+                self.newTableCol(0, "Name", header=True)
+                self.newTableCol(0, "Code", header=True)
+                self.newTableCol(0, "Data length", header=True)
+                self.newTableCol(0, "Data", header=True)
+                
+                for option in tcp_options:
+                    dec = tcp_option_to_name(option[0])
+
+                    idx = self.newTableRow()
+                    self.newTableCol(idx, dec[0])
+                    self.newTableCol(idx, option[0])
+
+                    if len(dec) >= 2 and dec[1] != option[1]:
+                        self.newTableCol(idx, "<b style='color:red;'>%d</b> (expected %d)" % (option[1], dec[1]))
+                    else:
+                        self.newTableCol(idx, "%d" % option[1])
+
+                    if len(dec) == 3 and dec[1] == option[1]:
+                       self.newTableCol(idx, "%s" % dec[2](option[2]))
+                    else:
+                        self.newTableCol(idx, "&nbsp;")
+                        
+                self.endTable()
+
+            udp.render_table(self, "UDP", ignored_value)
+            icmp.render_table(self, "ICMP", ignored_value)
+            data.render_table(self, "Payload", ignored_value)
+
+            self.endTable()
             self.endSection()
-            
+        
 
 class HeartbeatSummary(MessageSummary, view.View):
     view_name = "heartbeat_summary"
     
-    def buildTime(self, heartbeat):
-        self.beginSection("Dates")
-        self.newSectionEntry("Create time", heartbeat["create_time"])
-        self.newSectionEntry("Analyzer time", heartbeat["analyzer_time"])
-        self.endSection()
-
     def render(self):
         heartbeat = self.env.idmef_db.getHeartbeat(self.parameters["ident"])
         self.dataset["sections"] = [ ]
-        self.buildAnalyzer(heartbeat)
+
+        self.beginSection("Heartbeat")
         self.buildTime(heartbeat)
+
+        self.beginSection("Analyzer #0")
+        self.buildAnalyzer(heartbeat["analyzer(-1)"])
+    
+        self.buildAnalyzerList(heartbeat)
+    
+        self.endSection()
+        self.endSection()
+
         self.buildAdditionalData(heartbeat)
+        

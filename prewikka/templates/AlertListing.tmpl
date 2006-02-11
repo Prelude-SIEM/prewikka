@@ -434,7 +434,7 @@ function ${name}_add_entry(object, value, num) {
       #end if
    
       #for $address in $direction.addresses
-       <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$address_cnt'); return false;">$address.value</a>$service<br />
+       <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$address_cnt', 'table'); return false;">$address.value</a>$service<br />
        <span id="menu_$address_cnt" class="popup_menu">
        #set global $address_cnt += 1
 

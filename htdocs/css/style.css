@@ -857,10 +857,19 @@ p {
 	border-collapse: collapse; width: 100%; 
 }
 
+
+/*
 .fieldset_heading tr, #classification tr, #source tr, #target tr, #analyzer tr { border-bottom: 1px dashed white; }  
+*/
+#classification tr, #source tr, #target tr, #analyzer tr { border-bottom: 1px dashed white; }  
 .fieldset_heading .nodash { border-bottom: 0px; }  
 
+
+/* 
 .fieldset_heading td, .fieldset_heading th { font-size: 90%; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white; }
+*/
+
+.fieldset_heading td, .fieldset_heading th { font-size: 90%; padding: .5em 1em; vertical-align: top; }
 .fieldset_heading th { color: #950; font-weight: normal; text-align: left; }
 
 
@@ -892,16 +901,16 @@ p {
 }
 
 
-.network_centric {
+.message_summary table {
         border: 1px solid black;
 }
 
-.network_centric th {
-	padding: 3px;
-	border: 1px solid black;
+.message_summary th {
+	padding: 3px; 
+	border: 1px solid black; 
 }
 
-.network_centric td {
-     padding: 3px;
+.message_summary td {
+     padding: 3px; 
      border: 1px solid black;
 }

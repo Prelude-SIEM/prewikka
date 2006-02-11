@@ -1,18 +1,18 @@
 var cur_visible = null;
 
-function toggleVisibility(section_id) {
+function toggleVisibility(section_id, mode) {
 	section = document.getElementById(section_id);
 	
-	if ( section.style.display != 'block' ) {
+	if ( section.style.display != mode ) {
 		cur_visible = section;
-		section.style.display = 'block';
+		section.style.display = mode;
 	} else {
 		section.style.display = 'none';
 	}
 }
 
 
-function toggleVisibilityUnique(section_id) 
+function toggleVisibilityUnique(section_id, mode) 
 {
 	if ( cur_visible )
 		section.style.display = 'none';
@@ -23,7 +23,7 @@ function toggleVisibilityUnique(section_id)
 		return;
 	}
 
-	toggleVisibility(section_id);
+	toggleVisibility(section_id, mode);
 }
 
 
