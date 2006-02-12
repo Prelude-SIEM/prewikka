@@ -29,103 +29,6 @@ def isFlagSet(bits, flag, shift=0):
     else:
         return "&nbsp;"
 
-def decodeOption8(data):
-    return str(struct.unpack(">B", data)[0])
-
-def decodeOption16(data):
-    return str(struct.unpack(">H", data)[0])
-
-def decodeOption32(data):
-    return str(struct.unpack(">L", data)[0])
-
-def decodeOptionTimestamp(data):
-    x = struct.unpack(">LL", data)
-    return "TS Value (%d)<br/>TS Echo Reply (%d)" % (x[0], x[1])
-
-def decodeOptionSack(data):
-    x = struct.unpack(">" + "L" * (len(data) / 4), data)
-
-    s = ""
-    for i in x:
-        if len(s):
-            s += "<br/>"
-
-        s += str(i)
-
-    return s
-
-
-def decodeOptionMd5(data):
-    md = md5.md5(struct.unpack("B" * 16, data)[0])
-    return md.hexdigest()
-
-def decodeOptionPartialOrderProfile(data):
-    x = struct.unpack("B", data)
-    return "Start_Flags=%d End_Flags=%d" % (data & 0x80, data & 0x40)
-
-def decodeOptionTcpAltChecksumRequest(data):
-    x = struct.unpack("B", data)
-    if x == 0:
-        return "TCP checksum"
-
-    elif x == 1:
-        return "8-bit  Fletcher's algorithm"
-
-    elif x == 2:
-        return "16-bit  Fletcher's algorithm"
-
-    else:
-        return "%d (Invalid)" % x
-
-    
-def tcp_option_to_name(opt):
-    h = {}
-    h[0] = ("End of Option List", 0)
-    h[1] = ("No-Option", 0)
-    h[2] = ("Maximum Segment Size", 2, decodeOption16)
-    h[3] = ("Window Scaling", 1, decodeOption8)
-    h[4] = ("Sack Permitted", 0)
-    h[5] = ("Sack", -1, decodeOptionSack)
-    h[6] = ("Echo", 4, decodeOption32)
-    h[7] = ("Echo Reply", 4, decodeOption32)
-    h[8] = ("Timestamp", 8, decodeOptionTimestamp)
-    h[9] = ("Partial Order Permitted", 0)
-    h[10] = ("Partial Order Profile", 1, decodeOptionPartialOrderProfile)
-    h[11] = ("Connection Count", 4, decodeOption32)
-    h[12] = ("Connection Count New", 4, decodeOption32)
-    h[13] = ("Connection Count Echo", 4, decodeOption32)
-    h[14] = ("TCP Alternate Checksum Request", 1, decodeOptionTcpAltChecksumRequest)
-    h[15] = ("TCP Alternate Checksum",)
-    h[16] = ("Skeeter",)
-    h[17] = ("Bubba",)
-    h[18] = ("Trailer Checksum",)
-    h[19] = ("MD5 Signature", 16, decodeOptionMd5)
-    h[20] = ("Capabilities",)
-    h[21] = ("Selective Negative Acknowledgements",)
-    h[22] = ("Record Boundaries",)
-    h[23] = ("Corruption experienced",)
-    h[24] = ("Snap",)
-    h[25] = ("Unassigned",)
-    h[26] = ("TCP Compression Filter",)
-
-    return h.get(opt, ("Unknown",))
-
-
-def ip_option_to_name(opt):
-    h = {}
-    h[0] = ("End of Option List", 0)
-    h[1] = ("No-Option", 0)
-    h[7] = ("RR",)
-    h[20] = ("RTRALT",)
-    h[68] = ("Timestamp",)
-    h[130] = ("Security", )
-    h[131] = ("LSRR", 0)
-    h[132] = ("LSRR_E", 0)
-    h[136] = ("SATID", 0)
-    h[137] = ("SSRR", 0)
-    
-    return h.get(opt, ("Unknown",))
-
 
 class Table:
     def __init__(self):
@@ -149,8 +52,9 @@ class Table:
     def endSection(self):
         parent = self._current_section["parent"]
 
-        if len(self._current_section["tables"]) == 0 and \
-           len(self._current_section["sections"]) == 0:
+        if len(self._current_section["tables"]) == 0 and   \
+           len(self._current_section["sections"]) == 0 and \
+           len(self._current_section["entries"]) == 0:
             self._current_section = parent
             return
         
@@ -279,6 +183,150 @@ class HeaderTable(Table):
         else:
             self.endTable()
         
+
+class TcpIpOptions(Table):
+    def _decodeOption8(self, data):
+        return str(struct.unpack(">B", data)[0])
+
+    def _decodeOption16(self, data):
+        return str(struct.unpack(">H", data)[0])
+
+    def _decodeOption32(self, data):
+        return str(struct.unpack(">L", data)[0])
+
+    def _decodeOptionTimestamp(self, data):
+        x = struct.unpack(">LL", data)
+        return "TS Value (%d)<br/>TS Echo Reply (%d)" % (x[0], x[1])
+
+    def _decodeOptionSack(self, data):
+        x = struct.unpack(">" + "L" * (len(data) / 4), data)
+        
+        s = ""
+        for i in x:
+            if len(s):
+                s += "<br/>"
+
+            s += str(i)
+
+        return s
+
+
+    def _decodeOptionMd5(self, data):
+        md = md5.md5(struct.unpack(">B" * 16, data)[0])
+        return md.hexdigest()
+
+    def _decodeOptionPartialOrderProfile(self, data):
+        x = struct.unpack(">B", data)
+        return "Start_Flags=%d End_Flags=%d" % (data & 0x80, data & 0x40)
+
+    def _decodeOptionTcpAltChecksumRequest(self, data):
+        x = struct.unpack(">B", data)
+        if x == 0:
+            return "TCP checksum"
+
+        elif x == 1:
+            return "8-bit Fletcher's algorithm"
+
+        elif x == 2:
+            return "16-bit Fletcher's algorithm"
+
+        else:
+            return "%d (Invalid)" % x
+
+    
+    def _tcpOptionToName(self, opt):
+        h = {}
+        h[0] = ("End of Option List", 0)
+        h[1] = ("No-Option", 0)
+        h[2] = ("Maximum Segment Size", 2, self._decodeOption16)
+        h[3] = ("Window Scaling", 1, self._decodeOption8)
+        h[4] = ("Sack Permitted", 0)
+        h[5] = ("Sack", -1, self._decodeOptionSack)
+        h[6] = ("Echo", 4, self._decodeOption32)
+        h[7] = ("Echo Reply", 4, self._decodeOption32)
+        h[8] = ("Timestamp", 8, self._decodeOptionTimestamp)
+        h[9] = ("Partial Order Permitted", 0)
+        h[10] = ("Partial Order Profile", 1, self._decodeOptionPartialOrderProfile)
+        h[11] = ("Connection Count", 4, self._decodeOption32)
+        h[12] = ("Connection Count New", 4, self._decodeOption32)
+        h[13] = ("Connection Count Echo", 4, self._decodeOption32)
+        h[14] = ("TCP Alternate Checksum Request", 1, self._decodeOptionTcpAltChecksumRequest)
+        h[15] = ("TCP Alternate Checksum",)
+        h[16] = ("Skeeter",)
+        h[17] = ("Bubba",)
+        h[18] = ("Trailer Checksum",)
+        h[19] = ("MD5 Signature", 16, self._decodeOptionMd5)
+        h[20] = ("Capabilities",)
+        h[21] = ("Selective Negative Acknowledgements",)
+        h[22] = ("Record Boundaries",)
+        h[23] = ("Corruption experienced",)
+        h[24] = ("Snap",)
+        h[25] = ("Unassigned",)
+        h[26] = ("TCP Compression Filter",)
+
+        return h.get(opt, ("Unknown",))
+
+    
+    def _ipOptionToName(self, opt):
+        h = {}
+        h[0] = ("End of Option List", 0)
+        h[1] = ("No-Option", 0)
+        h[7] = ("RR",)
+        h[20] = ("RTRALT",)
+        h[68] = ("Timestamp",)
+        h[130] = ("Security", )
+        h[131] = ("LSRR", 0)
+        h[132] = ("LSRR_E", 0)
+        h[136] = ("SATID", 0)
+        h[137] = ("SSRR", 0)
+            
+        return h.get(opt, ("Unknown",))
+
+    def _optionRender(self, options, to_name_func):
+        self.beginTable()
+        self.newTableCol(0, "Name", header=True)
+        self.newTableCol(0, "Code", header=True)
+        self.newTableCol(0, "Data length", header=True)
+        self.newTableCol(0, "Data", header=True)
+        
+        for option in options:
+            dec = to_name_func(option[0])
+            
+            idx = self.newTableRow()
+            self.newTableCol(idx, dec[0])
+            self.newTableCol(idx, option[0])
+            
+            if len(dec) == 2 and dec[1] != -1 and dec[1] != option[1]:
+                self.newTableCol(idx, "<b style='color:red;'>%d</b> (expected %d)" % (option[1], dec[1]))
+            else:
+                self.newTableCol(idx, "%d" % option[1])
+
+            if len(dec) == 3 and (dec[1] == -1 or dec[1] == option[1]):
+                self.newTableCol(idx, "%s" % dec[2](option[2]))
+            else:
+                self.newTableCol(idx, "&nbsp;")
+                        
+        self.endTable()
+
+    def ipOptionRender(self, ip_options):
+        if not ip_options:
+            return
+
+        self.newTableRow()
+        self.newTableCol(-1, "IP options", header=True)
+
+        self._optionRender(ip_options, self._ipOptionToName)
+
+        
+    def tcpOptionRender(self, tcp_options):
+        if not tcp_options:
+            return
+
+        self.newTableRow()
+        self.newTableCol(-1, "TCP options", header=True)
+
+        self._optionRender(tcp_options, self._tcpOptionToName)
+
 
         
 class MessageParameters(view.RelativeViewParameters):
@@ -524,7 +572,7 @@ class MessageSummary(Table):
         return data
 
     
-class AlertSummary(MessageSummary, view.View):
+class AlertSummary(TcpIpOptions, MessageSummary, view.View):
     view_name = "alert_summary"
             
     def buildCorrelationAlert(self, alert):
@@ -791,41 +839,11 @@ class AlertSummary(MessageSummary, view.View):
 
             self.beginTable()
             ip.render_table(self, "IP", ignored_value)
+            self.ipOptionRender(ip_options)
+            
             tcp.render_table(self, "TCP", ignored_value)
-
-            if ip_options:
-                self.newTableRow()
-                self.newTableCol(-1, "IP options", header=True)
-                
-            if tcp_options:
-                self.newTableRow()
-                self.newTableCol(-1, "TCP options", header=True)
-
-                self.beginTable()
-                self.newTableCol(0, "Name", header=True)
-                self.newTableCol(0, "Code", header=True)
-                self.newTableCol(0, "Data length", header=True)
-                self.newTableCol(0, "Data", header=True)
-                
-                for option in tcp_options:
-                    dec = tcp_option_to_name(option[0])
-
-                    idx = self.newTableRow()
-                    self.newTableCol(idx, dec[0])
-                    self.newTableCol(idx, option[0])
-
-                    if len(dec) >= 2 and dec[1] != option[1]:
-                        self.newTableCol(idx, "<b style='color:red;'>%d</b> (expected %d)" % (option[1], dec[1]))
-                    else:
-                        self.newTableCol(idx, "%d" % option[1])
-
-                    if len(dec) == 3 and dec[1] == option[1]:
-                       self.newTableCol(idx, "%s" % dec[2](option[2]))
-                    else:
-                        self.newTableCol(idx, "&nbsp;")
-                        
-                self.endTable()
-
+            self.tcpOptionRender(tcp_options)
+            
             udp.render_table(self, "UDP", ignored_value)
             icmp.render_table(self, "ICMP", ignored_value)
             data.render_table(self, "Payload", ignored_value)
