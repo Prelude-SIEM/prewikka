@@ -580,9 +580,19 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         if not ca:
             return
 
-        self.beginSection("Correlation Alert")
-        self.newSectionEntry("Reason", ca["name"])
-
+	if ca["name"]:
+	    reason = ": %s" % ca["name"]
+	else:
+	    reason = ""
+            
+        self.beginSection("Correlation Alert%s" % reason)
+	
+	self.beginTable()
+	self.newTableCol(0, "Correlated Alert", header=True)
+	self.newTableCol(0, "Source Analyzer", header=True)
+        
+	calist = {}
+	
         for alertident in ca["alertident"]:
         
             # IDMEF draft 14 page 27
@@ -593,22 +603,33 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
             if not analyzerid:
                 analyzerid = alert["analyzer(-1).analyzerid"]
 
-            criteria = ""
-            if analyzerid:
-                criteria += "alert.analyzer.analyzerid = %s && " % analyzerid
-            
-            criteria += "alert.messageid = %s" % alertident["alertident"]
-            
-            results = self.env.idmef_db.getAlertIdents(criteria)
-            if len(results) == 0:
-                text = "Invalid analyzerid:messageid pair: %s:%s" % (analyzerid, alertident["alertident"])
-            else:
-                alert = self.env.idmef_db.getAlert(results[0])
-                link = utils.create_link("alert_summary", { "origin": "alert_listing", "ident": results[0] })
-                text = "%s: <a href=\"%s\">%s</a>" % (alert["analyzer(-1).name"], link, alert["classification.text"])
-                
-            self.newSectionEntry("Correlated", text)
+            if not calist.has_key(analyzerid):
+	        calist[analyzerid] = []
 
+            calist[analyzerid].append(alertident["alertident"])
+	 
+        idx = 1
+	for analyzerid in calist.keys():
+	    
+	    content = ""
+	    for ident in calist[analyzerid]:
+                criteria = "alert.analyzer.analyzerid = %s && alert.messageid = %s" % (analyzerid, ident)
+        
+                results = self.env.idmef_db.getAlertIdents(criteria)
+                if len(results) == 0:
+                    content += "<li>Invalid analyzerid:messageid pair: %s:%s</li>" % (analyzerid, alertident["alertident"])
+                else:
+                    alert = self.env.idmef_db.getAlert(results[0])
+                    link = utils.create_link("alert_summary", { "origin": "alert_listing", "ident": results[0] })
+                    content += "<li><a href=\"%s\">%s</a></li>" % (link, alert["classification.text"])
+
+            self.newTableCol(idx, "<ul style='padding: 0px; margin: 0px 0px 0px 10px;'>%s</ul>" % content)
+            self.buildAnalyzer(alert["analyzer(-1)"])
+            self.newTableRow()
+
+            idx += 1
+
+        self.endTable()
         self.endSection()
         
     def buildClassification(self, alert):
@@ -807,7 +828,8 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.buildClassification(alert)
         self.buildImpact(alert)
         self.endTable()
-        
+
+        self.buildCorrelationAlert(alert)
         self.buildReference(alert)
 
         self.beginSection("Analyzer #0")
@@ -816,9 +838,8 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.buildAnalyzerList(alert)
         self.endSection()
         
-        self.endSection()
-        
-        self.buildCorrelationAlert(alert)
+	self.endSection()
+
         self.buildSourceTarget(alert)
         
         ip = self.buildIpHeaderTable(alert)
