@@ -15,9 +15,9 @@
 		#end if
 
                 #if $table.odd_even:
-		<table id="$name" class="$table.class $row_classes[$table_cnt % 2] message_summary" style="$table.style display:$display;">
+		<table id="$name" class="$table.class $row_classes[$table_cnt % 2]" style="$table.style display:$display;">
 		#else
-		<table id="$name" class="$table.class message_summary" style="$table.style display:$display;">
+		<table id="$name" class="$table.class" style="$table.style display:$display;">
 		#end if
 
 		#set $table_cnt += 1

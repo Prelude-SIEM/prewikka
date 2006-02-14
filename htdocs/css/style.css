@@ -860,9 +860,9 @@ p {
 .fieldset_heading tr, #classification tr, #source tr, #target tr, #analyzer tr { border-bottom: 1px dashed white; }  
 .fieldset_heading .nodash { border-bottom: 0px; }  
 
-.fieldset_heading td, .fieldset_heading th { font-size: 90%; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white; }
+.fieldset_heading td, .fieldset_heading th { font-size: 8px; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white; }
 .fieldset_heading th { color: #950; font-weight: normal; text-align: left; }
-
+.fieldset_heading table { font-size: 100%; }
 
 #classification td, #source td, #target td, #analyzer td { 
 	text-align: right; font-size: 8px; padding: .5em 1em; border-bottom: 1px dashed white;
@@ -892,20 +892,16 @@ p {
 }
 
 
-.message_summary table {
+
+.message_summary_no_border, .message_summary_no_border tr, .message_summary_no_border td, .message_summary_no_border th {
+	border: 0px;
+}
+
+.message_summary, .message_summary tr {
         border: 1px solid black;
 }
 
-.message_summary th {
+.message_summary th, .message_summary td {
 	padding: 3px; 
 	border: 1px solid black; 
-}
-
-.message_summary td {
-     padding: 3px; 
-     border: 1px solid black;
-}
-
-.message_summary tr {
-     border: 1px solid black;
 }

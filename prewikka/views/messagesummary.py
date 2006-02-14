@@ -66,7 +66,7 @@ class Table:
                                                   "value": value,
                                                   "emphase": emphase })
 
-    def beginTable(self, cl="", style="", odd_even=False):
+    def beginTable(self, cl="message_summary", style="", odd_even=False):
         table = {}
         table["rows"] = []
         table["odd_even"] = odd_even
@@ -411,7 +411,7 @@ class MessageSummary(Table):
         self.newTableEntry("Node address", addr_list)
                 
     def buildAnalyzer(self, analyzer):
-        self.beginTable()
+        self.beginTable(cl="message_summary_no_border")
         
         self.beginTable()
         self.newTableEntry("Model", analyzer["model"], cl="section_alert_entry_value_emphasis")
@@ -448,7 +448,7 @@ class MessageSummary(Table):
 
         self.beginSection("Analyzer Path (%d not shown)" % len(l), display="none")
         
-        self.beginTable()
+        self.beginTable(cl="message_summary_no_border")
         i = 1
         for analyzer in l:
             self.newTableCol(i - 1, "Analyzer #%d" % i, None, header=True)
@@ -889,7 +889,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                 
             self.beginSection("Network centric information")
 
-            self.beginTable()
+            self.beginTable(cl="message_summary_no_border")
             ip.render_table(self, "IP", ignored_value)
             self.ipOptionRender(ip_options)
             
