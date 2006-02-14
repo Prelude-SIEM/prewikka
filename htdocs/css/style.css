@@ -862,7 +862,7 @@ p {
 
 .fieldset_heading td, .fieldset_heading th { font-size: 8px; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white; }
 .fieldset_heading th { color: #950; font-weight: normal; text-align: left; }
-.fieldset_heading table { font-size: 100%; }
+
 
 #classification td, #source td, #target td, #analyzer td { 
 	text-align: right; font-size: 8px; padding: .5em 1em; border-bottom: 1px dashed white;
