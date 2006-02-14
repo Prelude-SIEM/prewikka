@@ -123,7 +123,8 @@ def escape_html_char(c):
             ">": "&gt;",
             "<": "&lt;",
             "&": "&amp;",
-            "\"": "&quot;"
+            "\"": "&quot;",
+            "\n": "<br/>"
             }[c]
     except KeyError:
         return c
@@ -140,20 +141,19 @@ def hexdump(content):
 
     while i < len(decoded):
         chunk = decoded[i:i+16]
-        content += "%.4x:&nbsp;&nbsp;&nbsp;&nbsp;" % i
+        content += "%.4x:    " % i
         content += " ".join(map(lambda b: "%02x" % b, chunk))
 
-        content += "&nbsp;&nbsp;&nbsp;" * (16 - len(chunk))
-        content += "&nbsp;&nbsp;&nbsp;&nbsp;"
+        content += "   " * (16 - len(chunk))
+        content += "    "
         
         for b in chunk:
             if b >= 32 and b < 127:
-                content += escape_html_char(chr(b))
+                content += chr(b)
             else:
                 content += "."
 
-        content += "<br/>"
-
+        content += "\n"
         i += 16
 
-    return "<span class='fixed'>%s</span>" % content
+    return content

@@ -22,14 +22,7 @@ import struct
 import socket
 from prewikka import view, User, utils
 
-
-def isFlagSet(bits, flag, shift=0):    
-    if (bits & flag) >> shift:
-        return "X"
-    else:
-        return "&nbsp;"
-
-
+    
 class Table:
     def __init__(self):
         self._current_table = None
@@ -130,7 +123,7 @@ class Table:
     def newTableEntry(self, name, value, cl="", emphase=False):        
         if not value:
             return
-                    
+
         self.newTableCol(0, name, cl=cl, header=True)
         self.newTableCol(1, value, cl=cl, header=False, emphase=emphase)
         
@@ -185,6 +178,12 @@ class HeaderTable(Table):
         
 
 class TcpIpOptions(Table):
+    def _isFlagSet(self, bits, flag, shift=0):    
+        if (bits & flag) >> shift:
+            return "X"
+        else:
+            return "&nbsp;"
+
     def _decodeOption8(self, data):
         return str(struct.unpack(">B", data)[0])
 
@@ -492,7 +491,9 @@ class MessageSummary(Table):
                 
             if ad["data"] != None:
                 if ad["type"] == "byte-string":
-                    value = utils.hexdump(ad.get("data", escape=False))
+                    value = ad.get("data", escape=False)
+                    if meaning != "payload":
+                        value = utils.hexdump(value)
                 else:
                     value = ad.get("data")
 
@@ -516,9 +517,9 @@ class MessageSummary(Table):
         ip.register("TOS", "ip_tos")
         ip.register("Length", "ip_len")
         ip.register("Id", "ip_id")
-        ip.register("R<br/>F", "ip_off", isFlagSet, (0x8000, 15))
-        ip.register("D<br/>F", "ip_off", isFlagSet, (0x4000, 14))
-        ip.register("M<br/>F", "ip_off", isFlagSet, (0x2000, 13))
+        ip.register("R<br/>F", "ip_off", self._isFlagSet, (0x8000, 15))
+        ip.register("D<br/>F", "ip_off", self._isFlagSet, (0x4000, 14))
+        ip.register("M<br/>F", "ip_off", self._isFlagSet, (0x2000, 13))
         ip.register("Ip offset", "ip_off", (lambda x: x & 0x1fff))
         ip.register("TTL", "ip_ttl")
         ip.register("Protocol", "ip_proto")
@@ -535,14 +536,14 @@ class MessageSummary(Table):
         tcp.register("Ack #", "tcp_ack")
         tcp.register("Header length", "tcp_off")
         tcp.register("Reserved", "tcp_res")
-        tcp.register("R<br/>1", "tcp_flags", isFlagSet, (0x80,))
-        tcp.register("R<br/>2", "tcp_flags", isFlagSet, (0x40,))
-        tcp.register("U<br/>R<br/>G", "tcp_flags", isFlagSet, (0x20,))
-        tcp.register("A<br/>C<br/>K", "tcp_flags", isFlagSet, (0x10,))
-        tcp.register("P<br/>S<br/>H", "tcp_flags", isFlagSet, (0x08,))
-        tcp.register("R<br/>S<br/>T", "tcp_flags", isFlagSet, (0x04,))
-        tcp.register("S<br/>Y<br/>N", "tcp_flags", isFlagSet, (0x02,))
-        tcp.register("F<br/>I<br/>N", "tcp_flags", isFlagSet, (0x01,))
+        tcp.register("R<br/>1", "tcp_flags", self._isFlagSet, (0x80,))
+        tcp.register("R<br/>2", "tcp_flags", self._isFlagSet, (0x40,))
+        tcp.register("U<br/>R<br/>G", "tcp_flags", self._isFlagSet, (0x20,))
+        tcp.register("A<br/>C<br/>K", "tcp_flags", self._isFlagSet, (0x10,))
+        tcp.register("P<br/>S<br/>H", "tcp_flags", self._isFlagSet, (0x08,))
+        tcp.register("R<br/>S<br/>T", "tcp_flags", self._isFlagSet, (0x04,))
+        tcp.register("S<br/>Y<br/>N", "tcp_flags", self._isFlagSet, (0x02,))
+        tcp.register("F<br/>I<br/>N", "tcp_flags", self._isFlagSet, (0x01,))
         tcp.register("Window", "tcp_win")
         tcp.register("Checksum", "tcp_sum")
         tcp.register("URP", "tcp_urp")
@@ -563,12 +564,21 @@ class MessageSummary(Table):
         icmp.register("Checksum", "icmp_sum")
         icmp.register("Id", "icmp_id")
         icmp.register("Seq #", "icmp_seq")
+        icmp.register("Mask", "icmp_mask");
+        icmp.register("Gateway Address", "icmp_gwaddr", socket.inet_ntoa)
+        icmp.register("Num address", "icmp_num_addrs")
+        icmp.register("Wpa", "icmp_wpa")
+        icmp.register("Lifetime", "icmp_lifetime")
+        icmp.register("Otime", "icmp_otime")
+        icmp.register("Rtime", "icmp_rtime")
+        icmp.register("Ttime", "icmp_ttime")
         
         return icmp
     
     def buildPayloadTable(self, alert):
         data = HeaderTable()
         data.register("Payload", "payload")
+        #data.register("ASCII Payload", "payload", utils.escape_html_string)
         return data
 
     
@@ -815,12 +825,27 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.beginSection("Target")
         self.buildTarget(alert)
         self.endSection()
+
+    def getSectionName(self, alert):
+        if alert["correlation_alert"]:
+            section = "IDMEF Correlation Alert"
+            
+        elif alert["tool_alert"]:
+            section = "IDMEF Tool Alert"
+
+        elif alert["overflow_alert"]:
+            section = "IDMEF Overflow Alert"
+
+        else:
+            section = "IDMEF Alert"
+
+        return section
         
     def render(self):
         alert = self.env.idmef_db.getAlert(self.parameters["ident"])
         self.dataset["sections"] = [ ]
 
-        self.beginSection(alert["classification.text"])
+        self.beginSection(self.getSectionName(alert))
 
         self.buildTime(alert)
 
@@ -856,6 +881,12 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.buildAdditionalData(alert, ignore=group, ignored=ignored_value, ip_options=ip_options, tcp_options=tcp_options)
         
         if len(ignored_value.keys()) > 0:
+            def blah(b):
+                if b >= 32 and b < 127:
+                    return chr(b)
+                else:
+                    return "."
+                
             self.beginSection("Network centric information")
 
             self.beginTable()
@@ -867,8 +898,18 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
             
             udp.render_table(self, "UDP", ignored_value)
             icmp.render_table(self, "ICMP", ignored_value)
-            data.render_table(self, "Payload", ignored_value)
 
+            if ignored_value.has_key("payload"):
+                val = {}
+
+                payload = utils.escape_html_string(utils.hexdump(ignored_value["payload"])).replace(" ", "&nbsp;")
+                val["payload"] = "<span class='fixed'>%s</span>" % payload
+                data.render_table(self, "Payload", val)
+
+                payload = utils.escape_html_string(ignored_value["payload"]).replace(" ", "&nbsp;")                
+                val["payload"] = "<div style='overflow: auto;'>%s</div>" % utils.escape_html_string(ignored_value["payload"])
+                data.render_table(self, "Ascii Payload", val)
+                            
             self.endTable()
             self.endSection()
         
