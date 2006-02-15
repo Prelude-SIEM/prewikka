@@ -5,7 +5,7 @@
 #set global $row_classes = ("table_row_even", "table_row_odd")
 #set global $entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_value_emphasis")
 
-#def display_table($section, $display, $name, $depth)
+#def display_table($section, $depth)
 
  		#set $table_cnt = 0
 		#for table in $section.tables
@@ -15,9 +15,9 @@
 		#end if
 
                 #if $table.odd_even:
-		<table id="$name" class="$table.class $row_classes[$table_cnt % 2]" style="$table.style display:$display;">
+		<table class="$table.class $row_classes[$table_cnt % 2]" style="$table.style">
 		#else
-		<table id="$name" class="$table.class" style="$table.style display:$display;">
+		<table class="$table.class" style="$table.style">
 		#end if
 
 		#set $table_cnt += 1
@@ -29,7 +29,7 @@
 		     <th>$col.name</th>
                      #set $row_class="table_row_even"
 		    #elif $col.tables
-		     <td>$display_table($col, "table", $name, $depth + 1)</td>
+		     <td>$display_table($col, $depth + 1)</td>
                      #set $row_class=""		  
                     #else
 		     <td class="$col.class">$col.name</td>
@@ -46,12 +46,13 @@
 #for $section in $sections
         <fieldset class="fieldset_heading">
 		#set name = "section_" + $str($section_cnt) + ".id"
-		<legend><a onclick="javascript:toggleVisibility('$name', 'table')">$section.title</a></legend>
+		<legend><a href="#" onclick="javascript:toggleVisibility('$name'); return false;">$section.title</a></legend>
 
-		$display_table($section, $section.display, $name, 0)
+		<div id="$name" style="display: $section.display; width: 100%;">
+		$display_table($section, 0)
 
 		#if $section.entries
-		<table class="section_alert_entries" id="$name" style="display: $section.display;">
+		<table class="section_alert_entries">
 			
 			#set $cnt = 0
 			#for $entry in $section.entries
@@ -74,6 +75,8 @@
 		#if $section.sections
 		    $display_node($section.sections)
 		#end if
+
+		</div>
 
 	</fieldset>
 #end for

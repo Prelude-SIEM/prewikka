@@ -31,7 +31,7 @@ class Table:
     def getCurrentSection(self):
         return self._current_section
     
-    def beginSection(self, title, display="table"):    
+    def beginSection(self, title, display="block"):    
         _current_section = { }
         _current_section["title"] = title
         _current_section["entries"] = [ ]

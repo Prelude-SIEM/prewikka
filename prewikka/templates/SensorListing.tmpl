@@ -27,7 +27,7 @@
       #set $row_class = $row_classes[$cnt%2]
       <tr class="$row_class">
         <td>
-	  <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt');">$analyzer.name</a>
+	  <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$analyzer.name</a>
 	  <span id="menu_$cnt" class="popup_menu">
             - <a href="$analyzer.alert_listing">Alert listing</a><br />
             - <a href="$analyzer.heartbeat_listing">Heartbeat listing</a><br />
