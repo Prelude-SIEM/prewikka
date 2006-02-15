@@ -884,7 +884,7 @@ p {
 
 #fieldset_page { 
 	max-width: 700px; 
-	width:expression(document.body.clientWidth > 540 ? "540px": "auto" );
+	width:expression(document.body.clientWidth > 700 ? "700px": "auto" );
 }  
 
 #fieldset_page legend { font-size: 13px; font-weight: bold; }  
