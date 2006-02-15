@@ -125,8 +125,8 @@ p {
 }
 
 .fixed {
-        font-family: Courier;
-        font-size: 10px;
+        font-family: Courier, monospace;
+        font-size: 9px;
 }
 
 /*
@@ -860,7 +860,7 @@ p {
 .fieldset_heading tr, #classification tr, #source tr, #target tr, #analyzer tr { border-bottom: 1px dashed white; }  
 .fieldset_heading .nodash { border-bottom: 0px; }  
 
-.fieldset_heading td, .fieldset_heading th { font-size: 8px; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white; }
+.fieldset_heading td, .fieldset_heading th { font-size: 9px; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white; }
 .fieldset_heading th { color: #950; font-weight: normal; text-align: left; }
 
 
