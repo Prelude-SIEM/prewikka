@@ -46,7 +46,7 @@
 #for $section in $sections
         <fieldset class="fieldset_heading">
 		#set name = "section_" + $str($section_cnt) + ".id"
-		<legend><a href="javascript:toggleVisibility('$name', 'table')">$section.title</a></legend>
+		<legend><a onclick="javascript:toggleVisibility('$name', 'table')">$section.title</a></legend>
 
 		$display_table($section, $section.display, $name, 0)
 
