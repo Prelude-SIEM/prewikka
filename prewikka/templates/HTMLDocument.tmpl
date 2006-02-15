@@ -10,23 +10,6 @@
 			<link rel="stylesheet" href="$css_file" type="text/css"/>
 		#end for
 
-<!--[if IE]>
-<style type="text/css">
-#main {
-bottom : 0px;
-overflow-x : hidden;
-overflow-y : auto;
-width      : 
-   expression((document.body.clientWidth  - 195) + 'px');
-height     : 
-   expression((document.body.clientHeight - 90) + 'px');
-}
-#menu { height : 
-   expression((document.body.clientHeight - 80) + 'px'); }
-#menu, #topmenu,  { position   : absolute; }
-</style>
-<![endif-->
-		
 		#for $js_file in $document.js_files
 			<script src="$js_file" type="text/javascript"></script>
 		#end for

@@ -287,6 +287,7 @@ p {
 	border-style: solid;
 	background: #acacac;
 	height: 100%;
+	_height: expression((document.body.clientHeight - 80) + 'px');
 }
 
 #menu a {
@@ -451,6 +452,13 @@ p {
 	padding-left: 170px;
 	padding-right: 10px;
 	_padding-right: 25px;
+
+
+	_bottom: 0px;
+	_overflow-x: hidden;
+	_overflow-y: auto;
+	_width: expression((document.body.clientWidth  - 195) + 'px');
+	_height: expression((document.body.clientHeight - 90) + 'px');
 }
 
 /*
