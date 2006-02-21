@@ -87,6 +87,9 @@ class Database:
         if version != self.required_version:
             print >> sys.stderr, "Database schema version %s found when %s was required." % (version, self.required_version)
             sys.exit(1)
+
+    def __del__(self):
+        preludedb_sql_destroy(self._sql)
         
     def queries_from_file(self, filename):
         content = open(filename).read()
