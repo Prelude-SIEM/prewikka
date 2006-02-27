@@ -746,6 +746,7 @@ class MessageListing:
     def _deleteMessages(self):
         if len(self.parameters["delete"]) == 0:
             return
+        
         if not self.user.has(User.PERM_IDMEF_ALTER):
             raise User.PermissionDeniedError(user.login, self.current_view)
 
@@ -941,7 +942,7 @@ class AlertListing(MessageListing, view.View):
             message = self.env.idmef_db.getAlert(ca_ident)
             self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
             
-            results += [ [ row[0] ] + [None for i in aggregated_on] + [message] + [ row[1] ] ]
+            results += [ [ row[0] ] + [None for i in aggregated_on] + [ca_ident] + [message] + [ row[1] ] ]
 
         results.sort(lambda x, y: int(int(y[-1]) - int(x[-1])))
         total_results = len(results)
@@ -972,7 +973,7 @@ class AlertListing(MessageListing, view.View):
                 message = values[-2]
                 
                 self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
-                dataset = self._setMessage(message, ca_ident)
+                dataset = self._setMessage(message, values[-3])
                 self.dataset["messages"].append(dataset)
                 continue
             
