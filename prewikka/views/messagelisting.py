@@ -890,7 +890,7 @@ class AlertListing(MessageListing, view.View):
 
     def _ignoreAtomicIfNeeded(self, idmef, ignore_list):
         for ad in idmef["alert.additional_data"]:
-            if ad["meaning"] != "ignore_atomic_event":
+            if ad["data"] != "ignore_atomic_event":
                 continue
             
             for ca in idmef["alert.correlation_alert.alertident"]:
