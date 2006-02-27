@@ -950,7 +950,6 @@ class AlertListing(MessageListing, view.View):
                 message = self.env.idmef_db.getAlert(ca_ident)
 
                 self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
-                print atomic_ignore_list
                 
                 dataset = self._setMessage(message, ca_ident)
                 self.dataset["messages"].append(dataset)
