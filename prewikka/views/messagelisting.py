@@ -889,19 +889,25 @@ class AlertListing(MessageListing, view.View):
         self._applyCheckboxFilters(criteria, "analyzer")
 
     def _ignoreAtomicIfNeeded(self, idmef, ignore_list):
+
         for ad in idmef["alert.additional_data"]:
             if ad["data"] != "ignore_atomic_event":
                 continue
             
             for ca in idmef["alert.correlation_alert.alertident"]:
-                ignore_list.append((ca["analyzerid"] or idmef["alert.analyzer(-1).analyzerid"], ca["alertident"]))
-
+                # See FIXME ahead.
+                # ignore_list.append((ca["analyzerid"] or idmef["alert.analyzer(-1).analyzerid"], ca["alertident"]))
+                ignore_list.append(ca["alertident"])
+                
             break
 
     def _isAtomicEventIgnored(self, idmef, atomic_ignore_list):
-        if ( idmef["alert.analyzer(-1).analyzerid"], idmef["alert.messageid"]) in atomic_ignore_list:
+        #
+        # FIXME: LML really need to set analyzerid at the tail.
+        # if ( idmef["alert.analyzer(-1).analyzerid"], idmef["alert.messageid"]) in atomic_ignore_list:            
+        if idmef["alert.messageid"] in atomic_ignore_list:
             return True
-        else:
+        else:                
             return False
                 
     def _setAggregatedMessagesNoValues(self, criteria, aggregated_on):
@@ -924,9 +930,13 @@ class AlertListing(MessageListing, view.View):
         results2 = self.env.idmef_db.getValues(selection, criteria + ["alert.correlation_alert.name"])
 
         for row in results2:
-            results += [ [ row[0] ] + [None for i in aggregated_on] + [ row[1] ] ]
+            ca_ident = self.env.idmef_db.getAlertIdents(criteria + [ "alert.messageid = %s" % row[0] ], 1, -1)[0]
+            message = self.env.idmef_db.getAlert(ca_ident)
+            self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
+            
+            results += [ [ row[0] ] + [None for i in aggregated_on] + [message] + [ row[1] ] ]
 
-        results.sort(lambda x, y: int(int(y[3]) - int(x[3])))
+        results.sort(lambda x, y: int(int(y[-1]) - int(x[-1])))
         total_results = len(results)
             
         for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
@@ -952,11 +962,9 @@ class AlertListing(MessageListing, view.View):
 
             aggregated_count = values[start]
             if aggregated_count == None:
-                ca_ident = self.env.idmef_db.getAlertIdents(criteria + [ "alert.messageid = %s" % values[0] ], 1, -1)[0]
-                message = self.env.idmef_db.getAlert(ca_ident)
-
-                self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
+                message = values[-2]
                 
+                self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
                 dataset = self._setMessage(message, ca_ident)
                 self.dataset["messages"].append(dataset)
                 continue
