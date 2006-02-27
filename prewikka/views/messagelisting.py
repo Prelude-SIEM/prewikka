@@ -544,11 +544,18 @@ class ListedAlert(ListedMessage):
         self["correlation_alert_name"] = message["alert.correlation_alert.name"]
         self["correlation_alert_link"] = self.createMessageLink(ident, "alert_summary")
         self["correlated_alert_number"] = i
-        self["correlated_alert_display"] = utils.create_link(self.view_name,
-                                                                self.parameters -
-                                                                [ "timeline_unit", "timeline_value", "_load", "_save",
-                                                                  "alert.assessment.impact.severity",
-                                                                  "alert.assessment.impact.completion" ] + ca_params)
+                        
+        tmp = self.parameters
+        tmp -= [ "timeline_unit", "timeline_value", "offset",
+                 "aggregated_classification", "aggregated_source",
+                 "aggregated_target", "alert.assessment.impact.severity",
+                 "alert.assessment.impact.completion", "_load", "_save" ]
+
+        tmp["aggregated_target"] = \
+        tmp["aggregated_source"] = \
+        tmp["aggregated_classification"] = "none"
+        
+        self["correlated_alert_display"] = utils.create_link(self.view_name, tmp + ca_params)
 
     def setMessageInfo(self, message, ident):
         self["infos"] = [ { } ]
