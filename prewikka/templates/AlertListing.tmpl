@@ -371,7 +371,15 @@ function ${name}_add_entry(object, value, num) {
 
 <td>
   #if $message.correlation_alert_name
-    <b>Correlation Alert:</b> <i>$message.correlation_alert_name</i><br/>
+    <b>Correlation Alert#slurp
+    #if $message.correlated_alert_display
+      #set plural = ""
+      #if $message.correlated_alert_number > 1:
+          #set plural = "s"
+      #end if
+      (<a href="$message.correlated_alert_display">$message.correlated_alert_number</a> alert$plural)#slurp
+    #end if
+:</b> <i><a href="$message.correlation_alert_link">$message.correlation_alert_name</a></i><br/>#slurp
   #end if
 
   #if $message.aggregated and $message.aggregated_classifications_hidden > 0
@@ -395,16 +403,7 @@ function ${name}_add_entry(object, value, num) {
       (<span class="impact_completion_$info.completion.value">$info.completion.value</span>)
     #end if
 
-    #if $message.correlated_alert_display
-      #set plural = ""
-      #if $message.correlated_alert_number > 1:
-          #set plural = "s"
-      #end if
-
-      <b>(<a href="$message.correlated_alert_display">$message.correlated_alert_number</a> alert$plural)</b>
-    #end if
-
-      <br/>$info.classification_references
+    <br/>$info.classification_references
   #end for
 </td>
 

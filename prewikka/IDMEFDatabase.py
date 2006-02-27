@@ -117,6 +117,12 @@ class Message:
         
         self._list_iterator = 0
         return self
+
+    def __len__(self):
+        if self._value_list:
+            return idmef_value_get_count(self._value_list)
+
+        return 1
     
     def next(self):
         next = idmef_value_get_nth(self._value_list, self._list_iterate)
