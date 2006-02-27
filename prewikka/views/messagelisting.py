@@ -888,9 +888,20 @@ class AlertListing(MessageListing, view.View):
         self._applyCheckboxFilters(criteria, "target")
         self._applyCheckboxFilters(criteria, "analyzer")
 
+    def _ignoreAtomicIfNeeded(self, idmef, ignore_list):
+        for ad in idmef["alert.additional_data"]:
+            if ad["meaning"] != "ignore_atomic_event":
+                continue
+            
+            for ca in idmef["alert.correlation_alert.alertident"]:
+                ignore_list.append((ca["analyzerid"] or idmef["alert.analyzer(-1).analyzerid"], ca["alertident"]))
+
+            break
+    
     def _setAggregatedMessagesNoValues(self, criteria, aggregated_on):
         filter_on = []
         filter_values = []
+        atomic_ignore_list = []
 
         for column in "source", "target", "classification":
             if len(self.parameters[column]):
@@ -937,6 +948,10 @@ class AlertListing(MessageListing, view.View):
             if aggregated_count == None:
                 ca_ident = self.env.idmef_db.getAlertIdents(criteria + [ "alert.messageid = %s" % values[0] ], 1, -1)[0]
                 message = self.env.idmef_db.getAlert(ca_ident)
+
+                self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
+                print atomic_ignore_list
+                
                 dataset = self._setMessage(message, ca_ident)
                 self.dataset["messages"].append(dataset)
                 continue
@@ -983,6 +998,10 @@ class AlertListing(MessageListing, view.View):
 
             for ident in self.env.idmef_db.getAlertIdents(criteria2, limit=1):
                 idmef = self._fetchMessage(ident)
+                            
+                if (idmef["alert.analyzer(-1).analyzerid"], idmef["alert.messageid"]) in atomic_ignore_list:
+                    continue
+                
                 message = self.listed_aggregated_alert(self.env, self.parameters)
                 self.dataset["messages"].append(message)
                 message.setTime(time_min, time_max)
