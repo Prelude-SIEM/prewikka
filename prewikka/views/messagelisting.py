@@ -897,7 +897,13 @@ class AlertListing(MessageListing, view.View):
                 ignore_list.append((ca["analyzerid"] or idmef["alert.analyzer(-1).analyzerid"], ca["alertident"]))
 
             break
-    
+
+    def _isAtomicEventIgnored(self, idmef, atomic_ignore_list):
+        if ( idmef["alert.analyzer(-1).analyzerid"], idmef["alert.messageid"]) in atomic_ignore_list:
+            return True
+        else:
+            return False
+                
     def _setAggregatedMessagesNoValues(self, criteria, aggregated_on):
         filter_on = []
         filter_values = []
@@ -997,8 +1003,8 @@ class AlertListing(MessageListing, view.View):
 
             for ident in self.env.idmef_db.getAlertIdents(criteria2, limit=1):
                 idmef = self._fetchMessage(ident)
-                            
-                if (idmef["alert.analyzer(-1).analyzerid"], idmef["alert.messageid"]) in atomic_ignore_list:
+
+                if self._isAtomicEventIgnored(idmef, atomic_ignore_list):
                     continue
                 
                 message = self.listed_aggregated_alert(self.env, self.parameters)
@@ -1145,9 +1151,16 @@ class AlertListing(MessageListing, view.View):
 
         if len(aggregated_on) > 0:
             return self._setAggregatedMessagesNoValues(criteria, aggregated_on)
-        
+
+        atomic_ignore_list = []
         for ident in self.env.idmef_db.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
             message = self.env.idmef_db.getAlert(ident)
+
+            if self._isAtomicEventIgnored(message, atomic_ignore_list):
+                continue
+            
+            self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
+
             dataset = self._setMessage(message, ident)
             self.dataset["messages"].append(dataset)
 
