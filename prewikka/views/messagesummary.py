@@ -496,9 +496,9 @@ class MessageSummary(Table):
                         value = utils.hexdump(value)
                 else:
                     value = ad.get("data")
-
+            
             for field in ignore:
-                if meaning == field[0]:
+                if meaning != None and meaning == field[0]:
                     ignored[meaning] = value
                     break
                 
