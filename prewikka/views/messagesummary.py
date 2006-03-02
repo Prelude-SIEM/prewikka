@@ -523,7 +523,7 @@ class MessageSummary(Table):
         ip.register("Ip offset", "ip_off", (lambda x: x & 0x1fff))
         ip.register("TTL", "ip_ttl")
         ip.register("Protocol", "ip_proto")
-        ip.register("Checksum", "ip_csum")
+        ip.register("Checksum", "ip_sum")
         ip.register_static("Source address", alert["source(0).node.address(0).address"])
         ip.register_static("Target address", alert["target(0).node.address(0).address"])
         return ip
@@ -623,7 +623,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 	    
 	    content = ""
 	    for ident in calist[analyzerid]:
-                criteria = "alert.analyzer.analyzerid = %s && alert.messageid = %s" % (analyzerid, ident)
+                criteria = "alert.analyzer.analyzerid = '%s' && alert.messageid = '%s'" % (analyzerid, ident)
         
                 results = self.env.idmef_db.getAlertIdents(criteria)
                 if len(results) == 0:
