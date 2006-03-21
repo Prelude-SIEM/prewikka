@@ -10,11 +10,11 @@
  		#set $table_cnt = 0
 		#for table in $section.tables
 		
-		#if $depth == 0 and $table_cnt > 0 and $table.style.find("inline") == -1:
+		#if $depth == 0 and $table_cnt > 0 and $table.style.find("inline") == -1
 		  <br/>
 		#end if
 
-                #if $table.odd_even:
+                #if $table.odd_even
 		<table class="$table.class $row_classes[$table_cnt % 2]" style="$table.style">
 		#else
 		<table class="$table.class" style="$table.style">
