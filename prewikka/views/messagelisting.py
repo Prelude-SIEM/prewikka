@@ -753,7 +753,7 @@ class MessageListing:
         idents = [ ]
         for delete in self.parameters["delete"]:
             if delete.isdigit():
-                idents += [ delete ]
+                idents += [ long(delete) ]
             else:
                 criteria = urllib.unquote_plus(delete)
                 idents += self._getMessageIdents(criteria)
