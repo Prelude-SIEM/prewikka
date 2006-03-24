@@ -253,6 +253,13 @@ class IDMEFDatabase:
         if config.getOptionValue("log"):
             preludedb_sql_enable_query_logging(sql, config.getOptionValue("log"))
 
+        wanted_version = "0.9.7"
+        try:
+            if not preludedb_check_version(wanted_version):
+                raise "libpreludedb %s or higher is required." % wanted_version
+        except:
+            raise "libpreludedb %s or higher is required." % wanted_version
+        
         self._db = preludedb_new(sql, None)
 
     def _getMessageIdents(self, get_message_idents, criteria, limit, offset):
@@ -309,14 +316,20 @@ class IDMEFDatabase:
     def getAlert(self, ident):
         return Alert(preludedb_get_alert(self._db, ident))
 
-    def deleteAlert(self, ident):
-        preludedb_delete_alert(self._db, ident)
+    def deleteAlert(self, identlst):
+        preludedb_transaction_start(self._db)
+        for ident in identlst:
+            preludedb_delete_alert(self._db, ident)
+        preludedb_transaction_end(self._db)
 
     def getHeartbeat(self, ident):
         return Heartbeat(preludedb_get_heartbeat(self._db, ident))
 
-    def deleteHeartbeat(self, ident):
-        preludedb_delete_heartbeat(self._db, ident)
+    def deleteHeartbeat(self, identlst):
+        preludedb_transaction_start(self._db)
+        for ident in identlst:
+            preludedb_delete_heartbeat(self._db, ident)
+        preludedb_transaction_end(self._db)
 
     def getValues(self, selection, criteria=None, distinct=0, limit=-1, offset=-1):
         if type(criteria) is list:

@@ -140,12 +140,11 @@ class SensorMessagesDelete(SensorListing):
         for analyzerid in self.parameters["analyzerid"]:
             if self.parameters.has_key("alerts"):
                 criteria = "alert.analyzer.analyzerid == %d" % long(analyzerid)
-                for ident in self.env.idmef_db.getAlertIdents(criteria):
-                    self.env.idmef_db.deleteAlert(ident)
+                self.env.idmef_db.deleteAlert(self.env.idmef_db.getAlertIdents(criteria))
+
             if self.parameters.has_key("heartbeats"):
-                criteria = "heartbeat.analyzer.analyzerid == %d" % long(analyzerid)
-                for ident in self.env.idmef_db.getHeartbeatIdents(criteria):
-                    self.env.idmef_db.deleteHeartbeat(ident)
+                criteria = "heartbeat.analyzer(-1).analyzerid == %d" % long(analyzerid)
+                self.env.idmef_db.deleteHeartbeat(self.env.idmef_db.getHeartbeatIdents(criteria))
             
         SensorListing.render(self)
 

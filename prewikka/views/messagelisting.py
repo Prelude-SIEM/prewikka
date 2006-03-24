@@ -750,16 +750,15 @@ class MessageListing:
         if not self.user.has(User.PERM_IDMEF_ALTER):
             raise User.PermissionDeniedError(user.login, self.current_view)
 
+        idents = [ ]
         for delete in self.parameters["delete"]:
             if delete.isdigit():
-                idents = [ delete ]
+                idents += [ delete ]
             else:
                 criteria = urllib.unquote_plus(delete)
-                idents = self._getMessageIdents(criteria)
+                idents += self._getMessageIdents(criteria)
 
-            for ident in idents:
-                self._deleteMessage(long(ident))
-        
+        self._deleteMessage(idents)
         del self.parameters["delete"]
 
 
