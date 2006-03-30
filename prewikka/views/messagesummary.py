@@ -121,7 +121,7 @@ class Table:
             self._current_table["rows"][row_index] += [col]
                         
     def newTableEntry(self, name, value, cl="", emphase=False):        
-        if not value:
+        if value == None:
             return
 
         self.newTableCol(0, name, cl=cl, header=True)
@@ -461,7 +461,7 @@ class MessageSummary(Table):
         
     def buildAdditionalData(self, alert, ignore=[], ignored={}, ip_options=[], tcp_options=[]):
         self.beginSection("Additional data")
-        
+
         self.beginTable()
         self.newTableCol(0, "Meaning", header=True)
         self.newTableCol(0, "Value", header=True)
