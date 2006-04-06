@@ -431,7 +431,7 @@ function ${name}_add_entry(object, value, num) {
       #elif $proto_str
         #set $service += ":" + $proto_str
       #end if
-   
+
       #for $address in $direction.addresses
        <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$address_cnt'); return false;">$address.value</a>$service<br />
        <span id="menu_$address_cnt" class="popup_menu">
@@ -443,7 +443,11 @@ function ${name}_add_entry(object, value, num) {
           #end for
 
        </span>
-       #end for
+      #end for
+     
+      #if $len($direction.addresses) == 0 and $service
+	service: $service[1:]
+      #end if
 
       #if $direction.users
         #if len($direction.users) > 1
