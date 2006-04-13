@@ -1,3 +1,23 @@
+* 2006-04-13, prewikka-0.9.4:
+
+	- Intelligent display for CorrelationAlert. Include correlated
+	  alert information in the alert listing.
+
+	- Intelligent printing of Network centric information. 
+
+	- Fix Cheetah compilation for the heartbeat page.
+
+	- Correct handling of AdditionalData containing an integer 0.
+
+	- Handle ignore_atomic_event AdditionalData key (used by CorrelationAlert to
+	  hide linked-in alert).
+
+	- Fix aggregation when done simultaneously on multiple fields.
+
+	- Aggregation on fields other than "address" was not working well.
+
+
+
 * 2005-01-10, prewikka-0.9.3:
 
 	- Distribute SQLite schema.

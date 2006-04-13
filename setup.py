@@ -130,7 +130,7 @@ class my_install(install):
 
 
 setup(name="prewikka",
-      version="0.9.3",
+      version="0.9.4",
       maintainer = "Yoann Vandoorselaere",
       maintainer_email = "yoann.v@prelude-ids.com",
       url = "http://www.prelude-ids.org",
