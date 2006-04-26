@@ -258,7 +258,7 @@ class IDMEFDatabase:
             if not preludedb_check_version(wanted_version):
                 raise "libpreludedb %s or higher is required." % wanted_version
         except:
-            raise "libpreludedb %s or higher is required." % wanted_version
+            raise "libpreludedb %s or higher is required (%s found)." % (wanted_version, preludedb_check_version(None))
         
         self._db = preludedb_new(sql, None)
 
