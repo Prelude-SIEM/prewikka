@@ -29,6 +29,7 @@ from distutils.core import setup
 from distutils.command.build import build
 from distutils.command.build_py import build_py
 from distutils.command.install import install
+from distutils.command.install_scripts import install_scripts
 from distutils.core import Command
 
 from Cheetah.CheetahWrapper import CheetahWrapper
@@ -76,6 +77,36 @@ class MyDistribution(Distribution):
         self.conf_files = [ ]
         self.mysql2sqlite()
         Distribution.__init__(self, attrs)
+
+
+class my_install_scripts (install_scripts):
+    def initialize_options (self):
+        install_scripts.initialize_options(self)
+        self.install_data = None
+
+    def finalize_options (self):
+        install_scripts.finalize_options(self)
+        self.set_undefined_options('install',
+                                   ('install_data', 'install_data'))
+
+    def run (self):
+        if not self.skip_build:
+            self.run_command('build_scripts')
+
+        self.outfiles = []
+        
+        self.mkpath(os.path.normpath(self.install_dir))
+        ofile, copied = self.copy_file(os.path.join(self.build_dir, 'prewikka-httpd'), self.install_dir)
+        if copied:
+            self.outfiles.append(ofile)
+            
+        cgi_dir = os.path.join(self.install_data, 'share', 'prewikka', 'cgi-bin')
+        if not os.path.exists(cgi_dir):
+            os.makedirs(cgi_dir)
+
+        ofile, copied = self.copy_file(os.path.join(self.build_dir, 'prewikka.cgi'), cgi_dir)
+        if copied:
+            self.outfiles.append(ofile)
 
 
 class my_install(install):
@@ -143,8 +174,9 @@ setup(name="prewikka",
                    ("share/prewikka/htdocs/css", glob.glob("htdocs/css/*.css")),
                    ("share/prewikka/htdocs/js", glob.glob("htdocs/js/*.js")),
                    ("share/prewikka/database", glob.glob("database/*.sql") + glob.glob("database/*.sh") )],
-      scripts=[ "scripts/prewikka-httpd" ],
+      scripts=[ "scripts/prewikka-httpd", "cgi-bin/prewikka.cgi" ],
       conf_files=[ "conf/prewikka.conf" ],
       cmdclass={ 'build_py': my_build_py,
-                 'install': my_install },
+                 'install': my_install,
+                 'install_scripts': my_install_scripts },
       distclass=MyDistribution)
