@@ -387,7 +387,7 @@ class ListedAlert(ListedMessage):
         
     def _setMessageDirectionAddress(self, direction, address):
         self[direction]["empty"] = False
-        self[direction]["addresses"].append(self.createHostField("alert.%s.node.address" % direction, address, type=direction))
+        self[direction]["addresses"].append(self.createHostField("alert.%s.node.address.address" % direction, address, type=direction))
 
     def _setMessageDirectionNodeName(self, direction, name):
         self[direction]["empty"] = False
