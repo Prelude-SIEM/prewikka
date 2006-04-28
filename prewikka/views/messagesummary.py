@@ -736,7 +736,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
             self.newTableCol(index, fa["user_id.type"])
             self.newTableCol(index, fa["user_id.name"])
             self.newTableCol(index, fa["user_id.number"])
-            self.newTableCol(index, perm)
+            self.newTableCol(index, pstr)
 
             index += 1
             
