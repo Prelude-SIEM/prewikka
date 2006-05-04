@@ -53,8 +53,6 @@ class my_build_py(build_py):
 
             for template in templates:
                 compiled = self.build_lib + "/" + template.replace(".tmpl", ".py")
-                print "CMP=%s" % compiled
-                
                 self.outfiles.append(compiled)
                 if os.path.exists(compiled):
                     template_stat = os.stat(template)
@@ -63,7 +61,6 @@ class my_build_py(build_py):
                         continue
 
                 argv = [ sys.argv[0], "compile", "--nobackup", template ]
-
                 cheetah.main(argv)
                 sys.argv[0] = argbkp
 
