@@ -1,3 +1,17 @@
+* 2006-05-04, prewikka-0.9.5:
+
+	- Fix 'Filter on Target' link (fix #148).
+
+	- Fix alert summary exception with alert including file permission (fix #149).
+
+	- Fix creation of an empty __init__.py file in lib/site-packages (#147).
+
+	- Print currently installed version on libpreludedb requirement error.
+
+	- Make sure /usr/bin/env is expanded.
+
+
+
 * 2006-04-13, prewikka-0.9.4:
 
 	- Intelligent display for CorrelationAlert. Include correlated
