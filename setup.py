@@ -45,21 +45,28 @@ class my_build_py(build_py):
     
     def build_templates(self):
         cheetah = CheetahWrapper()
+        argbkp = sys.argv[0][:]
         
         for package in self.packages:
             package_dir = self.get_package_dir(package)
             templates = glob.glob(package_dir + '/*.tmpl')
+
             for template in templates:
                 compiled = self.build_lib + "/" + template.replace(".tmpl", ".py")
+                print "CMP=%s" % compiled
+                
                 self.outfiles.append(compiled)
                 if os.path.exists(compiled):
                     template_stat = os.stat(template)
                     compiled_stat = os.stat(compiled)
                     if compiled_stat.st_mtime > template_stat.st_mtime:
                         continue
-                argv = [ sys.argv[0], "compile", "--odir", self.build_lib, "--nobackup", template ]
+
+                argv = [ sys.argv[0], "compile", "--nobackup", template ]
+
                 cheetah.main(argv)
-    
+                sys.argv[0] = argbkp
+
     def run(self):
         self.build_templates()
         build_py.run(self)
