@@ -253,13 +253,19 @@ class IDMEFDatabase:
         if config.getOptionValue("log"):
             preludedb_sql_enable_query_logging(sql, config.getOptionValue("log"))
 
+        cur = ver = None
         wanted_version = "0.9.7"
         try:
-            if not preludedb_check_version(wanted_version):
-                raise "libpreludedb %s or higher is required." % wanted_version
+            cur = preludedb_check_version(None)
+            ver = preludedb_check_version(wanted_version)
+            if not ver:
+                raise
         except:
-            raise "libpreludedb %s or higher is required (%s found)." % (wanted_version, preludedb_check_version(None))
-        
+            if cur:
+                raise "libpreludedb %s or higher is required (%s found)." % (wanted_version, cur)
+            else:
+                raise "libpreludedb %s or higher is required." % wanted_version
+            
         self._db = preludedb_new(sql, None)
 
     def _getMessageIdents(self, get_message_idents, criteria, limit, offset):
