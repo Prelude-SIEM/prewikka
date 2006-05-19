@@ -25,6 +25,7 @@ import copy
 import re
 
 from prewikka import view, User, utils
+from prelude import idmef_path_new, idmef_path_get_value_type, IDMEF_VALUE_TYPE_STRING
 
 
 class _MyTime:
@@ -1014,7 +1015,11 @@ class AlertListing(MessageListing, view.View):
                     direction = "target"
 
                 if not value:
-                    criterion = "(! %s || %s == '')" % (path, path)
+                    if idmef_path_get_value_type(idmef_path_new(path), -1) != IDMEF_VALUE_TYPE_STRING:
+                        criterion = "! %s" % (path)
+                    else:
+                        criterion = "(! %s || %s == '')" % (path, path)
+                        
 
                 else:
                     criterion = "%s == '%s'" % (path, utils.escape_criteria(str(value)))
