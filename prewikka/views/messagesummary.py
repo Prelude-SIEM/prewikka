@@ -794,28 +794,30 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         elif service["protocol"]:
             self.newTableEntry("Protocol", service["protocol"])
                     
-    def buildDirection(self, alert, direction):
+    def buildDirection(self, direction):
         self.beginTable()
-        self.buildNode(alert["%s(0).node" % direction])
-        self.buildService(alert["%s(0).service" % direction])
+        self.buildNode(direction["node"])
+        self.buildService(direction["service"])
         self.endTable()
         
-        user = alert["%s(0).user" % direction]
+        user = direction["user"]
         if user:
             self.buildUser(user)
         
-        process = alert["%s(0).process" % direction]
+        process = direction["process"]
         if process:
             self.buildProcess(process)
         
     def buildSource(self, alert):
-        self.buildDirection(alert, "source")
+        for source in alert["source"]:
+            self.buildDirection(source)
 
     def buildTarget(self, alert):
-        self.buildDirection(alert, "target")
+        for target in alert["target"]:
+            self.buildDirection(target)
 
-        for f in alert["target(0).file"]:
-            self.buildFile(f)
+            for f in target["file"]:
+                self.buildFile(f)
 
     def buildSourceTarget(self, alert):
         self.beginSection("Source")
