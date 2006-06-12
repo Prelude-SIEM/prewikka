@@ -809,24 +809,30 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
             self.buildProcess(process)
         
     def buildSource(self, alert):
+        i = 0
+        
         for source in alert["source"]:
+            self.beginSection("Source(%d)" % i)
             self.buildDirection(source)
-
+            self.endSection()
+            i += 1
+            
     def buildTarget(self, alert):
+        i = 0
+        
         for target in alert["target"]:
+            self.beginSection("Target(%d)" % i)
             self.buildDirection(target)
 
             for f in target["file"]:
                 self.buildFile(f)
 
+            self.endSection()
+            i += 1
+            
     def buildSourceTarget(self, alert):
-        self.beginSection("Source")
         self.buildSource(alert)
-        self.endSection()
-
-        self.beginSection("Target")
         self.buildTarget(alert)
-        self.endSection()
 
     def getSectionName(self, alert):
         if alert["correlation_alert"]:
