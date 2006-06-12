@@ -565,7 +565,7 @@ class MessageSummary(Table):
         icmp.register("Id", "icmp_id")
         icmp.register("Seq #", "icmp_seq")
         icmp.register("Mask", "icmp_mask");
-        icmp.register("Gateway Address", "icmp_gwaddr", socket.inet_ntoa)
+        icmp.register("Gateway Address", "icmp_gwaddr")
         icmp.register("Num address", "icmp_num_addrs")
         icmp.register("Wpa", "icmp_wpa")
         icmp.register("Lifetime", "icmp_lifetime")
