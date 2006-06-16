@@ -397,9 +397,10 @@ class ListedAlert(ListedMessage):
     def _setMessageDirectionGeneric(self, direction, object, value):
         self[direction]["empty"] = False            
         self[direction][object]["value"] = value
-        
-    def _setMessageDirection(self, dataset, message, direction):
-        empty = True
+
+            
+    def _setMessageDirection(self, dataset, direction, obj):        
+        empty = dataset["empty"]
         
         def set_main_and_extra_values(dataset, name, object_main, object_extra):
             if object_main != None:
@@ -412,49 +413,51 @@ class ListedAlert(ListedMessage):
             if dataset[name]["value"] != None:
                 empty = False
             
-        dataset["interface"] = { "value": message["alert.%s(0).interface" % direction] }
+        dataset["interface"] = { "value": obj["interface"] }
 
-        for userid in message["alert.%s(0).user.user_id" % direction]:
+        for userid in obj["user.user_id"]:
             user = { }
             empty = False
             dataset["users"].append(user)
             set_main_and_extra_values(user, "user", userid["name"], userid["number"])
 
-        name = message["alert.%s(0).node.name" % direction]
+        name = obj["node.name"]
         if name != None:
             self._setMessageDirectionNodeName(direction, name)
             
-        for addr in message["alert.%s(0).node.address" % direction]:
+        for addr in obj["node.address"]:
             empty = False            
             self._setMessageDirectionAddress(direction, addr["address"])
                         
-        set_main_and_extra_values(dataset, "process",
-                                  message["alert.%s(0).process.name" % direction],
-                                  message["alert.%s(0).process.pid" % direction])
+        set_main_and_extra_values(dataset, "process", obj["process.name"], obj["process.pid"])
 
         proto = None
-        if message["alert.%s(0).service.iana_protocol_name" % direction]:
-            proto = message["alert.%s(0).service.iana_protocol_name" % direction]
+        if obj["service.iana_protocol_name"]:
+            proto = obj["service.iana_protocol_name"]
             
-        elif message["alert.%s(0).service.iana_protocol_number" % direction]:
-            num = message["alert.%s(0).service.iana_protocol_number" % direction]
+        elif obj["service.iana_protocol_number"]:
+            num = obj["service.iana_protocol_number"]
             proto = utils.protocol_number_to_name(num)
 
         if not proto:
-            proto = message["alert.%s(0).service.protocol" % direction]
+            proto = obj["service.protocol"]
        
         set_main_and_extra_values(dataset, "protocol", proto, None)
-        set_main_and_extra_values(dataset, "service", message["alert.%s(0).service.port" % direction], None)
+        set_main_and_extra_values(dataset, "service", obj["service.port"], None)
 
         dataset["files"] = []
         dataset["empty"] = empty
 
     def setMessageSource(self, message):
-        self._setMessageDirection(self["source"], message, "source")
+        self["source"]["empty"] = True
+        for source in message["alert.source"]:
+            self._setMessageDirection(self["source"], "source", source)
 
     def setMessageTarget(self, message):
-        self._setMessageDirection(self["target"], message, "target")
-
+        self["target"]["empty"] = True
+        for target in message["alert.target"]:
+            self._setMessageDirection(self["target"], "target", target)
+            
         flist = []
         empty = self["target"]["empty"]
         
@@ -962,7 +965,7 @@ class AlertListing(MessageListing, view.View):
             message = self.env.idmef_db.getAlert(ca_ident)
             self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
             results += [ [ row[0] ] + [None for i in aggregated_on] + [ca_ident] + [message] + [ row[1] ] ]
-
+            
         ignore_criteria = [ ]
         for messageid in atomic_ignore_list:
             ignore_criteria += [ "alert.messageid != '%s'" % messageid ]
@@ -980,7 +983,7 @@ class AlertListing(MessageListing, view.View):
             aggregated_source_values = []
             aggregated_target_values = []
             aggregated_classification_values = []
-
+            
             if self.parameters["aggregated_source"] != ["none"]:
                 start = len(self.parameters["aggregated_source"])
                 aggregated_source_values = values[:len(self.parameters["aggregated_source"])]
@@ -1046,19 +1049,19 @@ class AlertListing(MessageListing, view.View):
             message.setTime(time_min, time_max)
             message.setCriteriaForDeletion(delete_criteria)
 
-            results = self.env.idmef_db.getValues(["alert.analyzer(-1).name/group_by",
-                                                   "alert.analyzer(-1).node.name/group_by"],
-                                                  criteria2)
+            res = self.env.idmef_db.getValues(["alert.analyzer(-1).name/group_by",
+                                               "alert.analyzer(-1).node.name/group_by"],
+                                              criteria2)
 
-            for analyzer_name, analyzer_node_name in results:
+            for analyzer_name, analyzer_node_name in res:
                 message.addSensor(analyzer_name, analyzer_node_name)
 
-            results = self.env.idmef_db.getValues(["alert.classification.text/group_by",
-                                                   "alert.assessment.impact.severity/group_by",
-                                                   "alert.assessment.impact.completion/group_by",
-                                                   "count(alert.create_time)"], criteria2 + ignore_criteria)
+            res = self.env.idmef_db.getValues(["alert.classification.text/group_by",
+                                               "alert.assessment.impact.severity/group_by",
+                                               "alert.assessment.impact.completion/group_by",
+                                               "count(alert.create_time)"], criteria2 + ignore_criteria)
                 
-            results.sort(lambda x, y: cmp_severities(x[1], y[1]))
+            res.sort(lambda x, y: cmp_severities(x[1], y[1]))
 
             parameters = self._createAggregationParameters(aggregated_classification_values,
                                                            aggregated_source_values, aggregated_target_values)
@@ -1074,14 +1077,14 @@ class AlertListing(MessageListing, view.View):
                                                                                     { "aggregated_classification":
                                                                                       "alert.classification.text" } )
 
-            if len(results[:self._max_aggregated_classifications]) > 1:
+            if len(res[:self._max_aggregated_classifications]) > 1:
                 classification = None
             else:
-                classification = results[0][0] or ""
+                classification = res[0][0] or ""
 
             result_count = 0
 
-            for classification, severity, completion, count in results:
+            for classification, severity, completion, count in res:
                 if result_count >= self._max_aggregated_classifications:
                     result_count += 1
                     continue
