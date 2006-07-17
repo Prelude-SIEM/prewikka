@@ -124,9 +124,9 @@ class my_install(install):
         install.finalize_options(self)
 
     def install_conf(self):
-        self.mkpath(self.root or "" + self.conf_prefix)
+        self.mkpath((self.root or "") + self.conf_prefix)
         for file in self.distribution.conf_files:
-            dest = self.root or "" + self.conf_prefix + "/" + os.path.basename(file)
+            dest = (self.root or "") + self.conf_prefix + "/" + os.path.basename(file)
             if os.path.exists(dest):
                 dest += "-dist"
             self.copy_file(file, dest)
@@ -149,8 +149,8 @@ class my_install(install):
                     "share/prewikka/htdocs",
                     "share/prewikka/htdocs/images", "share/prewikka/htdocs/js", "share/prewikka/htdocs/css",
                     "share/prewikka/database", "share/prewikka/cgi-bin"):
-            os.chmod(self.root or "" + self.prefix + "/" + dir, 0755)
-        os.chmod(self.root or "" + self.conf_prefix, 0755)
+            os.chmod((self.root or "") + self.prefix + "/" + dir, 0755)
+        os.chmod((self.root or "") + self.conf_prefix, 0755)
         
         if not self.dry_run:
             for filename in self.get_outputs():
@@ -172,7 +172,7 @@ setup(name="prewikka",
       packages=[ 'prewikka', 'prewikka.views', 'prewikka.templates',
                  'prewikka.modules',
                  'prewikka.modules.log', 'prewikka.modules.log.stderr',
-                 'prewikka.modules.auth', 'prewikka.modules.auth.loginpassword' ],
+                 'prewikka.modules.auth', 'prewikka.modules.auth.loginpassword', 'prewikka.modules.auth.cgi' ],
       data_files=[ ("share/prewikka/cgi-bin", [ "cgi-bin/prewikka.cgi" ]),
                    ("share/prewikka/htdocs/images", glob.glob("htdocs/images/*")),
                    ("share/prewikka/htdocs/css", glob.glob("htdocs/css/*.css")),
