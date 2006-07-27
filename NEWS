@@ -1,3 +1,20 @@
+* 2006-07-27, prewikka-0.9.6:
+
+	- CGI authentication module, from Tilman Baumann <tilman.baumann@collax.com>.
+
+	- Correct libpreludedb runtime version check.
+
+	- Show multiple source/target in message listing/summary.
+
+	- Fix invalid use of socket.inet_ntoa() to read ICMP Gateway Address, 
+	  which is stored as string (#156).
+
+	- Fix aggregation on IDMEF-Path that are not string.
+
+	- Fix setup.py --root option (#166).
+
+
+
 * 2006-05-04, prewikka-0.9.5:
 
 	- Fix 'Filter on Target' link (fix #148).
