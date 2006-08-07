@@ -340,10 +340,13 @@ class MessageSummary(Table):
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     view_template = "MessageSummary"
 
-    def getUrlLink(self, url):
-        if not url:
+    def getUrlLink(self, name, url=None):
+        if not name:
             return None
-        
+
+        if not url:
+            url = name
+            
         external_link_new_window = self.env.config.general.getOptionValue("external_link_new_window", "true")
 
         if (not external_link_new_window and self.env.config.general.has_key("external_link_new_window")) or \
@@ -352,7 +355,7 @@ class MessageSummary(Table):
         else:
             target = "_self"
                 
-        return "<a target='%s' href='%s'>%s</a>" % (target, url, url)
+        return "<a target='%s' href='%s'>%s</a>" % (target, url, name)
                 
     def getTime(self, t):
         if not t:
@@ -394,7 +397,7 @@ class MessageSummary(Table):
         if not node:
             return
         
-        self.newTableEntry("Node name", node["name"])
+        self.newTableEntry("Node name", self.getUrlLink(node["name"], "https://www.prelude-ids.com/host_details.php?host=%s" % node["name"]))
         self.newTableEntry("Node location", node["location"])
         
         addr_list = ""
@@ -405,9 +408,10 @@ class MessageSummary(Table):
 
             if len(addr_list) > 0:
                 addr_list += "<br/>"
-                
-            addr_list += address
-                        
+
+            
+            addr_list += self.getUrlLink(address, "https://www.prelude-ids.com/host_details.php?host=%s" % address)
+            
         self.newTableEntry("Node address", addr_list)
                 
     def buildAnalyzer(self, analyzer):
@@ -782,7 +786,8 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
             return
         
         if service["port"]:
-            self.newTableEntry("Port", str(service["port"]))
+            port = str(service["port"])
+            self.newTableEntry("Port", self.getUrlLink(port, "https://www.prelude-ids.com/port_details.php?port=%s" % port))
 
         ipn = service["iana_protocol_number"]
         if ipn and utils.protocol_number_to_name(ipn) != None:
