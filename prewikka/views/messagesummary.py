@@ -20,6 +20,7 @@
 import time
 import struct
 import socket
+
 from prewikka import view, User, utils
 
     
@@ -409,8 +410,10 @@ class MessageSummary(Table):
             if len(addr_list) > 0:
                 addr_list += "<br/>"
 
-            
-            addr_list += self.getUrlLink(address, "https://www.prelude-ids.com/host_details.php?host=%s" % address)
+            if addr["category"] in ("ipv4-net", "ipv6-addr", "ipv4-net", "ipv6-net"):
+                addr_list += self.getUrlLink(address, "https://www.prelude-ids.com/host_details.php?host=%s" % address)
+            else:
+                addr_list += address
             
         self.newTableEntry("Node address", addr_list)
                 
