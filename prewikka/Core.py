@@ -130,8 +130,9 @@ class Core:
         
     def _initHostCommands(self):
         self._env.host_commands = { }
+        
         for option in self._env.config.command.getOptions():
-            if os.access(option.value, os.X_OK):
+            if os.access(option.value.split(" ")[0], os.X_OK):
                 self._env.host_commands[option.name] = option.value
         
     def _initAuth(self):

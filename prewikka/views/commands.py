@@ -47,7 +47,9 @@ class Command(view.View):
         except KeyError:
             raise Error("Attempt to execute unregistered command '%s'" % cmd)
 
-        stdin, stdout = os.popen2((command, self.parameters["host"]))
+        command = command.replace("$host", self.parameters["host"]).split(" ")
+                
+        stdin, stdout = os.popen2(command)
         output = stdout.read()
         output = output.replace(" ", "&nbsp;").replace("\n", "<br/>\n")
         self.dataset["command_output"] = output
