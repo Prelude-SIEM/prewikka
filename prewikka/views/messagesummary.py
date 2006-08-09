@@ -398,7 +398,7 @@ class MessageSummary(Table):
         if not node:
             return
         
-        self.newTableEntry("Node name", self.getUrlLink(node["name"], "https://www.prelude-ids.com/host_details.php?host=%s" % node["name"]))
+        self.newTableEntry("Node name", node["name"])
         self.newTableEntry("Node location", node["location"])
         
         addr_list = ""
