@@ -419,7 +419,7 @@ function ${name}_add_entry(object, value, num) {
       #end if
 
       #if $direction.service.value != None
-       #set $service = ":<a target=\"$external_link_target\" href=\"https://www.prelude-ids.com/port_details.php?port="
+       #set $service = ":<a target=\"$prewikka.external_link_target\" href=\"https://www.prelude-ids.com/port_details.php?port="
        #set $service += $str($direction.service.value) + $proto_param + "\">" + $str($direction.service.value)
        
        #if $proto_str
@@ -440,7 +440,7 @@ function ${name}_add_entry(object, value, num) {
          - <a href="$address.inline_filter">Filter on this $name</a><br />
  
        #if $address.category and $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
-         - <a target=\"$external_link_target\" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$name.capitalize() information</a><br />
+         - <a target=\"$prewikka.external_link_target\" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$name.capitalize() information</a><br />
 
           #for $cmdname, $link in $address.host_commands
          - <a href="$link">$cmdname</a><br />
