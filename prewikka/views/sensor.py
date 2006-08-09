@@ -105,12 +105,21 @@ class SensorListing(view.View):
                 analyzer["node_location"] = "n/a"
 
             for i in range(len(analyzer["node_addresses"])):
-                analyzer["node_addresses"][i] = "<a href='%s'>%s</a>" % \
-                                                (utils.create_link(self.view_name,
+                addr = analyzer["node_addresses"][i]
+                
+                analyzer["node_addresses"][i] = {}
+                analyzer["node_addresses"][i]["value"] = addr
+                analyzer["node_addresses"][i]["inline_filter"] = utils.create_link(self.view_name,
                                                                    { "filter_path": "heartbeat.analyzer(-1).node.address.address",
-                                                                     "filter_value": analyzer["node_addresses"][i] }),
-                                                 analyzer["node_addresses"][i])
+                                                                     "filter_value": addr })
 
+                analyzer["node_addresses"][i]["host_commands"] = []
+                for command in self.env.host_commands.keys():
+                    analyzer["node_addresses"][i]["host_commands"].append((command.capitalize(),
+                                                                           utils.create_link("Command",
+                                                                                             { "origin": self.view_name,
+                                                                                               "command": command, "host": addr })))
+            
             analyzer["status"], analyzer["status_meaning"] = \
                                 get_analyzer_status_from_latest_heartbeat(analyzer["last_heartbeat_status"],
                                                                           analyzer["last_heartbeat_time"],
@@ -121,7 +130,7 @@ class SensorListing(view.View):
                                               " %+.2d:%.2d" % utils.get_gmt_offset()
             
             analyzers.append(analyzer)
-
+            
         self.dataset["analyzers"] = [ ]
         for analyzer in analyzers:
             if analyzer["status"] == "ok":

@@ -41,7 +41,19 @@
         <td>
         #if len($analyzer.node_addresses) > 0
           #for $address in $analyzer.node_addresses
-            $address<br/>
+           #set $cnt += 1
+
+	   <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$address.value</a><br />
+           <span id="menu_$cnt" class="popup_menu">
+
+            - <a href="$address.inline_filter">Filter on address</a><br />
+            - <a target=\"$prewikka.external_link_target\" href="https://www.prelude-ids.com/host_details.php?host=$address.value">Address information</a><br />
+     
+	    #for $name, $link in $address.host_commands
+            - <a href="$link">$name</a><br />
+            #end for
+           </span>
+
           #end for
         #else
           n/a
