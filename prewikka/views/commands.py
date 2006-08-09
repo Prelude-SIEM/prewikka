@@ -22,39 +22,34 @@ import os
 
 from prewikka import view, User
 
+class Error(Exception):
+    pass
 
 
 class HostCommandParameters(view.RelativeViewParameters):
     def register(self):
         view.RelativeViewParameters.register(self)
         self.mandatory("host", str)
-
+        self.mandatory("command", str)
 
 
 class Command(view.View):
+    view_name = "Command"
     view_template = "Command"
-
-
-
-class HostCommand(Command):
-    view_parameters = HostCommandParameters
     view_permissions = [ User.PERM_COMMAND ]
-
+    view_parameters = HostCommandParameters
+            
     def render(self):
-        command = self.env.host_commands[self.command]
+        cmd = self.parameters["command"]
+        
+        try:
+            command = self.env.host_commands[cmd]
+        except KeyError:
+            raise Error("Attempt to execute unregistered command '%s'" % cmd)
+
         stdin, stdout = os.popen2((command, self.parameters["host"]))
         output = stdout.read()
         output = output.replace(" ", "&nbsp;").replace("\n", "<br/>\n")
         self.dataset["command_output"] = output
 
 
-
-class Whois(HostCommand):
-    view_name = "whois"
-    command = "whois"
-
-
-
-class Traceroute(HostCommand):
-    view_name = "traceroute"
-    command = "traceroute"

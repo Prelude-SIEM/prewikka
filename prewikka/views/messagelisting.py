@@ -279,13 +279,13 @@ class ListedMessage(dict):
         self.parameters = parameters
         self.timezone = parameters["timezone"]
 
-    def createInlineFilteredField(self, object, value, type=None):
+    def createInlineFilteredField(self, object, value, direction=None):
         if not value:
             return { "value": None, "inline_filter": None }
 
-        if type:
+        if direction:
             index = self.parameters.max_index
-            extra = { "%s_object_%d" % (type, index): object, "%s_value_%d" % (type, index): value }
+            extra = { "%s_object_%d" % (direction, index): object, "%s_value_%d" % (direction, index): value }
         else:
             extra = { object: value }
 
@@ -313,14 +313,15 @@ class ListedMessage(dict):
 
         return { "value": t }
 
-    def createHostField(self, object, value, type=None):
-        field = self.createInlineFilteredField(object, value, type)
+    def createHostField(self, object, value, category, direction=None):
+        field = self.createInlineFilteredField(object, value, direction)
         field["host_commands"] = [ ]
-        for command in "whois", "traceroute":
-            if self.env.host_commands.has_key(command):
-                field["host_commands"].append((command.capitalize(),
-                                               utils.create_link(command,
-                                                                 { "origin": self.view_name, "host": value })))
+        field["category"] = category
+        
+        for command in self.env.host_commands.keys():
+            field["host_commands"].append((command.capitalize(),
+                                           utils.create_link("Command",
+                                                             { "origin": self.view_name, "command": command, "host": value })))
 
         return field
     
@@ -347,8 +348,8 @@ class ListedHeartbeat(ListedMessage):
         self["node_addresses"] = [ ]
 
         for address in message["heartbeat.analyzer(-1).node.address"]:
-            self["node_addresses"].append(
-                self.createHostField("heartbeat.analyzer(-1).node.address.address", address["address"]))
+            hfield = self.createHostField("heartbeat.analyzer(-1).node.address.address", address["address"], address["category"])
+            self["node_addresses"].append(hfield)
             
         self["time"] = self.createTimeField(message["heartbeat.create_time"], self.parameters["timezone"])
 
@@ -386,13 +387,14 @@ class ListedAlert(ListedMessage):
         apply(ListedMessage.__init__, (self, ) + args, kwargs)
         self.reset()
         
-    def _setMessageDirectionAddress(self, direction, address):
+    def _setMessageDirectionAddress(self, direction, address, category):
         self[direction]["empty"] = False
-        self[direction]["addresses"].append(self.createHostField("alert.%s.node.address.address" % direction, address, type=direction))
+        hfield = self.createHostField("alert.%s.node.address.address" % direction, address, category, direction=direction)
+        self[direction]["addresses"].append(hfield)
 
     def _setMessageDirectionNodeName(self, direction, name):
         self[direction]["empty"] = False
-        self[direction]["addresses"].append(self.createHostField("alert.%s.node.name" % direction, name, type=direction))
+        self[direction]["addresses"].append(self.createHostField("alert.%s.node.name" % direction, name, None, direction=direction))
 
     def _setMessageDirectionGeneric(self, direction, object, value):
         self[direction]["empty"] = False            
@@ -427,7 +429,7 @@ class ListedAlert(ListedMessage):
             
         for addr in obj["node.address"]:
             empty = False            
-            self._setMessageDirectionAddress(direction, addr["address"])
+            self._setMessageDirectionAddress(direction, addr["address"], addr["category"])
                         
         set_main_and_extra_values(dataset, "process", obj["process.name"], obj["process.pid"])
 
@@ -458,37 +460,33 @@ class ListedAlert(ListedMessage):
         for target in message["alert.target"]:
             self._setMessageDirection(self["target"], "target", target)
             
-        flist = []
-        empty = self["target"]["empty"]
-        
-        for f in message["alert.target(0).file"]:
-            if f["path"] in flist:
-                continue
+            flist = [] 
+            for f in target["file"]:
+                if f["path"] in flist:
+                    continue
 
-            empty = False
-            flist.append(f["path"])
-            self["target"]["files"].append(self.createInlineFilteredField("alert.target.file.path",
-                                                                          f["path"], type="target"))
-
-        self["target"]["empty"] = empty
+                self["target"]["empty"] = False
+                flist.append(f["path"])
+                self["target"]["files"].append(self.createInlineFilteredField("alert.target.file.path",
+                                                                              f["path"], direction="target"))
         
 
     def setMessageClassificationReferences(self, dataset, message):
         urls = [ ]
 
+        val = self.env.config.general.getOptionValue("external_link_new_window", "true")
+        if (not val and self.env.config.general.has_key("external_link_new_window")) or \
+           (val == None or val.lower() in ["true", "yes"]):
+            external_link_target = "_blank"
+        else:
+            external_link_target = "_self"
+        
         for ref in message["alert.classification.reference"]:
             fstr = ""
 
             url = ref["url"]
-            if url:
-                external_link_new_window = self.env.config.general.getOptionValue("external_link_new_window", "true")
-                if (not external_link_new_window and self.env.config.general.has_key("external_link_new_window")) or \
-                   (external_link_new_window == None or external_link_new_window.lower() in [ "true", "yes" ]):
-                    target = "_blank"
-                else:
-                    target = "_self"
-                    
-                fstr="<a target='%s' href='%s'>" % (target, url)
+            if url:                    
+                fstr="<a target='%s' href='%s'>" % (external_link_target, url)
 
             origin = ref["origin"]
             if origin:
@@ -601,7 +599,7 @@ class ListedAlert(ListedMessage):
     def addSensor(self, name, node_name):
         sensor = { }
         self["sensors"].append(sensor)
-        sensor["name"] = self.createInlineFilteredField("alert.analyzer.name", name, type="analyzer")
+        sensor["name"] = self.createInlineFilteredField("alert.analyzer.name", name, direction="analyzer")
         sensor["node_name"] = { "value": node_name }
         
     def setMessageTime(self, message):
@@ -1014,9 +1012,14 @@ class AlertListing(MessageListing, view.View):
             for path, value in zip(aggregated_on, values[:start]):
                 if path.find("source") != -1:
                     direction = "source"
+                    value_category = aggregated_source_values[-1]
                 else:
                     direction = "target"
+                    value_category = aggregated_target_values[-1]
 
+                if re.compile("address.*\.category").match(path):
+                    continue
+                
                 if not value:
                     if idmef_path_get_value_type(idmef_path_new(path), -1) != IDMEF_VALUE_TYPE_STRING:
                         criterion = "! %s" % (path)
@@ -1028,7 +1031,7 @@ class AlertListing(MessageListing, view.View):
                     criterion = "%s == '%s'" % (path, utils.escape_criteria(str(value)))
                     
                     if path.find("address") != -1 or path.find("node.name") != -1:
-                        message._setMessageDirectionAddress(direction, value)
+                        message._setMessageDirectionAddress(direction, value, value_category)
                     
                     for var in [ ("user", None), ("process", None), ("service", None), ("port", "service") ]:
                         if path.find(var[0]) != -1:
@@ -1152,7 +1155,7 @@ class AlertListing(MessageListing, view.View):
             
         i = self.parameters.max_index
         for path, value in zip(self.parameters["aggregated_source"], aggregated_source_values):
-            if value == None:
+            if value == None or path == "alert.source(0).node.address(0).category":
                 continue
             
             parameters["source_object_%d" % i] = path.replace("(0)", "")
@@ -1161,7 +1164,7 @@ class AlertListing(MessageListing, view.View):
         
         i = self.parameters.max_index
         for path, value in zip(self.parameters["aggregated_target"], aggregated_target_values):
-            if value == None:
+            if value == None or path == "alert.target(0).node.address(0).category":
                 continue
             
             parameters["target_object_%d" % i] = path.replace("(0)", "")
@@ -1179,17 +1182,29 @@ class AlertListing(MessageListing, view.View):
 
         aggregated_on = []
         if self.parameters["aggregated_source"] != ["none"]:
+            if "alert.source(0).node.address(0).address" in self.parameters["aggregated_source"]:
+                self.parameters["aggregated_source"] += [ "alert.source(0).node.address(0).category" ]
             aggregated_on += self.parameters["aggregated_source"]
 
         if self.parameters["aggregated_target"] != ["none"]:
+            if "alert.target(0).node.address(0).address" in self.parameters["aggregated_target"]:
+                self.parameters["aggregated_target"] += [ "alert.target(0).node.address(0).category" ]
             aggregated_on += self.parameters["aggregated_target"]
 
         if self.parameters["aggregated_classification"] != ["none"]:
             aggregated_on += self.parameters["aggregated_classification"]
 
         if len(aggregated_on) > 0:
-            return self._setAggregatedMessagesNoValues(criteria, aggregated_on)
+            ret = self._setAggregatedMessagesNoValues(criteria, aggregated_on)
 
+            try: self.parameters["aggregated_source"].remove("alert.source(0).node.address(0).category")
+            except: pass
+            
+            try: self.parameters["aggregated_target"].remove("alert.target(0).node.address(0).category")
+            except: pass
+            
+            return ret
+        
         atomic_ignore_list = []
         for ident in self.env.idmef_db.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
             message = self.env.idmef_db.getAlert(ident)
@@ -1224,6 +1239,13 @@ class AlertListing(MessageListing, view.View):
         self._deleteMessages()
         self._setDatasetConstants()
         
+        val = self.env.config.general.getOptionValue("external_link_new_window", "true")
+        if (not val and self.env.config.general.has_key("external_link_new_window")) or \
+           (val == None or val.lower() in ["true", "yes"]):
+            self.dataset["external_link_target"] = "_blank"
+        else:
+            self.dataset["external_link_target"] = "_self"
+
         self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
         self.dataset["current_filter"] = self.parameters.get("filter", "")
         
@@ -1315,6 +1337,13 @@ class HeartbeatListing(MessageListing, view.View):
         self._deleteMessages()
         criteria = [ ]
         start = end = None
+
+        val = self.env.config.general.getOptionValue("external_link_new_window", "true")
+        if (not val and self.env.config.general.has_key("external_link_new_window")) or \
+           (val == None or val.lower() in ["true", "yes"]):
+            self.dataset["external_link_target"] = "_blank"
+        else:
+            self.dataset["external_link_target"] = "_self"
         
         if self.parameters.has_key("timeline_unit") and self.parameters["timeline_unit"] != "unlimited":
             start, end = self._getTimelineRange()

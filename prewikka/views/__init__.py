@@ -31,7 +31,7 @@ objects = messagelisting.AlertListing(), \
           sensor.SensorListing(), sensor.HeartbeatAnalyze(), sensor.SensorMessagesDelete(), \
           messagesummary.AlertSummary(), messagesummary.HeartbeatSummary(), \
           messagedetails.AlertDetails(), messagedetails.HeartbeatDetails(), \
-          commands.Whois(), commands.Traceroute(), \
+          commands.Command(), \
           filter.AlertFilterEdition(), \
           usermanagement.UserListing(), \
           usermanagement.UserAddForm(), usermanagement.UserDelete(), \
