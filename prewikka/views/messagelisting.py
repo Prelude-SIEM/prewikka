@@ -473,7 +473,7 @@ class ListedAlert(ListedMessage):
 
     def setMessageClassificationReferences(self, dataset, message):
         urls = [ ]
-
+        
         val = self.env.config.general.getOptionValue("external_link_new_window", "true")
         if (not val and self.env.config.general.has_key("external_link_new_window")) or \
            (val == None or val.lower() in ["true", "yes"]):
@@ -1239,13 +1239,6 @@ class AlertListing(MessageListing, view.View):
         self._deleteMessages()
         self._setDatasetConstants()
         
-        val = self.env.config.general.getOptionValue("external_link_new_window", "true")
-        if (not val and self.env.config.general.has_key("external_link_new_window")) or \
-           (val == None or val.lower() in ["true", "yes"]):
-            self.dataset["external_link_target"] = "_blank"
-        else:
-            self.dataset["external_link_target"] = "_self"
-
         self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
         self.dataset["current_filter"] = self.parameters.get("filter", "")
         
@@ -1338,13 +1331,6 @@ class HeartbeatListing(MessageListing, view.View):
         criteria = [ ]
         start = end = None
 
-        val = self.env.config.general.getOptionValue("external_link_new_window", "true")
-        if (not val and self.env.config.general.has_key("external_link_new_window")) or \
-           (val == None or val.lower() in ["true", "yes"]):
-            self.dataset["external_link_target"] = "_blank"
-        else:
-            self.dataset["external_link_target"] = "_self"
-        
         if self.parameters.has_key("timeline_unit") and self.parameters["timeline_unit"] != "unlimited":
             start, end = self._getTimelineRange()
             criteria.append("heartbeat.create_time >= '%s' && heartbeat.create_time < '%s'" % (str(start), str(end)))
