@@ -1017,7 +1017,7 @@ class AlertListing(MessageListing, view.View):
                     direction = "target"
                     value_category = aggregated_target_values[-1]
 
-                if re.compile("address.*\.category").match(path):
+                if re.compile("alert.%s(\([0-9\*]*\))?\.node\.address(\([0-9\*]*\))?\.category" % direction).match(path):
                     continue
                 
                 if not value:
