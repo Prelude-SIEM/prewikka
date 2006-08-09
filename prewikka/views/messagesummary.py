@@ -410,7 +410,7 @@ class MessageSummary(Table):
             if len(addr_list) > 0:
                 addr_list += "<br/>"
 
-            if addr["category"] in ("ipv4-net", "ipv6-addr", "ipv4-net", "ipv6-net"):
+            if addr["category"] in ("ipv4-addr", "ipv6-addr", "ipv4-net", "ipv6-net"):
                 addr_list += self.getUrlLink(address, "https://www.prelude-ids.com/host_details.php?host=%s" % address)
             else:
                 addr_list += address
