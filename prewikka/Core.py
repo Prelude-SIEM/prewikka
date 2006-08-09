@@ -59,7 +59,13 @@ def init_dataset(dataset, config, request):
     dataset["prewikka.url.referer"] = cgi.parse_qs(urllib.splitquery(request.getReferer())[1] or "")
     dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
     dataset["prewikka.query_string"] = utils.urlencode(request.arguments)
-
+    
+    val = config.general.getOptionValue("external_link_new_window", "true")
+    if (not val and config.general.has_key("external_link_new_window")) or (val == None or val.lower() in ["true", "yes"]):
+        dataset["prewikka.external_link_target"] = "_blank"
+    else:
+        dataset["prewikka.external_link_target"] = "_self"
+            
     qstring = request.getQueryString()
     if qstring[0:2] == "/?":
         qstring = qstring[2:]
