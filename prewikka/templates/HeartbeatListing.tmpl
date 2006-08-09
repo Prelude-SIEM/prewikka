@@ -57,7 +57,7 @@
 <td>
   #if len($message.node_addresses) > 0
     #for $address in $message.node_addresses
-    <a href="#" onclick="javascript:toggleVisibility('menu_$cnt'); return false;">$address.value</a><br />
+    <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$address.value</a><br />
     <span id="menu_$cnt" class="popup_menu">
     #set global $cnt += 1
 
