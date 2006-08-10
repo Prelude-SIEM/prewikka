@@ -100,7 +100,7 @@ function aggregated_${category}_add_entry(path) {
                           ), 
 
                           ("source", (("address", "alert.source.node.address.address"), 
-                                      ("name", "alert.source.node.name"), 
+                                      ("node name", "alert.source.node.name"), 
                                       ("user", "alert.source.user.user_id.name"), 
                                       ("process", "alert.source.process.name"), 
                                       ("service", "alert.source.service.name"), 
@@ -109,7 +109,7 @@ function aggregated_${category}_add_entry(path) {
                           ), 
  
                           ("target", (("address", "alert.target.node.address.address"), 
-                                      ("name", "alert.target.node.name"), 
+                                      ("node name", "alert.target.node.name"), 
                                       ("user", "alert.target.user.user_id.name"), 
                                       ("process", "alert.target.process.name"), 
                                       ("service", "alert.target.service.name"), 
@@ -407,8 +407,14 @@ function ${name}_add_entry(object, value, num) {
   #end for
 </td>
 
-#for $name, $separator, $direction in ("source", "from", $message.source), ("target", "to", $message.target)
+#for $name, $direction in ("source", $message.source), ("target", $message.target)
 <td>
+#if len($direction) == 0
+       n/a
+#end if
+
+#for $direction in $direction
+
       #set $service = ""
       #set $proto_param = ""
       #set $proto_str = ""
@@ -439,7 +445,7 @@ function ${name}_add_entry(object, value, num) {
 
          - <a href="$address.inline_filter">Filter on this $name</a><br />
  
-       #if $address.category and $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
+       #if not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
          - <a target=\"$prewikka.external_link_target\" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$name.capitalize() information</a><br />
 
           #for $cmdname, $link in $address.host_commands
@@ -497,10 +503,8 @@ function ${name}_add_entry(object, value, num) {
        <a href="$file.inline_filter">$file.value</a>
        #set $cnt = $cnt + 1
      #end for
+#end for
 
-     #if $direction.empty
-       n/a
-     #end if
 </td>
 #end for
 
