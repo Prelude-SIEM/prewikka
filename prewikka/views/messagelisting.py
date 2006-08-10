@@ -142,10 +142,6 @@ class MessageListingParameters(view.Parameters):
         if not self["timezone"] in ("frontend_localtime", "sensor_localtime", "utc"):
             raise view.InvalidValueError("timezone", self["timezone"])
         
-        for i in "aggregated_source", "aggregated_target", "aggregated_classification":
-            while "none" in self[i]:
-                self[i].remove("none")
-        
         # remove the bulshit
         try:
             del self["x"]
@@ -214,6 +210,10 @@ class AlertListingParameters(MessageListingParameters):
     
     def normalize(self, view_name, user):
         MessageListingParameters.normalize(self, view_name, user)
+
+        for i in "aggregated_source", "aggregated_target", "aggregated_classification":
+            while "none" in self[i]:
+                self[i].remove("none")
 
         for severity in self["alert.assessment.impact.severity"]:
             if not severity in ("info", "low", "medium", "high", "none"):
