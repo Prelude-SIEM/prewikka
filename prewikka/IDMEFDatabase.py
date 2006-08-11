@@ -254,7 +254,7 @@ class IDMEFDatabase:
             preludedb_sql_enable_query_logging(sql, config.getOptionValue("log"))
 
         cur = ver = None
-        wanted_version = "0.9.7"
+        wanted_version = "0.9.9"
         try:
             cur = preludedb_check_version(None)
             ver = preludedb_check_version(wanted_version)
@@ -324,8 +324,7 @@ class IDMEFDatabase:
 
     def deleteAlert(self, identlst):
         preludedb_transaction_start(self._db)
-        for ident in identlst:
-            preludedb_delete_alert(self._db, ident)
+        preludedb_delete_alert_from_list(self._db, identlst)
         preludedb_transaction_end(self._db)
 
     def getHeartbeat(self, ident):
@@ -333,8 +332,7 @@ class IDMEFDatabase:
 
     def deleteHeartbeat(self, identlst):
         preludedb_transaction_start(self._db)
-        for ident in identlst:
-            preludedb_delete_heartbeat(self._db, ident)
+        preludedb_delete_heartbeat_from_list(self._db, identlst)
         preludedb_transaction_end(self._db)
 
     def getValues(self, selection, criteria=None, distinct=0, limit=-1, offset=-1):
@@ -375,7 +373,7 @@ class IDMEFDatabase:
             idmef_criteria_destroy(criteria)
         
         preludedb_path_selection_destroy(my_selection)
-
+        
         return rows
 
     def _countMessages(self, root, criteria):
