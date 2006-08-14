@@ -446,7 +446,7 @@ function ${name}_add_entry(object, value, num) {
          - <a href="$address.inline_filter">Filter on this $name</a><br />
  
        #if not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
-         - <a target=\"$prewikka.external_link_target\" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$name.capitalize() information</a><br />
+         - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$name.capitalize() information</a><br />
 
           #for $cmdname, $link in $address.host_commands
          - <a href="$link">$cmdname</a><br />
