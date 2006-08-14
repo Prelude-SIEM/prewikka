@@ -211,10 +211,6 @@ class AlertListingParameters(MessageListingParameters):
     def normalize(self, view_name, user):
         MessageListingParameters.normalize(self, view_name, user)
 
-        for i in "aggregated_source", "aggregated_target", "aggregated_classification":
-            while "none" in self[i]:
-                self[i].remove("none")
-
         for severity in self["alert.assessment.impact.severity"]:
             if not severity in ("info", "low", "medium", "high", "none"):
                 raise view.InvalidParameterValueError("alert.assessment.impact.severity", severity)
@@ -970,8 +966,9 @@ class AlertListing(MessageListing, view.View):
         else:                
             return False
                 
-    def _setAggregatedMessagesNoValues(self, criteria, aggregated_on):
+    def _setAggregatedMessagesNoValues(self, criteria, ag_s, ag_t, ag_c):
         atomic_ignore_list = []
+        ag_list = ag_s + ag_t + ag_c
         
         selection = [ "alert.messageid", "alert.create_time" ]
         results2 = self.env.idmef_db.getValues(selection, criteria + ["alert.correlation_alert.name"])
@@ -981,14 +978,14 @@ class AlertListing(MessageListing, view.View):
             ca_ident = self.env.idmef_db.getAlertIdents(criteria + [ "alert.messageid = %s" % row[0] ], 1, -1)[0]
             message = self.env.idmef_db.getAlert(ca_ident)
             self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
-            results += [ [ row[0] ] + [None for i in aggregated_on] + [ca_ident] + [message] + [ row[1] ] ]
+            results += [ [ row[0] ] + [None for i in ag_list] + [ca_ident] + [message] + [ row[1] ] ]
             
         ignore_criteria = [ ]
         for messageid in atomic_ignore_list:
             ignore_criteria += [ "alert.messageid != '%s'" % messageid ]
             
         ##
-        selection = [ "%s/group_by" % path for path in aggregated_on ] + \
+        selection = [ "%s/group_by" % path for path in ag_list ] + \
                     [ "count(alert.create_time)", "max(alert.create_time)/order_desc" ]
 
         results += self.env.idmef_db.getValues(selection, criteria + [ "! alert.correlation_alert.name"] + ignore_criteria)
@@ -1001,17 +998,17 @@ class AlertListing(MessageListing, view.View):
             aggregated_target_values = []
             aggregated_classification_values = []
             
-            if self.parameters["aggregated_source"]:
-                start = len(self.parameters["aggregated_source"])
-                aggregated_source_values = values[:len(self.parameters["aggregated_source"])]
+            if len(ag_s) > 0:
+                start = len(ag_s)
+                aggregated_source_values = values[:len(ag_s)]
 
-            if self.parameters["aggregated_target"]:
-                last = start + len(self.parameters["aggregated_target"])
+            if len(ag_t) > 0:
+                last = start + len(ag_t)
                 aggregated_target_values = values[start:last]
                 start = last
 
-            if self.parameters["aggregated_classification"]:
-                last = start + len(self.parameters["aggregated_classification"])
+            if len(ag_c) > 0:
+                last = start + len(ag_c)
                 if values[start:last]:
                     aggregated_classification_values = values[start:last]
                 start = last
@@ -1027,7 +1024,7 @@ class AlertListing(MessageListing, view.View):
             delete_criteria = [ ]
             message = self.listed_aggregated_alert(self.env, self.parameters)
 
-            for path, value in zip(aggregated_on, values[:start]):
+            for path, value in zip(ag_list, values[:start]):
                                 
                 if path.find("source") != -1:
                     direction = "source"
@@ -1199,13 +1196,16 @@ class AlertListing(MessageListing, view.View):
         if "alert.target(0).node.address(0).address" in self.parameters["aggregated_target"]:
             self.parameters["aggregated_target"] += [ "alert.target(0).node.address(0).category" ]
 
-        aggregated_on = []
-        aggregated_on += self.parameters["aggregated_source"]
-        aggregated_on += self.parameters["aggregated_target"]
-        aggregated_on += self.parameters["aggregated_classification"]
-        
-        if len(aggregated_on) > 0:
-            ret = self._setAggregatedMessagesNoValues(criteria, aggregated_on)
+        ag_s = self.parameters["aggregated_source"][:]
+        ag_t = self.parameters["aggregated_target"][:]
+        ag_c = self.parameters["aggregated_classification"][:]
+
+        for l in ag_s, ag_t, ag_c:
+            while "none" in l:
+                l.remove("none")
+
+        if len(ag_s + ag_t + ag_c) > 0:
+            ret = self._setAggregatedMessagesNoValues(criteria, ag_s, ag_t, ag_c)
 
             try: self.parameters["aggregated_source"].remove("alert.source(0).node.address(0).category")
             except: pass
@@ -1278,6 +1278,7 @@ class AlertListing(MessageListing, view.View):
         self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
         self.dataset["limit"] = self.parameters["limit"]
         self.dataset["total"] = total
+
 
         self._setNavNext(self.parameters["offset"], total)
         self._setTimezone()
