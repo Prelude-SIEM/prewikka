@@ -1,3 +1,36 @@
+* 2006-08-16, prewikka-0.9.7:
+
+	- Use preludedb_delete_(alert|heartbeat)_from_list(). Require 
+	  libpreludedb 0.9.9. Provide a deletion performance improvement 
+	  of around 3000%.
+
+	- Handle multiple listed source/target properly. Separate 
+	  source/target in the message listing.
+
+	- Make host command/Information link available from the Sensor
+	  listing.
+
+	- Always take care of the "external_link_new_window" configuration 
+	  parameter. 
+	  
+	- Make external command handling more generic. Allow to specify 
+	  command line arguments.
+
+	- Allow to define unlimited number of external commands rather than 
+	  only a defined subset (fix #134). 
+
+	- Avoid toggling several popup at once in the HeartbeatListing.
+
+	- Only provide lookup capability for known network address type (fix #76).
+
+	- New address and node name lookup provided through prelude-ids.com service.
+
+	- Link to new prelude-ids.com port lookup instead of broken portsdb 
+          database (fix #162).
+
+	- Various bug fixes.
+
+
 * 2006-07-27, prewikka-0.9.6:
 
 	- CGI authentication module, from Tilman Baumann <tilman.baumann@collax.com>.
