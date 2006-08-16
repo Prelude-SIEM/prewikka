@@ -413,8 +413,14 @@ function ${name}_add_entry(object, value, num) {
        n/a
 #end if
 
-#for $direction in $direction
+#set $need_hr = 0
 
+#for $direction in $direction      
+      #if $need_hr
+	<hr style="border: 1px dashed #808080; margin-top: 3px; margin-bottom: 0px;" />
+      #end if
+
+      #set $need_hr = 1
       #set $service = ""
       #set $proto_param = ""
       #set $proto_str = ""
