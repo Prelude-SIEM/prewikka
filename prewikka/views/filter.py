@@ -53,9 +53,9 @@ class AlertFilterEdition(view.View):
     view_template = "FilterEdition"
     
     def _setCommon(self):
-        self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
-        self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.ALERT_OBJECTS))
-        
+        self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)        
+        self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.AlertFilter()))
+
         self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("=", "=*", "!=", "!=*",
                                                                         "~", "~*", "!~", "!~*",
                                                                         "<", "<=", ">", ">=",
