@@ -17,6 +17,7 @@
 # along with this program; see the file COPYING.  If not, write to
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
+import re
 import time
 import struct
 import socket
@@ -345,8 +346,15 @@ class MessageSummary(Table):
         if not name:
             return None
 
-        if not url:
-            url = name
+        if not url:            
+            if name.find("http://") != -1:
+                url = name
+
+            elif re.compile("\.[^\s]+\.[^\s+]").search(name):
+                url = "http://" + name
+                
+            else:
+                return name
             
         external_link_new_window = self.env.config.general.getOptionValue("external_link_new_window", "true")
 
