@@ -1,3 +1,12 @@
+* 2006-08-18, prewikka-0.9.7.1:
+	
+	- Fix filter interface bug introduced in 0.9.7.
+
+	- Improved error reporting on filter creation.
+
+	- Rename command configuration section to host_commands.
+
+
 * 2006-08-16, prewikka-0.9.7:
 
 	- Use preludedb_delete_(alert|heartbeat)_from_list(). Require 
