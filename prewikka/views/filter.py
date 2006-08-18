@@ -52,9 +52,9 @@ class AlertFilterEdition(view.View):
     view_parameters = AlertFilterEditionParameters
     view_template = "FilterEdition"
     
-    def _setCommon(self):
-        self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)        
-        self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.AlertFilter()))
+    def _setCommon(self):        
+        self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
+        self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.AlertFilterList))
 
         self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("=", "=*", "!=", "!=*",
                                                                         "~", "~*", "!~", "!~*",
@@ -120,11 +120,11 @@ class AlertFilterEdition(view.View):
 
         if self.parameters["formula"].find("Example") != -1:
             raise Error.SimpleError("Could not save Filter", "No valid filter formula provided")
-        
-        filter = Filter.AlertFilter(self.parameters["save_as"],
-                                    self.parameters.get("filter_comment", ""),
-                                    elements,
-                                    self.parameters["formula"])
+
+        filter = Filter.Filter(self.parameters["save_as"],
+                               self.parameters.get("filter_comment", ""),
+                               elements,
+                               self.parameters["formula"])
 
         self.env.db.setFilter(self.user.login, filter)
 

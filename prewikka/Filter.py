@@ -56,16 +56,16 @@ class CriteriaIDMEF:
             i = i + 1
 
 
-class _Filter:
+class Filter:
     def __init__(self, name, comment, elements, formula):
-        for element in elements.values():
-            if not element[0] in self._objects:
-                raise Error("Invalid filter object: %s" % element[0])        
         self.name = name
         self.comment = comment
         self.elements = elements
         self.formula = formula
 
+        crit = prelude.idmef_criteria_new_from_string(str(self))
+        prelude.idmef_criteria_destroy(crit)
+        
     def _replace(self, element):
         element = element.group(1)
         if element in ("and", "AND", "&&"):
@@ -85,21 +85,12 @@ class _Filter:
 
 
 
-class AlertFilter:
-    _objects = CriteriaIDMEF(prelude.IDMEF_CLASS_ID_ALERT, "alert").CriteriaList
-    
-    def __iter__(self):
-        return iter(self._objects)
-        
+AlertFilterList = CriteriaIDMEF(prelude.IDMEF_CLASS_ID_ALERT, "alert").CriteriaList
+HeartbeatFilterList = CriteriaIDMEF(prelude.IDMEF_CLASS_ID_HEARTBEAT, "heartbeat").CriteriaList
 
-class HeartbeatFilter(_Filter):
-    _objects = CriteriaIDMEF(prelude.IDMEF_CLASS_ID_HEARTBEAT, "heartbeat").CriteriaList
-
-    def __iter__(self):
-        return iter(self._objects)
 
 if __name__ == "__main__":
     print Filter("foo", "",
-                 { "A": ("alert.ident", "=", "1"),
-                   "B": ("alert.ident", "=", "2") },
+                 { "A": ("alert.source(0).node.category", "=", "blah"),
+                   "B": ("alert.messageid", "=", "2") },
                  "(A or B)")

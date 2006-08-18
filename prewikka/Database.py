@@ -261,7 +261,7 @@ class Database:
                 self.query("SELECT name, path, operator, value FROM Prewikka_Filter_Criterion WHERE id = %d" % int(id)):
             elements[element_name] = path, operator, value
 
-        return Filter.AlertFilter(name, comment, elements, formula)
+        return Filter.Filter(name, comment, elements, formula)
 
     def deleteFilter(self, login, name):
         id = long(self.query("SELECT id FROM Prewikka_Filter WHERE login = %s AND name = %s" % (self.escape(login), self.escape(name)))[0][0])
