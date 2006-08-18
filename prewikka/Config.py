@@ -28,7 +28,7 @@ class Config:
             
         self.general = MyConfigParser.ConfigParserSection("general")
         self.interface = MyConfigParser.ConfigParserSection("interface")
-        self.command = MyConfigParser.ConfigParserSection("command")
+        self.host_commands = MyConfigParser.ConfigParserSection("host_commands")
         self.database = MyConfigParser.ConfigParserSection("database")
         self.idmef_database = MyConfigParser.ConfigParserSection("idmef_database")
         self.admin = None
@@ -39,7 +39,7 @@ class Config:
         file = MyConfigParser.MyConfigParser(filename)
         file.load()
 
-        for section in file.getSections():
+        for section in file.getSections():            
             if " " in section.name:
                 type, name = section.name.split(" ")
                 section.name = name
@@ -55,12 +55,9 @@ class Config:
     def _set_interface(self, interface):
         self.interface = interface
 
-    def _set_command(self, command):
-        self.command = command
-
     def _set_database(self, database):
         self.database = database
-
+        
     def _set_idmef_database(self, idmef_database):
         self.idmef_database = idmef_database
 
