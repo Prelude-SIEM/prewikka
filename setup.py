@@ -35,6 +35,9 @@ from distutils.core import Command
 from Cheetah.CheetahWrapper import CheetahWrapper
 
 
+PREWIKKA_VERSION = "0.9.7.1"
+
+
 class my_build_py(build_py):
     def finalize_options(self):
         build_py.finalize_options(self)
@@ -136,6 +139,7 @@ class my_install(install):
         print >> config, "htdocs_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/htdocs"))
         print >> config, "database_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/database"))
         print >> config, "conf_dir = '%s'" % os.path.abspath((self.conf_prefix))
+        print >> config, "version = '%s'" % PREWIKKA_VERSION
         config.close()
         
     def run(self):
@@ -165,7 +169,7 @@ class my_install(install):
 
 
 setup(name="prewikka",
-      version="0.9.7.1",
+      version=PREWIKKA_VERSION,
       maintainer = "Yoann Vandoorselaere",
       maintainer_email = "yoann.v@prelude-ids.com",
       url = "http://www.prelude-ids.org",
