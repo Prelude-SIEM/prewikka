@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import os
+import os, popen2
 
 from prewikka import view, User
 
@@ -49,8 +49,10 @@ class Command(view.View):
 
         command = command.replace("$host", self.parameters["host"]).split(" ")
                 
-        stdin, stdout = os.popen2(command)
-        output = stdout.read()
+        pipe = popen2.Popen4(command)
+        pipe.wait()
+
+        output = pipe.fromchild.read()
         output = output.replace(" ", "&nbsp;").replace("\n", "<br/>\n")
         self.dataset["command_output"] = output
 
