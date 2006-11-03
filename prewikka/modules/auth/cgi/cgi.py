@@ -27,14 +27,13 @@ class CGIAuth(Auth.AnonymousAuth):
 	# Need to call Auth.Auth's init because the init of 
 	# our superclass Auth.AnonymousAuth does not set env.
         Auth.Auth.__init__(self, env)
-	self.config = config
 
     def getUser(self, request):
-	user = os.environ.get("REMOTE_USER", None)        
+	user = request.getRemoteUser()        
     	if not user:
 	    raise Auth.AuthError(message="CGI Authentication failed: no user specified.")
         
-        return User.User(self.db, user, User.ALL_PERMISSIONS, self.config)
+        return User.User(self.db, user, User.ALL_PERMISSIONS, self.db.getConfiguration(user))
 
 
 

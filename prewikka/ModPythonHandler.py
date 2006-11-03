@@ -44,7 +44,16 @@ class ModPythonRequest(Request.Request):
     def addCookie(self, param, value, expires):
     	c = Cookie.Cookie(param, value)
 	Cookie.add_cookie(self._req, c, expires)
-        
+
+    def getRemoteUser(self):
+        self._req.get_basic_auth_pw()
+
+        user = self._req.user
+        if user:
+            user.strip()
+
+        return user
+    
     def getQueryString(self):
     	return self._req.unparsed_uri
 

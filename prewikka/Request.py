@@ -81,6 +81,9 @@ class Request:
     def getQueryString(self):
         pass
 
+    def getRemoteUser(self):
+        pass
+    
     def getClientAddr(self):
         pass
 

@@ -73,6 +73,13 @@ class CGIRequest(Request.Request):
     def getReferer(self):
         return os.environ.get("HTTP_REFERER", "").strip()
 
+    def getRemoteUser(self):
+        user = os.environ.get("REMOTE_USER", None)
+        if user:
+            user.strip()
+            
+        return user
+
 
 request = CGIRequest()
 request.init()
