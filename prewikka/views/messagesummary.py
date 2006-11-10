@@ -619,7 +619,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 	calist = {}
 	
         for alertident in ca["alertident"]:
-        
+
             # IDMEF draft 14 page 27
             # If the "analyzerid" is not provided, the alert is assumed to have come
             # from the same analyzer that is sending the CorrelationAlert.
@@ -642,7 +642,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         
                 results = self.env.idmef_db.getAlertIdents(criteria)
                 if len(results) == 0:
-                    content += "<li>Invalid analyzerid:messageid pair: %s:%s</li>" % (analyzerid, alertident["alertident"])
+                    content += "<li>Invalid analyzerid:messageid pair: %s:%s</li>" % (analyzerid, ident)
                 else:
                     alert = self.env.idmef_db.getAlert(results[0])
                     link = utils.create_link("alert_summary", { "origin": "alert_listing", "ident": results[0] })
