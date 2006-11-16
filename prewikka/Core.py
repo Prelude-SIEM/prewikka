@@ -120,7 +120,6 @@ class Core:
         preludedb.preludedb_init()
         self._initDatabase()
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
-        self._env.auth = Auth.AnonymousAuth()
         self._env.log = Log.Log()
         self._initHostCommands()
         self._loadViews()
@@ -178,7 +177,9 @@ class Core:
 
         if config.auth:
             self._env.auth = self._loadModule("auth", config.auth.name, config.auth)
-        
+        else:
+            self._env.auth = Auth.AnonymousAuth(self._env)
+            
         for backend in config.logs:
             self._env.log.registerBackend(self._loadModule("log", backend.name, backend))
 
