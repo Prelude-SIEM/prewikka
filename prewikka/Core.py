@@ -188,6 +188,9 @@ class Core:
         if not object.view_initialized:
             object.init(self._env)
             object.view_initialized = True
+        
+        object = copy.copy(object)
+
         object.request = request
         object.parameters = parameters
         object.user = user
@@ -195,13 +198,14 @@ class Core:
         object.env = self._env
         self._setupDataSet(object.dataset, request, user, view, parameters)
 
+        return object
+    
     def _cleanupView(self, view):
-        object = view["object"]
-        del object.request
-        del object.parameters
-        del object.user
-        del object.dataset
-        del object.env
+        del view.request
+        del view.parameters
+        del view.user
+        del view.dataset
+        del view.env
         
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
         import prewikka.views
@@ -304,19 +308,18 @@ class Core:
             user = None
             user = self.checkAuth(request)
             view = self._getView(request, user)
+
             self._checkPermissions(request, view, user)
             parameters = self._getParameters(request, view, user)
-
-            self._setupView(view, request, parameters, user)
+            view_object = self._setupView(view, request, parameters, user)
 
             self._env.log(Log.EVENT_RENDER_VIEW, request, view, user)
-            
-            getattr(view["object"], view["handler"])()
+            getattr(view_object, view["handler"])()
 
-            dataset = view["object"].dataset
+            dataset = view_object.dataset
             template_name = view["template"]
 
-            self._cleanupView(view)
+            self._cleanupView(view_object)
             
         except Error.PrewikkaError, e:
             self._setupDataSet(e.dataset, request, user)
