@@ -22,12 +22,7 @@ import os
 from prewikka import Auth, User, Database
 
 
-class CGIAuth(Auth.AnonymousAuth):
-    def __init__(self, env, config):
-	# Need to call Auth.Auth's init because the init of 
-	# our superclass Auth.AnonymousAuth does not set env.
-        Auth.Auth.__init__(self, env)
-
+class CGIAuth(Auth.Auth):
     def getUser(self, request):
 	user = request.getRemoteUser()        
     	if not user:
@@ -38,6 +33,6 @@ class CGIAuth(Auth.AnonymousAuth):
 
 
 def load(env, config):
-    return CGIAuth(env, config)
+    return CGIAuth(env)
 
 
