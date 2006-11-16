@@ -123,7 +123,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         self.init()
         self._processDynamic(cgi.parse_qs((self._query_string)))
 
-    def getClientAddress(self):
+    def getClientAddr(self):
         return self.client_address[0]
 
     def getClientPort(self):
