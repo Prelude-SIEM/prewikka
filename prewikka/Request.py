@@ -77,6 +77,9 @@ class Request:
         
         if self.content:
             self.write(self.content)
+
+    def getView(self):
+        return self.arguments.get("view", "alert_listing")
         
     def getQueryString(self):
         pass

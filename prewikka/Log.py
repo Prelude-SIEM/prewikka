@@ -1,5 +1,5 @@
 # Copyright (C) 2004,2005 PreludeIDS Technologies. All Rights Reserved.
-# Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
+# Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 #
 # This file is part of the Prewikka program.
 #
@@ -18,103 +18,105 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import copy
-
-EVENT_QUERY = "QUERY"
-EVENT_RENDER_VIEW = "PROCESS_RENDER_VIEW"
-EVENT_LOGIN_SUCCESSFUL = "LOGIN_SUCCESSFUL"
-EVENT_LOGOUT = "LOGOUT"
-EVENT_SESSION_EXPIRED = "SESSION_EXPIRED"
-EVENT_INVALID_SESSIONID = "INVALID_SESSIONID"
-EVENT_BAD_LOGIN = "BAD_LOGIN"
-EVENT_BAD_PASSWORD = "BAD_PASSWORD"
-EVENT_INVALID_USERID = "INVALID_USERID"
-EVENT_INVALID_VIEW = "INVALID_VIEW"
-EVENT_INVALID_PARAMETERS = "INVALID_PARAMETERS"
-EVENT_VIEW_FORBIDDEN = "VIEW_FORBIDDEN"
-
-EVENT_DEBUG = "DEBUG"
-EVENT_INFO = "INFO"
-EVENT_ERROR = "ERROR"
-
-TYPE_DEBUG = "DEBUG"
-TYPE_INFO = "INFO"
-TYPE_ERROR = "ERROR"
-
-_CLASSIFICATIONS = {
-    TYPE_DEBUG: [ EVENT_DEBUG, EVENT_QUERY, EVENT_RENDER_VIEW, EVENT_SESSION_EXPIRED ],
-    TYPE_INFO: [ EVENT_INFO, EVENT_LOGIN_SUCCESSFUL, EVENT_LOGOUT ],
-    TYPE_ERROR: [ EVENT_ERROR, EVENT_INVALID_SESSIONID, EVENT_BAD_LOGIN,
-                  EVENT_BAD_PASSWORD, EVENT_INVALID_USERID, EVENT_INVALID_VIEW,
-                  EVENT_INVALID_PARAMETERS, EVENT_VIEW_FORBIDDEN ]
-    }
-
-
-
-def get_event_type(event):
-    for type, events in _CLASSIFICATIONS.items():
-        if event in events:
-            return type
-
+import logging, logging.handlers, sys
 
 
 class Log:
-    def __init__(self):
-        self._backends = [ ]
+    def __init__(self, conf):
+        self._logger = logging.getLogger()
+        self._logger.setLevel(logging.NOTSET)
         
-    def registerBackend(self, backend):
-        self._backends.append(backend)
+        for logconf in conf.logs:
+            logtype = logconf.keys()[0]
+
+            config = { }
+            for key in logconf[logtype].keys():
+                config[key] = logconf[logtype].getOptionValue(key)
+
+            self._logger.addHandler(self._getHandler(config, logtype))
+
         
-    def __call__(self, event, request=None, view=None, user=None, details=None):
-        for backend in self._backends:
-            if event in backend.events:
-                apply(backend, (get_event_type(event), event, request, view, user, details))
+    def _getHandler(self, config, logtype='syslog'):
+        logtype = logtype.lower()
+        level = config.get("level", "")
 
-    def debug(self, request=None, view=None, user=None, details=None):
-        self(EVENT_DEBUG, request, view, user, details)
+        if logtype == 'file':
+            hdlr = logging.FileHandler(config["file"])
 
-    def info(self, request=None, view=None, user=None, details=None):
-        self(EVENT_INFO, request, view, user, details)
+        elif logtype == 'nteventlog':
+            hdlr = logging.handlers.NTEventLogHandler(logid, logtype='Application')
 
-    def error(self, request=None, view=None, user=None, details=None):
-        self(EVENT_ERROR, request, view, user, details)
+        elif logtype in ['syslog', 'unix']:
+            hdlr = logging.handlers.SysLogHandler('/dev/log')
+
+        elif logtype in ['smtp']:
+            hdlr = logging.handlers.SMTPHandler(config["host"], config["from"], config["to"].split(", "), config["subject"]) 
+
+        elif logtype in ['stderr']:
+            hdlr = logging.StreamHandler(sys.stderr)
+
+        else:
+            raise "Unknown logtype specified: '%s'" % logtype
+
+        format = 'Prewikka %(levelname)s: %(message)s'
+        if logtype in ['file', 'stderr']:
+            format = '%(asctime)s ' + format 
+
+        datefmt = ''
+        if logtype == 'stderr':
+            datefmt = '%X'        
+
+        level = level.upper()
+        if level in ['DEBUG', 'ALL']:
+            hdlr.setLevel(logging.DEBUG)
+        elif level == 'INFO':
+            hdlr.setLevel(logging.INFO)
+        elif level == 'ERROR':
+            hdlr.setLevel(logging.ERROR)
+        elif level == 'CRITICAL':
+            hdlr.setLevel(logging.CRITICAL)
+        else:
+            hdlr.setLevel(logging.WARNING)
+        
+        formatter = logging.Formatter(format, datefmt)
+        hdlr.setFormatter(formatter)
+
+        return hdlr
 
 
+    def _getLog(self, request, user, details):
+        message = "["
+        
+        addr = request.getClientAddr()
+        message += "%s" % (addr)
 
-class LogBackend:
-    def __init__(self, config):
-        classifications = copy.copy(_CLASSIFICATIONS)
-        for option in config.getOptions():
-            if option.name.find("TYPE_") == 0:
-                type = option.name
-                if option.value == "enable":
-                    classifications[type] = _CLASSIFICATIONS[type]
-                else:
-                    del classifications[type]
-            elif option.name.find("EVENT_") == 0:
-                event = option.name
-                type = get_event_type(event)
-                if option.value == "enable":
-                    try:
-                        if not event in classifications[type]:
-                            classifications[type].append(event)
-                    except KeyError:
-                        classifications[type] = [ event ]
-                else:
-                    classifications[type].remove(event)
+        port = request.getClientPort()
+        if port:
+            message += ":%d" % port
 
-        self.events = [ ]
-        for events in classifications.values():
-            self.events += events
+        if user:
+            message += " %s@" % (user.login)
+        else:
+            message += " "
+            
+        message += "%s]" % (request.getView())
 
+        if details:
+            message += " " + details
 
+        return message
+        
+    def debug(self, message, request=None, user=None):
+        self._logger.debug(self._getLog(request, user, message))
 
-if __name__ == "__main__":
-    from MyConfigParser import OrderedDict
+    def info(self, message, request=None, user=None):
+        self._logger.info(self._getLog(request, user, message))
     
-    config = OrderedDict()
-    config[TYPE_ERROR] = "disable"
-    config[EVENT_ERROR] = "enable"
-    
-    backend = LogBackend(config)
-    backend.event(EVENT_ERROR, "test")
+    def warning(self, message, request=None, user=None):
+        self._logger.warning(self._getLog(request, user, message))
+
+    def error(self, message, request=None, user=None):
+        self._logger.error(self._getLog(request, user, message))
+
+    def critical(self, message, request=None, user=None):
+        self._logger.critical(self._getLog(request, user, message))

@@ -120,7 +120,7 @@ class Core:
         preludedb.preludedb_init()
         self._initDatabase()
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
-        self._env.log = Log.Log()
+        self._env.log = Log.Log(self._env.config)
         self._initHostCommands()
         self._loadViews()
         self._loadModules()
@@ -179,9 +179,6 @@ class Core:
             self._env.auth = self._loadModule("auth", config.auth.name, config.auth)
         else:
             self._env.auth = Auth.AnonymousAuth(self._env)
-            
-        for backend in config.logs:
-            self._env.log.registerBackend(self._loadModule("log", backend.name, backend))
 
     def _setupView(self, view, request, parameters, user):
         object = view["object"]
@@ -266,7 +263,7 @@ class Core:
     def _checkPermissions(self, request, view, user):
         if user and view.has_key("permissions"):
             if not user.has(view["permissions"]):
-                self._env.log(Log.EVENT_VIEW_FORBIDDEN, request, view, user)
+                self._env.log.warnings("Access to view forbidden", request, user)
                 raise User.PermissionDeniedError(user.login, view["name"])
 
     def _getParameters(self, request, view, user):
@@ -277,19 +274,18 @@ class Core:
         try:
             parameters.normalize(view["name"], user)
         except ParameterError, e:
-                self._env.log(Log.EVENT_INVALID_PARAMETERS, request, view, details=str(e))
-                raise InvalidQueryError(request.getQueryString())
+            self._env.log.error("%s" % str(e), request, user)
+            raise InvalidQueryError(request.getQueryString())
 
         return parameters
         
     def _getView(self, request, user):
-        name = request.arguments.get("view", "alert_listing")
-
+        name = request.getView()
         try:
             return self._views[name]
 
         except KeyError:
-            self._env.log(Log.EVENT_INVALID_VIEW, request=request, user=user)
+            self._env.log.error("View '%s' does not exist" % name, request=request, user=user)
             raise InvalidQueryError(request.getQueryString())
 
     def checkAuth(self, request):
@@ -302,8 +298,6 @@ class Core:
         return error.dataset, error.template
     
     def process(self, request):
-        self._env.log(Log.EVENT_QUERY, request)
-        
         try:
             user = None
             user = self.checkAuth(request)
@@ -313,7 +307,7 @@ class Core:
             parameters = self._getParameters(request, view, user)
             view_object = self._setupView(view, request, parameters, user)
 
-            self._env.log(Log.EVENT_RENDER_VIEW, request, view, user)
+            self._env.log.info("Loading view", request, user)
             getattr(view_object, view["handler"])()
 
             dataset = view_object.dataset

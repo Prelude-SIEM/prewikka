@@ -93,14 +93,14 @@ class Session:
         try:
             login, t = self.db.getSession(sessionid)
         except Database.DatabaseInvalidSessionError:
-            self.log(Log.EVENT_INVALID_SESSIONID, request)
+            self.log.error("Invalid session identifier", request)
             raise AuthSessionInvalid()
 
         now = int(time.time())
 
         if now - t > self._expiration:
             self.db.deleteSession(sessionid)
-            self.log(Log.EVENT_SESSION_EXPIRED, request)
+            self.log.error("Session expired", request)
             raise AuthSessionExpired()
 
         self.db.updateSession(sessionid, now)

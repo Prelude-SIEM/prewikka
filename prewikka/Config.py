@@ -68,7 +68,7 @@ class Config:
         self.auth = auth
 
     def _set_log(self, log):
-        self.logs.append(log)
+        self.logs.append({log.name: log})
 
     def _set_view(self, view):
         self.views.append(view)
