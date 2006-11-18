@@ -22,9 +22,8 @@ import logging, logging.handlers, sys
 
 
 class Log:
-    def __init__(self, conf):
-        self._logger = logging.getLogger()
-        self._logger.setLevel(logging.NOTSET)
+    def __init__(self, conf):        
+        self._logger = None
         
         for logconf in conf.logs:
             logtype = logconf.keys()[0]
@@ -33,6 +32,8 @@ class Log:
             for key in logconf[logtype].keys():
                 config[key] = logconf[logtype].getOptionValue(key)
 
+            self._logger = logging.getLogger()
+            self._logger.setLevel(logging.NOTSET)
             self._logger.addHandler(self._getHandler(config, logtype))
 
         
@@ -107,16 +108,21 @@ class Log:
         return message
         
     def debug(self, message, request=None, user=None):
-        self._logger.debug(self._getLog(request, user, message))
+        if self._logger:
+            self._logger.debug(self._getLog(request, user, message))
 
     def info(self, message, request=None, user=None):
-        self._logger.info(self._getLog(request, user, message))
+        if self._logger:
+            self._logger.info(self._getLog(request, user, message))
     
     def warning(self, message, request=None, user=None):
-        self._logger.warning(self._getLog(request, user, message))
+        if self._logger:
+            self._logger.warning(self._getLog(request, user, message))
 
     def error(self, message, request=None, user=None):
-        self._logger.error(self._getLog(request, user, message))
+        if self._logger:
+            self._logger.error(self._getLog(request, user, message))
 
     def critical(self, message, request=None, user=None):
-        self._logger.critical(self._getLog(request, user, message))
+        if self._logger:
+            self._logger.critical(self._getLog(request, user, message))
