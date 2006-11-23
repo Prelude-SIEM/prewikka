@@ -1,3 +1,25 @@
+* 2006-11-23, prewikka-0.9.8:
+	
+	- Save/load user configuration when using CGI authentication mode (#181).
+
+	- Show Prewikka version in the About page (#177).
+
+	- Use Python logging facility (available backend: stderr, file, smtp, syslog), 
+	  multiple simultaneous handler supported (#113).
+
+	- Fix anonymous authentication.
+
+	- Fix external process going into zombie state (#178).
+
+	- Fix sqlite schema (#180).
+
+	- Display correct alertident for invalid CorrelationAlert analyzerid/messageid pair.
+
+	- prewikka-httpd should now log the source address.
+
+	- Thread safety fixes.
+
+
 * 2006-08-18, prewikka-0.9.7.1:
 	
 	- Fix filter interface bug introduced in 0.9.7.
