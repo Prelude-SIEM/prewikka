@@ -2,6 +2,7 @@
 #extends prewikka.templates.MessageListing
 
 #block head_extra_content
+#filter CleanOutput
 
 <script type="text/javascript">
 
@@ -176,6 +177,7 @@ function ${name}_add_entry(object, value, num) {
 #end for
 //--></script>
 
+#filter Filter
 #end block
 
 
@@ -191,8 +193,7 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $classification
-        #set $escaped_value = utils.escape_attribute($value)
-          classification_add_entry("$object", "$escaped_value", $cnt)
+          classification_add_entry("$object", "$utils.escape_attribute($value)", $cnt)
           #set $cnt = $cnt + 1
         #end for
       </script>
@@ -290,8 +291,7 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $source
-          #set $escaped_value = utils.escape_attribute($value)
-          source_add_entry("$object", "$escaped_value", $cnt)
+          source_add_entry("$object", "$utils.escape_attribute($value)", $cnt)
 	  #set $cnt += 1
         #end for
       </script>
@@ -318,8 +318,7 @@ function ${name}_add_entry(object, value, num) {
       <script type="text/javascript">
         #set $cnt = 0
         #for $object, $value in $target
-        #set $escaped_value = utils.escape_attribute($value)
-          target_add_entry("$object", "$escaped_value", $cnt)
+          target_add_entry("$object", "$utils.escape_attribute($value)", $cnt)
           #set $cnt = $cnt + 1
         #end for
       </script>
@@ -346,8 +345,7 @@ function ${name}_add_entry(object, value, num) {
         <script  type="text/javascript">
           #set $cnt = 0
           #for $object, $value in $analyzer
-          #set $escaped_value = utils.escape_attribute($value)
-            analyzer_add_entry("$object", "$escaped_value", $cnt)
+            analyzer_add_entry("$object", "$utils.escape_attribute($value)", $cnt)
             #set $cnt = $cnt + 1
           #end for
         </script>
@@ -368,6 +366,7 @@ function ${name}_add_entry(object, value, num) {
 
 
 #block message_fields
+#filter CleanOutput
 
 <td>
   #if $message.correlation_alert_name
@@ -430,22 +429,20 @@ function ${name}_add_entry(object, value, num) {
        #set $proto_param = "&amp;protocol=" + $direction.protocol.value.upper() 
       #end if
 
-      #if $direction.service.value != None
-       #set $service = ":<a target=\"$prewikka.external_link_target\" href=\"https://www.prelude-ids.com/port_details.php?port="
-       #set $service += $str($direction.service.value) + $proto_param + "\">" + $str($direction.service.value)
-       
-       #if $proto_str
-        #set $service += "/" + $proto_str + "</a>"
-       #else
-        #set $service += "</a>"
-       #end if
-
-      #elif $proto_str
-        #set $service += ":" + $proto_str
-      #end if
-
       #for $address in $direction.addresses
-       <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$address_cnt'); return false;">$address.value</a>$service<br />
+       <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$address_cnt'); return false;">$address.value</a>#slurp
+       #if $direction.service.value != None
+:<a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$str($direction.service.value)$proto_param">$str($direction.service.value)#slurp
+         #if $proto_str
+/$proto_str</a>
+         #else 
+</a>
+         #end if
+       #elif $proto_str
+:$proto_str
+       #end if
+<br />
+
        <span id="menu_$address_cnt" class="popup_menu">
        #set global $address_cnt += 1
 
@@ -538,10 +535,11 @@ function ${name}_add_entry(object, value, num) {
     #end if
   #end if
 </td>
-
+#filter Filter
 #end block message_fields
 
 #block timeline_extra_content
+#filter CleanOutput
 <tr>
   <td id="filter_control_label">Filter: </td>
   <td colspan="3">
@@ -553,9 +551,10 @@ function ${name}_add_entry(object, value, num) {
     #else
       #set $selected = ""
     #end if
-    <option value="$utils.escape_html_string($fltr)" $selected>$fltr</option>
+    <option value="$fltr" $selected>$fltr</option>
   #end for
   </select>
   </td>
 </tr>
+#filter Filter
 #end block
