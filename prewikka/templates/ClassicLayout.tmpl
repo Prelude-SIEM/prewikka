@@ -5,6 +5,8 @@ classic_body
 #end def
 
 #block toplayout_content
+#filter CleanOutput
+
 <div id="topmenu">
   #for $name, $link in $interface.tabs
     #if $name == $interface.active_tab
@@ -27,11 +29,13 @@ classic_body
     #end if
   </div>
 </div>
+#filter Filter
 
 #def layout_start_hook
 #end def
 $layout_start_hook
 
+#filter CleanOutput
 <div id="menu">
   #for $name, $link in $interface.sections
     #if $name == $interface.active_section
@@ -41,11 +45,13 @@ $layout_start_hook
     #end if
     <a class="$class_" href="$link">$name</a>
   #end for
+
+#filter Filter
   #def menu_extra_content
   #end def
   $menu_extra_content
 </div>
-		
+
 <div id="main">$main_content</div>
 
 #def layout_end_hook
