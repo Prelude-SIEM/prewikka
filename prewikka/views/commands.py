@@ -20,7 +20,7 @@
 
 import os, popen2
 
-from prewikka import view, User
+from prewikka import view, User, utils
 
 class Error(Exception):
     pass
@@ -53,7 +53,7 @@ class Command(view.View):
         pipe.wait()
 
         output = pipe.fromchild.read()
-        output = output.replace(" ", "&nbsp;").replace("\n", "<br/>\n")
+        output = utils.escape_html_string(output).replace(" ", "&nbsp;").replace("\n", "<br/>")
         self.dataset["command_output"] = output
 
 
