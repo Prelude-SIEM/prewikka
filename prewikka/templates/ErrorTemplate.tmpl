@@ -1,6 +1,8 @@
 #extends prewikka.templates.TopLayout
 
 #block toplayout_content
+#filter CleanOutput
+
 <div id="fieldset_page" style="position: absolute; top: 25%; left: 50%; width:600px; margin-left:-300px;">
   <fieldset style="text-align: center; vertical-align: middle;"> 
    <legend class="error_name">$name</legend>
@@ -51,4 +53,5 @@
   </fieldset>
  </div>
 
+#filter Filter
 #end block toplayout_content
