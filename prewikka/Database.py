@@ -143,7 +143,7 @@ class Database:
         return "'" + utils.time_to_ymdhms(time.localtime(t)) + "'"
 
     def hasUser(self, login):
-        rows = self.query("SELECT login FROM Prewikka_User WHERE login = '%s'" % login)
+        rows = self.query("SELECT login FROM Prewikka_User WHERE login = %s" % self.escape(login))
         
         return bool(rows)
 
