@@ -66,7 +66,7 @@ def protocol_number_to_name(num):
 
 def escape_attribute(value):   
     # Escape '\' since it's a valid js escape.
-    return value.replace("\\", "\\\\").replace("\"", "\\\"")
+    return value.replace("\\", "\\\\").replace("\"", "\\\"").replace("/", "\\/")
 
 def escape_criteria(criteria):
     return criteria.replace("\\", "\\\\").replace("'", "\\'")
@@ -124,7 +124,7 @@ def escape_html_char(c):
             "<": "&lt;",
             "&": "&amp;",
             "\"": "&quot;",
-            "\n": "<br/>"
+            "'": "&#39;"
             }[c]
     except KeyError:
         return c
