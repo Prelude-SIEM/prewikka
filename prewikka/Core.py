@@ -263,7 +263,7 @@ class Core:
     def _checkPermissions(self, request, view, user):
         if user and view.has_key("permissions"):
             if not user.has(view["permissions"]):
-                self._env.log.warnings("Access to view forbidden", request, user)
+                self._env.log.warning("Access to view forbidden", request, user)
                 raise User.PermissionDeniedError(user.login, view["name"])
 
     def _getParameters(self, request, view, user):
