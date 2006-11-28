@@ -366,8 +366,6 @@ function ${name}_add_entry(object, value, num) {
 
 
 #block message_fields
-#filter CleanOutput
-
 <td>
   #if $message.correlation_alert_name
     <b>Correlation Alert#slurp
@@ -535,7 +533,6 @@ function ${name}_add_entry(object, value, num) {
     #end if
   #end if
 </td>
-#filter Filter
 #end block message_fields
 
 #block timeline_extra_content
