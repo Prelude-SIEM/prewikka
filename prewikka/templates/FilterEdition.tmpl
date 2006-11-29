@@ -2,6 +2,7 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
+
 <script type="text/javascript"><!--
 function newFilterElement(name, object, operator, object_value) {
 	objects = new Array($objects)
@@ -87,8 +88,8 @@ function newFilterElement(name, object, operator, object_value) {
 }
 //--></script>
 
-#filter CleanOutput
 
+#filter CleanOutput
 <div id="fieldset_page" style="display: table-cell;">
 
 <fieldset class="fieldset_heading">
@@ -130,12 +131,14 @@ function newFilterElement(name, object, operator, object_value) {
  <tbody id="elements"></tbody>
 </table>
 
-#end filter
+#filter Filter
+
 <script type="text/javascript"><!--
 #for $element in $elements
 	newFilterElement("$utils.escape_attribute($element.name)", "$utils.escape_attribute($element.object)", "$utils.escape_attribute($element.operator)", "$utils.escape_attribute($element.value)");
 #end for
 //--></script>
+
 #filter CleanOutput
 
 <br />
@@ -161,5 +164,4 @@ function newFilterElement(name, object, operator, object_value) {
 </form>
 
 </div>
-#end filter
 #end block main_content
