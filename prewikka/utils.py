@@ -96,7 +96,7 @@ def urlencode(parameters, doseq=False):
 def create_link(action_name, parameters=None):
     link = "?view=%s" % action_name
     if parameters:
-        link += "&amp;%s" % urllib.urlencode(parameters, doseq=True).replace('&', '&amp;')
+        link += "&%s" % urllib.urlencode(parameters, doseq=True)
 
     return link
 
@@ -117,21 +117,14 @@ def boolean_property(name, parameter, value=False):
     return property("checkbox", name, parameter, value)
 
 
-def escape_html_char(c):
-    try:
-        return {
-            ">": "&gt;",
-            "<": "&lt;",
-            "&": "&amp;",
-            "\"": "&quot;",
-            "'": "&#39;"
-            }[c]
-    except KeyError:
-        return c
-
-
 def escape_html_string(s):
-    return "".join(map(lambda c: escape_html_char(c), str(s)))
+    s = str(s)
+    s = s.replace("&", "&amp;")
+    s = s.replace("<", "&lt;")
+    s = s.replace(">", "&gt;")
+    s = s.replace("\"", "&quot;")
+    s = s.replace("'", "&#39;")
+    return s
 
 
 def hexdump(content):
