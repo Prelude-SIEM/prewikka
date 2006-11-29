@@ -87,23 +87,15 @@ class SensorListing(view.View):
             analyzer["heartbeat_analyze"] = utils.create_link("heartbeat_analyze", parameters)
 
             if analyzer["node_name"]:
-                analyzer["node_name"] = '<a href="%s">%s</a>' % \
-                                        (utils.create_link(self.view_name,
-                                                           { "filter_path": "heartbeat.analyzer(-1).node.name",
-                                                             "filter_value": analyzer["node_name"] }),
-                                         analyzer["node_name"])
-            else:
-                analyzer["node_name"] = "n/a"
-
+                analyzer["node_name_link"] = utils.create_link(self.view_name,
+                                                               { "filter_path": "heartbeat.analyzer(-1).node.name",
+                                                                 "filter_value": analyzer["node_name"] })
+                 
             if analyzer["node_location"]:
-                analyzer["node_location"] = "<a href='%s'>%s</a>" % \
-                                            (utils.create_link(self.view_name,
-                                                               { "filter_path": "heartbeat.analyzer(-1).node.location",
-                                                                 "filter_value": analyzer["node_location"] }),
-                                             analyzer["node_location"])
-            else:
-                analyzer["node_location"] = "n/a"
-
+                analyzer["node_location_link"] = utils.create_link(self.view_name,
+                                                                   { "filter_path": "heartbeat.analyzer(-1).node.location",
+                                                                     "filter_value": analyzer["node_location"] })
+                
             for i in range(len(analyzer["node_addresses"])):
                 addr = analyzer["node_addresses"][i]
                 

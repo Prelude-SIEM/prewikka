@@ -1,6 +1,7 @@
 #extends prewikka.templates.ClassicLayout
 
 #block main_content
+#filter CleanOutput
 
 #if len($analyzers) > 0
   <form action="?" method="post">
@@ -36,8 +37,19 @@
         </td>
         <td>$analyzer.model $analyzer.version</td>
         <td>$analyzer.ostype $analyzer.osversion</td>
-        <td>$analyzer.node_name</td>
-        <td>$analyzer.node_location</td>
+
+	#if $analyzer.node_name
+         <td><a href="$analyzer.node_name_link">$analyzer.node_name</a></td>
+        #else
+         <td>n/a</td>
+        #end if
+
+	#if $analyzer.node_location
+         <td><a href="$analyzer.node_location_link">$analyzer.node_location</a></td>
+        #else
+         <td>n/a</td>
+        #end if
+
         <td>
         #if len($analyzer.node_addresses) > 0
           #for $address in $analyzer.node_addresses
