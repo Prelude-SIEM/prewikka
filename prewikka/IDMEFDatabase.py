@@ -101,9 +101,10 @@ def convert_idmef_value(value):
 
     
 class Message:
-    def __init__(self, res):
+    def __init__(self, res, htmlsafe):
         self._res = res
         self._value_list = None
+        self._htmlsafe = htmlsafe
         
     def __del__(self):
         idmef_message_destroy(self._res)
@@ -136,7 +137,7 @@ class Message:
 
     def _convert_value(self, idmef_value, key):
         if idmef_value_get_type(idmef_value) == IDMEF_VALUE_TYPE_LIST:
-            value = Message(idmef_message_ref(self._res))
+            value = Message(idmef_message_ref(self._res), self._htmlsafe)
             value._root = key
             value._list_iterate = 0
             value._value_list = idmef_value
@@ -152,7 +153,7 @@ class Message:
             if not self._value_list:
                 idmef_value_destroy(idmef_value)
                 
-            value = Message(idmef_message_ref(self._res))
+            value = Message(idmef_message_ref(self._res), self._htmlsafe)
             value._root = key
 
         return value
@@ -176,8 +177,11 @@ class Message:
         if key.find("%s." % self._root) != 0:
             key = "%s." % self._root + key
 
-        return escape_value(self._get_raw_value(key))
-
+        if self._htmlsafe:
+            return escape_value(self._get_raw_value(key))
+        else:
+            return self._get_raw_value(key)
+             
     def match(self, criteria):
         if type(criteria) is list:
             criteria = " && ".join(criteria)
@@ -187,21 +191,12 @@ class Message:
         idmef_criteria_destroy(criteria)
 
         return ret
-        
-    def get(self, key, default=None, escape=True):
-        if key.find("%s." % self._root) != 0:
-            key = "%s." % self._root + key
-        
-        value = self._get_raw_value(key)
-        if value is None:
-            value = default
-        
-        if escape:
-            value = escape_value(value)
-            
-        return value
 
-    def getAdditionalData(self, searched, many_values=False, escape=True):
+    def get(self, key, default=None):
+        return self[key] or default
+
+
+    def getAdditionalData(self, searched, many_values=False):
         values = [ ]
         i = 0
         while True:
@@ -210,7 +205,7 @@ class Message:
                 break
             
             if meaning == searched:
-                value = self.get("%s.additional_data(%d).data" % (self._root, i))
+                value = self["%s.additional_data(%d).data" % (self._root, i)]
                 
                 if not many_values:
                     return value
@@ -319,16 +314,16 @@ class IDMEFDatabase:
     def getLastHeartbeatIdent(self, analyzer=None):
         return self._getLastMessageIdent("heartbeat", self.getHeartbeatIdents, analyzer)
 
-    def getAlert(self, ident):
-        return Alert(preludedb_get_alert(self._db, ident))
+    def getAlert(self, ident, htmlsafe=False):
+        return Alert(preludedb_get_alert(self._db, ident), htmlsafe)
 
     def deleteAlert(self, identlst):
         preludedb_transaction_start(self._db)
         preludedb_delete_alert_from_list(self._db, identlst)
         preludedb_transaction_end(self._db)
 
-    def getHeartbeat(self, ident):
-        return Heartbeat(preludedb_get_heartbeat(self._db, ident))
+    def getHeartbeat(self, ident, htmlsafe=False):
+        return Heartbeat(preludedb_get_heartbeat(self._db, ident), htmlsafe)
 
     def deleteHeartbeat(self, identlst):
         preludedb_transaction_start(self._db)
@@ -422,7 +417,7 @@ class IDMEFDatabase:
             if not heartbeat["heartbeat.analyzer(%d).name" % (index + 1)]:
                 break
             index += 1
-        
+
         analyzer = { }
         analyzer["analyzerid"] = analyzerid
         analyzer["name"] = heartbeat.get("heartbeat.analyzer(%d).name" % index)

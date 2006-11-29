@@ -644,7 +644,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                 if len(results) == 0:
                     content += "<li>Invalid analyzerid:messageid pair: %s:%s</li>" % (analyzerid, ident)
                 else:
-                    alert = self.env.idmef_db.getAlert(results[0])
+                    alert = self.env.idmef_db.getAlert(results[0], htmlsafe=True)
                     link = utils.create_link("alert_summary", { "origin": "alert_listing", "ident": results[0] })
                     content += "<li><a href=\"%s\">%s</a></li>" % (link, alert["classification.text"])
 
@@ -866,7 +866,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         return section
         
     def render(self):
-        alert = self.env.idmef_db.getAlert(self.parameters["ident"])
+        alert = self.env.idmef_db.getAlert(self.parameters["ident"], htmlsafe=True)
         self.dataset["sections"] = [ ]
 
         self.beginSection(self.getSectionName(alert))
@@ -942,7 +942,7 @@ class HeartbeatSummary(MessageSummary, view.View):
     view_name = "heartbeat_summary"
     
     def render(self):
-        heartbeat = self.env.idmef_db.getHeartbeat(self.parameters["ident"])
+        heartbeat = self.env.idmef_db.getHeartbeat(self.parameters["ident"], htmlsafe=True)
         self.dataset["sections"] = [ ]
 
         self.beginSection("Heartbeat")
