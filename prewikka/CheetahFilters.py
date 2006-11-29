@@ -26,10 +26,6 @@ from prewikka import utils
 
 
 class CleanOutput(Cheetah.Filters.Filter):
-    def filter(self, val, **kw):        
-        if val:
-            val = utils.escape_html_string(val)
-        else:
-            val = ""
-            
-        return val
+    def filter(self, val, **kw):
+        s = Filter.filter(self, val, **kw)
+        return utils.escape_html_string(s)
