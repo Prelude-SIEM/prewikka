@@ -62,8 +62,6 @@ $message_listing_header
   #def timeline_extra_content
   #end def
   $timeline_extra_content
-
-#filter CleanOutput
   
   <tr>
    <td id="timeline_step_label">Step:</td>
@@ -109,6 +107,8 @@ $message_listing_header
       <input style="display:inline;" type="submit" name="_save" value="Save" />
    </td>
   </tr>
+
+#filter CleanOutput
 
 #if not $timeline.start
  <tr><td colspan="4" class="timeline_range">Unlimited</td></tr>

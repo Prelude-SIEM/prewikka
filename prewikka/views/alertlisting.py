@@ -294,7 +294,7 @@ class ListedAlert(ListedMessage):
             if name:
                 fstr += ":" + name
 
-            dataset["classification_references"].append((ref["url"] + "'", fstr))
+            dataset["classification_references"].append((ref["url"], fstr))
 
     def setMessageClassification(self, dataset, message):
         self.setMessageClassificationReferences(dataset, message)

@@ -550,12 +550,7 @@ function ${name}_add_entry(object, value, num) {
   <select name="filter" size="1" class="filter_control_select">
   <option value="">&nbsp;</option>
   #for $fltr in $filters
-    #if $fltr == $current_filter
-      #set $selected = "selected=\"selected\""
-    #else
-      #set $selected = ""
-    #end if
-    <option value="$fltr" $selected>$fltr</option>
+    <option value="$fltr" #if $fltr == $current_filter# selected="selected" #end if#>$fltr</option>
   #end for
   </select>
   </td>
