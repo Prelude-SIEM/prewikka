@@ -19,15 +19,15 @@
 
 
 from prewikka.views import \
-     messagelisting, messagesummary, messagedetails, sensor, \
+     messagelisting, alertlisting, heartbeatlisting, messagesummary, messagedetails, sensor, \
      commands, filter, usermanagement, misc
 
 
 
-objects = messagelisting.AlertListing(), \
-          messagelisting.HeartbeatListing(), \
-          messagelisting.SensorAlertListing(), \
-          messagelisting.SensorHeartbeatListing(), \
+objects = alertlisting.AlertListing(), \
+          heartbeatlisting.HeartbeatListing(), \
+          alertlisting.SensorAlertListing(), \
+          heartbeatlisting.SensorHeartbeatListing(), \
           sensor.SensorListing(), sensor.HeartbeatAnalyze(), sensor.SensorMessagesDelete(), \
           messagesummary.AlertSummary(), messagesummary.HeartbeatSummary(), \
           messagedetails.AlertDetails(), messagedetails.HeartbeatDetails(), \
