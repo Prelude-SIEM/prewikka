@@ -17,19 +17,8 @@
 # along with this program; see the file COPYING.  If not, write to
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
-import sys
-import time
-import os, os.path
-import distutils.spawn
-
-import copy
-
-import urllib
-import cgi
-
-import prelude, preludedb
-import CheetahFilters
+import os, copy, time
+import preludedb, CheetahFilters
 
 from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer, \
      User, Auth, DataSet, Error, utils, siteconfig
@@ -37,7 +26,7 @@ from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer,
 
 class InvalidQueryError(Error.SimpleError):
     def __init__(self, query):
-        Error.SimpleError.__init__(self, "query error", "invalid query")
+        Error.SimpleError.__init__(self, "Query error", "Invalid query")
 
 
 
@@ -56,10 +45,8 @@ def init_dataset(dataset, config, request):
     dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
     dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
     dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
-    dataset["prewikka.url.referer"] = cgi.parse_qs(urllib.splitquery(request.getReferer())[1] or "")
     dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
-    dataset["prewikka.query_string"] = utils.urlencode(request.arguments)
-    
+
     val = config.general.getOptionValue("external_link_new_window", "true")
     if (not val and config.general.has_key("external_link_new_window")) or (val == None or val.lower() in ["true", "yes"]):
         dataset["prewikka.external_link_target"] = "_blank"
@@ -70,7 +57,8 @@ def init_dataset(dataset, config, request):
     if qstring[0:2] == "/?":
         qstring = qstring[2:]
 
-    dataset["prewikka.url.current"] = cgi.parse_qs(qstring)
+    dataset["prewikka.url.current"] = qstring
+    dataset["prewikka.url.referer"] = request.getReferer()
 
 
 def load_template(name, dataset):

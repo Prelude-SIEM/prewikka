@@ -1,3 +1,4 @@
+#import cgi
 #extends prewikka.templates.TopLayout
 
 #block toplayout_content
@@ -7,46 +8,54 @@
   <fieldset style="text-align: center; vertical-align: middle;"> 
    <legend class="error_name">$name</legend>
    <p><b>$message</b></p>
-   Failed query: <input type="text" value="$prewikka.query_string" style="width: 200px;" />
+   Failed query: <input type="text" value="$prewikka.url.current" style="width: 200px;" />
    #if $traceback
      <br/><br/>
      <textarea rows=10 cols=75 readonly>$traceback</textarea>
    #end if
 
    <br/><br/>
-   
-   <form action="?" method="get">
-     #if $prewikka.url.current.has_key('_error_back')
-         #set $md = $eval($prewikka.url.current['_error_back'][0], {"__builtins__": {}})
-     #else
-	 #set $md = $prewikka.url.referer
-     #end if
 
-     #for $param, $values in $md.items()
-      #for $value in $values
-         <input type="hidden" name="$param" value="$value"/>
-      #end for
-     #end for
-     <input style="float: left; position: relative;" type="submit" value="Back"/>
-   </form>
+#set $curparam = $cgi.parse_qs($prewikka.url.current)
 
-   <form action="?" method="post">
-     #set $have_back = False
+#if $curparam.has_key('_error_back')
+    #set $referer_string = $curparam['_error_back'][0]
+    #set $referer = $cgi.parse_qs($referer_string)
+#else
+    #set $referer_string = $prewikka.url.referer
+    #set $referer = $cgi.parse_qs($referer_string)
+#end if
 
-     #for $param, $values in $prewikka.url.current.items()
-       #if $param == "_error_back"
-	#set $have_back = True
-       #end if
+#if $curparam.has_key('_error_retry')
+    #set $retry_string = $curparam['_error_retry'][0]
+    #set $retry = $cgi.parse_qs($retry_string)
+#else
+    #set $retry_string = $prewikka.url.current
+    #set $retry = $cgi.parse_qs($prewikka.url.current)
+#end if
 
+
+   <form method="POST" action="?">
+     #for $param, $values in $referer.items()
        #for $value in $values
          <input type="hidden" name="$param" value="$value"/>
        #end for
      #end for
 
-#if not $have_back and $len($prewikka.url.referer) > 0
-     <input type="hidden" name="_error_back" value="$prewikka.url.referer"/>
-#end if
+     <input type="hidden" name="_error_back" value="$referer_string" />
+     <input type="hidden" name="_error_retry" value="$retry_string" />
+     <input style="float: left; position: relative;" type="submit" value="Back"/>
+   </form>
 
+   <form method="POST" action="?">
+     #for $param, $values in $retry.items()
+       #for $value in $values
+         <input type="hidden" name="$param" value="$value"/>
+       #end for
+     #end for
+
+     <input type="hidden" name="_error_back" value="$referer_string" />
+     <input type="hidden" name="_error_retry" value="$retry_string" />
      <input style="float: right; position: relative;" type="submit" value="Retry"/>
    </form>
 
