@@ -85,7 +85,7 @@ class Log:
         return hdlr
 
 
-    def _getLog(self, request, user, details):
+    def _getLog(self, request, login, details):
         message = "["
         
         addr = request.getClientAddr()
@@ -96,7 +96,7 @@ class Log:
             message += ":%d" % port
 
         if user:
-            message += " %s@" % (user.login)
+            message += " %s@" % (login)
         else:
             message += " "
             

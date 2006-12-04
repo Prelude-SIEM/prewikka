@@ -100,7 +100,7 @@ class Session:
 
         if now - t > self._expiration:
             self.db.deleteSession(sessionid)
-            self.log.error("Session expired", request)
+            self.log.error("Session expired", request, login)
             raise AuthSessionExpired()
 
         self.db.updateSession(sessionid, now)

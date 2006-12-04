@@ -251,7 +251,7 @@ class Core:
     def _checkPermissions(self, request, view, user):
         if user and view.has_key("permissions"):
             if not user.has(view["permissions"]):
-                self._env.log.warning("Access to view forbidden", request, user)
+                self._env.log.warning("Access to view forbidden", request, user.login)
                 raise User.PermissionDeniedError(user.login, view["name"])
 
     def _getParameters(self, request, view, user):
@@ -262,7 +262,7 @@ class Core:
         try:
             parameters.normalize(view["name"], user)
         except ParameterError, e:
-            self._env.log.error("%s" % str(e), request, user)
+            self._env.log.error("%s" % str(e), request, user.login)
             raise InvalidQueryError(request.getQueryString())
 
         return parameters
@@ -273,7 +273,7 @@ class Core:
             return self._views[name]
 
         except KeyError:
-            self._env.log.error("View '%s' does not exist" % name, request=request, user=user)
+            self._env.log.error("View '%s' does not exist" % name, request, user.login)
             raise InvalidQueryError(request.getQueryString())
 
     def checkAuth(self, request):
@@ -295,7 +295,7 @@ class Core:
             parameters = self._getParameters(request, view, user)
             view_object = self._setupView(view, request, parameters, user)
 
-            self._env.log.info("Loading view", request, user)
+            self._env.log.info("Loading view", request, user.login)
             getattr(view_object, view["handler"])()
 
             dataset = view_object.dataset
