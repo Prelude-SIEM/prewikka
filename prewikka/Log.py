@@ -95,7 +95,7 @@ class Log:
         if port:
             message += ":%d" % port
 
-        if user:
+        if login:
             message += " %s@" % (login)
         else:
             message += " "
