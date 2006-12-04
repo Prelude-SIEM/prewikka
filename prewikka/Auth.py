@@ -139,8 +139,11 @@ class LoginPasswordAuth(Auth, Session):
                 self.checkPassword(login, password)
             except AuthError, e:
                 e.dataset["arguments"] = request.arguments.items()
+                self.log.warning("Username and password do not match", request, login)
                 raise AuthError(message="Username and password do not match.")
+
             self.createSession(request, login)
+            self.log.warning("User login", request, login)
         else:
             login = self.checkSession(request)
 
