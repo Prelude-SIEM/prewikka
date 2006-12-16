@@ -192,9 +192,19 @@ class Message:
 
         return ret
 
-    def get(self, key, default=None):
-        return self[key] or default
-
+    def get(self, key, default=None, htmlsafe=None):     
+        if htmlsafe != None:
+            htmlsafe_bkp = self._htmlsafe
+            self._htmlsafe = htmlsafe
+            
+        val = self[key] 
+        if val == None:
+                val = default
+        
+        if htmlsafe != None:
+            self._htmlsafe = htmlsafe_bkp
+        
+        return val
 
     def getAdditionalData(self, searched, many_values=False):
         values = [ ]

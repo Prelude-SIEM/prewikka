@@ -506,7 +506,7 @@ class MessageSummary(Table):
                 
             if ad["data"] != None:
                 if ad["type"] == "byte-string":
-                    value = ad.get("data", escape=False)
+                    value = ad.get("data", htmlsafe=False)
                     if meaning != "payload":
                         value = utils.hexdump(value)
                 else:
