@@ -150,7 +150,10 @@ class LoginPasswordAuth(Auth, Session):
         return self.db.getUser(login)
 
     def logout(self, request):
+        login = self.checkSession(request)
         self.deleteSession(request)
+
+        self.log.warning("User logout", request, login)
         raise AuthSessionInvalid(message="Logged out")
 
 
