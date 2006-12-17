@@ -931,7 +931,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                 data.render_table(self, "Payload", val)
 
                 payload = utils.escape_html_string(ignored_value["payload"]).replace(" ", "&nbsp;")                
-                val["payload"] = "<div style='overflow: auto;'>%s</div>" % utils.escape_html_string(ignored_value["payload"])
+                val["payload"] = "<div style='overflow: auto;'>%s</div>" % utils.escape_html_string(ignored_value["payload"]).replace("\n", "<br/>")
                 data.render_table(self, "Ascii Payload", val)
                             
             self.endTable()
