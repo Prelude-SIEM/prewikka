@@ -29,12 +29,14 @@ classic_body
     #end if
   </div>
 </div>
+#end filter
 #filter Filter
 
 #def layout_start_hook
 #end def
 $layout_start_hook
 
+#end filter
 #filter CleanOutput
 <div id="menu">
   #for $name, $link in $interface.sections
@@ -46,6 +48,7 @@ $layout_start_hook
     <a class="$class_" href="$link">$name</a>
   #end for
 
+#end filter
 #filter Filter
   #def menu_extra_content
   #end def
@@ -58,4 +61,5 @@ $layout_start_hook
 #end def
 $layout_end_hook
 
+#end filter
 #end block toplayout_content

@@ -177,7 +177,9 @@ function ${name}_add_entry(object, value, num) {
 #end for
 //--></script>
 
+#end filter
 #filter Filter
+#end filter
 #end block
 
 
@@ -540,6 +542,9 @@ function ${name}_add_entry(object, value, num) {
     #end if
   #end if
 </td>
+#end filter
+#filter Filter
+#end filter
 #end block message_fields
 
 #block timeline_extra_content
@@ -555,5 +560,7 @@ function ${name}_add_entry(object, value, num) {
   </select>
   </td>
 </tr>
+#end filter
 #filter Filter
+#end filter
 #end block
