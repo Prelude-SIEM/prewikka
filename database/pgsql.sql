@@ -27,7 +27,6 @@ CREATE TABLE Prewikka_Permission (
 CREATE INDEX prewikka_permission_index_login ON Prewikka_Permission (login);
 
 
-
 DROP TABLE Prewikka_Session;
 
 CREATE TABLE Prewikka_Session (
@@ -37,7 +36,6 @@ CREATE TABLE Prewikka_Session (
 );
 
 CREATE INDEX prewikka_session_index_login ON Prewikka_Session (login);
-
 
 
 DROP TABLE Prewikka_Filter;
@@ -50,8 +48,7 @@ CREATE TABLE Prewikka_Filter (
 	formula VARCHAR(255) NOT NULL
 );
 
-CREATE INDEX prewikka_filter_index ON Prewikka_Filter (login, name);
-
+CREATE UNIQUE INDEX prewikka_filter_index_login_name ON Prewikka_Filter (login, name);
 
 
 DROP TABLE Prewikka_Filter_Criterion;
@@ -68,7 +65,6 @@ CREATE INDEX prewikka_filter_criterion_index_id ON Prewikka_Filter_Criterion (id
 
 
 DROP TABLE Prewikka_User_Configuration;
-
 CREATE TABLE Prewikka_User_Configuration (
 	login VARCHAR(32) NOT NULL,
 	view  VARCHAR(32) NOT NULL,

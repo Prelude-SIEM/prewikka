@@ -2,7 +2,7 @@
 sed \
 	-e 's/#.*//' \
 	-e '/^DROP /d' \
-	-e 's/[a-zA-Z]*INT /INTEGER /' \
+    	-e 's/[a-zA-Z]*INT /INTEGER /' \
 	-e 's/UNSIGNED //' \
 	-e 's/ENUM([^)]\+)/TEXT/' \
 	-e 's/VARCHAR([^)]\+)/TEXT/' \

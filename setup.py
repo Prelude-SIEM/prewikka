@@ -74,15 +74,8 @@ class my_build_py(build_py):
 
 
 class MyDistribution(Distribution):
-    def mysql2sqlite(self):
-        sqlite = open("database/sqlite.sql", "w")            
-        for line in os.popen("database/mysql2sqlite.sh database/mysql.sql"):
-            print >> sqlite, line
-        sqlite.close()
-
     def __init__(self, attrs):
         self.conf_files = [ ]
-        self.mysql2sqlite()
         Distribution.__init__(self, attrs)
 
 
@@ -141,7 +134,7 @@ class my_install(install):
         print >> config, "conf_dir = '%s'" % os.path.abspath((self.conf_prefix))
         print >> config, "version = '%s'" % PREWIKKA_VERSION
         config.close()
-        
+            
     def run(self):
         os.umask(022)
         self.install_conf()
@@ -166,6 +159,16 @@ class my_install(install):
                     mode |= 011
                 os.chmod(filename, mode)
 
+
+sqlite = open("database/sqlite.sql", "w")            
+for line in os.popen("database/mysql2sqlite.sh database/mysql.sql"):
+    print >> sqlite, line.rstrip()
+sqlite.close()
+
+pgsql = open("database/pgsql.sql", "w")
+for line in os.popen("database/mysql2pgsql.sh database/mysql.sql"):
+    print >> pgsql, line.rstrip()
+pgsql.close()
 
 
 setup(name="prewikka",
