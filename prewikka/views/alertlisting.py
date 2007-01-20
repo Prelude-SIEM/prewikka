@@ -147,7 +147,7 @@ class ListedAlert(ListedMessage):
         return { "alert.%s.interface" % direction: ("interface", None),
                  "alert.%s.service.port" % direction: ("service", None),
                  "alert.%s.process.name" % direction: ("process", None),
-                 "alert.%s.user.user_id.name" % direction: ("users", None),
+                 "alert.%s.user.user_id.name" % direction: ("users", self._setMessageDirectionUser),
                  "alert.%s.file.path" % direction: ("files", self._setMessageDirectionTargetFile),
                  "alert.%s.node.address.address" % direction: ("addresses", self._setMessageDirectionAddress),
                  "alert.%s.node.name" % direction: ("addresses", self._setMessageDirectionNodeName), 
@@ -180,6 +180,15 @@ class ListedAlert(ListedMessage):
     def __init__(self, *args, **kwargs):        
         apply(ListedMessage.__init__, (self, ) + args, kwargs)
         self.reset()
+
+    def _setMainAndExtraValues(self, dataset, name, object_main, object_extra):
+        if object_main != None:
+            dataset[name] = { "value": object_main }
+            dataset[name + "_extra"] = { "value": object_extra }
+                
+        else:
+            dataset[name] = { "value": object_extra }
+            dataset[name + "_extra"] = { "value": None }
         
     def _setMessageDirectionAddress(self, direction, address, category=None):        
         hfield = self.createHostField("alert.%s.node.address.address" % direction, address, category, direction=direction)
@@ -190,11 +199,19 @@ class ListedAlert(ListedMessage):
         self._initDirectionIfNeeded(direction)
         self[direction][-1]["addresses"].append(self.createHostField("alert.%s.node.name" % direction, name, None, direction=direction))
 
+    def _setMessageDirectionUser(self, direction, name, extra=None):
+        if name == None and extra == None:
+            return
+            
+        user = {}
+        self._setMainAndExtraValues(user, "user", name, extra)
+        self[direction][-1]["users"].append(user)
+        
     def _setMessageDirectionTargetFile(self, direction, path, extra=None):
         self["target"][-1]["files"].append(self.createInlineFilteredField("alert.target.file.path", path, direction="target"))
         
     def _setMessageDirectionGeneric(self, direction, object, value, extra=None):
-        dset_name, function = self._getKnownValue(direction, object.replace("(0)", ""))        
+        dset_name, function = self._getKnownValue(direction, object.replace("(0)", ""))
                         
         self._initDirectionIfNeeded(direction)
         if function:
@@ -207,22 +224,11 @@ class ListedAlert(ListedMessage):
 
             
     def _setMessageDirection(self, dataset, direction, obj):
-        
-        def set_main_and_extra_values(dataset, name, object_main, object_extra):
-            if object_main != None:
-                dataset[name] = { "value": object_main }
-                dataset[name + "_extra"] = { "value": object_extra }
-            else:
-                dataset[name] = { "value": object_extra }
-                dataset[name + "_extra"] = { "value": None }
-            
         dataset["interface"] = { "value": obj["interface"] }
         
         for userid in obj["user.user_id"]:
-            user = { }
-            dataset["users"].append(user)
-            set_main_and_extra_values(user, "user", userid["name"], userid["number"])
-
+            self._setMessageDirectionUser(direction, userid["name"], userid["number"])
+               
         name = obj["node.name"]
         if name != None:
             self._setMessageDirectionNodeName(direction, name)
@@ -230,7 +236,7 @@ class ListedAlert(ListedMessage):
         for addr in obj["node.address"]:
             self._setMessageDirectionAddress(direction, addr["address"], addr["category"])
                         
-        set_main_and_extra_values(dataset, "process", obj["process.name"], obj["process.pid"])
+        self._setMainAndExtraValues(dataset, "process", obj["process.name"], obj["process.pid"])
 
         proto = None
         if obj["service.iana_protocol_name"]:
@@ -243,8 +249,8 @@ class ListedAlert(ListedMessage):
         if not proto:
             proto = obj["service.protocol"]
        
-        set_main_and_extra_values(dataset, "protocol", proto, None)
-        set_main_and_extra_values(dataset, "service", obj["service.port"], None)
+        self._setMainAndExtraValues(dataset, "protocol", proto, None)
+        self._setMainAndExtraValues(dataset, "service", obj["service.port"], None)
 
         dataset["files"] = []
 
@@ -651,8 +657,9 @@ class AlertListing(MessageListing, view.View):
             delete_criteria = [ ]
             message = self.listed_aggregated_alert(self.env, self.parameters)
 
+            dirlist = [ ]
+            
             for path, value in zip(ag_list, values[:start]):
-                                
                 if path.find("source") != -1:
                     direction = "source"
                     value_category = aggregated_source_values[-1]
@@ -663,8 +670,10 @@ class AlertListing(MessageListing, view.View):
                     direction = None
                     
                 if re.compile("alert.%s(\([0-9\*]*\))?\.node\.address(\([0-9\*]*\))?\.category" % direction).match(path):
+                    if len(dirlist) > 0:
+                        dirlist[-1][3] = value_category
                     continue
-                
+                    
                 if not value:
                     if idmef_path_get_value_type(idmef_path_new(path), -1) != IDMEF_VALUE_TYPE_STRING:
                         criterion = "! %s" % (path)
@@ -673,11 +682,14 @@ class AlertListing(MessageListing, view.View):
                 else:
                     criterion = "%s == '%s'" % (path, utils.escape_criteria(str(value)))
                     if direction in ("source", "target"):
-                        message._setMessageDirectionGeneric(direction, path, value, value_category)
+                        dirlist.append([direction, path, value, None])
                        
                 criteria2.append(criterion)
                 delete_criteria.append(criterion)
 
+            for ent in dirlist:
+                message._setMessageDirectionGeneric(*ent)
+                
             time_min = self.env.idmef_db.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
             time_max = self.env.idmef_db.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
             
