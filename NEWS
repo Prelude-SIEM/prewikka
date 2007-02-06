@@ -1,5 +1,7 @@
-* 2007-01-29, prewikka-0.9.9:
+* 2007-02-06, prewikka-0.9.9:
 
+        - Improve database performance by reducing the number of query. (Paul Robert Marino)
+        
         - Activate CleanOutput filtering (lot of escaping fixes).
       
         - More action logging.
