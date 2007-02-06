@@ -1,3 +1,16 @@
+* 2007-01-29, prewikka-0.9.9:
+
+        - Activate CleanOutput filtering (lot of escaping fixes).
+      
+        - More action logging.
+        
+        - Bug fixes with the error pages Back/Retry buttons.
+          
+        - Fix error on group by user (#191).
+        
+        - Fix template compilation error with Cheetah version 2 (#184).
+        
+
 * 2006-11-23, prewikka-0.9.8:
 	
 	- Save/load user configuration when using CGI authentication mode (#181).

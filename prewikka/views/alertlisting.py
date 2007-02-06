@@ -612,7 +612,7 @@ class AlertListing(MessageListing, view.View):
             message = self.env.idmef_db.getAlert(ca_ident)
             self._ignoreAtomicIfNeeded(message, atomic_ignore_list)
             results += [ [ row[0] ] + [None for i in ag_list] + [ca_ident] + [message] + [ row[1] ] ]
-            
+ 
         ignore_criteria = [ ]
         for messageid in atomic_ignore_list:
             ignore_criteria += [ "alert.messageid != '%s'" % messageid ]
@@ -689,10 +689,33 @@ class AlertListing(MessageListing, view.View):
 
             for ent in dirlist:
                 message._setMessageDirectionGeneric(*ent)
-                
+
             time_min = self.env.idmef_db.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
             time_max = self.env.idmef_db.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
             
+            alert_list = self.env.idmef_db.getValues( ["count(alert.create_time)", 
+                                                       "alert.classification.text/group_by", 
+                                                       "alert.assessment.impact.severity/group_by", 
+                                                       "alert.assessment.impact.completion/group_by", 
+                                                       "alert.analyzer(-1).name/group_by", 
+                                                       "alert.analyzer(-1).node.name/group_by"], criteria2 + ignore_criteria)
+            
+            
+            nodesraw = {}
+            alertsraw = {}
+            for alert_count, classification, severity, completion, analyzer_name, analyzer_node_name in alert_list:
+        
+               alertkey = classification or "" + '-' + severity or "" + '-' + completion or ""
+               if alertsraw.has_key(alertkey):
+                   alertsraw[alertkey][3] += alert_count
+               else:
+                   alertsraw[alertkey] = ( [classification, severity, completion, alert_count] )
+               
+               nodekey = analyzer_name or "" + "-" + analyzer_node_name or ""
+               if not nodesraw.has_key(nodekey):
+                   message.addSensor(analyzer_name, analyzer_node_name)
+                   nodesraw[nodekey] = True
+                   
             delete_criteria.append("alert.create_time >= '%s'" % time_min.toYMDHMS())
             delete_criteria.append("alert.create_time <= '%s'" % time_max.toYMDHMS())
 
@@ -702,18 +725,7 @@ class AlertListing(MessageListing, view.View):
             message.setTime(time_min, time_max)
             message.setCriteriaForDeletion(delete_criteria)
 
-            res = self.env.idmef_db.getValues(["alert.analyzer(-1).name/group_by",
-                                               "alert.analyzer(-1).node.name/group_by"],
-                                              criteria2)
-
-            for analyzer_name, analyzer_node_name in res:
-                message.addSensor(analyzer_name, analyzer_node_name)
-
-            res = self.env.idmef_db.getValues(["alert.classification.text/group_by",
-                                               "alert.assessment.impact.severity/group_by",
-                                               "alert.assessment.impact.completion/group_by",
-                                               "count(alert.create_time)"], criteria2 + ignore_criteria)
-                
+            res = alertsraw.values()
             res.sort(lambda x, y: cmp_severities(x[1], y[1]))
 
             parameters = self._createAggregationParameters(aggregated_classification_values,
@@ -729,11 +741,6 @@ class AlertListing(MessageListing, view.View):
                                                                                     + parameters +
                                                                                     { "aggregated_classification":
                                                                                       "alert.classification.text" } )
-
-            if len(res[:self._max_aggregated_classifications]) > 1:
-                classification = None
-            else:
-                classification = res[0][0] or ""
 
             result_count = 0
 

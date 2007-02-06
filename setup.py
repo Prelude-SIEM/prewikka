@@ -35,7 +35,7 @@ from distutils.core import Command
 from Cheetah.CheetahWrapper import CheetahWrapper
 
 
-PREWIKKA_VERSION = "0.9.8"
+PREWIKKA_VERSION = "0.9.9"
 
 
 class my_build_py(build_py):
