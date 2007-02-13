@@ -605,7 +605,7 @@ class AlertListing(MessageListing, view.View):
         
         selection = [ "alert.messageid", "alert.create_time" ]
         results2 = self.env.idmef_db.getValues(selection, criteria + ["alert.correlation_alert.name"])
-
+        
         results = []
         for row in results2:
             ca_ident = self.env.idmef_db.getAlertIdents(criteria + [ "alert.messageid = %s" % row[0] ], 1, -1)[0]
@@ -692,24 +692,22 @@ class AlertListing(MessageListing, view.View):
 
             time_min = self.env.idmef_db.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
             time_max = self.env.idmef_db.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
-            
-            alert_list = self.env.idmef_db.getValues( ["count(alert.create_time)", 
+          
+            alert_list = self.env.idmef_db.getValues( ["max(alert.messageid)", "count(alert.create_time)", 
                                                        "alert.classification.text/group_by", 
                                                        "alert.assessment.impact.severity/group_by", 
                                                        "alert.assessment.impact.completion/group_by", 
                                                        "alert.analyzer(-1).name/group_by", 
                                                        "alert.analyzer(-1).node.name/group_by"], criteria2 + ignore_criteria)
             
-            
             nodesraw = {}
             alertsraw = {}
-            for alert_count, classification, severity, completion, analyzer_name, analyzer_node_name in alert_list:
-        
+            for max_messageid, alert_count, classification, severity, completion, analyzer_name, analyzer_node_name in alert_list:
                alertkey = classification or "" + '-' + severity or "" + '-' + completion or ""
                if alertsraw.has_key(alertkey):
                    alertsraw[alertkey][3] += alert_count
                else:
-                   alertsraw[alertkey] = ( [classification, severity, completion, alert_count] )
+                   alertsraw[alertkey] = ( [classification, severity, completion, alert_count, max_messageid] )
                
                nodekey = analyzer_name or "" + "-" + analyzer_node_name or ""
                if not nodesraw.has_key(nodekey):
@@ -718,8 +716,6 @@ class AlertListing(MessageListing, view.View):
                    
             delete_criteria.append("alert.create_time >= '%s'" % time_min.toYMDHMS())
             delete_criteria.append("alert.create_time <= '%s'" % time_max.toYMDHMS())
-
-            ident = self.env.idmef_db.getAlertIdents(criteria2 + ignore_criteria, limit=1)[0]
             
             self.dataset["messages"].append(message)
             message.setTime(time_min, time_max)
@@ -744,7 +740,7 @@ class AlertListing(MessageListing, view.View):
 
             result_count = 0
 
-            for classification, severity, completion, count in res:
+            for classification, severity, completion, count, messageid in res:
                 if result_count >= self._max_aggregated_classifications:
                     result_count += 1
                     continue
@@ -754,25 +750,12 @@ class AlertListing(MessageListing, view.View):
                 infos = message.setInfos(count, classification, severity, completion)
                     
                 if count == 1:
+                    ident = self.env.idmef_db.getAlertIdents("alert.messageid = %s" % messageid)[0]
                     if aggregated_count == 1:                            
                         message.reset()
                         message.setMessage(self._fetchMessage(ident), ident)
-                                                    
-                    criteria3 = criteria2[:]
-
-                    for path, value, is_string in (("alert.classification.text", classification, True),
-                                                       ("alert.assessment.impact.severity", severity, False),
-                                                       ("alert.assessment.impact.completion", completion, False)):
-                        if value:
-                            criteria3.append("%s == '%s'" % (path, utils.escape_criteria(value)))
-                        else:
-                            if is_string:
-                                criteria3.append("(! %s || %s == '')" % (path, path))
-                            else:
-                                criteria3.append("! %s" % path)
-
-                    ident = self.env.idmef_db.getAlertIdents(criteria3, limit=1)[0]
-                    infos["display"] = message.createMessageLink(ident, "alert_summary")
+                    else:                                
+                        infos["display"] = message.createMessageLink(ident, "alert_summary")
                 else:
                     entry_param = {}
                         
@@ -794,7 +777,7 @@ class AlertListing(MessageListing, view.View):
                                                          [ "offset", "aggregated_classification",
                                                            "aggregated_source", "aggregated_target", "_load", "_save" ] +
                                                          parameters + entry_param)
-                        
+                                                           
         return total_results
     
 
