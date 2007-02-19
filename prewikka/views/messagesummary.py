@@ -409,20 +409,22 @@ class MessageSummary(Table):
         self.newTableEntry("Node name", node["name"])
         self.newTableEntry("Node location", node["location"])
         
-        addr_list = ""
+        addr_list = None
         for addr in node["address"]:
             address = addr["address"]
             if not address:
                 continue
 
-            if len(addr_list) > 0:
+            if addr_list:
                 addr_list += "<br/>"
-
+            else:
+                addr_list = ""
+            
             if addr["category"] in ("ipv4-addr", "ipv6-addr", "ipv4-net", "ipv6-net"):
                 addr_list += self.getUrlLink(address, "https://www.prelude-ids.com/host_details.php?host=%s" % address)
             else:
                 addr_list += address
-            
+        
         self.newTableEntry("Node address", addr_list)
                 
     def buildAnalyzer(self, analyzer):
@@ -693,6 +695,14 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.newTableEntry("Type", alert["assessment.impact.type"])
         self.newTableEntry("Description", alert["assessment.impact.description"])
         
+    def buildAction(self, action):
+        self.beginTable()
+        
+        self.newTableEntry("Category", action["category"])
+        self.newTableEntry("Description", action["description"])
+        
+        self.endTable()
+        
     def buildChecksum(self, checksum):
         self.newTableEntry(checksum["algorithm"], checksum["value"])
         self.newTableEntry("%s key" % checksum["algorithm"], checksum["key"])
@@ -792,6 +802,43 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
             
         self.endSection()
 
+    def buildWebService(self, webservice):
+        if not webservice:
+            return
+            
+        self.beginSection("Web Service")
+        self.beginTable()
+        
+        self.newTableEntry("Url", webservice["url"])
+        self.newTableEntry("Cgi", webservice["cgi"])
+        self.newTableEntry("Http Method", webservice["http_method"])        
+        
+        for arg in webservice["arg"]:
+            self.newTableEntry("CGI Argument", arg)
+            
+        self.endTable()
+        self.endSection()
+        
+    def buildSnmpService(self, service):
+        if not service:
+            return
+            
+        self.beginSection("SNMP Service")
+        self.beginTable()
+        
+        self.newTableEntry("oid", service["oid"])
+        self.newTableEntry("messageProcessingModel", service["message_processing_model"])
+        self.newTableEntry("securityModel", service["security_model"])        
+        self.newTableEntry("securityName", service["security_name"])
+        self.newTableEntry("securityLevel", service["security_level"])
+        self.newTableEntry("contextName", service["context_name"])
+        self.newTableEntry("contextEngineID", service["context_engine_id"])
+        self.newTableEntry("command", service["command"])
+        
+        self.endTable()
+        self.endSection()
+
+        
     def buildService(self, service):
         if not service:
             return
@@ -809,13 +856,13 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                              
         elif service["protocol"]:
             self.newTableEntry("Protocol", service["protocol"])
-                    
+            
     def buildDirection(self, direction):
         self.beginTable()
         self.buildNode(direction["node"])
         self.buildService(direction["service"])
         self.endTable()
-        
+                
         user = direction["user"]
         if user:
             self.buildUser(user)
@@ -823,6 +870,9 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         process = direction["process"]
         if process:
             self.buildProcess(process)
+        
+        self.buildWebService(direction["service.web_service"])
+        self.buildSnmpService(direction["service.snmp_service"])
         
     def buildSource(self, alert):
         i = 0
@@ -878,6 +928,11 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.buildImpact(alert)
         self.endTable()
 
+        self.beginSection("Actions")
+        for action in alert["assessment.action"]:
+            self.buildAction(action)
+        self.endSection()
+               
         self.buildCorrelationAlert(alert)
         self.buildReference(alert)
 
