@@ -472,9 +472,6 @@ class AlertListing(MessageListing, view.View):
     def _getMessageIdents(self, criteria, limit=-1, offset=-1):
         return self.env.idmef_db.getAlertIdents(criteria, limit, offset)
 
-    def _countMessages(self, criteria):
-        return self.env.idmef_db.countAlerts(criteria)
-
     def _fetchMessage(self, ident):
         return self.env.idmef_db.getAlert(ident)
 
@@ -845,7 +842,9 @@ class AlertListing(MessageListing, view.View):
             return ret
         
         atomic_ignore_list = []
-        for ident in self.env.idmef_db.getAlertIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
+        
+        results = self.env.idmef_db.getAlertIdents(criteria)
+        for ident in results[self.parameters["offset"] : self.parameters["offset"] + self.parameters["limit"]]:
             message = self.env.idmef_db.getAlert(ident)
 
             if self._isAtomicEventIgnored(message, atomic_ignore_list):
@@ -856,8 +855,8 @@ class AlertListing(MessageListing, view.View):
             dataset = self._setMessage(message, ident)
             self.dataset["messages"].append(dataset)
 
-        return self.env.idmef_db.countAlerts(criteria)
-            
+        return len(results)
+        
     def _setDatasetConstants(self):
         self.dataset["available_aggregations"] = { }
         self.dataset["available_aggregations"]["classification"] = ( ("", "none"),
