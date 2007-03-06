@@ -18,8 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import time
-
+import time, types
 from prelude import *
 from preludedb import *
 
@@ -37,7 +36,7 @@ def escape_value(value):
 class IDMEFTime(object):
     def __init__(self, res):
         self._res = res
-
+        
     def __del__(self):
         idmef_time_destroy(self._res)
 
@@ -46,13 +45,13 @@ class IDMEFTime(object):
 
     def __int__(self):
         return idmef_time_get_sec(self._res)
-
+                
     def __float__(self):
         return float(idmef_time_get_sec(self._res)) + float(idmef_time_get_usec(self._res)) / 10 ** 6
-
+        
     def toYMDHMS(self):
         return time_to_ymdhms(time.localtime(idmef_time_get_sec(self._res)))
-
+        
     def __getattribute__(self, name):
         if name is "sec":
             return idmef_time_get_sec(self._res)
@@ -100,6 +99,7 @@ def convert_idmef_value(value):
         return None
 
     
+        
 class Message:
     def __init__(self, res, htmlsafe):
         self._res = res
@@ -247,6 +247,93 @@ class Heartbeat(Message):
 
 
 
+class DbResult:
+    def __init__(self, results):
+        self._rows = [ ]
+        self._has_cache = False
+        self._res, self._len = results
+        
+    def __iter__(self):
+        return self
+        
+    def __len__(self):
+        return self._len
+       
+    def __del__(self):
+        if self._res:
+            self._db_delete(self._res)
+        
+    def __getitem__(self, key):
+        if isinstance(key, types.SliceType):
+            start, stop, step = key.start, key.stop, key.step
+            index = start + stop
+        else:
+            index = key
+        
+        if not self._has_cache:
+            for r in self:
+                if len(self._rows) >= index:
+                    break
+                
+        return self._rows[key]
+        
+    def next(self):        
+        if self._res == None:
+            raise StopIteration
+            
+        if self._has_cache:
+            return self._rows
+                        
+        values = self._db_get_next()
+        if values is None:
+            self._has_cache = True
+            self._db_delete(self._res)
+            self._res = None
+            raise StopIteration
+
+        row = self._db_convert_row(values)
+       
+        self._rows.append(row)
+        return row
+            
+
+class DbResultValues(DbResult):
+    def __init__(self, selection, results):
+        self._selection = selection
+        DbResult.__init__(self, results)
+                
+    def _db_get_next(self):
+        return preludedb_result_values_get_next(self._res)
+        
+    def _db_delete(self, result):
+        if self._selection:
+            preludedb_path_selection_destroy(self._selection)
+            
+        if result:
+            preludedb_result_values_destroy(result)
+            
+    def _db_convert_row(self, values):
+        row = []
+        for value in values:
+           if value is None:
+               row.append(None)
+           else:
+               row.append(convert_idmef_value(value))
+               idmef_value_destroy(value)      
+               
+        return row
+        
+class DbResultIdents(DbResult):
+    def _db_get_next(self):
+        return preludedb_result_idents_get_next(self._res)
+        
+    def _db_delete(self, result):
+        if result:
+            preludedb_result_idents_destroy(result)
+                    
+    def _db_convert_row(self, value):
+        return value
+
 class IDMEFDatabase:
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
@@ -270,7 +357,8 @@ class IDMEFDatabase:
                 raise "libpreludedb %s or higher is required (%s found)." % (wanted_version, cur)
             else:
                 raise "libpreludedb %s or higher is required." % wanted_version
-            
+        
+        self._sql = sql
         self._db = preludedb_new(sql, None)
 
     def _getMessageIdents(self, get_message_idents, criteria, limit, offset):
@@ -287,27 +375,20 @@ class IDMEFDatabase:
         
         result = get_message_idents(self._db, criteria, limit, offset,
                                     PRELUDEDB_RESULT_IDENTS_ORDER_BY_CREATE_TIME_DESC)
-        if result:
-            while True:
-                ident = preludedb_result_idents_get_next(result)
-                if ident is None:
-                    break
-                idents.append(ident)
-            preludedb_result_idents_destroy(result)
-
-        if type(criteria) is list:
-            criteria = " && ".join(criteria)
         
         if criteria:
             idmef_criteria_destroy(criteria)
-
-        return idents        
-
+        
+        if not result:
+            return [ ]            
+        
+        return DbResultIdents(result)
+        
     def getAlertIdents(self, criteria=None, limit=-1, offset=-1):
-        return self._getMessageIdents(preludedb_get_alert_idents, criteria, limit, offset)
+        return self._getMessageIdents(preludedb_get_alert_idents2, criteria, limit, offset)
 
     def getHeartbeatIdents(self, criteria=None, limit=-1, offset=-1):
-        return self._getMessageIdents(preludedb_get_heartbeat_idents, criteria, limit, offset)
+        return self._getMessageIdents(preludedb_get_heartbeat_idents2, criteria, limit, offset)
 
     def _getLastMessageIdent(self, type, get_message_idents, analyzerid):
         criteria = None
@@ -355,35 +436,19 @@ class IDMEFDatabase:
             my_selected = preludedb_selected_path_new_string(selected)
             preludedb_path_selection_add(my_selection, my_selected)
 
-        rows = [ ]
-
-        result = preludedb_get_values(self._db, my_selection, criteria, distinct, limit, offset)
-        if result != None:
-            while True:
-                values = preludedb_result_values_get_next(result)
-                if values is None:
-                    break
-
-                row = [ ]
-                rows.append(row)
-                for value in values:
-                    if value is None:
-                        row.append(None)
-                    else:
-                        row.append(convert_idmef_value(value))
-                        idmef_value_destroy(value)
-            preludedb_result_values_destroy(result)
-
+        result = preludedb_get_values2(self._db, my_selection, criteria, distinct, limit, offset)
         if criteria:
-            idmef_criteria_destroy(criteria)
+            idmef_criteria_destroy(criteria)       
         
-        preludedb_path_selection_destroy(my_selection)
+        if not result:
+            preludedb_path_selection_destroy(my_selection)
+            return [ ]
+            
+        return DbResultValues(my_selection, result)
         
-        return rows
-
     def _countMessages(self, root, criteria):
         return self.getValues(["count(%s.create_time)" % root], criteria)[0][0]
-
+        
     def countAlerts(self, criteria=None):
         return self._countMessages("alert", criteria)
 
