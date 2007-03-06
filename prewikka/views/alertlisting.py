@@ -700,13 +700,13 @@ class AlertListing(MessageListing, view.View):
             nodesraw = {}
             alertsraw = {}
             for max_messageid, alert_count, classification, severity, completion, analyzer_name, analyzer_node_name in alert_list:
-               alertkey = classification or "" + '-' + severity or "" + '-' + completion or ""
+               alertkey = (classification or "") + '-' + (severity or "") + '-' + (completion or "")
                if alertsraw.has_key(alertkey):
                    alertsraw[alertkey][3] += alert_count
                else:
                    alertsraw[alertkey] = ( [classification, severity, completion, alert_count, max_messageid] )
                
-               nodekey = analyzer_name or "" + "-" + analyzer_node_name or ""
+               nodekey = (analyzer_name or "") + "-" + (analyzer_node_name or "")
                if not nodesraw.has_key(nodekey):
                    message.addSensor(analyzer_name, analyzer_node_name)
                    nodesraw[nodekey] = True
