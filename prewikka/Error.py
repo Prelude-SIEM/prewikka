@@ -34,8 +34,10 @@ class PrewikkaError(Exception):
 class SimpleError(PrewikkaError):
     def __init__(self, name, message, display_traceback=False):
         self.dataset = DataSet.DataSet()
+        self.template = "ErrorTemplate"
         self.dataset["message"] = message
         self.dataset["name"] = name
+        
         if display_traceback:
             output = StringIO.StringIO()
             traceback.print_exc(file=output)
@@ -44,4 +46,3 @@ class SimpleError(PrewikkaError):
             self.dataset["traceback"] = tmp
         else:
             self.dataset["traceback"] = None
-        self.template = "ErrorTemplate"
