@@ -8,7 +8,6 @@
   <fieldset style="text-align: center; vertical-align: middle;"> 
    <legend class="error_name">$name</legend>
    <p><b>$message</b></p>
-   Failed query: <input type="text" value="$prewikka.url.current" style="width: 200px;" />
    #if $traceback
      <br/><br/>
      <textarea rows=10 cols=75 readonly>$traceback</textarea>
@@ -42,8 +41,13 @@
        #end for
      #end for
 
+#if not $referer.has_key("_error_back")
      <input type="hidden" name="_error_back" value="$referer_string" />
+#end if
+
+#if not $referer.has_key("_error_retry")
      <input type="hidden" name="_error_retry" value="$retry_string" />
+#endif
      <input style="float: left; position: relative;" type="submit" value="Back"/>
    </form>
 
@@ -54,8 +58,14 @@
        #end for
      #end for
 
+#if not $retry.has_key("_error_back")
      <input type="hidden" name="_error_back" value="$referer_string" />
+#end if
+
+#if not $retry.has_key("_error_retry")
      <input type="hidden" name="_error_retry" value="$retry_string" />
+#endif
+
      <input style="float: right; position: relative;" type="submit" value="Retry"/>
    </form>
 
