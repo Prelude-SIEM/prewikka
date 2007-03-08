@@ -29,14 +29,14 @@ from prewikka.templates import ErrorTemplate
 class PrewikkaError(Exception):
     pass
 
-
-
-class SimpleError(PrewikkaError):
-    def __init__(self, name, message, display_traceback=False):
+class PrewikkaUserError(PrewikkaError):
+    def __init__(self, name, message, display_traceback=False, log=None, log_user=None):
         self.dataset = DataSet.DataSet()
         self.template = "ErrorTemplate"
         self.dataset["message"] = message
         self.dataset["name"] = name
+        self._log_priority = log
+        self._log_user = log_user
         
         if display_traceback:
             output = StringIO.StringIO()
@@ -46,3 +46,7 @@ class SimpleError(PrewikkaError):
             self.dataset["traceback"] = tmp
         else:
             self.dataset["traceback"] = None
+
+    def __str__(self):
+        return self.dataset["message"]
+        

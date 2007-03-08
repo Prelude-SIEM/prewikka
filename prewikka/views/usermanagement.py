@@ -129,7 +129,7 @@ class UserSettingsDisplay(view.View):
         login = self.parameters.get("login", self.user.login)
 
         if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):            
-            raise prewikka.Error.SimpleError("Permission Denied", "Access denied to other users settings")
+            raise prewikka.Error.PrewikkaUserError("Permission Denied", "Access denied to other users settings", log=Log.WARNING)
 
         self.dataset["ask_current_password"] = (login == self.user.login)
         self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
@@ -151,7 +151,7 @@ class UserSettingsModify(UserListing):
         login = self.parameters.get("login", self.user.login)
         
         if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):            
-            raise prewikka.Error.SimpleError("Permission Denied", "Cannot modify other users settings")
+            raise prewikka.Error.PrewikkaUserError("Permission Denied", "Cannot modify other users settings", log=Log.WARNING)
         
         if self.user.has(User.PERM_USER_MANAGEMENT):
             self.env.db.setPermissions(login, self.parameters["permissions"])
@@ -163,10 +163,10 @@ class UserSettingsModify(UserListing):
                 try:
                     self.env.auth.checkPassword(login, self.parameters["password_current"])
                 except Auth.AuthError, e:
-                    raise prewikka.Error.SimpleError("Password Error", "Invalid Password specified")
+                    raise prewikka.Error.PrewikkaUserError("Password Error", "Invalid Password specified")
 
             if self.parameters["password_new"] != self.parameters["password_new_confirmation"]:
-                raise prewikka.Error.SimpleError("Password Error", "Password mismatch")
+                raise prewikka.Error.PrewikkaUserError("Password Error", "Password mismatch")
 
             self.env.auth.setPassword(login, self.parameters["password_new"])
 

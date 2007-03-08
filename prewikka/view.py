@@ -19,25 +19,27 @@
 
 
 from copy import copy
-
+import Error, Log
 
 class ParameterError(Exception):
-    pass
-
-
-class InvalidParameterError(ParameterError):
+        pass
+        
+class InvalidParameterError(Error.PrewikkaUserError):
     def __init__(self, name):
-        ParameterError.__init__(self, "invalid parameter '%s'" % name)
+        Error.PrewikkaUserError.__init__(self, "Parameters Normalization failed", 
+                                               "Parameter '%s' is not valid" % name, log=Log.WARNING)
 
 
-class InvalidParameterValueError(ParameterError):
+class InvalidParameterValueError(Error.PrewikkaUserError):
     def __init__(self, name, value):
-        ParameterError.__init__(self, "invalid value '%s' for parameter '%s'" % (value, name))
+        Error.PrewikkaUserError.__init__(self, "Parameters Normalization failed", 
+                                               "Invalid value '%s' for parameter '%s'" % (value, name), log=Log.WARNING)
 
 
-class MissingParameterError(ParameterError):
+class MissingParameterError(Error.PrewikkaUserError):
     def __init__(self, name):
-        ParameterError.__init__(self, "parameter '%s' is missing" % name)
+        PrewikkaUserError.__init__(self, "Parameters Normalization failed", 
+                                         "Required parameter '%s' is missing" % name, log=Log.WARNING)
 
 
 
@@ -49,6 +51,7 @@ class Parameters(dict):
         self._parameters = { }
         self.register()
         self.optional("_error_back", str)
+        self.optional("_error_retry", str)
         self.optional("_save", str)
         self.optional("_load", str)
         
@@ -78,7 +81,7 @@ class Parameters(dict):
                 
             if parameter_type is list and not type(value) is list:
                 value = [ value ]
-            
+
             try:
                 value = parameter_type(value)
             except (ValueError, TypeError):

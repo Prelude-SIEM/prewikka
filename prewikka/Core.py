@@ -20,23 +20,31 @@
 import os, copy, time
 import preludedb, CheetahFilters
 
-from prewikka import Config, Log, Database, IDMEFDatabase, ParametersNormalizer, \
+from prewikka import view, Config, Log, Database, IDMEFDatabase, ParametersNormalizer, \
      User, Auth, DataSet, Error, utils, siteconfig
 
 
-class InvalidQueryError(Error.SimpleError):
-    def __init__(self, query):
-        Error.SimpleError.__init__(self, "Query error", "Invalid query")
+class InvalidQueryError(Error.PrewikkaUserError):
+    def __init__(self, message):
+        Error.PrewikkaUserError.__init__(self, "Invalid query", message, log=Log.ERROR)
 
 
 
-class PermissionDeniedError(Error.SimpleError):
+class PermissionDeniedError(Error.PrewikkaUserError):
     def __init__(self, user, action_name):
-        Error.SimpleError.__init__(self, "Permission Denied",
-                                   "User %s cannot access action %s" % (user, action_name))
+        Error.PrewikkaUserError.__init__(self, "Permission Denied",
+                                         "User %s cannot access action %s" % (user, action_name), log=Log.WARNING)
 
 
-
+class Logout(view.View):
+    view_name = "logout"
+    view_parameters = view.Parameters
+    view_permissions = [ ]
+                
+    def render(self):
+        self.env.auth.logout(self.request)
+                    
+                    
 def init_dataset(dataset, config, request):
     interface = config.interface
     dataset["document.title"] = "[PREWIKKA]"
@@ -58,9 +66,27 @@ def init_dataset(dataset, config, request):
         qstring = qstring[2:]
 
     dataset["prewikka.url.current"] = qstring
-    dataset["prewikka.url.referer"] = request.getReferer()
 
-
+    referer = request.getReferer()
+    idx = referer.rfind("/")
+    if idx != -1:
+        referer = referer[idx + 1:]
+        if referer[0:1] == "?":
+            referer = referer[1:]
+        
+    dataset["prewikka.url.referer"] = referer
+    
+    dataset["arguments"] = []
+    for name, value in request.arguments.items():
+        if name in ("_login", "_password"):
+            continue
+                
+        if name == "view" and value == "logout":
+            continue
+        
+        dataset["arguments"].append((name, value))
+            
+            
 def load_template(name, dataset):
     template = getattr(__import__("prewikka.templates." + name, globals(), locals(), [ name ]), name)(filtersLib=CheetahFilters)
         
@@ -130,16 +156,6 @@ class Core:
         
     def _initAuth(self):
         if self._env.auth.canLogout():
-            from prewikka import view
-
-            class Logout(view.View):
-                view_name = "logout"
-                view_parameters = view.Parameters
-                view_permissions = [ ]
-                
-                def render(self):
-                    self.env.auth.logout(self.request)
-            
             self._views.update(Logout().get())
 
     def _loadViews(self):
@@ -258,12 +274,7 @@ class Core:
         from prewikka.view import ParameterError
 
         parameters = view["parameters"](request.arguments) - [ "view" ]
-
-        try:
-            parameters.normalize(view["name"], user)
-        except ParameterError, e:
-            self._env.log.error("%s" % str(e), request, user.login)
-            raise InvalidQueryError(request.getQueryString())
+        parameters.normalize(view["name"], user)
 
         return parameters
         
@@ -273,8 +284,7 @@ class Core:
             return self._views[name]
 
         except KeyError:
-            self._env.log.error("View '%s' does not exist" % name, request, user.login)
-            raise InvalidQueryError(request.getQueryString())
+            raise InvalidQueryError("View '%s' does not exist" % name)
 
     def checkAuth(self, request):
         return self._env.auth.getUser(request)
@@ -286,16 +296,19 @@ class Core:
         return error.dataset, error.template
     
     def process(self, request):
+        login = None
         try:
             user = None
             user = self.checkAuth(request)
+            login = user.login
             view = self._getView(request, user)
 
             self._checkPermissions(request, view, user)
             parameters = self._getParameters(request, view, user)
             view_object = self._setupView(view, request, parameters, user)
 
-            self._env.log.info("Loading view", request, user.login)
+            if not isinstance(view_object, Logout):
+                self._env.log.info("Loading view", request, user.login)
             getattr(view_object, view["handler"])()
 
             dataset = view_object.dataset
@@ -303,13 +316,17 @@ class Core:
 
             self._cleanupView(view_object)
             
-        except Error.PrewikkaError, e:
+        except Error.PrewikkaUserError, e:
+            if e._log_priority:
+                self._env.log.log(e._log_priority, "%s" % str(e), request=request, user=login or e._log_user)
+                
             self._setupDataSet(e.dataset, request, user)
             dataset, template_name = e.dataset, e.template
-            
+                    
         except Exception, e:
-            error = Error.SimpleError("prewikka internal error", str(e),
-                                      display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
+            self._env.log.error("%s" % str(e), request, login)
+            error = Error.PrewikkaUserError("Prewikka internal error", str(e),
+                                            display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
             init_dataset(error.dataset, self._env.config, request)
             dataset, template_name = error.dataset, error.template
         

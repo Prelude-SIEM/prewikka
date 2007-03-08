@@ -21,35 +21,28 @@ import time
 import md5
 import random
 
-from prewikka.Error import PrewikkaError, SimpleError
+from prewikka.Error import PrewikkaError, PrewikkaUserError
 from prewikka import DataSet
 from prewikka import Database
 from prewikka import Log
 from prewikka import User
 
 
-class AuthError(PrewikkaError):
-    def __init__(self, arguments={}, message="Authentication failed"):
-        self.dataset = DataSet.DataSet()
-        self.dataset["message"] = message
-        self.dataset["arguments"] = [ ]
-        for name, value in arguments.items():
-            if name in ("_login", "_password"):
-                continue
-            self.dataset["arguments"].append((name, value))
+class AuthError(PrewikkaUserError):
+    def __init__(self, arguments={}, message="Authentication failed", log=Log.ERROR, log_user=None):
+        PrewikkaUserError.__init__(self, None, message, log=log, log_user=log_user)
         self.template = "LoginPasswordForm"
 
 
-
 class AuthSessionInvalid(AuthError):
-    def __init__(self, arguments={}, message=""):
-        AuthError.__init__(self, arguments, message)
+    def __init__(self, arguments={}, message="Session invalid", login=None, log=None):
+        AuthError.__init__(self, arguments, message, log=log, log_user=login)
 
 
 
 class AuthSessionExpired(AuthError):
-    def __init__(self, arguments={}, message="Session expired"):
-        AuthError.__init__(self, arguments, message)
+    def __init__(self, login, arguments={}, message="Session expired"):
+        AuthError.__init__(self, arguments, message, log=Log.ERROR, log_user=login)
 
 
 
@@ -82,7 +75,7 @@ class Session:
         self._expiration = expiration
 
     def setSession(self, request, sessionid):
-        request.addCookie("sessionid", sessionid,  self._expiration * 3)
+        request.addCookie("sessionid", sessionid, self._expiration * 3)
     
     def checkSession(self, request):
         if not request.input_cookie.has_key("sessionid"):
@@ -93,15 +86,13 @@ class Session:
         try:
             login, t = self.db.getSession(sessionid)
         except Database.DatabaseInvalidSessionError:
-            self.log.error("Invalid session identifier", request)
-            raise AuthSessionInvalid()
+            raise AuthSessionInvalid(log=Log.ERROR)
 
         now = int(time.time())
 
         if now - t > self._expiration:
             self.db.deleteSession(sessionid)
-            self.log.error("Session expired", request, login)
-            raise AuthSessionExpired()
+            raise AuthSessionExpired(login)
 
         self.db.updateSession(sessionid, now)
         self.setSession(request, sessionid)
@@ -134,16 +125,14 @@ class LoginPasswordAuth(Auth, Session):
                 del request.arguments["_password"]
             except KeyError:
                 pass
-
+        
             try:
                 self.checkPassword(login, password)
             except AuthError, e:
-                e.dataset["arguments"] = request.arguments.items()
-                self.log.warning("Username and password do not match", request, login)
-                raise AuthError(message="Username and password do not match.")
+                raise AuthError(message="Username and password do not match.", login=login)
 
             self.createSession(request, login)
-            self.log.warning("User login", request, login)
+            self.log.info("User login", request, login)
         else:
             login = self.checkSession(request)
 
@@ -153,8 +142,7 @@ class LoginPasswordAuth(Auth, Session):
         login = self.checkSession(request)
         self.deleteSession(request)
 
-        self.log.warning("User logout", request, login)
-        raise AuthSessionInvalid(message="Logged out")
+        raise AuthSessionInvalid(message="Logged out", login=login, log=Log.INFO)
 
 
 
