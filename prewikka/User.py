@@ -35,12 +35,6 @@ ALL_PERMISSIONS = [ PERM_IDMEF_VIEW,
 
 ADMIN_LOGIN = "admin"
 
-class PermissionDeniedError(Error.SimpleError):
-    def __init__(self, user, action_name):
-        Error.SimpleError.__init__(self, "Permission Denied",
-                                   "User %s cannot access action %s" % (user, action_name))
-
-
 
 class User:
     def __init__(self, db, login, permissions, configuration):
