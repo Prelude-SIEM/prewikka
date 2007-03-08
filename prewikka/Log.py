@@ -20,6 +20,11 @@
 
 import logging, logging.handlers, sys
 
+DEBUG = logging.DEBUG
+INFO = logging.INFO
+ERROR = logging.ERROR
+WARNING = logging.WARNING
+CRITICAL = logging.CRITICAL
 
 class Log:
     def __init__(self, conf):        
@@ -126,3 +131,11 @@ class Log:
     def critical(self, message, request=None, user=None):
         if self._logger:
             self._logger.critical(self._getLog(request, user, message))
+
+    def log(self, priority, message, request=None, user=None):
+        return { DEBUG: self.debug,
+                 INFO: self.info,
+                 WARNING: self.warning,
+                 ERROR: self.error,
+                 CRITICAL: self.critical }[priority](message, request, user)
+                 
