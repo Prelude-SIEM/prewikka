@@ -316,7 +316,7 @@ class MessageListing:
             return
 
         if not self.user.has(User.PERM_IDMEF_ALTER):
-            raise User.PermissionDeniedError(user.login, self.current_view)
+            raise User.PermissionDeniedError(self.current_view)
 
         idents = [ ]
         for delete in self.parameters["delete"]:

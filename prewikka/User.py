@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import Error
+from prewikka import Error, Log
 
 
 PERM_IDMEF_VIEW = "IDMEF_VIEW"
@@ -36,6 +36,12 @@ ALL_PERMISSIONS = [ PERM_IDMEF_VIEW,
 ADMIN_LOGIN = "admin"
 
 
+class PermissionDeniedError(Error.PrewikkaUserError):
+    def __init__(self, action_name):
+        Error.PrewikkaUserError.__init__(self, "Permission Denied",
+                                         "Access to view '%s' forbidden" % action_name, log=Log.WARNING)
+                                         
+                                         
 class User:
     def __init__(self, db, login, permissions, configuration):
         self._db = db

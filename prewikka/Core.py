@@ -29,13 +29,6 @@ class InvalidQueryError(Error.PrewikkaUserError):
         Error.PrewikkaUserError.__init__(self, "Invalid query", message, log=Log.ERROR)
 
 
-
-class PermissionDeniedError(Error.PrewikkaUserError):
-    def __init__(self, user, action_name):
-        Error.PrewikkaUserError.__init__(self, "Permission Denied",
-                                         "User %s cannot access action %s" % (user, action_name), log=Log.WARNING)
-
-
 class Logout(view.View):
     view_name = "logout"
     view_parameters = view.Parameters
@@ -267,8 +260,7 @@ class Core:
     def _checkPermissions(self, request, view, user):
         if user and view.has_key("permissions"):
             if not user.has(view["permissions"]):
-                self._env.log.warning("Access to view forbidden", request, user.login)
-                raise User.PermissionDeniedError(user.login, view["name"])
+                raise User.PermissionDeniedError(view["name"])
 
     def _getParameters(self, request, view, user):
         from prewikka.view import ParameterError
