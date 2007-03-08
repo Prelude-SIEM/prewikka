@@ -20,7 +20,7 @@
 import os, copy, time
 import preludedb, CheetahFilters
 
-from prewikka import view, Config, Log, Database, IDMEFDatabase, ParametersNormalizer, \
+from prewikka import view, Config, Log, Database, IDMEFDatabase, \
      User, Auth, DataSet, Error, utils, siteconfig
 
 
