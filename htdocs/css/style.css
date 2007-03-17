@@ -381,6 +381,22 @@ p {
 }
 
 
+.popup_operator_select {
+        width: 46px;
+        max-width: 46px;
+}
+
+.popup_select_field {
+        width: 100px;
+        max-width: 100px;
+}
+
+.popup_input_field {
+        width: 150px;
+        max-width: 150px;
+}
+
+
 .filter_control_select, .timezone_control_select {
 	width: 107px;
 	max-width: 107px;
@@ -849,9 +865,9 @@ p {
 }
  	
 
-#classification { width: 400px; }
-#source, #target { width: 400px; }
-#analyzer { width: 400px; right: 80px;}
+#classification { width: 450px; }
+#source, #target { width: 445px; }
+#analyzer { width: 445px; right: 80px;}
 
 #classification td, #source td, #target td, #analyzer td {
 	text-align: right; font-size: 8px; padding: .5em 1em; border-bottom: 1px dashed white;

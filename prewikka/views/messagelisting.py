@@ -157,12 +157,14 @@ class ListedMessage(dict):
         self.timezone = parameters["timezone"]
 
     def createInlineFilteredField(self, object, value, direction=None):
-        if not value:
+        if value == None:
             return { "value": None, "inline_filter": None }
 
         if direction:
             index = self.parameters.max_index
-            extra = { "%s_object_%d" % (direction, index): object, "%s_value_%d" % (direction, index): value }
+            extra = { "%s_object_%d" % (direction, index): object,
+                      "%s_operator_%d" % (direction, index): "=",
+                      "%s_value_%d" % (direction, index): value }
         else:
             extra = { object: value }
 
@@ -190,7 +192,7 @@ class ListedMessage(dict):
 
         return { "value": t }
 
-    def createHostField(self, object, value, category, direction=None):
+    def createHostField(self, object, value, category=None, direction=None):
         field = self.createInlineFilteredField(object, value, direction)
         field["host_commands"] = [ ]
         field["category"] = category
