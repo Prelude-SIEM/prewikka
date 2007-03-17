@@ -1,10 +1,10 @@
 #import cgi
-#extends prewikka.templates.TopLayout
+#extends prewikka.templates.ClassicLayout
 
-#block toplayout_content
+#block main_content
 #filter CleanOutput
 
-<div id="fieldset_page" style="position: absolute; top: 25%; left: 50%; width:600px; margin-left:-300px;">
+<div id="fieldset_page" style="position: absolute; top: 25%; left: 50%; width:600px; margin-left:-220px;">
   <fieldset style="text-align: center; vertical-align: middle;"> 
    <legend class="error_name">$name</legend>
    <p><b>$message</b></p>
@@ -73,4 +73,4 @@
  </div>
 
 #end filter
-#end block toplayout_content
+#end block main_content

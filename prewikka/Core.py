@@ -20,6 +20,7 @@
 import os, copy, time
 import preludedb, CheetahFilters
 
+import prewikka.views
 from prewikka import view, Config, Log, Database, IDMEFDatabase, \
      User, Auth, DataSet, Error, utils, siteconfig
 
@@ -152,14 +153,15 @@ class Core:
             self._views.update(Logout().get())
 
     def _loadViews(self):
-        import prewikka.views
+        self._view_to_tab = { }
+        self._view_to_section = { }
         
-        self._views_position = { }
-        for section, tabs in (prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.users_section,
-                              prewikka.views.about_section):
+        for section, tabs in (prewikka.views.events_section, prewikka.views.agents_section, 
+                              prewikka.views.users_section, prewikka.views.about_section):
             for tab, views in tabs:
                 for view in views:
-                    self._views_position[view] = section, tabs, tab
+                    self._view_to_tab[view] = tab
+                    self._view_to_section[view] = section
                     
         self._views = { }
         for object in prewikka.views.objects:
@@ -202,50 +204,52 @@ class Core:
         del view.env
         
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
-        import prewikka.views
-
         init_dataset(dataset, self._env.config, request)
-        
+       
         if isinstance(self._env.auth, Auth.AnonymousAuth):
             sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.about_section
         else:
             sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.users_section, \
                        prewikka.views.about_section
 
+        section_to_tabs = { }
         dataset["interface.sections"] = [ ]
-        if user:
-            for section_name, tabs in sections:
-                viewable_tabs = 0
-                for tab_name, views in tabs:
-                    default_view = views[0]
-                    if user.has(self._views[default_view]["permissions"]):
-                        viewable_tabs += 1
-
-                if viewable_tabs > 0:
-                    dataset["interface.sections"].append((section_name,
-                                                          utils.create_link(tabs[0][1][0])))
-                    
-        import prewikka.view
-
-        if view and self._views_position.has_key(view["name"]):
-            active_section, tabs, active_tab = self._views_position[view["name"]]
-        elif isinstance(parameters, prewikka.view.RelativeViewParameters):
-            active_section, tabs, active_tab = self._views_position[parameters["origin"]]
-        else:
-            active_section, tabs, active_tab = "", "", ""
-
-        dataset["interface.active_section"] = active_section
-
-        dataset["interface.tabs"] = [ ]
-        if user:
-            for tab, views in tabs:
-                if user.has(self._views[views[0]]["permissions"]):
-                    dataset["interface.tabs"].append((tab, utils.create_link(views[0])))
+        for section_name, tabs in sections:
+            first_tab = None   
+   
+            for tab_name, views in tabs:
+                default_view = views[0]
         
-        dataset["interface.tabs"] = [ (tab, utils.create_link(views[0])) for tab, views in tabs ]
-        dataset["interface.active_tab"] = active_tab
+                if user and user.has(self._views[default_view]["permissions"]):
+                    if not first_tab:
+                        first_tab = views[0]
+                        section_to_tabs[section_name] = [ ]
+                        
+                    section_to_tabs[section_name] += [ (tab_name, utils.create_link(views[0])) ]
+                        
+            if first_tab:
+                dataset["interface.sections"].append( (section_name, utils.create_link(first_tab)) )
+    
+ 
+        if isinstance(parameters, prewikka.view.RelativeViewParameters):
+            view_name = parameters["origin"]
+        elif view:
+            view_name = view["name"]
+        else:
+            view_name = None
+            
+        if view_name and self._view_to_section.has_key(view_name):
+            active_section = self._view_to_section[view_name]
+            active_tab = self._view_to_tab[view_name]
+            tabs = section_to_tabs[active_section]
+        
+        else:
+            active_section, tabs, active_tab = "", [ ], ""
 
+        dataset["interface.tabs"] = tabs
         dataset["prewikka.user"] = user
+        dataset["interface.active_tab"] = active_tab
+        dataset["interface.active_section"] = active_section
         dataset["prewikka.logout_link"] = (user and self._env.auth.canLogout()) and utils.create_link("logout") or None
 
     def _printDataSet(self, dataset, level=0):
@@ -263,8 +267,6 @@ class Core:
                 raise User.PermissionDeniedError(view["name"])
 
     def _getParameters(self, request, view, user):
-        from prewikka.view import ParameterError
-
         parameters = view["parameters"](request.arguments) - [ "view" ]
         parameters.normalize(view["name"], user)
 
@@ -289,8 +291,9 @@ class Core:
     
     def process(self, request):
         login = None
+        view = None
+        user = None
         try:
-            user = None
             user = self.checkAuth(request)
             login = user.login
             view = self._getView(request, user)
@@ -312,14 +315,14 @@ class Core:
             if e._log_priority:
                 self._env.log.log(e._log_priority, "%s" % str(e), request=request, user=login or e._log_user)
                 
-            self._setupDataSet(e.dataset, request, user)
+            self._setupDataSet(e.dataset, request, user, view=view)
             dataset, template_name = e.dataset, e.template
                     
         except Exception, e:
             self._env.log.error("%s" % str(e), request, login)
             error = Error.PrewikkaUserError("Prewikka internal error", str(e),
                                             display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
-            init_dataset(error.dataset, self._env.config, request)
+            self._setupDataSet(error.dataset, request, user, view=view)
             dataset, template_name = error.dataset, error.template
         
         #self._printDataSet(dataset)
