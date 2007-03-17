@@ -839,12 +839,8 @@ class AlertListing(MessageListing, view.View):
                     entry_param["classification_operator_%d" % self.parameters.max_index] = "="
                     entry_param["classification_value_%d" % self.parameters.max_index] = utils.escape_criteria(classification)
 
-                if severity:
-                    entry_param["alert.assessment.impact.severity"] = severity
-
-                if completion:
-                    entry_param["alert.assessment.impact.completion"] = completion
-
+                entry_param["alert.assessment.impact.severity"] = severity or "none"
+                entry_param["alert.assessment.impact.completion"] = completion or "none"
                                                 
                 entry_param["aggregated_target"] = \
                 entry_param["aggregated_source"] = \
