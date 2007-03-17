@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import view, Filter, Error
+from prewikka import view, Filter, Error, User
 
 
 class AlertFilterEditionParameters(view.Parameters):
@@ -51,6 +51,7 @@ class AlertFilterEdition(view.View):
     view_name = "filter_edition"
     view_parameters = AlertFilterEditionParameters
     view_template = "FilterEdition"
+    view_permissions = [ User.PERM_IDMEF_VIEW ]
     
     def _setCommon(self):        
         self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
