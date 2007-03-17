@@ -2,6 +2,7 @@
 #extends prewikka.templates.MessageListing
 
 #block head_extra_content
+#filter CleanOutput 
 
 <script type="text/javascript">
 
@@ -36,6 +37,7 @@ function end(row) {
 
 function get_operator_option(select, operator)
 {
+#end filter
 #for $operator, $desc in (("=", "Equal"), ("<", "Lesser than"), 
                           (">", "Greater than"), ("<=", "Lesser or equal"), 
                           (">=", "Greater or equal"), ("<>", "Substring"), 
@@ -51,6 +53,7 @@ function get_operator_option(select, operator)
         option.appendChild(option_value)
         select.appendChild(option)
 #end for
+#filter CleanOutput
 
 }
 
@@ -283,6 +286,7 @@ function ${name}_add_entry(object, operator, value, num) {
 #end for
 //--></script>
 
+#end filter 
 #filter Filter
 #end filter
 #end block

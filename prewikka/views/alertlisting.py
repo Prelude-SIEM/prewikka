@@ -228,7 +228,7 @@ class AlertListingParameters(MessageListingParameters):
                 raise view.InvalidParameterValueError("alert.assessment.impact.type", type)
 
         for type in self["alert.type"]:
-            if not type in ("empty", "alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"):
+            if not type in ("alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"):
                 raise view.InvalidParameterValueError("alert.type", type)
                 
         load_saved = True
@@ -947,7 +947,8 @@ class AlertListing(MessageListing, view.View):
                                                                                     self.parameters -
                                                                                     [ "offset",
                                                                                       "aggregated_source",
-                                                                                      "aggregated_target" ]
+                                                                                      "aggregated_target",
+                                                                                      "aggregated_analyzer" ]
                                                                                     + parameters +
                                                                                     { "aggregated_classification":
                                                                                       "alert.classification.text" } )
