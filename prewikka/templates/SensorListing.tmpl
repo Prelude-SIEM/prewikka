@@ -24,8 +24,10 @@
   #if len($analyzers) > 0
     #set $row_classes = ("table_row_even", "table_row_odd")
     #set $cnt = 0
+    #set $rcnt = 0
+
     #for $analyzer in $analyzers
-      #set $row_class = $row_classes[$cnt%2]
+      #set $row_class = $row_classes[$rcnt%2]
       <tr class="$row_class">
         <td>
 	  <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$analyzer.name</a>
@@ -75,6 +77,7 @@
         <td class="heartbeat_analyze_sensor_status_$analyzer.status"><b>$analyzer.status_meaning</b></td>
         <td><input class="checkbox" type="checkbox" name="analyzerid" value="$analyzer.analyzerid" /></td>
       </tr>
+      #set $rcnt += 1
       #set $cnt += 1
     #end for
   #else
