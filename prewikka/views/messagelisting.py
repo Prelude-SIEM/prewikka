@@ -144,10 +144,11 @@ class MessageListingParameters(view.Parameters):
 
 
 class ListedMessage(dict):
-    def __init__(self, env, parameters):
+    def __init__(self, view_name, env, parameters):
         self.env = env
         self.parameters = parameters
         self.timezone = parameters["timezone"]
+        self.view_name = view_name
 
     def createInlineFilteredField(self, object, value, direction=None):
         if value == None:

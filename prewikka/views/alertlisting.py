@@ -280,8 +280,6 @@ class CorrelationAlertListingParameters(AlertListingParameters):
 
 
 class ListedAlert(ListedMessage):
-    view_name = "alert_listing"
-
     def _getKnownValue(self, direction, key):
         return { "alert.%s.service.port" % direction: ("service", None),
                  "alert.%s.node.address.address" % direction: ("addresses", self._setMessageDirectionAddress),
@@ -640,7 +638,7 @@ class AlertListing(MessageListing, view.View):
         return self.env.idmef_db.getAlert(ident)
 
     def _setMessage(self, message, ident):
-        msg = self.listed_alert(self.env, self.parameters)
+        msg = self.listed_alert(self.view_name, self.env, self.parameters)
         msg.setMessage(message, ident)
         msg["aggregated"] = False
         msg["delete"] = ident
@@ -906,7 +904,7 @@ class AlertListing(MessageListing, view.View):
             
             criteria2 = criteria[:]
             delete_criteria = [ ]
-            message = self.listed_aggregated_alert(self.env, self.parameters)
+            message = self.listed_aggregated_alert(self.view_name, self.env, self.parameters)
 
             valueshash = {}
             

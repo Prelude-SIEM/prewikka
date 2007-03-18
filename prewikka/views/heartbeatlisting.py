@@ -38,9 +38,7 @@ class SensorHeartbeatListingParameters(HeartbeatListingParameters):
 
 
 
-class ListedHeartbeat(ListedMessage):
-    view_name = "heartbeat_listing"
-    
+class ListedHeartbeat(ListedMessage):    
     def setMessage(self, message, ident):
         
         self["delete"] = ident
@@ -85,7 +83,7 @@ class HeartbeatListing(MessageListing, view.View):
         return self.env.idmef_db.getHeartbeat(ident)
 
     def _setMessage(self, message, ident):
-        msg = self.listed_heartbeat(self.env, self.parameters)
+        msg = self.listed_heartbeat(self.view_name, self.env, self.parameters)
         msg.view_name = self.view_name
         msg.setMessage(message, ident)
 
