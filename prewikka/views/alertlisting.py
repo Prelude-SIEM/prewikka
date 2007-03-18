@@ -562,7 +562,7 @@ class ListedAlert(ListedMessage):
         sensor = { }
         self["sensors"].append(sensor)
         sensor["name"] = self.createInlineFilteredField("alert.analyzer.name", name, direction="analyzer")
-        sensor["node_name"] = { "value": node_name }
+        sensor["node_name"] = self.createInlineFilteredField("alert.analyzer.node.name", node_name, direction="analyzer")
         
     def setMessageTime(self, message):
         self["time"] = self.createTimeField(message["alert.create_time"], self.timezone)
@@ -855,7 +855,12 @@ class AlertListing(MessageListing, view.View):
                                                      parameters + entry_param)
                                                          
                                                                            
-                       
+    def _getPathValueType(self, path):
+        p = prelude.idmef_path_new(path)
+        t = prelude.idmef_path_get_value_type(p, -1)
+        prelude.idmef_path_destroy(p)
+        return t
+        
     def _setAggregatedMessagesNoValues(self, criteria, ag_s, ag_t, ag_c, ag_a):
         ag_list = ag_s + ag_t + ag_c + ag_a
         
@@ -903,8 +908,6 @@ class AlertListing(MessageListing, view.View):
             delete_criteria = [ ]
             message = self.listed_aggregated_alert(self.env, self.parameters)
 
-            dirlist = [ ]
-            
             valueshash = {}
             
             for path, value in zip(ag_list, values[:start]):
@@ -918,20 +921,17 @@ class AlertListing(MessageListing, view.View):
                     direction = None
                     
                 if value == None:
-                    if prelude.idmef_path_get_value_type(prelude.idmef_path_new(path), -1) != prelude.IDMEF_VALUE_TYPE_STRING:
+                    if self._getPathValueType(path) != prelude.IDMEF_VALUE_TYPE_STRING:
                         criterion = "! %s" % (path)
                     else:
                         criterion = "(! %s || %s == '')" % (path, path)
                 else:
                     criterion = "%s == '%s'" % (path, utils.escape_criteria(str(value)))
                     if direction != None:
-                        dirlist.append([direction, path, value])
+                        message._setMessageDirectionGeneric(direction, path, value)
                        
                 criteria2.append(criterion)
                 delete_criteria.append(criterion)
-
-            for ent in dirlist:
-                message._setMessageDirectionGeneric(*ent)
 
             time_min = self.env.idmef_db.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
             time_max = self.env.idmef_db.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
