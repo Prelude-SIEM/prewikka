@@ -17,15 +17,8 @@
 # along with this program; see the file COPYING.  If not, write to
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
-import os.path
-import urllib
-import time
-import copy
-import re
-
+import copy, time, urllib
 from prewikka import view, User, utils
-from prelude import idmef_path_new, idmef_path_get_value_type, IDMEF_VALUE_TYPE_STRING
 
 
 class _MyTime:
