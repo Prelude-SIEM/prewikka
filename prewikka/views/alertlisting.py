@@ -162,6 +162,13 @@ class AlertListingParameters(MessageListingParameters):
         self.optional("alert.assessment.impact.type", list, [ "other", "admin", "dos", "file", "recon", "user" ], save=True)
         self.optional("alert.type", list, ["alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"], save=True)
 
+    def _checkOperator(self, operator):
+        if operator[0] == "!":
+            operator = operator[1:]
+            
+        if not operator in ("=", "<", ">", "<=", ">=", "~", "~*", "<>", "<>*"):
+            raise view.InvalidParameterValueError("operator", operator)
+    
     def _loadColumnParam(self, view_name, user, paramlist, column):
         ret = False
         sorted = [ ]
@@ -176,12 +183,9 @@ class AlertListingParameters(MessageListingParameters):
                 self.max_index = num + 1
 
             ret = True
+            operator = paramlist.get(column + "_operator_" + str(num), "=")
+            self._checkOperator(operator)
 
-            try:
-                operator = paramlist["%s_operator_%s" % (column, num)]
-            except KeyError:
-                continue
-                                       
             try:
                 value = paramlist["%s_value_%s" % (column, num)]
             except KeyError:
@@ -670,8 +674,6 @@ class AlertListing(MessageListing, view.View):
                         new.append("!%s" % (object))
                     else:
                         new.append("%s = '%s'" % (object, utils.escape_criteria(value)))
-                    
-            print new
             
             criteria.append("(" + " || ".join(new) + ")")
             self.dataset[object] = self.parameters[object]
