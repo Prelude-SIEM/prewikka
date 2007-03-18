@@ -187,7 +187,7 @@ class AlertListingParameters(MessageListingParameters):
             self._checkOperator(operator)
 
             try:
-                value = paramlist["%s_value_%s" % (column, num)]
+                value = paramlist[column + "_value_" + str(num)]
             except KeyError:
                 continue
 
