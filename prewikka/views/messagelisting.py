@@ -108,8 +108,8 @@ class MessageListingParameters(view.Parameters):
     def register(self):
         self.optional("timeline_value", int, default=1, save=True)
         self.optional("timeline_unit", str, default="hour", save=True)
-        self.optional("timeline_end", int)
-        self.optional("timeline_start", int)
+        self.optional("timeline_end", long)
+        self.optional("timeline_start", long)
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50, save=True)
         self.optional("timezone", str, "frontend_localtime", save=True)
