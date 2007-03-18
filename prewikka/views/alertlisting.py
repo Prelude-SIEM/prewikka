@@ -866,8 +866,7 @@ class AlertListing(MessageListing, view.View):
         selection = [ "%s/group_by" % path for path in ag_list ] + \
                     [ "count(alert.create_time)", "max(alert.create_time)/order_desc" ]
 
-        results = self.env.idmef_db.getValues(selection, criteria + [ "! alert.correlation_alert.name"])
-
+        results = self.env.idmef_db.getValues(selection, criteria)
         total_results = len(results)
         
         for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
