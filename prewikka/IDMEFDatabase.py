@@ -254,7 +254,10 @@ class DbResult:
         self._res, self._len = results
         
     def __iter__(self):
-        return self
+        if self._has_cache:
+            return iter(self._rows)
+        else:
+            return self
         
     def __len__(self):
         return self._len
@@ -280,10 +283,7 @@ class DbResult:
     def next(self):        
         if self._res == None:
             raise StopIteration
-            
-        if self._has_cache:
-            return self._rows
-                        
+
         values = self._db_get_next()
         if values is None:
             self._has_cache = True
