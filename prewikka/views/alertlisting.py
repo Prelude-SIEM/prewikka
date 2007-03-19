@@ -777,11 +777,7 @@ class AlertListing(MessageListing, view.View):
                             
         selection = [ "%s/group_by" % i[0] for i in selection_list ]
            
-        ts = time.time()
         alert_list = self.env.idmef_db.getValues( selection + ["max(alert.messageid)", "count(alert.messageid)" ], criteria2)
-        te = time.time()
-        #sensor_req += (te-ts)
-        
         alertsraw = { }
         nodesraw = { }
         
