@@ -472,16 +472,16 @@ function ${name}_add_entry(object, operator, value, num) {
 #filter CleanOutput
 
 <td>
-  #if $message.correlation_alert_name
-    <b>Correlation Alert#slurp
-    #if $message.correlated_alert_display
+  #if $message.sub_alert_name
+    <b>$message.sub_alert_type#slurp
+    #if $message.sub_alert_display
       #set plural = ""
-      #if $message.correlated_alert_number > 1:
+      #if $message.sub_alert_number > 1:
           #set plural = "s"
       #end if
-      (<a href="$message.correlated_alert_display">$message.correlated_alert_number</a> alert$plural)#slurp
+      (<a href="$message.sub_alert_display">$message.sub_alert_number</a> alert$plural)#slurp
     #end if
-:</b> <i><a href="$message.correlation_alert_link">$message.correlation_alert_name</a></i><br/>#slurp
+:</b> <i><a href="$message.sub_alert_link">$message.sub_alert_name</a></i><br/>#slurp
   #end if
 
   #if $message.aggregated and $message.aggregated_classifications_hidden > 0
@@ -494,7 +494,7 @@ function ${name}_add_entry(object, operator, value, num) {
     #if $message.aggregated and (len($message.infos) > 1 or $info.count > 1)
       $info.count x
     #end if
-     
+    
     #if $info.classification.value
       <a class="impact_severity_$info.severity.value" href="$info.display">$info.classification.value</a>
     #else

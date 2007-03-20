@@ -613,8 +613,11 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 
             analyzerid = alertident["analyzerid"]
             if not analyzerid:
-                analyzerid = alert["analyzer(-1).analyzerid"]
-
+                for a in alert["analyzer"]:
+                    if a["analyzerid"]:
+                        analyzerid = a["analyzerid"]
+                        break
+                        
             if not calist.has_key(analyzerid):
 	        calist[analyzerid] = []
 
