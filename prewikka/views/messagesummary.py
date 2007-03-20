@@ -602,29 +602,14 @@ class MessageSummary(Table):
 class AlertSummary(TcpIpOptions, MessageSummary, view.View):
     view_name = "alert_summary"
             
-    def buildCorrelationAlert(self, alert):
-        ca = alert["correlation_alert"]
-        if not ca:
-            return
-
-	if ca["name"]:
-	    reason = ": %s" % ca["name"]
-	else:
-	    reason = ""
-            
-        self.beginSection("Correlation Alert%s" % reason)
-	
-	self.beginTable()
-	self.newTableCol(0, "Correlated Alert", header=True)
-	self.newTableCol(0, "Source Analyzer", header=True)
+    def buildAlertIdent(self, alert, parent):
+        calist = { }
         
-	calist = {}
-	
-        for alertident in ca["alertident"]:
+        for alertident in parent["alertident"]:
 
             # IDMEF draft 14 page 27
             # If the "analyzerid" is not provided, the alert is assumed to have come
-            # from the same analyzer that is sending the CorrelationAlert.
+            # from the same analyzer that is sending the Alert.
 
             analyzerid = alertident["analyzerid"]
             if not analyzerid:
@@ -656,7 +641,44 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 
             idx += 1
 
+    
+    def buildCorrelationAlert(self, alert):
+        ca = alert["correlation_alert"]
+        if not ca:
+            return
+
+	if ca["name"]:
+	    reason = ": %s" % ca["name"]
+	else:
+	    reason = ""
+            
+        self.beginSection("Correlation Alert%s" % reason)
+	
+	self.beginTable()
+	self.newTableCol(0, "Correlated Alert", header=True)
+	self.newTableCol(0, "Source Analyzer", header=True)
+        self.buildAlertIdent(alert, ca)
         self.endTable()
+        self.endSection()
+
+    def buildToolAlert(self, alert):
+        ta = alert["tool_alert"]
+        if not ta:
+            return
+
+	if ta["name"]:
+	    reason = ": %s" % ta["name"]
+	else:
+	    reason = ""
+            
+        self.beginSection("Tool Alert%s" % reason)
+	
+	self.beginTable()
+	self.newTableCol(0, "Linked Alert", header=True)
+	self.newTableCol(0, "Source Analyzer", header=True)
+        self.buildAlertIdent(alert, ta)
+        self.endTable()
+        
         self.endSection()
         
     def buildClassification(self, alert):
@@ -934,6 +956,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.endSection()
                
         self.buildCorrelationAlert(alert)
+        self.buildToolAlert(alert)
         self.buildReference(alert)
 
         self.beginSection("Analyzer #0")
