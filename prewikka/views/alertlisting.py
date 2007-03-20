@@ -582,10 +582,15 @@ class ListedAlert(ListedMessage):
         self.setMessageCorrelationAlertInfo(message, ident)
         self.setMessageToolAlertInfo(message, ident)
 
-    def addSensor(self, name, node_name):
+    def addSensor(self, name, model, node_name):
         sensor = { }
         self["sensors"].append(sensor)
-        sensor["name"] = self.createInlineFilteredField("alert.analyzer.name", name, direction="analyzer")
+        
+        if name:
+            sensor["name"] = self.createInlineFilteredField("alert.analyzer.name", name, direction="analyzer")
+        elif model:
+            sensor["name"] = self.createInlineFilteredField("alert.analyzer.model", model, direction="analyzer")
+        
         sensor["node_name"] = self.createInlineFilteredField("alert.analyzer.node.name", node_name, direction="analyzer")
         
     def setMessageTime(self, message):
@@ -605,8 +610,7 @@ class ListedAlert(ListedMessage):
 
     def setMessage(self, message, ident):
         self.setMessageCommon(message)
-        name = message["alert.analyzer(-1).name"] or message["alert.analyzer(-1).model"] or message["alert.analyzer(-1).analyzerid"]
-        self.addSensor(name , message["alert.analyzer(-1).node.name"])
+        self.addSensor(message["alert.analyzer(-1).name"], message["alert.analyzer(-1).model"], message["alert.analyzer(-1).node.name"])
         self.setMessageTime(message)
         self.setMessageInfo(message, ident)
         
@@ -829,9 +833,9 @@ class AlertListing(MessageListing, view.View):
             else:
                alertsraw[alertkey] = ( [classification, severity, completion, alert_count, max_messageid] )
                
-            nodekey = (analyzer_name or "") + "-" + (analyzer_node_name or "")
+            nodekey = (analyzer_name or analyzer_model or "") + "-" + (analyzer_node_name or "")
             if not nodesraw.has_key(nodekey):
-               message.addSensor(analyzer_name or analyzer_model, analyzer_node_name)
+               message.addSensor(analyzer_name, analyzer_model, analyzer_node_name)
                nodesraw[nodekey] = True
                    
         res = alertsraw.values()
