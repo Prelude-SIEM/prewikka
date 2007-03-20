@@ -788,20 +788,20 @@ class AlertListing(MessageListing, view.View):
             max_messageid = values[-2]
             alert_count = values[-1]
             
-            classification = path_value_hash["alert.classification.text"] or ""
-            analyzer_name = path_value_hash["alert.analyzer(-1).name"] or ""
-            analyzer_node_name = path_value_hash["alert.analyzer(-1).node.name"] or ""
-            severity = path_value_hash["alert.assessment.impact.severity"] or ""
-            completion = path_value_hash["alert.assessment.impact.completion"] or ""
+            classification = path_value_hash["alert.classification.text"]
+            analyzer_name = path_value_hash["alert.analyzer(-1).name"]
+            analyzer_node_name = path_value_hash["alert.analyzer(-1).node.name"]
+            severity = path_value_hash["alert.assessment.impact.severity"]
+            completion = path_value_hash["alert.assessment.impact.completion"]
             
-            alertkey = classification + "-" + severity + "-" + completion
+            alertkey = (classification or "") + "-" + (severity or "") + "-" + (completion or "")
             
             if alertsraw.has_key(alertkey):
                alertsraw[alertkey][-2] += alert_count
             else:
                alertsraw[alertkey] = ( [classification, severity, completion, alert_count, max_messageid] )
                
-            nodekey = analyzer_name + "-" + analyzer_node_name
+            nodekey = (analyzer_name or "") + "-" + (analyzer_node_name or "")
             if not nodesraw.has_key(nodekey):
                message.addSensor(analyzer_name, analyzer_node_name)
                nodesraw[nodekey] = True
