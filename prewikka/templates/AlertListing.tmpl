@@ -227,7 +227,7 @@ function ${name}_add_entry(object, operator, value, num) {
                 options_array["$object"][$cnt] = '${opt}'
                 #set $cnt += 1
         #end for
-#endif
+#end if
 
 #if $object == None
 	option.setAttribute("disabled", "disabled")
@@ -328,7 +328,7 @@ function ${name}_add_entry(object, operator, value, num) {
        #set $disabled="disabled=\"disabled\""
       #else
        #set $disabled=""
-      #endif
+      #end if
       
       #for name, path in (("Alert", "alert.create_time"), ("CorrelationAlert", "alert.correlation_alert.name"), 
                           ("OverflowAlert", "alert.overflow_alert.program"), ("ToolAlert", "alert.tool_alert.name"))
