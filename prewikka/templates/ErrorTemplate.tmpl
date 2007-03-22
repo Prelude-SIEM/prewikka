@@ -47,7 +47,7 @@
 
 #if not $referer.has_key("_error_retry")
      <input type="hidden" name="_error_retry" value="$retry_string" />
-#endif
+#end if
      <input style="float: left; position: relative;" type="submit" value="Back"/>
    </form>
 
@@ -64,7 +64,7 @@
 
 #if not $retry.has_key("_error_retry")
      <input type="hidden" name="_error_retry" value="$retry_string" />
-#endif
+#end if
 
      <input style="float: right; position: relative;" type="submit" value="Retry"/>
    </form>
