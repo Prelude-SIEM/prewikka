@@ -335,6 +335,9 @@ class DbResultIdents(DbResult):
         return value
 
 class IDMEFDatabase:
+    _db_destroy = preludedb_destroy
+    _db = None
+    
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
         for param in "file", "host", "port", "name", "user", "pass":
@@ -346,7 +349,7 @@ class IDMEFDatabase:
             preludedb_sql_enable_query_logging(sql, config.getOptionValue("log"))
 
         cur = ver = None
-        wanted_version = "0.9.9"
+        wanted_version = "0.9.12"
         try:
             cur = preludedb_check_version(None)
             ver = preludedb_check_version(wanted_version)
@@ -358,9 +361,12 @@ class IDMEFDatabase:
             else:
                 raise "libpreludedb %s or higher is required." % wanted_version
         
-        self._sql = sql
         self._db = preludedb_new(sql, None)
 
+    def __del__(self):
+        if self._db:
+            self._db_destroy(self._db)
+            
     def _getMessageIdents(self, get_message_idents, criteria, limit, offset):
         if type(criteria) is list:
             if len(criteria) == 0:
@@ -372,10 +378,14 @@ class IDMEFDatabase:
             criteria = idmef_criteria_new_from_string(criteria)
 
         idents = [ ]
-        
-        result = get_message_idents(self._db, criteria, limit, offset,
-                                    PRELUDEDB_RESULT_IDENTS_ORDER_BY_CREATE_TIME_DESC)
-        
+    
+        try:    
+            result = get_message_idents(self._db, criteria, limit, offset,
+                                        PRELUDEDB_RESULT_IDENTS_ORDER_BY_CREATE_TIME_DESC)
+        except:
+            self._freeDbParams(criteria=criteria)
+            raise
+                    
         if criteria:
             idmef_criteria_destroy(criteria)
         
@@ -421,6 +431,13 @@ class IDMEFDatabase:
         preludedb_delete_heartbeat_from_list(self._db, identlst)
         preludedb_transaction_end(self._db)
 
+    def _freeDbParams(self, selection=None, criteria=None):
+        if selection:
+            preludedb_path_selection_destroy(selection)
+        
+        if criteria:
+            idmef_criteria_destroy(criteria)
+            
     def getValues(self, selection, criteria=None, distinct=0, limit=-1, offset=-1):
         if type(criteria) is list:
             if len(criteria) == 0:
@@ -436,7 +453,12 @@ class IDMEFDatabase:
             my_selected = preludedb_selected_path_new_string(selected)
             preludedb_path_selection_add(my_selection, my_selected)
 
-        result = preludedb_get_values2(self._db, my_selection, criteria, distinct, limit, offset)
+        try:
+            result = preludedb_get_values2(self._db, my_selection, criteria, distinct, limit, offset)
+        except:
+            self._freeDbParams(my_selection, criteria)
+            raise
+            
         if criteria:
             idmef_criteria_destroy(criteria)       
         

@@ -53,9 +53,13 @@ class DatabaseInvalidFilterError(_DatabaseInvalidError):
     type = "filter"
 
 
-
 class Database:
     required_version = "0.9.1"
+    
+    # We reference preludedb_sql_destroy since it might be deleted
+    # prior Database.__del__() is called.
+    _sql_destroy = preludedb_sql_destroy
+    _sql = None
     
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
@@ -89,7 +93,8 @@ class Database:
             sys.exit(1)
 
     def __del__(self):
-        preludedb_sql_destroy(self._sql)
+        if self._sql:
+            self._sql_destroy(self._sql)
         
     def queries_from_file(self, filename):
         content = open(filename).read()
