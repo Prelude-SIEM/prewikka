@@ -204,7 +204,7 @@ class AlertListingParameters(MessageListingParameters):
         sorted.sort()
         self[column] = [ (i[1], i[2], i[3]) for i in sorted ]
         
-
+        
         if self.has_key("_save"):
             user.delConfigValueMatch(view_name, "%s_object_%%" % (column))
             user.delConfigValueMatch(view_name, "%s_operator_%%" % (column))
@@ -217,6 +217,7 @@ class AlertListingParameters(MessageListingParameters):
 
         return ret
     
+        
     def normalize(self, view_name, user):
         MessageListingParameters.normalize(self, view_name, user)
 
@@ -275,12 +276,28 @@ class CorrelationAlertListingParameters(AlertListingParameters):
         AlertListingParameters.register(self)
         self.optional("aggregated_source", list, [ ], save=True)
         self.optional("aggregated_target", list, [ ], save=True)
+        self.optional("alert.type", list, ["alert.correlation_alert.name"], save=True)
+        
+    def normalize(self, view_name, user):
+        AlertListingParameters.normalize(self, view_name, user)
 
+
+class ToolAlertListingParameters(AlertListingParameters):
+    def register(self):
+        AlertListingParameters.register(self)
+        self.optional("aggregated_source", list, [ ], save=True)
+        self.optional("aggregated_target", list, [ ], save=True)
+        self.optional("alert.type", list, ["alert.tool_alert.name"], save=True)
+        
     def normalize(self, view_name, user):
         AlertListingParameters.normalize(self, view_name, user)
 
 
 class ListedAlert(ListedMessage):
+    def __init__(self, *args, **kwargs):        
+        apply(ListedMessage.__init__, (self, ) + args, kwargs)
+        self.reset()
+
     def _getKnownValue(self, direction, key):
         return { "alert.%s.service.port" % direction: ("service", None),
                  "alert.%s.node.address.address" % direction: ("addresses", self._setMessageDirectionAddress),
@@ -295,23 +312,13 @@ class ListedAlert(ListedMessage):
         self._initValue(dataset, "service", { "value": None })
         self._initValue(dataset, "addresses", [ ])
         self._initValue(dataset, "listed_values", [ ])
-
+        self._initValue(dataset, "aggregated_hidden", 0)
         return dataset
     
     def _initDirectionIfNeeded(self, direction):
         if len(self[direction]) == 0:        
             self[direction].append(self._initDirection({ }))
-            
-    def reset(self):
-        self["sensors"] = [ ]    
-        self["sub_alert_name"] = None
-        self["source"] = [ ]
-        self["target"] = [ ]
-        
-    def __init__(self, *args, **kwargs):        
-        apply(ListedMessage.__init__, (self, ) + args, kwargs)
-        self.reset()
-
+                    
     def _setMainAndExtraValues(self, dataset, name, object_main, object_extra):
         if object_main != None:
             dataset[name] = { "value": object_main }
@@ -333,19 +340,17 @@ class ListedAlert(ListedMessage):
 
         return None        
 
-    def _setMessageDirectionAddress(self, direction, address, category=None):  
+    def _setMessageDirectionAddress(self, dataset, direction, address, category=None):  
         if category == None:
             category = self._guessAddressCategory(address)
             
         hfield = self.createHostField("alert.%s.node.address.address" % direction, address, category=category, direction=direction)
-        self._initDirectionIfNeeded(direction)
-        self[direction][-1]["addresses"].append(hfield)
+        dataset["addresses"].append(hfield)
 
-    def _setMessageDirectionNodeName(self, direction, name):
-        self._initDirectionIfNeeded(direction)
-        self[direction][-1]["addresses"].append(self.createHostField("alert.%s.node.name" % direction, name, direction=direction))
+    def _setMessageDirectionNodeName(self, dataset, direction, name):
+        dataset["addresses"].append(self.createHostField("alert.%s.node.name" % direction, name, direction=direction))
       
-    def _setMessageDirectionOther(self, direction, path, value, extra_path=None, extra=None):
+    def _setMessageDirectionOther(self, dataset, direction, path, value, extra_path=None, extra=None):
         if value == None:
            if extra == None:
                 return
@@ -364,43 +369,27 @@ class ListedAlert(ListedMessage):
                 
         name += l[-1]
         
-        self._initDirectionIfNeeded(direction)
         item = (name, self.createInlineFilteredField(path, value, direction), extra)
-        if not item in self[direction][-1]["listed_values"]:
-            self[direction][-1]["listed_values"].append(item)
-         
-    def _setMessageDirectionGeneric(self, direction, object, value):
-        try:
-            dset_name, function = self._getKnownValue(direction, object.replace("(0)", ""))
-        except KeyError:
-            return self._setMessageDirectionOther(direction, object, value)
-                        
-        self._initDirectionIfNeeded(direction)
-        if function:
-            function(direction, value)
-        else:
-            if type(self[direction][-1][dset_name]) is list:
-                self[direction][-1][dset_name].append({ "value": value })
-            else:
-                self[direction][-1][dset_name]["value"] = value
+        if not item in dataset["listed_values"]:
+            dataset["listed_values"].append(item)
        
         
     def _setMessageDirection(self, dataset, direction, obj):
         dataset["interface"] = { "value": obj["interface"] }
         
         for userid in obj["user.user_id"]:
-            self._setMessageDirectionOther(direction, "alert.%s.user.user_id.name" % direction, userid["name"], 
-                                                      "alert.%s.user.user_id.number" % direction, userid["number"])
+            self._setMessageDirectionOther(dataset, direction, "alert.%s.user.user_id.name" % direction, userid["name"], 
+                                                               "alert.%s.user.user_id.number" % direction, userid["number"])
                                                       
         name = obj["node.name"]
         if name != None:
-            self._setMessageDirectionNodeName(direction, name)
+            self._setMessageDirectionNodeName(dataset, direction, name)
             
         for addr in obj["node.address"]:
-            self._setMessageDirectionAddress(direction, addr["address"], addr["category"])
+            self._setMessageDirectionAddress(dataset, direction, addr["address"], addr["category"])
         
-        self._setMessageDirectionOther(direction, "alert.%s.process.name" % direction, obj["process.name"], 
-                                                  "alert.%s.process.pid" % direction, extra=obj["process.pid"])        
+        self._setMessageDirectionOther(dataset, direction, "alert.%s.process.name" % direction, obj["process.name"], 
+                                                           "alert.%s.process.pid" % direction, extra=obj["process.pid"])        
 
         proto = None
         if obj["service.iana_protocol_name"]:
@@ -418,39 +407,63 @@ class ListedAlert(ListedMessage):
 
         dataset["files"] = []
 
-    def setMessageSource(self, message):
+    def _lookupDataset(self, dlist, dataset):
+        for dset in dlist:
+           if dset.items() == dataset.items():
+                return dset
+                
+        return None
+         
+    def _setMessageSource(self, message):
+        total = 0
+        index = 0
         for source in message["alert.source"]:
             dataset = { }
-            self["source"].append(dataset)            
             self._initDirection(dataset)
             self._setMessageDirection(dataset, "source", source)
-                
-    def setMessageTarget(self, message):
+            
+            if not self._lookupDataset(self["source"], dataset):
+                total += 1
+                if self._source_index == self.env.max_aggregated_source:
+                        continue
+                        
+                index += 1
+                self._source_index += 1
+                self["source"].append(dataset)
+
+        self["aggregated_source_total"] += total
+        self["aggregated_source_hidden"] += (total - index)
+        
+    def _setMessageTarget(self, message):     
+        index = 0
+        total = 0
         
         for target in message["alert.target"]:
             dataset = { }
-            self["target"].append(dataset)
-            
             self._initDirection(dataset)
             self._setMessageDirection(dataset, "target", target)
-
+                        
             flist = []
             for f in target["file"]:
                 if f["path"] in flist:
                     continue
                 
                 flist.append(f["path"])
-                self._setMessageDirectionOther("target", "alert.target.file.path", f["path"]) 
+                self._setMessageDirectionOther(dataset, "target", "alert.target.file.path", f["path"]) 
         
+            if not self._lookupDataset(self["target"], dataset):
+                total += 1
+                if self._target_index == self.env.max_aggregated_target:
+                        continue
+                        
+                index += 1
+                self._target_index += 1                        
+                self["target"].append(dataset)
 
-    def setMessageClassificationReferences(self, dataset, message):
-        val = self.env.config.general.getOptionValue("external_link_new_window", "true")
-        if (not val and self.env.config.general.has_key("external_link_new_window")) or \
-           (val == None or val.lower() in ["true", "yes"]):
-            external_link_target = "_blank"
-        else:
-            external_link_target = "_self"
+        self["aggregated_target_total"] += total
+        self["aggregated_target_hidden"] += (total - index)
 
+    def _setMessageClassificationReferences(self, dataset, message):
         dataset["classification_references"] = [ ]
         for ref in message["alert.classification.reference"]:
             fstr = ""
@@ -463,78 +476,69 @@ class ListedAlert(ListedMessage):
             if name:
                 fstr += ":" + name
 
-            dataset["classification_references"].append((ref["url"], fstr))
+            urlstr = "https://www.prelude-ids.com/reference_details.php?origin=%s&name=%s" % (ref["origin"], ref["name"])
+            if ref["origin"] in ("vendor-specific", "user-specific"):
+                urlstr += "&url=" + ref["url"]
+                
+            dataset["classification_references"].append((urlstr, fstr))
 
-    def setMessageClassification(self, dataset, message):
-        self.setMessageClassificationReferences(dataset, message)
+    def _setMessageClassification(self, dataset, message):
+        self._setMessageClassificationReferences(dataset, message)
         dataset["classification"] = self.createInlineFilteredField("alert.classification.text",
                                                                    message["alert.classification.text"])
+    
+    def _fetchInfoFromLinkedMessage(self, criteria, source, target):
+        result = self.env.idmef_db.getAlertIdents(criteria)
+        for ident in result:
+            idmef = self.env.idmef_db.getAlert(ident)
+            
+            if not source:
+                self._setMessageSource(idmef)
+            
+            if not target:
+                self._setMessageTarget(idmef)
+    
+    
+    def _setMessageAlertIdentInfo(self, message, alert, ident):        
+        fetch_classification_info = fetch_source_info = fetch_target_info = True
+
+        i = 0        
+        params = { }
+        criteria = [ ]
+        source_analyzer = None
         
-    def setMessageAlertIdentInfo(self, message, alert, ident):
-        i = 0
-        ca_params = { }
-
-        if message["alert.source"]:
-            fetch_source_info = False
-        else:
-            fetch_source_info = True
-                    
-        if message["alert.target"]:
-            fetch_target_info = False
-        else:
-            fetch_target_info = True
-
-        if message["alert.classification"]:
-            fetch_classification_info = False
-        else:
-            fetch_classification_info = True
-
         for alertident in alert["alertident"]:
+            i += 1
+            
             # IDMEF draft 14 page 27
             # If the "analyzerid" is not provided, the alert is assumed to have come
             # from the same analyzer that is sending the Alert.
             
             analyzerid = alertident["analyzerid"]
             if not analyzerid:
-                for a in message["analyzer"]:
-                    if a["analyzerid"]:
-                        analyzerid = a["analyzerid"]
-                        break
+                if source_analyzer:
+                    analyzerid = source_analyzer
+                else:
+                    for a in message["analyzer"]:
+                        if a["analyzerid"]:
+                            source_analyzer = analyzerid = a["analyzerid"]
+                            break
                 
-            ca_params["analyzer_object_%d" % i] = "alert.analyzer.analyzerid"
-            ca_params["analyzer_value_%d" % i] = analyzerid
-            
-            ca_params["classification_object_%d" % i] = "alert.messageid"
-            ca_params["classification_value_%d" % i] = alertident["alertident"]
+            params["analyzer_object_%d" % i] = "alert.analyzer.analyzerid"
+            params["analyzer_value_%d" % i] = analyzerid
+            params["classification_object_%d" % i] = "alert.messageid"
+            params["classification_value_%d" % i] = alertident["alertident"]
 
-            criteria = "alert.messageid = '%s' && alert.analyzer.analyzerid = '%s'" % (alertident["alertident"], analyzerid)
-            result = self.env.idmef_db.getAlertIdents(criteria, 1, -1)
-            if len(result) == 0:
-                continue
+            criteria.append("(alert.messageid = '%s' && alert.analyzer.analyzerid = '%s')" % (alertident["alertident"], analyzerid))
+        
+        source = message["alert.source"]
+        target = message["alert.target"]
+        if not source or not target:
+            self._fetchInfoFromLinkedMessage(" || ".join(criteria), source, target)
             
-            i += 1
-            if i > 1:
-                continue
-            
-            ca_idmef = self.env.idmef_db.getAlert(result[0])
-            
-            if fetch_classification_info:
-                dataset = { }
-                self.setClassificationInfos(dataset, message, ident)
-                self.setMessageClassification(dataset, ca_idmef)
-                self["infos"].append(dataset)
-                        
-            if fetch_source_info:
-                self.setMessageSource(ca_idmef)
-            
-            if fetch_target_info:
-                self.setMessageTarget(ca_idmef)
-
-        ca_params["timeline_unit"] = "unlimited"
-
+        self["sub_alert_number"] = i
         self["sub_alert_name"] = alert["name"]
         self["sub_alert_link"] = self.createMessageLink(ident, "alert_summary")
-        self["sub_alert_number"] = i
                         
         tmp = self.parameters
         tmp -= [ "timeline_unit", "timeline_value", "offset",
@@ -542,58 +546,19 @@ class ListedAlert(ListedMessage):
                  "aggregated_target", "aggregated_analyzer", "alert.type", "alert.assessment.impact.severity",
                  "alert.assessment.impact.completion", "_load", "_save" ]
 
-        tmp["aggregated_target"] = \
-        tmp["aggregated_source"] = \
-        tmp["aggregated_classification"] = \
-        tmp["aggregated_analyzer"] = "none"
-        
-        self["sub_alert_display"] = utils.create_link(self.view_name, tmp + ca_params)
+        tmp["aggregated_target"] = tmp["aggregated_source"] = \
+        tmp["aggregated_classification"] = tmp["aggregated_analyzer"] = "none"
 
-        return ca_params, i
-            
-    def setMessageToolAlertInfo(self, message, ident):
-        if not message["alert.tool_alert"]:
-            return
-
-        self["sub_alert_type"] = "Tool Alert"
-        ca_params, i = self.setMessageAlertIdentInfo(message, message["alert.tool_alert"], ident)
-        
-    def setMessageCorrelationAlertInfo(self, message, ident):
-        if not message["alert.correlation_alert"]:
-            return
-
-        ca_params = self.setMessageAlertIdentInfo(message, message["alert.correlation_alert"], ident)
-        ca_params["timeline_unit"] = "unlimited"
-
-
-    def setClassificationInfos(self, dataset, message, ident):
+        params["timeline_unit"] = "unlimited"        
+        self["sub_alert_display"] = utils.create_link("alert_listing", tmp + params)
+    
+    def _setClassificationInfos(self, dataset, message, ident):
         dataset["count"] = 1
         dataset["display"] = self.createMessageLink(ident, "alert_summary")
         dataset["severity"] = { "value": message["alert.assessment.impact.severity"] }
         dataset["completion"] = { "value": message["alert.assessment.impact.completion"] }
-    
-    def setMessageInfo(self, message, ident):
-        self["infos"] = [ { } ]
-        
-        dataset = self["infos"][0]
-        self.setClassificationInfos(dataset, message, ident)
-        
-        self.setMessageClassification(dataset, message)
-        self.setMessageCorrelationAlertInfo(message, ident)
-        self.setMessageToolAlertInfo(message, ident)
-
-    def addSensor(self, name, model, node_name):
-        sensor = { }
-        self["sensors"].append(sensor)
-        
-        if name:
-            sensor["name"] = self.createInlineFilteredField("alert.analyzer.name", name, direction="analyzer")
-        elif model:
-            sensor["name"] = self.createInlineFilteredField("alert.analyzer.model", model, direction="analyzer")
-        
-        sensor["node_name"] = self.createInlineFilteredField("alert.analyzer.node.name", node_name, direction="analyzer")
-        
-    def setMessageTime(self, message):
+            
+    def _setMessageTime(self, message):
         self["time"] = self.createTimeField(message["alert.create_time"], self.timezone)
 	if (message["alert.analyzer_time"] != None and
 	    abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
@@ -601,20 +566,73 @@ class ListedAlert(ListedMessage):
 	else:
 	    self["analyzer_time"] = { "value": None }
 
-    def setMessageCommon(self, message):
-        self["sub_alert_display"] = None            
-        self["sub_alert_name"] = None
+    def addSensor(self, name, model, node_name):
+        sensor = { }
+        self["sensors"].append(sensor)
         
-        self.setMessageSource(message)
-        self.setMessageTarget(message)
+        if name:
+            sensor["name"] = self.createInlineFilteredField("alert.analyzer.name", name, direction="analyzer")
+   
+        elif model:
+            sensor["name"] = self.createInlineFilteredField("alert.analyzer.model", model, direction="analyzer")
+        
+        sensor["node_name"] = self.createInlineFilteredField("alert.analyzer.node.name", node_name, direction="analyzer")
 
     def setMessage(self, message, ident):
-        self.setMessageCommon(message)
-        self.addSensor(message["alert.analyzer(-1).name"], message["alert.analyzer(-1).model"], message["alert.analyzer(-1).node.name"])
-        self.setMessageTime(message)
-        self.setMessageInfo(message, ident)
+        self["infos"] = [ { } ]
         
+        self.addSensor(message["alert.analyzer(-1).name"], message["alert.analyzer(-1).model"], message["alert.analyzer(-1).node.name"])
+        self._setMessageTime(message)
+                
+        dataset = self["infos"][0]
+        self._setClassificationInfos(dataset, message, ident)
+        self._setMessageClassification(dataset, message)
 
+        if message["alert.correlation_alert"]:        
+            self["sub_alert_type"] = "Correlation Alert"
+            self._setMessageAlertIdentInfo(message, message["alert.correlation_alert"], ident)
+            
+        elif message["alert.tool_alert"]:
+            self["sub_alert_type"] = "Tool Alert"
+            self._setMessageAlertIdentInfo(message, message["alert.tool_alert"], ident)
+            
+        if not self["source"]:
+            self._setMessageSource(message)
+            
+        if not self["target"]:
+            self._setMessageTarget(message)
+            
+    def setMessageDirectionGeneric(self, direction, object, value):
+        self._initDirectionIfNeeded(direction)
+        dataset = self[direction][-1]
+            
+        try:
+            dset_name, function = self._getKnownValue(direction, object.replace("(0)", ""))
+        except KeyError:
+            return self._setMessageDirectionOther(dataset, direction, object, value)
+                        
+        if function:
+            function(dataset, direction, value)
+        else:
+            if type(dataset[dset_name]) is list:
+                dataset[dset_name].append({ "value": value })
+            else:
+                dataset[dset_name]["value"] = value
+                        
+    def reset(self):
+        self["sensors"] = [ ]    
+        self["source"] = [ ]
+        self["target"] = [ ]
+        self["sub_alert_name"] = None
+        self["aggregated_source_total"] = 0
+        self["aggregated_source_hidden"] = 0
+        self["aggregated_source_expand"] = 0
+        self["aggregated_target_total"] = 0
+        self["aggregated_target_hidden"] = 0
+        self["aggregated_target_expand"] = 0
+        self._source_index = 0
+        self._target_index = 0 
+ 
 
 class ListedAggregatedAlert(ListedAlert):
     def __init__(self, *args, **kwargs):
@@ -658,8 +676,11 @@ class AlertListing(MessageListing, view.View):
     details_view = "alert_details"
     listed_alert = ListedAlert
     listed_aggregated_alert = ListedAggregatedAlert
-
+    alert_type_default = ["alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"]
+    
     def init(self, env):
+        self._max_aggregated_source = int(env.config.general.getOptionValue("max_aggregated_source", 10))
+        self._max_aggregated_target = int(env.config.general.getOptionValue("max_aggregated_target", 10))
         self._max_aggregated_classifications = int(env.config.general.getOptionValue("max_aggregated_classifications", 10))
 
     def _getMessageIdents(self, criteria, limit=-1, offset=-1):
@@ -685,17 +706,16 @@ class AlertListing(MessageListing, view.View):
     def _deleteMessage(self, ident):
         self.env.idmef_db.deleteAlert(ident)
 
-    def _applyOptionalEnumFilter(self, criteria, column, object, values):
-            
-        def lists_have_same_content(l1, l2):
-            l1 = copy.copy(l1)
-            l2 = copy.copy(l2)
-            l1.sort()
-            l2.sort()
+    def _lists_have_same_content(self, l1, l2):
+        l1 = copy.copy(l1)
+        l2 = copy.copy(l2)
+        l1.sort()
+        l2.sort()
 
-            return l1 == l2
-        
-        if ( self.parameters.has_key(object) and not lists_have_same_content(self.parameters[object], values) ):
+        return l1 == l2
+
+    def _applyOptionalEnumFilter(self, criteria, column, object, values):        
+        if ( self.parameters.has_key(object) and not self._lists_have_same_content(self.parameters[object], values) ):
             new = [ ]
             for value in values:
                 if value in self.parameters[object]:
@@ -711,15 +731,13 @@ class AlertListing(MessageListing, view.View):
             self.dataset[object] = values
     
     def _applyAlertTypeFilters(self, criteria):
-        if self.parameters["alert.type"] == ["empty"]:
-                return criteria.append("!alert.create_time")      
-                  
         if "alert.create_time" in self.parameters["alert.type"]:
             have_base = True
         else:
             have_base = False
             
         new = [ ]
+        
         for param in ["alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"]:
             if not have_base:
                 if param in self.parameters["alert.type"]:
@@ -737,9 +755,10 @@ class AlertListing(MessageListing, view.View):
             criteria.append("(" + " || ".join(new) + ")")
         else:
             criteria.append("(" + " && ".join(new) + ")")
-            
-        self.dataset["classification_filtered"] = True    
-        
+         
+        if not self._lists_have_same_content(self.parameters["alert.type"], self.alert_type_default):   
+            self.dataset["classification_filtered"] = True    
+           
     def _applyClassificationFilters(self, criteria):
         self._applyAlertTypeFilters(criteria)
         
@@ -749,6 +768,7 @@ class AlertListing(MessageListing, view.View):
                                       ["failed", "succeeded", "none"])
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.type",  
                                       ["other", "admin", "dos", "file", "recon", "user"])  
+    
                             
     def _applyCheckboxFilters(self, criteria, type):
         def get_string((object, operator, value)):
@@ -778,7 +798,7 @@ class AlertListing(MessageListing, view.View):
             if newcrit:
                 criteria.append(newcrit)
             
-            self.dataset[type] = self.parameters[type]
+            self.dataset[type] = [ (path.replace("(0)", "").replace("(-1)", ""), operator, value) for path, operator, value in self.parameters[type] ]
             self.dataset["%s_filtered" % type] = True
         else:
             self.dataset[type] = [ ("", "", "") ]
@@ -932,9 +952,8 @@ class AlertListing(MessageListing, view.View):
             criteria2 = criteria[:]
             delete_criteria = [ ]
             message = self.listed_aggregated_alert(self.view_name, self.env, self.parameters)
-
+                   
             valueshash = {}
-            
             for path, value in zip(ag_list, values[:start]):
                 valueshash[path] = value
                 
@@ -953,7 +972,7 @@ class AlertListing(MessageListing, view.View):
                 else:
                     criterion = "%s == '%s'" % (path, utils.escape_criteria(str(value)))
                     if direction != None:
-                        message._setMessageDirectionGeneric(direction, path, value)
+                        message.setMessageDirectionGeneric(direction, path, value)
                        
                 criteria2.append(criterion)
                 delete_criteria.append(criterion)
@@ -1026,8 +1045,9 @@ class AlertListing(MessageListing, view.View):
 
         if len(ag_s + ag_t + ag_c + ag_a) > 0:
             return self._setAggregatedMessagesNoValues(criteria, ag_s, ag_t, ag_c, ag_a)
-        
+       
         results = self.env.idmef_db.getAlertIdents(criteria)
+
         for ident in results[self.parameters["offset"] : self.parameters["offset"] + self.parameters["limit"]]:
             message = self.env.idmef_db.getAlert(ident)
             dataset = self._setMessage(message, ident)
@@ -1092,6 +1112,18 @@ class ListedSensorAlert(ListedAlert):
 class ListedSensorAggregatedAlert(ListedAggregatedAlert):
     view_name = "sensor_alert_listing"
 
+
+class CorrelationAlertListing(AlertListing, view.View):
+    view_name = "correlation_alert_listing"
+    view_parameters = CorrelationAlertListingParameters
+    alert_type_default = [ "alert.correlation_alert.name" ]
+    
+
+class ToolAlertListing(AlertListing, view.View):
+    view_name = "tool_alert_listing"
+    view_parameters = ToolAlertListingParameters
+    alert_type_default = [ "alert.tool_alert.name" ]
+        
 
 
 class SensorAlertListing(AlertListing, view.View):

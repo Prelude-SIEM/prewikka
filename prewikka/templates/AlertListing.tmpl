@@ -508,13 +508,13 @@ function ${name}_add_entry(object, operator, value, num) {
     <br/>
     #set $sep = "("
 #for url, name in $info.classification_references##slurp
-#if $url#$sep<a href="$url">$name</a>#else#$sep$name#end if##slurp
+#if $url#$sep<a target="$prewikka.external_link_target" href="$url">$name</a>#else#$sep$name#end if##slurp
       #set $sep = ", "
 #end for##if $info.classification_references#)#end if
   #end for
 </td>
 
-#for $name, $direction in ("source", $message.source), ("target", $message.target)
+#for $name, $direction, $hidden, $total, $expand in ("source", $message.source, $message.aggregated_source_hidden, $message.aggregated_source_total, $message.aggregated_source_expand), ("target", $message.target, $message.aggregated_target_hidden, $message.aggregated_target_total, $message.aggregated_target_expand)
 <td>
 #if len($direction) == 0
        n/a
@@ -522,7 +522,13 @@ function ${name}_add_entry(object, operator, value, num) {
 
 #set $need_hr = 0
 
-#for $direction in $direction      
+#if $hidden > 0
+       <b>($hidden/$total $name not shown...
+       <a href="$expand">expand</a>)</b>
+       <br/>
+#end if
+
+#for $direction in $direction 
       #if $need_hr
 	<hr style="border: 1px dashed #808080; margin-top: 3px; margin-bottom: 0px;" />
       #end if
