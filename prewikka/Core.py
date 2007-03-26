@@ -159,7 +159,7 @@ class Core:
         self._view_to_section = { }
         
         for section, tabs in (prewikka.views.events_section, prewikka.views.agents_section, 
-                              prewikka.views.users_section, prewikka.views.about_section):
+                              prewikka.views.settings_section, prewikka.views.about_section):
             for tab, views in tabs:
                 for view in views:
                     self._view_to_tab[view] = tab
@@ -208,11 +208,9 @@ class Core:
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
         init_dataset(dataset, self._env.config, request)
        
-        if isinstance(self._env.auth, Auth.AnonymousAuth):
-            sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.about_section
-        else:
-            sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.users_section, \
-                       prewikka.views.about_section
+        is_anon = isinstance(self._env.auth, Auth.AnonymousAuth)
+        sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.settings_section, \
+                   prewikka.views.about_section
 
         section_to_tabs = { }
         dataset["interface.sections"] = [ ]
@@ -222,6 +220,9 @@ class Core:
             for tab_name, views in tabs:
                 default_view = views[0]
         
+                if is_anon and tab_name == "Users":
+                    continue
+                    
                 if user and user.has(self._views[default_view]["permissions"]):
                     if not first_tab:
                         first_tab = views[0]

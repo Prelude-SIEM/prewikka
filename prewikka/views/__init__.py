@@ -25,8 +25,10 @@ from prewikka.views import \
 
 
 objects = alertlisting.AlertListing(), \
-          heartbeatlisting.HeartbeatListing(), \
+          alertlisting.CorrelationAlertListing(), \
+          alertlisting.ToolAlertListing(), \
           alertlisting.SensorAlertListing(), \
+          heartbeatlisting.HeartbeatListing(), \
           heartbeatlisting.SensorHeartbeatListing(), \
           sensor.SensorListing(), sensor.HeartbeatAnalyze(), sensor.SensorMessagesDelete(), \
           messagesummary.AlertSummary(), messagesummary.HeartbeatSummary(), \
@@ -41,15 +43,17 @@ objects = alertlisting.AlertListing(), \
 
 
 events_section = ("Events", [("Alerts", ["alert_listing"]),
-                             ("Heartbeats", ["heartbeat_listing"]),
-                             ("Filters", ["filter_edition"])])
+                             ("CorrelationAlerts", ["correlation_alert_listing"]),
+                             ("ToolAlerts", ["tool_alert_listing"])])
 
 
 agents_section = ("Agents", [("Agents", ["sensor_listing", "sensor_messages_delete", "heartbeat_analyze",
-                                         "sensor_alert_listing", "sensor_heartbeat_listing" ])])
+                                         "sensor_alert_listing", "sensor_heartbeat_listing" ]),
+                             ("Heartbeats", ["heartbeat_listing"])])
 
-users_section = ("Users", [("Users", ["user_listing", "user_add_form", "user_add", "user_delete",
-                                      "user_password_change_form", "user_password_change",
-                                      "user_permissions_change_form", "user_permissions_change"])])
+settings_section = ("Settings", [("Users", ["user_listing", "user_add_form", "user_add", "user_delete",
+                                         "user_password_change_form", "user_password_change",
+                                         "user_permissions_change_form", "user_permissions_change"]),
+                                 ("Filters", ["filter_edition"])])
 
 about_section = ("About", [("About", ["about"])])
