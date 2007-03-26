@@ -635,7 +635,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                     content += "<li>Invalid analyzerid:messageid pair: %s:%s</li>" % (analyzerid, ident)
                 else:
                     alert = self.env.idmef_db.getAlert(results[0], htmlsafe=True)
-                    link = utils.create_link("alert_summary", { "origin": "alert_listing", "ident": results[0] })
+                    link = utils.create_link("alert_summary", { "origin": self.parameters["origin"], "ident": results[0] })
                     content += "<li><a href=\"%s\">%s</a></li>" % (link, alert["classification.text"])
 
             self.newTableCol(idx, "<ul style='padding: 0px; margin: 0px 0px 0px 10px;'>%s</ul>" % content)
@@ -698,14 +698,17 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.newTableCol(0, "Origin", header=True)
         self.newTableCol(0, "Name", header=True)
         self.newTableCol(0, "Meaning", header=True)
-        self.newTableCol(0, "Url", header=True)
-
+        
         index = 1
         for reference in alert["classification.reference"]:                
             self.newTableCol(index, reference["origin"])
-            self.newTableCol(index, reference["name"])
+            if reference["origin"] in ("user-specific", "vendor-specific"):
+                urlstr="&url=%s" % reference["url"]
+            else:
+                urlstr=""
+                
+            self.newTableCol(index, self.getUrlLink(reference["name"], "http://www.prelude-ids.com/reference_details.php?origin=%s&name=%s%s" % (reference["origin"], reference["name"], urlstr)))
             self.newTableCol(index, reference["meaning"])
-            self.newTableCol(index, self.getUrlLink(reference["url"]))
             index += 1
             
         self.endTable()
