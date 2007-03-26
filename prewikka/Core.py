@@ -125,6 +125,8 @@ class Core:
         class Env: pass
         self._env = Env()
         self._env.config = Config.Config(config)
+        self._env.max_aggregated_source = int(self._env.config.general.getOptionValue("max_aggregated_source", 10))
+        self._env.max_aggregated_target = int(self._env.config.general.getOptionValue("max_aggregated_target", 10))
         preludedb.preludedb_init()
         self._initDatabase()
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
