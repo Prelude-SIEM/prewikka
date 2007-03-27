@@ -22,8 +22,6 @@ from prewikka.views import \
      messagelisting, alertlisting, heartbeatlisting, messagesummary, messagedetails, sensor, \
      commands, filter, usermanagement, misc
 
-
-
 objects = alertlisting.AlertListing(), \
           alertlisting.CorrelationAlertListing(), \
           alertlisting.ToolAlertListing(), \
@@ -42,18 +40,18 @@ objects = alertlisting.AlertListing(), \
 
 
 
-events_section = ("Events", [("Alerts", ["alert_listing"]),
+events_section = (_("Events"), [("Alerts", ["alert_listing"]),
                              ("CorrelationAlerts", ["correlation_alert_listing"]),
                              ("ToolAlerts", ["tool_alert_listing"])])
 
 
-agents_section = ("Agents", [("Agents", ["sensor_listing", "sensor_messages_delete", "heartbeat_analyze",
+agents_section = (_("Agents"), [("Agents", ["sensor_listing", "sensor_messages_delete", "heartbeat_analyze",
                                          "sensor_alert_listing", "sensor_heartbeat_listing" ]),
                              ("Heartbeats", ["heartbeat_listing"])])
 
-settings_section = ("Settings", [("Users", ["user_listing", "user_add_form", "user_add", "user_delete",
+settings_section = (_("Settings"), [(_("Users"), ["user_listing", "user_add_form", "user_add", "user_delete",
                                          "user_password_change_form", "user_password_change",
                                          "user_permissions_change_form", "user_permissions_change"]),
-                                 ("Filters", ["filter_edition"])])
+                                 (_("Filters"), ["filter_edition"])])
 
-about_section = ("About", [("About", ["about"])])
+about_section = (_("About"), [(_("About"), ["about"])])
