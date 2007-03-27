@@ -75,7 +75,7 @@ class Filter:
             return "||"
 
         if not self.elements.has_key(element):
-            raise Error("Invalid filter element '%s' referenced from filter formula" % element)
+            raise Error(_("Invalid filter element '%s' referenced from filter formula") % element)
 
         criteria, operator, value = self.elements[element]
         return "%s %s '%s'" % (criteria, operator, utils.escape_criteria(value))

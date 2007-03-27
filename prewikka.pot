@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-27 16:23+0200\n"
+"POT-Creation-Date: 2007-03-27 17:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,12 +16,86 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: prewikka/Auth.py:32
+msgid "Authentication failed"
+msgstr ""
+
+#: prewikka/Auth.py:38
+msgid "Session invalid"
+msgstr ""
+
+#: prewikka/Auth.py:44
+msgid "Session expired"
+msgstr ""
+
+#: prewikka/Auth.py:132
+msgid "Username and password do not match."
+msgstr ""
+
+#: prewikka/Auth.py:145
+msgid "Logged out"
+msgstr ""
+
+#: prewikka/Filter.py:78
+#, python-format
+msgid "Invalid filter element '%s' referenced from filter formula"
+msgstr ""
+
+#: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
+msgid "Parameters Normalization failed"
+msgstr ""
+
+#: prewikka/view.py:30
+#, python-format
+msgid "Parameter '%s' is not valid"
+msgstr ""
+
+#: prewikka/view.py:36
+#, python-format
+msgid "Invalid value '%s' for parameter '%s'"
+msgstr ""
+
+#: prewikka/view.py:42
+#, python-format
+msgid "Required parameter '%s' is missing"
+msgstr ""
+
+#: prewikka/User.py:41
+msgid "Permission Denied"
+msgstr ""
+
+#: prewikka/User.py:42
+#, python-format
+msgid "Access to view '%s' forbidden"
+msgstr ""
+
+#: prewikka/Log.py:65
+#, python-format
+msgid "Unknown logtype specified: '%s'"
+msgstr ""
+
 #: prewikka/views/__init__.py:43
 msgid "Events"
 msgstr ""
 
+#: prewikka/views/__init__.py:43
+msgid "Alerts"
+msgstr ""
+
+#: prewikka/views/__init__.py:44
+msgid "CorrelationAlerts"
+msgstr ""
+
+#: prewikka/views/__init__.py:45
+msgid "ToolAlerts"
+msgstr ""
+
 #: prewikka/views/__init__.py:48
 msgid "Agents"
+msgstr ""
+
+#: prewikka/views/__init__.py:50
+msgid "Heartbeats"
 msgstr ""
 
 #: prewikka/views/__init__.py:52
@@ -40,18 +114,6 @@ msgstr ""
 msgid "About"
 msgstr ""
 
-#: prewikka/templates/HeartbeatListing.py:103
-msgid "Agent"
-msgstr ""
-
-#: prewikka/templates/HeartbeatListing.py:114
-msgid "Node Address"
-msgstr ""
-
-#: prewikka/templates/HeartbeatListing.py:125
-msgid "Node Name"
-msgstr ""
-
-#: prewikka/templates/HeartbeatListing.py:136
-msgid "Type"
+#: prewikka/modules/auth/cgi/cgi.py:29
+msgid "CGI Authentication failed: no user specified."
 msgstr ""

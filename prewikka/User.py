@@ -38,8 +38,8 @@ ADMIN_LOGIN = "admin"
 
 class PermissionDeniedError(Error.PrewikkaUserError):
     def __init__(self, action_name):
-        Error.PrewikkaUserError.__init__(self, "Permission Denied",
-                                         "Access to view '%s' forbidden" % action_name, log=Log.WARNING)
+        Error.PrewikkaUserError.__init__(self, _("Permission Denied"),
+                                         _("Access to view '%s' forbidden") % action_name, log=Log.WARNING)
                                          
                                          
 class User:

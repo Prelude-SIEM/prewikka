@@ -26,7 +26,7 @@ class CGIAuth(Auth.Auth):
     def getUser(self, request):
 	user = request.getRemoteUser()        
     	if not user:
-	    raise Auth.AuthError(message="CGI Authentication failed: no user specified.")
+	    raise Auth.AuthError(message=_("CGI Authentication failed: no user specified."))
         
         return User.User(self.db, user, User.ALL_PERMISSIONS, self.db.getConfiguration(user))
 

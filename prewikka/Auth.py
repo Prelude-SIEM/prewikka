@@ -29,19 +29,19 @@ from prewikka import User
 
 
 class AuthError(PrewikkaUserError):
-    def __init__(self, arguments={}, message="Authentication failed", log=Log.ERROR, log_user=None):
+    def __init__(self, arguments={}, message=_("Authentication failed"), log=Log.ERROR, log_user=None):
         PrewikkaUserError.__init__(self, None, message, log=log, log_user=log_user)
         self.template = "LoginPasswordForm"
 
 
 class AuthSessionInvalid(AuthError):
-    def __init__(self, arguments={}, message="Session invalid", login=None, log=None):
+    def __init__(self, arguments={}, message=_("Session invalid"), login=None, log=None):
         AuthError.__init__(self, arguments, message, log=log, log_user=login)
 
 
 
 class AuthSessionExpired(AuthError):
-    def __init__(self, login, arguments={}, message="Session expired"):
+    def __init__(self, login, arguments={}, message=_("Session expired")):
         AuthError.__init__(self, arguments, message, log=Log.ERROR, log_user=login)
 
 
@@ -129,7 +129,7 @@ class LoginPasswordAuth(Auth, Session):
             try:
                 self.checkPassword(login, password)
             except AuthError, e:
-                raise AuthError(message="Username and password do not match.", log_user=login)
+                raise AuthError(message=_("Username and password do not match."), log_user=login)
 
             self.createSession(request, login)
             self.log.info("User login", request, login)
@@ -142,7 +142,7 @@ class LoginPasswordAuth(Auth, Session):
         login = self.checkSession(request)
         self.deleteSession(request)
 
-        raise AuthSessionInvalid(message="Logged out", login=login, log=Log.INFO)
+        raise AuthSessionInvalid(message=_("Logged out"), login=login, log=Log.INFO)
 
 
 
