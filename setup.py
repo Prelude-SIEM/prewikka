@@ -30,6 +30,7 @@ from distutils.command.build import build
 from distutils.command.build_py import build_py
 from distutils.command.install import install
 from distutils.command.install_scripts import install_scripts
+from distutils.command.install_data import install_data
 from distutils.core import Command
 
 from Cheetah.CheetahWrapper import CheetahWrapper
@@ -37,6 +38,44 @@ from Cheetah.CheetahWrapper import CheetahWrapper
 
 PREWIKKA_VERSION = "0.9.9"
 
+from fnmatch import fnmatch
+from distutils.dep_util import newer
+
+def listfiles(*dirs):
+    dir, pattern = os.path.split(os.path.join(*dirs))
+    return [os.path.join(dir, filename)
+            for filename in os.listdir(os.path.abspath(dir))
+                if filename[0] != '.' and fnmatch(filename, pattern)]
+                
+class my_install_data(install_data):
+    def run(self):
+        self.data_files.extend(self._compile_po_files())
+        install_data.run(self)
+
+    def _compile_po_files(self):
+        data_files = []
+        
+        for po in listfiles("po", "*.po"):
+            lang = os.path.basename(po[:-3])
+            mo = os.path.join("locale", lang, "LC_MESSAGES", "prewikka.mo")
+
+            if not os.path.exists(mo) or newer(po, mo):
+                directory = os.path.dirname(mo)
+                if not os.path.exists(directory):
+                    print "creating %s" % directory
+                    os.makedirs(directory)
+                    
+                cmd = 'msgfmt -o %s %s' % (mo, po)
+                print "compiling %s -> %s" % (po, mo)
+                if os.system(cmd) != 0:
+                    raise SystemExit("Error while running msgfmt")
+            
+            dest = os.path.dirname(os.path.join('share', mo))
+            data_files.append((dest, [mo]))
+            
+        return data_files
+        
+     
 
 class my_build_py(build_py):
     def finalize_options(self):
@@ -131,6 +170,7 @@ class my_install(install):
         config = open("prewikka/siteconfig.py", "w")
         print >> config, "htdocs_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/htdocs"))
         print >> config, "database_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/database"))
+        print >> config, "locale_dir = '%s'" % os.path.abspath((self.prefix + "/share/locale"))
         print >> config, "conf_dir = '%s'" % os.path.abspath((self.conf_prefix))
         print >> config, "version = '%s'" % PREWIKKA_VERSION
         config.close()
@@ -188,5 +228,6 @@ setup(name="prewikka",
       conf_files=[ "conf/prewikka.conf" ],
       cmdclass={ 'build_py': my_build_py,
                  'install': my_install,
-                 'install_scripts': my_install_scripts },
+                 'install_scripts': my_install_scripts,
+                 'install_data': my_install_data },
       distclass=MyDistribution)

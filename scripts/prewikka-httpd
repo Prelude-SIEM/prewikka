@@ -32,8 +32,12 @@ import getopt
 import SocketServer
 import BaseHTTPServer
 
+import gettext
+from prewikka import siteconfig
 
-from prewikka import Core, Request, siteconfig
+gettext.install("prewikka", siteconfig.locale_dir)
+
+from prewikka import Core, Request
 
 
 class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
