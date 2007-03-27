@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-27 16:59+0200\n"
+"POT-Creation-Date: 2007-03-27 17:48+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Sebastien Tricaud <sebastien.tricaud@wengo.com>\n"
 "Language-Team: French\n"
@@ -36,11 +36,34 @@ msgstr ""
 msgid "Logged out"
 msgstr ""
 
+#: prewikka/Filter.py:78
+#, python-format
+msgid "Invalid filter element '%s' referenced from filter formula"
+msgstr ""
+
+#: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
+msgid "Parameters Normalization failed"
+msgstr ""
+
+#: prewikka/User.py:41
+msgid "Permission Denied"
+msgstr ""
+
+#: prewikka/User.py:42
+#, python-format
+msgid "Access to view '%s' forbidden"
+msgstr ""
+
+#: prewikka/Log.py:65
+#, python-format
+msgid "Unknown logtype specified: '%s'"
+msgstr ""
+
 #: prewikka/views/__init__.py:43
 msgid "Events"
 msgstr "Evénements"
 
-#: prewikka/views/__init__.py:43
+#: prewikka/views/__init__.py:43 prewikka/templates/SensorListing.py:263
 #, fuzzy
 msgid "Alerts"
 msgstr "Agents"
@@ -57,7 +80,7 @@ msgstr ""
 msgid "Agents"
 msgstr "Agents"
 
-#: prewikka/views/__init__.py:50
+#: prewikka/views/__init__.py:50 prewikka/templates/SensorListing.py:268
 msgid "Heartbeats"
 msgstr ""
 
@@ -77,14 +100,244 @@ msgstr "Filtres"
 msgid "About"
 msgstr "A propos"
 
-#~ msgid "Agent"
-#~ msgstr "Agent"
+#: prewikka/templates/MessageListing.py:211
+#: prewikka/templates/FilterEdition.py:221
+#: prewikka/templates/SensorListing.py:273
+msgid "Delete"
+msgstr ""
 
-#~ msgid "Node Address"
-#~ msgstr "Adresse du noeud"
+#: prewikka/templates/MessageListing.py:295
+msgid "Minutes"
+msgstr ""
 
-#~ msgid "Node Name"
-#~ msgstr "Nom du noeud"
+#: prewikka/templates/MessageListing.py:303
+msgid "Hours"
+msgstr ""
 
-#~ msgid "Type"
-#~ msgstr "Type"
+#: prewikka/templates/MessageListing.py:311
+msgid "Days"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:319
+msgid "Months"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:327
+#, fuzzy
+msgid "Years"
+msgstr "Utilisateurs"
+
+#: prewikka/templates/MessageListing.py:335
+msgid "Unlimited"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:352
+msgid "Frontend localtime"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:360
+msgid "Sensor localtime"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:374
+msgid "Limit:"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:389
+msgid "Apply"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:398
+#: prewikka/templates/FilterEdition.py:308
+msgid "Save"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:439
+#: prewikka/templates/MessageListing.py:446
+msgid "prev"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:457
+#: prewikka/templates/MessageListing.py:464
+msgid "current"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:475
+#: prewikka/templates/MessageListing.py:482
+msgid "next"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:528
+msgid "total"
+msgstr ""
+
+#: prewikka/templates/UserListing.py:144
+msgid "Delete user"
+msgstr ""
+
+#: prewikka/templates/UserListing.py:153
+msgid "Create user"
+msgstr ""
+
+#: prewikka/templates/About.py:111
+msgid ""
+"provides support to Large Accounts, Major Companies and Government Agencies "
+"around the world, to improve and strengthen the security of their systems "
+"and networks."
+msgstr ""
+
+#: prewikka/templates/About.py:131
+msgid ""
+"In keeping with the Open Source spirit, we encourage you to participate in "
+"the development of your application. You can order customized versions of "
+"Prelude to suit your needs: adapting, adding on functionality etc. Because "
+"they are carried out by PreludeIDS engineers, you know that any "
+"modifications made to the system will be integrated optimally and guaranteed "
+"by our technical support department. Additionally, the company can extend "
+"Prelude to handle yet unsupported sensors (including proprietary), ruleset "
+"extension to handle new devices and porting of Prelude to unsupported "
+"operating systems."
+msgstr ""
+
+#: prewikka/templates/About.py:142
+msgid ""
+"PreludeIDS maintenance and support services guarantee optimal operation of "
+"the Prelude platform on your infrastructure. With our support services, you "
+"benefit from priority assistance and the expertise of our engineers, while "
+"the maintenance service we offer maintains and updates your software."
+msgstr ""
+
+#: prewikka/templates/About.py:153
+msgid "The Prelude framework is licensed under the"
+msgstr ""
+
+#: prewikka/templates/About.py:158
+msgid ""
+"PreludeIDS provides specific commercial licenses to allow proprietary "
+"systems based on Prelude to be developed and to interoperate."
+msgstr ""
+
+#: prewikka/templates/About.py:169
+msgid ""
+"Through our partners, you have access to an array of top-of-the-line "
+"security services. By advising you on how to secure your infrastructure, "
+"deploying Prelude and training your users, we provide a turnkey solution to "
+"secure your infrastructure, delivered by specialists."
+msgstr ""
+
+#: prewikka/templates/LoginPasswordForm.py:132
+msgid "Submit"
+msgstr ""
+
+#: prewikka/templates/ClassicLayout.py:223
+msgid "logout"
+msgstr ""
+
+#: prewikka/templates/HeartbeatListing.py:103
+msgid "Agent"
+msgstr "Agent"
+
+#: prewikka/templates/HeartbeatListing.py:114
+msgid "Node Address"
+msgstr "Adresse du noeud"
+
+#: prewikka/templates/HeartbeatListing.py:125
+msgid "Node Name"
+msgstr "Nom du noeud"
+
+#: prewikka/templates/HeartbeatListing.py:136
+msgid "Type"
+msgstr "Type"
+
+#: prewikka/templates/HeartbeatListing.py:193
+msgid "Heartbeat summar"
+msgstr ""
+
+#: prewikka/templates/HeartbeatListing.py:201
+msgid "Filter on agent"
+msgstr ""
+
+#: prewikka/templates/HeartbeatListing.py:228
+msgid "Filter on address"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:112
+msgid "Account informations"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:122
+msgid "Login:"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:149
+msgid "Permissions:"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:225
+msgid "Change password"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:232
+msgid "Current password:"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:241
+msgid "New password:"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:250
+msgid "Confirm new password:"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:262
+msgid "Submit Changes"
+msgstr ""
+
+#: prewikka/templates/FilterEdition.py:216
+msgid "Load"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:495
+msgid "Classification"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:619
+msgid "Source"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:663
+msgid "Target"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:707
+msgid "Sensor"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:748
+msgid "Time"
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:137
+#, fuzzy
+msgid "Alert listing"
+msgstr "Agents"
+
+#: prewikka/templates/SensorListing.py:145
+msgid "Heartbeat listing"
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:153
+msgid "Heartbeat analysis"
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:217
+msgid "Address information"
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:250
+msgid "No agent available"
+msgstr ""
+
+#: prewikka/modules/auth/cgi/cgi.py:29
+msgid "CGI Authentication failed: no user specified."
+msgstr ""

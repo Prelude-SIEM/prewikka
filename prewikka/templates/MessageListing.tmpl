@@ -43,7 +43,7 @@ $message_listing_header
 #if $prewikka.user.has(User.PERM_IDMEF_ALTER) and $cnt
      <tr>
       <td colspan="4">&nbsp;</td>
-      <td style="text-align: right;"><input type="submit" value="Delete"/></td>
+      <td style="text-align: right;"><input type="submit" value="$_("Delete")"/></td>
       <td class="static_content_column">
        <input class="checkbox" type="checkbox" id="allbox" onclick="checkBoxByName('delete', document.forms[0].allbox.checked);"/>
       </td>
@@ -71,12 +71,12 @@ $message_listing_header
 
    <td colspan=2 id="timeline_unit">
     <select class="timeline_unit_select" name="timeline_unit">
-     <option value="min" $timeline.min_selected>Minutes</option>
-     <option value="hour" $timeline.hour_selected>Hours</option>
-     <option value="day" $timeline.day_selected>Days</option>
-     <option value="month" $timeline.month_selected>Months</option>
-     <option value="year" $timeline.year_selected>Years</option>
-     <option value="unlimited" $timeline.unlimited_selected>Unlimited</option>
+     <option value="min" $timeline.min_selected>$_("Minutes")</option>
+     <option value="hour" $timeline.hour_selected>$_("Hours")</option>
+     <option value="day" $timeline.day_selected>$_("Days")</option>
+     <option value="month" $timeline.month_selected>$_("Months")</option>
+     <option value="year" $timeline.year_selected>$_("Years")</option>
+     <option value="unlimited" $timeline.unlimited_selected>$_("Unlimited")</option>
     </select>
    </td>
   </tr>
@@ -85,26 +85,26 @@ $message_listing_header
     <td id="timezone_control_label">Tz:</td>
     <td colspan="3">
       <select class="timezone_control_select" name="timezone">
-        <option value="frontend_localtime" $timeline.frontend_localtime_selected>Frontend localtime</option>
-	<option value="sensor_localtime" $timeline.sensor_localtime_selected>Sensor localtime</option>
+        <option value="frontend_localtime" $timeline.frontend_localtime_selected>$_("Frontend localtime")</option>
+	<option value="sensor_localtime" $timeline.sensor_localtime_selected>$_("Sensor localtime")</option>
 	<option value="utc" $timeline.utc_selected>UTC</option>
        </select>
      </td>
   </tr>
 	
   <tr>
-   <td id="timeline_limit_label">Limit:</td>
+   <td id="timeline_limit_label">$_("Limit:")</td>
 
    <td>
     <input style="display: inline;" id="timeline_limit_value" type="text" size="2" name="limit" value="$limit"/>
    </td>
 
    <td id="timeline_submit">
- 	<input style="display:inline;" type="submit" name="apply" value="Apply" />
+ 	<input style="display:inline;" type="submit" name="apply" value="$_("Apply")" />
    </td>
 
    <td id="timeline_submit">
-      <input style="display:inline;" type="submit" name="_save" value="Save" />
+      <input style="display:inline;" type="submit" name="_save" value="$_("Save")" />
    </td>
   </tr>
 
@@ -123,21 +123,21 @@ $message_listing_header
   <td colspan="4" style="text-align: center;">
    <table><tr>
     #if $timeline.prev
-     <td class="timeline_control_prev"><a href="$timeline.prev"><b>prev</b></a></td>
+     <td class="timeline_control_prev"><a href="$timeline.prev"><b>$_("prev")</b></a></td>
     #else
-     <td class="timeline_control_inactive"><b>prev</b></td>
+     <td class="timeline_control_inactive"><b>$_("prev")</b></td>
     #end if
 
     #if $timeline.current
-     <td class="timeline_control_cur"><a href="$timeline.current"><b>current</b></a></td>
+     <td class="timeline_control_cur"><a href="$timeline.current"><b>$_("current")</b></a></td>
     #else
-     <td class="timeline_control_cur_inactive"><b>current</b></td>
+     <td class="timeline_control_cur_inactive"><b>$_("current")</b></td>
     #end if
 
     #if $timeline.next
-     <td class="timeline_control_next"><a href="$timeline.next"><b>next</b></a></td>
+     <td class="timeline_control_next"><a href="$timeline.next"><b>$_("next")</b></a></td>
     #else 
-     <td class="timeline_control_inactive"><b>next</b></td>
+     <td class="timeline_control_inactive"><b>$_("next")</b></td>
     #end if
 
    </tr></table>
@@ -166,7 +166,7 @@ $message_listing_header
   </tr>
   <tr>
     <td class="message_list_nav_infos" colspan="4">
-      $nav.from ... $nav.to (total:$total)
+      $nav.from ... $nav.to ($_("total"):$total)
     </td>
   </tr>
 </table>

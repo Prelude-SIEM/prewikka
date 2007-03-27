@@ -32,9 +32,9 @@
         <td>
 	  <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$analyzer.name</a>
 	  <span id="menu_$cnt" class="popup_menu">
-            - <a href="$analyzer.alert_listing">Alert listing</a><br />
-            - <a href="$analyzer.heartbeat_listing">Heartbeat listing</a><br />
-            - <a href="$analyzer.heartbeat_analyze">Heartbeat analysis</a><br />
+            - <a href="$analyzer.alert_listing">$_("Alert listing")</a><br />
+            - <a href="$analyzer.heartbeat_listing">$_("Heartbeat listing")</a><br />
+            - <a href="$analyzer.heartbeat_analyze">$_("Heartbeat analysis")</a><br />
           </span>
         </td>
         <td>$analyzer.model $analyzer.version</td>
@@ -61,7 +61,7 @@
            <span id="menu_$cnt" class="popup_menu">
 
             - <a href="$address.inline_filter">Filter on address</a><br />
-            - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">Address information</a><br />
+            - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$_("Address information")</a><br />
      
 	    #for $name, $link in $address.host_commands
             - <a href="$link">$name</a><br />
@@ -81,7 +81,7 @@
       #set $cnt += 1
     #end for
   #else
-    <tr><td class="not_available" style="text-align: center;" colspan="9">No agent available</td></tr>
+    <tr><td class="not_available" style="text-align: center;" colspan="9">$_("No agent available")</td></tr>
   #end if
   </tbody>
 </table>
@@ -90,9 +90,9 @@
 
 #if len($analyzers) > 0
   <div style="text-align: right; vertical-align: bottom;">
-    <input class="checkbox" type="checkbox" name="alerts" /><b>Alerts</b>
-    <input class="checkbox" type="checkbox" name="heartbeats" /><b>Heartbeats</b>
-    &nbsp;<input type="submit" value="Delete" />
+    <input class="checkbox" type="checkbox" name="alerts" /><b>$_("Alerts")</b>
+    <input class="checkbox" type="checkbox" name="heartbeats" /><b>$_("Heartbeats")</b>
+    &nbsp;<input type="submit" value="$_("Delete")" />
   </div>
 #end if
 

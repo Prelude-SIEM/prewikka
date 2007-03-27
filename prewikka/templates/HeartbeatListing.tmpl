@@ -49,8 +49,8 @@
   <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$message.agent.value</a>
   <span id="menu_$cnt" class="popup_menu">
   #set global $cnt += 1
-   - <a href="$message.summary">Heartbeat summary</a><br />
-   - <a href="$message.agent.inline_filter">Filter on agent</a>
+   - <a href="$message.summary">$_("Heartbeat summar")y</a><br />
+   - <a href="$message.agent.inline_filter">$_("Filter on agent")</a>
   </span>
 </td>
 
@@ -61,7 +61,7 @@
     <span id="menu_$cnt" class="popup_menu">
     #set global $cnt += 1
 
-      - <a href="$address.inline_filter">Filter on address</a><br />
+      - <a href="$address.inline_filter">$_("Filter on address")</a><br />
       - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">Address information</a><br />
 
       #for $name, $link in $address.host_commands

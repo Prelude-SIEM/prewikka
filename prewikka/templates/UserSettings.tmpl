@@ -15,12 +15,12 @@
 <input type="hidden" name="login" value="$user.login"/>
 
 <fieldset class="fieldset_heading">
- <legend>Account informations</legend>
+ <legend>$_("Account informations")</legend>
 
   <table>
 #if $user.login
    <tr>
-    <th style="vertical-align: middle;">Login:</th>
+    <th style="vertical-align: middle;">$_("Login:")</th>
     <td style="text-align:right; vertical-align: middle;">
      <h2 style="vertical-align: middle; padding:0px; margin:0px;"><b>$user.login</b></h2>
     </td>
@@ -43,7 +43,7 @@
 #set $row_classes = ("table_row_even", "table_row_odd")
 
 <tr class="nodash" style="padding:0; margin:0;">
- <th class="nodash">Permissions:</th>
+ <th class="nodash">$_("Permissions:")</th>
  <td class="nodash"></td>
 </tr>
 
@@ -98,20 +98,20 @@
 
 #if $can_change_password
 <fieldset>
-  <legend>Change password</legend>
+  <legend>$_("Change password")</legend>
   <table>
     #if $ask_current_password
     <tr>
-      <th>Current password:</th>
+      <th>$_("Current password:")</th>
       <td><input type="password" name="password_current"/></td>
     </tr>
     #end if
     <tr>
-      <th>New password:</th>
+      <th>$_("New password:")</th>
       <td><input type="password" name="password_new"/></td>
     </tr>
     <tr>
-      <th>Confirm new password:</th>
+      <th>$_("Confirm new password:")</th>
       <td><input type="password" name="password_new_confirmation"/></td>
     </tr>
   </table>
@@ -119,7 +119,7 @@
 <br/>
 #end if
 
-<input type="submit" value="Submit Changes"/>
+<input type="submit" value="$_("Submit Changes")"/>
 
 </form>
 </div>

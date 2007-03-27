@@ -27,19 +27,19 @@ class ParameterError(Exception):
 class InvalidParameterError(Error.PrewikkaUserError):
     def __init__(self, name):
         Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"), 
-                                               _("Parameter '%s' is not valid") % name, log=Log.WARNING)
+                                               "Parameter '%s' is not valid" % name, log=Log.WARNING)
 
 
 class InvalidParameterValueError(Error.PrewikkaUserError):
     def __init__(self, name, value):
         Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"), 
-                                               _("Invalid value '%s' for parameter '%s'") % (value, name), log=Log.WARNING)
+                                               "Invalid value '%s' for parameter '%s'" % (value, name), log=Log.WARNING)
 
 
 class MissingParameterError(Error.PrewikkaUserError):
     def __init__(self, name):
         Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"), 
-                                         _("Required parameter '%s' is missing") % name, log=Log.WARNING)
+                                         "Required parameter '%s' is missing" % name, log=Log.WARNING)
 
 
 
