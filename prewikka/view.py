@@ -38,7 +38,7 @@ class InvalidParameterValueError(Error.PrewikkaUserError):
 
 class MissingParameterError(Error.PrewikkaUserError):
     def __init__(self, name):
-        PrewikkaUserError.__init__(self, "Parameters Normalization failed", 
+        Error.PrewikkaUserError.__init__(self, "Parameters Normalization failed", 
                                          "Required parameter '%s' is missing" % name, log=Log.WARNING)
 
 
