@@ -18,46 +18,46 @@ msgstr ""
 
 #: prewikka/Auth.py:32
 msgid "Authentication failed"
-msgstr ""
+msgstr "Authentification echouée"
 
 #: prewikka/Auth.py:38
 msgid "Session invalid"
-msgstr ""
+msgstr "Session invalide"
 
 #: prewikka/Auth.py:44
 msgid "Session expired"
-msgstr ""
+msgstr "Session expirée"
 
 #: prewikka/Auth.py:132
 msgid "Username and password do not match."
-msgstr ""
+msgstr "Le login et le mot de passe ne correspondent pas"
 
 #: prewikka/Auth.py:145
 msgid "Logged out"
-msgstr ""
+msgstr "Session terminée"
 
 #: prewikka/Filter.py:78
 #, python-format
 msgid "Invalid filter element '%s' referenced from filter formula"
-msgstr ""
+msgstr "Element de filtre '%s'  référencé depuis la formule de filtre"
 
 #: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
 msgid "Parameters Normalization failed"
-msgstr ""
+msgstr "Normalisation des paramètres échouée"
 
 #: prewikka/User.py:41
 msgid "Permission Denied"
-msgstr ""
+msgstr "Permission refusée"
 
 #: prewikka/User.py:42
 #, python-format
 msgid "Access to view '%s' forbidden"
-msgstr ""
+msgstr "Accès pour visualiser '%s' interdit"
 
 #: prewikka/Log.py:65
 #, python-format
 msgid "Unknown logtype specified: '%s'"
-msgstr ""
+msgstr "Type de log inconnu: '%s'"
 
 #: prewikka/views/__init__.py:43
 msgid "Events"
@@ -70,11 +70,11 @@ msgstr "Agents"
 
 #: prewikka/views/__init__.py:44
 msgid "CorrelationAlerts"
-msgstr ""
+msgstr "AlertesDeCorrelation"
 
 #: prewikka/views/__init__.py:45
 msgid "ToolAlerts"
-msgstr ""
+msgstr "OutilsDAlertes"
 
 #: prewikka/views/__init__.py:48
 msgid "Agents"
