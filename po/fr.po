@@ -82,7 +82,7 @@ msgstr "Agents"
 
 #: prewikka/views/__init__.py:50 prewikka/templates/SensorListing.py:268
 msgid "Heartbeats"
-msgstr ""
+msgstr "Pulsations"
 
 #: prewikka/views/__init__.py:52
 msgid "Settings"
@@ -327,11 +327,11 @@ msgstr "Agents"
 
 #: prewikka/templates/SensorListing.py:145
 msgid "Heartbeat listing"
-msgstr ""
+msgstr "Liste des pulsations"
 
 #: prewikka/templates/SensorListing.py:153
 msgid "Heartbeat analysis"
-msgstr ""
+msgstr "Analyse des pulsations"
 
 #: prewikka/templates/SensorListing.py:217
 msgid "Address information"
@@ -343,5 +343,4 @@ msgstr "Pas d'agent disponible"
 
 #: prewikka/modules/auth/cgi/cgi.py:29
 msgid "CGI Authentication failed: no user specified."
-msgstr ""
-
+msgstr "Authentification CGI échouée : aucun utilisateur spécifié."
