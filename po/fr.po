@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-27 17:48+0200\n"
+"POT-Creation-Date: 2007-03-29 10:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Sebastien Tricaud <sebastien.tricaud@wengo.com>\n"
 "Language-Team: French\n"
@@ -185,9 +185,9 @@ msgid ""
 "around the world, to improve and strengthen the security of their systems "
 "and networks."
 msgstr ""
-"fournit du support pour les grands comptes, agences gouvernementales "
-"dans le monde, afin d'amméliorer et renforcer la sécurité de leurs systèmes "
-"et réseaux."
+"fournit du support pour les grands comptes, agences gouvernementales dans le "
+"monde, afin d'amméliorer et renforcer la sécurité de leurs systèmes et "
+"réseaux."
 
 #: prewikka/templates/About.py:131
 msgid ""
@@ -253,8 +253,9 @@ msgid "Type"
 msgstr "Type"
 
 #: prewikka/templates/HeartbeatListing.py:193
-msgid "Heartbeat summar"
-msgstr ""
+#, fuzzy
+msgid "Heartbeat summary"
+msgstr "Liste des pulsations"
 
 #: prewikka/templates/HeartbeatListing.py:201
 msgid "Filter on agent"
@@ -300,23 +301,32 @@ msgstr "Soumettre les modifications"
 msgid "Load"
 msgstr "Charger"
 
-#: prewikka/templates/AlertListing.py:495
+#: prewikka/templates/AlertListing.py:249
+msgid "Group entry by:"
+msgstr "Grouper les entrées par :"
+
+#: prewikka/templates/AlertListing.py:333
+#, fuzzy
+msgid "Filter on:"
+msgstr "Filtrer sur :"
+
+#: prewikka/templates/AlertListing.py:505
 msgid "Classification"
 msgstr "Classification"
 
-#: prewikka/templates/AlertListing.py:619
+#: prewikka/templates/AlertListing.py:629
 msgid "Source"
 msgstr "Source"
 
-#: prewikka/templates/AlertListing.py:663
+#: prewikka/templates/AlertListing.py:673
 msgid "Target"
 msgstr "Destination"
 
-#: prewikka/templates/AlertListing.py:707
+#: prewikka/templates/AlertListing.py:717
 msgid "Sensor"
 msgstr "Sonde"
 
-#: prewikka/templates/AlertListing.py:748
+#: prewikka/templates/AlertListing.py:758
 msgid "Time"
 msgstr "Temps"
 
