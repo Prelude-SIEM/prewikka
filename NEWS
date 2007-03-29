@@ -1,3 +1,34 @@
+
+        - Don't show all source and target when they reach a predefined limit, instead 
+          provide an expansion link.
+        
+        - Add two new events view: CorrelationAlert and ToolAlert.
+        
+        - Ability to filter and aggregate on all IDMEF path. If the filtered path is 
+          an enumeration, automatically provide the list of possible value. 
+          
+        - Add a combo box for the user to choose which criteria operator to use. 
+        
+        - Provide an enumeration filter for the type of alert.
+        
+        - Provide the ability to do analyzer aggregation. 
+        
+        - When a session expire, the user is now redirected to the page he attempted to
+          access when the view expired.
+          
+        - When an error occur, the default Prewikka layout is now preserved.
+        
+        - Correct handling of empty value for hash key generation. Fix #204. 
+        
+        - Use new libpreludedb function that return the results as well as the number 
+          of results. This avoid using COUNT() in some places (namely, this speedup 
+          non aggregated view by ~50%).
+          
+        - Avoid iterating the list of database result more than needed.
+        
+        - Support IDMEF Action, SNMPService, and WebService class.
+        
+
 * 2007-02-06, prewikka-0.9.9:
 
         - Improve database performance by reducing the number of query. (Paul Robert Marino)
