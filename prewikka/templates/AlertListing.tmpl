@@ -135,7 +135,7 @@ function aggregated_${category}_add_entry(path) {
 
         field = document.createElement("th")
         row.appendChild(field)
-        content = document.createTextNode("Group entry by:")
+        content = document.createTextNode("$_('Group entry by:')")
         field.appendChild(content)
 
         field = document.createElement("td")
@@ -197,7 +197,7 @@ function ${name}_add_entry(object, operator, value, num) {
 	table.appendChild(row)
 
 	field = document.createElement("th")
-	content = document.createTextNode("Filter on:")
+	content = document.createTextNode("$_('Filter on:')")
 	field.appendChild(content)
 	row.appendChild(field)
 	
