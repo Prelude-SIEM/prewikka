@@ -286,12 +286,6 @@ class Core:
     def checkAuth(self, request):
         return self._env.auth.getUser(request)
 
-    def _setupError(self, error, request, user):
-        error.dataset["query"] = request.getQueryString()
-        self._setupDataSet(error.dataset, request, user)
-
-        return error.dataset, error.template
-    
     def process(self, request):
         login = None
         view = None
