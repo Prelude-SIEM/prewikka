@@ -49,11 +49,16 @@ class User:
         self.permissions = permissions
         self.configuration = configuration    
         
-    def delConfigValue(self, view, key):
+    def delConfigValue(self, view, key=None):
         login = self._db.escape(self.login)
         
-        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s AND name = %s" %
-                       (self._db.escape(view), login, self._db.escape(key)))
+        if key != None:
+            qstr = " AND name = %s" % (self._db.escape(key))
+        else:
+            qstr = ""
+            
+        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s%s" %
+                       (self._db.escape(view), login, qstr))
 
         try: self.configuration[view].pop(key)
         except KeyError: pass
