@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-29 09:54+0200\n"
+"POT-Creation-Date: 2007-03-29 10:05+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,23 +79,23 @@ msgstr ""
 msgid "Agents"
 msgstr ""
 
-#: prewikka/views/__init__.py:50 prewikka/templates/SensorListing.py:268
+#: prewikka/views/__init__.py:49 prewikka/templates/SensorListing.py:268
 msgid "Heartbeats"
 msgstr ""
 
-#: prewikka/views/__init__.py:52
+#: prewikka/views/__init__.py:51
 msgid "Settings"
 msgstr ""
 
-#: prewikka/views/__init__.py:52
+#: prewikka/views/__init__.py:51
 msgid "Users"
 msgstr ""
 
-#: prewikka/views/__init__.py:55
+#: prewikka/views/__init__.py:54
 msgid "Filters"
 msgstr ""
 
-#: prewikka/views/__init__.py:57
+#: prewikka/views/__init__.py:56
 msgid "About"
 msgstr ""
 
