@@ -23,10 +23,7 @@ import sys, os
 import copy
 import cgi
 
-import gettext
-from prewikka import siteconfig
-gettext.install("prewikka", siteconfig.locale_dir)
-
+from prewikka import locale
 from prewikka import Core, Request, Error
 
 

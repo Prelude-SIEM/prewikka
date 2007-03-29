@@ -31,13 +31,8 @@ import getopt
 
 import SocketServer
 import BaseHTTPServer
-
-import gettext
-from prewikka import siteconfig
-
-gettext.install("prewikka", siteconfig.locale_dir)
-
-from prewikka import Core, Request
+from prewikka import locale
+from prewikka import Core, Request, siteconfig
 
 
 class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
