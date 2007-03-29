@@ -210,7 +210,7 @@ class AlertListingParameters(MessageListingParameters):
             user.delConfigValueMatch(view_name, "%s_operator_%%" % (column))
             user.delConfigValueMatch(view_name, "%s_value_%%" % (column))
 
-            for num, obj, value in sorted:
+            for num, obj, operator, value in sorted:
                 user.setConfigValue(view_name, "%s_object_%d" % (column, num), obj)
                 user.setConfigValue(view_name, "%s_operator_%d" % (column, num), operator)
                 user.setConfigValue(view_name, "%s_value_%d" % (column, num), value)
