@@ -529,7 +529,7 @@ class ListedAlert(ListedMessage):
             params["classification_object_%d" % i] = "alert.messageid"
             params["classification_value_%d" % i] = alertident["alertident"]
 
-            criteria.append("(alert.messageid = '%s' && alert.analyzer.analyzerid = '%s')" % (alertident["alertident"], analyzerid))
+            criteria.append("(alert.messageid = '%s' && alert.analyzer.analyzerid = '%s')" % (utils.escape_criteria(alertident["alertident"]), utils.escape_criteria(analyzerid)))
         
         source = message["alert.source"]
         target = message["alert.target"]
@@ -871,7 +871,7 @@ class AlertListing(MessageListing, view.View):
             infos = message.setInfos(count, classification, severity, completion)
                     
             if count == 1:
-                ident = self.env.idmef_db.getAlertIdents("alert.messageid = %s" % messageid)[0]
+                ident = self.env.idmef_db.getAlertIdents("alert.messageid = '%s'" % utils.escape_criteria(messageid))[0]
                 if aggregated_count == 1:                            
                     message.reset()
                     message.setMessage(self._fetchMessage(ident), ident)
