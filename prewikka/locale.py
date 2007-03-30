@@ -19,28 +19,42 @@
 
 import siteconfig, gettext, __builtin__
 
+
 try: 
     import threading    
 
 except ImportError:
-    class dummy:
-        pass
-                        
-    _thread_specific_data = dummy()
+    _lock = None
+    currentThread = lambda: "none"
 
 else:
-    _thread_specific_data = threading.local()
+    _lock = threading.Lock()
+    currentThread = threading.currentThread
 
+
+_all_locale = { }
+_localized_thread = { }    
 
 
 def _safeGettext(s):
-    try:
-        return _thread_specific_data.translate.gettext(s)
-    except AttributeError:
+    if _localized_thread.has_key(currentThread()):
+        return _localized_thread[currentThread()].gettext(s)
+    else:
         return s
     
-def initLocale(lang):
-    _thread_specific_data.translate = gettext.translation("prewikka", siteconfig.locale_dir, languages=[lang])
 
-
+def setLocale(lang):
+    if _lock:
+        _lock.acquire()
+    
+    if not _all_locale.has_key(lang):
+        _all_locale[lang] = gettext.translation("prewikka", siteconfig.locale_dir, languages=[lang])
+            
+    if _lock:
+        _lock.release()
+            
+    _localized_thread[currentThread()] = _all_locale[lang]
+   
+        
+gettext.install("prewikka", siteconfig.locale_dir)
 __builtin__._ = _safeGettext
