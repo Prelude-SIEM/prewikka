@@ -419,16 +419,20 @@ class IDMEFDatabase:
         return Alert(preludedb_get_alert(self._db, ident), htmlsafe)
 
     def deleteAlert(self, identlst):
+        # we need to cast the value to list since we might get
+        # a DbResultIdent() class as input.
         preludedb_transaction_start(self._db)
-        preludedb_delete_alert_from_list(self._db, identlst)
+        preludedb_delete_alert_from_list(self._db, list(identlst))
         preludedb_transaction_end(self._db)
 
     def getHeartbeat(self, ident, htmlsafe=False):
         return Heartbeat(preludedb_get_heartbeat(self._db, ident), htmlsafe)
 
     def deleteHeartbeat(self, identlst):
+        # we need to cast the value to list since we might get
+        # a DbResultIdent() class as input.
         preludedb_transaction_start(self._db)
-        preludedb_delete_heartbeat_from_list(self._db, identlst)
+        preludedb_delete_heartbeat_from_list(self._db, list(identlst))
         preludedb_transaction_end(self._db)
 
     def _freeDbParams(self, selection=None, criteria=None):
