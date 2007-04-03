@@ -140,6 +140,11 @@ function aggregated_${category}_add_entry(path) {
 
         field = document.createElement("td")
         row.appendChild(field)
+        field = document.createElement("td")
+        row.appendChild(field)
+
+        field = document.createElement("td")
+        row.appendChild(field)
         select = document.createElement("select")
         field.appendChild(select)
 
@@ -300,27 +305,11 @@ function ${name}_add_entry(object, operator, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('classification');" href="#">$_("Classification")</a>
     <div id="classification">
-      <table style="width: 100%;"><tbody id="classification_table" style="width: 100%;"></tbody></table>
-      <script type="text/javascript">
-        #set $cnt = 0
-        #for $object, $operator, $value in $classification
-          classification_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
-          #set $cnt = $cnt + 1
-        #end for
-      </script>
-
-      <table style="width: 100%;"><tbody id="classification_aggregation_table"></tbody></table>
-      <script type="text/javascript">
-      #if len($aggregated_classification) == 0
-        aggregated_classification_add_entry("")
-      #else
-        #for $path in $aggregated_classification
-          aggregated_classification_add_entry('$path')
-        #end for
-      #end if
-      </script>
-
-      <table style="width: 100%;">
+     <table>
+      <tr><td><table class="inline_filter_content"><tbody id="classification_table"></tbody></table></td></tr>
+      <tr><td><table class="inline_filter_content"><tbody id="classification_aggregation_table"></tbody></table></td></tr>
+      <tr><td>
+      <table class="inline_filter_content">
       <tr>
        <th>Type:</th>
        <td>&nbsp;</td>
@@ -370,6 +359,24 @@ function ${name}_add_entry(object, operator, value, num) {
       
     </tr>
     </table>
+      </td></tr>
+     </table>
+
+      <script type="text/javascript">
+        #set $cnt = 0
+        #for $object, $operator, $value in $classification
+          classification_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
+          #set $cnt = $cnt + 1
+        #end for
+
+      #if len($aggregated_classification) == 0
+        aggregated_classification_add_entry("")
+      #else
+        #for $path in $aggregated_classification
+          aggregated_classification_add_entry('$path')
+        #end for
+      #end if
+      </script>
     </div>
 
     #if $classification_filtered
@@ -380,16 +387,18 @@ function ${name}_add_entry(object, operator, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('source');" href="#">$_("Source")</a>
     <div id="source">
-      <table style="width: 100%;"><tbody id="source_table"></tbody></table>
-      <script type="text/javascript">
+     <table>
+      <tr><td><table class="inline_filter_content"><tbody id="source_table"></tbody></table></td></tr>
+      <tr><td><table class="inline_filter_content"><tbody id="source_aggregation_table"></tbody></table></td></tr>
+     </table>
+     
+     <script type="text/javascript">
         #set $cnt = 0
         #for $object, $operator, $value in $source
           source_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
 	  #set $cnt += 1
         #end for
-      </script>
-      <table style="width: 100%;"><tbody id="source_aggregation_table"></tbody></table>
-      <script type="text/javascript">
+
       #if len($aggregated_source) == 0
         aggregated_source_add_entry("")
       #else
@@ -397,7 +406,7 @@ function ${name}_add_entry(object, operator, value, num) {
           aggregated_source_add_entry('$path')
         #end for
       #end if
-      </script>
+     </script>
     </div>
     #if $source_filtered
       <span class="filter_enabled_marker">*</span>
@@ -407,16 +416,17 @@ function ${name}_add_entry(object, operator, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('target');" href="#">$_("Target")</a>
     <div id="target">
-      <table style="width: 100%;"><tbody id="target_table"></tbody></table>
-      <script type="text/javascript">
+     <table>
+      <tr><td><table class="inline_filter_content"><tbody id="target_table"></tbody></table></td></tr>
+      <tr><td><table class="inline_filter_content"><tbody id="target_aggregation_table"></tbody></table></td></tr>
+     </table>
+     <script type="text/javascript">
         #set $cnt = 0
         #for $object, $operator, $value in $target
           target_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
           #set $cnt = $cnt + 1
         #end for
-      </script>
-      <table style="width: 100%;"><tbody id="target_aggregation_table"></tbody></table>
-      <script type="text/javascript">
+
       #if len($aggregated_target) == 0
         aggregated_target_add_entry("")
       #else
@@ -424,7 +434,7 @@ function ${name}_add_entry(object, operator, value, num) {
           aggregated_target_add_entry('$path')
         #end for
       #end if
-      </script>
+     </script>
     </div>
     #if $target_filtered
       <span class="filter_enabled_marker">*</span>
@@ -434,16 +444,18 @@ function ${name}_add_entry(object, operator, value, num) {
   <td class="filter_popup">
     <a onclick="javascript:toggleFilteredColumnVisibility('analyzer');" href="#">$_("Sensor")</a>
     <div id="analyzer">
-    <table style="width: 100%;"><tbody id="analyzer_table"></tbody></table>
-        <script  type="text/javascript">
-          #set $cnt = 0
-          #for $object, $operator, $value in $analyzer
-            analyzer_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
-            #set $cnt = $cnt + 1
-          #end for
-        </script>
-      <table style="width: 100%;"><tbody id="analyzer_aggregation_table"></tbody></table>
-      <script type="text/javascript">
+     <table>
+      <tr><td><table class="inline_filter_content"><tbody id="analyzer_table"></tbody></table></td></tr>
+      <tr><td><table class="inline_filter_content"><tbody id="analyzer_aggregation_table"></tbody></table></td></tr>
+     </table>
+
+     <script  type="text/javascript">
+      #set $cnt = 0
+      #for $object, $operator, $value in $analyzer
+       analyzer_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
+       #set $cnt = $cnt + 1
+      #end for
+
       #if len($aggregated_analyzer) == 0
         aggregated_analyzer_add_entry("")
       #else
@@ -451,7 +463,7 @@ function ${name}_add_entry(object, operator, value, num) {
           aggregated_analyzer_add_entry('$path')
         #end for
       #end if
-      </script>
+     </script>
     </div>
     #if $analyzer_filtered
       <span class="filter_enabled_marker">*</span>

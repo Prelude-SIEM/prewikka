@@ -777,7 +777,6 @@ p {
 .filter_popup div {
 	display: none;
 	margin-top: 15px;
-/*	width: 360px; */
 	padding: 3px;
         border: dotted black;
         border-width: 1px 1px 1px 1px;
@@ -860,42 +859,37 @@ p {
 .fieldset_heading h2 { font-weight: normal; font-size: 150%; margin-bottom: 1em }
 .fieldset_heading .date { color: #996; font-size: 130%; float: right; position: relative }  
  
-#classification table, #source table, #target table, #analyzer table { 
-	border-collapse: collapse; width: 360px; 
-}
- 	
 
-#classification { width: 450px; }
-#source, #target { width: 445px; }
+#classification { }
 #target { margin-left: -100px; }
-#analyzer { width: 445px; margin-left: -222px; }
+#analyzer { margin-left: -222px; }
 
-#classification td, #source td, #target td, #analyzer td {
-	text-align: right; font-size: 8px; padding: .5em 1em; border-bottom: 1px dashed white;
+
+.inline_filter_content td {
+        width: 100%;
+        text-align: right; 
+        font-size: 8px; 
+        padding: .5em 1em; 
+        border-bottom: 1px dashed white;
 }
 
-#classification th, #source th, #target th, #analyzer th {
-	font-size: 10px; color: #950; font-weight: normal; text-align: left; border-bottom: 1px dashed white;
+.inline_filter_content th {
+        font-size: 10px; 
+        color: #950; 
+        font-weight: normal; 
+        text-align: left; 
+        border-bottom: 1px dashed white;
 }
 
 .fieldset_heading table, #classification table, #source table, #target table, #analyzer table { 
-	border-collapse: collapse; width: 100%; 
+	border-collapse: collapse;
 }
 
-.fieldset_heading tr, #classification tr, #source tr, #target tr, #analyzer tr { border-bottom: 1px dashed white; }  
+.fieldset_heading tr { border-bottom: 1px dashed white; }  
 .fieldset_heading .nodash { border-bottom: 0px; }  
 
 .fieldset_heading td, .fieldset_heading th { font-size: 9px; padding: .5em 1em; vertical-align: top; border-bottom: 1px dashed white; }
 .fieldset_heading th { color: #950; font-weight: normal; text-align: left; }
-
-
-#classification td, #source td, #target td, #analyzer td { 
-	text-align: right; font-size: 8px; padding: .5em 1em; border-bottom: 1px dashed white;
-}
-
-#classification th, #source th, #target th, #analyzer th { 
-	font-size: 10px; color: #950; font-weight: normal; text-align: left; border-bottom: 1px dashed white;
-}  
 
 .fieldset_heading hr { color: #999999; background: #999999; border: 0; height: 1px; }
 
