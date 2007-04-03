@@ -881,8 +881,13 @@ p {
         border-bottom: 1px dashed white;
 }
 
-.fieldset_heading table, #classification table, #source table, #target table, #analyzer table { 
+#classification table, #source table, #target table, #analyzer table { 
 	border-collapse: collapse;
+}
+
+.fieldset_heading table {
+	border-collapse: collapse;
+	width: 100%;
 }
 
 .fieldset_heading tr { border-bottom: 1px dashed white; }  
