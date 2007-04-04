@@ -53,7 +53,6 @@ class Parameters(dict):
         self.optional("_error_back", str)
         self.optional("_error_retry", str)
         self.optional("_save", str)
-        self.optional("_load", str)
         
     def register(self):
         pass
@@ -64,10 +63,12 @@ class Parameters(dict):
     def optional(self, name, type, default=None, save=False):
         self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
-    def normalize(self, view, user):                
+    def normalize(self, view, user):          
         if len(self) == 0:
             # Load settings from database
-            self["_load"] = True
+            do_load = True
+        else:
+            do_load = False
             
         for name, value in self.items():
             try:
@@ -107,7 +108,7 @@ class Parameters(dict):
             elif self._parameters[name]["default"] != None:
                 self[name] = self._parameters[name]["default"]
 
-            if self._parameters[name]["save"] and self.has_key("_load"):
+            if self._parameters[name]["save"] and do_load:
                 try:
                     value = user.getConfigValue(view, name)
                     
@@ -120,6 +121,9 @@ class Parameters(dict):
                 except KeyError:
                     pass
         
+        try: self.pop("_save")
+        except: pass
+
     def __add__(self, src):
         dst = copy(self)
         dst.update(src)

@@ -170,7 +170,7 @@ class AlertListingParameters(MessageListingParameters):
         if not operator in ("=", "<", ">", "<=", ">=", "~", "~*", "<>", "<>*"):
             raise view.InvalidParameterValueError("operator", operator)
     
-    def _loadColumnParam(self, view_name, user, paramlist, column):
+    def _loadColumnParam(self, view_name, user, paramlist, column, do_save):
         ret = False
         sorted = [ ]
 
@@ -205,7 +205,7 @@ class AlertListingParameters(MessageListingParameters):
         self[column] = [ (i[1], i[2], i[3]) for i in sorted ]
         
         
-        if self.has_key("_save"):
+        if do_save:
             user.delConfigValueMatch(view_name, "%s_object_%%" % (column))
             user.delConfigValueMatch(view_name, "%s_operator_%%" % (column))
             user.delConfigValueMatch(view_name, "%s_value_%%" % (column))
@@ -219,6 +219,12 @@ class AlertListingParameters(MessageListingParameters):
     
         
     def normalize(self, view_name, user):
+        do_save = self.has_key("_save")
+        if len(self) == 0:
+            do_load = True
+        else:
+            do_load = False
+            
         MessageListingParameters.normalize(self, view_name, user)
 
         for severity in self["alert.assessment.impact.severity"]:
@@ -239,14 +245,14 @@ class AlertListingParameters(MessageListingParameters):
                 
         load_saved = True
         for column in "classification", "source", "target", "analyzer":
-            ret = self._loadColumnParam(view_name, user, self, column)
+            ret = self._loadColumnParam(view_name, user, self, column, do_save)
             if ret:
                 load_saved = False
         
-        if load_saved and self.has_key("_load") and user.configuration.has_key(view_name):
+        if load_saved and do_load and user.configuration.has_key(view_name):
             for column in "classification", "source", "target", "analyzer":
-                self._loadColumnParam(view_name, user, user.configuration[view_name], column)
-            
+                self._loadColumnParam(view_name, user, user.configuration[view_name], column, do_save)
+                    
         for category in "classification", "source", "target", "analyzer":
             i = 0
             for path in self["aggregated_%s" % category]:
@@ -544,7 +550,7 @@ class ListedAlert(ListedMessage):
         tmp -= [ "timeline_unit", "timeline_value", "offset",
                  "aggregated_classification", "aggregated_source",
                  "aggregated_target", "aggregated_analyzer", "alert.type", "alert.assessment.impact.severity",
-                 "alert.assessment.impact.completion", "_load", "_save" ]
+                 "alert.assessment.impact.completion" ]
 
         tmp["aggregated_target"] = tmp["aggregated_source"] = \
         tmp["aggregated_classification"] = tmp["aggregated_analyzer"] = "none"
@@ -895,7 +901,7 @@ class AlertListing(MessageListing, view.View):
                         
                 infos["display"] = utils.create_link(self.view_name, self.parameters -
                                                      [ "offset", "aggregated_classification",
-                                                       "aggregated_source", "aggregated_target", "aggregated_analyzer", "_load", "_save" ] +
+                                                       "aggregated_source", "aggregated_target", "aggregated_analyzer" ] +
                                                      parameters + entry_param)
                                                          
                                                                            
@@ -1074,7 +1080,8 @@ class AlertListing(MessageListing, view.View):
         
         if self.parameters.has_key("filter"):
             filter = self.env.db.getAlertFilter(self.user.login, self.parameters["filter"])
-            criteria.append("(%s)" % str(filter))
+            if filter:
+                criteria.append("(%s)" % str(filter))
 
         start = end = None
         if self.parameters.has_key("timeline_unit") and self.parameters["timeline_unit"] != "unlimited":

@@ -54,7 +54,7 @@ class DatabaseInvalidFilterError(_DatabaseInvalidError):
 
 
 class Database:
-    required_version = "0.9.1"
+    required_version = "0.9.9"
     
     # We reference preludedb_sql_destroy since it might be deleted
     # prior Database.__del__() is called.
@@ -260,6 +260,9 @@ class Database:
     def getAlertFilter(self, login, name):
         rows = self.query("SELECT id, comment, formula FROM Prewikka_Filter WHERE login = %s AND name = %s" %
                           (self.escape(login), self.escape(name)))
+        if len(rows) == 0:
+            return None
+            
         id, comment, formula = rows[0]
         elements = { }
         for element_name, path, operator, value in \

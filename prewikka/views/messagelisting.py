@@ -115,19 +115,17 @@ class MessageListingParameters(view.Parameters):
         self.optional("y", int)
         
     def normalize(self, view_name, user):
-        if len(self) == 0 or self.has_key("_load"):
-            self["_load"] = True
-            
-            filter_set = self.has_key("filter")
-            if not filter_set and self.has_key("timeline_value"):
-                user.delConfigValue(view_name, "filter")
-
+        do_save = self.has_key("_save")
+        
         # Filter out invalid limit which would trigger an exception.
         if self.has_key("limit") and int(self["limit"]) <= 0:
             self.pop("limit")
             
         view.Parameters.normalize(self, view_name, user)
-        
+ 
+        if not self.has_key("filter") and do_save:
+            user.delConfigValue(view_name, "filter")
+
         if self.has_key("timeline_value") ^ self.has_key("timeline_unit"):
             raise view.MissingParameterError(self.has_key("timeline_value") and "timeline_value" or "timeline_unit")
             
@@ -162,7 +160,7 @@ class ListedMessage(dict):
         else:
             extra = { object: value }
 
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters - ["_load", "_save"] + extra) }
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
 
     def createTimeField(self, t, timezone=None):
         if t:
@@ -213,9 +211,6 @@ class MessageListing:
         self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
         if self.parameters.has_key("timeline_end"):
             self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
-
-        if self.parameters.has_key("_load"):
-            self.dataset["hidden_parameters"].append(("_load", "True"))
 
     def _setTimelineNext(self, next):
         parameters = self.parameters - [ "offset" ] + { "timeline_end": int(next) }
