@@ -650,12 +650,10 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         if not ca:
             return
 
-	if ca["name"]:
-	    reason = ": %s" % ca["name"]
-	else:
-	    reason = ""
-            
-        self.beginSection("Correlation Alert%s" % reason)
+        self.beginSection("Correlation Alert")
+	self.beginTable()
+	self.newTableEntry("Name", ca["alert.correlation_alert.name"])
+	self.endTable()
 	
 	self.beginTable()
 	self.newTableCol(0, "Correlated Alert", header=True)
