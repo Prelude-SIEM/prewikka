@@ -1,20 +1,22 @@
+* 2007-04-05, prewikka-0.9.10:
 
         - Don't show all source and target when they reach a predefined limit, instead 
           provide an expansion link.
         
-        - Add two new events view: CorrelationAlert and ToolAlert.
+        - Add two new view in the Events section: CorrelationAlert and ToolAlert.
         
         - Ability to filter and aggregate on all IDMEF path. If the filtered path is 
           an enumeration, automatically provide the list of possible value. 
           
         - Add a combo box for the user to choose which criteria operator to use. 
         
-        - Provide an enumeration filter for the type of alert.
+        - Provide an enumeration filter for the type of alert (Alert, CorrelationAlert, 
+          ToolAlert, OverflowAlert).
         
-        - Provide the ability to do analyzer aggregation. 
+        - Prewikka can now aggregate by analyzer.
         
-        - When a session expire, the user is now redirected to the page he attempted to
-          access when the view expired.
+        - When a session expire and the user login, the user is redirected to the page 
+          he attempted to access when the session expired.
           
         - When an error occur, the default Prewikka layout is now preserved.
         
@@ -27,6 +29,9 @@
         - Avoid iterating the list of database result more than needed.
         
         - Support IDMEF Action, SNMPService, and WebService class.
+        
+        - Improved support for small screen resolution.
+        
         
 
 * 2007-02-06, prewikka-0.9.9:
