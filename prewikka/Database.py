@@ -54,7 +54,7 @@ class DatabaseInvalidFilterError(_DatabaseInvalidError):
 
 
 class Database:
-    required_version = "0.9.9"
+    required_version = "0.9.1"
     
     # We reference preludedb_sql_destroy since it might be deleted
     # prior Database.__del__() is called.
