@@ -121,7 +121,7 @@ class MessageListingParameters(view.Parameters):
         if self.has_key("limit") and int(self["limit"]) <= 0:
             self.pop("limit")
             
-        view.Parameters.normalize(self, view_name, user)
+        do_load = view.Parameters.normalize(self, view_name, user)
  
         if not self.has_key("filter") and do_save:
             user.delConfigValue(view_name, "filter")
@@ -139,6 +139,7 @@ class MessageListingParameters(view.Parameters):
         except KeyError:
             pass
         
+        return do_load
 
 
 class ListedMessage(dict):

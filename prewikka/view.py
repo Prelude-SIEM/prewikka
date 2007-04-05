@@ -63,13 +63,9 @@ class Parameters(dict):
     def optional(self, name, type, default=None, save=False):
         self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
-    def normalize(self, view, user):          
-        if len(self) == 0:
-            # Load settings from database
-            do_load = True
-        else:
-            do_load = False
-            
+    def normalize(self, view, user):
+        do_load = True
+        
         for name, value in self.items():
             try:
                 parameter_type = self._parameters[name]["type"]
@@ -79,6 +75,8 @@ class Parameters(dict):
                 
                 raise InvalidParameterError(name)
                 
+            if not self._parameters.has_key(name) or self._parameters[name]["mandatory"] is not True:
+                do_load = False
                 
             if parameter_type is list and not type(value) is list:
                 value = [ value ]
@@ -123,6 +121,8 @@ class Parameters(dict):
         
         try: self.pop("_save")
         except: pass
+        
+        return do_load
 
     def __add__(self, src):
         dst = copy(self)

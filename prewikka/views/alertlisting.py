@@ -220,12 +220,7 @@ class AlertListingParameters(MessageListingParameters):
         
     def normalize(self, view_name, user):
         do_save = self.has_key("_save")
-        if len(self) == 0:
-            do_load = True
-        else:
-            do_load = False
-            
-        MessageListingParameters.normalize(self, view_name, user)
+        do_load = MessageListingParameters.normalize(self, view_name, user)
 
         for severity in self["alert.assessment.impact.severity"]:
             if not severity in ("info", "low", "medium", "high", "none"):
