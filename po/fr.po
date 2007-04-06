@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-06 13:18+0200\n"
+"POT-Creation-Date: 2007-04-06 18:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Sebastien Tricaud <sebastien.tricaud@wengo.com>\n"
 "Language-Team: French\n"
@@ -58,6 +58,82 @@ msgstr "Normalisation des paramètres échouée"
 #, python-format
 msgid "Invalid filter element '%s' referenced from filter formula"
 msgstr "Element de filtre '%s'  référencé depuis la formule de filtre"
+
+#: prewikka/localization.py:86
+msgid "January"
+msgstr "Janvier"
+
+#: prewikka/localization.py:87
+msgid "February"
+msgstr "Fevrier"
+
+#: prewikka/localization.py:88
+msgid "March"
+msgstr "Mars"
+
+#: prewikka/localization.py:89
+msgid "April"
+msgstr "Avril"
+
+#: prewikka/localization.py:90
+msgid "May"
+msgstr "Mai"
+
+#: prewikka/localization.py:91
+msgid "June"
+msgstr "Juin"
+
+#: prewikka/localization.py:92
+msgid "July"
+msgstr "Juillet"
+
+#: prewikka/localization.py:93
+msgid "August"
+msgstr "Aout"
+
+#: prewikka/localization.py:94
+msgid "September"
+msgstr "Septembre"
+
+#: prewikka/localization.py:95
+msgid "November"
+msgstr "Novembre"
+
+#: prewikka/localization.py:96
+msgid "October"
+msgstr "Octobre"
+
+#: prewikka/localization.py:97
+msgid "December"
+msgstr "Decembre"
+
+#: prewikka/localization.py:99
+msgid "Monday"
+msgstr "Lundi"
+
+#: prewikka/localization.py:100
+msgid "Tuesday"
+msgstr "Mardi"
+
+#: prewikka/localization.py:101
+msgid "Wednesday"
+msgstr "Mercredi"
+
+#: prewikka/localization.py:102
+msgid "Thursday"
+msgstr "Jeudi"
+
+#: prewikka/localization.py:103
+msgid "Friday"
+msgstr "Vendredi"
+
+#: prewikka/localization.py:104
+msgid "Saturday"
+msgstr "Samedi"
+
+#: prewikka/localization.py:105
+msgid "Sunday"
+msgstr "Dimanche"
 
 #: prewikka/views/__init__.py:43
 msgid "Events"
@@ -319,7 +395,6 @@ msgid "Type"
 msgstr "Type"
 
 #: prewikka/templates/HeartbeatListing.py:193
-#, fuzzy
 msgid "Heartbeat summary"
 msgstr "Liste des pulsations"
 
@@ -334,6 +409,10 @@ msgstr "Filtrer sur l'adresse"
 #: prewikka/templates/ClassicLayout.py:223
 msgid "logout"
 msgstr "déconnexion"
+
+#: prewikka/templates/ClassicLayout.py:237
+msgid "on"
+msgstr "le"
 
 #: prewikka/templates/AlertListing.py:249
 msgid "Group entry by:"

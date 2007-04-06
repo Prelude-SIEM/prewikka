@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-06 13:18+0200\n"
+"POT-Creation-Date: 2007-04-06 18:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -57,6 +57,82 @@ msgstr ""
 #: prewikka/Filter.py:78
 #, python-format
 msgid "Invalid filter element '%s' referenced from filter formula"
+msgstr ""
+
+#: prewikka/localization.py:86
+msgid "January"
+msgstr ""
+
+#: prewikka/localization.py:87
+msgid "February"
+msgstr ""
+
+#: prewikka/localization.py:88
+msgid "March"
+msgstr ""
+
+#: prewikka/localization.py:89
+msgid "April"
+msgstr ""
+
+#: prewikka/localization.py:90
+msgid "May"
+msgstr ""
+
+#: prewikka/localization.py:91
+msgid "June"
+msgstr ""
+
+#: prewikka/localization.py:92
+msgid "July"
+msgstr ""
+
+#: prewikka/localization.py:93
+msgid "August"
+msgstr ""
+
+#: prewikka/localization.py:94
+msgid "September"
+msgstr ""
+
+#: prewikka/localization.py:95
+msgid "November"
+msgstr ""
+
+#: prewikka/localization.py:96
+msgid "October"
+msgstr ""
+
+#: prewikka/localization.py:97
+msgid "December"
+msgstr ""
+
+#: prewikka/localization.py:99
+msgid "Monday"
+msgstr ""
+
+#: prewikka/localization.py:100
+msgid "Tuesday"
+msgstr ""
+
+#: prewikka/localization.py:101
+msgid "Wednesday"
+msgstr ""
+
+#: prewikka/localization.py:102
+msgid "Thursday"
+msgstr ""
+
+#: prewikka/localization.py:103
+msgid "Friday"
+msgstr ""
+
+#: prewikka/localization.py:104
+msgid "Saturday"
+msgstr ""
+
+#: prewikka/localization.py:105
+msgid "Sunday"
 msgstr ""
 
 #: prewikka/views/__init__.py:43
@@ -329,6 +405,10 @@ msgstr ""
 
 #: prewikka/templates/ClassicLayout.py:223
 msgid "logout"
+msgstr ""
+
+#: prewikka/templates/ClassicLayout.py:237
+msgid "on"
 msgstr ""
 
 #: prewikka/templates/AlertListing.py:249
