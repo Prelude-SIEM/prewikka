@@ -39,6 +39,22 @@
    </tr>
 #end if
 
+   <tr>
+    <th style="vertical-align: middle;">$_("Language:")</th>
+    <td style="text-align:right; vertical-align: middle;">
+     <select name="language">
+#for $lang, $identifier in $available_languages
+#if $user.language == $identifier
+    #set $selected=" selected=true"
+#else
+    #set $selected=""
+#endif
+     <option value="$identifier"$selected>$lang</option>
+#end for
+     </select>
+    </td>
+   </tr>
+   
 
 #set $row_classes = ("table_row_even", "table_row_odd")
 

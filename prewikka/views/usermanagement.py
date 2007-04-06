@@ -24,7 +24,7 @@ import time
 import random
 import md5
 
-from prewikka import view, Log, DataSet, User, Auth
+from prewikka import view, Log, DataSet, User, Auth, locale
 import prewikka.Error
 from prewikka import utils
 
@@ -39,6 +39,7 @@ class UserSettingsModifyParameters(UserSettingsParameters):
     def register(self):
 
         UserSettingsParameters.register(self)
+        self.optional("language", str)
         self.optional("permissions", list, [])
         self.optional("password_current", str)
         self.optional("password_new", str)
@@ -131,6 +132,9 @@ class UserSettingsDisplay(view.View):
         if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):            
             raise prewikka.Error.PrewikkaUserError("Permission Denied", "Access denied to other users settings", log=Log.WARNING)
 
+        self.dataset["available_languages"] = locale.getLanguagesAndIdentifiers()
+        self.dataset["user.language"] = self.user.language
+
         self.dataset["ask_current_password"] = (login == self.user.login)
         self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
         self.dataset["can_change_password"] = self.env.auth.canSetPassword()
@@ -145,7 +149,7 @@ class UserSettingsDisplay(view.View):
 class UserSettingsModify(UserListing):
     view_name = "user_settings_modify"
     view_parameters = UserSettingsModifyParameters
-    view_permissions = [ User.PERM_USER_MANAGEMENT ]
+    view_permissions = [ ]
 
     def render(self):
         login = self.parameters.get("login", self.user.login)
@@ -157,7 +161,14 @@ class UserSettingsModify(UserListing):
             self.env.db.setPermissions(login, self.parameters["permissions"])
             if login == self.user.login:
                 self.user.permissions = self.parameters["permissions"]
-
+        
+        lang = self.parameters["language"]
+        if not lang in locale.getLanguagesIdentifiers():
+            raise prewikka.Error.PrewikkaUserError("Invalid Language", "Specified language does not exist", log=Log.WARNING)
+        
+        if lang != self.user.language:
+            self.user.setLanguage(lang)
+                    
         if self.parameters.has_key("password_new") and self.parameters.has_key("password_new_confirmation"):
             if self.parameters.has_key("password_current"):
                 try:

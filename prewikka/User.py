@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import Error, Log
+from prewikka import Error, Log, locale
 
 
 PERM_IDMEF_VIEW = "IDMEF_VIEW"
@@ -43,11 +43,21 @@ class PermissionDeniedError(Error.PrewikkaUserError):
                                          
                                          
 class User:
-    def __init__(self, db, login, permissions, configuration):
+    def __init__(self, db, login, language, permissions, configuration):
         self._db = db
         self.login = login
         self.permissions = permissions
         self.configuration = configuration    
+        if language:
+            locale.setLocale(language)
+            self.setLanguage(language)
+        else:
+            self.language = None
+            
+    def setLanguage(self, lang):
+        self.language = lang
+        locale.setLocale(lang)
+        self._db.setLanguage(self.login, lang)
         
     def delConfigValue(self, view, key=None):
         login = self._db.escape(self.login)

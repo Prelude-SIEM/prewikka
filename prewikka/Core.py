@@ -22,7 +22,7 @@ import preludedb, CheetahFilters
 
 import prewikka.views
 from prewikka import view, Config, Log, Database, IDMEFDatabase, \
-     User, Auth, DataSet, Error, utils, siteconfig
+     User, Auth, DataSet, Error, utils, siteconfig, locale
 
 
 class InvalidQueryError(Error.PrewikkaUserError):
@@ -42,6 +42,7 @@ class Logout(view.View):
 def init_dataset(dataset, config, request):
     interface = config.interface
     dataset["document.title"] = "[PREWIKKA]"
+    dataset["document.charset"] = locale.getCurrentCharset()
     dataset["document.css_files"] = [ "prewikka/css/style.css" ]
     dataset["document.js_files"] = [ "prewikka/js/functions.js" ]
     dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
@@ -325,5 +326,9 @@ class Core:
         #self._printDataSet(dataset)
         template = load_template(template_name, dataset)
 
+        # We check the character set after loading the template, 
+        # since the template might trigger a language change.
+        dataset["document.charset"] = locale.getCurrentCharset()
+        
         request.content = str(template)
         request.sendResponse()

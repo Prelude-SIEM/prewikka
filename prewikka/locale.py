@@ -32,13 +32,17 @@ else:
     currentThread = threading.currentThread
 
 
-_all_locale = { }
-_localized_thread = { }    
+_DEFAULT_LANGUAGE = "en"
+_LANGUAGES = { "English": "en", "French": "fr" }
+
+_localized_thread = { }
+_all_locale = { _DEFAULT_LANGUAGE: None }
 
 
 def _safeGettext(s):
-    if _localized_thread.has_key(currentThread()):
-        return _localized_thread[currentThread()].gettext(s)
+    tid = currentThread()
+    if _localized_thread.has_key(tid) and _localized_thread[tid] != None:
+        return _localized_thread[tid].gettext(s)
     else:
         return s
     
@@ -49,12 +53,35 @@ def setLocale(lang):
     
     if not _all_locale.has_key(lang):
         _all_locale[lang] = gettext.translation("prewikka", siteconfig.locale_dir, languages=[lang])
-            
+        
     if _lock:
         _lock.release()
             
     _localized_thread[currentThread()] = _all_locale[lang]
-   
+
+
+def getLanguages():
+    return _LANGUAGES.keys()   
+        
+
+def getLanguagesIdentifiers():
+    return _LANGUAGES.values()
+
+
+def getLanguagesAndIdentifiers():
+    return _LANGUAGES.items()
+
+
+def getCurrentCharset():
+    tid = currentThread()
+    
+    if _localized_thread.has_key(tid) and _localized_thread[tid] != None:
+        return _localized_thread[currentThread()].charset()
+    else:
+        return "iso-8859-1"
+
         
 gettext.install("prewikka", siteconfig.locale_dir)
 __builtin__._ = _safeGettext
+
+

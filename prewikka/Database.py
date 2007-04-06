@@ -54,7 +54,7 @@ class DatabaseInvalidFilterError(_DatabaseInvalidError):
 
 
 class Database:
-    required_version = "0.9.1"
+    required_version = "0.9.11"
     
     # We reference preludedb_sql_destroy since it might be deleted
     # prior Database.__del__() is called.
@@ -191,7 +191,7 @@ class Database:
         return map(lambda r: r[0], self.query("SELECT login FROM Prewikka_User"))
         
     def getUser(self, login):
-        return User.User(self, login, self.getPermissions(login), self.getConfiguration(login))
+        return User.User(self, login, self.getLanguage(login), self.getPermissions(login), self.getConfiguration(login))
 
     def setPassword(self, login, password):
         self.query("UPDATE Prewikka_User SET password=%s WHERE login = %s" % (self.escape(password), self.escape(login)))
@@ -206,6 +206,13 @@ class Database:
     def hasPassword(self, login):
         return bool(self.query("SELECT password FROM Prewikka_User WHERE login = %s AND password IS NOT NULL" % self.escape(login)))
 
+    def setLanguage(self, login, lang):
+        self.query("UPDATE Prewikka_User SET lang=%s WHERE login = %s" % (self.escape(lang), self.escape(login)))
+        
+    def getLanguage(self, login):
+        rows = self.query("SELECT lang FROM Prewikka_User WHERE login = %s" % (self.escape(login)))
+        return rows[0][0]
+        
     def setPermissions(self, login, permissions):
         self.transaction_start()
         self.query("DELETE FROM Prewikka_Permission WHERE login = %s" % self.escape(login))

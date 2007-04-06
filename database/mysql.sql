@@ -11,6 +11,7 @@ DROP TABLE IF EXISTS Prewikka_User;
 
 CREATE TABLE Prewikka_User (
 	login VARCHAR(32) NOT NULL PRIMARY KEY,
+	lang VARCHAR(32) NULL, 
 	password VARCHAR(32) NULL,
 	email VARCHAR(64) NULL
 );
