@@ -402,6 +402,11 @@ p {
 	max-width: 107px;
 }
 
+.timeline_value {
+        width: 28px;
+        max-width: 28px;
+}
+
 .timeline_unit_select {
 	width: 74px;
 	max-width: 74px;
