@@ -17,8 +17,8 @@
 # along with this program; see the file COPYING.  If not, write to
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
-import siteconfig, gettext, __builtin__
-
+import locale, gettext, __builtin__, time
+from prewikka import siteconfig
 
 try: 
     import threading    
@@ -58,6 +58,8 @@ def setLocale(lang):
         _lock.release()
             
     _localized_thread[currentThread()] = _all_locale[lang]
+    print getDate()
+    
 
 
 def getLanguages():
@@ -80,7 +82,32 @@ def getCurrentCharset():
     else:
         return "iso-8859-1"
 
-        
+def getDate():
+    _localized_month = [ _("January"), 
+                         _("February"), 
+                         _("March"), 
+                         _("April"), 
+                         _("May"), 
+                         _("June"), 
+                         _("July"), 
+                         _("August"), 
+                         _("September"),
+                         _("November"), 
+                         _("October"), 
+                         _("December") ]
+
+    _localized_weekday = [ _("Monday"),
+                           _("Tuesday"),
+                           _("Wednesday"),
+                           _("Thursday"),
+                           _("Friday"),
+                           _("Saturday"),
+                           _("Sunday") ]
+                                
+    weekday, day, month, year = time.strftime("%A %d %B %Y").split()
+    return " ".join((_(weekday).lower(), day, _(month).lower(), year))
+    
+          
 gettext.install("prewikka", siteconfig.locale_dir)
 __builtin__._ = _safeGettext
 
