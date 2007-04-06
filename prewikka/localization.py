@@ -58,8 +58,6 @@ def setLocale(lang):
         _lock.release()
             
     _localized_thread[currentThread()] = _all_locale[lang]
-    print getDate()
-    
 
 
 def getLanguages():
