@@ -31,7 +31,7 @@ import getopt
 
 import SocketServer
 import BaseHTTPServer
-from prewikka import locale
+from prewikka import localization
 from prewikka import Core, Request, siteconfig
 
 

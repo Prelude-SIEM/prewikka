@@ -24,7 +24,7 @@ import time
 import random
 import md5
 
-from prewikka import view, Log, DataSet, User, Auth, locale
+from prewikka import view, Log, DataSet, User, Auth
 import prewikka.Error
 from prewikka import utils
 

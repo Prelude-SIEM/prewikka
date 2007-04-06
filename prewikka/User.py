@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-from prewikka import Error, Log, locale
+from prewikka import Error, Log, localization
 
 
 PERM_IDMEF_VIEW = "IDMEF_VIEW"
@@ -49,14 +49,14 @@ class User:
         self.permissions = permissions
         self.configuration = configuration    
         if language:
-            locale.setLocale(language)
+            localization.setLocale(language)
             self.setLanguage(language)
         else:
             self.language = None
             
     def setLanguage(self, lang):
         self.language = lang
-        locale.setLocale(lang)
+        localization.setLocale(lang)
         self._db.setLanguage(self.login, lang)
         
     def delConfigValue(self, view, key=None):

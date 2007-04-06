@@ -23,8 +23,7 @@ import sys, os
 import copy
 import cgi
 
-from prewikka import locale
-from prewikka import Core, Request, Error
+from prewikka import Core, Request, Error, localization
 
 
 class CGIRequest(Request.Request):
