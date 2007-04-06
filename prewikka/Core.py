@@ -48,7 +48,7 @@ def init_dataset(dataset, config, request):
     dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
     dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
     dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
-    dataset["prewikka.date"] = time.strftime("%A %B %d %Y")
+    dataset["prewikka.date"] = localization.getDate()
 
     val = config.general.getOptionValue("external_link_new_window", "true")
     if (not val and config.general.has_key("external_link_new_window")) or (val == None or val.lower() in ["true", "yes"]):
