@@ -228,7 +228,7 @@ msgstr "Créer un utilisateur"
 
 #: prewikka/templates/MessageListing.py:282
 msgid "Step"
-msgstr ""
+msgstr "Étapes"
 
 #: prewikka/templates/MessageListing.py:293
 msgid "Minutes"
