@@ -50,7 +50,7 @@ agents_section = (_("Agents"), [(_("Agents"), ["sensor_listing", "sensor_message
 
 settings_section = (_("Settings"), [(_("Users"), ["user_listing", "user_add_form", "user_add", "user_delete",
                                          "user_password_change_form", "user_password_change", "user_settings_display",
-                                         "user_permissions_change_form", "user_permissions_change"]),
+                                         "user_settings_modify", "user_permissions_change_form", "user_permissions_change"]),
                                  (_("Filters"), ["filter_edition"])])
 
 about_section = (_("About"), [(_("About"), ["about"])])
