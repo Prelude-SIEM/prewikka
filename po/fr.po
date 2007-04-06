@@ -8,13 +8,27 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-29 10:08+0200\n"
+"POT-Creation-Date: 2007-04-06 13:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Sebastien Tricaud <sebastien.tricaud@wengo.com>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: prewikka/User.py:41
+msgid "Permission Denied"
+msgstr "Permission refusée"
+
+#: prewikka/User.py:42
+#, python-format
+msgid "Access to view '%s' forbidden"
+msgstr "Accès pour visualiser '%s' interdit"
+
+#: prewikka/Log.py:65
+#, python-format
+msgid "Unknown logtype specified: '%s'"
+msgstr "Type de log inconnu: '%s'"
 
 #: prewikka/Auth.py:32
 msgid "Authentication failed"
@@ -36,148 +50,84 @@ msgstr "Le login et le mot de passe ne correspondent pas"
 msgid "Logged out"
 msgstr "Session terminée"
 
-#: prewikka/Filter.py:78
-#, python-format
-msgid "Invalid filter element '%s' referenced from filter formula"
-msgstr "Element de filtre '%s'  référencé depuis la formule de filtre"
-
 #: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
 msgid "Parameters Normalization failed"
 msgstr "Normalisation des paramètres échouée"
 
-#: prewikka/User.py:41
-msgid "Permission Denied"
-msgstr "Permission refusée"
-
-#: prewikka/User.py:42
+#: prewikka/Filter.py:78
 #, python-format
-msgid "Access to view '%s' forbidden"
-msgstr "Accès pour visualiser '%s' interdit"
-
-#: prewikka/Log.py:65
-#, python-format
-msgid "Unknown logtype specified: '%s'"
-msgstr "Type de log inconnu: '%s'"
+msgid "Invalid filter element '%s' referenced from filter formula"
+msgstr "Element de filtre '%s'  référencé depuis la formule de filtre"
 
 #: prewikka/views/__init__.py:43
 msgid "Events"
 msgstr "Evénements"
 
 #: prewikka/views/__init__.py:43 prewikka/templates/SensorListing.py:263
-#, fuzzy
 msgid "Alerts"
-msgstr "Agents"
+msgstr "Alertes"
 
 #: prewikka/views/__init__.py:44
 msgid "CorrelationAlerts"
-msgstr "AlertesDeCorrelation"
+msgstr "Alertes de Correlation"
 
 #: prewikka/views/__init__.py:45
 msgid "ToolAlerts"
-msgstr "OutilsDAlertes"
+msgstr "Alertes d'Outils"
 
 #: prewikka/views/__init__.py:48
 msgid "Agents"
 msgstr "Agents"
 
-#: prewikka/views/__init__.py:50 prewikka/templates/SensorListing.py:268
+#: prewikka/views/__init__.py:49 prewikka/templates/SensorListing.py:268
 msgid "Heartbeats"
 msgstr "Pulsations"
 
-#: prewikka/views/__init__.py:52
+#: prewikka/views/__init__.py:51
 msgid "Settings"
 msgstr "Paramètres"
 
-#: prewikka/views/__init__.py:52
+#: prewikka/views/__init__.py:51
 msgid "Users"
 msgstr "Utilisateurs"
 
-#: prewikka/views/__init__.py:55
+#: prewikka/views/__init__.py:54
 msgid "Filters"
 msgstr "Filtres"
 
-#: prewikka/views/__init__.py:57
+#: prewikka/views/__init__.py:56
 msgid "About"
 msgstr "A propos"
 
+#: prewikka/modules/auth/cgi/cgi.py:29
+msgid "CGI Authentication failed: no user specified."
+msgstr "Authentification CGI échouée : aucun utilisateur spécifié."
+
+#: prewikka/templates/SensorListing.py:137
+msgid "Alert listing"
+msgstr "Liste d'alertes"
+
+#: prewikka/templates/SensorListing.py:145
+msgid "Heartbeat listing"
+msgstr "Liste des pulsations"
+
+#: prewikka/templates/SensorListing.py:153
+msgid "Heartbeat analysis"
+msgstr "Analyse des pulsations"
+
+#: prewikka/templates/SensorListing.py:217
+msgid "Address information"
+msgstr "Information d'adresse"
+
+#: prewikka/templates/SensorListing.py:250
+msgid "No agent available"
+msgstr "Pas d'agent disponible"
+
+#: prewikka/templates/SensorListing.py:273
 #: prewikka/templates/MessageListing.py:211
 #: prewikka/templates/FilterEdition.py:221
-#: prewikka/templates/SensorListing.py:273
 msgid "Delete"
 msgstr "Effacer"
-
-#: prewikka/templates/MessageListing.py:295
-msgid "Minutes"
-msgstr "Minutes"
-
-#: prewikka/templates/MessageListing.py:303
-msgid "Hours"
-msgstr "Heures"
-
-#: prewikka/templates/MessageListing.py:311
-msgid "Days"
-msgstr "Jours"
-
-#: prewikka/templates/MessageListing.py:319
-msgid "Months"
-msgstr "Mois"
-
-#: prewikka/templates/MessageListing.py:327
-#, fuzzy
-msgid "Years"
-msgstr "Utilisateurs"
-
-#: prewikka/templates/MessageListing.py:335
-msgid "Unlimited"
-msgstr "Illimité"
-
-#: prewikka/templates/MessageListing.py:352
-msgid "Frontend localtime"
-msgstr "Heure locale de Prewikka"
-
-#: prewikka/templates/MessageListing.py:360
-msgid "Sensor localtime"
-msgstr "Heure locale de la sonde"
-
-#: prewikka/templates/MessageListing.py:374
-msgid "Limit:"
-msgstr "Limite :"
-
-#: prewikka/templates/MessageListing.py:389
-msgid "Apply"
-msgstr "Appliquer"
-
-#: prewikka/templates/MessageListing.py:398
-#: prewikka/templates/FilterEdition.py:308
-msgid "Save"
-msgstr "Enregister"
-
-#: prewikka/templates/MessageListing.py:439
-#: prewikka/templates/MessageListing.py:446
-msgid "prev"
-msgstr "prec"
-
-#: prewikka/templates/MessageListing.py:457
-#: prewikka/templates/MessageListing.py:464
-msgid "current"
-msgstr "actuel"
-
-#: prewikka/templates/MessageListing.py:475
-#: prewikka/templates/MessageListing.py:482
-msgid "next"
-msgstr "suiv"
-
-#: prewikka/templates/MessageListing.py:528
-msgid "total"
-msgstr "total"
-
-#: prewikka/templates/UserListing.py:144
-msgid "Delete user"
-msgstr "Effacer utilisateur"
-
-#: prewikka/templates/UserListing.py:153
-msgid "Create user"
-msgstr "Créer un utilisateur"
 
 #: prewikka/templates/About.py:111
 msgid ""
@@ -232,9 +182,125 @@ msgstr ""
 msgid "Submit"
 msgstr "Valider"
 
-#: prewikka/templates/ClassicLayout.py:223
-msgid "logout"
-msgstr "déconnexion"
+#: prewikka/templates/UserSettings.py:112
+msgid "Account informations"
+msgstr "Informations du compte"
+
+#: prewikka/templates/UserSettings.py:122
+msgid "Login:"
+msgstr "Identifiant :"
+
+#: prewikka/templates/UserSettings.py:147
+msgid "Language:"
+msgstr "Langue :"
+
+#: prewikka/templates/UserSettings.py:178
+msgid "Permissions:"
+msgstr "Permissions :"
+
+#: prewikka/templates/UserSettings.py:254
+msgid "Change password"
+msgstr "Modifier le mot de passe"
+
+#: prewikka/templates/UserSettings.py:261
+msgid "Current password:"
+msgstr "Mot de passe actuel :"
+
+#: prewikka/templates/UserSettings.py:270
+msgid "New password:"
+msgstr "Nouveau mot de passe :"
+
+#: prewikka/templates/UserSettings.py:279
+msgid "Confirm new password:"
+msgstr "Confirmation du mot de passe :"
+
+#: prewikka/templates/UserSettings.py:291
+msgid "Submit Changes"
+msgstr "Soumettre les modifications"
+
+#: prewikka/templates/UserListing.py:144
+msgid "Delete user"
+msgstr "Effacer utilisateur"
+
+#: prewikka/templates/UserListing.py:153
+msgid "Create user"
+msgstr "Créer un utilisateur"
+
+#: prewikka/templates/MessageListing.py:282
+msgid "Step"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:293
+msgid "Minutes"
+msgstr "Minutes"
+
+#: prewikka/templates/MessageListing.py:301
+msgid "Hours"
+msgstr "Heures"
+
+#: prewikka/templates/MessageListing.py:309
+msgid "Days"
+msgstr "Jours"
+
+#: prewikka/templates/MessageListing.py:317
+msgid "Months"
+msgstr "Mois"
+
+#: prewikka/templates/MessageListing.py:325
+msgid "Years"
+msgstr "Années"
+
+#: prewikka/templates/MessageListing.py:333
+msgid "Unlimited"
+msgstr "Illimité"
+
+#: prewikka/templates/MessageListing.py:344
+msgid "Tz"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:355
+msgid "Frontend localtime"
+msgstr "Heure locale de Prewikka"
+
+#: prewikka/templates/MessageListing.py:363
+msgid "Sensor localtime"
+msgstr "Heure locale de la sonde"
+
+#: prewikka/templates/MessageListing.py:377
+msgid "Limit"
+msgstr "Limite"
+
+#: prewikka/templates/MessageListing.py:394
+msgid "Apply"
+msgstr "Appliquer"
+
+#: prewikka/templates/MessageListing.py:399
+#: prewikka/templates/FilterEdition.py:308
+msgid "Save"
+msgstr "Enregistrer"
+
+#: prewikka/templates/MessageListing.py:440
+#: prewikka/templates/MessageListing.py:447
+msgid "prev"
+msgstr "prec"
+
+#: prewikka/templates/MessageListing.py:458
+#: prewikka/templates/MessageListing.py:465
+msgid "current"
+msgstr "actuel"
+
+#: prewikka/templates/MessageListing.py:476
+#: prewikka/templates/MessageListing.py:483
+msgid "next"
+msgstr "suiv"
+
+#: prewikka/templates/MessageListing.py:529
+msgid "total"
+msgstr "total"
+
+#: prewikka/templates/FilterEdition.py:216
+msgid "Load"
+msgstr "Charger"
 
 #: prewikka/templates/HeartbeatListing.py:103
 msgid "Agent"
@@ -265,92 +331,34 @@ msgstr "Filtrer sur l'agent"
 msgid "Filter on address"
 msgstr "Filtrer sur l'adresse"
 
-#: prewikka/templates/UserSettings.py:112
-msgid "Account informations"
-msgstr "Informations du compte"
-
-#: prewikka/templates/UserSettings.py:122
-msgid "Login:"
-msgstr "Identifiant :"
-
-#: prewikka/templates/UserSettings.py:149
-msgid "Permissions:"
-msgstr "Permissions :"
-
-#: prewikka/templates/UserSettings.py:225
-msgid "Change password"
-msgstr "Modifier le mot de passe"
-
-#: prewikka/templates/UserSettings.py:232
-msgid "Current password:"
-msgstr "Mot de passe actuel :"
-
-#: prewikka/templates/UserSettings.py:241
-msgid "New password:"
-msgstr "Nouveau mot de passe :"
-
-#: prewikka/templates/UserSettings.py:250
-msgid "Confirm new password:"
-msgstr "Confirmation du mot de passe :"
-
-#: prewikka/templates/UserSettings.py:262
-msgid "Submit Changes"
-msgstr "Soumettre les modifications"
-
-#: prewikka/templates/FilterEdition.py:216
-msgid "Load"
-msgstr "Charger"
+#: prewikka/templates/ClassicLayout.py:223
+msgid "logout"
+msgstr "déconnexion"
 
 #: prewikka/templates/AlertListing.py:249
 msgid "Group entry by:"
 msgstr "Grouper les entrées par :"
 
-#: prewikka/templates/AlertListing.py:333
-#, fuzzy
+#: prewikka/templates/AlertListing.py:338
 msgid "Filter on:"
 msgstr "Filtrer sur :"
 
-#: prewikka/templates/AlertListing.py:505
+#: prewikka/templates/AlertListing.py:510
 msgid "Classification"
 msgstr "Classification"
 
-#: prewikka/templates/AlertListing.py:629
+#: prewikka/templates/AlertListing.py:635
 msgid "Source"
 msgstr "Source"
 
-#: prewikka/templates/AlertListing.py:673
+#: prewikka/templates/AlertListing.py:680
 msgid "Target"
 msgstr "Destination"
 
-#: prewikka/templates/AlertListing.py:717
+#: prewikka/templates/AlertListing.py:724
 msgid "Sensor"
 msgstr "Sonde"
 
-#: prewikka/templates/AlertListing.py:758
+#: prewikka/templates/AlertListing.py:766
 msgid "Time"
 msgstr "Temps"
-
-#: prewikka/templates/SensorListing.py:137
-#, fuzzy
-msgid "Alert listing"
-msgstr "Agents"
-
-#: prewikka/templates/SensorListing.py:145
-msgid "Heartbeat listing"
-msgstr "Liste des pulsations"
-
-#: prewikka/templates/SensorListing.py:153
-msgid "Heartbeat analysis"
-msgstr "Analyse des pulsations"
-
-#: prewikka/templates/SensorListing.py:217
-msgid "Address information"
-msgstr "Information d'adresse"
-
-#: prewikka/templates/SensorListing.py:250
-msgid "No agent available"
-msgstr "Pas d'agent disponible"
-
-#: prewikka/modules/auth/cgi/cgi.py:29
-msgid "CGI Authentication failed: no user specified."
-msgstr "Authentification CGI échouée : aucun utilisateur spécifié."

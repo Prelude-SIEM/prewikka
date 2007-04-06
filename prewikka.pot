@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-03-29 10:05+0200\n"
+"POT-Creation-Date: 2007-04-06 13:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -30,7 +30,7 @@ msgstr ""
 msgid "Unknown logtype specified: '%s'"
 msgstr ""
 
-#: prewikka/Auth.py:32 prewikka/locale.py:47
+#: prewikka/Auth.py:32
 msgid "Authentication failed"
 msgstr ""
 
@@ -187,27 +187,31 @@ msgstr ""
 msgid "Login:"
 msgstr ""
 
-#: prewikka/templates/UserSettings.py:149
+#: prewikka/templates/UserSettings.py:147
+msgid "Language:"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:178
 msgid "Permissions:"
 msgstr ""
 
-#: prewikka/templates/UserSettings.py:225
+#: prewikka/templates/UserSettings.py:254
 msgid "Change password"
 msgstr ""
 
-#: prewikka/templates/UserSettings.py:232
+#: prewikka/templates/UserSettings.py:261
 msgid "Current password:"
 msgstr ""
 
-#: prewikka/templates/UserSettings.py:241
+#: prewikka/templates/UserSettings.py:270
 msgid "New password:"
 msgstr ""
 
-#: prewikka/templates/UserSettings.py:250
+#: prewikka/templates/UserSettings.py:279
 msgid "Confirm new password:"
 msgstr ""
 
-#: prewikka/templates/UserSettings.py:262
+#: prewikka/templates/UserSettings.py:291
 msgid "Submit Changes"
 msgstr ""
 
@@ -219,67 +223,75 @@ msgstr ""
 msgid "Create user"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:295
+#: prewikka/templates/MessageListing.py:282
+msgid "Step"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:293
 msgid "Minutes"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:303
+#: prewikka/templates/MessageListing.py:301
 msgid "Hours"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:311
+#: prewikka/templates/MessageListing.py:309
 msgid "Days"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:319
+#: prewikka/templates/MessageListing.py:317
 msgid "Months"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:327
+#: prewikka/templates/MessageListing.py:325
 msgid "Years"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:335
+#: prewikka/templates/MessageListing.py:333
 msgid "Unlimited"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:352
+#: prewikka/templates/MessageListing.py:344
+msgid "Tz"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:355
 msgid "Frontend localtime"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:360
+#: prewikka/templates/MessageListing.py:363
 msgid "Sensor localtime"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:374
-msgid "Limit:"
+#: prewikka/templates/MessageListing.py:377
+msgid "Limit"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:389
+#: prewikka/templates/MessageListing.py:394
 msgid "Apply"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:398
+#: prewikka/templates/MessageListing.py:399
 #: prewikka/templates/FilterEdition.py:308
 msgid "Save"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:439
-#: prewikka/templates/MessageListing.py:446
+#: prewikka/templates/MessageListing.py:440
+#: prewikka/templates/MessageListing.py:447
 msgid "prev"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:457
-#: prewikka/templates/MessageListing.py:464
+#: prewikka/templates/MessageListing.py:458
+#: prewikka/templates/MessageListing.py:465
 msgid "current"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:475
-#: prewikka/templates/MessageListing.py:482
+#: prewikka/templates/MessageListing.py:476
+#: prewikka/templates/MessageListing.py:483
 msgid "next"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:528
+#: prewikka/templates/MessageListing.py:529
 msgid "total"
 msgstr ""
 
@@ -323,26 +335,26 @@ msgstr ""
 msgid "Group entry by:"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:333
+#: prewikka/templates/AlertListing.py:338
 msgid "Filter on:"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:505
+#: prewikka/templates/AlertListing.py:510
 msgid "Classification"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:629
+#: prewikka/templates/AlertListing.py:635
 msgid "Source"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:673
+#: prewikka/templates/AlertListing.py:680
 msgid "Target"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:717
+#: prewikka/templates/AlertListing.py:724
 msgid "Sensor"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:758
+#: prewikka/templates/AlertListing.py:766
 msgid "Time"
 msgstr ""
