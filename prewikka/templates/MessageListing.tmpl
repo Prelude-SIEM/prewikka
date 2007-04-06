@@ -64,12 +64,9 @@ $message_listing_header
   $timeline_extra_content
   
   <tr>
-   <td id="timeline_step_label">Step:</td>
-   <td id="timeline_step_value">
-    <input name="timeline_value" type="text" size="2" value="$timeline.value"/>
-   </td>
-
-   <td colspan=2 id="timeline_unit">
+   <td id="timeline_step_label">$_("Step"):</td>
+   <td colspan="3" id="timeline_unit">
+    <input class="timeline_value" name="timeline_value" type="text" size="2" value="$timeline.value"/>
     <select class="timeline_unit_select" name="timeline_unit">
      <option value="min" $timeline.min_selected>$_("Minutes")</option>
      <option value="hour" $timeline.hour_selected>$_("Hours")</option>
@@ -82,7 +79,7 @@ $message_listing_header
   </tr>
 
   <tr>
-    <td id="timezone_control_label">Tz:</td>
+    <td id="timezone_control_label">$_("Tz"):</td>
     <td colspan="3">
       <select class="timezone_control_select" name="timezone">
         <option value="frontend_localtime" $timeline.frontend_localtime_selected>$_("Frontend localtime")</option>
@@ -93,18 +90,17 @@ $message_listing_header
   </tr>
 	
   <tr>
-   <td id="timeline_limit_label">$_("Limit:")</td>
+   <td id="timeline_limit_label" colspan="2">$_("Limit"):</td>
 
-   <td>
+   <td colspan="2">
     <input style="display: inline;" id="timeline_limit_value" type="text" size="2" name="limit" value="$limit"/>
    </td>
+  </tr>
 
-   <td id="timeline_submit">
- 	<input style="display:inline;" type="submit" name="apply" value="$_("Apply")" />
-   </td>
-
-   <td id="timeline_submit">
-      <input style="display:inline;" type="submit" name="_save" value="$_("Save")" />
+  <tr>
+   <td colspan="4" style="text-align: center;">
+    <input style="text-align: center; display:inline;" type="submit" name="apply" value="$_("Apply")" />
+    <input style="text-align: center; display:inline;" type="submit" name="_save" value="$_("Save")" />
    </td>
   </tr>
 
