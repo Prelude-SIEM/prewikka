@@ -229,10 +229,10 @@ class Core:
                         first_tab = views[0]
                         section_to_tabs[section_name] = [ ]
                         
-                    section_to_tabs[section_name] += [ (tab_name, utils.create_link(views[0])) ]
+                    section_to_tabs[section_name] += [ (_(tab_name), utils.create_link(views[0])) ]
                         
             if first_tab:
-                dataset["interface.sections"].append( (section_name, utils.create_link(first_tab)) )
+                dataset["interface.sections"].append( (_(section_name), utils.create_link(first_tab)) )
     
  
         if isinstance(parameters, prewikka.view.RelativeViewParameters):
@@ -252,8 +252,8 @@ class Core:
 
         dataset["interface.tabs"] = tabs
         dataset["prewikka.user"] = user
-        dataset["interface.active_tab"] = active_tab
-        dataset["interface.active_section"] = active_section
+        dataset["interface.active_tab"] = _(active_tab)
+        dataset["interface.active_section"] = _(active_section)
         dataset["prewikka.logout_link"] = (user and self._env.auth.canLogout()) and utils.create_link("logout") or None
 
     def _printDataSet(self, dataset, level=0):
