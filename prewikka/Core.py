@@ -195,7 +195,6 @@ class Core:
         object.user = user
         object.dataset = DataSet.DataSet()
         object.env = self._env
-        self._setupDataSet(object.dataset, request, user, view, parameters)
 
         return object
     
@@ -299,11 +298,13 @@ class Core:
             self._checkPermissions(request, view, user)
             parameters = self._getParameters(request, view, user)
             view_object = self._setupView(view, request, parameters, user)
-
+            
             if not isinstance(view_object, Logout):
                 self._env.log.info("Loading view", request, user.login)
+            
             getattr(view_object, view["handler"])()
-
+            self._setupDataSet(view_object.dataset, request, user, view, parameters)
+            
             dataset = view_object.dataset
             template_name = view["template"]
 
