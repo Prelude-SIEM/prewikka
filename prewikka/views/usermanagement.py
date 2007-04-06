@@ -24,7 +24,7 @@ import time
 import random
 import md5
 
-from prewikka import view, Log, DataSet, User, Auth
+from prewikka import view, Log, DataSet, User, Auth, localization
 import prewikka.Error
 from prewikka import utils
 
@@ -132,7 +132,7 @@ class UserSettingsDisplay(view.View):
         if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):            
             raise prewikka.Error.PrewikkaUserError("Permission Denied", "Access denied to other users settings", log=Log.WARNING)
 
-        self.dataset["available_languages"] = locale.getLanguagesAndIdentifiers()
+        self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
         self.dataset["user.language"] = self.user.language
 
         self.dataset["ask_current_password"] = (login == self.user.login)
@@ -163,7 +163,7 @@ class UserSettingsModify(UserListing):
                 self.user.permissions = self.parameters["permissions"]
         
         lang = self.parameters["language"]
-        if not lang in locale.getLanguagesIdentifiers():
+        if not lang in localization.getLanguagesIdentifiers():
             raise prewikka.Error.PrewikkaUserError("Invalid Language", "Specified language does not exist", log=Log.WARNING)
         
         if lang != self.user.language:
