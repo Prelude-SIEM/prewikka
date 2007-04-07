@@ -343,6 +343,7 @@ p {
 	height: 163px;
 }
 
+
 .timeline_control_prev, .timeline_control_cur, .timeline_control_next {
         background: #E2EBF5;
         width: 53px;
@@ -380,7 +381,6 @@ p {
         font-weight: bold;
 }
 
-
 .popup_operator_select {
         width: 46px;
         max-width: 46px;
@@ -398,18 +398,15 @@ p {
 
 
 .filter_control_select, .timezone_control_select {
-	width: 107px;
-	max-width: 107px;
+	width: 100%;
 }
 
 .timeline_value {
-        width: 28px;
-        max-width: 28px;
+        width: 100%;
 }
 
 .timeline_unit_select {
-	width: 74px;
-	max-width: 74px;
+        width: 100%;
 }
 
 .timeline_range {
@@ -869,6 +866,10 @@ p {
 #target { margin-left: -100px; }
 #analyzer { margin-left: -222px; }
 
+
+.inline_filter_content {
+        width: 100%;
+}
 
 .inline_filter_content td {
         width: 100%;

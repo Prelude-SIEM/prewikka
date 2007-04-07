@@ -639,15 +639,15 @@ function ${name}_add_entry(object, operator, value, num) {
 #block timeline_extra_content
 #filter CleanOutput
 <tr>
-  <td id="filter_control_label">Filter: </td>
-  <td colspan="3">
-  <select name="filter" size="1" class="filter_control_select">
-  <option value="">&nbsp;</option>
+  <td id="filter_control_label">$_("Filter:")</td>
+  <td colspan="2">
+   <select name="filter" size="1" class="filter_control_select">
+    <option value="">&nbsp;</option>
   #for $fltr in $filters
     <option value="$fltr" #if $fltr == $current_filter# selected="selected" #end if#>$fltr</option>
   #end for
   </select>
-  </td>
+ </td>
 </tr>
 #end filter
 #filter Filter
