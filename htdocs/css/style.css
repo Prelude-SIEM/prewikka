@@ -343,6 +343,13 @@ p {
 	height: 163px;
 }
 
+#timeline th {
+        text-align: left;
+}
+
+table th {
+        white-space: nowrap;
+}
 
 .timeline_control_prev, .timeline_control_cur, .timeline_control_next {
         background: #E2EBF5;

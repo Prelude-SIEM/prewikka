@@ -38,10 +38,10 @@ function end(row) {
 function get_operator_option(select, operator)
 {
 #end filter
-#for $operator, $desc in (("=", "Equal"), ("<", "Lesser than"), 
-                          (">", "Greater than"), ("<=", "Lesser or equal"), 
-                          (">=", "Greater or equal"), ("<>", "Substring"), 
-			  ("<>*", "Substring (case-insensitive)"), ("~", "Regular expression"), ("~*", "Regular expression (case-insensitive)"))
+#for $operator, $desc in (("=", $_("Equal")), ("<", $_("Lesser than")), 
+                          (">", $_("Greater than")), ("<=", $_("Lesser or equal")), 
+                          (">=", $_("Greater or equal")), ("<>", $_("Substring")), 
+			  ("<>*", $_("Substring (case-insensitive)")), ("~", $_("Regular expression")), ("~*", $_("Regular expression (case-insensitive)")))
         option = document.createElement("option")
 
         option.setAttribute("value", '$operator')
@@ -311,7 +311,7 @@ function ${name}_add_entry(object, operator, value, num) {
       <tr><td>
       <table class="inline_filter_content">
       <tr>
-       <th>Type:</th>
+       <th>$_("Type:")</th>
        <td>&nbsp;</td>
       #if $correlation_alert_view
        #set $disabled="disabled=\"disabled\""
@@ -319,42 +319,42 @@ function ${name}_add_entry(object, operator, value, num) {
        #set $disabled=""
       #end if
       
-      #for name, path in (("Alert", "alert.create_time"), ("CorrelationAlert", "alert.correlation_alert.name"), 
-                          ("OverflowAlert", "alert.overflow_alert.program"), ("ToolAlert", "alert.tool_alert.name"))
+      #for name, path in (($N_("Alert"), "alert.create_time"), ($N_("CorrelationAlert"), "alert.correlation_alert.name"), 
+                          ($N_("OverflowAlert"), "alert.overflow_alert.program"), ($N_("ToolAlert"), "alert.tool_alert.name"))
         #if path in $alert.type
          #set $checked = "checked='checked'"
         #else
          #set $checked = ""
         #end if
         
-        <td>$name<input class="checkbox" $disabled type="checkbox" name="alert.type" value="$path" $checked /></td>
+        <td>$_($name)<input class="checkbox" $disabled type="checkbox" name="alert.type" value="$path" $checked /></td>
       #end for
       </tr>
 
 
       <tr>
-       <th>Severity:</th>
-      #for item in "info", "low", "medium", "high", "none"
-        #if item in $alert.assessment.impact.severity
+       <th>$_("Severity:")</th>
+      #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
+        #if $item in $alert.assessment.impact.severity
          #set $checked = "checked='checked'"
         #else
          #set $checked = ""
         #end if
-        <td>$item<input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="$item" $checked /></td>
+        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="$item" $checked /></td>
       #end for
       </tr>
 
       <tr>
-       <th>Completion:</th>  
+       <th>$_("Completion:")</th>  
        <td colspan="2">&nbsp;</td>
        
-      #for item in "succeeded", "failed", "none"
+      #for item in $N_("succeeded"), $N_("failed"), $N_("none")
         #if item in $alert.assessment.impact.completion
          #set $checked = "checked='checked'"
         #else
          #set $checked = ""
         #end if
-        <td>$item<input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="$item" $checked /></td>
+        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="$item" $checked /></td>
       #end for
       
     </tr>
@@ -639,7 +639,7 @@ function ${name}_add_entry(object, operator, value, num) {
 #block timeline_extra_content
 #filter CleanOutput
 <tr>
-  <td id="filter_control_label">$_("Filter:")</td>
+  <th id="filter_control_label">$_("Filter:")</td>
   <td colspan="2">
    <select name="filter" size="1" class="filter_control_select">
     <option value="">&nbsp;</option>

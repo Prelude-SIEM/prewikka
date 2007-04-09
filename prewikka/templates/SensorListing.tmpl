@@ -10,14 +10,14 @@
 <table>
   <thead>
     <tr>
-      <td>Name</td>
-      <td>Type</td>
-      <td>OS</td>
-      <td>Node Name</td>
-      <td>Node Location</td>
-      <td>Node Address</td>
-      <td>Last Heartbeat Time</td>
-      <td>Latest status</td>
+      <td>$_("Name")</td>
+      <td>$_("Type")</td>
+      <td>$_("OS")</td>
+      <td>$_("Node Name")</td>
+      <td>$_("Node Location")</td>
+      <td>$_("Node Address")</td>
+      <td>$_("Last Heartbeat Time")</td>
+      <td>$_("Latest status")</td>
     </tr>
   </thead>
   <tbody>
@@ -60,7 +60,7 @@
 	   <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$address.value</a><br />
            <span id="menu_$cnt" class="popup_menu">
 
-            - <a href="$address.inline_filter">Filter on address</a><br />
+            - <a href="$address.inline_filter">$_("Filter on address")</a><br />
             - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$_("Address information")</a><br />
      
 	    #for $name, $link in $address.host_commands
