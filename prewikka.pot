@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-09 18:50+0200\n"
+"POT-Creation-Date: 2007-04-09 19:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -79,79 +79,79 @@ msgstr ""
 msgid "Russian"
 msgstr ""
 
-#: prewikka/localization.py:96
+#: prewikka/localization.py:96 prewikka/localization.py:95
 msgid "January"
 msgstr ""
 
-#: prewikka/localization.py:97
+#: prewikka/localization.py:97 prewikka/localization.py:96
 msgid "February"
 msgstr ""
 
-#: prewikka/localization.py:98
+#: prewikka/localization.py:98 prewikka/localization.py:97
 msgid "March"
 msgstr ""
 
-#: prewikka/localization.py:99
+#: prewikka/localization.py:99 prewikka/localization.py:98
 msgid "April"
 msgstr ""
 
-#: prewikka/localization.py:100
+#: prewikka/localization.py:100 prewikka/localization.py:99
 msgid "May"
 msgstr ""
 
-#: prewikka/localization.py:101
+#: prewikka/localization.py:101 prewikka/localization.py:100
 msgid "June"
 msgstr ""
 
-#: prewikka/localization.py:102
+#: prewikka/localization.py:102 prewikka/localization.py:101
 msgid "July"
 msgstr ""
 
-#: prewikka/localization.py:103
+#: prewikka/localization.py:103 prewikka/localization.py:102
 msgid "August"
 msgstr ""
 
-#: prewikka/localization.py:104
+#: prewikka/localization.py:104 prewikka/localization.py:103
 msgid "September"
 msgstr ""
 
-#: prewikka/localization.py:105
+#: prewikka/localization.py:105 prewikka/localization.py:104
 msgid "November"
 msgstr ""
 
-#: prewikka/localization.py:106
+#: prewikka/localization.py:106 prewikka/localization.py:105
 msgid "October"
 msgstr ""
 
-#: prewikka/localization.py:107
+#: prewikka/localization.py:107 prewikka/localization.py:106
 msgid "December"
 msgstr ""
 
-#: prewikka/localization.py:109
+#: prewikka/localization.py:109 prewikka/localization.py:108
 msgid "Monday"
 msgstr ""
 
-#: prewikka/localization.py:110
+#: prewikka/localization.py:110 prewikka/localization.py:109
 msgid "Tuesday"
 msgstr ""
 
-#: prewikka/localization.py:111
+#: prewikka/localization.py:111 prewikka/localization.py:110
 msgid "Wednesday"
 msgstr ""
 
-#: prewikka/localization.py:112
+#: prewikka/localization.py:112 prewikka/localization.py:111
 msgid "Thursday"
 msgstr ""
 
-#: prewikka/localization.py:113
+#: prewikka/localization.py:113 prewikka/localization.py:112
 msgid "Friday"
 msgstr ""
 
-#: prewikka/localization.py:114
+#: prewikka/localization.py:114 prewikka/localization.py:113
 msgid "Saturday"
 msgstr ""
 
-#: prewikka/localization.py:115
+#: prewikka/localization.py:115 prewikka/localization.py:114
 msgid "Sunday"
 msgstr ""
 
@@ -272,7 +272,7 @@ msgid ""
 "and networks."
 msgstr ""
 
-#: prewikka/templates/About.py:131
+#: prewikka/templates/About.py:131 prewikka/templates/About.py:134
 msgid ""
 "In keeping with the Open Source spirit, we encourage you to participate in "
 "the development of your application. You can order customized versions of "
@@ -285,7 +285,7 @@ msgid ""
 "operating systems."
 msgstr ""
 
-#: prewikka/templates/About.py:142
+#: prewikka/templates/About.py:142 prewikka/templates/About.py:148
 msgid ""
 "PreludeIDS maintenance and support services guarantee optimal operation of "
 "the Prelude platform on your infrastructure. With our support services, you "
@@ -293,17 +293,17 @@ msgid ""
 "the maintenance service we offer maintains and updates your software."
 msgstr ""
 
-#: prewikka/templates/About.py:153
+#: prewikka/templates/About.py:153 prewikka/templates/About.py:162
 msgid "The Prelude framework is licensed under the"
 msgstr ""
 
-#: prewikka/templates/About.py:158
+#: prewikka/templates/About.py:158 prewikka/templates/About.py:167
 msgid ""
 "PreludeIDS provides specific commercial licenses to allow proprietary "
 "systems based on Prelude to be developed and to interoperate."
 msgstr ""
 
-#: prewikka/templates/About.py:169
+#: prewikka/templates/About.py:169 prewikka/templates/About.py:181
 msgid ""
 "Through our partners, you have access to an array of top-of-the-line "
 "security services. By advising you on how to secure your infrastructure, "
@@ -602,4 +602,24 @@ msgstr ""
 
 #: prewikka/templates/AlertListing.py:1186
 msgid "Filter:"
+msgstr ""
+
+#: prewikka/templates/About.py:129
+msgid "Customizing Prelude"
+msgstr ""
+
+#: prewikka/templates/About.py:143
+msgid "Software Maintenance and Technical Support"
+msgstr ""
+
+#: prewikka/templates/About.py:157
+msgid "Commercial licenses"
+msgstr ""
+
+#: prewikka/templates/About.py:176
+msgid "Advice, Deployment and Training"
+msgstr ""
+
+#: prewikka/templates/About.py:210
+msgid "Phone:"
 msgstr ""
