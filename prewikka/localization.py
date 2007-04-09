@@ -33,8 +33,6 @@ else:
 
 
 _DEFAULT_LANGUAGE = "en"
-_LANGUAGES = { "English": "en", "French": "fr" }
-
 _localized_thread = { }
 _all_locale = { _DEFAULT_LANGUAGE: None }
 
@@ -45,6 +43,19 @@ def _safeGettext(s):
         return _localized_thread[tid].gettext(s)
     else:
         return s
+
+def _deferredGettext(s):
+    return s
+    
+gettext.install("prewikka", siteconfig.locale_dir)
+__builtin__._ = _safeGettext
+__builtin__.N_ = _deferredGettext
+
+
+_LANGUAGES = { 
+               _("English"): "en", 
+               _("French"): "fr" 
+             }
     
 
 def setLocale(lang):
@@ -61,7 +72,7 @@ def setLocale(lang):
 
 
 def getLanguages():
-    return _LANGUAGES.keys()   
+    return [ _(x) for x in _LANGUAGES.keys() ]
         
 
 def getLanguagesIdentifiers():
@@ -69,7 +80,7 @@ def getLanguagesIdentifiers():
 
 
 def getLanguagesAndIdentifiers():
-    return _LANGUAGES.items()
+    return [ (_(x), y) for x, y in _LANGUAGES.items() ]
 
 
 def getCurrentCharset():
@@ -104,9 +115,5 @@ def getDate():
                                 
     weekday, day, month, year = time.strftime("%A %d %B %Y").split()
     return " ".join((_(weekday).lower(), day, _(month).lower(), year))
-    
-          
-gettext.install("prewikka", siteconfig.locale_dir)
-__builtin__._ = _safeGettext
 
 
