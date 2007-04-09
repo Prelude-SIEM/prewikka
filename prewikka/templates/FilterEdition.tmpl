@@ -93,7 +93,7 @@ function newFilterElement(name, object, operator, object_value) {
 <div id="fieldset_page" style="display: table-cell;">
 
 <fieldset class="fieldset_heading">
-<legend>Available filters</legend>
+<legend>$_("Available filters")</legend>
 <form action="?" method="post">
   <input type="hidden" name="view" value="filter_edition"/>
 
@@ -120,7 +120,7 @@ function newFilterElement(name, object, operator, object_value) {
 <input type="hidden" name="view" value="filter_edition"/>
 
 <fieldset>
-<legend>Edition</legend>
+<legend>$_("Edition")</legend>
 <table>
  <tfoot>
   <tr>
@@ -148,15 +148,15 @@ function newFilterElement(name, object, operator, object_value) {
 
 <table>
  <tr>
-  <th>Formula:</th>
+  <th>$_("Formula:")</th>
   <td><input style="width: 400px;" type="text" name="formula" value="$formula"/></td>
  </tr>
  <tr>
-  <th>name:</th>
+  <th>$("Name:")</th>
   <td><input style="width: 400px;" type="text" name="save_as" value="$fltr.name"/></td>
  </tr>
  <tr>
-  <th style="vertical-align: top;">comment:</th>
+  <th style="vertical-align: top;">$_("Comment:")</th>
   <td><textarea style="width: 400px;" name="filter_comment" rows="4" cols="55">$fltr.comment</textarea></td>
  </tr>
 </table>
