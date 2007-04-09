@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-09 19:15+0200\n"
+"POT-Creation-Date: 2007-04-09 19:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -408,34 +408,44 @@ msgid "Sensor localtime"
 msgstr ""
 
 #: prewikka/templates/MessageListing.py:381
+#: prewikka/templates/MessageListing.py:386
 msgid "Limit:"
 msgstr ""
 
 #: prewikka/templates/MessageListing.py:397
+#: prewikka/templates/MessageListing.py:402
 msgid "Apply"
 msgstr ""
 
 #: prewikka/templates/MessageListing.py:402
 #: prewikka/templates/FilterEdition.py:328
+#: prewikka/templates/MessageListing.py:407
 msgid "Save"
 msgstr ""
 
 #: prewikka/templates/MessageListing.py:442
 #: prewikka/templates/MessageListing.py:449
+#: prewikka/templates/MessageListing.py:447
+#: prewikka/templates/MessageListing.py:454
 msgid "prev"
 msgstr ""
 
 #: prewikka/templates/MessageListing.py:460
 #: prewikka/templates/MessageListing.py:467
+#: prewikka/templates/MessageListing.py:465
+#: prewikka/templates/MessageListing.py:472
 msgid "current"
 msgstr ""
 
 #: prewikka/templates/MessageListing.py:478
 #: prewikka/templates/MessageListing.py:485
+#: prewikka/templates/MessageListing.py:483
+#: prewikka/templates/MessageListing.py:490
 msgid "next"
 msgstr ""
 
 #: prewikka/templates/MessageListing.py:531
+#: prewikka/templates/MessageListing.py:536
 msgid "total"
 msgstr ""
 
@@ -622,4 +632,8 @@ msgstr ""
 
 #: prewikka/templates/About.py:210
 msgid "Phone:"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:375
+msgid "UTC"
 msgstr ""
