@@ -1,0 +1,424 @@
+# Brazilian Portuguese Translation for Prewikka
+# Copyright (C) 2007 PreludeIDS Technologies
+# This file is distributed under the same license as the prewikka package.
+# edeunix@edeunix.com, 2007.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Prewikka 0.99\n"
+"POT-Creation-Date: \n"
+"PO-Revision-Date: 2007-04-09 19:54-0300\n"
+"Last-Translator: Edelberto Franco Silva <edeunix@edeunix.com>\n"
+"Language-Team: Portuguese\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Poedit-Language: Portuguese\n"
+"X-Poedit-Country: BRAZIL\n"
+"X-Poedit-SourceCharset: utf-8\n"
+
+#: prewikka/User.py:41
+msgid "Permission Denied"
+msgstr "Permissão Negada"
+
+#: prewikka/User.py:42
+#, python-format
+msgid "Access to view '%s' forbidden"
+msgstr "A visualização de '%s' está proibida"
+
+#: prewikka/Log.py:65
+#, python-format
+msgid "Unknown logtype specified: '%s'"
+msgstr "Tipo de log especificado é desconhecido: '%s'"
+
+#: prewikka/Auth.py:32
+msgid "Authentication failed"
+msgstr "A auntenticação falhou"
+
+#: prewikka/Auth.py:38
+msgid "Session invalid"
+msgstr "Sessão inválida"
+
+#: prewikka/Auth.py:44
+msgid "Session expired"
+msgstr "Sessão expirada"
+
+#: prewikka/Auth.py:132
+msgid "Username and password do not match."
+msgstr "Usuário e senha não conferem"
+
+#: prewikka/Auth.py:145
+msgid "Logged out"
+msgstr "Deslogado"
+
+#: prewikka/view.py:29
+#: prewikka/view.py:35
+#: prewikka/view.py:41
+msgid "Parameters Normalization failed"
+msgstr "A normalização dos parâmetros falhou"
+
+#: prewikka/Filter.py:78
+#, python-format
+msgid "Invalid filter element '%s' referenced from filter formula"
+msgstr "Elemento de filtro '%s' inválido, referenciado pela fórmula do filtro"
+
+#: prewikka/localization.py:86
+msgid "January"
+msgstr "Janeiro"
+
+#: prewikka/localization.py:87
+msgid "February"
+msgstr "Fevereiro"
+
+#: prewikka/localization.py:88
+msgid "March"
+msgstr "Março"
+
+#: prewikka/localization.py:89
+msgid "April"
+msgstr "Abril"
+
+#: prewikka/localization.py:90
+msgid "May"
+msgstr "Maio"
+
+#: prewikka/localization.py:91
+msgid "June"
+msgstr "Junho"
+
+#: prewikka/localization.py:92
+msgid "July"
+msgstr "Julho"
+
+#: prewikka/localization.py:93
+msgid "August"
+msgstr "Agosto"
+
+#: prewikka/localization.py:94
+msgid "September"
+msgstr "Setembro"
+
+#: prewikka/localization.py:95
+msgid "November"
+msgstr "Novembro"
+
+#: prewikka/localization.py:96
+msgid "October"
+msgstr "Outubro"
+
+#: prewikka/localization.py:97
+msgid "December"
+msgstr "dezembro"
+
+#: prewikka/localization.py:99
+msgid "Monday"
+msgstr "Segunda-feira"
+
+#: prewikka/localization.py:100
+msgid "Tuesday"
+msgstr "Terça-feira"
+
+#: prewikka/localization.py:101
+msgid "Wednesday"
+msgstr "Quarta-feira"
+
+#: prewikka/localization.py:102
+msgid "Thursday"
+msgstr "Quinta-feira"
+
+#: prewikka/localization.py:103
+msgid "Friday"
+msgstr "Sexta"
+
+#: prewikka/localization.py:104
+msgid "Saturday"
+msgstr "Sábado"
+
+#: prewikka/localization.py:105
+msgid "Sunday"
+msgstr "Domingo"
+
+#: prewikka/views/__init__.py:43
+msgid "Events"
+msgstr "Eventos"
+
+#: prewikka/views/__init__.py:43
+#: prewikka/templates/SensorListing.py:263
+msgid "Alerts"
+msgstr "Alertas"
+
+#: prewikka/views/__init__.py:44
+msgid "CorrelationAlerts"
+msgstr "AlertasDeCorreção"
+
+#: prewikka/views/__init__.py:45
+msgid "ToolAlerts"
+msgstr "AlertasDasFerramentas"
+
+#: prewikka/views/__init__.py:48
+msgid "Agents"
+msgstr "Agentes"
+
+#: prewikka/views/__init__.py:49
+#: prewikka/templates/SensorListing.py:268
+msgid "Heartbeats"
+msgstr "Heartbeats"
+
+#: prewikka/views/__init__.py:51
+msgid "Settings"
+msgstr "Ajustes"
+
+#: prewikka/views/__init__.py:51
+msgid "Users"
+msgstr "Usuários"
+
+#: prewikka/views/__init__.py:54
+msgid "Filters"
+msgstr "Filtros"
+
+#: prewikka/views/__init__.py:56
+msgid "About"
+msgstr "Sobre"
+
+#: prewikka/modules/auth/cgi/cgi.py:29
+msgid "CGI Authentication failed: no user specified."
+msgstr "Autenticação CGI falhou: usuário não especificado"
+
+#: prewikka/templates/SensorListing.py:137
+msgid "Alert listing"
+msgstr "Lista de alertas"
+
+#: prewikka/templates/SensorListing.py:145
+msgid "Heartbeat listing"
+msgstr "Lista de Heartbeats"
+
+#: prewikka/templates/SensorListing.py:153
+msgid "Heartbeat analysis"
+msgstr "Análise de Heartbeats"
+
+#: prewikka/templates/SensorListing.py:217
+msgid "Address information"
+msgstr "Endereço da informação"
+
+#: prewikka/templates/SensorListing.py:250
+msgid "No agent available"
+msgstr "Nenhum agente disponível"
+
+#: prewikka/templates/SensorListing.py:273
+#: prewikka/templates/MessageListing.py:211
+#: prewikka/templates/FilterEdition.py:221
+msgid "Delete"
+msgstr "Apagar"
+
+#: prewikka/templates/About.py:111
+msgid "provides support to Large Accounts, Major Companies and Government Agencies around the world, to improve and strengthen the security of their systems and networks."
+msgstr "ornece suporte a grandes clientes, grandes companhias e agências do governo ao redor do mundo, a fim de melhorar a segurança dos sistemas e das redes."
+
+#: prewikka/templates/About.py:131
+msgid "In keeping with the Open Source spirit, we encourage you to participate in the development of your application. You can order customized versions of Prelude to suit your needs: adapting, adding on functionality etc. Because they are carried out by PreludeIDS engineers, you know that any modifications made to the system will be integrated optimally and guaranteed by our technical support department. Additionally, the company can extend Prelude to handle yet unsupported sensors (including proprietary), ruleset extension to handle new devices and porting of Prelude to unsupported operating systems."
+msgstr "De acordo com a filosofia do Código Aberto, nós o incentivamos a participar do desenvolvimento de sua aplicação. Você pode ter versões customizadas do Preludepara suprir suas necessidade: adaptando, adicionando funcionalidades, etc. Porque são realizados por coordenadores do PreludeIDS, você sabe que algumas modificações feitas no sistema estarão integradas otimizadamente e garantidas por nosso departamento de suporte técnico. Adicionalmente, a companhia pode estender o Prelude para integrar sensores não suportados (incluindo os proprietários), extensões de regras para integrar novos dispositivos e portas de outros sistemas operacionais que o Prelude não suportava também podem ser integrados."
+
+#: prewikka/templates/About.py:142
+msgid "PreludeIDS maintenance and support services guarantee optimal operation of the Prelude platform on your infrastructure. With our support services, you benefit from priority assistance and the expertise of our engineers, while the maintenance service we offer maintains and updates your software."
+msgstr "PreludeIDS serviços de manutenção e suporte garantem a ótima operação da plataforma Prelude em sua infraestrutura. Com nossos serviços de suporte, você será beneficiado com a assistência prioritária e a perícia de nossos engenheiros, enquanto os serviço de manutenção compreenderão a atualização de seu software."
+
+#: prewikka/templates/About.py:153
+msgid "The Prelude framework is licensed under the"
+msgstr "A estrutura do Prelude é licenciada sob"
+
+#: prewikka/templates/About.py:158
+msgid "PreludeIDS provides specific commercial licenses to allow proprietary systems based on Prelude to be developed and to interoperate."
+msgstr "PreludeIDS fornece licenças comerciais específicas para aceitar sistemas proprietários baseados no Prelude a serem desenvolvidos e interoperantes."
+
+#: prewikka/templates/About.py:169
+msgid "Through our partners, you have access to an array of top-of-the-line security services. By advising you on how to secure your infrastructure, deploying Prelude and training your users, we provide a turnkey solution to secure your infrastructure, delivered by specialists."
+msgstr "Como sócio, você tem acesso a serviços de segurança tops de linha. Recomendado para criar sua infraestrutura com segurança, instalando o Preludee treinando seus usuários. Nós forneceremos soluções de segurança turnkey, ou seja, uma solução empacotada para sua infraestrutura e estregue por especialistas."
+
+#: prewikka/templates/LoginPasswordForm.py:132
+msgid "Submit"
+msgstr "Enviar"
+
+#: prewikka/templates/UserSettings.py:112
+msgid "Account informations"
+msgstr "Informações sobre a conta"
+
+#: prewikka/templates/UserSettings.py:122
+msgid "Login:"
+msgstr "Usuário:"
+
+#: prewikka/templates/UserSettings.py:147
+msgid "Language:"
+msgstr "Idioma:"
+
+#: prewikka/templates/UserSettings.py:178
+msgid "Permissions:"
+msgstr "Permissões:"
+
+#: prewikka/templates/UserSettings.py:254
+msgid "Change password"
+msgstr "Mudar a senha"
+
+#: prewikka/templates/UserSettings.py:261
+msgid "Current password:"
+msgstr "Senha atual:"
+
+#: prewikka/templates/UserSettings.py:270
+msgid "New password:"
+msgstr "Nova senha:"
+
+#: prewikka/templates/UserSettings.py:279
+msgid "Confirm new password:"
+msgstr "Confirmação da nova senha:"
+
+#: prewikka/templates/UserSettings.py:291
+msgid "Submit Changes"
+msgstr "Confirmar mudanças"
+
+#: prewikka/templates/UserListing.py:144
+msgid "Delete user"
+msgstr "Apagar usuário"
+
+#: prewikka/templates/UserListing.py:153
+msgid "Create user"
+msgstr "Criar usuário"
+
+#: prewikka/templates/MessageListing.py:282
+msgid "Step"
+msgstr "Etapa"
+
+#: prewikka/templates/MessageListing.py:293
+msgid "Minutes"
+msgstr "Minutos"
+
+#: prewikka/templates/MessageListing.py:301
+msgid "Hours"
+msgstr "Horas"
+
+#: prewikka/templates/MessageListing.py:309
+msgid "Days"
+msgstr "Dias"
+
+#: prewikka/templates/MessageListing.py:317
+msgid "Months"
+msgstr "Meses"
+
+#: prewikka/templates/MessageListing.py:325
+msgid "Years"
+msgstr "Anos"
+
+#: prewikka/templates/MessageListing.py:333
+msgid "Unlimited"
+msgstr "Ilimitado"
+
+#: prewikka/templates/MessageListing.py:344
+msgid "Tz"
+msgstr "Tz"
+
+#: prewikka/templates/MessageListing.py:355
+msgid "Frontend localtime"
+msgstr "Hora do frontend"
+
+#: prewikka/templates/MessageListing.py:363
+msgid "Sensor localtime"
+msgstr "Hora do sensor"
+
+#: prewikka/templates/MessageListing.py:377
+msgid "Limit"
+msgstr "Limite"
+
+#: prewikka/templates/MessageListing.py:394
+msgid "Apply"
+msgstr "Aplicar"
+
+#: prewikka/templates/MessageListing.py:399
+#: prewikka/templates/FilterEdition.py:308
+msgid "Save"
+msgstr "Salvar"
+
+#: prewikka/templates/MessageListing.py:440
+#: prewikka/templates/MessageListing.py:447
+msgid "prev"
+msgstr "anterior"
+
+#: prewikka/templates/MessageListing.py:458
+#: prewikka/templates/MessageListing.py:465
+msgid "current"
+msgstr "atual"
+
+#: prewikka/templates/MessageListing.py:476
+#: prewikka/templates/MessageListing.py:483
+msgid "next"
+msgstr "próximo"
+
+#: prewikka/templates/MessageListing.py:529
+msgid "total"
+msgstr "total"
+
+#: prewikka/templates/FilterEdition.py:216
+msgid "Load"
+msgstr "Carregar"
+
+#: prewikka/templates/HeartbeatListing.py:103
+msgid "Agent"
+msgstr "Agente"
+
+#: prewikka/templates/HeartbeatListing.py:114
+msgid "Node Address"
+msgstr "Endereço do nó"
+
+#: prewikka/templates/HeartbeatListing.py:125
+msgid "Node Name"
+msgstr "Nome do nó"
+
+#: prewikka/templates/HeartbeatListing.py:136
+msgid "Type"
+msgstr "Tipo"
+
+#: prewikka/templates/HeartbeatListing.py:193
+msgid "Heartbeat summary"
+msgstr "Heartbeat sumário"
+
+#: prewikka/templates/HeartbeatListing.py:201
+msgid "Filter on agent"
+msgstr "Filtro no agente"
+
+#: prewikka/templates/HeartbeatListing.py:228
+msgid "Filter on address"
+msgstr "Filtro no endereço"
+
+#: prewikka/templates/ClassicLayout.py:223
+msgid "logout"
+msgstr "sair"
+
+#: prewikka/templates/ClassicLayout.py:237
+msgid "on"
+msgstr "em"
+
+#: prewikka/templates/AlertListing.py:249
+msgid "Group entry by:"
+msgstr "Entrada do grupo em:"
+
+#: prewikka/templates/AlertListing.py:338
+msgid "Filter on:"
+msgstr "Filtro em:"
+
+#: prewikka/templates/AlertListing.py:510
+msgid "Classification"
+msgstr "Classificação"
+
+#: prewikka/templates/AlertListing.py:635
+msgid "Source"
+msgstr "Fonte"
+
+#: prewikka/templates/AlertListing.py:680
+msgid "Target"
+msgstr "Alvo"
+
+#: prewikka/templates/AlertListing.py:724
+msgid "Sensor"
+msgstr "Sensor"
+
+#: prewikka/templates/AlertListing.py:766
+msgid "Time"
+msgstr "Tempo"
+

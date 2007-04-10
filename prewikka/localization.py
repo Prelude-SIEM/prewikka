@@ -53,8 +53,9 @@ __builtin__.N_ = _deferredGettext
 
 
 _LANGUAGES = { 
+               _("Brazilian Portuguese"): "pt_BR",
                _("English"): "en", 
-               _("French"): "fr" 
+               _("French"): "fr", 
              }
     
 
