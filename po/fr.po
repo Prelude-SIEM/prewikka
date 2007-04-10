@@ -1,9 +1,9 @@
 # French Translation for Prewikka
-# Copyright (C) 2007 Sebastien Tricaud
+# Copyright (C) 2007 PreludeIDS Technologies
 # This file is distributed under the same license as the prewikka package.
 # sebastien.tricaud@wengo.com, 2007.
 #
-#, fuzzy
+
 msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
@@ -224,7 +224,7 @@ msgstr "Pulsations"
 
 #: prewikka/templates/SensorListing.py:138
 msgid "Latest status"
-msgstr ""
+msgstr "Dernier état"
 
 #: prewikka/templates/SensorListing.py:170
 msgid "Alert listing"
@@ -269,7 +269,7 @@ msgstr ""
 
 #: prewikka/templates/About.py:129
 msgid "Customizing Prelude"
-msgstr ""
+msgstr "Personaliser Prelude"
 
 #: prewikka/templates/About.py:134
 msgid ""
@@ -332,7 +332,7 @@ msgstr ""
 
 #: prewikka/templates/About.py:210
 msgid "Website"
-msgstr ""
+msgstr "Site web"
 
 #: prewikka/templates/About.py:223
 #, fuzzy
@@ -474,7 +474,7 @@ msgstr "total"
 
 #: prewikka/templates/FilterEdition.py:194
 msgid "Available filters"
-msgstr ""
+msgstr "Filtres disponibles"
 
 #: prewikka/templates/FilterEdition.py:221
 msgid "Load"
@@ -482,11 +482,11 @@ msgstr "Charger"
 
 #: prewikka/templates/FilterEdition.py:241
 msgid "Edition"
-msgstr ""
+msgstr "Edition"
 
 #: prewikka/templates/FilterEdition.py:296
 msgid "Formula:"
-msgstr ""
+msgstr "Formules :"
 
 #: prewikka/templates/FilterEdition.py:316
 #, fuzzy
