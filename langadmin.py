@@ -94,7 +94,7 @@ class LangAdmin:
         for dirname in directories:
             files += self._list_files(dirname, recurse)
 
-        cmd = 'xgettext -j --copyright-holder="PreludeIDS Technologies" -k_ -kN_ -o %s %s' % (self.pot_file, ' '.join(files))
+        cmd = 'xgettext --copyright-holder="PreludeIDS Technologies" -k_ -kN_ -o %s %s' % (self.pot_file, ' '.join(files))
         print cmd
         os.system(cmd)
 

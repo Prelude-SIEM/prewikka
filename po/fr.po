@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-09 19:15+0200\n"
+"POT-Creation-Date: 2007-04-10 10:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Sebastien Tricaud <sebastien.tricaud@wengo.com>\n"
 "Language-Team: French\n"
@@ -59,99 +59,91 @@ msgstr "Normalisation des paramètres échouée"
 msgid "Invalid filter element '%s' referenced from filter formula"
 msgstr "Element de filtre '%s'  référencé depuis la formule de filtre"
 
-#: prewikka/localization.py:55
+#: prewikka/localization.py:56
 msgid "Brazilian Portuguese"
 msgstr "Brézilien Portuguais"
 
-#: prewikka/localization.py:56
+#: prewikka/localization.py:57
 msgid "English"
 msgstr "Anglais"
 
-#: prewikka/localization.py:57
+#: prewikka/localization.py:58
 msgid "French"
 msgstr "Français"
 
-#: prewikka/localization.py:58
-msgid "German"
-msgstr "Allemand"
-
-#: prewikka/localization.py:59
-msgid "Russian"
-msgstr ""
-
-#: prewikka/localization.py:96 prewikka/localization.py:95
+#: prewikka/localization.py:96
 msgid "January"
 msgstr "Janvier"
 
-#: prewikka/localization.py:97 prewikka/localization.py:96
+#: prewikka/localization.py:97
 msgid "February"
 msgstr "Fevrier"
 
-#: prewikka/localization.py:98 prewikka/localization.py:97
+#: prewikka/localization.py:98
 msgid "March"
 msgstr "Mars"
 
-#: prewikka/localization.py:99 prewikka/localization.py:98
+#: prewikka/localization.py:99
 msgid "April"
 msgstr "Avril"
 
-#: prewikka/localization.py:100 prewikka/localization.py:99
+#: prewikka/localization.py:100
 msgid "May"
 msgstr "Mai"
 
-#: prewikka/localization.py:101 prewikka/localization.py:100
+#: prewikka/localization.py:101
 msgid "June"
 msgstr "Juin"
 
-#: prewikka/localization.py:102 prewikka/localization.py:101
+#: prewikka/localization.py:102
 msgid "July"
 msgstr "Juillet"
 
-#: prewikka/localization.py:103 prewikka/localization.py:102
+#: prewikka/localization.py:103
 msgid "August"
 msgstr "Aout"
 
-#: prewikka/localization.py:104 prewikka/localization.py:103
+#: prewikka/localization.py:104
 msgid "September"
 msgstr "Septembre"
 
-#: prewikka/localization.py:105 prewikka/localization.py:104
+#: prewikka/localization.py:105
 msgid "November"
 msgstr "Novembre"
 
-#: prewikka/localization.py:106 prewikka/localization.py:105
+#: prewikka/localization.py:106
 msgid "October"
 msgstr "Octobre"
 
-#: prewikka/localization.py:107 prewikka/localization.py:106
+#: prewikka/localization.py:107
 msgid "December"
 msgstr "Decembre"
 
-#: prewikka/localization.py:109 prewikka/localization.py:108
+#: prewikka/localization.py:109
 msgid "Monday"
 msgstr "Lundi"
 
-#: prewikka/localization.py:110 prewikka/localization.py:109
+#: prewikka/localization.py:110
 msgid "Tuesday"
 msgstr "Mardi"
 
-#: prewikka/localization.py:111 prewikka/localization.py:110
+#: prewikka/localization.py:111
 msgid "Wednesday"
 msgstr "Mercredi"
 
-#: prewikka/localization.py:112 prewikka/localization.py:111
+#: prewikka/localization.py:112
 msgid "Thursday"
 msgstr "Jeudi"
 
-#: prewikka/localization.py:113 prewikka/localization.py:112
+#: prewikka/localization.py:113
 msgid "Friday"
 msgstr "Vendredi"
 
-#: prewikka/localization.py:114 prewikka/localization.py:113
+#: prewikka/localization.py:114
 msgid "Saturday"
 msgstr "Samedi"
 
-#: prewikka/localization.py:115 prewikka/localization.py:114
+#: prewikka/localization.py:115
 msgid "Sunday"
 msgstr "Dimanche"
 
@@ -275,7 +267,11 @@ msgstr ""
 "monde, afin d'amméliorer et renforcer la sécurité de leurs systèmes et "
 "réseaux."
 
-#: prewikka/templates/About.py:131 prewikka/templates/About.py:134
+#: prewikka/templates/About.py:129
+msgid "Customizing Prelude"
+msgstr ""
+
+#: prewikka/templates/About.py:134
 msgid ""
 "In keeping with the Open Source spirit, we encourage you to participate in "
 "the development of your application. You can order customized versions of "
@@ -288,7 +284,11 @@ msgid ""
 "operating systems."
 msgstr ""
 
-#: prewikka/templates/About.py:142 prewikka/templates/About.py:148
+#: prewikka/templates/About.py:143
+msgid "Software Maintenance and Technical Support"
+msgstr ""
+
+#: prewikka/templates/About.py:148
 msgid ""
 "PreludeIDS maintenance and support services guarantee optimal operation of "
 "the Prelude platform on your infrastructure. With our support services, you "
@@ -296,23 +296,48 @@ msgid ""
 "the maintenance service we offer maintains and updates your software."
 msgstr ""
 
-#: prewikka/templates/About.py:153 prewikka/templates/About.py:162
+#: prewikka/templates/About.py:157
+msgid "Commercial licenses"
+msgstr ""
+
+#: prewikka/templates/About.py:162
 msgid "The Prelude framework is licensed under the"
 msgstr "L'environnement Prelude est sous licence"
 
-#: prewikka/templates/About.py:158 prewikka/templates/About.py:167
+#: prewikka/templates/About.py:167
 msgid ""
 "PreludeIDS provides specific commercial licenses to allow proprietary "
 "systems based on Prelude to be developed and to interoperate."
 msgstr ""
 
-#: prewikka/templates/About.py:169 prewikka/templates/About.py:181
+#: prewikka/templates/About.py:176
+msgid "Advice, Deployment and Training"
+msgstr ""
+
+#: prewikka/templates/About.py:181
 msgid ""
 "Through our partners, you have access to an array of top-of-the-line "
 "security services. By advising you on how to secure your infrastructure, "
 "deploying Prelude and training your users, we provide a turnkey solution to "
 "secure your infrastructure, delivered by specialists."
 msgstr ""
+
+#: prewikka/templates/About.py:200
+msgid "Contact"
+msgstr ""
+
+#: prewikka/templates/About.py:205
+msgid "Headquarter"
+msgstr ""
+
+#: prewikka/templates/About.py:210
+msgid "Website"
+msgstr ""
+
+#: prewikka/templates/About.py:223
+#, fuzzy
+msgid "Phone:"
+msgstr "aucun"
 
 #: prewikka/templates/LoginPasswordForm.py:132
 msgid "Submit"
@@ -411,35 +436,39 @@ msgstr "Heure locale de Prewikka"
 msgid "Sensor localtime"
 msgstr "Heure locale de la sonde"
 
-#: prewikka/templates/MessageListing.py:381
+#: prewikka/templates/MessageListing.py:375
+msgid "UTC"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:386
 msgid "Limit:"
 msgstr "Limite : "
 
-#: prewikka/templates/MessageListing.py:397
+#: prewikka/templates/MessageListing.py:402
 msgid "Apply"
 msgstr "Appliquer"
 
-#: prewikka/templates/MessageListing.py:402
+#: prewikka/templates/MessageListing.py:407
 #: prewikka/templates/FilterEdition.py:328
 msgid "Save"
 msgstr "Enregistrer"
 
-#: prewikka/templates/MessageListing.py:442
-#: prewikka/templates/MessageListing.py:449
+#: prewikka/templates/MessageListing.py:447
+#: prewikka/templates/MessageListing.py:454
 msgid "prev"
 msgstr "prec"
 
-#: prewikka/templates/MessageListing.py:460
-#: prewikka/templates/MessageListing.py:467
+#: prewikka/templates/MessageListing.py:465
+#: prewikka/templates/MessageListing.py:472
 msgid "current"
 msgstr "actuel"
 
-#: prewikka/templates/MessageListing.py:478
-#: prewikka/templates/MessageListing.py:485
+#: prewikka/templates/MessageListing.py:483
+#: prewikka/templates/MessageListing.py:490
 msgid "next"
 msgstr "suiv"
 
-#: prewikka/templates/MessageListing.py:531
+#: prewikka/templates/MessageListing.py:536
 msgid "total"
 msgstr "total"
 
@@ -609,26 +638,8 @@ msgstr "Temps"
 msgid "Filter:"
 msgstr "Filtres : "
 
-#: prewikka/templates/About.py:129
-msgid "Customizing Prelude"
-msgstr ""
-
-#: prewikka/templates/About.py:143
-msgid "Software Maintenance and Technical Support"
-msgstr ""
-
-#: prewikka/templates/About.py:157
-msgid "Commercial licenses"
-msgstr ""
-
-#: prewikka/templates/About.py:176
-msgid "Advice, Deployment and Training"
-msgstr ""
-
-#: prewikka/templates/About.py:210
-#, fuzzy
-msgid "Phone:"
-msgstr "aucun"
+#~ msgid "German"
+#~ msgstr "Allemand"
 
 #~ msgid "Timezone:"
 #~ msgstr "Temps : "
