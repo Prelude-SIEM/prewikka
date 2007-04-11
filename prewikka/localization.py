@@ -53,9 +53,9 @@ __builtin__.N_ = _deferredGettext
 
 
 _LANGUAGES = { 
-               _("Brazilian Portuguese"): "pt_BR",
                _("English"): "en", 
                _("French"): "fr", 
+               _("Portuguese (Brazilian)"): "pt_BR",
              }
     
 
@@ -73,15 +73,18 @@ def setLocale(lang):
 
 
 def getLanguages():
-    return [ _(x) for x in _LANGUAGES.keys() ]
-        
+    l = _LANGUAGES.keys()
+    l.sort()
+    return l
 
 def getLanguagesIdentifiers():
     return _LANGUAGES.values()
 
 
 def getLanguagesAndIdentifiers():
-    return [ (_(x), y) for x, y in _LANGUAGES.items() ]
+    l = _LANGUAGES.keys()
+    l.sort()
+    return [ (_(x), _LANGUAGES[x]) for x in l ]
 
 
 def getCurrentCharset():
