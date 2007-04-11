@@ -62,6 +62,7 @@ _LANGUAGES = {
                _("English"): "en", 
                _("French"): "fr", 
                _("Portuguese (Brazilian)"): "pt_BR",
+               _("Russian"): "ru"
              }
     
 
