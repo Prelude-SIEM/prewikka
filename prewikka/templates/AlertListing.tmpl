@@ -487,15 +487,15 @@ function ${name}_add_entry(object, operator, value, num) {
   #if $message.sub_alert_name
     <b>$message.sub_alert_type#slurp
     #if $message.sub_alert_display
-      #set $str = $ngettext("alert", "alerts", $message.sub_alert_number)
-      (<a href="$message.sub_alert_display">$message.sub_alert_number</a> $str)#slurp
+      #set $string = $ngettext("alert", "alerts", $message.sub_alert_number)
+      (<a href="$message.sub_alert_display">$message.sub_alert_number</a> $string)#slurp
     #end if
 :</b> <i><a href="$message.sub_alert_link">$message.sub_alert_name</a></i><br/>#slurp
   #end if
 
   #if $message.aggregated and $message.aggregated_classifications_hidden > 0
-    #set $string = $_("%(hidden)/%(total) alerts not shown...")
-    <b>$str($string) % { "hidden": $message.aggregated_classifications_hidden, "total": $message.aggregated_classifications_total }
+    #set $string = $_("%(hidden)d of %(total)d alerts not shown...")
+    <b>($str($string % { "hidden": $message.aggregated_classifications_hidden, "total": $message.aggregated_classifications_total })
     <a href="$message.aggregated_classifications_hidden_expand">$_("expand")</a>)</b>
     <br/>
   #end if
@@ -533,8 +533,9 @@ function ${name}_add_entry(object, operator, value, num) {
 #set $need_hr = 0
 
 #if $hidden > 0
-       <b>($hidden/$total $name not shown...
-       <a href="$expand">expand</a>)</b>
+       #set $string = $_("%(hidden)d of %(total)d %(name)ss not shown...")
+       <b>($str($string % { "hidden": $hidden, "total": $total, "name": $name })
+       <a href="$expand">$_("expand")</a>)</b>
        <br/>
 #end if
 
