@@ -44,13 +44,19 @@ def _safeGettext(s):
     else:
         return s
 
+def _safeNgettext(singular, plural, num):
+    if num <= 1:
+        return _safeGettext(singular)
+    else:
+        return _safeGettext(plural)
+        
 def _deferredGettext(s):
     return s
     
 gettext.install("prewikka", siteconfig.locale_dir)
 __builtin__._ = _safeGettext
 __builtin__.N_ = _deferredGettext
-
+__builtin__.ngettext = _safeNgettext
 
 _LANGUAGES = { 
                _("English"): "en", 
