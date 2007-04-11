@@ -285,10 +285,10 @@ class TcpIpOptions(Table):
 
     def _optionRender(self, options, to_name_func):
         self.beginTable()
-        self.newTableCol(0, "Name", header=True)
-        self.newTableCol(0, "Code", header=True)
-        self.newTableCol(0, "Data length", header=True)
-        self.newTableCol(0, "Data", header=True)
+        self.newTableCol(0, _("Name"), header=True)
+        self.newTableCol(0, _("Code"), header=True)
+        self.newTableCol(0, _("Data length"), header=True)
+        self.newTableCol(0, _("Data"), header=True)
         
         for option in options:
             dec = to_name_func(option[0])
@@ -382,23 +382,23 @@ class MessageSummary(Table):
     def buildTime(self, msg):
         self.beginTable()
 
-        self.newTableEntry("Create time", self.getTime(msg["create_time"]))
+        self.newTableEntry(_("Create time"), self.getTime(msg["create_time"]))
 
         try:
-            self.newTableEntry("Detect time", self.getTime(msg["detect_time"]), cl="section_alert_entry_value_emphasis")
+            self.newTableEntry(_("Detect time"), self.getTime(msg["detect_time"]), cl="section_alert_entry_value_emphasis")
         except:
             pass
         
         if msg["analyzer_time"]:
-            self.newTableEntry("Analyzer time", self.getTime(msg["analyzer_time"]))
+            self.newTableEntry(_("Analyzer time"), self.getTime(msg["analyzer_time"]))
             
         self.endTable()
 
     def buildProcess(self, process):
         self.beginTable()
-        self.newTableEntry("Process", process["name"])
-        self.newTableEntry("Process Path", process["path"])
-        self.newTableEntry("Process Pid", process["pid"])
+        self.newTableEntry(_("Process"), process["name"])
+        self.newTableEntry(_("Process Path"), process["path"])
+        self.newTableEntry(_("Process PID"), process["pid"])
         self.endTable()
 
         
@@ -406,8 +406,8 @@ class MessageSummary(Table):
         if not node:
             return
         
-        self.newTableEntry("Node name", node["name"])
-        self.newTableEntry("Node location", node["location"])
+        self.newTableEntry(_("Node name"), node["name"])
+        self.newTableEntry(_("Node location"), node["location"])
         
         addr_list = None
         for addr in node["address"]:
@@ -425,19 +425,19 @@ class MessageSummary(Table):
             else:
                 addr_list += address
         
-        self.newTableEntry("Node address", addr_list)
+        self.newTableEntry(_("Node address"), addr_list)
                 
     def buildAnalyzer(self, analyzer):
         self.beginTable(cl="message_summary_no_border")
         
         self.beginTable()
-        self.newTableEntry("Model", analyzer["model"], cl="section_alert_entry_value_emphasis")
-        self.newTableEntry("Name", analyzer["name"], cl="section_alert_entry_value_emphasis")
-        self.newTableEntry("Analyzerid", analyzer["analyzerid"])
-        self.newTableEntry("Version", analyzer["version"])
-        self.newTableEntry("Class", analyzer["class"])
+        self.newTableEntry(_("Model"), analyzer["model"], cl="section_alert_entry_value_emphasis")
+        self.newTableEntry(_("Name"), analyzer["name"], cl="section_alert_entry_value_emphasis")
+        self.newTableEntry(_("Analyzerid"), analyzer["analyzerid"])
+        self.newTableEntry(_("Version"), analyzer["version"])
+        self.newTableEntry(_("Class"), analyzer["class"])
             
-        self.newTableEntry("Manufacturer", self.getUrlLink(analyzer["manufacturer"]))                
+        self.newTableEntry(_("Manufacturer"), self.getUrlLink(analyzer["manufacturer"]))                
         self.endTable()
         self.newTableRow()
                 
@@ -445,7 +445,7 @@ class MessageSummary(Table):
         
         self.buildNode(analyzer["node"])
         if analyzer["ostype"] or analyzer["osversion"]:
-                self.newTableEntry("Operating System", "%s %s" % (analyzer["ostype"] or "", analyzer["osversion"] or ""))
+                self.newTableEntry(_("Operating System"), "%s %s" % (analyzer["ostype"] or "", analyzer["osversion"] or ""))
 
         self.endTable()
         self.newTableRow()
@@ -463,12 +463,12 @@ class MessageSummary(Table):
 
         l.pop(0)
 
-        self.beginSection("Analyzer Path (%d not shown)" % len(l), display="none")
+        self.beginSection(_("Analyzer Path (%d not shown)") % len(l), display="none")
         
         self.beginTable(cl="message_summary_no_border")
         i = 1
         for analyzer in l:
-            self.newTableCol(i - 1, "Analyzer #%d" % i, None, header=True)
+            self.newTableCol(i - 1, _("Analyzer #%d") % i, None, header=True)
             self.buildAnalyzer(analyzer)
             self.newTableRow()
             i += 1
@@ -477,11 +477,11 @@ class MessageSummary(Table):
         self.endSection()
         
     def buildAdditionalData(self, alert, ignore=[], ignored={}, ip_options=[], tcp_options=[]):
-        self.beginSection("Additional data")
+        self.beginSection(_("Additional data"))
 
         self.beginTable()
-        self.newTableCol(0, "Meaning", header=True)
-        self.newTableCol(0, "Value", header=True)
+        self.newTableCol(0, _("Meaning"), header=True)
+        self.newTableCol(0, _("Value"), header=True)
         
         index = 1
         for ad in alert["additional_data"]:
@@ -529,30 +529,30 @@ class MessageSummary(Table):
         
     def buildIpHeaderTable(self, alert):
         ip = HeaderTable()
-        ip.register("Version", "ip_ver")
-        ip.register("Header length", "ip_hlen")
-        ip.register("TOS", "ip_tos")
-        ip.register("Length", "ip_len")
-        ip.register("Id", "ip_id")
+        ip.register(_("Version"), "ip_ver")
+        ip.register(_("Header length"), "ip_hlen")
+        ip.register(_("TOS"), "ip_tos")
+        ip.register(_("Length"), "ip_len")
+        ip.register(_("Id"), "ip_id")
         ip.register("R<br/>F", "ip_off", self._isFlagSet, (0x8000, 15))
         ip.register("D<br/>F", "ip_off", self._isFlagSet, (0x4000, 14))
         ip.register("M<br/>F", "ip_off", self._isFlagSet, (0x2000, 13))
-        ip.register("Ip offset", "ip_off", (lambda x: x & 0x1fff))
-        ip.register("TTL", "ip_ttl")
-        ip.register("Protocol", "ip_proto")
-        ip.register("Checksum", "ip_sum")
-        ip.register_static("Source address", alert["source(0).node.address(0).address"])
-        ip.register_static("Target address", alert["target(0).node.address(0).address"])
+        ip.register(_("Ip offset"), "ip_off", (lambda x: x & 0x1fff))
+        ip.register(_("TTL"), "ip_ttl")
+        ip.register(_("Protocol"), "ip_proto")
+        ip.register(_("Checksum"), "ip_sum")
+        ip.register_static(_("Source address"), alert["source(0).node.address(0).address"])
+        ip.register_static(_("Target address"), alert["target(0).node.address(0).address"])
         return ip
 
     def buildTcpHeaderTable(self, alert):
         tcp = HeaderTable()
-        tcp.register_static("Source port", alert["source(0).service.port"])
-        tcp.register_static("Target port", alert["target(0).service.port"])
+        tcp.register_static(_("Source port"), alert["source(0).service.port"])
+        tcp.register_static(_("Target port"), alert["target(0).service.port"])
         tcp.register("Seq #", "tcp_seq")
         tcp.register("Ack #", "tcp_ack")
-        tcp.register("Header length", "tcp_off")
-        tcp.register("Reserved", "tcp_res")
+        tcp.register(_("Header length"), "tcp_off")
+        tcp.register(_("Reserved"), "tcp_res")
         tcp.register("R<br/>1", "tcp_flags", self._isFlagSet, (0x80,))
         tcp.register("R<br/>2", "tcp_flags", self._isFlagSet, (0x40,))
         tcp.register("U<br/>R<br/>G", "tcp_flags", self._isFlagSet, (0x20,))
@@ -561,40 +561,40 @@ class MessageSummary(Table):
         tcp.register("R<br/>S<br/>T", "tcp_flags", self._isFlagSet, (0x04,))
         tcp.register("S<br/>Y<br/>N", "tcp_flags", self._isFlagSet, (0x02,))
         tcp.register("F<br/>I<br/>N", "tcp_flags", self._isFlagSet, (0x01,))
-        tcp.register("Window", "tcp_win")
-        tcp.register("Checksum", "tcp_sum")
-        tcp.register("URP", "tcp_urp")
+        tcp.register(_("Window"), "tcp_win")
+        tcp.register(_("Checksum"), "tcp_sum")
+        tcp.register(_("URP"), "tcp_urp")
         return tcp
     
     def buildUdpHeaderTable(self, alert):
         udp = HeaderTable()
-        udp.register_static("Source port", alert["source(0).service.port"])
-        udp.register_static("Target port", alert["target(0).service.port"])
-        udp.register("Length", "udp_len")
-        udp.register("Checksum", "udp_sum")
+        udp.register_static(_("Source port"), alert["source(0).service.port"])
+        udp.register_static(_("Target port"), alert["target(0).service.port"])
+        udp.register(_("Length"), "udp_len")
+        udp.register(_("Checksum"), "udp_sum")
         return udp 
 
     def buildIcmpHeaderTable(self, alert):
         icmp = HeaderTable()
-        icmp.register("Type", "icmp_type")
-        icmp.register("Code", "icmp_code")
-        icmp.register("Checksum", "icmp_sum")
-        icmp.register("Id", "icmp_id")
-        icmp.register("Seq #", "icmp_seq")
-        icmp.register("Mask", "icmp_mask");
-        icmp.register("Gateway Address", "icmp_gwaddr")
-        icmp.register("Num address", "icmp_num_addrs")
-        icmp.register("Wpa", "icmp_wpa")
-        icmp.register("Lifetime", "icmp_lifetime")
-        icmp.register("Otime", "icmp_otime")
-        icmp.register("Rtime", "icmp_rtime")
-        icmp.register("Ttime", "icmp_ttime")
+        icmp.register(_("Type"), "icmp_type")
+        icmp.register(_("Code"), "icmp_code")
+        icmp.register(_("Checksum"), "icmp_sum")
+        icmp.register(_("Id"), "icmp_id")
+        icmp.register(_("Seq #"), "icmp_seq")
+        icmp.register(_("Mask"), "icmp_mask");
+        icmp.register(_("Gateway Address"), "icmp_gwaddr")
+        icmp.register(_("Num address"), "icmp_num_addrs")
+        icmp.register(_("Wpa"), "icmp_wpa")
+        icmp.register(_("Lifetime"), "icmp_lifetime")
+        icmp.register(_("Otime"), "icmp_otime")
+        icmp.register(_("Rtime"), "icmp_rtime")
+        icmp.register(_("Ttime"), "icmp_ttime")
         
         return icmp
     
     def buildPayloadTable(self, alert):
         data = HeaderTable()
-        data.register("Payload", "payload")
+        data.register(_("Payload"), "payload")
         #data.register("ASCII Payload", "payload", utils.escape_html_string)
         return data
 
@@ -632,7 +632,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         
                 results = self.env.idmef_db.getAlertIdents(criteria)
                 if len(results) == 0:
-                    content += "<li>Invalid analyzerid:messageid pair: %s:%s</li>" % (analyzerid, ident)
+                    content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": messageid } + "</li>"
                 else:
                     alert = self.env.idmef_db.getAlert(results[0], htmlsafe=True)
                     link = utils.create_link("alert_summary", { "origin": self.parameters["origin"], "ident": results[0] })
@@ -650,14 +650,14 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         if not ca:
             return
 
-        self.beginSection("Correlation Alert")
+        self.beginSection(_("Correlation Alert"))
 	self.beginTable()
-	self.newTableEntry("Name", ca["alert.correlation_alert.name"])
+	self.newTableEntry(_("Name"), ca["alert.correlation_alert.name"])
 	self.endTable()
 	
 	self.beginTable()
-	self.newTableCol(0, "Correlated Alert", header=True)
-	self.newTableCol(0, "Source Analyzer", header=True)
+	self.newTableCol(0, _("Correlated Alert"), header=True)
+	self.newTableCol(0, _("Source Analyzer"), header=True)
         self.buildAlertIdent(alert, ca)
         self.endTable()
         self.endSection()
@@ -667,16 +667,14 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         if not ta:
             return
 
-	if ta["name"]:
-	    reason = ": %s" % ta["name"]
-	else:
-	    reason = ""
-            
-        self.beginSection("Tool Alert%s" % reason)
+        self.beginSection(_("Tool Alert"))
+	self.beginTable()
+	self.newTableEntry(_("Name"), ca["alert.tool_alert.name"])
+	self.endTable()
 	
 	self.beginTable()
-	self.newTableCol(0, "Linked Alert", header=True)
-	self.newTableCol(0, "Source Analyzer", header=True)
+	self.newTableCol(0, _("Linked Alert"), header=True)
+	self.newTableCol(0, _("Source Analyzer"), header=True)
         self.buildAlertIdent(alert, ta)
         self.endTable()
         
@@ -686,16 +684,16 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         if not alert["classification.text"]:
             return
 
-        self.newTableEntry("Text", alert["classification.text"],
+        self.newTableEntry(_("Text"), alert["classification.text"],
                            cl="section_alert_entry_value_emphasis impact_severity_%s" % alert["assessment.impact.severity"])
-        self.newTableEntry("Ident", alert["classification.ident"])
+        self.newTableEntry(_("Ident"), alert["classification.ident"])
         
     def buildReference(self, alert):
         self.beginTable()
 
-        self.newTableCol(0, "Origin", header=True)
-        self.newTableCol(0, "Name", header=True)
-        self.newTableCol(0, "Meaning", header=True)
+        self.newTableCol(0, _("Origin"), header=True)
+        self.newTableCol(0, _("Name"), header=True)
+        self.newTableCol(0, _("Meaning"), header=True)
         
         index = 1
         for reference in alert["classification.reference"]:                
@@ -712,20 +710,20 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.endTable()
         
     def buildImpact(self, alert):        
-        self.newTableEntry("Severity", alert["assessment.impact.severity"],
+        self.newTableEntry(_("Severity"), alert["assessment.impact.severity"],
                            cl="impact_severity_%s" % alert["assessment.impact.severity"])
 
-        self.newTableEntry("Completion", alert["assessment.impact.completion"],
+        self.newTableEntry(_("Completion"), alert["assessment.impact.completion"],
                            cl="impact_completion_%s" % alert["assessment.impact.completion"])
         
-        self.newTableEntry("Type", alert["assessment.impact.type"])
-        self.newTableEntry("Description", alert["assessment.impact.description"])
+        self.newTableEntry(_("Type"), alert["assessment.impact.type"])
+        self.newTableEntry(_("Description"), alert["assessment.impact.description"])
         
     def buildAction(self, action):
         self.beginTable()
         
-        self.newTableEntry("Category", action["category"])
-        self.newTableEntry("Description", action["description"])
+        self.newTableEntry(_("Category"), action["category"])
+        self.newTableEntry(_("Description"), action["description"])
         
         self.endTable()
         
@@ -748,13 +746,13 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
     
     def buildUser(self, user):
         self.beginTable()  
-        self.newTableEntry("User category", user["category"])
+        self.newTableEntry(_("User category"), user["category"])
 
         self.beginTable()
-        self.newTableCol(0, "Type", header=True)
-        self.newTableCol(0, "Name", header=True)
-        self.newTableCol(0, "Number", header=True)
-        self.newTableCol(0, "Tty", header=True)
+        self.newTableCol(0, _("Type"), header=True)
+        self.newTableCol(0, _("Name"), header=True)
+        self.newTableCol(0, _("Number"), header=True)
+        self.newTableCol(0, _("Tty"), header=True)
         
         index = 1
         for user_id in user["user_id"]:
@@ -770,10 +768,10 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         
     def buildFileAccess(self, file):
         self.beginTable()
-        self.newTableCol(0, "Type", header=True)
-        self.newTableCol(0, "Name", header=True)
-        self.newTableCol(0, "Number", header=True)
-        self.newTableCol(0, "Permission", header=True)
+        self.newTableCol(0, _("Type"), header=True)
+        self.newTableCol(0, _("Name"), header=True)
+        self.newTableCol(0, _("Number"), header=True)
+        self.newTableCol(0, _("Permission"), header=True)
 
         index = 1
         for fa in file["file_access"]:
@@ -795,25 +793,25 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         
     def buildInode(self, inode):
         self.beginTable()
-        self.newTableEntry("Change time", self.getTime(inode["change_time"]))
-        self.newTableEntry("Inode Number", inode["number"])
-        self.newTableEntry("Major device", inode["major_device"])
-        self.newTableEntry("Minor device", inode["minor_device"])
-        self.newTableEntry("C Major device", inode["c_major_device"])
-        self.newTableEntry("C Minor device", inode["c_minor_device"])
+        self.newTableEntry(_("Change time"), self.getTime(inode["change_time"]))
+        self.newTableEntry(_("Inode Number"), inode["number"])
+        self.newTableEntry(_("Major device"), inode["major_device"])
+        self.newTableEntry(_("Minor device"), inode["minor_device"])
+        self.newTableEntry(_("C Major device"), inode["c_major_device"])
+        self.newTableEntry(_("C Minor device"), inode["c_minor_device"])
         self.endTable()
         
     def buildFile(self, file):
-        self.beginSection("Target file %s" % file["category"])
+        self.beginSection(_("Target file %s") % file["category"])
         
         self.beginTable()
-        self.newTableEntry("Name", file["name"])
-        self.newTableEntry("Path", file["path"])
-        self.newTableEntry("Create time", self.getTime(file["create_time"]))
-        self.newTableEntry("Modify time", self.getTime(file["modify_time"]))
-        self.newTableEntry("Access time", self.getTime(file["access_time"]))
-        self.newTableEntry("Data size", file["data_size"])
-        self.newTableEntry("Disk size", file["disk_size"])
+        self.newTableEntry(_("Name"), file["name"])
+        self.newTableEntry(_("Path"), file["path"])
+        self.newTableEntry(_("Create time"), self.getTime(file["create_time"]))
+        self.newTableEntry(_("Modify time"), self.getTime(file["modify_time"]))
+        self.newTableEntry(_("Access time"), self.getTime(file["access_time"]))
+        self.newTableEntry(_("Data size"), file["data_size"])
+        self.newTableEntry(_("Disk size"), file["disk_size"])
         self.endTable()
 
         self.beginTable()
@@ -832,15 +830,15 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         if not webservice:
             return
             
-        self.beginSection("Web Service")
+        self.beginSection(_("Web Service"))
         self.beginTable()
         
-        self.newTableEntry("Url", webservice["url"])
-        self.newTableEntry("Cgi", webservice["cgi"])
-        self.newTableEntry("Http Method", webservice["http_method"])        
+        self.newTableEntry(_("Url"), webservice["url"])
+        self.newTableEntry(_("Cgi"), webservice["cgi"])
+        self.newTableEntry(_("Http Method"), webservice["http_method"])        
         
         for arg in webservice["arg"]:
-            self.newTableEntry("CGI Argument", arg)
+            self.newTableEntry(_("CGI Argument"), arg)
             
         self.endTable()
         self.endSection()
@@ -849,17 +847,17 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         if not service:
             return
             
-        self.beginSection("SNMP Service")
+        self.beginSection(_("SNMP Service"))
         self.beginTable()
         
-        self.newTableEntry("oid", service["oid"])
-        self.newTableEntry("messageProcessingModel", service["message_processing_model"])
-        self.newTableEntry("securityModel", service["security_model"])        
-        self.newTableEntry("securityName", service["security_name"])
-        self.newTableEntry("securityLevel", service["security_level"])
-        self.newTableEntry("contextName", service["context_name"])
-        self.newTableEntry("contextEngineID", service["context_engine_id"])
-        self.newTableEntry("command", service["command"])
+        self.newTableEntry(_("oid"), service["oid"])
+        self.newTableEntry(_("messageProcessingModel"), service["message_processing_model"])
+        self.newTableEntry(_("securityModel"), service["security_model"])        
+        self.newTableEntry(_("securityName"), service["security_name"])
+        self.newTableEntry(_("securityLevel"), service["security_level"])
+        self.newTableEntry(_("contextName"), service["context_name"])
+        self.newTableEntry(_("contextEngineID"), service["context_engine_id"])
+        self.newTableEntry(_("command"), service["command"])
         
         self.endTable()
         self.endSection()
@@ -871,17 +869,17 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         
         if service["port"]:
             port = str(service["port"])
-            self.newTableEntry("Port", self.getUrlLink(port, "https://www.prelude-ids.com/port_details.php?port=%s" % port))
+            self.newTableEntry(_("Port"), self.getUrlLink(port, "https://www.prelude-ids.com/port_details.php?port=%s" % port))
 
         ipn = service["iana_protocol_number"]
         if ipn and utils.protocol_number_to_name(ipn) != None:
-            self.newTableEntry("Protocol", utils.protocol_number_to_name(ipn))
+            self.newTableEntry(_("Protocol"), utils.protocol_number_to_name(ipn))
 
         elif service["iana_protocol_name"]:
-             self.newTableEntry("Protocol", service["iana_protocol_name"])
+             self.newTableEntry(_("Protocol"), service["iana_protocol_name"])
                              
         elif service["protocol"]:
-            self.newTableEntry("Protocol", service["protocol"])
+            self.newTableEntry(_("Protocol"), service["protocol"])
             
     def buildDirection(self, direction):
         self.beginTable()
@@ -904,7 +902,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         i = 0
         
         for source in alert["source"]:
-            self.beginSection("Source(%d)" % i)
+            self.beginSection(_("Source(%d)") % i)
             self.buildDirection(source)
             self.endSection()
             i += 1
@@ -913,7 +911,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         i = 0
         
         for target in alert["target"]:
-            self.beginSection("Target(%d)" % i)
+            self.beginSection(_("Target(%d)") % i)
             self.buildDirection(target)
 
             for f in target["file"]:
@@ -928,16 +926,16 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 
     def getSectionName(self, alert):
         if alert["correlation_alert"]:
-            section = "IDMEF Correlation Alert"
+            section = _("Correlation Alert")
             
         elif alert["tool_alert"]:
-            section = "IDMEF Tool Alert"
+            section = _("Tool Alert")
 
         elif alert["overflow_alert"]:
-            section = "IDMEF Overflow Alert"
+            section = _("Overflow Alert")
 
         else:
-            section = "IDMEF Alert"
+            section = _("Alert")
 
         return section
         
@@ -954,7 +952,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.buildImpact(alert)
         self.endTable()
 
-        self.beginSection("Actions")
+        self.beginSection(_("Actions"))
         for action in alert["assessment.action"]:
             self.buildAction(action)
         self.endSection()
@@ -963,7 +961,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.buildToolAlert(alert)
         self.buildReference(alert)
 
-        self.beginSection("Analyzer #0")
+        self.beginSection(_("Analyzer #0"))
         self.buildAnalyzer(alert["analyzer(-1)"])
                 
         self.buildAnalyzerList(alert)
@@ -993,7 +991,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                 else:
                     return "."
                 
-            self.beginSection("Network centric information")
+            self.beginSection(_("Network centric information"))
 
             self.beginTable(cl="message_summary_no_border")
             ip.render_table(self, "IP", ignored_value)
@@ -1010,11 +1008,11 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 
                 payload = utils.escape_html_string(utils.hexdump(ignored_value["payload"])).replace(" ", "&nbsp;")
                 val["payload"] = "<span class='fixed'>%s</span>" % payload
-                data.render_table(self, "Payload", val)
+                data.render_table(self, _("Payload"), val)
 
                 payload = utils.escape_html_string(ignored_value["payload"]).replace(" ", "&nbsp;")                
                 val["payload"] = "<div style='overflow: auto;'>%s</div>" % utils.escape_html_string(ignored_value["payload"]).replace("\n", "<br/>")
-                data.render_table(self, "Ascii Payload", val)
+                data.render_table(self, _("ASCII Payload"), val)
                             
             self.endTable()
             self.endSection()
@@ -1027,10 +1025,10 @@ class HeartbeatSummary(MessageSummary, view.View):
         heartbeat = self.env.idmef_db.getHeartbeat(self.parameters["ident"], htmlsafe=True)
         self.dataset["sections"] = [ ]
 
-        self.beginSection("Heartbeat")
+        self.beginSection(_("Heartbeat"))
         self.buildTime(heartbeat)
 
-        self.beginSection("Analyzer #0")
+        self.beginSection(_("Analyzer #0"))
         self.buildAnalyzer(heartbeat["analyzer(-1)"])
     
         self.buildAnalyzerList(heartbeat)

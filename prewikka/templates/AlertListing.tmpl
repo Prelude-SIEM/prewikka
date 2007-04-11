@@ -487,18 +487,16 @@ function ${name}_add_entry(object, operator, value, num) {
   #if $message.sub_alert_name
     <b>$message.sub_alert_type#slurp
     #if $message.sub_alert_display
-      #set plural = ""
-      #if $message.sub_alert_number > 1:
-          #set plural = "s"
-      #end if
-      (<a href="$message.sub_alert_display">$message.sub_alert_number</a> alert$plural)#slurp
+      #set $str = $ngettext("alert", "alerts", $message.sub_alert_number)
+      (<a href="$message.sub_alert_display">$message.sub_alert_number</a> $str)#slurp
     #end if
 :</b> <i><a href="$message.sub_alert_link">$message.sub_alert_name</a></i><br/>#slurp
   #end if
 
   #if $message.aggregated and $message.aggregated_classifications_hidden > 0
-    <b>($message.aggregated_classifications_hidden/$message.aggregated_classifications_total alerts not shown...
-    <a href="$message.aggregated_classifications_hidden_expand">expand</a>)</b>
+    #set $string = $_("%(hidden)/%(total) alerts not shown...")
+    <b>$str($string) % { "hidden": $message.aggregated_classifications_hidden, "total": $message.aggregated_classifications_total }
+    <a href="$message.aggregated_classifications_hidden_expand">$_("expand")</a>)</b>
     <br/>
   #end if
 
@@ -526,7 +524,7 @@ function ${name}_add_entry(object, operator, value, num) {
   #end for
 </td>
 
-#for $name, $direction, $hidden, $total, $expand in ("source", $message.source, $message.aggregated_source_hidden, $message.aggregated_source_total, $message.aggregated_source_expand), ("target", $message.target, $message.aggregated_target_hidden, $message.aggregated_target_total, $message.aggregated_target_expand)
+#for $name, $direction, $hidden, $total, $expand in ($_("source"), $message.source, $message.aggregated_source_hidden, $message.aggregated_source_total, $message.aggregated_source_expand), ($_("target"), $message.target, $message.aggregated_target_hidden, $message.aggregated_target_total, $message.aggregated_target_expand)
 <td>
 #if len($direction) == 0
        n/a
@@ -572,10 +570,10 @@ function ${name}_add_entry(object, operator, value, num) {
        <span id="menu_$address_cnt" class="popup_menu">
        #set global $address_cnt += 1
 
-         - <a href="$address.inline_filter">Filter on this $name</a><br />
+         - <a href="$address.inline_filter">$str($_("Filter on this %s") % ($name))</a><br />
  
        #if not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
-         - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$name.capitalize() information</a><br />
+         - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$str($_("%s information") % ($name)).capitalize()</a><br />
 
           #for $cmdname, $link in $address.host_commands
          - <a href="$link">$cmdname</a><br />
@@ -639,7 +637,7 @@ function ${name}_add_entry(object, operator, value, num) {
 #block timeline_extra_content
 #filter CleanOutput
 <tr>
-  <th id="filter_control_label">$_("Filter:")</td>
+  <th id="filter_control_label">$_("Filter")</th>
   <td colspan="2">
    <select name="filter" size="1" class="filter_control_select">
     <option value="">&nbsp;</option>

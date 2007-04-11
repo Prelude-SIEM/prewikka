@@ -52,7 +52,8 @@ class AlertFilterEdition(view.View):
     view_parameters = AlertFilterEditionParameters
     view_template = "FilterEdition"
     view_permissions = [ User.PERM_IDMEF_VIEW ]
-    
+    example_formula = N_("Example: (A AND B) OR (C AND D)")
+ 
     def _setCommon(self):        
         self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
         self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.AlertFilterList))
@@ -64,7 +65,7 @@ class AlertFilterEdition(view.View):
         self.dataset["elements"] = [ ]
         self.dataset["fltr.name"] = ""
         self.dataset["fltr.comment"] = ""
-        self.dataset["formula"] = "Example: (A AND B) OR (C AND D)"
+        self.dataset["formula"] = _(self.example_formula)
         
     def _reload(self):
         for name, obj, operator, value in self.parameters.get("elements", [ ]):
@@ -119,7 +120,7 @@ class AlertFilterEdition(view.View):
         if not self.parameters.has_key("save_as"):
             raise Error.PrewikkaUserError("Could not save Filter", "No name for this filter was provided")
 
-        if self.parameters["formula"].find("Example") != -1:
+        if self.parameters["formula"] == _(self.example_formula):
             raise Error.PrewikkaUserError("Could not save Filter", "No valid filter formula provided")
 
         filter = Filter.Filter(self.parameters["save_as"],

@@ -48,15 +48,16 @@ class SensorMessagesDelete(SensorListingParameters):
 def get_analyzer_status_from_latest_heartbeat(heartbeat_status, heartbeat_time,
                                               heartbeat_interval, error_margin):
     if heartbeat_interval is None:
-        return "unknown", "unknown"
+        return "unknown", _("Unknown")
 
     if heartbeat_status == "exiting":
-        return "normal_offline", "normal offline"
+        return "offline", _("Offline")
     
     if time.time() - int(heartbeat_time) > int(heartbeat_interval) + error_margin:
-        return "abnormal_offline", "abnormal offline"
+        return "missing", _("Missing")
     
-    return "online", "online"
+    return "online", _("Online")
+
 
 
 

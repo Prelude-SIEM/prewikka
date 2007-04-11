@@ -343,12 +343,17 @@ p {
 	height: 163px;
 }
 
-#timeline th {
-        text-align: left;
+#timeline td {
+	padding: 0;
+	margin: 0;
 }
 
-table th {
-        white-space: nowrap;
+#timeline th {
+	padding: 0;
+	margin: 0;
+        text-align: left;
+	font-size: 8px;
+	font-weight: bold;
 }
 
 .timeline_control_prev, .timeline_control_cur, .timeline_control_next {
@@ -384,9 +389,6 @@ table th {
         color:black;
 }
 
-#filter_control_label, #timezone_control_label, #timeline_limit_label, #timeline_submit, #timeline_step_label, .navigation_label {
-        font-weight: bold;
-}
 
 .popup_operator_select {
         width: 46px;
@@ -693,13 +695,13 @@ table th {
         color: red;
 }
 
-.heartbeat_analyze_sensor_status_normal_offline {
+.heartbeat_analyze_sensor_status_offline {
         /* background-color: #b5cba0; */
         background-color: #ffb063;
 	text-align: center;
 }
  
-.heartbeat_analyze_sensor_status_abnormal_offline {
+.heartbeat_analyze_sensor_status_missing {
 	text-align: center;
 	background-color: #e77070;
 }
