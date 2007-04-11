@@ -590,11 +590,11 @@ class ListedAlert(ListedMessage):
         self._setMessageClassification(dataset, message)
 
         if message["alert.correlation_alert"]:        
-            self["sub_alert_type"] = "Correlation Alert"
+            self["sub_alert_type"] = _("Correlation Alert")
             self._setMessageAlertIdentInfo(message, message["alert.correlation_alert"], ident)
             
         elif message["alert.tool_alert"]:
-            self["sub_alert_type"] = "Tool Alert"
+            self["sub_alert_type"] = _("Tool Alert")
             self._setMessageAlertIdentInfo(message, message["alert.tool_alert"], ident)
             
         if not self["source"]:
