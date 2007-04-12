@@ -265,7 +265,7 @@ class AlertListingParameters(MessageListingParameters):
 class SensorAlertListingParameters(AlertListingParameters):
     def register(self):
         AlertListingParameters.register(self)
-        self.mandatory("analyzerid", long)
+        self.mandatory("analyzerid", str)
 
     def normalize(self, view_name, user):
         AlertListingParameters.normalize(self, view_name, user)
