@@ -61,11 +61,11 @@ msgstr "Ошибка в элементе фильтра '%s', на которы�
 
 #: prewikka/localization.py:62
 msgid "English"
-msgstr "Английский"
+msgstr ""
 
 #: prewikka/localization.py:63
 msgid "French"
-msgstr "Французский"
+msgstr "Français"
 
 #: prewikka/localization.py:64
 msgid "Portuguese (Brazilian)"

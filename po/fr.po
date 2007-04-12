@@ -60,7 +60,7 @@ msgstr "L'élément de filtre '%s'  référencé depuis la formule est invalide"
 
 #: prewikka/localization.py:62
 msgid "English"
-msgstr "Anglais"
+msgstr ""
 
 #: prewikka/localization.py:63
 msgid "French"

@@ -67,7 +67,7 @@ msgstr ""
 
 #: prewikka/localization.py:63
 msgid "French"
-msgstr ""
+msgstr "Français"
 
 #: prewikka/localization.py:64
 msgid "Portuguese (Brazilian)"
