@@ -1,3 +1,4 @@
+# coding=UTF-8
 # Copyright (C) 2007 PreludeIDS Technologies. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 #
