@@ -59,6 +59,27 @@ def get_analyzer_status_from_latest_heartbeat(heartbeat_status, heartbeat_time,
     return "online", _("Online")
 
 
+def analyzer_cmp(x, y):
+    xmiss = x["status"] == "missing"
+    ymiss = y["status"] == "missing"
+    
+    if xmiss and ymiss:
+        return cmp(x["name"], y["name"])
+        
+    elif xmiss or ymiss:
+        return ymiss - xmiss
+        
+    else:
+        return cmp(x["name"], y["name"])
+        
+def node_cmp(x, y):
+    xmiss = x["missing"]
+    ymiss = y["missing"]
+    
+    if xmiss or ymiss:
+        return ymiss - xmiss        
+    else:
+        return cmp(x["node_name"], y["node_name"])
 
 
 class SensorListing(view.View):
@@ -71,17 +92,23 @@ class SensorListing(view.View):
         self._heartbeat_count = int(env.config.general.getOptionValue("heartbeat_count", 30))
         self._heartbeat_error_margin = int(env.config.general.getOptionValue("heartbeat_error_margin", 3))
     
+        
     def render(self):
-        analyzers = [ ]
+        analyzers = { }
 
         criteria = None
         if self.parameters.has_key("filter_path"):
             criteria = "%s == '%s'" % (self.parameters["filter_path"],
                                        utils.escape_criteria(self.parameters["filter_value"]))
+
+        locations = { }
+        nodes = { }
         
-        for analyzer_path in self.env.idmef_db.getAnalyzerPaths(criteria):
-            analyzerid = analyzer_path[-1]
+        cum = 0
+        for analyzer_path in self.env.idmef_db.getAnalyzerPaths():
+            analyzerid = analyzer_path[-1]          
             analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
+
             parameters = { "analyzerid": analyzer["analyzerid"] }
             analyzer["alert_listing"] = utils.create_link("sensor_alert_listing", parameters)
             analyzer["heartbeat_listing"] = utils.create_link("sensor_heartbeat_listing", parameters)
@@ -97,8 +124,10 @@ class SensorListing(view.View):
                                                                    { "filter_path": "heartbeat.analyzer(-1).node.location",
                                                                      "filter_value": analyzer["node_location"] })
                 
+            node_key = ""
             for i in range(len(analyzer["node_addresses"])):
                 addr = analyzer["node_addresses"][i]
+                node_key += addr
                 
                 analyzer["node_addresses"][i] = {}
                 analyzer["node_addresses"][i]["value"] = addr
@@ -121,17 +150,37 @@ class SensorListing(view.View):
 
             analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(int(analyzer["last_heartbeat_time"]))) + \
                                               " %+.2d:%.2d" % utils.get_gmt_offset()
+       
+            node_location = analyzer["node_location"] or "Node location n/a"
+            node_name = analyzer.get("node_name") or "Node name n/a"
+            osversion = analyzer["osversion"] or "OS version n/a"
+            ostype = analyzer["ostype"] or "OS type n/a"
+            addresses = analyzer["node_addresses"]
             
-            analyzers.append(analyzer)
+            node_key = node_name + osversion + ostype
             
-        self.dataset["analyzers"] = [ ]
-        for analyzer in analyzers:
-            if analyzer["status"] == "ok":
-                self.dataset["analyzers"].append(analyzer)
+            if not locations.has_key(node_location):
+                locations[node_location] = { "total": 1, "missing": 0, "nodes": { } }
             else:
-                self.dataset["analyzers"].insert(0, analyzer)
+                locations[node_location]["total"] += 1
 
-
+            if not locations[node_location]["nodes"].has_key(node_key):
+                locations[node_location]["nodes"][node_key] = { "total": 1, "missing": 0, "analyzers": [ ], 
+                                                                "node_name": node_name, "node_location": node_location,
+                                                                "ostype": ostype, "osversion": osversion, 
+                                                                "node_addresses": addresses, "node_key": node_key }
+            else:
+                locations[node_location]["nodes"][node_key]["total"] += 1
+                  
+            if analyzer["status"] == "missing":
+                locations[node_location]["missing"] += 1
+                locations[node_location]["nodes"][node_key]["missing"] += 1
+                locations[node_location]["nodes"][node_key]["analyzers"].insert(0, analyzer)
+            else:
+                locations[node_location]["nodes"][node_key]["analyzers"].append(analyzer)
+                
+        self.dataset["locations"] = locations
+        
 
 class SensorMessagesDelete(SensorListing):
     view_name = "sensor_messages_delete"

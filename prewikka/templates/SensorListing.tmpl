@@ -1,94 +1,130 @@
 #extends prewikka.templates.ClassicLayout
+#from prewikka.views.sensor import node_cmp
+#from prewikka.views.sensor import analyzer_cmp
 
 #block main_content
 #filter CleanOutput
 
-#if len($analyzers) > 0
-  <form action="?" method="post">
-  <input type="hidden" name="view" value="sensor_messages_delete" />
+#if len($locations) > 0
+ <form action="?" method="post">
+ <input type="hidden" name="view" value="sensor_messages_delete" />
 #end if
-<table>
-  <thead>
-    <tr>
-      <td>$_("Name")</td>
-      <td>$_("Model")</td>
-      <td>$_("OS")</td>
-      <td>$_("Node name")</td>
-      <td>$_("Node location")</td>
-      <td>$_("Node address")</td>
-      <td>$_("Last heartbeat")</td>
-      <td>$_("Latest status")</td>
-    </tr>
-  </thead>
-  <tbody>
-  #if len($analyzers) > 0
-    #set $row_classes = ("table_row_even", "table_row_odd")
-    #set $cnt = 0
-    #set $rcnt = 0
 
-    #for $analyzer in $analyzers
-      #set $row_class = $row_classes[$rcnt%2]
-      <tr class="$row_class">
-        <td>
-	  <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$analyzer.name</a>
-	  <span id="menu_$cnt" class="popup_menu">
-            - <a href="$analyzer.alert_listing">$_("Alert listing")</a><br />
-            - <a href="$analyzer.heartbeat_listing">$_("Heartbeat listing")</a><br />
-            - <a href="$analyzer.heartbeat_analyze">$_("Heartbeat analysis")</a><br />
-          </span>
-        </td>
-        <td>$analyzer.model $analyzer.version</td>
-        <td>$analyzer.ostype $analyzer.osversion</td>
+<div id="fieldset_page">
 
-	#if $analyzer.node_name
-         <td><a href="$analyzer.node_name_link">$analyzer.node_name</a></td>
-        #else
-         <td>n/a</td>
-        #end if
+#set $listing = $locations.keys()
+$listing.sort()
 
-	#if $analyzer.node_location
-         <td><a href="$analyzer.node_location_link">$analyzer.node_location</a></td>
-        #else
-         <td>n/a</td>
-        #end if
-
-        <td>
-        #if len($analyzer.node_addresses) > 0
-          #for $address in $analyzer.node_addresses
-           #set $cnt += 1
-
-	   <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$address.value</a><br />
-           <span id="menu_$cnt" class="popup_menu">
-
-            - <a href="$address.inline_filter">$_("Filter on address")</a><br />
-            - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$_("Address information")</a><br />
-     
-	    #for $name, $link in $address.host_commands
-            - <a href="$link">$name</a><br />
-            #end for
-           </span>
-
-          #end for
-        #else
-          n/a
-        #end if
-        </td>
-        <td>$analyzer.last_heartbeat_time</td>
-        <td class="heartbeat_analyze_sensor_status_$analyzer.status"><b>$analyzer.status_meaning</b></td>
-        <td><input class="checkbox" type="checkbox" name="analyzerid" value="$analyzer.analyzerid" /></td>
-      </tr>
-      #set $rcnt += 1
-      #set $cnt += 1
-    #end for
+#for $entry in $listing:
+ <fieldset class="fieldset_heading">
+  #if $locations[$entry]["missing"] > 0:
+   #set $display = "block"
+   #set $display_tmp = "none"
+   #set $dclass = "heartbeat_analyze_sensor_status_missing" 
+   #set $text = $str($locations[$entry]["missing"]) + " of " + $str($locations[$entry]["total"]) + " analyzers missing"
   #else
-    <tr><td class="not_available" style="text-align: center;" colspan="9">$_("No agent available")</td></tr>
+   #set $display = "none"
+   #set $display_tmp = "block"
+   #set $dclass = "heartbeat_analyze_sensor_status_online"
+   #set $text = "All analyzers online"
   #end if
-  </tbody>
-</table>
 
-<br/>
+  <legend><b><a href="#" onclick="javascript:toggleVisibility('${entry}_tmp'); toggleVisibility('${entry}'); return false;">$entry</a></b></legend>
 
-#if len($analyzers) > 0
+   <div id="${entry}_tmp" style="display: $display_tmp">
+    <p style="text-align: center;" class="$dclass">$text</p>
+   </div>
+
+   <div id="$entry" style="display: $display">
+   #set $nlisting = $locations[$entry]["nodes"].values()
+   $nlisting.sort(node_cmp)
+   
+   #for $node in $nlisting
+    #set $cnt = 0
+    #set $row_classes = ("table_row_even", "table_row_odd")
+    #set $row_class = $row_classes[$cnt%2]
+
+  #if $node.missing > 0:
+   #set $display = "block"
+   #set $dclass = "heartbeat_analyze_sensor_status_missing"
+   #set $text = $str($node.missing) + " of " + $str($node.total) + " analyzers missing"
+  #else
+   #set $display = "none"
+   #set $text = "All analyzers online"
+   #set $dclass = "heartbeat_analyze_sensor_status_online" 
+  #end if
+    
+    <table style="width:100%; border: 1px solid black;">
+     <thead style="width: 100%;">
+      <tr class="$dclass">
+        <th>$node.node_name</th>
+        <th>
+         #for $addr in $node.node_addresses
+          <a href="#" onclick="javascript:toggleVisibilityUnique('${entry}_${node.node_key}_addr'); return false;">$addr.value</a><br />
+          <span id="${entry}_${node.node_key}_addr" class="popup_menu">
+           - <a href="$addr.inline_filter">$_("Filter on address")</a><br />
+           - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$addr.value">$_("Address information")</a><br />
+    
+           #for $name, $link in $addr.host_commands
+           - <a href="$link">$name</a><br />
+           #end for
+          </span>
+         #end for
+        </th>
+        <th>$node.ostype</th>
+        <th>$node.osversion</th>        
+        <th style="width: 150px; text-align: center;" class="$dclass">  
+         <b><a href="#" onclick="javascript:toggleVisibility('${entry}_${node.node_key}'); return false;">$text</a></b>
+        </th>
+      </tr>
+     </thead>
+    </table>
+    
+    <div id="${entry}_${node.node_key}" style="display: $display"> 
+    <table style="width: 100%; border: 1px solid black;">
+      <tr class="$row_classes[$cnt%2]">
+       <th>$_("Delete")</th>
+       <th>$_("Name")</th>
+       <th>$_("Model")</th>
+       <th>$_("Version")</th>
+       <th>$_("Class")</th>
+       <th>$_("Last heartbeat")</th>
+       <th style="text-align: center;">$_("Status")</th>
+      </tr>
+     #set $alisting = $node.analyzers
+     $node.analyzers.sort(analyzer_cmp)
+     #for $analyzer in $node.analyzers
+      #set $cnt += 1
+      <tr class="$row_classes[$cnt%2]">
+       <td style="padding-top: 0px; padding-bottom: 0px;"><input class="checkbox" type="checkbox" name="analyzerid" value="$analyzer["analyzerid"]" /></td>
+       
+       <td>
+        <a href="#" onclick="javascript:toggleVisibilityUnique('${entry}_${node.node_name}_${analyzer.analyzerid}'); return false;">$analyzer.name</a>
+        <span id="${entry}_${node.node_name}_${analyzer.analyzerid}" class="popup_menu">
+         - <a href="$analyzer.alert_listing">$_("Alert listing")</a><br />
+         - <a href="$analyzer.heartbeat_listing">$_("Heartbeat listing")</a><br />
+         - <a href="$analyzer.heartbeat_analyze">$_("Heartbeat analysis")</a><br />
+        </span>
+       </td>
+       <td>$analyzer["model"]</td>
+       <td>$analyzer["version"]</td>
+       <td>$analyzer["class"]</td>
+       <td>$analyzer["last_heartbeat_time"]</td>
+       <td class=heartbeat_analyze_sensor_status_$analyzer["status"]>$analyzer["status_meaning"]</td>
+      </tr>
+     #end for
+    </table>
+    </div>
+    
+    <br />
+   #end for
+  </div>
+ </fieldset>
+
+<br />
+#end for
+
+#if len($locations) > 0
   <div style="text-align: right; vertical-align: bottom;">
     <input class="checkbox" type="checkbox" name="alerts" /><b>$_("Alerts")</b>
     <input class="checkbox" type="checkbox" name="heartbeats" /><b>$_("Heartbeats")</b>
@@ -96,6 +132,7 @@
   </div>
 #end if
 
+</div>
 </form>
 
 #end filter
