@@ -36,7 +36,7 @@ msgstr "Authentifizierung fehlgeschlagen"
 
 #: prewikka/Auth.py:38
 msgid "Session invalid"
-msgstr "Session ungültig"
+msgstr "Session ungÃ¼ltig"
 
 #: prewikka/Auth.py:44
 msgid "Session expired"
@@ -44,7 +44,7 @@ msgstr "Session abgelaufen"
 
 #: prewikka/Auth.py:132
 msgid "Username and password do not match."
-msgstr "Benutzername und Passwort stimmen nicht überein."
+msgstr "Benutzername und Passwort stimmen nicht Ã¼berein."
 
 #: prewikka/Auth.py:145
 msgid "Logged out"
@@ -57,7 +57,7 @@ msgstr "Parameter-Normalisierung fehlgeschlagen"
 #: prewikka/Filter.py:78
 #, python-format
 msgid "Invalid filter element '%s' referenced from filter formula"
-msgstr "Ungültiges Filterelement '%s' von Filterformel referenziert"
+msgstr "UngÃ¼ltiges Filterelement '%s' von Filterformel referenziert"
 
 #: prewikka/localization.py:86
 msgid "January"
@@ -69,7 +69,7 @@ msgstr "Februar"
 
 #: prewikka/localization.py:88
 msgid "March"
-msgstr "März"
+msgstr "MÃ¤rz"
 
 #: prewikka/localization.py:89
 msgid "April"
@@ -173,7 +173,7 @@ msgstr "Filter"
 
 #: prewikka/views/__init__.py:56
 msgid "About"
-msgstr "Über"
+msgstr "Ãœber"
 
 #: prewikka/modules/auth/cgi/cgi.py:29
 msgid "CGI Authentication failed: no user specified."
@@ -197,21 +197,21 @@ msgstr "Adress Informationen"
 
 #: prewikka/templates/SensorListing.py:250
 msgid "No agent available"
-msgstr "Kein Agent verfügbar"
+msgstr "Kein Agent verfÃ¼gbar"
 
 #: prewikka/templates/SensorListing.py:273
 #: prewikka/templates/MessageListing.py:211
 #: prewikka/templates/FilterEdition.py:221
 msgid "Delete"
-msgstr "Löschen"
+msgstr "LÃ¶schen"
 
 #: prewikka/templates/About.py:111
 msgid ""
 "provides support to Large Accounts, Major Companies and Government Agencies "
 "around the world, to improve and strengthen the security of their systems "
 "and networks."
-msgstr "bietet Unterstützung für Großanbieter, Unternehmen und Regierungsbehörden "
-"weltweit, um System- und Netzsicherheit zu stärken und zu verbessern."
+msgstr "bietet UnterstÃ¼tzung fÃ¼r GroÃŸanbieter, Unternehmen und RegierungsbehÃ¶rden "
+"weltweit, um System- und Netzsicherheit zu stÃ¤rken und zu verbessern."
 
 #: prewikka/templates/About.py:131
 msgid ""
@@ -225,13 +225,13 @@ msgid ""
 "extension to handle new devices and porting of Prelude to unsupported "
 "operating systems."
 msgstr "Im Geiste der Open Source Community ermuntern wir Sie, zu der Entwicklung "
-"unserer Anwendung beizutragen. Sie können individuelle Versionen von Prelude bestellen, "
-"um Ihren Ansprüchen gerecht zu werden: Anpassung, Hinzufügen von Funktionalitäten etc. "
-"Da die Änderungen von PreludeIDS Technikern ausgeführt werden, können Sie sich sicher "
+"unserer Anwendung beizutragen. Sie kÃ¶nnen individuelle Versionen von Prelude bestellen, "
+"um Ihren AnsprÃ¼chen gerecht zu werden: Anpassung, HinzufÃ¼gen von FunktionalitÃ¤ten etc. "
+"Da die Ã„nderungen von PreludeIDS Technikern ausgefÃ¼hrt werden, kÃ¶nnen Sie sich sicher "
 "sein, dass alle System-Modifikationen garantiert optimal von unserer technischen "
-"Supportabteilung integriert werden. Außerdem können wir Prelude erweitern, um auch "
-"bisher nicht unterstützte oder proprietäre Sensoren sowie Rulesetserweiterungen für neue Geräte "
-"zu implementieren oder Prelude auf bisher nicht unterstützte Betriebssysteme portieren. "
+"Supportabteilung integriert werden. AuÃŸerdem kÃ¶nnen wir Prelude erweitern, um auch "
+"bisher nicht unterstÃ¼tzte oder proprietÃ¤re Sensoren sowie Rulesetserweiterungen fÃ¼r neue GerÃ¤te "
+"zu implementieren oder Prelude auf bisher nicht unterstÃ¼tzte Betriebssysteme portieren. "
 
 #: prewikka/templates/About.py:142
 msgid ""
@@ -241,8 +241,8 @@ msgid ""
 "the maintenance service we offer maintains and updates your software."
 msgstr "Unser PreludeIDS Wartungs- und Support-Service garantiert den optimalen Betrieb "
 "der Prelude Plattform in Ihrer Infrastruktur. Mit unserem Support-Service profitieren "
-"Sie von priorisierter Hilfe und der Kompetenz unserer Techniker, während der Wartungs-Service "
-"Ihre Software auf dem aktuellsten Stand hält."
+"Sie von priorisierter Hilfe und der Kompetenz unserer Techniker, wÃ¤hrend der Wartungs-Service "
+"Ihre Software auf dem aktuellsten Stand hÃ¤lt."
 
 #: prewikka/templates/About.py:153
 msgid "The Prelude framework is licensed under the"
@@ -252,8 +252,8 @@ msgstr "Das Prelude Framework ist lizensiert unter der"
 msgid ""
 "PreludeIDS provides specific commercial licenses to allow proprietary "
 "systems based on Prelude to be developed and to interoperate."
-msgstr "PreludeIDS bietet spezifische kommerzielle Lizensen, um proprietäre "
-"auf Prelude basierende Systeme entwickeln und zwischen diesen interagieren zu können."
+msgstr "PreludeIDS bietet spezifische kommerzielle Lizensen, um proprietÃ¤re "
+"auf Prelude basierende Systeme entwickeln und zwischen diesen interagieren zu kÃ¶nnen."
 
 #: prewikka/templates/About.py:169
 msgid ""
@@ -261,10 +261,10 @@ msgid ""
 "security services. By advising you on how to secure your infrastructure, "
 "deploying Prelude and training your users, we provide a turnkey solution to "
 "secure your infrastructure, delivered by specialists."
-msgstr "Durch unsere Partner haben Sie Zugang zu einer großen Anzahl überzeugender"
+msgstr "Durch unsere Partner haben Sie Zugang zu einer groÃŸen Anzahl Ã¼berzeugender"
 "Sicherheitsdienste. Indem wir Ihnen mit Rat und Tat bei der Sicherung Ihrer Infrastruktur, "
 "der Implementierung von Prelude und dem Training Ihrer Benutzer zur Seite stehen, "
-"bieten wir Ihnen eine komplette Sicherheits-Lösung, geliefert von Spezialisten."
+"bieten wir Ihnen eine komplette Sicherheits-LÃ¶sung, geliefert von Spezialisten."
 
 #: prewikka/templates/LoginPasswordForm.py:132
 msgid "Submit"
@@ -288,7 +288,7 @@ msgstr "Rechte:"
 
 #: prewikka/templates/UserSettings.py:254
 msgid "Change password"
-msgstr "Passwort ändern"
+msgstr "Passwort Ã¤ndern"
 
 #: prewikka/templates/UserSettings.py:261
 msgid "Current password:"
@@ -300,15 +300,15 @@ msgstr "Neues Passwort:"
 
 #: prewikka/templates/UserSettings.py:279
 msgid "Confirm new password:"
-msgstr "Neues Passwort bestätigen:"
+msgstr "Neues Passwort bestÃ¤tigen:"
 
 #: prewikka/templates/UserSettings.py:291
 msgid "Submit Changes"
-msgstr "Änderungen abschicken"
+msgstr "Ã„nderungen abschicken"
 
 #: prewikka/templates/UserListing.py:144
 msgid "Delete user"
-msgstr "Benutzer löschen"
+msgstr "Benutzer lÃ¶schen"
 
 #: prewikka/templates/UserListing.py:153
 msgid "Create user"
@@ -360,7 +360,7 @@ msgstr "Limit"
 
 #: prewikka/templates/MessageListing.py:394
 msgid "Apply"
-msgstr "Übernehmen"
+msgstr "Ãœbernehmen"
 
 #: prewikka/templates/MessageListing.py:399
 #: prewikka/templates/FilterEdition.py:308
@@ -370,7 +370,7 @@ msgstr "Sichern"
 #: prewikka/templates/MessageListing.py:440
 #: prewikka/templates/MessageListing.py:447
 msgid "prev"
-msgstr "früher"
+msgstr "frÃ¼her"
 
 #: prewikka/templates/MessageListing.py:458
 #: prewikka/templates/MessageListing.py:465
@@ -380,7 +380,7 @@ msgstr "aktuell"
 #: prewikka/templates/MessageListing.py:476
 #: prewikka/templates/MessageListing.py:483
 msgid "next"
-msgstr "später"
+msgstr "spÃ¤ter"
 
 #: prewikka/templates/MessageListing.py:529
 msgid "total"
@@ -408,7 +408,7 @@ msgstr "Typ"
 
 #: prewikka/templates/HeartbeatListing.py:193
 msgid "Heartbeat summary"
-msgstr "Heartbeat Übersicht"
+msgstr "Heartbeat Ãœbersicht"
 
 #: prewikka/templates/HeartbeatListing.py:201
 msgid "Filter on agent"
