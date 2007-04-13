@@ -4,7 +4,6 @@ function toggleVisibility(section_id) {
 	section = document.getElementById(section_id);
 	
 	if ( section.style.display != 'block' ) {
-		cur_visible = section;
 		section.style.display = 'block';
 	} else {
 		section.style.display = 'none';
@@ -15,15 +14,20 @@ function toggleVisibility(section_id) {
 function toggleVisibilityUnique(section_id) 
 {
 	if ( cur_visible )
-		section.style.display = 'none';
+		cur_visible.style.display = 'none';
 
 	section = document.getElementById(section_id);
-	if ( section == cur_visible ) {
+	if ( cur_visible == section ) {
 		cur_visible = null;
 		return;
 	}
 
 	toggleVisibility(section_id);
+
+	if ( section.style.display == 'block' )
+		cur_visible = section;
+	else
+		cur_visible = null;
 }
 
 
