@@ -61,6 +61,7 @@ __builtin__.ngettext = _safeNgettext
 
 _LANGUAGES = { 
                "Deutsche": "de",
+               "Español": "es",
                "English": "en", 
                "Français": "fr", 
                "Portuguese (Brazilian)": "pt_BR",
