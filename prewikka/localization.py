@@ -63,7 +63,7 @@ _LANGUAGES = {
                "English": "en", 
                "Français": "fr", 
                "Portuguese (Brazilian)": "pt_BR",
-               "Russian": "ru"
+               "Русский": "ru"
              }
     
 
