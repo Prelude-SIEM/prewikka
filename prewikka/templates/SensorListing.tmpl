@@ -21,12 +21,13 @@ $listing.sort()
    #set $display = "block"
    #set $display_tmp = "none"
    #set $dclass = "heartbeat_analyze_sensor_status_missing" 
-   #set $text = $str($locations[$entry]["missing"]) + " of " + $str($locations[$entry]["total"]) + " analyzers missing"
+   
+   #set $text = $str($_("%(missing)d of %(total)d analyzers missing") % $locations[$entry])
   #else
    #set $display = "none"
    #set $display_tmp = "block"
    #set $dclass = "heartbeat_analyze_sensor_status_online"
-   #set $text = "All analyzers online"
+   #set $text = $_("All analyzers online")
   #end if
 
   <legend><b><a href="#" onclick="javascript:toggleVisibility('${entry}_tmp'); toggleVisibility('${entry}'); return false;">$entry</a></b></legend>
@@ -47,10 +48,10 @@ $listing.sort()
   #if $node.missing > 0:
    #set $display = "block"
    #set $dclass = "heartbeat_analyze_sensor_status_missing"
-   #set $text = $str($node.missing) + " of " + $str($node.total) + " analyzers missing"
+   #set $text = $str($_("%(missing)d of %(total)d analyzers missing") % $node)
   #else
    #set $display = "none"
-   #set $text = "All analyzers online"
+   #set $text = $_("All analyzers online")
    #set $dclass = "heartbeat_analyze_sensor_status_online" 
   #end if
     
