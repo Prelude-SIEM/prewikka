@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-13 11:22+0200\n"
+"POT-Creation-Date: 2007-04-13 18:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Valentin Bogdanov <bogdanov.valentin@gmail.com>\n"
 "Language-Team: Russian <LL@li.org>\n"
@@ -143,7 +143,7 @@ msgstr "Пример: (A AND B) OR (C AND D)"
 #: prewikka/views/messagesummary.py:655 prewikka/views/messagesummary.py:672
 #: prewikka/views/messagesummary.py:695 prewikka/views/messagesummary.py:753
 #: prewikka/views/messagesummary.py:772 prewikka/views/messagesummary.py:808
-#: prewikka/templates/SensorListing.py:204
+#: prewikka/templates/SensorListing.py:279
 msgid "Name"
 msgstr "Имя"
 
@@ -202,7 +202,7 @@ msgid "Node address"
 msgstr "Адрес узла"
 
 #: prewikka/views/messagesummary.py:434
-#: prewikka/templates/SensorListing.py:209
+#: prewikka/templates/SensorListing.py:284
 #: prewikka/templates/HeartbeatListing.py:136
 msgid "Model"
 msgstr "Модель"
@@ -212,13 +212,13 @@ msgid "Analyzerid"
 msgstr "Идентификатор анализатора"
 
 #: prewikka/views/messagesummary.py:437 prewikka/views/messagesummary.py:532
-#: prewikka/templates/SensorListing.py:214
+#: prewikka/templates/SensorListing.py:289
 #, fuzzy
 msgid "Version"
 msgstr "Версия"
 
 #: prewikka/views/messagesummary.py:438
-#: prewikka/templates/SensorListing.py:219
+#: prewikka/templates/SensorListing.py:294
 msgid "Class"
 msgstr "Класс"
 
@@ -616,7 +616,7 @@ msgstr ""
 msgid "Events"
 msgstr "События"
 
-#: prewikka/views/__init__.py:43 prewikka/templates/SensorListing.py:333
+#: prewikka/views/__init__.py:43 prewikka/templates/SensorListing.py:405
 msgid "Alerts"
 msgstr "Сигналы тревоги"
 
@@ -632,7 +632,7 @@ msgstr "События со средств защиты"
 msgid "Agents"
 msgstr "Агенты"
 
-#: prewikka/views/__init__.py:49 prewikka/templates/SensorListing.py:338
+#: prewikka/views/__init__.py:49 prewikka/templates/SensorListing.py:410
 msgid "Heartbeats"
 msgstr "Пульс"
 
@@ -656,31 +656,52 @@ msgstr "О программе"
 msgid "CGI Authentication failed: no user specified."
 msgstr "Ошибка аутентификации CGI: пользователь не указан"
 
-#: prewikka/templates/SensorListing.py:199
-#: prewikka/templates/SensorListing.py:343
+#: prewikka/templates/SensorListing.py:116
+#: prewikka/templates/SensorListing.py:172
+#, python-format
+msgid "%(missing)d of %(total)d analyzers missing"
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:124
+#: prewikka/templates/SensorListing.py:178
+#, fuzzy
+msgid "All analyzers online"
+msgstr "Время анализатора"
+
+#: prewikka/templates/SensorListing.py:212
+#: prewikka/templates/HeartbeatListing.py:231
+msgid "Filter on address"
+msgstr "Фильтровать по адресу"
+
+#: prewikka/templates/SensorListing.py:223
+msgid "Address information"
+msgstr "Информация об адресе"
+
+#: prewikka/templates/SensorListing.py:274
+#: prewikka/templates/SensorListing.py:415
 #: prewikka/templates/MessageListing.py:211
 #: prewikka/templates/FilterEdition.py:226
 msgid "Delete"
 msgstr "Удалить"
 
-#: prewikka/templates/SensorListing.py:224
+#: prewikka/templates/SensorListing.py:299
 #, fuzzy
 msgid "Last heartbeat"
 msgstr "Последнее время пульса"
 
-#: prewikka/templates/SensorListing.py:229
+#: prewikka/templates/SensorListing.py:304
 msgid "Status"
 msgstr ""
 
-#: prewikka/templates/SensorListing.py:278
+#: prewikka/templates/SensorListing.py:350
 msgid "Alert listing"
 msgstr "Список событий"
 
-#: prewikka/templates/SensorListing.py:286
+#: prewikka/templates/SensorListing.py:358
 msgid "Heartbeat listing"
 msgstr "Просмотр пульса"
 
-#: prewikka/templates/SensorListing.py:294
+#: prewikka/templates/SensorListing.py:366
 msgid "Heartbeat analysis"
 msgstr "Анализ пульса"
 
@@ -946,10 +967,6 @@ msgstr "Сводка пульса"
 msgid "Filter on agent"
 msgstr "Фильтровать по агенту"
 
-#: prewikka/templates/HeartbeatListing.py:231
-msgid "Filter on address"
-msgstr "Фильтровать по адресу"
-
 #: prewikka/templates/ClassicLayout.py:223
 msgid "logout"
 msgstr "выход"
@@ -1125,9 +1142,6 @@ msgstr "Фильтры"
 #, fuzzy
 #~ msgid "Node Name"
 #~ msgstr "Имя узла"
-
-#~ msgid "Address information"
-#~ msgstr "Информация об адресе"
 
 #~ msgid "No agent available"
 #~ msgstr "Нет доступных агентов"

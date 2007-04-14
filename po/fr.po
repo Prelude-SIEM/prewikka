@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-13 11:22+0200\n"
+"POT-Creation-Date: 2007-04-13 18:34+0200\n"
 "PO-Revision-Date: 2007-04-10 12:50+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
@@ -142,7 +142,7 @@ msgstr "Exemple : (A ET B) OR (C AND D)"
 #: prewikka/views/messagesummary.py:655 prewikka/views/messagesummary.py:672
 #: prewikka/views/messagesummary.py:695 prewikka/views/messagesummary.py:753
 #: prewikka/views/messagesummary.py:772 prewikka/views/messagesummary.py:808
-#: prewikka/templates/SensorListing.py:204
+#: prewikka/templates/SensorListing.py:279
 msgid "Name"
 msgstr "Nom"
 
@@ -168,7 +168,7 @@ msgstr "Heure de détection"
 
 #: prewikka/views/messagesummary.py:393
 msgid "Analyzer time"
-msgstr "Heure de l'analyseur"
+msgstr "Heure de l'agent"
 
 #: prewikka/views/messagesummary.py:399
 msgid "Process"
@@ -197,7 +197,7 @@ msgid "Node address"
 msgstr "Adresse du noeud"
 
 #: prewikka/views/messagesummary.py:434
-#: prewikka/templates/SensorListing.py:209
+#: prewikka/templates/SensorListing.py:284
 #: prewikka/templates/HeartbeatListing.py:136
 msgid "Model"
 msgstr "Modèle"
@@ -207,12 +207,12 @@ msgid "Analyzerid"
 msgstr ""
 
 #: prewikka/views/messagesummary.py:437 prewikka/views/messagesummary.py:532
-#: prewikka/templates/SensorListing.py:214
+#: prewikka/templates/SensorListing.py:289
 msgid "Version"
 msgstr "Version"
 
 #: prewikka/views/messagesummary.py:438
-#: prewikka/templates/SensorListing.py:219
+#: prewikka/templates/SensorListing.py:294
 msgid "Class"
 msgstr "Classe"
 
@@ -594,7 +594,7 @@ msgstr "Connecté"
 msgid "Events"
 msgstr "Evénements"
 
-#: prewikka/views/__init__.py:43 prewikka/templates/SensorListing.py:333
+#: prewikka/views/__init__.py:43 prewikka/templates/SensorListing.py:405
 msgid "Alerts"
 msgstr "Alertes"
 
@@ -610,7 +610,7 @@ msgstr "Alertes sur les Outils"
 msgid "Agents"
 msgstr "Agents"
 
-#: prewikka/views/__init__.py:49 prewikka/templates/SensorListing.py:338
+#: prewikka/views/__init__.py:49 prewikka/templates/SensorListing.py:410
 msgid "Heartbeats"
 msgstr "Pulsations"
 
@@ -634,30 +634,51 @@ msgstr "A propos"
 msgid "CGI Authentication failed: no user specified."
 msgstr "Echec de l'authentification CGI : aucun utilisateur spécifié."
 
-#: prewikka/templates/SensorListing.py:199
-#: prewikka/templates/SensorListing.py:343
+# python-format
+#: prewikka/templates/SensorListing.py:116
+#: prewikka/templates/SensorListing.py:172
+#, python-format
+msgid "%(missing)d of %(total)d analyzers missing"
+msgstr "%(missing)d sur %(total)d agents invisibles..."
+
+#: prewikka/templates/SensorListing.py:124
+#: prewikka/templates/SensorListing.py:178
+msgid "All analyzers online"
+msgstr "Tout les agents sont connectés"
+
+#: prewikka/templates/SensorListing.py:212
+#: prewikka/templates/HeartbeatListing.py:231
+msgid "Filter on address"
+msgstr "Filtrer sur l'adresse"
+
+#: prewikka/templates/SensorListing.py:223
+msgid "Address information"
+msgstr "Information sur l'adresse"
+
+#: prewikka/templates/SensorListing.py:274
+#: prewikka/templates/SensorListing.py:415
 #: prewikka/templates/MessageListing.py:211
 #: prewikka/templates/FilterEdition.py:226
 msgid "Delete"
 msgstr "Effacer"
 
-#: prewikka/templates/SensorListing.py:224
+#: prewikka/templates/SensorListing.py:299
 msgid "Last heartbeat"
 msgstr "Dernière pulsation"
 
-#: prewikka/templates/SensorListing.py:229
+#: prewikka/templates/SensorListing.py:304
 msgid "Status"
 msgstr ""
 
-#: prewikka/templates/SensorListing.py:278
+#: prewikka/templates/SensorListing.py:350
 msgid "Alert listing"
 msgstr "Liste des alertes"
 
-#: prewikka/templates/SensorListing.py:286
+#: prewikka/templates/SensorListing.py:358
 msgid "Heartbeat listing"
 msgstr "Liste des pulsations"
 
-#: prewikka/templates/SensorListing.py:294
+#: prewikka/templates/SensorListing.py:366
 msgid "Heartbeat analysis"
 msgstr "Analyse des pulsations"
 
@@ -731,9 +752,8 @@ msgid "Contact"
 msgstr ""
 
 #: prewikka/templates/About.py:205
-#, fuzzy
 msgid "Office"
-msgstr "Déconnecté"
+msgstr "Bureau"
 
 #: prewikka/templates/About.py:210
 msgid "Website"
@@ -848,7 +868,6 @@ msgid "UTC"
 msgstr ""
 
 #: prewikka/templates/MessageListing.py:386
-#, fuzzy
 msgid "Limit"
 msgstr "Limite"
 
@@ -920,10 +939,6 @@ msgstr "Détails sur l'heartbeat"
 #: prewikka/templates/HeartbeatListing.py:204
 msgid "Filter on agent"
 msgstr "Filtrer sur l'agent"
-
-#: prewikka/templates/HeartbeatListing.py:231
-msgid "Filter on address"
-msgstr "Filtrer sur l'adresse"
 
 #: prewikka/templates/ClassicLayout.py:223
 msgid "logout"
@@ -1002,9 +1017,8 @@ msgid "Severity:"
 msgstr "Gravité :"
 
 #: prewikka/templates/AlertListing.py:590
-#, fuzzy
 msgid "info"
-msgstr "Fenêtre"
+msgstr "info"
 
 #: prewikka/templates/AlertListing.py:592
 msgid "low"
@@ -1097,9 +1111,6 @@ msgstr "Filtre"
 #, fuzzy
 #~ msgid "Node Name"
 #~ msgstr "Nom du noeud"
-
-#~ msgid "Address information"
-#~ msgstr "Information sur l'adresse"
 
 #~ msgid "No agent available"
 #~ msgstr "Pas d'agent disponible"

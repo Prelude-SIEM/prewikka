@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-13 11:22+0200\n"
+"POT-Creation-Date: 2007-04-13 18:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator:  Bjoern Weiland <bjoern.weiland@web.de>\n"
 "Language-Team: German\n"
@@ -143,7 +143,7 @@ msgstr ""
 #: prewikka/views/messagesummary.py:655 prewikka/views/messagesummary.py:672
 #: prewikka/views/messagesummary.py:695 prewikka/views/messagesummary.py:753
 #: prewikka/views/messagesummary.py:772 prewikka/views/messagesummary.py:808
-#: prewikka/templates/SensorListing.py:204
+#: prewikka/templates/SensorListing.py:279
 #, fuzzy
 msgid "Name"
 msgstr "Knotenname"
@@ -202,7 +202,7 @@ msgid "Node address"
 msgstr "Knotenadresse"
 
 #: prewikka/views/messagesummary.py:434
-#: prewikka/templates/SensorListing.py:209
+#: prewikka/templates/SensorListing.py:284
 #: prewikka/templates/HeartbeatListing.py:136
 msgid "Model"
 msgstr ""
@@ -212,13 +212,13 @@ msgid "Analyzerid"
 msgstr ""
 
 #: prewikka/views/messagesummary.py:437 prewikka/views/messagesummary.py:532
-#: prewikka/templates/SensorListing.py:214
+#: prewikka/templates/SensorListing.py:289
 #, fuzzy
 msgid "Version"
 msgstr "Rechte:"
 
 #: prewikka/views/messagesummary.py:438
-#: prewikka/templates/SensorListing.py:219
+#: prewikka/templates/SensorListing.py:294
 msgid "Class"
 msgstr ""
 
@@ -617,7 +617,7 @@ msgstr ""
 msgid "Events"
 msgstr "Ereignisse"
 
-#: prewikka/views/__init__.py:43 prewikka/templates/SensorListing.py:333
+#: prewikka/views/__init__.py:43 prewikka/templates/SensorListing.py:405
 msgid "Alerts"
 msgstr "Alarme"
 
@@ -633,7 +633,7 @@ msgstr "Tool-Alarme"
 msgid "Agents"
 msgstr "Agenten"
 
-#: prewikka/views/__init__.py:49 prewikka/templates/SensorListing.py:338
+#: prewikka/views/__init__.py:49 prewikka/templates/SensorListing.py:410
 msgid "Heartbeats"
 msgstr "Heartbeats"
 
@@ -657,31 +657,52 @@ msgstr "Über"
 msgid "CGI Authentication failed: no user specified."
 msgstr "CGI Authentifizierung fehlgeschlagen: Kein Benutzer angegeben."
 
-#: prewikka/templates/SensorListing.py:199
-#: prewikka/templates/SensorListing.py:343
+#: prewikka/templates/SensorListing.py:116
+#: prewikka/templates/SensorListing.py:172
+#, python-format
+msgid "%(missing)d of %(total)d analyzers missing"
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:124
+#: prewikka/templates/SensorListing.py:178
+msgid "All analyzers online"
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:212
+#: prewikka/templates/HeartbeatListing.py:231
+msgid "Filter on address"
+msgstr "Nach Adresse filtern"
+
+#: prewikka/templates/SensorListing.py:223
+#, fuzzy
+msgid "Address information"
+msgstr "Adress Informationen"
+
+#: prewikka/templates/SensorListing.py:274
+#: prewikka/templates/SensorListing.py:415
 #: prewikka/templates/MessageListing.py:211
 #: prewikka/templates/FilterEdition.py:226
 msgid "Delete"
 msgstr "Löschen"
 
-#: prewikka/templates/SensorListing.py:224
+#: prewikka/templates/SensorListing.py:299
 #, fuzzy
 msgid "Last heartbeat"
 msgstr "Heartbeats"
 
-#: prewikka/templates/SensorListing.py:229
+#: prewikka/templates/SensorListing.py:304
 msgid "Status"
 msgstr ""
 
-#: prewikka/templates/SensorListing.py:278
+#: prewikka/templates/SensorListing.py:350
 msgid "Alert listing"
 msgstr "Alarm-Liste"
 
-#: prewikka/templates/SensorListing.py:286
+#: prewikka/templates/SensorListing.py:358
 msgid "Heartbeat listing"
 msgstr "Heartbeat-Liste"
 
-#: prewikka/templates/SensorListing.py:294
+#: prewikka/templates/SensorListing.py:366
 msgid "Heartbeat analysis"
 msgstr "Heartbeat-Analyse"
 
@@ -969,10 +990,6 @@ msgstr "Heartbeat Übersicht"
 #: prewikka/templates/HeartbeatListing.py:204
 msgid "Filter on agent"
 msgstr "Nach Agent filtern"
-
-#: prewikka/templates/HeartbeatListing.py:231
-msgid "Filter on address"
-msgstr "Nach Adresse filtern"
 
 #: prewikka/templates/ClassicLayout.py:223
 msgid "logout"
