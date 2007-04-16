@@ -104,7 +104,6 @@ class SensorListing(view.View):
         locations = { }
         nodes = { }
         
-        cum = 0
         for analyzer_path in self.env.idmef_db.getAnalyzerPaths():
             analyzerid = analyzer_path[-1]          
             analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
