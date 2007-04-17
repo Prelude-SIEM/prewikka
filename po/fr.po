@@ -227,7 +227,7 @@ msgstr "Système d'Exploitation"
 #: prewikka/views/messagesummary.py:466
 #, python-format
 msgid "Analyzer Path (%d not shown)"
-msgstr "Chemin vers l'Analyseur (%d non montrés)"
+msgstr "Chemin vers l'Analyseur (%d non visibles)"
 
 #: prewikka/views/messagesummary.py:471
 #, python-format
