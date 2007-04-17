@@ -24,8 +24,7 @@ import time
 import random
 import md5
 
-from prewikka import view, Log, DataSet, User, Auth, localization
-import prewikka.Error
+from prewikka import view, Log, DataSet, User, Auth, Error, localization
 from prewikka import utils
 
 
@@ -130,7 +129,7 @@ class UserSettingsDisplay(view.View):
         login = self.parameters.get("login", self.user.login)
 
         if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):            
-            raise prewikka.Error.PrewikkaUserError("Permission Denied", "Access denied to other users settings", log=Log.WARNING)
+            raise Error.PrewikkaUserError("Permission Denied", "Access denied to other users settings", log=Log.WARNING)
 
         self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
         self.dataset["user.language"] = self.user.language
@@ -155,7 +154,7 @@ class UserSettingsModify(UserListing):
         login = self.parameters.get("login", self.user.login)
         
         if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):            
-            raise prewikka.Error.PrewikkaUserError("Permission Denied", "Cannot modify other users settings", log=Log.WARNING)
+            raise Error.PrewikkaUserError("Permission Denied", "Cannot modify other users settings", log=Log.WARNING)
         
         if self.user.has(User.PERM_USER_MANAGEMENT):
             self.env.db.setPermissions(login, self.parameters["permissions"])
@@ -164,7 +163,7 @@ class UserSettingsModify(UserListing):
         
         lang = self.parameters["language"]
         if not lang in localization.getLanguagesIdentifiers():
-            raise prewikka.Error.PrewikkaUserError("Invalid Language", "Specified language does not exist", log=Log.WARNING)
+            raise Error.PrewikkaUserError("Invalid Language", "Specified language does not exist", log=Log.WARNING)
         
         if lang != self.user.language:
             self.user.setLanguage(lang)
@@ -174,10 +173,10 @@ class UserSettingsModify(UserListing):
                 try:
                     self.env.auth.checkPassword(login, self.parameters["password_current"])
                 except Auth.AuthError, e:
-                    raise prewikka.Error.PrewikkaUserError("Password Error", "Invalid Password specified")
+                    raise Error.PrewikkaUserError("Password Error", "Invalid Password specified")
 
             if self.parameters["password_new"] != self.parameters["password_new_confirmation"]:
-                raise prewikka.Error.PrewikkaUserError("Password Error", "Password mismatch")
+                raise Error.PrewikkaUserError("Password Error", "Password mismatch")
 
             self.env.auth.setPassword(login, self.parameters["password_new"])
 
