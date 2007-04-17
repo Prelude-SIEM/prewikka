@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-13 18:34+0200\n"
+"POT-Creation-Date: 2007-04-17 16:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator:  Bjoern Weiland <bjoern.weiland@web.de>\n"
 "Language-Team: German\n"
@@ -597,20 +597,38 @@ msgstr ""
 msgid "Heartbeat"
 msgstr "Heartbeats"
 
-#: prewikka/views/sensor.py:51 prewikka/views/sensor2.py:51
+#: prewikka/views/sensor.py:51
 msgid "Unknown"
 msgstr ""
 
-#: prewikka/views/sensor.py:54 prewikka/views/sensor2.py:54
+#: prewikka/views/sensor.py:54
 msgid "Offline"
 msgstr ""
 
-#: prewikka/views/sensor.py:57 prewikka/views/sensor2.py:57
+#: prewikka/views/sensor.py:57
 msgid "Missing"
 msgstr ""
 
-#: prewikka/views/sensor.py:59 prewikka/views/sensor2.py:59
+#: prewikka/views/sensor.py:59
 msgid "Online"
+msgstr ""
+
+#: prewikka/views/sensor.py:153
+msgid "Node location n/a"
+msgstr ""
+
+#: prewikka/views/sensor.py:154
+#, fuzzy
+msgid "Node name n/a"
+msgstr "Knotenname"
+
+#: prewikka/views/sensor.py:155
+#, fuzzy
+msgid "OS version n/a"
+msgstr "Session ungültig"
+
+#: prewikka/views/sensor.py:156
+msgid "OS type n/a"
 msgstr ""
 
 #: prewikka/views/__init__.py:43

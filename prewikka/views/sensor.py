@@ -150,10 +150,10 @@ class SensorListing(view.View):
             analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(int(analyzer["last_heartbeat_time"]))) + \
                                               " %+.2d:%.2d" % utils.get_gmt_offset()
        
-            node_location = analyzer["node_location"] or "Node location n/a"
-            node_name = analyzer.get("node_name") or "Node name n/a"
-            osversion = analyzer["osversion"] or "OS version n/a"
-            ostype = analyzer["ostype"] or "OS type n/a"
+            node_location = analyzer["node_location"] or _("Node location n/a")
+            node_name = analyzer.get("node_name") or _("Node name n/a")
+            osversion = analyzer["osversion"] or _("OS version n/a")
+            ostype = analyzer["ostype"] or _("OS type n/a")
             addresses = analyzer["node_addresses"]
             
             node_key = node_name + osversion + ostype

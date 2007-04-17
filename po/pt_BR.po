@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-13 18:34+0200\n"
+"POT-Creation-Date: 2007-04-17 16:26+0200\n"
 "PO-Revision-Date: 2007-04-09 19:54-0300\n"
 "Last-Translator: Edelberto Franco Silva <edeunix@edeunix.com>\n"
 "Language-Team: Portuguese\n"
@@ -600,23 +600,41 @@ msgstr ""
 msgid "Heartbeat"
 msgstr "Heartbeats"
 
-#: prewikka/views/sensor.py:51 prewikka/views/sensor2.py:51
+#: prewikka/views/sensor.py:51
 msgid "Unknown"
 msgstr ""
 
-#: prewikka/views/sensor.py:54 prewikka/views/sensor2.py:54
+#: prewikka/views/sensor.py:54
 #, fuzzy
 msgid "Offline"
 msgstr "em"
 
-#: prewikka/views/sensor.py:57 prewikka/views/sensor2.py:57
+#: prewikka/views/sensor.py:57
 msgid "Missing"
 msgstr ""
 
-#: prewikka/views/sensor.py:59 prewikka/views/sensor2.py:59
+#: prewikka/views/sensor.py:59
 #, fuzzy
 msgid "Online"
 msgstr "em"
+
+#: prewikka/views/sensor.py:153
+msgid "Node location n/a"
+msgstr ""
+
+#: prewikka/views/sensor.py:154
+#, fuzzy
+msgid "Node name n/a"
+msgstr "Nome do nó"
+
+#: prewikka/views/sensor.py:155
+#, fuzzy
+msgid "OS version n/a"
+msgstr "Sessão inválida"
+
+#: prewikka/views/sensor.py:156
+msgid "OS type n/a"
+msgstr ""
 
 #: prewikka/views/__init__.py:43
 msgid "Events"

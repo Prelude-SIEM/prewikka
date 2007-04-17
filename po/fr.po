@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-13 18:34+0200\n"
+"POT-Creation-Date: 2007-04-17 16:26+0200\n"
 "PO-Revision-Date: 2007-04-10 12:50+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
@@ -574,21 +574,40 @@ msgstr "Données ASCII"
 msgid "Heartbeat"
 msgstr "Pulsations"
 
-#: prewikka/views/sensor.py:51 prewikka/views/sensor2.py:51
+#: prewikka/views/sensor.py:51
 msgid "Unknown"
 msgstr "Inconnus"
 
-#: prewikka/views/sensor.py:54 prewikka/views/sensor2.py:54
+#: prewikka/views/sensor.py:54
 msgid "Offline"
 msgstr "Déconnecté"
 
-#: prewikka/views/sensor.py:57 prewikka/views/sensor2.py:57
+#: prewikka/views/sensor.py:57
 msgid "Missing"
 msgstr "Manquant"
 
-#: prewikka/views/sensor.py:59 prewikka/views/sensor2.py:59
+#: prewikka/views/sensor.py:59
 msgid "Online"
 msgstr "Connecté"
+
+#: prewikka/views/sensor.py:153
+#, fuzzy
+msgid "Node location n/a"
+msgstr "Emplacement du noeud"
+
+#: prewikka/views/sensor.py:154
+#, fuzzy
+msgid "Node name n/a"
+msgstr "Nom du noeud"
+
+#: prewikka/views/sensor.py:155
+#, fuzzy
+msgid "OS version n/a"
+msgstr "Session invalide"
+
+#: prewikka/views/sensor.py:156
+msgid "OS type n/a"
+msgstr ""
 
 #: prewikka/views/__init__.py:43
 msgid "Events"
