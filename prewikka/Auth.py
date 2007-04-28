@@ -148,4 +148,4 @@ class LoginPasswordAuth(Auth, Session):
 
 class AnonymousAuth(Auth):
     def getUser(self, request):
-        return User.User(self.db, "anonymous", User.ALL_PERMISSIONS, self.db.getConfiguration("anonymous"))
+        return User.User(self.db, "anonymous", self.db.getLanguage("anonymous"), User.ALL_PERMISSIONS, self.db.getConfiguration("anonymous"))
