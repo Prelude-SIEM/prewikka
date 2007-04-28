@@ -218,16 +218,19 @@ class Core:
             first_tab = None   
    
             for tab_name, views in tabs:
-                default_view = views[0]
+                view_name = views[0]
         
                 if is_anon and tab_name == "Users":
                     continue
                     
-                if not first_tab:
-                    first_tab = views[0]
-                    section_to_tabs[section_name] = [ (_(tab_name), utils.create_link(views[0])) ]
-                        
-            if first_tab and (not user or user.has(self._views[first_tab]["permissions"])):
+                if not user or user.has(self._views[view_name]["permissions"]):
+                    if not first_tab:
+                        first_tab = view_name
+                        section_to_tabs[section_name] = []
+                    
+                    section_to_tabs[section_name] += [ ((_(tab_name), utils.create_link(views[0]))) ]
+                    
+            if first_tab:
                 dataset["interface.sections"].append( (_(section_name), utils.create_link(first_tab)) )
     
  
