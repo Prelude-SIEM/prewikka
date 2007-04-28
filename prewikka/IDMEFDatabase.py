@@ -447,7 +447,7 @@ class IDMEFDatabase:
             if len(criteria) == 0:
                 criteria = None
             else:
-                criteria = " && ".join(criteria)
+                criteria = " && ".join([ "(" + c + ")" for c in criteria ])
                             
         if criteria:
             criteria = idmef_criteria_new_from_string(criteria)
