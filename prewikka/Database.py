@@ -211,7 +211,7 @@ class Database:
         
     def getLanguage(self, login):
         rows = self.query("SELECT lang FROM Prewikka_User WHERE login = %s" % (self.escape(login)))
-        if len(rows) > 1:
+        if len(rows) > 0:
             return rows[0][0]
         
         return None
