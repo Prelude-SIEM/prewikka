@@ -389,7 +389,7 @@ msgstr "Texte"
 
 #: prewikka/views/messagesummary.py:689
 msgid "Ident"
-msgstr "Identitée"
+msgstr "Identité"
 
 #: prewikka/views/messagesummary.py:694
 msgid "Origin"
@@ -619,7 +619,7 @@ msgstr "Alertes"
 
 #: prewikka/views/__init__.py:44
 msgid "CorrelationAlerts"
-msgstr "Alertes de Correlation"
+msgstr "Alertes de Corrélation"
 
 #: prewikka/views/__init__.py:45
 msgid "ToolAlerts"
@@ -713,7 +713,7 @@ msgstr ""
 
 #: prewikka/templates/About.py:129
 msgid "Customizing Prelude"
-msgstr "Personaliser Prelude"
+msgstr "Personnaliser Prelude"
 
 #: prewikka/templates/About.py:134
 msgid ""
@@ -772,7 +772,7 @@ msgstr ""
 
 #: prewikka/templates/About.py:205
 msgid "Office"
-msgstr "Bureau"
+msgstr "Siège Social"
 
 #: prewikka/templates/About.py:210
 msgid "Website"
@@ -791,7 +791,7 @@ msgid "Submit"
 msgstr "Valider"
 
 #: prewikka/templates/UserSettings.py:112
-msgid "Account informations"
+msgid "Account information"
 msgstr "Informations sur le compte"
 
 #: prewikka/templates/UserSettings.py:122
@@ -1021,7 +1021,7 @@ msgstr "Type :"
 
 #: prewikka/templates/AlertListing.py:553
 msgid "CorrelationAlert"
-msgstr "Alertes de Corrélation"
+msgstr "Alerte de Corrélation"
 
 #: prewikka/templates/AlertListing.py:555
 msgid "OverflowAlert"
@@ -1029,7 +1029,7 @@ msgstr ""
 
 #: prewikka/templates/AlertListing.py:557
 msgid "ToolAlert"
-msgstr "Alertes d'Outil"
+msgstr "Alerte sur les Outils"
 
 #: prewikka/templates/AlertListing.py:585
 msgid "Severity:"
