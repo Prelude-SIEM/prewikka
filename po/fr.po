@@ -679,7 +679,7 @@ msgstr "Information sur l'adresse"
 #: prewikka/templates/MessageListing.py:211
 #: prewikka/templates/FilterEdition.py:226
 msgid "Delete"
-msgstr "Effacer"
+msgstr "Supprimer"
 
 #: prewikka/templates/SensorListing.py:299
 msgid "Last heartbeat"
@@ -836,7 +836,7 @@ msgstr "Identifiant"
 
 #: prewikka/templates/UserListing.py:148
 msgid "Delete user"
-msgstr "Effacer l'utilisateur"
+msgstr "Supprimer l'utilisateur"
 
 #: prewikka/templates/UserListing.py:157
 msgid "Create user"
