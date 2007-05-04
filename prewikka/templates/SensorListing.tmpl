@@ -17,12 +17,12 @@ $listing.sort()
 
 #for $entry in $listing:
  <fieldset class="fieldset_heading">
-  #if $locations[$entry]["missing"] > 0:
+  #if $locations[$entry]["missing"] > 0 or $locations[$entry]["unknown"] > 0:
    #set $display = "block"
    #set $display_tmp = "none"
    #set $dclass = "heartbeat_analyze_sensor_status_missing" 
    
-   #set $text = $str($_("%(missing)d of %(total)d analyzers missing") % $locations[$entry])
+   #set $text = $str($_("%(missing)d missing, %(unknown)d unknown, of %(total)d analyzers") % $locations[$entry])
   #else
    #set $display = "none"
    #set $display_tmp = "block"
@@ -45,10 +45,10 @@ $listing.sort()
     #set $row_classes = ("table_row_even", "table_row_odd")
     #set $row_class = $row_classes[$cnt%2]
 
-  #if $node.missing > 0:
+  #if $node.missing > 0 or $node.unknown > 0:
    #set $display = "block"
    #set $dclass = "heartbeat_analyze_sensor_status_missing"
-   #set $text = $str($_("%(missing)d of %(total)d analyzers missing") % $node)
+   #set $text = $str($_("%(missing)d missing, %(unknown)d unknown of %(total)d analyzers") % $node)
   #else
    #set $display = "none"
    #set $text = $_("All analyzers online")

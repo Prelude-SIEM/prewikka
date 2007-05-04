@@ -107,7 +107,7 @@ class SensorListing(view.View):
         for analyzer_path in self.env.idmef_db.getAnalyzerPaths():
             analyzerid = analyzer_path[-1]          
             analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
-
+            
             parameters = { "analyzerid": analyzer["analyzerid"] }
             analyzer["alert_listing"] = utils.create_link("sensor_alert_listing", parameters)
             analyzer["heartbeat_listing"] = utils.create_link("sensor_heartbeat_listing", parameters)
@@ -159,21 +159,22 @@ class SensorListing(view.View):
             node_key = node_name + osversion + ostype
             
             if not locations.has_key(node_location):
-                locations[node_location] = { "total": 1, "missing": 0, "nodes": { } }
+                locations[node_location] = { "total": 1, "missing": 0, "unknown": 0, "nodes": { } }
             else:
                 locations[node_location]["total"] += 1
 
             if not locations[node_location]["nodes"].has_key(node_key):
-                locations[node_location]["nodes"][node_key] = { "total": 1, "missing": 0, "analyzers": [ ], 
+                locations[node_location]["nodes"][node_key] = { "total": 1, "missing": 0, "unknown": 0, "analyzers": [ ], 
                                                                 "node_name": node_name, "node_location": node_location,
                                                                 "ostype": ostype, "osversion": osversion, 
                                                                 "node_addresses": addresses, "node_key": node_key }
             else:
                 locations[node_location]["nodes"][node_key]["total"] += 1
                   
-            if analyzer["status"] == "missing":
-                locations[node_location]["missing"] += 1
-                locations[node_location]["nodes"][node_key]["missing"] += 1
+            status = analyzer["status"]
+            if status == "missing" or status == "unknown":
+                locations[node_location][status] += 1
+                locations[node_location]["nodes"][node_key][status] += 1
                 locations[node_location]["nodes"][node_key]["analyzers"].insert(0, analyzer)
             else:
                 locations[node_location]["nodes"][node_key]["analyzers"].append(analyzer)
