@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-04-17 16:26+0200\n"
-"PO-Revision-Date: 2007-04-10 12:50+0100\n"
+"POT-Creation-Date: 2007-05-03 16:18+0200\n"
+"PO-Revision-Date: 2007-05-03 15:55+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
 "MIME-Version: 1.0\n"
@@ -619,7 +619,7 @@ msgstr "Alertes"
 
 #: prewikka/views/__init__.py:44
 msgid "CorrelationAlerts"
-msgstr "Alertes de Corrélation"
+msgstr "Alertes de Correlation"
 
 #: prewikka/views/__init__.py:45
 msgid "ToolAlerts"
@@ -655,15 +655,20 @@ msgstr "Echec de l'authentification CGI : aucun utilisateur spécifié."
 
 # python-format
 #: prewikka/templates/SensorListing.py:116
-#: prewikka/templates/SensorListing.py:172
-#, python-format
-msgid "%(missing)d of %(total)d analyzers missing"
+#, fuzzy, python-format
+msgid "%(missing)d missing, %(unknown)d unknown, of %(total)d analyzers"
 msgstr "%(missing)d sur %(total)d agents invisibles..."
 
 #: prewikka/templates/SensorListing.py:124
 #: prewikka/templates/SensorListing.py:178
 msgid "All analyzers online"
 msgstr "Tout les agents sont connectés"
+
+# python-format
+#: prewikka/templates/SensorListing.py:172
+#, fuzzy, python-format
+msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
+msgstr "%(missing)d sur %(total)d agents invisibles..."
 
 #: prewikka/templates/SensorListing.py:212
 #: prewikka/templates/HeartbeatListing.py:231
@@ -679,7 +684,7 @@ msgstr "Information sur l'adresse"
 #: prewikka/templates/MessageListing.py:211
 #: prewikka/templates/FilterEdition.py:226
 msgid "Delete"
-msgstr "Supprimer"
+msgstr "Effacer"
 
 #: prewikka/templates/SensorListing.py:299
 msgid "Last heartbeat"
@@ -707,9 +712,9 @@ msgid ""
 "around the world, to improve and strengthen the security of their systems "
 "and networks."
 msgstr ""
-"fournit du support pour les grands comptes et agences gouvernementales dans "
-"le monde afin d'améliorer et renforcer la sécurité de leurs systèmes et "
-"réseaux."
+"accompagne les Grands Comptes, Grands Groupes et Administrations du monde "
+"entier dans l'amélioration et le renforcement de la sécurité de leurs "
+"systèmes et réseaux."
 
 #: prewikka/templates/About.py:129
 msgid "Customizing Prelude"
@@ -727,10 +732,20 @@ msgid ""
 "extension to handle new devices and porting of Prelude to unsupported "
 "operating systems."
 msgstr ""
+"Dans l'esprit Open Source, nous vous proposons de participer au "
+"développement de votre logiciel. Vous pouvez commander des développements "
+"personnalisés de Prelude en fonction de vos besoins : customisation, ajout "
+"de fonctionnalités, etc. Réalisées par les ingénieurs PreludeIDS, les "
+"modifications apportées au système Prelude vous donneront l’assurance d’être "
+"intégrées de façon optimisée et garanties par notre Support Technique. De "
+"plus, notre entreprise peut mettre en compatibilité des sondes non encore "
+"supportées (incluant des sondes propriétaires), réaliser une extension des "
+"signatures pour la gestion de nouveaux systèmes ou encore porter Prelude sur "
+"un OS non encore supporté."
 
 #: prewikka/templates/About.py:143
 msgid "Software Maintenance and Technical Support"
-msgstr ""
+msgstr "Support Technique et Maintenance Logicielle"
 
 #: prewikka/templates/About.py:148
 msgid ""
@@ -739,10 +754,15 @@ msgid ""
 "benefit from priority assistance and the expertise of our engineers, while "
 "the maintenance service we offer maintains and updates your software."
 msgstr ""
+"Le support PreludeIDS vous garantit le fonctionnement optimal du système "
+"Prelude sur votre infrastructure. PreludeIDS a créé cinq offres de support "
+"technique packagées. En vous assurant une assistance en cas d'incident, le "
+"support PreludeIDS met à votre disposition nos experts pour vous fournir des "
+"solutions rapides et fiables."
 
 #: prewikka/templates/About.py:157
 msgid "Commercial licenses"
-msgstr ""
+msgstr "Licences commerciales"
 
 #: prewikka/templates/About.py:162
 msgid "The Prelude framework is licensed under the"
@@ -753,10 +773,12 @@ msgid ""
 "PreludeIDS provides specific commercial licenses to allow proprietary "
 "systems based on Prelude to be developed and to interoperate."
 msgstr ""
+"PreludeIDS Technologies propose des licences commerciales afin de permettre "
+"le développement et l’interopérabilité d’applications propriétaires."
 
 #: prewikka/templates/About.py:176
 msgid "Advice, Deployment and Training"
-msgstr ""
+msgstr "Conseil, Déploiement et Formation"
 
 #: prewikka/templates/About.py:181
 msgid ""
@@ -765,14 +787,17 @@ msgid ""
 "deploying Prelude and training your users, we provide a turnkey solution to "
 "secure your infrastructure, delivered by specialists."
 msgstr ""
+"Aux côtés de ses partenaires, PreludeIDS vous propose des solutions haut de "
+"gamme associées à une grande qualité de conseils et de services (conseil, "
+"deploiement, formation, etc.) afin de concrétiser vos projets sécurité."
 
 #: prewikka/templates/About.py:200
 msgid "Contact"
-msgstr ""
+msgstr "Contact"
 
 #: prewikka/templates/About.py:205
 msgid "Office"
-msgstr "Siège Social"
+msgstr "Bureau"
 
 #: prewikka/templates/About.py:210
 msgid "Website"
@@ -791,7 +816,7 @@ msgid "Submit"
 msgstr "Valider"
 
 #: prewikka/templates/UserSettings.py:112
-msgid "Account information"
+msgid "Account informations"
 msgstr "Informations sur le compte"
 
 #: prewikka/templates/UserSettings.py:122
@@ -836,7 +861,7 @@ msgstr "Identifiant"
 
 #: prewikka/templates/UserListing.py:148
 msgid "Delete user"
-msgstr "Supprimer l'utilisateur"
+msgstr "Effacer l'utilisateur"
 
 #: prewikka/templates/UserListing.py:157
 msgid "Create user"
@@ -1021,7 +1046,7 @@ msgstr "Type :"
 
 #: prewikka/templates/AlertListing.py:553
 msgid "CorrelationAlert"
-msgstr "Alerte de Corrélation"
+msgstr "Alertes de Corrélation"
 
 #: prewikka/templates/AlertListing.py:555
 msgid "OverflowAlert"
@@ -1029,7 +1054,7 @@ msgstr ""
 
 #: prewikka/templates/AlertListing.py:557
 msgid "ToolAlert"
-msgstr "Alerte sur les Outils"
+msgstr "Alertes d'Outil"
 
 #: prewikka/templates/AlertListing.py:585
 msgid "Severity:"

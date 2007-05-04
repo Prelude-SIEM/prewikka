@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-02 17:46+0200\n"
+"POT-Creation-Date: 2007-05-03 16:18+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator:  Bjoern Weiland <bjoern.weiland@web.de>\n"
 "Language-Team: German\n"
@@ -676,14 +676,18 @@ msgid "CGI Authentication failed: no user specified."
 msgstr "CGI Authentifizierung fehlgeschlagen: Kein Benutzer angegeben."
 
 #: prewikka/templates/SensorListing.py:116
-#: prewikka/templates/SensorListing.py:172
 #, python-format
-msgid "%(missing)d of %(total)d analyzers missing"
+msgid "%(missing)d missing, %(unknown)d unknown, of %(total)d analyzers"
 msgstr ""
 
 #: prewikka/templates/SensorListing.py:124
 #: prewikka/templates/SensorListing.py:178
 msgid "All analyzers online"
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:172
+#, python-format
+msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
 msgstr ""
 
 #: prewikka/templates/SensorListing.py:212
@@ -836,8 +840,7 @@ msgid "Submit"
 msgstr "Abschicken"
 
 #: prewikka/templates/UserSettings.py:112
-#, fuzzy
-msgid "Account information"
+msgid "Account informations"
 msgstr "Kontoinformationen"
 
 #: prewikka/templates/UserSettings.py:122
