@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-04 17:12+0200\n"
+"POT-Creation-Date: 2007-05-04 18:26+0200\n"
 "PO-Revision-Date: 2007-05-03 15:55+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
@@ -591,19 +591,16 @@ msgid "Online"
 msgstr "Connecté"
 
 #: prewikka/views/sensor.py:153
-#, fuzzy
 msgid "Node location n/a"
-msgstr "Emplacement du noeud"
+msgstr "Emplacement du noeud inconnus"
 
 #: prewikka/views/sensor.py:154
-#, fuzzy
 msgid "Node name n/a"
-msgstr "Nom du noeud"
+msgstr "Nom du noeud inconnus"
 
 #: prewikka/views/sensor.py:155
-#, fuzzy
 msgid "OS version n/a"
-msgstr "Session invalide"
+msgstr "Système inconnus"
 
 #: prewikka/views/sensor.py:156
 msgid "OS type n/a"
@@ -655,9 +652,8 @@ msgstr "Echec de l'authentification CGI : aucun utilisateur spécifié."
 
 # python-format
 #: prewikka/templates/SensorListing.py:116
-#, fuzzy, python-format
 msgid "%(missing)d missing, %(unknown)d unknown, of %(total)d analyzers"
-msgstr "%(missing)d sur %(total)d agents invisibles..."
+msgstr "%(missing)d manquant, %(unknown)d inconnus, sur %(total)d agents"
 
 #: prewikka/templates/SensorListing.py:124
 #: prewikka/templates/SensorListing.py:178
@@ -666,9 +662,8 @@ msgstr "Tout les agents sont connectés"
 
 # python-format
 #: prewikka/templates/SensorListing.py:172
-#, fuzzy, python-format
 msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
-msgstr "%(missing)d sur %(total)d agents invisibles..."
+msgstr "%(missing)d manquant, %(unknown)d inconnus sur %(total)d agents"
 
 #: prewikka/templates/SensorListing.py:212
 #: prewikka/templates/HeartbeatListing.py:231
@@ -748,7 +743,6 @@ msgid "Software Maintenance and Technical Support"
 msgstr "Support Technique et Maintenance Logicielle"
 
 #: prewikka/templates/About.py:148
-#, fuzzy
 msgid ""
 "PreludeIDS maintenance and support services guarantee optimal operation of "
 "the Prelude platform on your infrastructure. There are five support packages "
@@ -818,7 +812,7 @@ msgid "Submit"
 msgstr "Valider"
 
 #: prewikka/templates/UserSettings.py:112
-msgid "Account informations"
+msgid "Account information"
 msgstr "Informations sur le compte"
 
 #: prewikka/templates/UserSettings.py:122

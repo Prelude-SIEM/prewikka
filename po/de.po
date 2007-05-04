@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-04 17:12+0200\n"
+"POT-Creation-Date: 2007-05-04 18:23+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator:  Bjoern Weiland <bjoern.weiland@web.de>\n"
 "Language-Team: German\n"
@@ -842,7 +842,8 @@ msgid "Submit"
 msgstr "Abschicken"
 
 #: prewikka/templates/UserSettings.py:112
-msgid "Account informations"
+#, fuzzy
+msgid "Account information"
 msgstr "Kontoinformationen"
 
 #: prewikka/templates/UserSettings.py:122
