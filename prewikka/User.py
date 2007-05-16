@@ -49,7 +49,8 @@ class User:
         self.permissions = permissions
         self.configuration = configuration    
         if language:
-            self.setLanguage(language)
+            self.language = language
+            localization.setLocale(language)
         else:
             self.language = None
             
