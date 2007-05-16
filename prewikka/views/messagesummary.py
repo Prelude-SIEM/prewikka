@@ -466,12 +466,15 @@ class MessageSummary(Table):
         self.beginSection(_("Analyzer Path (%d not shown)") % len(l), display="none")
         
         self.beginTable(cl="message_summary_no_border")
+        
         i = 1
+        index = len(l) - 1
         for analyzer in l:
-            self.newTableCol(i - 1, _("Analyzer #%d") % i, None, header=True)
+            self.newTableCol(i - 1, _("Analyzer #%d") % index, None, header=True)
             self.buildAnalyzer(analyzer)
             self.newTableRow()
             i += 1
+            index -= 1
 
         self.endTable()
         self.endSection()
@@ -961,7 +964,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.buildToolAlert(alert)
         self.buildReference(alert)
 
-        self.beginSection(_("Analyzer #0"))
+        self.beginSection(_("Analyzer #%d" % (len(alert["analyzer"]) - 1)))
         self.buildAnalyzer(alert["analyzer(-1)"])
                 
         self.buildAnalyzerList(alert)
@@ -1028,7 +1031,7 @@ class HeartbeatSummary(MessageSummary, view.View):
         self.beginSection(_("Heartbeat"))
         self.buildTime(heartbeat)
 
-        self.beginSection(_("Analyzer #0"))
+        self.beginSection(_("Analyzer #%d" % (len(heartbeat["analyzer"]) - 1)))
         self.buildAnalyzer(heartbeat["analyzer(-1)"])
     
         self.buildAnalyzerList(heartbeat)

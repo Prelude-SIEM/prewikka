@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-16 11:34+0200\n"
+"POT-Creation-Date: 2007-05-16 17:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Valentin Bogdanov <bogdanov.valentin@gmail.com>\n"
 "Language-Team: Russian <LL@li.org>\n"
@@ -144,14 +144,14 @@ msgid "Example: (A AND B) OR (C AND D)"
 msgstr "Пример: (A AND B) OR (C AND D)"
 
 #: prewikka/views/messagesummary.py:288 prewikka/views/messagesummary.py:435
-#: prewikka/views/messagesummary.py:655 prewikka/views/messagesummary.py:672
-#: prewikka/views/messagesummary.py:695 prewikka/views/messagesummary.py:753
-#: prewikka/views/messagesummary.py:772 prewikka/views/messagesummary.py:808
+#: prewikka/views/messagesummary.py:658 prewikka/views/messagesummary.py:675
+#: prewikka/views/messagesummary.py:698 prewikka/views/messagesummary.py:756
+#: prewikka/views/messagesummary.py:775 prewikka/views/messagesummary.py:811
 #: prewikka/templates/SensorListing.py:279
 msgid "Name"
 msgstr "Имя"
 
-#: prewikka/views/messagesummary.py:289 prewikka/views/messagesummary.py:580
+#: prewikka/views/messagesummary.py:289 prewikka/views/messagesummary.py:583
 msgid "Code"
 msgstr "Код"
 
@@ -163,7 +163,7 @@ msgstr "Размер данных"
 msgid "Data"
 msgstr "Данные"
 
-#: prewikka/views/messagesummary.py:385 prewikka/views/messagesummary.py:810
+#: prewikka/views/messagesummary.py:385 prewikka/views/messagesummary.py:813
 #, fuzzy
 msgid "Create time"
 msgstr "Время создания"
@@ -215,7 +215,7 @@ msgstr "Модель"
 msgid "Analyzerid"
 msgstr "Идентификатор анализатора"
 
-#: prewikka/views/messagesummary.py:437 prewikka/views/messagesummary.py:532
+#: prewikka/views/messagesummary.py:437 prewikka/views/messagesummary.py:535
 #: prewikka/templates/SensorListing.py:289
 #, fuzzy
 msgid "Version"
@@ -239,363 +239,360 @@ msgstr "Операционная система"
 msgid "Analyzer Path (%d not shown)"
 msgstr "Путь анализатора (%d не показан)"
 
-#: prewikka/views/messagesummary.py:471
+#: prewikka/views/messagesummary.py:473 prewikka/views/messagesummary.py:967
+#: prewikka/views/messagesummary.py:1034
 #, python-format
 msgid "Analyzer #%d"
 msgstr "Анализатор #%d"
 
-#: prewikka/views/messagesummary.py:480
+#: prewikka/views/messagesummary.py:483
 msgid "Additional data"
 msgstr "Дополнительные данные"
 
-#: prewikka/views/messagesummary.py:483 prewikka/views/messagesummary.py:696
+#: prewikka/views/messagesummary.py:486 prewikka/views/messagesummary.py:699
 msgid "Meaning"
 msgstr "Смысл"
 
-#: prewikka/views/messagesummary.py:484
+#: prewikka/views/messagesummary.py:487
 msgid "Value"
 msgstr "Значение"
 
-#: prewikka/views/messagesummary.py:533 prewikka/views/messagesummary.py:554
+#: prewikka/views/messagesummary.py:536 prewikka/views/messagesummary.py:557
 msgid "Header length"
 msgstr "Длина заголовка"
 
-#: prewikka/views/messagesummary.py:534
+#: prewikka/views/messagesummary.py:537
 msgid "TOS"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:535 prewikka/views/messagesummary.py:573
+#: prewikka/views/messagesummary.py:538 prewikka/views/messagesummary.py:576
 msgid "Length"
 msgstr "Длина"
 
-#: prewikka/views/messagesummary.py:536 prewikka/views/messagesummary.py:582
+#: prewikka/views/messagesummary.py:539 prewikka/views/messagesummary.py:585
 msgid "Id"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:540
+#: prewikka/views/messagesummary.py:543
 msgid "Ip offset"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:541
+#: prewikka/views/messagesummary.py:544
 msgid "TTL"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:542 prewikka/views/messagesummary.py:876
-#: prewikka/views/messagesummary.py:879 prewikka/views/messagesummary.py:882
+#: prewikka/views/messagesummary.py:545 prewikka/views/messagesummary.py:879
+#: prewikka/views/messagesummary.py:882 prewikka/views/messagesummary.py:885
 msgid "Protocol"
 msgstr "Протокол"
 
-#: prewikka/views/messagesummary.py:543 prewikka/views/messagesummary.py:565
-#: prewikka/views/messagesummary.py:574 prewikka/views/messagesummary.py:581
+#: prewikka/views/messagesummary.py:546 prewikka/views/messagesummary.py:568
+#: prewikka/views/messagesummary.py:577 prewikka/views/messagesummary.py:584
 msgid "Checksum"
 msgstr "Контрольная сумма"
 
-#: prewikka/views/messagesummary.py:544
+#: prewikka/views/messagesummary.py:547
 #, fuzzy
 msgid "Source address"
 msgstr "Адрес узла"
 
-#: prewikka/views/messagesummary.py:545
+#: prewikka/views/messagesummary.py:548
 #, fuzzy
 msgid "Target address"
 msgstr "Адрес узла"
 
-#: prewikka/views/messagesummary.py:550 prewikka/views/messagesummary.py:571
+#: prewikka/views/messagesummary.py:553 prewikka/views/messagesummary.py:574
 #, fuzzy
 msgid "Source port"
 msgstr "Порт источника"
 
-#: prewikka/views/messagesummary.py:551 prewikka/views/messagesummary.py:572
+#: prewikka/views/messagesummary.py:554 prewikka/views/messagesummary.py:575
 #, fuzzy
 msgid "Target port"
 msgstr "Порт цели"
 
-#: prewikka/views/messagesummary.py:555
+#: prewikka/views/messagesummary.py:558
 msgid "Reserved"
 msgstr "Зарезервировано"
 
-#: prewikka/views/messagesummary.py:564
+#: prewikka/views/messagesummary.py:567
 #, fuzzy
 msgid "Window"
 msgstr "Окно"
 
-#: prewikka/views/messagesummary.py:566
+#: prewikka/views/messagesummary.py:569
 msgid "URP"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:579 prewikka/views/messagesummary.py:719
-#: prewikka/views/messagesummary.py:752 prewikka/views/messagesummary.py:771
+#: prewikka/views/messagesummary.py:582 prewikka/views/messagesummary.py:722
+#: prewikka/views/messagesummary.py:755 prewikka/views/messagesummary.py:774
 msgid "Type"
 msgstr "Тип"
 
-#: prewikka/views/messagesummary.py:583
+#: prewikka/views/messagesummary.py:586
 msgid "Seq #"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:584
+#: prewikka/views/messagesummary.py:587
 msgid "Mask"
 msgstr "Маска"
 
-#: prewikka/views/messagesummary.py:585
+#: prewikka/views/messagesummary.py:588
 #, fuzzy
 msgid "Gateway Address"
 msgstr "Адрес шлюза"
 
-#: prewikka/views/messagesummary.py:586
+#: prewikka/views/messagesummary.py:589
 msgid "Num address"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:587
+#: prewikka/views/messagesummary.py:590
 msgid "Wpa"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:588
+#: prewikka/views/messagesummary.py:591
 msgid "Lifetime"
 msgstr "Время жизни"
 
-#: prewikka/views/messagesummary.py:589
+#: prewikka/views/messagesummary.py:592
 msgid "Otime"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:590
+#: prewikka/views/messagesummary.py:593
 msgid "Rtime"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:591
+#: prewikka/views/messagesummary.py:594
 #, fuzzy
 msgid "Ttime"
 msgstr "Время"
 
-#: prewikka/views/messagesummary.py:597 prewikka/views/messagesummary.py:1011
+#: prewikka/views/messagesummary.py:600 prewikka/views/messagesummary.py:1014
 msgid "Payload"
 msgstr "Полезная нагрузка"
 
-#: prewikka/views/messagesummary.py:635
+#: prewikka/views/messagesummary.py:638
 msgid "Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:653 prewikka/views/messagesummary.py:929
+#: prewikka/views/messagesummary.py:656 prewikka/views/messagesummary.py:932
 #: prewikka/views/alertlisting.py:593
 #, fuzzy
 msgid "Correlation Alert"
 msgstr "Событие корреляции"
 
-#: prewikka/views/messagesummary.py:659
+#: prewikka/views/messagesummary.py:662
 #, fuzzy
 msgid "Correlated Alert"
 msgstr "Событие корреляции"
 
-#: prewikka/views/messagesummary.py:660 prewikka/views/messagesummary.py:677
+#: prewikka/views/messagesummary.py:663 prewikka/views/messagesummary.py:680
 msgid "Source Analyzer"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:670 prewikka/views/messagesummary.py:932
+#: prewikka/views/messagesummary.py:673 prewikka/views/messagesummary.py:935
 #: prewikka/views/alertlisting.py:597
 #, fuzzy
 msgid "Tool Alert"
 msgstr "Событие со средства защиты"
 
-#: prewikka/views/messagesummary.py:676
+#: prewikka/views/messagesummary.py:679
 msgid "Linked Alert"
 msgstr "Связанное событие"
 
-#: prewikka/views/messagesummary.py:687
+#: prewikka/views/messagesummary.py:690
 #, fuzzy
 msgid "Text"
 msgstr "Текст"
 
-#: prewikka/views/messagesummary.py:689
+#: prewikka/views/messagesummary.py:692
 msgid "Ident"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:694
+#: prewikka/views/messagesummary.py:697
 msgid "Origin"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:713
+#: prewikka/views/messagesummary.py:716
 #, fuzzy
 msgid "Severity"
 msgstr "Важность:"
 
-#: prewikka/views/messagesummary.py:716
+#: prewikka/views/messagesummary.py:719
 #, fuzzy
 msgid "Completion"
 msgstr "Завершенность:"
 
-#: prewikka/views/messagesummary.py:720 prewikka/views/messagesummary.py:726
+#: prewikka/views/messagesummary.py:723 prewikka/views/messagesummary.py:729
 msgid "Description"
 msgstr "Описание"
 
-#: prewikka/views/messagesummary.py:725
+#: prewikka/views/messagesummary.py:728
 msgid "Category"
 msgstr "Категория"
 
-#: prewikka/views/messagesummary.py:749
+#: prewikka/views/messagesummary.py:752
 msgid "User category"
 msgstr "Категория пользователя"
 
-#: prewikka/views/messagesummary.py:754 prewikka/views/messagesummary.py:773
+#: prewikka/views/messagesummary.py:757 prewikka/views/messagesummary.py:776
 #, fuzzy
 msgid "Number"
 msgstr "Номер"
 
-#: prewikka/views/messagesummary.py:755
+#: prewikka/views/messagesummary.py:758
 msgid "Tty"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:774
+#: prewikka/views/messagesummary.py:777
 #, fuzzy
 msgid "Permission"
 msgstr "Привилегии:"
 
-#: prewikka/views/messagesummary.py:796
+#: prewikka/views/messagesummary.py:799
 msgid "Change time"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:797
+#: prewikka/views/messagesummary.py:800
 #, fuzzy
 msgid "Inode Number"
 msgstr "Номер inode"
 
-#: prewikka/views/messagesummary.py:798
+#: prewikka/views/messagesummary.py:801
 msgid "Major device"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:799
+#: prewikka/views/messagesummary.py:802
 msgid "Minor device"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:800
+#: prewikka/views/messagesummary.py:803
 msgid "C Major device"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:801
+#: prewikka/views/messagesummary.py:804
 msgid "C Minor device"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:805
+#: prewikka/views/messagesummary.py:808
 #, fuzzy, python-format
 msgid "Target file %s"
 msgstr "Целевой файл %s"
 
-#: prewikka/views/messagesummary.py:809
+#: prewikka/views/messagesummary.py:812
 msgid "Path"
 msgstr "Путь"
 
-#: prewikka/views/messagesummary.py:811
+#: prewikka/views/messagesummary.py:814
 msgid "Modify time"
 msgstr "Время модификации"
 
-#: prewikka/views/messagesummary.py:812
+#: prewikka/views/messagesummary.py:815
 msgid "Access time"
 msgstr "Время доступа"
 
-#: prewikka/views/messagesummary.py:813
+#: prewikka/views/messagesummary.py:816
 msgid "Data size"
 msgstr "Размер данных"
 
-#: prewikka/views/messagesummary.py:814
+#: prewikka/views/messagesummary.py:817
 msgid "Disk size"
 msgstr "Размер диска"
 
-#: prewikka/views/messagesummary.py:833
+#: prewikka/views/messagesummary.py:836
 msgid "Web Service"
 msgstr "Web сервис"
 
-#: prewikka/views/messagesummary.py:836
+#: prewikka/views/messagesummary.py:839
 msgid "Url"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:837
+#: prewikka/views/messagesummary.py:840
 msgid "Cgi"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:838
+#: prewikka/views/messagesummary.py:841
 msgid "Http Method"
 msgstr "Метод http"
 
-#: prewikka/views/messagesummary.py:841
+#: prewikka/views/messagesummary.py:844
 msgid "CGI Argument"
 msgstr "Аргумент CGI"
 
-#: prewikka/views/messagesummary.py:850
+#: prewikka/views/messagesummary.py:853
 msgid "SNMP Service"
 msgstr "SNMP-сервис"
 
-#: prewikka/views/messagesummary.py:853
+#: prewikka/views/messagesummary.py:856
 msgid "oid"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:854
+#: prewikka/views/messagesummary.py:857
 msgid "messageProcessingModel"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:855
+#: prewikka/views/messagesummary.py:858
 msgid "securityModel"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:856
+#: prewikka/views/messagesummary.py:859
 msgid "securityName"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:857
+#: prewikka/views/messagesummary.py:860
 msgid "securityLevel"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:858
+#: prewikka/views/messagesummary.py:861
 #, fuzzy
 msgid "contextName"
 msgstr "Имя контекста"
 
-#: prewikka/views/messagesummary.py:859
+#: prewikka/views/messagesummary.py:862
 msgid "contextEngineID"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:860
+#: prewikka/views/messagesummary.py:863
 msgid "command"
 msgstr "команда"
 
-#: prewikka/views/messagesummary.py:872
+#: prewikka/views/messagesummary.py:875
 msgid "Port"
 msgstr "Порт"
 
-#: prewikka/views/messagesummary.py:905
+#: prewikka/views/messagesummary.py:908
 #, fuzzy, python-format
 msgid "Source(%d)"
 msgstr "Источник(%d)"
 
-#: prewikka/views/messagesummary.py:914
+#: prewikka/views/messagesummary.py:917
 #, fuzzy, python-format
 msgid "Target(%d)"
 msgstr "Цель(%d)"
 
-#: prewikka/views/messagesummary.py:935
+#: prewikka/views/messagesummary.py:938
 #, fuzzy
 msgid "Overflow Alert"
 msgstr "Событие переполнения"
 
-#: prewikka/views/messagesummary.py:938 prewikka/templates/AlertListing.py:551
+#: prewikka/views/messagesummary.py:941 prewikka/templates/AlertListing.py:551
 msgid "Alert"
 msgstr "Сигнал тревоги"
 
-#: prewikka/views/messagesummary.py:955
+#: prewikka/views/messagesummary.py:958
 msgid "Actions"
 msgstr "Действие"
 
-#: prewikka/views/messagesummary.py:964 prewikka/views/messagesummary.py:1031
-msgid "Analyzer #0"
-msgstr "Анализатор #0"
-
-#: prewikka/views/messagesummary.py:994
+#: prewikka/views/messagesummary.py:997
 #, fuzzy
 msgid "Network centric information"
 msgstr "Информация об учетной записи"
 
-#: prewikka/views/messagesummary.py:1015
+#: prewikka/views/messagesummary.py:1018
 msgid "ASCII Payload"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:1028
+#: prewikka/views/messagesummary.py:1031
 #, fuzzy
 msgid "Heartbeat"
 msgstr "Пульс"
@@ -1164,6 +1161,9 @@ msgstr "Информация об адресе"
 #, fuzzy
 msgid "Filter"
 msgstr "Фильтры"
+
+#~ msgid "Analyzer #0"
+#~ msgstr "Анализатор #0"
 
 #~ msgid "on"
 #~ msgstr "вкл"
