@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-04 18:23+0200\n"
+"POT-Creation-Date: 2007-05-16 11:34+0200\n"
 "PO-Revision-Date: 2007-04-09 19:54-0300\n"
 "Last-Translator: Edelberto Franco Silva <edeunix@edeunix.com>\n"
 "Language-Team: Portuguese\n"
@@ -51,6 +51,10 @@ msgstr "Usuário e senha não conferem"
 #: prewikka/Auth.py:145
 msgid "Logged out"
 msgstr "Deslogado"
+
+#: prewikka/Auth.py:151
+msgid "anonymous"
+msgstr ""
 
 #: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
 msgid "Parameters Normalization failed"
@@ -1025,9 +1029,10 @@ msgstr "Filtro no agente"
 msgid "logout"
 msgstr "sair"
 
-#: prewikka/templates/ClassicLayout.py:237
-msgid "on"
-msgstr "em"
+#: prewikka/templates/ClassicLayout.py:234
+#, python-format
+msgid "%(username)s on %(date)s"
+msgstr ""
 
 #: prewikka/templates/AlertListing.py:133
 msgid "Equal"
@@ -1193,6 +1198,9 @@ msgstr "Endereço da informação"
 #, fuzzy
 msgid "Filter"
 msgstr "Filtros"
+
+#~ msgid "on"
+#~ msgstr "em"
 
 #, fuzzy
 #~ msgid "Node Address"

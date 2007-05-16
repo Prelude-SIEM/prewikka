@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-04 18:23+0200\n"
+"POT-Creation-Date: 2007-05-16 11:34+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Valentin Bogdanov <bogdanov.valentin@gmail.com>\n"
 "Language-Team: Russian <LL@li.org>\n"
@@ -49,6 +49,10 @@ msgstr "Имя пользователя и пароль не подходят."
 #: prewikka/Auth.py:145
 msgid "Logged out"
 msgstr "Пользователь вышел из системы"
+
+#: prewikka/Auth.py:151
+msgid "anonymous"
+msgstr ""
 
 #: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
 msgid "Parameters Normalization failed"
@@ -996,9 +1000,10 @@ msgstr "Фильтровать по агенту"
 msgid "logout"
 msgstr "выход"
 
-#: prewikka/templates/ClassicLayout.py:237
-msgid "on"
-msgstr "вкл"
+#: prewikka/templates/ClassicLayout.py:234
+#, python-format
+msgid "%(username)s on %(date)s"
+msgstr ""
 
 #: prewikka/templates/AlertListing.py:133
 msgid "Equal"
@@ -1159,6 +1164,9 @@ msgstr "Информация об адресе"
 #, fuzzy
 msgid "Filter"
 msgstr "Фильтры"
+
+#~ msgid "on"
+#~ msgstr "вкл"
 
 #, fuzzy
 #~ msgid "Node Address"

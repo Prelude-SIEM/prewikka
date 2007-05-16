@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-04 18:26+0200\n"
+"POT-Creation-Date: 2007-05-16 11:34+0200\n"
 "PO-Revision-Date: 2007-05-03 15:55+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
@@ -48,6 +48,10 @@ msgstr "Identifiant et/ou mot de passe erroné(s)"
 #: prewikka/Auth.py:145
 msgid "Logged out"
 msgstr "Session terminée"
+
+#: prewikka/Auth.py:151
+msgid "anonymous"
+msgstr "anonyme"
 
 #: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
 msgid "Parameters Normalization failed"
@@ -652,6 +656,7 @@ msgstr "Echec de l'authentification CGI : aucun utilisateur spécifié."
 
 # python-format
 #: prewikka/templates/SensorListing.py:116
+#, python-format
 msgid "%(missing)d missing, %(unknown)d unknown, of %(total)d analyzers"
 msgstr "%(missing)d manquant, %(unknown)d inconnus, sur %(total)d agents"
 
@@ -662,6 +667,7 @@ msgstr "Tout les agents sont connectés"
 
 # python-format
 #: prewikka/templates/SensorListing.py:172
+#, python-format
 msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
 msgstr "%(missing)d manquant, %(unknown)d inconnus sur %(total)d agents"
 
@@ -984,9 +990,10 @@ msgstr "Filtrer sur l'agent"
 msgid "logout"
 msgstr "déconnexion"
 
-#: prewikka/templates/ClassicLayout.py:237
-msgid "on"
-msgstr "le"
+#: prewikka/templates/ClassicLayout.py:234
+#, python-format
+msgid "%(username)s on %(date)s"
+msgstr "%(username)s le %(date)s"
 
 #: prewikka/templates/AlertListing.py:133
 msgid "Equal"
@@ -1143,6 +1150,9 @@ msgstr "Information sur la %s"
 #: prewikka/templates/AlertListing.py:1204
 msgid "Filter"
 msgstr "Filtre"
+
+#~ msgid "on"
+#~ msgstr "le"
 
 #, fuzzy
 #~ msgid "Node Address"
