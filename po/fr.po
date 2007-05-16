@@ -231,13 +231,13 @@ msgstr "Système d'Exploitation"
 #: prewikka/views/messagesummary.py:466
 #, python-format
 msgid "Analyzer Path (%d not shown)"
-msgstr "Chemin vers l'Analyseur (%d non visibles)"
+msgstr "Chemin vers l'agent (%d non visibles)"
 
 #: prewikka/views/messagesummary.py:473 prewikka/views/messagesummary.py:967
 #: prewikka/views/messagesummary.py:1034
 #, python-format
 msgid "Analyzer #%d"
-msgstr "Analyseur #%d"
+msgstr "Agent #%d"
 
 #: prewikka/views/messagesummary.py:483
 msgid "Additional data"
@@ -377,7 +377,7 @@ msgstr "Alertes de Corrélation"
 
 #: prewikka/views/messagesummary.py:663 prewikka/views/messagesummary.py:680
 msgid "Source Analyzer"
-msgstr "Analyseur Source"
+msgstr "Agent Source"
 
 #: prewikka/views/messagesummary.py:673 prewikka/views/messagesummary.py:935
 #: prewikka/views/alertlisting.py:597

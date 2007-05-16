@@ -964,7 +964,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.buildToolAlert(alert)
         self.buildReference(alert)
 
-        self.beginSection(_("Analyzer #%d" % (len(alert["analyzer"]) - 1)))
+        self.beginSection(_("Analyzer #%d") % (len(alert["analyzer"]) - 1))
         self.buildAnalyzer(alert["analyzer(-1)"])
                 
         self.buildAnalyzerList(alert)
@@ -1031,7 +1031,7 @@ class HeartbeatSummary(MessageSummary, view.View):
         self.beginSection(_("Heartbeat"))
         self.buildTime(heartbeat)
 
-        self.beginSection(_("Analyzer #%d" % (len(heartbeat["analyzer"]) - 1)))
+        self.beginSection(_("Analyzer #%d") % (len(heartbeat["analyzer"]) - 1))
         self.buildAnalyzer(heartbeat["analyzer(-1)"])
     
         self.buildAnalyzerList(heartbeat)
