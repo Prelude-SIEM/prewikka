@@ -24,9 +24,9 @@ classic_body
   </div>
 
   <div class="topmenu_item_info">
-    #if $prewikka.user
-     <p><b><a href="?view=user_settings_display">$prewikka.user.login</a></b> $_("on") $prewikka.date</p>
-    #end if
+    #end filter
+    <p>$str($_("%(username)s on %(date)s") % { "username": $prewikka.userlink, "date": $prewikka.date })</p>
+    #filter CleanOutput
   </div>
 </div>
 #end filter

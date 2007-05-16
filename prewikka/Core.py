@@ -128,6 +128,7 @@ class Core:
         self._env.config = Config.Config(config)
         self._env.max_aggregated_source = int(self._env.config.general.getOptionValue("max_aggregated_source", 10))
         self._env.max_aggregated_target = int(self._env.config.general.getOptionValue("max_aggregated_target", 10))
+        self._env.default_locale = self._env.config.general.getOptionValue("default_locale", None)
         preludedb.preludedb_init()
         self._initDatabase()
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
@@ -222,8 +223,8 @@ class Core:
         
                 if is_anon and tab_name == "Users":
                     continue
-                    
-                if not user or user.has(self._views[view_name]["permissions"]):
+        
+                if not user or is_anon or user.has(self._views[view_name]["permissions"]):
                     if not first_tab:
                         first_tab = view_name
                         section_to_tabs[section_name] = []
@@ -251,6 +252,13 @@ class Core:
 
         dataset["interface.tabs"] = tabs
         dataset["prewikka.user"] = user
+        
+        if user:
+            if is_anon:
+                dataset["prewikka.userlink"] = "<b>%s</b>" % utils.escape_html_string(_(user.login))
+            else:
+                dataset["prewikka.userlink"] = "<b><a href=\"%s\">%s</a></b>" % (utils.create_link("user_settings_display"), utils.escape_html_string(user.login))
+            
         dataset["interface.active_tab"] = _(active_tab)
         dataset["interface.active_section"] = _(active_section)
         dataset["prewikka.logout_link"] = (user and self._env.auth.canLogout()) and utils.create_link("logout") or None
@@ -284,8 +292,12 @@ class Core:
             raise InvalidQueryError("View '%s' does not exist" % name)
 
     def checkAuth(self, request):
-        return self._env.auth.getUser(request)
-
+        user = self._env.auth.getUser(request)
+        if not user.language and self._env.default_locale:
+            user.setLanguage(self._env.default_locale)
+            
+        return user
+        
     def process(self, request):
         login = None
         view = None
