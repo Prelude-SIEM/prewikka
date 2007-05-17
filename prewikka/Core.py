@@ -294,7 +294,7 @@ class Core:
     def checkAuth(self, request):
         user = self._env.auth.getUser(request)
         if not user.language and self._env.default_locale:
-            user.setLanguage(self._env.default_locale)
+            localization.setLocale(self._env.default_locale)
             
         return user
         
