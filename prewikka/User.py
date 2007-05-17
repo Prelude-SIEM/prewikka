@@ -48,17 +48,12 @@ class User:
         self.login = login
         self.permissions = permissions
         self.configuration = configuration    
-        if language:
-            self.language = language
-            localization.setLocale(language)
-        else:
-            self.language = None
+        self.setLanguage(language)
             
     def setLanguage(self, lang):
         self.language = lang
         localization.setLocale(lang)
-        self._db.setLanguage(self.login, lang)
-        
+          
     def delConfigValue(self, view, key=None):
         login = self._db.escape(self.login)
         

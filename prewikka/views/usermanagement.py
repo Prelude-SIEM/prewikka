@@ -132,7 +132,7 @@ class UserSettingsDisplay(view.View):
             raise Error.PrewikkaUserError("Permission Denied", "Access denied to other users settings", log=Log.WARNING)
 
         self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
-        self.dataset["user.language"] = self.user.language
+        self.dataset["user.language"] = self.user.language or localization._DEFAULT_LANGUAGE
 
         self.dataset["ask_current_password"] = (login == self.user.login)
         self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
@@ -167,6 +167,7 @@ class UserSettingsModify(UserListing):
         
         if lang != self.user.language:
             self.user.setLanguage(lang)
+            self.env.db.setLanguage(self.user.login, lang)
                     
         if self.parameters.has_key("password_new") and self.parameters.has_key("password_new_confirmation"):
             if self.parameters.has_key("password_current"):

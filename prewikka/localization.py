@@ -70,6 +70,9 @@ _LANGUAGES = {
     
 
 def setLocale(lang):
+    if not lang:
+        lang = _DEFAULT_LANGUAGE
+        
     if _lock:
         _lock.acquire()
     
