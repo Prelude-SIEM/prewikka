@@ -34,7 +34,7 @@ class HeartbeatListingParameters(MessageListingParameters):
 class SensorHeartbeatListingParameters(HeartbeatListingParameters):
     def register(self):
         HeartbeatListingParameters.register(self)
-        self.mandatory("analyzerid", long)
+        self.mandatory("analyzerid", str)
 
 
 
@@ -144,7 +144,7 @@ class SensorHeartbeatListing(HeartbeatListing, view.View):
     listed_heartbeat = ListedHeartbeat
 
     def _adjustCriteria(self, criteria):
-        criteria.append("heartbeat.analyzer.analyzerid == %d" % self.parameters["analyzerid"])
+        criteria.append("heartbeat.analyzer.analyzerid == '%s'" % self.parameters["analyzerid"])
 
     def _setHiddenParameters(self):
         HeartbeatListing._setHiddenParameters(self)
