@@ -95,6 +95,8 @@ class UserAddForm(view.View):
         self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
         self.dataset["can_change_password"] = self.env.auth.canSetPassword()
         self.dataset["ask_current_password"] = False
+        self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
+        self.dataset["user.language"] = localization._DEFAULT_LANGUAGE
         
         self.dataset["hiddens"] = [ ("view", "user_add") ]
         self.dataset["properties"] = [ utils.text_property("Login", "login") ]
