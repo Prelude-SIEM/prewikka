@@ -696,7 +696,6 @@ p {
 }
 
 .heartbeat_analyze_sensor_status_offline {
-        /* background-color: #b5cba0; */
         background-color: #ffb063;
 	text-align: center;
 }
