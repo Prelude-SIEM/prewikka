@@ -1,3 +1,28 @@
+* 2007-05-21, prewikka-0.9.11:
+
+        - Prewikka has been internationalized: user might choose the language
+          used in their settings tabs. Additionally, you might specify
+          a default locale using the "default_locale" configuration keyword.
+
+        - Brazilian Portuguese translation, by Edelberto Franco Silva<edeunix@edeunix.com>. 
+        - French translation, by Sebastien Tricaud <sebastien@gscore.org>.
+        - German translation, by Bjoern Weiland <mail@bjou.de>.
+        - Russian translation, by Valentin Bogdanov <bogdanov.valentin@gmail.com>. 
+        - Spanish translation, by Carlo G. Añez M. <carlo.anez@gmail.com>.
+
+        - New powerfull and scalable agent view, grouping agent together by 
+          Location and Node. 
+        
+        - In the Alert/Heartbeat summary view, number analyzers backward so that
+          it reflect the ordering in the analyzer list.
+          
+        - Improved support for resizing menu. 
+        
+        - Fix a konqueror rendering bug with the inline filter. 
+
+        - Various bug fixes.
+        
+        
 * 2007-04-05, prewikka-0.9.10:
 
         - Don't show all source and target when they reach a predefined limit, instead 

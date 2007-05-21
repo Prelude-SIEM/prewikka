@@ -7,10 +7,11 @@ include htdocs/css/*.css
 include htdocs/js/*.js
 include conf/*.conf
 include doc/*
-include po/*
+include po/*.po
 include *.py
 include NEWS
 include AUTHORS
 include README
 include HACKING.README
+include prewikka.pot
 recursive-include prewikka *.py *.tmpl
