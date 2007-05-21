@@ -140,7 +140,7 @@ msgstr "Dimanche"
 
 #: prewikka/views/filter.py:55
 msgid "Example: (A AND B) OR (C AND D)"
-msgstr "Exemple : (A ET B) OR (C AND D)"
+msgstr "Exemple : (A AND B) OR (C AND D)"
 
 #: prewikka/views/messagesummary.py:288 prewikka/views/messagesummary.py:435
 #: prewikka/views/messagesummary.py:658 prewikka/views/messagesummary.py:675
