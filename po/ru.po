@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-16 17:34+0200\n"
+"POT-Creation-Date: 2007-05-21 16:51+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Valentin Bogdanov <bogdanov.valentin@gmail.com>\n"
 "Language-Team: Russian <LL@li.org>\n"
@@ -63,79 +63,79 @@ msgstr "Ошибка нормализации параметров"
 msgid "Invalid filter element '%s' referenced from filter formula"
 msgstr "Ошибка в элементе фильтра '%s', на который ссылается формула фильтра"
 
-#: prewikka/localization.py:109
+#: prewikka/localization.py:112
 msgid "January"
 msgstr "Январь"
 
-#: prewikka/localization.py:110
+#: prewikka/localization.py:113
 msgid "February"
 msgstr "Февраль"
 
-#: prewikka/localization.py:111
+#: prewikka/localization.py:114
 msgid "March"
 msgstr "Март"
 
-#: prewikka/localization.py:112
+#: prewikka/localization.py:115
 msgid "April"
 msgstr "Апрель"
 
-#: prewikka/localization.py:113
+#: prewikka/localization.py:116
 msgid "May"
 msgstr "Май"
 
-#: prewikka/localization.py:114
+#: prewikka/localization.py:117
 msgid "June"
 msgstr "Июнь"
 
-#: prewikka/localization.py:115
+#: prewikka/localization.py:118
 msgid "July"
 msgstr "Июль"
 
-#: prewikka/localization.py:116
+#: prewikka/localization.py:119
 msgid "August"
 msgstr "Август"
 
-#: prewikka/localization.py:117
+#: prewikka/localization.py:120
 msgid "September"
 msgstr "Сентябрь"
 
-#: prewikka/localization.py:118
+#: prewikka/localization.py:121
 msgid "November"
 msgstr "Ноябрь"
 
-#: prewikka/localization.py:119
+#: prewikka/localization.py:122
 msgid "October"
 msgstr "Октябрь"
 
-#: prewikka/localization.py:120
+#: prewikka/localization.py:123
 msgid "December"
 msgstr "Декабрь"
 
-#: prewikka/localization.py:122
+#: prewikka/localization.py:125
 msgid "Monday"
 msgstr "Понедельник"
 
-#: prewikka/localization.py:123
+#: prewikka/localization.py:126
 msgid "Tuesday"
 msgstr "Вторник"
 
-#: prewikka/localization.py:124
+#: prewikka/localization.py:127
 msgid "Wednesday"
 msgstr "Среда"
 
-#: prewikka/localization.py:125
+#: prewikka/localization.py:128
 msgid "Thursday"
 msgstr "Четверг"
 
-#: prewikka/localization.py:126
+#: prewikka/localization.py:129
 msgid "Friday"
 msgstr "Пятница"
 
-#: prewikka/localization.py:127
+#: prewikka/localization.py:130
 msgid "Saturday"
 msgstr "Суббота"
 
-#: prewikka/localization.py:128
+#: prewikka/localization.py:131
 msgid "Sunday"
 msgstr "Воскресенье"
 
