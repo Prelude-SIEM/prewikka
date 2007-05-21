@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-21 16:51+0200\n"
+"POT-Creation-Date: 2007-05-21 18:02+0200\n"
 "PO-Revision-Date: 2007-04-11 10:55-0400\n"
 "Last-Translator: Carlo Anez <carlo.anez@siscotec.com>\n"
 "Language-Team: SPANISH\n"
@@ -687,18 +687,14 @@ msgid "CGI Authentication failed: no user specified."
 msgstr "Autenticación fallida de CGI: no se especifico el usuario"
 
 #: prewikka/templates/SensorListing.py:116
+#: prewikka/templates/SensorListing.py:172
 #, python-format
-msgid "%(missing)d missing, %(unknown)d unknown, of %(total)d analyzers"
+msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
 msgstr ""
 
 #: prewikka/templates/SensorListing.py:124
 #: prewikka/templates/SensorListing.py:178
 msgid "All analyzers online"
-msgstr ""
-
-#: prewikka/templates/SensorListing.py:172
-#, python-format
-msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
 msgstr ""
 
 #: prewikka/templates/SensorListing.py:212

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-21 16:51+0200\n"
+"POT-Creation-Date: 2007-05-21 18:02+0200\n"
 "PO-Revision-Date: 2007-05-03 15:55+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
@@ -386,7 +386,7 @@ msgstr "Alertes d'Outil"
 
 #: prewikka/views/messagesummary.py:679
 msgid "Linked Alert"
-msgstr "Alert Liées"
+msgstr "Alertes Liées"
 
 #: prewikka/views/messagesummary.py:690
 msgid "Text"
@@ -577,7 +577,7 @@ msgstr "Pulsations"
 
 #: prewikka/views/sensor.py:51
 msgid "Unknown"
-msgstr "Inconnus"
+msgstr "Inconnu"
 
 #: prewikka/views/sensor.py:54
 msgid "Offline"
@@ -593,19 +593,19 @@ msgstr "Connecté"
 
 #: prewikka/views/sensor.py:153
 msgid "Node location n/a"
-msgstr "Emplacement du noeud inconnus"
+msgstr "Emplacement du noeud inconnu"
 
 #: prewikka/views/sensor.py:154
 msgid "Node name n/a"
-msgstr "Nom du noeud inconnus"
+msgstr "Nom du noeud inconnu"
 
 #: prewikka/views/sensor.py:155
 msgid "OS version n/a"
-msgstr "Système inconnus"
+msgstr "Version système inconnu"
 
 #: prewikka/views/sensor.py:156
 msgid "OS type n/a"
-msgstr ""
+msgstr "Type du système inconnu"
 
 #: prewikka/views/__init__.py:43
 msgid "Events"
@@ -617,7 +617,7 @@ msgstr "Alertes"
 
 #: prewikka/views/__init__.py:44
 msgid "CorrelationAlerts"
-msgstr "Alertes de Correlation"
+msgstr "Alertes de Corrélation"
 
 #: prewikka/views/__init__.py:45
 msgid "ToolAlerts"
@@ -653,20 +653,15 @@ msgstr "Echec de l'authentification CGI : aucun utilisateur spécifié."
 
 # python-format
 #: prewikka/templates/SensorListing.py:116
+#: prewikka/templates/SensorListing.py:172
 #, python-format
-msgid "%(missing)d missing, %(unknown)d unknown, of %(total)d analyzers"
-msgstr "%(missing)d manquant, %(unknown)d inconnus, sur %(total)d agents"
+msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
+msgstr "%(missing)d manquants, %(unknown)d inconnus sur %(total)d agents"
 
 #: prewikka/templates/SensorListing.py:124
 #: prewikka/templates/SensorListing.py:178
 msgid "All analyzers online"
 msgstr "Tout les agents sont connectés"
-
-# python-format
-#: prewikka/templates/SensorListing.py:172
-#, python-format
-msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
-msgstr "%(missing)d manquant, %(unknown)d inconnus sur %(total)d agents"
 
 #: prewikka/templates/SensorListing.py:212
 #: prewikka/templates/HeartbeatListing.py:231
@@ -675,7 +670,7 @@ msgstr "Filtrer sur l'adresse"
 
 #: prewikka/templates/SensorListing.py:223
 msgid "Address information"
-msgstr "Information sur l'adresse"
+msgstr "Informations sur l'adresse"
 
 #: prewikka/templates/SensorListing.py:274
 #: prewikka/templates/SensorListing.py:415
@@ -709,10 +704,7 @@ msgid ""
 "provides support to Large Accounts, Major Companies and Government Agencies "
 "around the world, to improve and strengthen the security of their systems "
 "and networks."
-msgstr ""
-"accompagne les Grands Comptes, Grands Groupes et Administrations du monde "
-"entier dans l'amélioration et le renforcement de la sécurité de leurs "
-"systèmes et réseaux."
+msgstr "accompagne les Grands Comptes, Grands Groupes et Administrations du monde entier dans l'amélioration et le renforcement de la sécurité de leurs systèmes et réseaux."
 
 #: prewikka/templates/About.py:129
 msgid "Customizing Prelude"
@@ -729,17 +721,7 @@ msgid ""
 "Prelude to handle yet unsupported sensors (including proprietary), ruleset "
 "extension to handle new devices and porting of Prelude to unsupported "
 "operating systems."
-msgstr ""
-"Dans l'esprit Open Source, nous vous proposons de participer au "
-"développement de votre logiciel. Vous pouvez commander des développements "
-"personnalisés de Prelude en fonction de vos besoins : customisation, ajout "
-"de fonctionnalités, etc. Réalisées par les ingénieurs PreludeIDS, les "
-"modifications apportées au système Prelude vous donneront l’assurance d’être "
-"intégrées de façon optimisée et garanties par notre Support Technique. De "
-"plus, notre entreprise peut mettre en compatibilité des sondes non encore "
-"supportées (incluant des sondes propriétaires), réaliser une extension des "
-"signatures pour la gestion de nouveaux systèmes ou encore porter Prelude sur "
-"un OS non encore supporté."
+msgstr "Dans l'esprit Open Source, nous vous proposons de participer au développement de votre logiciel. Vous pouvez commander des développements personnalisés de Prelude en fonction de vos besoins : customisation, ajout de fonctionnalités, etc. Réalisées par les ingénieurs PreludeIDS, les modifications apportées au système Prelude vous donneront l’assurance d’être intégrées de façon optimisée et garanties par notre Support Technique. De plus, notre entreprise peut mettre en compatibilité des sondes non encore supportées (incluant des sondes propriétaires), réaliser une extension des signatures pour la gestion de nouveaux systèmes ou encore porter Prelude sur un OS non encore supporté."
 
 #: prewikka/templates/About.py:143
 msgid "Software Maintenance and Technical Support"
@@ -752,12 +734,7 @@ msgid ""
 "that provide our customers with peace of mind,  knowing that they are not "
 "only covered for all outcomes, but that our experts are at hand to provide "
 "rapid and reliable solutions."
-msgstr ""
-"Le support PreludeIDS vous garantit le fonctionnement optimal du système "
-"Prelude sur votre infrastructure. PreludeIDS a créé cinq offres de support "
-"technique packagées. En vous assurant une assistance en cas d'incident, le "
-"support PreludeIDS met à votre disposition nos experts pour vous fournir des "
-"solutions rapides et fiables."
+msgstr "Le support PreludeIDS vous garantit le fonctionnement optimal du système Prelude sur votre infrastructure. PreludeIDS a créé cinq offres de support technique packagées. En vous assurant une assistance en cas d'incident, le support PreludeIDS met à votre disposition nos experts pour vous fournir des solutions rapides et fiables."
 
 #: prewikka/templates/About.py:157
 msgid "Commercial licenses"
@@ -1147,6 +1124,10 @@ msgstr "Information sur la %s"
 #: prewikka/templates/AlertListing.py:1204
 msgid "Filter"
 msgstr "Filtre"
+
+# python-format
+#~ msgid "%(missing)d missing, %(unknown)d unknown, of %(total)d analyzers"
+#~ msgstr "%(missing)d manquant, %(unknown)d inconnus, sur %(total)d agents"
 
 #~ msgid "Analyzer #0"
 #~ msgstr "Analyseur #0"

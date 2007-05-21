@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-21 16:51+0200\n"
+"POT-Creation-Date: 2007-05-21 18:02+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Valentin Bogdanov <bogdanov.valentin@gmail.com>\n"
 "Language-Team: Russian <LL@li.org>\n"
@@ -677,8 +677,9 @@ msgid "CGI Authentication failed: no user specified."
 msgstr "Ошибка аутентификации CGI: пользователь не указан"
 
 #: prewikka/templates/SensorListing.py:116
+#: prewikka/templates/SensorListing.py:172
 #, python-format
-msgid "%(missing)d missing, %(unknown)d unknown, of %(total)d analyzers"
+msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
 msgstr ""
 
 #: prewikka/templates/SensorListing.py:124
@@ -686,11 +687,6 @@ msgstr ""
 #, fuzzy
 msgid "All analyzers online"
 msgstr "Время анализатора"
-
-#: prewikka/templates/SensorListing.py:172
-#, python-format
-msgid "%(missing)d missing, %(unknown)d unknown of %(total)d analyzers"
-msgstr ""
 
 #: prewikka/templates/SensorListing.py:212
 #: prewikka/templates/HeartbeatListing.py:231
