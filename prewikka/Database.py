@@ -82,7 +82,7 @@ class Database:
 
         # check if the database has been created
         try:
-            version = self.query("SELECT * FROM Prewikka_Version")[0][0]
+            version = self.query("SELECT version FROM Prewikka_Version")[0][0]
         except PreludeDBError, e:
             print >> sys.stderr, e
             print >> sys.stderr, "The Prewikka database does not seem to have been created."
