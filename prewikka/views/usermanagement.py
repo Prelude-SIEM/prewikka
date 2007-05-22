@@ -60,6 +60,9 @@ class UserListing(view.View):
     view_permissions = [ User.PERM_USER_MANAGEMENT ]
     view_template = "UserListing"
 
+    def hasPermission(self, perm, permlist):
+        return perm in permlist
+        
     def render(self):
         self.dataset["add_form_hiddens"] = [("view", "user_add_form")]
         self.dataset["permissions"] = User.ALL_PERMISSIONS
@@ -69,11 +72,13 @@ class UserListing(view.View):
         logins = self.env.db.getUserLogins()
         logins.sort()
         for login in logins:
-            user = self.env.db.getUser(login)
+            permissions = self.env.db.getPermissions(login)
+            
             tmp = { }
-            tmp["login"] = user.login
+            tmp["login"] = login
             tmp["settings_link"] = utils.create_link("user_settings_display", { "login": login })
-            tmp["permissions"] = map(lambda perm: user.has(perm), User.ALL_PERMISSIONS)
+            tmp["permissions"] = map(lambda perm: self.hasPermission(perm, permissions), User.ALL_PERMISSIONS)
+            
             self.dataset["users"].append(tmp)
 
 

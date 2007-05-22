@@ -53,11 +53,11 @@ class Auth:
         
         has_user_manager = False
         for login in self.db.getUserLogins():
-            user = self.db.getUser(login)
-            if User.PERM_USER_MANAGEMENT in user.permissions:
+            permissions = self.db.getPermissions(login)
+            if User.PERM_USER_MANAGEMENT in permissions:
                 has_user_manager = True
                 break
-            
+        
         if not has_user_manager:
             self.db.createUser(User.ADMIN_LOGIN)
             self.db.setPermissions(User.ADMIN_LOGIN, User.ALL_PERMISSIONS)
