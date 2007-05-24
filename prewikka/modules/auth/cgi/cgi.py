@@ -28,7 +28,7 @@ class CGIAuth(Auth.Auth):
     	if not user:
 	    raise Auth.AuthError(message=_("CGI Authentication failed: no user specified."))
         
-        return User.User(self.db, user, User.ALL_PERMISSIONS, self.db.getConfiguration(user))
+        return User.User(self.db, user, self.db.getLanguage(user), User.ALL_PERMISSIONS, self.db.getConfiguration(user))
 
 
 
