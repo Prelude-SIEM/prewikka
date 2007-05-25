@@ -1,3 +1,10 @@
+* 2007-05-25, prewikka-0.9.11.1:
+
+	- Fix Apache CGI authentication. (Robin Gruyters)
+
+	- Fix incorrect locale switch when accessing certain pages.
+
+	
 * 2007-05-21, prewikka-0.9.11:
 
         - Prewikka has been internationalized: user might choose the language
