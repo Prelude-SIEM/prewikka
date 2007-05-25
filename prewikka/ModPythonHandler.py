@@ -34,8 +34,8 @@ class ModPythonRequest(Request.Request):
         self._req.write(data)
 
     def sendHeader(self, name, value):
-    	pass
- 
+        self._req.headers_out[name] = value
+         
     def endHeader(self):
     	pass
 
