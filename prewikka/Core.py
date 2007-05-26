@@ -125,26 +125,34 @@ class Core:
     def __init__(self, config=None):
         class Env: pass
         self._env = Env()
+        self._env.auth = None # In case of database error
         self._env.config = Config.Config(config)
         self._env.max_aggregated_source = int(self._env.config.general.getOptionValue("max_aggregated_source", 10))
         self._env.max_aggregated_target = int(self._env.config.general.getOptionValue("max_aggregated_target", 10))
         self._env.default_locale = self._env.config.general.getOptionValue("default_locale", None)
         preludedb.preludedb_init()
-        self._initDatabase()
+
+        self._database_schema_error = None        
+        try:
+            self._initDatabase()
+        except Database.DatabaseSchemaError, e:
+            self._database_schema_error = e
+            return
+            
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
         self._env.log = Log.Log(self._env.config)
         self._initHostCommands()
         self._loadViews()
         self._loadModules()
         self._initAuth()
-
+                
     def _initDatabase(self):
         config = { }
         for key in self._env.config.database.keys():
             config[key] = self._env.config.database.getOptionValue(key)
 
         self._env.db = Database.Database(config)
-        
+            
     def _initHostCommands(self):
         self._env.host_commands = { }
         
@@ -303,6 +311,9 @@ class Core:
         view = None
         user = None
         try:
+            if self._database_schema_error != None:
+                raise Error.PrewikkaUserError("Database error", self._database_schema_error)
+                
             user = self.checkAuth(request)
             login = user.login
             view = self._getView(request, user)
