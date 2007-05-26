@@ -8,13 +8,23 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-21 18:02+0200\n"
+"POT-Creation-Date: 2007-05-26 11:59+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Valentin Bogdanov <bogdanov.valentin@gmail.com>\n"
 "Language-Team: Russian <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+
+#: prewikka/Database.py:89
+msgid "The Prewikka database does not seem to have been created"
+msgstr ""
+
+#: prewikka/Database.py:93
+#, python-format
+msgid ""
+"Database schema version %(version)s found when %(reqversion)s was required"
+msgstr ""
 
 #: prewikka/User.py:41
 msgid "Permission Denied"

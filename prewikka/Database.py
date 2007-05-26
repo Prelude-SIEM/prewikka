@@ -86,10 +86,11 @@ class Database:
         try:
             version = self.query("SELECT version FROM Prewikka_Version")[0][0]
         except PreludeDBError, e:
-            raise DatabaseSchemaError("The Prewikka database does not seem to have been created")
+            raise DatabaseSchemaError(_("The Prewikka database does not seem to have been created"))
            
         if version != self.required_version:
-            raise DatabaseSchemaError("Database schema version %s found when %s was required" % (version, self.required_version))
+            d = { "version": version, "reqversion": self.required_version }
+            raise DatabaseSchemaError(_("Database schema version %(version)s found when %(reqversion)s was required") % d)
  
     def __del__(self):
         if self._sql:
