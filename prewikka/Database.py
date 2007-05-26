@@ -22,7 +22,6 @@ import sys
 import time
 
 from preludedb import *
-
 from prewikka import User, Filter, utils, siteconfig
 
 class DatabaseError(Exception):
@@ -52,6 +51,9 @@ class DatabaseInvalidSessionError(_DatabaseInvalidError):
 class DatabaseInvalidFilterError(_DatabaseInvalidError):
     type = "filter"
 
+
+class DatabaseSchemaError(Exception):
+    pass       
 
 class Database:
     required_version = "0.9.11"
@@ -84,14 +86,11 @@ class Database:
         try:
             version = self.query("SELECT version FROM Prewikka_Version")[0][0]
         except PreludeDBError, e:
-            print >> sys.stderr, e
-            print >> sys.stderr, "The Prewikka database does not seem to have been created."
-            sys.exit(1)
-
-        if version != self.required_version:
-            print >> sys.stderr, "Database schema version %s found when %s was required." % (version, self.required_version)
-            sys.exit(1)
-
+            raise DatabaseSchemaError("The Prewikka database does not seem to have been created")
+           
+        if version == self.required_version:
+            raise DatabaseSchemaError("Database schema version %s found when %s was required" % (version, self.required_version))
+ 
     def __del__(self):
         if self._sql:
             self._sql_destroy(self._sql)
