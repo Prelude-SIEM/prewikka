@@ -1,3 +1,11 @@
+* 2007-05-26, prewikka-0.9.11.2:
+
+        - In case a database schema upgrade is required, or the Prewikka 
+          database does not exist, make the error available from the Prewikka
+          console, rather than exiting badly (which previously required the 
+          user to parse its web server log in order to find out the problem).
+          
+
 * 2007-05-25, prewikka-0.9.11.1:
 
 	- Fix Apache CGI authentication. (Robin Gruyters)
