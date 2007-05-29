@@ -2,7 +2,7 @@
 CREATE TABLE Prewikka_Version (
 	version TEXT NOT NULL
 );
-INSERT INTO Prewikka_Version (version) VALUES('0.9.1');
+INSERT INTO Prewikka_Version (version) VALUES('0.9.11');
 
 
 
