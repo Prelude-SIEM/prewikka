@@ -1,3 +1,8 @@
+* 2007-05-29, prewikka-0.9.11.3:
+
+	- Fix database schema version.
+
+
 * 2007-05-26, prewikka-0.9.11.2:
 
         - In case a database schema upgrade is required, or the Prewikka 

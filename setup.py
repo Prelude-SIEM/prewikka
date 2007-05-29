@@ -36,7 +36,7 @@ from distutils.core import Command
 from Cheetah.CheetahWrapper import CheetahWrapper
 
 
-PREWIKKA_VERSION = "0.9.11.2"
+PREWIKKA_VERSION = "0.9.11.3"
 
 from fnmatch import fnmatch
 from distutils.dep_util import newer
