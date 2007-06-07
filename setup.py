@@ -114,6 +114,11 @@ class my_build_py(build_py):
 
 class MyDistribution(Distribution):
     def __init__(self, attrs):
+        try:
+            os.remove("prewikka/siteconfig.py")
+        except:
+            pass
+
         self.conf_files = [ ]
         Distribution.__init__(self, attrs)
 
