@@ -138,6 +138,9 @@ class Database:
     def transaction_end(self):
         preludedb_sql_transaction_end(self._sql)
 
+    def transaction_abort(self):
+        preludedb_sql_transaction_abort(self._sql)
+
     def error(self):
         return 
 
@@ -159,12 +162,28 @@ class Database:
     def deleteUser(self, login):
         login = self.escape(login)
         self.transaction_start()
-        self.query("DELETE FROM Prewikka_User WHERE login = %s" % login)
-        self.query("DELETE FROM Prewikka_Permission WHERE login = %s" % login)
-        self.query("DELETE FROM Prewikka_Session WHERE login = %s" % login)
-        self.query("DELETE FROM Prewikka_Filter_Criterion USING Prewikka_Filter, Prewikka_Filter_Criterion "
-                   "WHERE Prewikka_Filter.login = %s AND Prewikka_Filter.id = Prewikka_Filter_Criterion.id" % login)
-        self.query("DELETE FROM Prewikka_Filter WHERE login = %s" % login)
+        try:
+            self.query("DELETE FROM Prewikka_User WHERE login = %s" % login)
+            self.query("DELETE FROM Prewikka_Permission WHERE login = %s" % login)
+            self.query("DELETE FROM Prewikka_Session WHERE login = %s" % login)
+			self.query("DELETE FROM Prewikka_View WHERE login = %s" % login)
+            
+            rows = self.query("SELECT id FROM Prewikka_Filter WHERE login = %s" % login)
+            lst=""
+            for id in rows:
+                if len(lst) > 0:
+                    lst += ", "
+             
+                lst += str(id[0])
+            
+            if len(lst) > 0:
+                self.query("DELETE FROM Prewikka_Filter_Criterion WHERE Prewikka_Filter_Criterion.id IN (%s)" % lst)                       
+            
+            self.query("DELETE FROM Prewikka_Filter WHERE login = %s" % login)
+        except:
+            self.transaction_abort()
+            raise
+            
         self.transaction_end()
         
     def getConfiguration(self, login):
