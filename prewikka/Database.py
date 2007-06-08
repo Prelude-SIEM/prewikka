@@ -166,17 +166,10 @@ class Database:
             self.query("DELETE FROM Prewikka_User WHERE login = %s" % login)
             self.query("DELETE FROM Prewikka_Permission WHERE login = %s" % login)
             self.query("DELETE FROM Prewikka_Session WHERE login = %s" % login)
-			self.query("DELETE FROM Prewikka_View WHERE login = %s" % login)
             
-            rows = self.query("SELECT id FROM Prewikka_Filter WHERE login = %s" % login)
-            lst=""
-            for id in rows:
-                if len(lst) > 0:
-                    lst += ", "
-             
-                lst += str(id[0])
-            
-            if len(lst) > 0:
+            rows = self.query("SELECT id FROM Prewikka_Filter WHERE login = %s" % login)            
+            if len(rows) > 0:
+                lst = ", ".join([ id[0] for id in rows ])
                 self.query("DELETE FROM Prewikka_Filter_Criterion WHERE Prewikka_Filter_Criterion.id IN (%s)" % lst)                       
             
             self.query("DELETE FROM Prewikka_Filter WHERE login = %s" % login)
