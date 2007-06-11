@@ -1,3 +1,8 @@
+* 2007-06-11, prewikka-0.9.11.4:
+
+	- Fix PostgreSQL user deletion error.
+
+
 * 2007-05-29, prewikka-0.9.11.3:
 
 	- Fix database schema version.
