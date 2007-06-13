@@ -870,17 +870,17 @@ class AlertListing(MessageListing, view.View):
 
             message["aggregated_classifications_hidden"] -= count
             infos = message.setInfos(count, classification, severity, completion)
-                    
+
             if count == 1:
-                ident = self.env.idmef_db.getAlertIdents("alert.messageid = '%s'" % utils.escape_criteria(messageid))[0]
-                if aggregated_count == 1:                            
+                if aggregated_count == 1:
                     message.reset()
+                    ident = self.env.idmef_db.getAlertIdents("alert.messageid = '%s'" % utils.escape_criteria(messageid))[0]
                     message.setMessage(self._fetchMessage(ident), ident)
-                else:                                
-              	    infos["display"] = message.createMessageLink(ident, "alert_summary")
+                else:
+                    infos["display"] = message.createMessageIdentLink(messageid, "alert_summary")
             else:
                 entry_param = {}
-                        
+
                 if classification:
                     entry_param["classification_object_%d" % self.parameters.max_index] = "alert.classification.text"
                     entry_param["classification_operator_%d" % self.parameters.max_index] = "="

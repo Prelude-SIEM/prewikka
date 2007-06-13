@@ -196,7 +196,10 @@ class ListedMessage(dict):
                                                              { "origin": self.view_name, "command": command, "host": value })))
 
         return field
-    
+
+    def createMessageIdentLink(self, messageid, view):
+        return utils.create_link(view, { "origin": self.view_name, "messageid": messageid })
+
     def createMessageLink(self, ident, view):
         return utils.create_link(view, { "origin": self.view_name, "ident": ident })
 
