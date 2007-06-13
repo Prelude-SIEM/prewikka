@@ -26,6 +26,20 @@ import socket
 from prewikka import view, User, utils
 
 
+def getUriCriteria(parameters):
+    if not parameters.has_key("messageid"):
+            return None
+
+    if parameters.has_key("analyzerid"):
+        criteria = "alert.analyzer(-1).analyzerid = '%s' &&" % utils.escape_criteria(parameters["analyzerid"])
+    else:
+        criteria = ""
+
+    criteria += "alert.messageid = '%s'" % utils.escape_criteria(parameters["messageid"])
+
+    return criteria
+
+
 class Table:
     def __init__(self):
         self._current_table = None
@@ -334,7 +348,9 @@ class TcpIpOptions(Table):
 class MessageParameters(view.RelativeViewParameters):
     def register(self):
         view.RelativeViewParameters.register(self)
-        self.mandatory("ident", long)
+        self.optional("ident", long)
+        self.optional("analyzerid", str)
+        self.optional("messageid", str)
 
 
 
@@ -944,7 +960,13 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         return section
 
     def render(self):
-        alert = self.env.idmef_db.getAlert(self.parameters["ident"], htmlsafe=True)
+        criteria = getUriCriteria(self.parameters)
+        if criteria is not None:
+            ident = self.env.idmef_db.getAlertIdents(criteria)[0]
+        else:
+            ident = self.parameters["ident"]
+
+        alert = self.env.idmef_db.getAlert(ident, htmlsafe=True)
         self.dataset["sections"] = [ ]
 
         self.beginSection(self.getSectionName(alert))
@@ -1026,7 +1048,13 @@ class HeartbeatSummary(MessageSummary, view.View):
     view_name = "heartbeat_summary"
 
     def render(self):
-        heartbeat = self.env.idmef_db.getHeartbeat(self.parameters["ident"], htmlsafe=True)
+        criteria = getUriCriteria(self.parameters)
+        if criteria is not None:
+            ident = self.env.idmef_db.getHeartbeatIdents(criteria)[0]
+        else:
+            ident = self.parameters["ident"]
+
+        heartbeat = self.env.idmef_db.getHeartbeat(ident, htmlsafe=True)
         self.dataset["sections"] = [ ]
 
         self.beginSection(_("Heartbeat"))
