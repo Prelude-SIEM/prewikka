@@ -48,9 +48,14 @@ events_section = (_("Events"), [(_("Alerts"), ["alert_listing", "sensor_alert_li
 agents_section = (_("Agents"), [(_("Agents"), ["sensor_listing", "sensor_messages_delete", "heartbeat_analyze"]),
                              (_("Heartbeats"), ["heartbeat_listing", "sensor_heartbeat_listing"] )])
 
-settings_section = (_("Settings"), [(_("Users"), ["user_listing", "user_add_form", "user_add", "user_delete",
-                                         "user_password_change_form", "user_password_change", "user_settings_display",
-                                         "user_settings_modify", "user_permissions_change_form", "user_permissions_change"]),
-                                 (_("Filters"), ["filter_edition"])])
+settings_section = (_("Settings"), [
+                                    (_("Filters"), ["filter_edition"]),
+                                    
+                                    (_("My account"), ["user_settings_display", "user_password_change_form", "user_password_change", "user_settings_display", 
+                                                       "user_settings_modify", "user_permissions_change_form", "user_permissions_change"]),
+     
+                                    (_("User listing"), ["user_listing", "user_add_form", "user_add", "user_delete"]),
+                                   ])
+      
 
 about_section = (_("About"), [(_("About"), ["about"])])
