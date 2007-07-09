@@ -17,27 +17,21 @@
 # along with this program; see the file COPYING.  If not, write to
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
-
-import sys
-
-import time
-import random
-import md5
-
 from prewikka import view, Log, DataSet, User, Auth, Error, localization
 from prewikka import utils
 
 
-class UserSettingsParameters(view.Parameters):
+class UserSettingsDisplayParameters(view.RelativeViewParameters):
     def register(self):
         self.optional("login", str)
+        self.optional("origin", str)
 
 
 
-class UserSettingsModifyParameters(UserSettingsParameters):
+class UserSettingsModifyParameters(UserSettingsDisplayParameters):
     def register(self):
 
-        UserSettingsParameters.register(self)
+        UserSettingsDisplayParameters.register(self)
         self.optional("language", str)
         self.optional("permissions", list, [])
         self.optional("password_current", str)
@@ -76,7 +70,7 @@ class UserListing(view.View):
             
             tmp = { }
             tmp["login"] = login
-            tmp["settings_link"] = utils.create_link("user_settings_display", { "login": login })
+            tmp["settings_link"] = utils.create_link("user_settings_display", { "login": login, "origin": self.view_name })
             tmp["permissions"] = map(lambda perm: self.hasPermission(perm, permissions), User.ALL_PERMISSIONS)
             
             self.dataset["users"].append(tmp)
@@ -128,7 +122,7 @@ class UserDelete(UserListing):
 
 class UserSettingsDisplay(view.View):
     view_name = "user_settings_display"
-    view_parameters = UserSettingsParameters
+    view_parameters = UserSettingsDisplayParameters
     view_permissions = [ ]
     view_template = "UserSettings"
 
@@ -139,20 +133,24 @@ class UserSettingsDisplay(view.View):
             raise Error.PrewikkaUserError("Permission Denied", "Access denied to other users settings", log=Log.WARNING)
 
         self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
-        self.dataset["user.language"] = self.user.language or localization._DEFAULT_LANGUAGE
+        self.dataset["user.language"] = self.env.db.getLanguage(login) or localization._DEFAULT_LANGUAGE
 
         self.dataset["ask_current_password"] = (login == self.user.login)
         self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
         self.dataset["can_change_password"] = self.env.auth.canSetPassword()
         self.dataset["user.login"] = login
         self.dataset["user.permissions"] = [ ]
+
+        if self.parameters.has_key("origin"):
+            self.dataset["user.origin"] = self.parameters["origin"]
+        
         permissions = self.env.db.getPermissions(login)
         for perm in User.ALL_PERMISSIONS:
             self.dataset["user.permissions"].append((perm, perm in permissions))
 
 
 
-class UserSettingsModify(UserListing):
+class UserSettingsModify(UserSettingsDisplay):
     view_name = "user_settings_modify"
     view_parameters = UserSettingsModifyParameters
     view_permissions = [ ]
@@ -172,9 +170,10 @@ class UserSettingsModify(UserListing):
         if not lang in localization.getLanguagesIdentifiers():
             raise Error.PrewikkaUserError("Invalid Language", "Specified language does not exist", log=Log.WARNING)
         
-        if lang != self.user.language:
+        if login == self.user.login:
             self.user.setLanguage(lang)
-            self.env.db.setLanguage(self.user.login, lang)
+        
+        self.env.db.setLanguage(login, lang)
                     
         if self.parameters.has_key("password_new") and self.parameters.has_key("password_new_confirmation"):
             if self.parameters.has_key("password_current"):
@@ -188,9 +187,14 @@ class UserSettingsModify(UserListing):
 
             self.env.auth.setPassword(login, self.parameters["password_new"])
 
+        origin = self.parameters.get("origin", None)
         self.parameters.clear()
-        return UserListing.render(self)
-
+        
+        if origin:
+            self.parameters["origin"] = origin
+        self.parameters["login"] = login
+        
+        return UserSettingsDisplay.render(self)
 
 class UserSettingsAdd(UserSettingsModify, UserAddForm):
     view_name = "user_settings_add"

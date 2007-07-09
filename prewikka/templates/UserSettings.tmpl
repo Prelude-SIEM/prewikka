@@ -14,6 +14,10 @@
 
 <input type="hidden" name="login" value="$user.login"/>
 
+#if $user.origin
+<input type="hidden" name="origin" value="$user.origin" />
+#end if
+
 <fieldset class="fieldset_heading">
  <legend>$_("Account information")</legend>
 
