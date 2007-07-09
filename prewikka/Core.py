@@ -243,13 +243,13 @@ class Core:
                 dataset["interface.sections"].append( (_(section_name), utils.create_link(first_tab)) )
     
  
-        if isinstance(parameters, prewikka.view.RelativeViewParameters):
+        if isinstance(parameters, prewikka.view.RelativeViewParameters) and parameters.has_key("origin"):
             view_name = parameters["origin"]
         elif view:
             view_name = view["name"]
         else:
             view_name = None
-            
+        
         if view_name and self._view_to_section.has_key(view_name):
             active_section = self._view_to_section[view_name]
             active_tab = self._view_to_tab[view_name]
