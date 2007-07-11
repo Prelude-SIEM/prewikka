@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 0.99\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-05-26 11:59+0200\n"
+"POT-Creation-Date: 2007-07-11 11:46+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator:  Bjoern Weiland <bjoern.weiland@web.de>\n"
 "Language-Team: German\n"
@@ -24,7 +24,8 @@ msgstr "Die Prewikka Datenbank wurde anscheinend noch nicht erstellt"
 #, python-format
 msgid ""
 "Database schema version %(version)s found when %(reqversion)s was required"
-msgstr "Datenbank Schema version %(version)s gefunden, aber %(reqversion)s benötigt"
+msgstr ""
+"Datenbank Schema version %(version)s gefunden, aber %(reqversion)s benötigt"
 
 #: prewikka/User.py:41
 msgid "Permission Denied"
@@ -153,429 +154,432 @@ msgstr "Sonntag"
 msgid "Example: (A AND B) OR (C AND D)"
 msgstr "Beispiel: (A AND B) OR (C AND D)"
 
-#: prewikka/views/messagesummary.py:288 prewikka/views/messagesummary.py:435
-#: prewikka/views/messagesummary.py:658 prewikka/views/messagesummary.py:675
-#: prewikka/views/messagesummary.py:698 prewikka/views/messagesummary.py:756
-#: prewikka/views/messagesummary.py:775 prewikka/views/messagesummary.py:811
+#: prewikka/views/messagesummary.py:303 prewikka/views/messagesummary.py:452
+#: prewikka/views/messagesummary.py:675 prewikka/views/messagesummary.py:692
+#: prewikka/views/messagesummary.py:715 prewikka/views/messagesummary.py:773
+#: prewikka/views/messagesummary.py:792 prewikka/views/messagesummary.py:828
 #: prewikka/templates/SensorListing.py:279
 msgid "Name"
 msgstr "Name"
 
-#: prewikka/views/messagesummary.py:289 prewikka/views/messagesummary.py:583
+#: prewikka/views/messagesummary.py:304 prewikka/views/messagesummary.py:600
 msgid "Code"
 msgstr "Code"
 
-#: prewikka/views/messagesummary.py:290
+#: prewikka/views/messagesummary.py:305
 msgid "Data length"
 msgstr "Datenlänge"
 
-#: prewikka/views/messagesummary.py:291
+#: prewikka/views/messagesummary.py:306
 msgid "Data"
 msgstr "Daten"
 
-#: prewikka/views/messagesummary.py:385 prewikka/views/messagesummary.py:813
+#: prewikka/views/messagesummary.py:402 prewikka/views/messagesummary.py:830
 msgid "Create time"
 msgstr "Erstellungszeit"
 
-#: prewikka/views/messagesummary.py:388
+#: prewikka/views/messagesummary.py:405
 msgid "Detect time"
 msgstr "Detektionszeit"
 
-#: prewikka/views/messagesummary.py:393
+#: prewikka/views/messagesummary.py:410
 msgid "Analyzer time"
 msgstr "Analyzer Zeit"
 
-#: prewikka/views/messagesummary.py:399
+#: prewikka/views/messagesummary.py:416
 msgid "Process"
 msgstr "Process"
 
-#: prewikka/views/messagesummary.py:400
+#: prewikka/views/messagesummary.py:417
 msgid "Process Path"
 msgstr "Prozess Pfad"
 
-#: prewikka/views/messagesummary.py:401
+#: prewikka/views/messagesummary.py:418
 msgid "Process PID"
 msgstr "Prozess PID"
 
-#: prewikka/views/messagesummary.py:409
+#: prewikka/views/messagesummary.py:426
 #: prewikka/templates/HeartbeatListing.py:125
 msgid "Node name"
 msgstr "Knotenname"
 
-#: prewikka/views/messagesummary.py:410
+#: prewikka/views/messagesummary.py:427
 msgid "Node location"
 msgstr "Knoten Standort"
 
-#: prewikka/views/messagesummary.py:428
+#: prewikka/views/messagesummary.py:445
 #: prewikka/templates/HeartbeatListing.py:114
 msgid "Node address"
 msgstr "Knotenadresse"
 
-#: prewikka/views/messagesummary.py:434
+#: prewikka/views/messagesummary.py:451
 #: prewikka/templates/SensorListing.py:284
 #: prewikka/templates/HeartbeatListing.py:136
 msgid "Model"
 msgstr "Model"
 
-#: prewikka/views/messagesummary.py:436
+#: prewikka/views/messagesummary.py:453
 msgid "Analyzerid"
 msgstr "Analyzer-ID"
 
-#: prewikka/views/messagesummary.py:437 prewikka/views/messagesummary.py:535
+#: prewikka/views/messagesummary.py:454 prewikka/views/messagesummary.py:552
 #: prewikka/templates/SensorListing.py:289
 msgid "Version"
 msgstr "Version"
 
-#: prewikka/views/messagesummary.py:438
+#: prewikka/views/messagesummary.py:455
 #: prewikka/templates/SensorListing.py:294
 msgid "Class"
 msgstr "Klasse"
 
-#: prewikka/views/messagesummary.py:440
+#: prewikka/views/messagesummary.py:457
 msgid "Manufacturer"
 msgstr "Hersteller"
 
-#: prewikka/views/messagesummary.py:448
+#: prewikka/views/messagesummary.py:465
 msgid "Operating System"
 msgstr "Betriebssystem"
 
-#: prewikka/views/messagesummary.py:466
+#: prewikka/views/messagesummary.py:483
 #, python-format
 msgid "Analyzer Path (%d not shown)"
 msgstr "Analyzer Pfad (%d nicht gezeigt)"
 
-#: prewikka/views/messagesummary.py:473 prewikka/views/messagesummary.py:967
-#: prewikka/views/messagesummary.py:1034
+#: prewikka/views/messagesummary.py:490 prewikka/views/messagesummary.py:990
+#: prewikka/views/messagesummary.py:1063
 #, python-format
 msgid "Analyzer #%d"
 msgstr "Analyzer #%d"
 
-#: prewikka/views/messagesummary.py:483
+#: prewikka/views/messagesummary.py:500
 msgid "Additional data"
 msgstr "Zusätzliche Daten"
 
-#: prewikka/views/messagesummary.py:486 prewikka/views/messagesummary.py:699
+#: prewikka/views/messagesummary.py:503 prewikka/views/messagesummary.py:716
 msgid "Meaning"
 msgstr "Bedeutung"
 
-#: prewikka/views/messagesummary.py:487
+#: prewikka/views/messagesummary.py:504
 msgid "Value"
 msgstr "Wert"
 
-#: prewikka/views/messagesummary.py:536 prewikka/views/messagesummary.py:557
+#: prewikka/views/messagesummary.py:553 prewikka/views/messagesummary.py:574
 msgid "Header length"
 msgstr "Header Länge"
 
-#: prewikka/views/messagesummary.py:537
+#: prewikka/views/messagesummary.py:554
 msgid "TOS"
 msgstr "TOS"
 
-#: prewikka/views/messagesummary.py:538 prewikka/views/messagesummary.py:576
+#: prewikka/views/messagesummary.py:555 prewikka/views/messagesummary.py:593
 msgid "Length"
 msgstr "Länge"
 
-#: prewikka/views/messagesummary.py:539 prewikka/views/messagesummary.py:585
+#: prewikka/views/messagesummary.py:556 prewikka/views/messagesummary.py:602
 msgid "Id"
 msgstr "Id"
 
-#: prewikka/views/messagesummary.py:543
+#: prewikka/views/messagesummary.py:560
 msgid "Ip offset"
 msgstr "Ip Offset"
 
-#: prewikka/views/messagesummary.py:544
+#: prewikka/views/messagesummary.py:561
 msgid "TTL"
 msgstr "TTL"
 
-#: prewikka/views/messagesummary.py:545 prewikka/views/messagesummary.py:879
-#: prewikka/views/messagesummary.py:882 prewikka/views/messagesummary.py:885
+#: prewikka/views/messagesummary.py:562 prewikka/views/messagesummary.py:896
+#: prewikka/views/messagesummary.py:899 prewikka/views/messagesummary.py:902
 msgid "Protocol"
 msgstr "Protokoll"
 
-#: prewikka/views/messagesummary.py:546 prewikka/views/messagesummary.py:568
-#: prewikka/views/messagesummary.py:577 prewikka/views/messagesummary.py:584
+#: prewikka/views/messagesummary.py:563 prewikka/views/messagesummary.py:585
+#: prewikka/views/messagesummary.py:594 prewikka/views/messagesummary.py:601
 msgid "Checksum"
 msgstr "Prüfsumme"
 
-#: prewikka/views/messagesummary.py:547
+#: prewikka/views/messagesummary.py:564
 msgid "Source address"
 msgstr "Knotenadresse"
 
-#: prewikka/views/messagesummary.py:548
+#: prewikka/views/messagesummary.py:565
 msgid "Target address"
 msgstr "Knotenadresse"
 
-#: prewikka/views/messagesummary.py:553 prewikka/views/messagesummary.py:574
+#: prewikka/views/messagesummary.py:570 prewikka/views/messagesummary.py:591
 msgid "Source port"
 msgstr "Quellport"
 
-#: prewikka/views/messagesummary.py:554 prewikka/views/messagesummary.py:575
+#: prewikka/views/messagesummary.py:571 prewikka/views/messagesummary.py:592
 msgid "Target port"
 msgstr "Zielport"
 
-#: prewikka/views/messagesummary.py:558
+#: prewikka/views/messagesummary.py:575
 msgid "Reserved"
 msgstr "Reserviert"
 
-#: prewikka/views/messagesummary.py:567
+#: prewikka/views/messagesummary.py:584
 msgid "Window"
 msgstr "Fenster"
 
-#: prewikka/views/messagesummary.py:569
+#: prewikka/views/messagesummary.py:586
 msgid "URP"
 msgstr "URP"
 
-#: prewikka/views/messagesummary.py:582 prewikka/views/messagesummary.py:722
-#: prewikka/views/messagesummary.py:755 prewikka/views/messagesummary.py:774
+#: prewikka/views/messagesummary.py:599 prewikka/views/messagesummary.py:739
+#: prewikka/views/messagesummary.py:772 prewikka/views/messagesummary.py:791
 msgid "Type"
 msgstr "Typ"
 
-#: prewikka/views/messagesummary.py:586
+#: prewikka/views/messagesummary.py:603
 msgid "Seq #"
 msgstr "Seq #"
 
-#: prewikka/views/messagesummary.py:587
+#: prewikka/views/messagesummary.py:604
 msgid "Mask"
 msgstr "Maske"
 
-#: prewikka/views/messagesummary.py:588
+#: prewikka/views/messagesummary.py:605
 msgid "Gateway Address"
 msgstr "Gatewayadresse"
 
-#: prewikka/views/messagesummary.py:589
+#: prewikka/views/messagesummary.py:606
 msgid "Num address"
 msgstr "Numadresse"
 
-#: prewikka/views/messagesummary.py:590
+#: prewikka/views/messagesummary.py:607
 msgid "Wpa"
 msgstr "Wpa"
 
-#: prewikka/views/messagesummary.py:591
+#: prewikka/views/messagesummary.py:608
 msgid "Lifetime"
 msgstr "Lifetime"
 
-#: prewikka/views/messagesummary.py:592
+#: prewikka/views/messagesummary.py:609
 msgid "Otime"
 msgstr "OZeit"
 
-#: prewikka/views/messagesummary.py:593
+#: prewikka/views/messagesummary.py:610
 msgid "Rtime"
 msgstr "RZeit"
 
-#: prewikka/views/messagesummary.py:594
+#: prewikka/views/messagesummary.py:611
 msgid "Ttime"
 msgstr "TZeit"
 
-#: prewikka/views/messagesummary.py:600 prewikka/views/messagesummary.py:1014
+#: prewikka/views/messagesummary.py:617 prewikka/views/messagesummary.py:1037
 msgid "Payload"
 msgstr "Payload"
 
-#: prewikka/views/messagesummary.py:638
+#: prewikka/views/messagesummary.py:655
 msgid "Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'"
 msgstr "Ungültiges 'analyzerid:messageid' Paar, '%(analyzerid):%(messageid)'"
 
-#: prewikka/views/messagesummary.py:656 prewikka/views/messagesummary.py:932
+#: prewikka/views/messagesummary.py:673 prewikka/views/messagesummary.py:949
 #: prewikka/views/alertlisting.py:593
 msgid "Correlation Alert"
 msgstr "Korrelations-Alarm"
 
-#: prewikka/views/messagesummary.py:662
+#: prewikka/views/messagesummary.py:679
 msgid "Correlated Alert"
 msgstr "Korrelierter Alarm"
 
-#: prewikka/views/messagesummary.py:663 prewikka/views/messagesummary.py:680
+#: prewikka/views/messagesummary.py:680 prewikka/views/messagesummary.py:697
 msgid "Source Analyzer"
 msgstr "Quell Analyzer"
 
-#: prewikka/views/messagesummary.py:673 prewikka/views/messagesummary.py:935
+#: prewikka/views/messagesummary.py:690 prewikka/views/messagesummary.py:952
 #: prewikka/views/alertlisting.py:597
 msgid "Tool Alert"
 msgstr "Tool-Alarme"
 
-#: prewikka/views/messagesummary.py:679
+#: prewikka/views/messagesummary.py:696
 msgid "Linked Alert"
 msgstr "Linked Alarm"
 
-#: prewikka/views/messagesummary.py:690
+#: prewikka/views/messagesummary.py:707
 msgid "Text"
 msgstr "Text"
 
-#: prewikka/views/messagesummary.py:692
+#: prewikka/views/messagesummary.py:709
 msgid "Ident"
 msgstr "Ident"
 
-#: prewikka/views/messagesummary.py:697
+#: prewikka/views/messagesummary.py:714
 msgid "Origin"
 msgstr "Ursprung"
 
-#: prewikka/views/messagesummary.py:716
+#: prewikka/views/messagesummary.py:733
 msgid "Severity"
 msgstr "Severity"
 
-#: prewikka/views/messagesummary.py:719
+#: prewikka/views/messagesummary.py:736
 msgid "Completion"
 msgstr "Completion"
 
-#: prewikka/views/messagesummary.py:723 prewikka/views/messagesummary.py:729
+#: prewikka/views/messagesummary.py:740 prewikka/views/messagesummary.py:746
 msgid "Description"
 msgstr "Beschreibung"
 
-#: prewikka/views/messagesummary.py:728
+#: prewikka/views/messagesummary.py:745
 msgid "Category"
 msgstr "Kategorie"
 
-#: prewikka/views/messagesummary.py:752
+#: prewikka/views/messagesummary.py:769
 msgid "User category"
 msgstr "Benutzer Kategorie"
 
-#: prewikka/views/messagesummary.py:757 prewikka/views/messagesummary.py:776
+#: prewikka/views/messagesummary.py:774 prewikka/views/messagesummary.py:793
 msgid "Number"
 msgstr "Nummer"
 
-#: prewikka/views/messagesummary.py:758
+#: prewikka/views/messagesummary.py:775
 msgid "Tty"
 msgstr "Tty"
 
-#: prewikka/views/messagesummary.py:777
+#: prewikka/views/messagesummary.py:794
 msgid "Permission"
 msgstr "Rechte:"
 
-#: prewikka/views/messagesummary.py:799
+#: prewikka/views/messagesummary.py:816
 msgid "Change time"
 msgstr "Änderungszeit"
 
-#: prewikka/views/messagesummary.py:800
+#: prewikka/views/messagesummary.py:817
 msgid "Inode Number"
 msgstr "Knotenname"
 
-#: prewikka/views/messagesummary.py:801
+#: prewikka/views/messagesummary.py:818
 msgid "Major device"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:802
+#: prewikka/views/messagesummary.py:819
 msgid "Minor device"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:803
+#: prewikka/views/messagesummary.py:820
 msgid "C Major device"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:804
+#: prewikka/views/messagesummary.py:821
 msgid "C Minor device"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:808
+#: prewikka/views/messagesummary.py:825
+#, python-format
 msgid "Target file %s"
 msgstr "Ziel-Datei %s"
 
-#: prewikka/views/messagesummary.py:812
+#: prewikka/views/messagesummary.py:829
 msgid "Path"
 msgstr "Pfad"
 
-#: prewikka/views/messagesummary.py:814
+#: prewikka/views/messagesummary.py:831
 msgid "Modify time"
 msgstr "Änderungsdatum"
 
-#: prewikka/views/messagesummary.py:815
+#: prewikka/views/messagesummary.py:832
 msgid "Access time"
 msgstr "Zugriffsdatum"
 
-#: prewikka/views/messagesummary.py:816
+#: prewikka/views/messagesummary.py:833
 msgid "Data size"
 msgstr "Datengröße"
 
-#: prewikka/views/messagesummary.py:817
+#: prewikka/views/messagesummary.py:834
 msgid "Disk size"
 msgstr "Plattengröße"
 
-#: prewikka/views/messagesummary.py:836
+#: prewikka/views/messagesummary.py:853
 msgid "Web Service"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:839
+#: prewikka/views/messagesummary.py:856
 msgid "Url"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:840
+#: prewikka/views/messagesummary.py:857
 msgid "Cgi"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:841
+#: prewikka/views/messagesummary.py:858
 msgid "Http Method"
 msgstr "Http Methode"
 
-#: prewikka/views/messagesummary.py:844
+#: prewikka/views/messagesummary.py:861
 msgid "CGI Argument"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:853
+#: prewikka/views/messagesummary.py:870
 msgid "SNMP Service"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:856
+#: prewikka/views/messagesummary.py:873
 msgid "oid"
 msgstr "oid"
 
-#: prewikka/views/messagesummary.py:857
+#: prewikka/views/messagesummary.py:874
 msgid "messageProcessingModel"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:858
+#: prewikka/views/messagesummary.py:875
 msgid "securityModel"
 msgstr "Sicherheitsmodel"
 
-#: prewikka/views/messagesummary.py:859
+#: prewikka/views/messagesummary.py:876
 msgid "securityName"
 msgstr "Sicherheitsname"
 
-#: prewikka/views/messagesummary.py:860
+#: prewikka/views/messagesummary.py:877
 msgid "securityLevel"
 msgstr "Sicherheitslevel"
 
-#: prewikka/views/messagesummary.py:861
+#: prewikka/views/messagesummary.py:878
 msgid "contextName"
 msgstr "KontextName"
 
-#: prewikka/views/messagesummary.py:862
+#: prewikka/views/messagesummary.py:879
 msgid "contextEngineID"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:863
+#: prewikka/views/messagesummary.py:880
 msgid "command"
 msgstr "Kommando"
 
-#: prewikka/views/messagesummary.py:875
+#: prewikka/views/messagesummary.py:892
 msgid "Port"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:908
+#: prewikka/views/messagesummary.py:925
+#, python-format
 msgid "Source(%d)"
 msgstr "Quelle(%d)"
 
-#: prewikka/views/messagesummary.py:917
+#: prewikka/views/messagesummary.py:934
+#, python-format
 msgid "Target(%d)"
 msgstr "Ziel(%d)"
 
-#: prewikka/views/messagesummary.py:938
+#: prewikka/views/messagesummary.py:955
 msgid "Overflow Alert"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:941 prewikka/templates/AlertListing.py:551
+#: prewikka/views/messagesummary.py:958 prewikka/templates/AlertListing.py:551
 msgid "Alert"
 msgstr "Alarm"
 
-#: prewikka/views/messagesummary.py:958
+#: prewikka/views/messagesummary.py:981
 msgid "Actions"
 msgstr "Aktionen"
 
-#: prewikka/views/messagesummary.py:997
+#: prewikka/views/messagesummary.py:1020
 msgid "Network centric information"
 msgstr "Netzwerkinformationen"
 
-#: prewikka/views/messagesummary.py:1018
+#: prewikka/views/messagesummary.py:1041
 msgid "ASCII Payload"
 msgstr ""
 
-#: prewikka/views/messagesummary.py:1031
+#: prewikka/views/messagesummary.py:1060
 msgid "Heartbeat"
 msgstr "Heartbeat"
 
@@ -639,15 +643,20 @@ msgstr "Heartbeats"
 msgid "Settings"
 msgstr "Einstellungen"
 
-#: prewikka/views/__init__.py:51
-msgid "Users"
-msgstr "Benutzer"
-
-#: prewikka/views/__init__.py:54
+#: prewikka/views/__init__.py:52
 msgid "Filters"
 msgstr "Filter"
 
-#: prewikka/views/__init__.py:56
+#: prewikka/views/__init__.py:54
+msgid "My account"
+msgstr ""
+
+#: prewikka/views/__init__.py:57
+#, fuzzy
+msgid "User listing"
+msgstr "Alarm-Liste"
+
+#: prewikka/views/__init__.py:61
 msgid "About"
 msgstr "Über"
 
@@ -677,7 +686,7 @@ msgstr "Adress Informationen"
 
 #: prewikka/templates/SensorListing.py:274
 #: prewikka/templates/SensorListing.py:415
-#: prewikka/templates/MessageListing.py:211
+#: prewikka/templates/MessageListing.py:225
 #: prewikka/templates/FilterEdition.py:226
 msgid "Delete"
 msgstr "Löschen"
@@ -814,43 +823,47 @@ msgstr ""
 msgid "Submit"
 msgstr "Abschicken"
 
-#: prewikka/templates/UserSettings.py:112
+#: prewikka/templates/UserSettings.py:115
 msgid "Account information"
 msgstr "Kontoinformationen"
 
-#: prewikka/templates/UserSettings.py:122
+#: prewikka/templates/UserSettings.py:125
 msgid "Login:"
 msgstr "Login:"
 
-#: prewikka/templates/UserSettings.py:147
+#: prewikka/templates/UserSettings.py:150
 msgid "Language:"
 msgstr "Sprache"
 
-#: prewikka/templates/UserSettings.py:178
+#: prewikka/templates/UserSettings.py:179
+msgid "Auto refresh:"
+msgstr ""
+
+#: prewikka/templates/UserSettings.py:192
 msgid "Permissions:"
 msgstr "Rechte:"
 
-#: prewikka/templates/UserSettings.py:235
+#: prewikka/templates/UserSettings.py:249
 msgid "Check All"
 msgstr "Alles wählen"
 
-#: prewikka/templates/UserSettings.py:259
+#: prewikka/templates/UserSettings.py:273
 msgid "Change password"
 msgstr "Passwort ändern"
 
-#: prewikka/templates/UserSettings.py:266
+#: prewikka/templates/UserSettings.py:280
 msgid "Current password:"
 msgstr "Aktuelles Passwort:"
 
-#: prewikka/templates/UserSettings.py:275
+#: prewikka/templates/UserSettings.py:289
 msgid "New password:"
 msgstr "Neues Passwort:"
 
-#: prewikka/templates/UserSettings.py:284
+#: prewikka/templates/UserSettings.py:298
 msgid "Confirm new password:"
 msgstr "Neues Passwort bestätigen:"
 
-#: prewikka/templates/UserSettings.py:296
+#: prewikka/templates/UserSettings.py:310
 msgid "Submit Changes"
 msgstr "Änderungen abschicken"
 
@@ -866,80 +879,84 @@ msgstr "Benutzer löschen"
 msgid "Create user"
 msgstr "Benutzer erstellen"
 
-#: prewikka/templates/MessageListing.py:282
+#: prewikka/templates/MessageListing.py:296
 #, fuzzy
 msgid "Period"
 msgstr "Rechte:"
 
-#: prewikka/templates/MessageListing.py:297
+#: prewikka/templates/MessageListing.py:311
 msgid "Minutes"
 msgstr "Minuten"
 
-#: prewikka/templates/MessageListing.py:305
+#: prewikka/templates/MessageListing.py:319
 msgid "Hours"
 msgstr "Stunden"
 
-#: prewikka/templates/MessageListing.py:313
+#: prewikka/templates/MessageListing.py:327
 msgid "Days"
 msgstr "Tage"
 
-#: prewikka/templates/MessageListing.py:321
+#: prewikka/templates/MessageListing.py:335
 msgid "Months"
 msgstr "Monate"
 
-#: prewikka/templates/MessageListing.py:329
+#: prewikka/templates/MessageListing.py:343
 msgid "Years"
 msgstr "Jahre"
 
-#: prewikka/templates/MessageListing.py:337
+#: prewikka/templates/MessageListing.py:351
 msgid "Unlimited"
 msgstr "Unbegrenzt"
 
-#: prewikka/templates/MessageListing.py:348
+#: prewikka/templates/MessageListing.py:362
 msgid "Timezone"
 msgstr "Zeitzone"
 
-#: prewikka/templates/MessageListing.py:359
+#: prewikka/templates/MessageListing.py:373
 msgid "Frontend localtime"
 msgstr "Frontend Lokalzeit"
 
-#: prewikka/templates/MessageListing.py:367
+#: prewikka/templates/MessageListing.py:381
 msgid "Sensor localtime"
 msgstr "Sensor Lokalzeit"
 
-#: prewikka/templates/MessageListing.py:375
+#: prewikka/templates/MessageListing.py:389
 msgid "UTC"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:386
+#: prewikka/templates/MessageListing.py:400
 msgid "Limit"
 msgstr "Limit"
 
-#: prewikka/templates/MessageListing.py:402
+#: prewikka/templates/MessageListing.py:416
+msgid "Refresh"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:440
 msgid "Apply"
 msgstr "Übernehmen"
 
-#: prewikka/templates/MessageListing.py:407
+#: prewikka/templates/MessageListing.py:445
 #: prewikka/templates/FilterEdition.py:330
 msgid "Save"
 msgstr "Sichern"
 
-#: prewikka/templates/MessageListing.py:447
-#: prewikka/templates/MessageListing.py:454
+#: prewikka/templates/MessageListing.py:485
+#: prewikka/templates/MessageListing.py:492
 msgid "prev"
 msgstr "früher"
 
-#: prewikka/templates/MessageListing.py:465
-#: prewikka/templates/MessageListing.py:472
+#: prewikka/templates/MessageListing.py:503
+#: prewikka/templates/MessageListing.py:510
 msgid "current"
 msgstr "aktuell"
 
-#: prewikka/templates/MessageListing.py:483
-#: prewikka/templates/MessageListing.py:490
+#: prewikka/templates/MessageListing.py:521
+#: prewikka/templates/MessageListing.py:528
 msgid "next"
 msgstr "später"
 
-#: prewikka/templates/MessageListing.py:536
+#: prewikka/templates/MessageListing.py:574
 msgid "total"
 msgstr "Total"
 
@@ -1148,6 +1165,9 @@ msgstr "Adress Informationen"
 #: prewikka/templates/AlertListing.py:1204
 msgid "Filter"
 msgstr "Filter"
+
+#~ msgid "Users"
+#~ msgstr "Benutzer"
 
 #~ msgid "on"
 #~ msgstr "auf"
