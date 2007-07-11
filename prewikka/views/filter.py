@@ -134,9 +134,9 @@ class AlertFilterEdition(view.View):
         self._reload()
 
     def render(self):
-        if self.parameters.get("mode", "Load") == "Load":
+        if self.parameters.get("mode", _("Load")) == _("Load"):
             self.render_alert_filter_load()
-        elif self.parameters["mode"] == "Save":
+        elif self.parameters["mode"] == _("Save"):
             self.render_alert_filter_save()
-        elif self.parameters["mode"] == "Delete":
+        elif self.parameters["mode"] == _("Delete"):
             self.render_alert_filter_delete()
