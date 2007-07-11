@@ -696,12 +696,6 @@ class AlertListing(MessageListing, view.View):
         
         return msg
     
-    def _getFilters(self, storage, login):
-        return storage.getAlertFilters(login)
-
-    def _getFilter(self, storage, login, name):
-        return storage.getAlertFilter(login, name)
-
     def _deleteMessage(self, ident):
         self.env.idmef_db.deleteAlert(ident)
 
