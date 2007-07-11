@@ -14,7 +14,7 @@ classic_body
     #else
       #set $class_ = 'topmenu_item_inactive'
     #end if
-    <div class="$class_"><p><a href="$link">$name</a></p></div>
+    <div class="$class_"><p><a href="$link">$_($name)</a></p></div>
   #end for
 
   <div class="topmenu_item_special">
@@ -45,7 +45,7 @@ $layout_start_hook
     #else
       #set $class_ = 'menu_item_inactive'
     #end if
-    <a class="$class_" href="$link">$name</a>
+    <a class="$class_" href="$link">_($name)</a>
   #end for
 
 #end filter
