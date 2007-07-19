@@ -47,12 +47,12 @@ class SensorMessagesDelete(SensorListingParameters):
 
 def get_analyzer_status_from_latest_heartbeat(heartbeat_status, heartbeat_time,
                                               heartbeat_interval, error_margin):
+    if heartbeat_status == "exiting":
+        return "offline", _("Offline")
+
     if heartbeat_interval is None:
         return "unknown", _("Unknown")
 
-    if heartbeat_status == "exiting":
-        return "offline", _("Offline")
-    
     if time.time() - int(heartbeat_time) > int(heartbeat_interval) + error_margin:
         return "missing", _("Missing")
     
@@ -80,6 +80,13 @@ def node_cmp(x, y):
         return ymiss - xmiss        
     else:
         return cmp(x["node_name"], y["node_name"])
+
+
+def getDominantStatus(d):
+    if d["missing"] > 0 or d["unknown"] > 0:
+        return "missing"
+
+    return "online"
 
 
 class SensorListing(view.View):
@@ -159,12 +166,13 @@ class SensorListing(view.View):
             node_key = node_name + osversion + ostype
             
             if not locations.has_key(node_location):
-                locations[node_location] = { "total": 1, "missing": 0, "unknown": 0, "nodes": { } }
+                locations[node_location] = { "total": 1, "missing": 0, "unknown": 0, "offline": 0, "online": 0, "nodes": { } }
             else:
                 locations[node_location]["total"] += 1
 
             if not locations[node_location]["nodes"].has_key(node_key):
-                locations[node_location]["nodes"][node_key] = { "total": 1, "missing": 0, "unknown": 0, "analyzers": [ ], 
+                locations[node_location]["nodes"][node_key] = { "total": 1, "missing": 0, "unknown": 0, "offline": 0, "online": 0,
+                                                                "analyzers": [ ],
                                                                 "node_name": node_name, "node_location": node_location,
                                                                 "ostype": ostype, "osversion": osversion, 
                                                                 "node_addresses": addresses, "node_key": node_key }
@@ -172,9 +180,10 @@ class SensorListing(view.View):
                 locations[node_location]["nodes"][node_key]["total"] += 1
                   
             status = analyzer["status"]
+            locations[node_location][status] += 1
+            locations[node_location]["nodes"][node_key][status] += 1
+
             if status == "missing" or status == "unknown":
-                locations[node_location][status] += 1
-                locations[node_location]["nodes"][node_key][status] += 1
                 locations[node_location]["nodes"][node_key]["analyzers"].insert(0, analyzer)
             else:
                 locations[node_location]["nodes"][node_key]["analyzers"].append(analyzer)

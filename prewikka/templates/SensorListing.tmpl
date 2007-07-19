@@ -1,6 +1,51 @@
 #extends prewikka.templates.ClassicLayout
 #from prewikka.views.sensor import node_cmp
 #from prewikka.views.sensor import analyzer_cmp
+#from prewikka.views.sensor import getDominantStatus
+
+#def layout_start_hook
+<script type="text/javascript">
+<!--
+
+function showRowsByClass(id, wanted) {
+    var div = document.getElementById(id);
+    var table = document.getElementById('table_' + id);
+    var rows  = table.getElementsByTagName('tr');
+
+    for ( var i = 0; i < rows.length; i++ ) {
+        tr_class = rows[i].className.split(' ')[0];
+
+        if ( tr_class != wanted && tr_class != 'tr_header' )
+            rows[i].style.display = "none";
+        else
+            rows[i].style.display = "";
+    }
+
+    div.style.display = "block";
+}
+
+function showRowsAll(id) {
+    var div = document.getElementById(id);
+    var table = document.getElementById('table_' + id);
+    var rows  = table.getElementsByTagName('tr');
+    var some_hidden = false;
+
+    for ( var i = 0; i < rows.length; i++ ) {
+        if ( rows[i].style.display == "none" )
+            some_hidden = true;
+
+        rows[i].style.display = "";
+    }
+
+    if ( some_hidden || div.style.display == "none" )
+        div.style.display = "block";
+    else
+        div.style.display = "none";
+}
+
+//--></script>
+
+#end def
 
 #block main_content
 #filter CleanOutput
@@ -17,44 +62,60 @@ $listing.sort()
 
 #for $entry in $listing:
  <fieldset class="fieldset_heading">
-  #if $locations[$entry]["missing"] > 0 or $locations[$entry]["unknown"] > 0:
+  #set $dominant = $getDominantStatus($locations[$entry])
+  #set $dclass = "heartbeat_analyze_sensor_status_" + $dominant
+
+  #if $dominant != "online"
    #set $display = "block"
    #set $display_tmp = "none"
-   #set $dclass = "heartbeat_analyze_sensor_status_missing" 
-   
-   #set $text = $str($_("%(missing)d missing, %(unknown)d unknown of %(total)d analyzers") % $locations[$entry])
   #else
    #set $display = "none"
    #set $display_tmp = "block"
-   #set $dclass = "heartbeat_analyze_sensor_status_online"
-   #set $text = $_("All analyzers online")
   #end if
 
-  <legend><b><a href="#" onclick="javascript:toggleVisibility('${entry}_tmp'); toggleVisibility('${entry}'); return false;">$entry</a></b></legend>
+  <legend>
+   <b>
+    <a href="#" onclick="javascript:toggleVisibility('${entry}_tmp'); toggleVisibility('${entry}'); return false;">$entry</a>
+   </b>
+  </legend>
 
-   <div id="${entry}_tmp" style="display: $display_tmp">
-    <p style="text-align: center;" class="$dclass">$text</p>
+   <div id="${entry}_tmp" style="display: $display_tmp" class="$dclass">
+    <table style="border: 1px solid black;">
+     <tr class="nodash">
+      <td style="background-color: white; width:150px;">
+       #set $nlen = $len($locations[$entry]["nodes"])
+       #set $alen = $locations[$entry]["total"]
+       $str($ngettext("%d Node", "%d Nodes", $nlen) % $nlen), $str($ngettext("%d Analyzer", "%d Analyzers", $alen) % $alen)
+      </td>
+       #for $i in ( ("online",  $ngettext("%d Online", "%d Onlines", $locations[$entry]["online"])),
+                    ("offline", $ngettext("%d Offline", "%d Offlines", $locations[$entry]["offline"])),
+                    ("unknown", $ngettext("%d Unknown", "%d Unknowns", $locations[$entry]["unknown"])),
+                    ("missing", $ngettext("%d Missing", "%d Missings", $locations[$entry]["missing"])))
+        #if $locations[$entry][$i[0]] > 0
+      <td class="heartbeat_analyze_sensor_status_$i[0]">$str($i[1] % $locations[$entry][$i[0]])</td>
+        #end if
+       #end for
+     </tr>
+    </table>
    </div>
 
    <div id="$entry" style="display: $display">
    #set $nlisting = $locations[$entry]["nodes"].values()
    $nlisting.sort(node_cmp)
-   
+
    #for $node in $nlisting
     #set $cnt = 0
     #set $row_classes = ("table_row_even", "table_row_odd")
     #set $row_class = $row_classes[$cnt%2]
+    #set $dominant = $getDominantStatus($node)
+    #set $dclass = "heartbeat_analyze_sensor_status_" + dominant
 
-  #if $node.missing > 0 or $node.unknown > 0:
-   #set $display = "block"
-   #set $dclass = "heartbeat_analyze_sensor_status_missing"
-   #set $text = $str($_("%(missing)d missing, %(unknown)d unknown of %(total)d analyzers") % $node)
-  #else
-   #set $display = "none"
-   #set $text = $_("All analyzers online")
-   #set $dclass = "heartbeat_analyze_sensor_status_online" 
-  #end if
-    
+    #if $dominant != "online"
+     #set $display = "block"
+    #else
+     #set $display = "none"
+    #endif
+
     <table style="width:100%; border: 1px solid black;">
      <thead style="width: 100%;">
       <tr class="$dclass">
@@ -65,7 +126,7 @@ $listing.sort()
           <span id="${entry}_${node.node_key}_addr" class="popup_menu">
            - <a href="$addr.inline_filter">$_("Filter on address")</a><br />
            - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$addr.value">$_("Address information")</a><br />
-    
+
            #for $name, $link in $addr.host_commands
            - <a href="$link">$name</a><br />
            #end for
@@ -73,17 +134,32 @@ $listing.sort()
          #end for
         </th>
         <th>$node.ostype</th>
-        <th>$node.osversion</th>        
-        <th style="width: 150px; text-align: center;" class="$dclass">  
-         <b><a href="#" onclick="javascript:toggleVisibility('${entry}_${node.node_key}'); return false;">$text</a></b>
+        <th>$node.osversion</th>
+        <th>
+
+         <table align="right" style="border: 1px solid black; width: 200px; text-align: center;">
+          <tr class="nodash">
+           <td style="background-color: white; width: 60px; text-align: center;">
+            $_("Total:") <a href="#" onclick="javascript:showRowsAll('${entry}_${node.node_key}'); return false;">$node["total"]</a>
+           </td>
+           #for $i in ("online", "offline", "unknown", "missing")
+            #if $node[$i] > 0
+           <td class="heartbeat_analyze_sensor_status_$i">
+            <a href="#" onclick="javascript:showRowsByClass('${entry}_${node.node_key}', 'tr_${i}'); return false;">$node[$i]</a>
+           </td>
+            #end if
+           #end for
+          </tr>
+         </table>
+
         </th>
       </tr>
      </thead>
     </table>
-    
-    <div id="${entry}_${node.node_key}" style="display: $display"> 
-    <table style="width: 100%; border: 1px solid black;">
-      <tr class="$row_classes[$cnt%2]">
+
+    <div id="${entry}_${node.node_key}" style="display: $display">
+    <table id="table_${entry}_${node.node_key}" style="width: 100%; border: 1px solid black;">
+      <tr class="tr_header $row_classes[$cnt%2]">
        <th>$_("Delete")</th>
        <th>$_("Name")</th>
        <th>$_("Model")</th>
@@ -96,9 +172,9 @@ $listing.sort()
      $node.analyzers.sort(analyzer_cmp)
      #for $analyzer in $node.analyzers
       #set $cnt += 1
-      <tr class="$row_classes[$cnt%2]">
+      <tr class="tr_$analyzer['status'] $row_classes[$cnt%2]">
        <td style="padding-top: 0px; padding-bottom: 0px;"><input class="checkbox" type="checkbox" name="analyzerid" value="$analyzer["analyzerid"]" /></td>
-       
+
        <td>
         <a href="#" onclick="javascript:toggleVisibilityUnique('${entry}_${node.node_name}_${analyzer.analyzerid}'); return false;">$analyzer.name</a>
         <span id="${entry}_${node.node_name}_${analyzer.analyzerid}" class="popup_menu">
@@ -111,12 +187,12 @@ $listing.sort()
        <td>$analyzer["version"]</td>
        <td>$analyzer["class"]</td>
        <td>$analyzer["last_heartbeat_time"]</td>
-       <td class="heartbeat_analyze_sensor_status_$analyzer["status"]">$analyzer["status_meaning"]</td>
+       <td style="text-align: center;" class="heartbeat_analyze_sensor_status_$analyzer["status"]">$analyzer["status_meaning"]</td>
       </tr>
      #end for
     </table>
     </div>
-    
+
     <br />
    #end for
   </div>
