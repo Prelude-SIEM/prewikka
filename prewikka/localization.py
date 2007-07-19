@@ -46,10 +46,15 @@ def _safeGettext(s):
         return s
 
 def _safeNgettext(singular, plural, num):
-    if num <= 1:
-        return _safeGettext(singular)
+    tid = currentThread()
+    if _localized_thread.has_key(tid) and _localized_thread[tid] != None:
+        return _localized_thread[tid].ngettext(singular, plural, num)
+
+    elif num <= 1:
+        return singular
+        
     else:
-        return _safeGettext(plural)
+        return plural
         
 def _deferredGettext(s):
     return s
