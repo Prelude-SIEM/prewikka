@@ -106,6 +106,8 @@ class HeartbeatListing(MessageListing, view.View):
         self.env.idmef_db.deleteHeartbeat(ident)
 
     def render(self):
+        MessageListing.render(self)
+
         self._deleteMessages()
         criteria = [ ]
         start = end = None

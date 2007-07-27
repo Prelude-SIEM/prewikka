@@ -2,7 +2,147 @@
 #extends prewikka.templates.ClassicLayout
 
 #def layout_start_hook
-<form method="post" action="?">
+<script type="text/javascript">
+
+<!--
+
+var second_reload  = 0;
+var second_count   = 0;
+var autorefresh_enabled = true;
+
+function enableAutoRefresh() {
+        if ( document.messagelisting.auto_apply_enable.value == "true" ) {
+                autorefresh_enabled = false;
+
+                document.messagelisting.auto_apply_enable.value = "false";
+                document.messagelisting.auto_apply_image.src = "prewikka/images/play.png";
+        } else {
+                autorefresh_enabled = true;
+
+                document.messagelisting.auto_apply_enable.value = "true";
+                document.messagelisting.auto_apply_image.src = "prewikka/images/pause.png";
+        }
+}
+
+function inputFocus() {
+        autorefresh_possible = false;
+}
+
+
+function inputBlur() {
+        if ( second_reload <= second_count )
+                second_count = 0;
+
+        autorefresh_possible = true;
+}
+
+function pad(number)
+{
+        if ( number < 10 )
+            return "0" + number;
+        else
+            return number;
+}
+
+function autoApplyTime() {
+        if ( document.messagelisting.auto_apply_value.value )
+                var rawtime = document.messagelisting.auto_apply_value.value;
+        else
+                var rawtime = "0:00";
+
+        var rawtime = "0:10";
+        var old = second_reload;
+        var parselimit = rawtime.split(":");
+
+        if ( parselimit[0] && parselimit[1] && parselimit[2] )
+                second_reload = parselimit[0] * 3600 + parselimit[1] * 60 + parselimit[2] * 1;
+
+        else if ( parselimit[0] && parselimit[1] )
+                second_reload = parselimit[0] * 60 + parselimit[1] * 1;
+
+        else
+                second_reload = rawtime;
+
+        if ( second_reload != old )
+                secound_count = 0;
+}
+
+
+function autoApplyCounter() {
+        autoApplyTime();
+
+        if ( autorefresh_enabled == false || autorefresh_possible == false || second_reload == 0 ) {
+                setTimeout("autoApplyCounter()", 1000);
+                return;
+        }
+
+        second_count += 1;
+         document.getElementById("auto_apply_current").innerHTML = Math.floor(second_count / 60) + ":" + pad((second_count % 60));
+
+        if ( second_count != second_reload )
+                setTimeout("autoApplyCounter()", 1000);
+
+        else if ( second_count == second_reload ) {
+                second_count = 0;
+
+                var yaxis = 0;
+
+                if ( window.pageYOffset )
+                        yaxis = window.pageYOffset;
+
+                else if ( window.documentElement && window.documentElement.scrollTop )
+                        yaxis = window.documentElement.scrollTop;
+
+                else if ( document.body.scrollTop )
+                        yaxis = window.body.scrollTop;
+
+                document.messagelisting.y.value = yaxis;
+                document.messagelisting.submit("Apply");
+        }
+}
+
+
+function setScrollBar() {
+        if ( document.messagelisting.y.value ) {
+                window.scrollTo('0', document.messagelisting.y.value) ;
+                document.messagelisting.y.value = 0;
+        }
+}
+
+
+function stopTimerOnClick() {
+        autorefresh_possible = false;
+}
+
+
+function beginAutoApply() {
+#if $auto_apply_enable == "true"
+        autorefresh_enabled = true;
+#else
+        autorefresh_enabled = false;
+#end if
+
+        setScrollBar();
+        setTimeout("autoApplyCounter()", 1000);
+
+        var i;
+
+        for ( i = 0; i < document.links.length; i++ ) {
+                if ( document.links[i].onclick == null )
+                        document.links[i].onclick = stopTimerOnClick;
+        }
+
+        for ( i = 0; i < document.messagelisting.elements.length; i++ ) {
+                var elem = document.messagelisting.elements[i];
+
+                if ( elem.type == "submit" )
+                        elem.onclick = stopTimerOnClick;
+        }
+}
+
+//--></script>
+
+<form name="messagelisting" method="post" action="?">
 #for $name, $value in $hidden_parameters
   <input type="hidden" name="$name" value="$value"/>
 #end for
@@ -32,8 +172,8 @@ $message_listing_header
           <td class="static_content_column">
             #if $prewikka.user.has(User.PERM_IDMEF_ALTER)
               <input class="checkbox" type="checkbox" name="delete" value="$message.delete"/>
-	    #else
-	      &nbsp;
+            #else
+              &nbsp;
             #end if
           </td>
         </tr>
@@ -48,28 +188,26 @@ $message_listing_header
        <input class="checkbox" type="checkbox" id="allbox" onclick="checkBoxByName('delete', document.forms[0].allbox.checked);"/>
       </td>
      </tr>
-    </tbody>
 #end if
-
-  </table>
+ </tbody>
+</table>
 #end block main_content
 
 
 
 
 #block menu_extra_content
+
 <table id="timeline">
   #def timeline_extra_content
   #end def
   $timeline_extra_content
-  
+
   <tr>
    <th id="timeline_step_label">$_("Period")</th>
-   <td>
-    <input class="timeline_value" name="timeline_value" type="text" size="2" value="$timeline.value"/>
-   </td>
-   <td> 
-    <select class="timeline_unit_select" name="timeline_unit">
+   <td colspan="2">
+    <input name="timeline_value" type="text" size="2" value="$timeline.value"/>
+    <select name="timeline_unit">
      <option value="min" $timeline.min_selected>$_("Minutes")</option>
      <option value="hour" $timeline.hour_selected>$_("Hours")</option>
      <option value="day" $timeline.day_selected>$_("Days")</option>
@@ -83,14 +221,14 @@ $message_listing_header
   <tr>
     <th id="timezone_control_label">$_("Timezone")</th>
     <td colspan="2">
-      <select class="timezone_control_select" name="timezone">
+      <select name="timezone">
         <option value="frontend_localtime" $timeline.frontend_localtime_selected>$_("Frontend localtime")</option>
-	<option value="sensor_localtime" $timeline.sensor_localtime_selected>$_("Sensor localtime")</option>
-	<option value="utc" $timeline.utc_selected>$_("UTC")</option>
+        <option value="sensor_localtime" $timeline.sensor_localtime_selected>$_("Sensor localtime")</option>
+        <option value="utc" $timeline.utc_selected>$_("UTC")</option>
        </select>
      </td>
   </tr>
-	
+
   <tr>
    <th id="timeline_limit_label">$_("Limit")</th>
 
@@ -99,24 +237,54 @@ $message_listing_header
    </td>
   </tr>
 
-  <tr style="text-align: center;">
-      <td colspan=3><input type="submit" name="apply" value="$_("Apply")" />
-      <input type="submit" name="_save" value="$_("Save")" /></td>
+  <tr>
+    <th id="auto_apply_label">$_("Refresh")</th>
+
+    <td colspan="2">
+    #if $auto_apply_enable == "true"
+        #set $img = "prewikka/images/pause.png"
+    #else:
+        #set $img = "prewikka/images/play.png"
+    #end if
+
+<input type="hidden" name="auto_apply_enable" value="$auto_apply_enable" />
+
+<div class="counter_box_left" id="auto_apply_current" >0:00</div>
+<input type="text" size="3" name="auto_apply_value" value="$auto_apply_value" onfocus="javascript:inputFocus()" onblur="javascript:inputBlur()" />
+<a class="auto_apply_play_pause" href="#" onclick="javascript:enableAutoRefresh();"><img id="auto_apply_image" src="$img" alt="Play/Pause" /></a>
+
+    </td>
   </tr>
 
 #filter CleanOutput
 
+<tr>
+ <td colspan="3" style="text-align: center">
+
+<br style="line-height: 5px;" />
+
+<div>
+ <input id="form_apply" type="submit" name="apply" value="$_("Apply")" />&nbsp;<input type="submit" name="_save" value="$_("Save")" />
+</div>
+
+<br style="line-height: 5px;" />
+
+<div class="timeline_range">
 #if not $timeline.start
- <tr><td colspan="4" class="timeline_range">Unlimited</td></tr>
- <tr><td colspan="4" class="timeline_range">-</td></tr>
+ Unlimited<br/>
+ -<br/>
 #else
- <tr><td colspan="4" class="timeline_range">$timeline.start</td></tr>
- <tr><td colspan="4" class="timeline_range">$timeline.end</td></tr>
+ $timeline.start<br/>
+ $timeline.end<br/>
 #end if
- <tr><td colspan="4" class="timeline_range">$timeline.range_timezone</td></tr>
+ $timeline.range_timezone
+</div>
+
+</td>
+</tr>
 
  <tr>
-  <td colspan="4" style="text-align: center;">
+  <td colspan="3">
    <table><tr>
     #if $timeline.prev
      <td class="timeline_control_prev"><a href="$timeline.prev"><b>$_("prev")</b></a></td>
@@ -132,7 +300,7 @@ $message_listing_header
 
     #if $timeline.next
      <td class="timeline_control_next"><a href="$timeline.next"><b>$_("next")</b></a></td>
-    #else 
+    #else
      <td class="timeline_control_inactive"><b>$_("next")</b></td>
     #end if
 
@@ -141,7 +309,6 @@ $message_listing_header
  </tr>
 
  </table>
-
 
 <table id="message_list_nav">
   <tr>
@@ -171,3 +338,16 @@ $message_listing_header
 #filter Filter
 #end filter
 #end block menu_extra_content
+
+#block body
+<body class="$body_class" onload="beginAutoApply()">
+        <div id="top_view">
+                <div id="top_view_header">
+                        <div id="top_view_header_software">$prewikka.software</div>
+                        <div id="top_view_header_place">$prewikka.place</div>
+                        <div id="top_view_header_title">$prewikka.title</div>
+                </div>
+                $toplayout_content
+        </div>
+</body>
+#end block body

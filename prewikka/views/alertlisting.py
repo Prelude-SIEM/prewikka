@@ -1059,6 +1059,8 @@ class AlertListing(MessageListing, view.View):
         self.dataset["analyzer_aggregations"] = ANALYZER_AGGREGATIONS
 
     def render(self):
+        MessageListing.render(self)
+    
         self._deleteMessages()
         self._setDatasetConstants()
         

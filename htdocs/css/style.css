@@ -343,6 +343,9 @@ p {
 	height: 163px;
 }
 
+#timeline tr {
+}
+
 #timeline td {
 	padding: 0;
 	margin: 0;
@@ -354,6 +357,94 @@ p {
         text-align: left;
 	font-size: 8px;
 	font-weight: bold;
+}
+
+#timeline select {
+        border: 1px solid black;
+        vertical-align: middle;
+        width: 100%;
+}
+
+
+#timeline input[type=text] {
+        padding-bottom: 1px;
+        padding-top: 1px;
+        margin: 0px;
+        vertical-align: middle;
+        border: 1px solid black;
+}
+
+
+#timeline input[name="auto_apply_value"] {
+        border: 0px;
+        padding: 0px;
+}
+
+#timeline img {
+        height: 15px;
+        border: 1px solid black;
+        margin: 0px;
+        padding: 0px;
+}
+
+#timeline .auto_apply_current {
+        text-align: center;
+        vertical-align: middle;
+}
+
+#timeline .auto_apply_values {
+        float: left; 
+        display: block; 
+        padding: 0; 
+        margin: 0; 
+        border: 1px solid black; 
+        vertical-align: middle;
+}
+
+#timeline input[name="timeline_value"] {
+        float: left;
+}
+
+#timeline select[name="timeline_unit"] {
+        float: right;
+        width: 65px;
+}
+
+
+#timeline .counter_box_left {
+        float: left; 
+        border: 1px solid black; 
+        border-right: 0; 
+        height: 15px; 
+        width: 28px; 
+        text-align: center; 
+        vertical-align: bottom;
+}
+
+#timeline input[name="auto_apply_value"] {
+        float: left; 
+        border: 1px solid black; 
+        border-left: 0; 
+        height: 15px; 
+        width: 28px; 
+        text-align: center; 
+        vertical-align: bottom;
+}
+
+#timeline .auto_apply_play_pause {
+        float: right;
+        display: block; 
+        padding: 0; 
+        margin: 0; 
+        height: 15px;
+}
+
+#timeline .timeline_range {
+        font-size: 9px;
+        text-align: center;
+        border-spacing: 0;
+	padding: 0;
+	margin: 0;
 }
 
 .timeline_control_prev, .timeline_control_cur, .timeline_control_next {
@@ -403,24 +494,6 @@ p {
 .popup_input_field {
         width: 150px;
         max-width: 150px;
-}
-
-
-.filter_control_select, .timezone_control_select {
-	width: 100%;
-}
-
-.timeline_value {
-        width: 100%;
-}
-
-.timeline_unit_select {
-        width: 100%;
-}
-
-.timeline_range {
-        font-size: 9px;
-        text-align: center;
 }
 
 

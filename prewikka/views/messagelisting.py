@@ -108,7 +108,10 @@ class MessageListingParameters(view.Parameters):
         self.optional("timezone", str, "frontend_localtime", save=True)
         self.optional("delete", list, [ ])
         self.optional("apply", str)
-        
+
+        self.optional("auto_apply_value", str, default="1:00", save=True)
+        self.optional("auto_apply_enable", str, default="false", save=True)
+
         # submit with an image passes the x and y coordinate values
         # where the image was clicked
         self.optional("x", int)
@@ -131,14 +134,10 @@ class MessageListingParameters(view.Parameters):
             
         if not self["timezone"] in ("frontend_localtime", "sensor_localtime", "utc"):
             raise view.InvalidValueError("timezone", self["timezone"])
-        
-        # remove the bulshit
-        try:
-            del self["x"]
-            del self["y"]
-        except KeyError:
-            pass
-        
+
+        if not self.has_key("auto_apply_enable"):
+            user.delConfigValue(view_name, "auto_apply_enable")
+
         return do_load
 
 
@@ -210,9 +209,27 @@ class ListedMessage(dict):
 class MessageListing:    
     def _adjustCriteria(self, criteria):
         pass
-    
+
+    def render(self):
+        self.dataset["auto_apply_value"] = self.parameters["auto_apply_value"]
+        self.dataset["auto_apply_enable"] = self.parameters["auto_apply_enable"]
+
+        # We need to remove x/y from parameters, so that they aren't used for link.
+        self.dataset["hidden_parameters"] = [ ]
+
+        if self.parameters.has_key("x"):
+            self.dataset["hidden_parameters"].append( ("x", self.parameters.pop("x")) )
+        else:
+            self.dataset["hidden_parameters"].append( ("x", "") )
+
+        if self.parameters.has_key("y"):
+            self.dataset["hidden_parameters"].append( ("y", self.parameters.pop("y")) )
+        else:
+            self.dataset["hidden_parameters"].append( ("y", "") )
+
     def _setHiddenParameters(self):
-        self.dataset["hidden_parameters"] = [ [ "view", self.view_name ] ]
+        self.dataset["hidden_parameters"].append( ("view", self.view_name) )
+
         if self.parameters.has_key("timeline_end"):
             self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
 
