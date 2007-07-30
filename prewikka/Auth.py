@@ -29,19 +29,19 @@ from prewikka import User
 
 
 class AuthError(PrewikkaUserError):
-    def __init__(self, arguments={}, message=_("Authentication failed"), log=Log.ERROR, log_user=None):
+    def __init__(self, arguments={}, message=_("Failed authentication"), log=Log.ERROR, log_user=None):
         PrewikkaUserError.__init__(self, None, message, log=log, log_user=log_user)
         self.template = "LoginPasswordForm"
 
 
 class AuthSessionInvalid(AuthError):
-    def __init__(self, arguments={}, message=_("Session invalid"), login=None, log=None):
+    def __init__(self, arguments={}, message=_("Invalid session"), login=None, log=None):
         AuthError.__init__(self, arguments, message, log=log, log_user=login)
 
 
 
 class AuthSessionExpired(AuthError):
-    def __init__(self, login, arguments={}, message=_("Session expired")):
+    def __init__(self, login, arguments={}, message=_("Expired session")):
         AuthError.__init__(self, arguments, message, log=Log.ERROR, log_user=login)
 
 
