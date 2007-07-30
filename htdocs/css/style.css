@@ -386,17 +386,29 @@ p {
 }
 
 #timeline .auto_apply_current {
-        text-align: center;
+        float: left; 
+        border: 1px solid black; 
+        border-right: 0; 
+        height: 15px; 
+        width: 28px; 
+        text-align: center; 
         vertical-align: middle;
 }
 
-#timeline .auto_apply_values {
-        float: left; 
-        display: block; 
+#timeline .auto_apply_button {
+        float: right;
         padding: 0; 
         margin: 0; 
-        border: 1px solid black; 
-        vertical-align: middle;
+}
+
+#timeline input[name="auto_apply_value"] {
+        float: left; 
+        border: 1px solid black;
+        border-left: 0; 
+        width: 28px; 
+		height: 15px;
+        text-align: center; 
+        vertical-align: bottom;
 }
 
 #timeline input[name="timeline_value"] {
@@ -408,41 +420,12 @@ p {
         width: 65px;
 }
 
-
-#timeline .auto_apply_current {
-        float: left; 
-        border: 1px solid black; 
-        border-right: 0; 
-        height: 15px; 
-        width: 28px; 
-        text-align: center; 
-        vertical-align: bottom;
-}
-
-#timeline .auto_apply_button {
-        float: right;
-        padding: 0; 
-        margin: 0; 
-        height: 15px;
-}
-
-#timeline input[name="auto_apply_value"] {
-        float: left; 
-        border: 1px solid black;
-        border-left: 0; 
-        height: 15px; 
-        width: 28px; 
-        text-align: center; 
-        vertical-align: bottom;
-}
-
-
 #timeline .timeline_range {
         font-size: 9px;
         text-align: center;
         border-spacing: 0;
-	padding: 0;
-	margin: 0;
+	    padding: 0;
+        margin: 0;
 }
 
 .timeline_control_prev, .timeline_control_cur, .timeline_control_next {
