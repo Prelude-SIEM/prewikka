@@ -61,7 +61,7 @@ table {
 }
 
 
-textarea, input {
+textarea, input, select {
        padding: 0px;
        font-size: 10px;
        font-family: Verdana, Arial, Helvetica, sans-serif;
@@ -74,11 +74,11 @@ textarea {
 	overflow: auto;
 }
 
-select {
-	padding: 0px;
-        font-size: 10px;
-	font-family: Verdana, Arial, Helvetica, sans-serif;
+
+input[type="checkbox"] {
+	border: none;
 }
+
 
 form {
 	display: inline;
@@ -118,10 +118,6 @@ legend {
 p {
         margin: 0;
         padding: 0;
-}
-
-.checkbox {
-	border: none;
 }
 
 .fixed {
