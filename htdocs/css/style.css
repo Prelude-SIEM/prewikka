@@ -419,9 +419,16 @@ p {
         vertical-align: bottom;
 }
 
+#timeline .auto_apply_button {
+        float: right;
+        padding: 0; 
+        margin: 0; 
+        height: 15px;
+}
+
 #timeline input[name="auto_apply_value"] {
         float: left; 
-        border: 1px solid black; 
+        border: 1px solid black;
         border-left: 0; 
         height: 15px; 
         width: 28px; 
@@ -429,13 +436,6 @@ p {
         vertical-align: bottom;
 }
 
-#timeline .auto_apply_button {
-        float: right;
-        display: block; 
-        padding: 0; 
-        margin: 0; 
-        height: 15px;
-}
 
 #timeline .timeline_range {
         font-size: 9px;
