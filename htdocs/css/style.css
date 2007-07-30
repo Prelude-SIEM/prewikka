@@ -330,11 +330,13 @@ p {
 /* menu timeline control */
 #timeline {
         background: #999999; 
+        border: 1px solid black;
         font-size: 10px;
-        width: 160px;
+        width: 154px;
         color: white;
 	position: fixed;
 	_position: absolute;
+	left: 3px;
 	bottom: 43px;
 	height: 163px;
 }
@@ -407,7 +409,7 @@ p {
 }
 
 
-#timeline .counter_box_left {
+#timeline .auto_apply_current {
         float: left; 
         border: 1px solid black; 
         border-right: 0; 
@@ -427,7 +429,7 @@ p {
         vertical-align: bottom;
 }
 
-#timeline .auto_apply_play_pause {
+#timeline .auto_apply_button {
         float: right;
         display: block; 
         padding: 0; 
