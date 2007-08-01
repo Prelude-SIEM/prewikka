@@ -56,7 +56,7 @@ class DatabaseSchemaError(Exception):
     pass       
 
 class Database:
-    required_version = "0.9.11.1"
+    required_version = "0.9.11"
     
     # We reference preludedb_sql_destroy since it might be deleted
     # prior Database.__del__() is called.
