@@ -374,11 +374,6 @@ p {
 }
 
 
-#timeline input[name="auto_apply_value"] {
-        border: 0px;
-        padding: 0px;
-}
-
 #timeline img {
         height: 15px;
         border: 1px solid black;
@@ -407,9 +402,11 @@ p {
         border: 1px solid black;
         border-left: 0; 
         width: 28px; 
-		height: 15px;
+	height: 15px;
         text-align: center; 
         vertical-align: bottom;
+	padding: 0;
+	margin: 0;
 }
 
 #timeline input[name="timeline_value"] {
@@ -418,7 +415,7 @@ p {
 
 #timeline select[name="timeline_unit"] {
         float: right;
-        width: 65px;
+        width: 62px;
 }
 
 #timeline .timeline_range {
