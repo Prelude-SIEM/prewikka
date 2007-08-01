@@ -1,3 +1,28 @@
+* 2007-08-01, prewikka-0.9.12:
+
+- Implement an Auto-Refresh system (fix #231).  (including code from
+  Paul Robert Marino <prmarino1@gmail.com>).
+
+- Ability to filter on missing/offline/online/unknown agents. Make more easier
+  to read each agent status in collapsed mode.
+
+- Fix filter load/save/delete issue with translation.
+
+- New 'My account' tabs, under the Settings section (fix #241).
+
+- New messageid and analyzerid parameters, allowing link to a Prewikka alert
+  from an external tool (previously required a database query in order to
+  retrieve the database event id).
+
+- Don't redirect to user listing once an user preference are recorded. Fix
+  changing of another user language by an user with PERM_USER_MANAGEMENT.
+  Display target user language rather than current user language.
+
+- Improve the timeline control table layout.
+
+- Fix translation of string possibly using plural.
+
+
 * 2007-06-11, prewikka-0.9.11.4:
 
 	- Fix PostgreSQL user deletion error.
