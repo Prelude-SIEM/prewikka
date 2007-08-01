@@ -19,10 +19,8 @@
 
 
 import sys
-import os, os.path
-
+import os, os.path, time
 import copy
-
 import Cookie
 
 
@@ -33,9 +31,11 @@ class Request:
         self.arguments = { }
         self.input_headers = { }
         self.output_headers = [ ("Content-type", "text/html"),
-                                ("Pragma", "no-cache"),
-                                ("Cache-control", "no-cache"),
-                                ("Expires", "Fri, 01 Jan 1999 00:00:00 GMT") ]
+				("Last-Modified", time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())),
+				("Expires", "Fri, 01 Jan 1999 00:00:00 GMT"),
+				("Cache-control", "no-store, no-cache, must-revalidate"),
+				("Cache-control", "post-check=0, pre-check=0"),
+				("Pragma", "no-cache") ]
 
         cookie = Cookie.SimpleCookie(self.getCookieString())
         self.input_cookie = { }
