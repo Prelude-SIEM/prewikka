@@ -1,3 +1,9 @@
+* 2007-08-02, prewikka-0.9.12.1:
+
+- Fix a template compilation problem with certain version of Cheetah
+  (Giandomenico De Tullio <ghisha at email.it>)
+
+
 * 2007-08-01, prewikka-0.9.12:
 
 - Implement an Auto-Refresh system (fix #231).  (including code from
