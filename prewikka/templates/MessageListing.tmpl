@@ -2,15 +2,34 @@
 #extends prewikka.templates.ClassicLayout
 
 #def layout_start_hook
+
 <script type="text/javascript">
-
 <!--
-
 var second_reload  = 0;
 var second_count   = 0;
 var autorefresh_enabled = true;
 
-function enableAutoRefresh() {
+\$(document).ready(function() {
+  \$("#allbox").click(function(){
+    \$('input[@name=delete]').check(\$(this).attr('checked'));
+  });
+
+  \$("th.filter_popup > a").click(function(){
+	\$(this).next().popupUnique(function(data){data.fadeIn('normal')}, function(data){data.fadeOut('normal')});
+  });
+
+  \$("input[@name=auto_apply_value], input[@type=submit]").focus(function(){
+	autorefresh_possible = false;	
+  });
+
+  \$("input[@name=auto_apply_value]").blur(function(){
+        if ( second_reload <= second_count )
+                second_count = 0;
+
+        autorefresh_possible = true;
+  });
+
+  \$(".auto_apply_button").click(function(){
         if ( document.messagelisting.auto_apply_enable.value == "true" ) {
                 autorefresh_enabled = false;
 
@@ -22,19 +41,13 @@ function enableAutoRefresh() {
                 document.messagelisting.auto_apply_enable.value = "true";
                 document.messagelisting.auto_apply_image.src = "prewikka/images/pause.png";
         }
-}
+  });
 
-function inputFocus() {
-        autorefresh_possible = false;
-}
+  \$("a[@href]").click(function(){
+	autorefresh_possible = false;
+  });
+}); 
 
-
-function inputBlur() {
-        if ( second_reload <= second_count )
-                second_count = 0;
-
-        autorefresh_possible = true;
-}
 
 function pad(number)
 {
@@ -76,7 +89,7 @@ function autoApplyCounter() {
         }
 
         second_count += 1;
-         document.getElementById("auto_apply_current").innerHTML = Math.floor(second_count / 60) + ":" + pad((second_count % 60));
+        document.getElementById("auto_apply_current").innerHTML = Math.floor(second_count / 60) + ":" + pad((second_count % 60));
 
         if ( second_count != second_reload )
                 setTimeout("autoApplyCounter()", 1000);
@@ -109,11 +122,6 @@ function setScrollBar() {
 }
 
 
-function stopTimerOnClick() {
-        autorefresh_possible = false;
-}
-
-
 function beginAutoApply() {
 #if $auto_apply_enable == "true"
         autorefresh_enabled = true;
@@ -123,25 +131,11 @@ function beginAutoApply() {
 
         setScrollBar();
         setTimeout("autoApplyCounter()", 1000);
-
-        var i;
-
-        for ( i = 0; i < document.links.length; i++ ) {
-                if ( document.links[i].onclick == null )
-                        document.links[i].onclick = stopTimerOnClick;
-        }
-
-        for ( i = 0; i < document.messagelisting.elements.length; i++ ) {
-                var elem = document.messagelisting.elements[i];
-
-                if ( elem.type == "submit" )
-                        elem.onclick = stopTimerOnClick;
-        }
 }
 
 //--></script>
 
-<form name="messagelisting" method="post" action="?">
+<form id="messagelisting" name="messagelisting" method="post" action="?">
 #for $name, $value in $hidden_parameters
   <input type="hidden" name="$name" value="$value"/>
 #end for
@@ -152,8 +146,8 @@ function beginAutoApply() {
 #end def
 
 
-
 #block main_content
+
 #def message_listing_header
 #end def
 $message_listing_header
@@ -168,7 +162,7 @@ $message_listing_header
       #set global $message = $message
         <tr class="$row_classes[$cnt % 2]">
           $message_fields
-          <td class="static_content_column">
+          <td>
             #if $prewikka.user.has(User.PERM_IDMEF_ALTER)
               <input class="checkbox" type="checkbox" name="delete" value="$message.delete"/>
             #else
@@ -178,17 +172,19 @@ $message_listing_header
         </tr>
         #set $cnt += 1
       #end for
+    </tbody>
 
 #if $prewikka.user.has(User.PERM_IDMEF_ALTER) and $cnt
+   <tfoot>
      <tr>
       <td colspan="4">&nbsp;</td>
       <td style="text-align: right;"><input type="submit" value="$_("Delete")"/></td>
-      <td class="static_content_column">
-       <input class="checkbox" type="checkbox" id="allbox" onclick="checkBoxByName('delete', document.forms[0].allbox.checked);"/>
+      <td>
+       <input class="checkbox" type="checkbox" id="allbox" />
       </td>
      </tr>
+    </tfoot>
 #end if
- </tbody>
 </table>
 #end block main_content
 
@@ -249,8 +245,8 @@ $message_listing_header
 <input type="hidden" name="auto_apply_enable" value="$auto_apply_enable" />
 
 <div class="auto_apply_current" id="auto_apply_current">0:00</div>
-<input type="text" size="3" name="auto_apply_value" value="$auto_apply_value" onfocus="javascript:inputFocus()" onblur="javascript:inputBlur()" />
-<a class="auto_apply_button" href="#" onclick="javascript:enableAutoRefresh();"><img id="auto_apply_image" src="$img" alt="Play/Pause" /></a>
+<input type="text" size="3" name="auto_apply_value" value="$auto_apply_value" />
+<a class="auto_apply_button"><img id="auto_apply_image" src="$img" alt="Play/Pause" /></a>
 
     </td>
   </tr>

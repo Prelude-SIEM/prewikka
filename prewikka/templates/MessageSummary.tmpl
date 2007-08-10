@@ -1,5 +1,26 @@
 #extends prewikka.templates.ClassicLayout
 
+#def layout_start_hook
+<script type="text/javascript">
+<!--
+\$(document).ready(function() {
+
+ \$("legend a").click(function(){
+    var \$div = \$(this).parent().next();
+
+    if ( \$div.is(":hidden") )
+        \$div.show('normal');
+    else
+        \$div.hide('normal');
+
+    return false;
+  });
+});
+
+//--></script>
+
+#end def
+
 #block main_content
 #set global $section_cnt = 0
 #set global $row_classes = ("table_row_even", "table_row_odd")
@@ -45,10 +66,8 @@
 #def display_node($sections)
 #for $section in $sections
         <fieldset class="fieldset_heading">
-		#set name = "section_" + $str($section_cnt) + ".id"
-		<legend><a href="#" onclick="javascript:toggleVisibility('$name'); return false;">$section.title</a></legend>
-
-		<div id="$name" style="display: $section.display; width: 100%;">
+		<legend><a href="#">$section.title</a></legend>
+		<div style="display: $section.display; width: 100%;">
 		$display_table($section, 0)
 
 		#if $section.entries

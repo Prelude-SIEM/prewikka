@@ -46,9 +46,8 @@
 #block message_fields
 
 <td>
-  <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$message.agent.value</a>
-  <span id="menu_$cnt" class="popup_menu">
-  #set global $cnt += 1
+  <a class="popup_menu_toggle" href="#">$message.agent.value</a>
+  <span class="popup_menu">
    - <a href="$message.summary">$_("Heartbeat summary")</a><br />
    - <a href="$message.agent.inline_filter">$_("Filter on agent")</a>
   </span>
@@ -57,18 +56,15 @@
 <td>
   #if len($message.node_addresses) > 0
     #for $address in $message.node_addresses
-    <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$cnt'); return false;">$address.value</a><br />
-    <span id="menu_$cnt" class="popup_menu">
-    #set global $cnt += 1
-
+    <a class="popup_menu_toggle" href="#">$address.value</a>
+    <span class="popup_menu">
       - <a href="$address.inline_filter">$_("Filter on address")</a><br />
       - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">Address information</a><br />
-
       #for $name, $link in $address.host_commands
       - <a href="$link">$name</a><br />
       #end for
-
     </span>
+    <br />
     #end for
   #else
     n/a

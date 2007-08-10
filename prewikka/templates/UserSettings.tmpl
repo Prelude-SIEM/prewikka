@@ -1,11 +1,28 @@
 #extends prewikka.templates.ClassicLayout
 
+#def layout_start_hook
+<script type="text/javascript" src="prewikka/js/jquery.js"></script>
+<script type="text/javascript" src="prewikka/js/jquery.checkboxes.pack.js"></script>
+
+<script type="text/javascript">
+
+<!--
+
+\$(document).ready(function() {
+  \$("#allbox").click(function(){
+    \$('input[@name=permissions]').check(\$(this).attr('checked'));
+  });
+});
+
+//--></script>
+#end def
+
 #block main_content
 #filter CleanOutput
 
 <div id="fieldset_page" style="width: 430px;">
 
-<form action="?" method="post">
+<form id="usersettings" action="?" method="post">
 #if $user.login
 <input type="hidden" name="view" value="user_settings_modify"/>
 #else
@@ -105,7 +122,7 @@
 #end if
 
  <td class="nodash"style="text-align: right;"><b>$_("Check All")</b>
-  <input $checked $disabled class="checkbox" type="checkbox" id="allbox" onclick="checkBoxByName('permissions', document.forms[0].allbox.checked);"/>
+  <input $checked $disabled class="checkbox" type="checkbox" id="allbox"/>
  </td>
 </tr>
 

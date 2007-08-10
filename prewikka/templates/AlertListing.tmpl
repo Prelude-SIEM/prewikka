@@ -25,7 +25,6 @@ function end(row) {
 	if ( row.firstChild != row.lastChild ) {
 		link = document.createElement("a")
 		link.onclick = function(){ del_entry(this) }
-		link.setAttribute("href", "#")
 		content = document.createTextNode("-")
 		link.appendChild(content)
 		field.appendChild(link)		
@@ -177,7 +176,6 @@ function aggregated_${category}_add_entry(path) {
 
 	link = document.createElement("a")
 	link.onclick = function(){ aggregated_${category}_add_entry('') }
-	link.setAttribute("href", "#")
 	content = document.createTextNode("+")
 	link.appendChild(content)
 	field.appendChild(link)
@@ -282,7 +280,6 @@ function ${name}_add_entry(object, operator, value, num) {
 	row.appendChild(field)
 	link = document.createElement("a")
 	link.onclick = function(){ ${name}_add_entry('', '', '', (num + 1)) };
-	link.setAttribute("href", "#")
 	content = document.createTextNode("+")
 	link.appendChild(content)
 	field.appendChild(link)
@@ -298,12 +295,11 @@ function ${name}_add_entry(object, operator, value, num) {
 
 
 #block message_fields_header
-#set global $address_cnt = 0
 
 <thead>
-<tr>
-  <td class="filter_popup">
-    <a onclick="javascript:toggleFilteredColumnVisibility('classification');" href="#">$_("Classification")</a>
+<tr style="height: 20px;">
+  <th class="filter_popup">
+    <a>$_("Classification")</a>
     <div id="classification">
      <table>
       <tr><td><table class="inline_filter_content"><tbody id="classification_table"></tbody></table></td></tr>
@@ -382,10 +378,10 @@ function ${name}_add_entry(object, operator, value, num) {
     #if $classification_filtered
       <span class="filter_enabled_marker">*</span>
     #end if
-  </td>
+  </th>
 
-  <td class="filter_popup">
-    <a onclick="javascript:toggleFilteredColumnVisibility('source');" href="#">$_("Source")</a>
+  <th class="filter_popup">
+    <a>$_("Source")</a>
     <div id="source">
      <table>
       <tr><td><table class="inline_filter_content"><tbody id="source_table"></tbody></table></td></tr>
@@ -411,10 +407,10 @@ function ${name}_add_entry(object, operator, value, num) {
     #if $source_filtered
       <span class="filter_enabled_marker">*</span>
     #end if
-  </td>
+  </th>
 
-  <td class="filter_popup">
-    <a onclick="javascript:toggleFilteredColumnVisibility('target');" href="#">$_("Target")</a>
+  <th class="filter_popup">
+    <a>$_("Target")</a>
     <div id="target">
      <table>
       <tr><td><table class="inline_filter_content"><tbody id="target_table"></tbody></table></td></tr>
@@ -439,10 +435,10 @@ function ${name}_add_entry(object, operator, value, num) {
     #if $target_filtered
       <span class="filter_enabled_marker">*</span>
     #end if
-  </td>
+  </th>
   
-  <td class="filter_popup">
-    <a onclick="javascript:toggleFilteredColumnVisibility('analyzer');" href="#">$_("Sensor")</a>
+  <th class="filter_popup">
+    <a>$_("Sensor")</a>
     <div id="analyzer">
      <table>
       <tr><td><table class="inline_filter_content"><tbody id="analyzer_table"></tbody></table></td></tr>
@@ -468,13 +464,9 @@ function ${name}_add_entry(object, operator, value, num) {
     #if $analyzer_filtered
       <span class="filter_enabled_marker">*</span>
     #end if
-  </td>
+  </th>
 
   <td>$_("Time")</td>
-
-  <td>
-    <input src="prewikka/images/search.png" type="image" style="border: 0;" />
-  </td>
 </tr>
 </thead>
 #end block message_fields_header
@@ -555,9 +547,18 @@ function ${name}_add_entry(object, operator, value, num) {
       #end if
 
       #for $address in $direction.addresses
-       <a href="#" onclick="javascript:toggleVisibilityUnique('menu_$address_cnt'); return false;">$address.value</a>#slurp
-       #if $direction.service.value != None
-:<a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$str($direction.service.value)$proto_param">$str($direction.service.value)#slurp
+       <a class="popup_menu_toggle">$address.value</a><span class="popup_menu">
+         - <a href="$address.inline_filter">$str($_("Filter on this %s") % ($name))</a><br />
+
+       #if not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
+         - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$str($_("%s information") % ($name)).capitalize()</a><br />
+
+          #for $cmdname, $link in $address.host_commands
+         - <a href="$link">$cmdname</a><br />
+          #end for
+       #end if
+       </span>#slurp
+#if $direction.service.value != None#:<a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$str($direction.service.value)$proto_param">$str($direction.service.value)#slurp
          #if $proto_str
 /$proto_str</a>
          #else 
@@ -567,21 +568,6 @@ function ${name}_add_entry(object, operator, value, num) {
 :$proto_str
        #end if
 <br />
-
-       <span id="menu_$address_cnt" class="popup_menu">
-       #set global $address_cnt += 1
-
-         - <a href="$address.inline_filter">$str($_("Filter on this %s") % ($name))</a><br />
- 
-       #if not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
-         - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$str($_("%s information") % ($name)).capitalize()</a><br />
-
-          #for $cmdname, $link in $address.host_commands
-         - <a href="$link">$cmdname</a><br />
-          #end for
-       #end if
-
-       </span>
       #end for
      
       #if $len($direction.addresses) == 0 and $service

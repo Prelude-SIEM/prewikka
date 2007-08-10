@@ -4,44 +4,57 @@
 #from prewikka.views.sensor import getDominantStatus
 
 #def layout_start_hook
+<script src="prewikka/js/jquery.js" type="text/javascript"></script>
 <script type="text/javascript">
 <!--
+\$(document).ready(function() {
 
-function showRowsByClass(id, wanted) {
-    var div = document.getElementById(id);
-    var table = document.getElementById('table_' + id);
-    var rows  = table.getElementsByTagName('tr');
+ \$(".fieldset_toggle").click(function(){
+    var \$d1 = \$(this).parent().parent().next("div");
+    var \$d2 = \$(this).parent().parent().next("div").next("div");
 
-    for ( var i = 0; i < rows.length; i++ ) {
-        tr_class = rows[i].className.split(' ')[0];
-
-        if ( tr_class != wanted && tr_class != 'tr_header' )
-            rows[i].style.display = "none";
-        else
-            rows[i].style.display = "";
+    if ( \$d1.is(':visible') ) {
+       \$d1.hide('normal');
+       \$d2.show('normal');
+    } else {
+       \$d2.hide('normal');
+       \$d1.show('normal');
     }
 
-    div.style.display = "block";
-}
+    return false;
+  });
 
-function showRowsAll(id) {
-    var div = document.getElementById(id);
-    var table = document.getElementById('table_' + id);
-    var rows  = table.getElementsByTagName('tr');
-    var some_hidden = false;
+  \$(".fieldset_toggle2").click(function(){
+	\$(this).prev().find(".fieldset_toggle").click();
+	return false;
+  });
 
-    for ( var i = 0; i < rows.length; i++ ) {
-        if ( rows[i].style.display == "none" )
-            some_hidden = true;
+  \$("td.offline, td.online, td.missing, td.unknown").click(function(){
+        var \$ctype = \$(this).attr('class');
+        var \$div = \$(this).parents("table").next("div");
+        var \$all_tr = \$("table tbody tr", \$div);
 
-        rows[i].style.display = "";
-    }
+        \$all_tr.filter(".tr_" + \$ctype).show();
+        \$all_tr.not(".tr_" + \$ctype).hide();
+        \$div.show('normal');
 
-    if ( some_hidden || div.style.display == "none" )
-        div.style.display = "block";
-    else
-        div.style.display = "none";
-}
+        return false;
+  });
+
+  \$("td.show_all").click(function(){
+        var \$div = \$(this).parents("table").next("div");
+        var \$all_tr = \$("table tbody tr", \$div);
+
+        if ( \$div.is(':visible') && ! \$all_tr.is(':hidden') ) {
+                \$div.hide('normal');
+        } else {
+                \$all_tr.show();
+                \$div.show('normal');
+        }
+
+        return false;
+  });
+});
 
 //--></script>
 
@@ -75,13 +88,13 @@ $listing.sort()
 
   <legend>
    <b>
-    <a href="#" onclick="javascript:toggleVisibility('${entry}_tmp'); toggleVisibility('${entry}'); return false;">$entry</a>
+    <a href="#" class="fieldset_toggle"; return false;">$entry</a>
    </b>
   </legend>
 
-   <div id="${entry}_tmp" style="display: $display_tmp" class="$dclass">
+   <div style="display: $display_tmp" class="$dclass fieldset_toggle2">
     <table style="border: 1px solid black;">
-     <tr class="nodash">
+     <tr class="nodash" style="cursor: pointer;">
       <td style="background-color: white; width:150px;">
        #set $nlen = $len($locations[$entry]["nodes"])
        #set $alen = $locations[$entry]["total"]
@@ -99,7 +112,7 @@ $listing.sort()
     </table>
    </div>
 
-   <div id="$entry" style="display: $display">
+   <div style="display: $display">
    #set $nlisting = $locations[$entry]["nodes"].values()
    $nlisting.sort(node_cmp)
 
@@ -122,8 +135,8 @@ $listing.sort()
         <th>$node.node_name</th>
         <th>
          #for $addr in $node.node_addresses
-          <a href="#" onclick="javascript:toggleVisibilityUnique('${entry}_${node.node_key}_addr'); return false;">$addr.value</a><br />
-          <span id="${entry}_${node.node_key}_addr" class="popup_menu">
+          <a class="popup_menu_toggle" href="#">$addr.value</a>
+          <span class="popup_menu">
            - <a href="$addr.inline_filter">$_("Filter on address")</a><br />
            - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$addr.value">$_("Address information")</a><br />
 
@@ -131,6 +144,7 @@ $listing.sort()
            - <a href="$link">$name</a><br />
            #end for
           </span>
+          <br/>
          #end for
         </th>
         <th>$node.ostype</th>
@@ -139,13 +153,13 @@ $listing.sort()
 
          <table align="right" style="border: 1px solid black; width: 200px; text-align: center;">
           <tr class="nodash">
-           <td style="background-color: white; width: 60px; text-align: center;">
-            $_("Total:") <a href="#" onclick="javascript:showRowsAll('${entry}_${node.node_key}'); return false;">$node["total"]</a>
+           <td class="show_all" style="cursor: pointer; background-color: white; width: 60px; text-align: center;">
+            $_("Total:") <a href="#">$node["total"]</a>
            </td>
            #for $i in ("online", "offline", "unknown", "missing")
             #if $node[$i] > 0
-           <td class="heartbeat_analyze_sensor_status_$i">
-            <a href="#" onclick="javascript:showRowsByClass('${entry}_${node.node_key}', 'tr_${i}'); return false;">$node[$i]</a>
+           <td class="$i heartbeat_analyze_sensor_status_$i" style="cursor: pointer;">
+            <a href="#">$node[$i]</a>
            </td>
             #end if
            #end for
@@ -157,8 +171,9 @@ $listing.sort()
      </thead>
     </table>
 
-    <div id="${entry}_${node.node_key}" style="display: $display">
-    <table id="table_${entry}_${node.node_key}" style="width: 100%; border: 1px solid black;">
+    <div style="display: $display">
+    <table style="width: 100%; border: 1px solid black;">
+     <thead>
       <tr class="tr_header $row_classes[$cnt%2]">
        <th>$_("Delete")</th>
        <th>$_("Name")</th>
@@ -168,16 +183,18 @@ $listing.sort()
        <th>$_("Last heartbeat")</th>
        <th style="text-align: center;">$_("Status")</th>
       </tr>
+     </thead>
      #set $alisting = $node.analyzers
      $node.analyzers.sort(analyzer_cmp)
+     <tbody>
      #for $analyzer in $node.analyzers
       #set $cnt += 1
       <tr class="tr_$analyzer['status'] $row_classes[$cnt%2]">
        <td style="padding-top: 0px; padding-bottom: 0px;"><input class="checkbox" type="checkbox" name="analyzerid" value="$analyzer["analyzerid"]" /></td>
 
        <td>
-        <a href="#" onclick="javascript:toggleVisibilityUnique('${entry}_${node.node_name}_${analyzer.analyzerid}'); return false;">$analyzer.name</a>
-        <span id="${entry}_${node.node_name}_${analyzer.analyzerid}" class="popup_menu">
+        <a class="popup_menu_toggle" href="#">$analyzer.name</a>
+        <span class="popup_menu">
          - <a href="$analyzer.alert_listing">$_("Alert listing")</a><br />
          - <a href="$analyzer.heartbeat_listing">$_("Heartbeat listing")</a><br />
          - <a href="$analyzer.heartbeat_analyze">$_("Heartbeat analysis")</a><br />
@@ -190,6 +207,7 @@ $listing.sort()
        <td style="text-align: center;" class="heartbeat_analyze_sensor_status_$analyzer["status"]">$analyzer["status_meaning"]</td>
       </tr>
      #end for
+     </tbody>
     </table>
     </div>
 
