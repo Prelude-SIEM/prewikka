@@ -1,4 +1,4 @@
-# Copyright (C) 2004,2005,2006,2007 PreludeIDS Technologies. All Rights Reserved.
+# Copyright (C) 2004,2005,2006 PreludeIDS Technologies. All Rights Reserved.
 # Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
 #
 # This file is part of the Prewikka program.
@@ -572,11 +572,17 @@ class ListedAlert(ListedMessage):
         self["sensors"].append(sensor)
 
         if name:
-            sensor["name"] = self.createInlineFilteredField("alert.analyzer.name", name, direction="analyzer")
+            val = name
+            path = "alert.analyzer.name"
 
         elif model:
-            sensor["name"] = self.createInlineFilteredField("alert.analyzer.model", model, direction="analyzer")
+            val = model
+            path = "alert.analyzer.model"
 
+        else:
+            path = val = None
+
+        sensor["name"] = self.createInlineFilteredField(path, val, direction="analyzer")
         sensor["node_name"] = self.createInlineFilteredField("alert.analyzer.node.name", node_name, direction="analyzer")
 
     def setMessage(self, message, ident):

@@ -594,7 +594,9 @@ function ${name}_add_entry(object, operator, value, num) {
 
 <td>
   #for $sensor in $message.sensors
-    <a href="$sensor.name.inline_filter">$sensor.name.value</a>
+    #if $sensor.name.value
+      <a href="$sensor.name.inline_filter">$sensor.name.value</a>
+    #end if
     #if $sensor.node_name.value
       (<a href="$sensor.node_name.inline_filter">$sensor.node_name.value</a>)
     #end if
