@@ -561,11 +561,11 @@ class ListedAlert(ListedMessage):
 
     def _setMessageTime(self, message):
         self["time"] = self.createTimeField(message["alert.create_time"], self.timezone)
-    if (message["alert.analyzer_time"] != None and
-        abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
-        self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"], self.timezone)
-    else:
-        self["analyzer_time"] = { "value": None }
+        if (message["alert.analyzer_time"] != None and
+            abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
+            self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"], self.timezone)
+        else:
+            self["analyzer_time"] = { "value": None }
 
     def addSensor(self, name, model, node_name):
         sensor = { }
