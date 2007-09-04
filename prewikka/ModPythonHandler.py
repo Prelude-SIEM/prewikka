@@ -36,7 +36,7 @@ class ModPythonRequest(Request.Request):
     def sendHeader(self, name, value):
         self._req.headers_out[name] = value
          
-    def endHeader(self):
+    def endHeaders(self):
     	pass
 
     def addCookie(self, param, value, expires):
