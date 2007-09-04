@@ -176,9 +176,9 @@ class UserSettingsModify(UserSettingsDisplay):
         self.env.db.setLanguage(login, lang)
                     
         if self.parameters.has_key("password_new") and self.parameters.has_key("password_new_confirmation"):
-            if self.parameters.has_key("password_current"):
+            if login == self.user.login:
                 try:
-                    self.env.auth.checkPassword(login, self.parameters["password_current"])
+                    self.env.auth.checkPassword(login, self.parameters.get("password_current", ""))
                 except Auth.AuthError, e:
                     raise Error.PrewikkaUserError("Password Error", "Invalid Password specified")
 
