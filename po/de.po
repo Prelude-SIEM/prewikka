@@ -315,11 +315,11 @@ msgstr "Prüfsumme"
 
 #: prewikka/views/messagesummary.py:564
 msgid "Source address"
-msgstr "Knotenadresse"
+msgstr "Quelladresse"
 
 #: prewikka/views/messagesummary.py:565
 msgid "Target address"
-msgstr "Knotenadresse"
+msgstr "Zieladresse"
 
 #: prewikka/views/messagesummary.py:570 prewikka/views/messagesummary.py:591
 msgid "Source port"
@@ -426,7 +426,7 @@ msgstr "Ursprung"
 
 #: prewikka/views/messagesummary.py:733
 msgid "Severity"
-msgstr "Severity"
+msgstr ""
 
 #: prewikka/views/messagesummary.py:736
 msgid "Completion"
@@ -462,7 +462,7 @@ msgstr "Änderungszeit"
 
 #: prewikka/views/messagesummary.py:817
 msgid "Inode Number"
-msgstr "Knotenname"
+msgstr "Inode NUmmer"
 
 #: prewikka/views/messagesummary.py:818
 msgid "Major device"
@@ -507,15 +507,15 @@ msgstr "Plattengröße"
 
 #: prewikka/views/messagesummary.py:853
 msgid "Web Service"
-msgstr ""
+msgstr "Web Service"
 
 #: prewikka/views/messagesummary.py:856
 msgid "Url"
-msgstr ""
+msgstr "Url"
 
 #: prewikka/views/messagesummary.py:857
 msgid "Cgi"
-msgstr ""
+msgstr "Cgi"
 
 #: prewikka/views/messagesummary.py:858
 msgid "Http Method"
@@ -523,11 +523,11 @@ msgstr "Http Methode"
 
 #: prewikka/views/messagesummary.py:861
 msgid "CGI Argument"
-msgstr ""
+msgstr "Cgi Argument"
 
 #: prewikka/views/messagesummary.py:870
 msgid "SNMP Service"
-msgstr ""
+msgstr "SNMP Dienst"
 
 #: prewikka/views/messagesummary.py:873
 msgid "oid"
@@ -563,7 +563,7 @@ msgstr "Kommando"
 
 #: prewikka/views/messagesummary.py:892
 msgid "Port"
-msgstr ""
+msgstr "Port"
 
 #: prewikka/views/messagesummary.py:925
 #, python-format
@@ -577,7 +577,7 @@ msgstr "Ziel(%d)"
 
 #: prewikka/views/messagesummary.py:955
 msgid "Overflow Alert"
-msgstr ""
+msgstr "Overflow Alarm"
 
 #: prewikka/views/messagesummary.py:958 prewikka/templates/AlertListing.py:551
 msgid "Alert"
@@ -665,7 +665,7 @@ msgstr "Filter"
 
 #: prewikka/views/__init__.py:54
 msgid "My account"
-msgstr ""
+msgstr "Meni Konto"
 
 #: prewikka/views/__init__.py:57
 #, fuzzy
@@ -681,14 +681,12 @@ msgid "CGI Authentication failed: no user specified."
 msgstr "CGI Authentifizierung fehlgeschlagen: Kein Benutzer angegeben."
 
 #: prewikka/modules/auth/sslcert/sslcert.py:29
-#, fuzzy
 msgid "SSLcert Authentication failed: Not in a SSL session."
-msgstr "CGI Authentifizierung fehlgeschlagen: Kein Benutzer angegeben."
+msgstr "SSLcert Authentifizierung fehlgeschlagen: Keine SSL session."
 
 #: prewikka/modules/auth/sslcert/sslcert.py:33
-#, fuzzy
 msgid "SSLcert Authentication failed: no user specified in x509 CN."
-msgstr "CGI Authentifizierung fehlgeschlagen: Kein Benutzer angegeben."
+msgstr "SSLcert Authentifizierung fehlgeschlagen: Kein Benutzer in x509 CN."
 
 #: prewikka/templates/SensorListing.py:222
 #, python-format
@@ -698,39 +696,34 @@ msgstr[0] ""
 msgstr[1] ""
 
 #: prewikka/templates/SensorListing.py:227
-#, fuzzy, python-format
 msgid "%d Analyzer"
 msgid_plural "%d Analyzers"
-msgstr[0] "Analyzer-ID"
-msgstr[1] "Analyzer-ID"
+msgstr[0] "%d Analyzer"
+msgstr[1] "%d Analyzer"
 
 #: prewikka/templates/SensorListing.py:232
-#, fuzzy, python-format
 msgid "%d Online"
 msgid_plural "%d Onlines"
-msgstr[0] "Analyzer-ID"
-msgstr[1] "Analyzer-ID"
+msgstr[0] "%d Online"
+msgstr[1] "%d Online"
 
 #: prewikka/templates/SensorListing.py:234
-#, fuzzy, python-format
 msgid "%d Offline"
 msgid_plural "%d Offlines"
-msgstr[0] "Büro"
-msgstr[1] "Büro"
+msgstr[0] "%d Offline"
+msgstr[1] "%d Offline"
 
 #: prewikka/templates/SensorListing.py:236
-#, fuzzy, python-format
 msgid "%d Unknown"
 msgid_plural "%d Unknowns"
-msgstr[0] "Unbekannt"
-msgstr[1] "Unbekannt"
+msgstr[0] "%d Unbekannt"
+msgstr[1] "%d Unbekannt"
 
 #: prewikka/templates/SensorListing.py:238
-#, fuzzy, python-format
 msgid "%d Missing"
 msgid_plural "%d Missings"
-msgstr[0] "Vermisst"
-msgstr[1] "Vermisst"
+msgstr[0] "%d Vermisst"
+msgstr[1] "%d Vermisst"
 
 #: prewikka/templates/SensorListing.py:309
 #: prewikka/templates/HeartbeatListing.py:231
@@ -931,9 +924,8 @@ msgid "Create user"
 msgstr "Benutzer erstellen"
 
 #: prewikka/templates/MessageListing.py:421
-#, fuzzy
 msgid "Period"
-msgstr "Rechte:"
+msgstr "Periode"
 
 #: prewikka/templates/MessageListing.py:432
 msgid "Minutes"
@@ -981,7 +973,7 @@ msgstr "Limit"
 
 #: prewikka/templates/MessageListing.py:537
 msgid "Refresh"
-msgstr ""
+msgstr "Neu Laden"
 
 #: prewikka/templates/MessageListing.py:582
 msgid "Apply"
@@ -1074,11 +1066,11 @@ msgstr "Größer oder gleich"
 
 #: prewikka/templates/AlertListing.py:143
 msgid "Substring"
-msgstr ""
+msgstr "Teilstring"
 
 #: prewikka/templates/AlertListing.py:145
 msgid "Substring (case-insensitive)"
-msgstr ""
+msgstr "Teilstring (Groß-/Kleinschreibung egal)"
 
 #: prewikka/templates/AlertListing.py:147
 msgid "Regular expression"
@@ -1086,7 +1078,7 @@ msgstr "Regulärer Ausdruck"
 
 #: prewikka/templates/AlertListing.py:149
 msgid "Regular expression (case-insensitive)"
-msgstr ""
+msgstr "Regulärer Ausdruck (Groß-/Kleinschreibung egal)"
 
 #: prewikka/templates/AlertListing.py:267
 msgid "Group entry by:"
@@ -1200,9 +1192,8 @@ msgid "Filter on this %s"
 msgstr "Nach Adresse filtern"
 
 #: prewikka/templates/AlertListing.py:1074
-#, fuzzy, python-format
 msgid "%s information"
-msgstr "Adress Informationen"
+msgstr "%s Information"
 
 #: prewikka/templates/AlertListing.py:1204
 msgid "Filter"
