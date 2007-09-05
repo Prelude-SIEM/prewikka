@@ -65,7 +65,7 @@ __builtin__.N_ = _deferredGettext
 __builtin__.ngettext = _safeNgettext
 
 _LANGUAGES = { 
-               "Deutsche": "de",
+               "Deutsch": "de",
                "Español": "es",
                "English": "en", 
                "Français": "fr", 
