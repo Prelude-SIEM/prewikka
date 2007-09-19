@@ -30,4 +30,7 @@ $(document).ready(function(){
     $(this).next().popupUnique(function(data){data.show('fast')}, function(data){data.hide('fast')});
   });
 
+
+ if ( navigator.userAgent.indexOf("Konqueror") != -1 )
+        $(".popup_menu").hide();
 });

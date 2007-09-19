@@ -14,12 +14,19 @@ var autorefresh_enabled = true;
     \$('input[@name=delete]').check(\$(this).attr('checked'));
   });
 
+
+  if ( navigator.userAgent.indexOf("Konqueror") != -1 ) {
+        \$("th.filter_popup > div").css("display", "block");
+        \$("th.filter_popup > div").hide();
+   }
+   
   \$("th.filter_popup > a").click(function(){
-	\$(this).next().popupUnique(function(data){data.fadeIn('normal')}, function(data){data.fadeOut('normal')});
+	\$(this).next().popupUnique(function(data){data.show()}, function(data){data.hide()})
+	return false;
   });
 
   \$("input[@name=auto_apply_value], input[@type=submit]").focus(function(){
-	autorefresh_possible = false;	
+	autorefresh_possible = false;
   });
 
   \$("input[@name=auto_apply_value]").blur(function(){
