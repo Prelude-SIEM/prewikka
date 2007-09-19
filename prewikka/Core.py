@@ -306,6 +306,13 @@ class Core:
             
         return user
         
+    def prepareError(self, e, request, user, login, view):
+        self._env.log.error("%s" % str(e), request, login)
+        error = Error.PrewikkaUserError("Prewikka internal error", str(e),
+                                        display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
+        self._setupDataSet(error.dataset, request, user, view=view)
+        return error
+            
     def process(self, request):
         login = None
         view = None
@@ -332,7 +339,7 @@ class Core:
             template_name = view["template"]
 
             self._cleanupView(view_object)
-            
+              
         except Error.PrewikkaUserError, e:
             if e._log_priority:
                 self._env.log.log(e._log_priority, "%s" % str(e), request=request, user=login or e._log_user)
@@ -341,10 +348,7 @@ class Core:
             dataset, template_name = e.dataset, e.template
                     
         except Exception, e:
-            self._env.log.error("%s" % str(e), request, login)
-            error = Error.PrewikkaUserError("Prewikka internal error", str(e),
-                                            display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
-            self._setupDataSet(error.dataset, request, user, view=view)
+            error = self.prepareError(e, request, user, login, view)
             dataset, template_name = error.dataset, error.template
         
         #self._printDataSet(dataset)
@@ -353,6 +357,12 @@ class Core:
         # We check the character set after loading the template, 
         # since the template might trigger a language change.
         dataset["document.charset"] = localization.getCurrentCharset()
-        
-        request.content = str(template)
+       
+        try:
+                request.content = str(template)
+        except Exception, e:
+            error = self.prepareError(e, request, user, login, view)
+            request.content = str(load_template(error.template, error.dataset))
+            
         request.sendResponse()
+
