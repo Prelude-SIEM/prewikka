@@ -24,11 +24,12 @@ class AnonymousAuth(Auth.Auth):
     def __init__(self, env):
         Auth.Auth.__init__(self, env)
 
-        self._permissions = User.ALL_PERMISSIONS[:]
-        self._permissions.remove(User.PERM_USER_MANAGEMENT)
-
         if not self.db.hasUser("anonymous"):
             self.db.createUser("anonymous")
+
+        self._permissions = User.ALL_PERMISSIONS[:]
+        self._permissions.remove(User.PERM_USER_MANAGEMENT)
+        self.db.setPermissions("anonymous", self._permissions)
 
     def getUser(self, request):
         return User.User(self.db, "anonymous", self.db.getLanguage("anonymous"), self._permissions, self.db.getConfiguration("anonymous"))
