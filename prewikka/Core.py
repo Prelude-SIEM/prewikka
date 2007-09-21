@@ -253,7 +253,7 @@ class Core:
         if view_name and self._view_to_section.has_key(view_name):
             active_section = self._view_to_section[view_name]
             active_tab = self._view_to_tab[view_name]
-            tabs = section_to_tabs[active_section]
+            tabs = section_to_tabs.get(active_section, [])
 
         else:
             active_section, tabs, active_tab = "", [ ], ""
