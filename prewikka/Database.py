@@ -55,6 +55,12 @@ class DatabaseInvalidFilterError(_DatabaseInvalidError):
 class DatabaseSchemaError(Exception):
     pass       
 
+
+def get_timestamp(s):
+    return s and time.mktime(time.strptime(s, "%Y-%m-%d %H:%M:%S")) or None
+
+
+
 class Database:
     required_version = "0.9.11"
     
@@ -148,6 +154,8 @@ class Database:
         return preludedb_sql_escape(self._sql, data)
 
     def datetime(self, t):
+        if t is None:
+            return "NULL"
         return "'" + utils.time_to_ymdhms(time.localtime(t)) + "'"
 
     def hasUser(self, login):
@@ -252,9 +260,7 @@ class Database:
 
         login, t = rows[0]
 
-        t = time.mktime(time.strptime(t, "%Y-%m-%d %H:%M:%S"))
-
-        return login, t
+        return login, get_timestamp(t)
 
     def deleteSession(self, sessionid):
         self.query("DELETE FROM Prewikka_Session WHERE sessionid = %s" % self.escape(sessionid))
