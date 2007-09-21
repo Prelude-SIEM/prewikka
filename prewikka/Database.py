@@ -86,7 +86,7 @@ class Database:
         try:
             version = self.query("SELECT version FROM Prewikka_Version")[0][0]
         except PreludeDBError, e:
-            raise DatabaseSchemaError(_("The Prewikka database does not seem to have been created"))
+            raise DatabaseSchemaError(str(e))
            
         if version != self.required_version:
             d = { "version": version, "reqversion": self.required_version }
