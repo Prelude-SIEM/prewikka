@@ -50,18 +50,18 @@ class Auth:
     def __init__(self, env):
         self.db = env.db
         self.log = env.log
-        
+
         has_user_manager = False
         for login in self.db.getUserLogins():
             permissions = self.db.getPermissions(login)
             if User.PERM_USER_MANAGEMENT in permissions:
                 has_user_manager = True
                 break
-        
+
         if not has_user_manager:
             self.db.createUser(User.ADMIN_LOGIN)
             self.db.setPermissions(User.ADMIN_LOGIN, User.ALL_PERMISSIONS)
-        
+
     def canSetPassword(self):
         return hasattr(self, "setPassword")
 
@@ -76,11 +76,11 @@ class Session:
 
     def setSession(self, request, sessionid):
         request.addCookie("sessionid", sessionid, self._expiration * 3)
-    
+
     def checkSession(self, request):
         if not request.input_cookie.has_key("sessionid"):
             raise AuthSessionInvalid()
-        
+
         sessionid = request.input_cookie["sessionid"].value
 
         try:
@@ -125,7 +125,7 @@ class LoginPasswordAuth(Auth, Session):
                 del request.arguments["_password"]
             except KeyError:
                 pass
-        
+
             try:
                 self.checkPassword(login, password)
             except AuthError, e:
