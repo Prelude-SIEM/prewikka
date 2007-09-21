@@ -34,11 +34,11 @@ class Logout(view.View):
     view_name = "logout"
     view_parameters = view.Parameters
     view_permissions = [ ]
-                
+
     def render(self):
         self.env.auth.logout(self.request)
-                    
-                    
+
+
 def init_dataset(dataset, config, request):
     interface = config.interface
     dataset["document.title"] = "[PREWIKKA]"
@@ -55,7 +55,7 @@ def init_dataset(dataset, config, request):
         dataset["prewikka.external_link_target"] = "_blank"
     else:
         dataset["prewikka.external_link_target"] = "_self"
-            
+
     qstring = request.getQueryString()
     if qstring[0:2] == "/?":
         qstring = qstring[2:]
@@ -68,23 +68,23 @@ def init_dataset(dataset, config, request):
         referer = referer[idx + 1:]
         if referer[0:1] == "?":
             referer = referer[1:]
-        
+
     dataset["prewikka.url.referer"] = referer
-    
+
     dataset["arguments"] = []
     for name, value in request.arguments.items():
         if name in ("_login", "_password"):
             continue
-                
+
         if name == "view" and value == "logout":
             continue
-        
+
         dataset["arguments"].append((name, value))
-            
-            
+
+
 def load_template(name, dataset):
     template = getattr(__import__("prewikka.templates." + name, globals(), locals(), [ name ]), name)(filtersLib=CheetahFilters)
-        
+
     for key, value in dataset.items():
         setattr(template, key, value)
 
@@ -102,7 +102,7 @@ else:
     _core_cache_lock = threading.Lock()
 
 
-def get_core_from_config(path, threaded=False):    
+def get_core_from_config(path, threaded=False):
     global _core_cache
 
     if not path:
@@ -110,13 +110,13 @@ def get_core_from_config(path, threaded=False):
 
     if _has_threads and threaded:
         _core_cache_lock.acquire()
-    
+
     if not _core_cache.has_key(path):
         _core_cache[path] = Core(path)
 
     if _has_threads and threaded:
         _core_cache_lock.release()
-    
+
     return _core_cache[path]
 
 
@@ -132,34 +132,34 @@ class Core:
         self._env.default_locale = self._env.config.general.getOptionValue("default_locale", None)
         preludedb.preludedb_init()
 
-        self._database_schema_error = None        
+        self._database_schema_error = None
         try:
             self._initDatabase()
         except Database.DatabaseSchemaError, e:
             self._database_schema_error = e
             return
-            
+
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
         self._env.log = Log.Log(self._env.config)
         self._initHostCommands()
         self._loadViews()
         self._loadModules()
         self._initAuth()
-                
+
     def _initDatabase(self):
         config = { }
         for key in self._env.config.database.keys():
             config[key] = self._env.config.database.getOptionValue(key)
 
         self._env.db = Database.Database(config)
-            
+
     def _initHostCommands(self):
         self._env.host_commands = { }
-        
+
         for option in self._env.config.host_commands.getOptions():
             if os.access(option.value.split(" ")[0], os.X_OK):
                 self._env.host_commands[option.name] = option.value
-        
+
     def _initAuth(self):
         if self._env.auth.canLogout():
             self._views.update(Logout().get())
@@ -167,18 +167,18 @@ class Core:
     def _loadViews(self):
         self._view_to_tab = { }
         self._view_to_section = { }
-        
-        for section, tabs in (prewikka.views.events_section, prewikka.views.agents_section, 
+
+        for section, tabs in (prewikka.views.events_section, prewikka.views.agents_section,
                               prewikka.views.settings_section, prewikka.views.about_section):
             for tab, views in tabs:
                 for view in views:
                     self._view_to_tab[view] = tab
                     self._view_to_section[view] = section
-                    
+
         self._views = { }
         for object in prewikka.views.objects:
             self._views.update(object.get())
-        
+
     def _loadModule(self, type, name, config):
         module = __import__("prewikka.modules.%s.%s.%s" % (type, name, name), globals(), locals(), [ name ])
         return module.load(self._env, config)
@@ -196,7 +196,7 @@ class Core:
         if not object.view_initialized:
             object.init(self._env)
             object.view_initialized = True
-        
+
         object = copy.copy(object)
 
         object.request = request
@@ -206,17 +206,17 @@ class Core:
         object.env = self._env
 
         return object
-    
+
     def _cleanupView(self, view):
         del view.request
         del view.parameters
         del view.user
         del view.dataset
         del view.env
-        
+
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
         init_dataset(dataset, self._env.config, request)
-       
+
         is_anon = isinstance(self._env.auth, Auth.AnonymousAuth)
         sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.settings_section, \
                    prewikka.views.about_section
@@ -224,49 +224,49 @@ class Core:
         section_to_tabs = { }
         dataset["interface.sections"] = [ ]
         for section_name, tabs in sections:
-            first_tab = None   
-   
+            first_tab = None
+
             for tab_name, views in tabs:
                 view_name = views[0]
-        
+
                 if is_anon and tab_name == "Users":
                     continue
-        
+
                 if not user or is_anon or user.has(self._views[view_name]["permissions"]):
                     if not first_tab:
                         first_tab = view_name
                         section_to_tabs[section_name] = []
-                    
+
                     section_to_tabs[section_name] += [ ((tab_name, utils.create_link(views[0]))) ]
-                    
+
             if first_tab:
                 dataset["interface.sections"].append( (section_name, utils.create_link(first_tab)) )
-    
- 
+
+
         if isinstance(parameters, prewikka.view.RelativeViewParameters) and parameters.has_key("origin"):
             view_name = parameters["origin"]
         elif view:
             view_name = view["name"]
         else:
             view_name = None
-        
+
         if view_name and self._view_to_section.has_key(view_name):
             active_section = self._view_to_section[view_name]
             active_tab = self._view_to_tab[view_name]
             tabs = section_to_tabs[active_section]
-        
+
         else:
             active_section, tabs, active_tab = "", [ ], ""
 
         dataset["interface.tabs"] = tabs
         dataset["prewikka.user"] = user
-        
+
         if user:
             if is_anon:
                 dataset["prewikka.userlink"] = "<b>%s</b>" % utils.escape_html_string(_(user.login))
             else:
                 dataset["prewikka.userlink"] = "<b><a href=\"%s\">%s</a></b>" % (utils.create_link("user_settings_display"), utils.escape_html_string(user.login))
-            
+
         dataset["interface.active_tab"] = active_tab
         dataset["interface.active_section"] = active_section
         dataset["prewikka.logout_link"] = (user and self._env.auth.canLogout()) and utils.create_link("logout") or None
@@ -279,7 +279,7 @@ class Core:
                 self._printDataSet(value, level + 1)
             else:
                 print "%s: %s" % (key, value)
-                    
+
     def _checkPermissions(self, request, view, user):
         if user and view.has_key("permissions"):
             if not user.has(view["permissions"]):
@@ -290,7 +290,7 @@ class Core:
         parameters.normalize(view["name"], user)
 
         return parameters
-        
+
     def _getView(self, request, user):
         name = request.getView()
         try:
@@ -303,16 +303,16 @@ class Core:
         user = self._env.auth.getUser(request)
         if not user.language and self._env.default_locale:
             user.setLanguage(self._env.default_locale)
-            
+
         return user
-        
+
     def prepareError(self, e, request, user, login, view):
         self._env.log.error("%s" % str(e), request, login)
         error = Error.PrewikkaUserError("Prewikka internal error", str(e),
                                         display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
         self._setupDataSet(error.dataset, request, user, view=view)
         return error
-            
+
     def process(self, request):
         login = None
         view = None
@@ -320,7 +320,7 @@ class Core:
         try:
             if self._database_schema_error != None:
                 raise Error.PrewikkaUserError("Database error", self._database_schema_error)
-                
+
             user = self.checkAuth(request)
             login = user.login
             view = self._getView(request, user)
@@ -328,41 +328,41 @@ class Core:
             self._checkPermissions(request, view, user)
             parameters = self._getParameters(request, view, user)
             view_object = self._setupView(view, request, parameters, user)
-            
+
             if not isinstance(view_object, Logout):
                 self._env.log.info("Loading view", request, user.login)
-            
+
             getattr(view_object, view["handler"])()
             self._setupDataSet(view_object.dataset, request, user, view, parameters)
-            
+
             dataset = view_object.dataset
             template_name = view["template"]
 
             self._cleanupView(view_object)
-              
+
         except Error.PrewikkaUserError, e:
             if e._log_priority:
                 self._env.log.log(e._log_priority, "%s" % str(e), request=request, user=login or e._log_user)
-                
+
             self._setupDataSet(e.dataset, request, user, view=view)
             dataset, template_name = e.dataset, e.template
-                    
+
         except Exception, e:
             error = self.prepareError(e, request, user, login, view)
             dataset, template_name = error.dataset, error.template
-        
+
         #self._printDataSet(dataset)
         template = load_template(template_name, dataset)
 
-        # We check the character set after loading the template, 
+        # We check the character set after loading the template,
         # since the template might trigger a language change.
         dataset["document.charset"] = localization.getCurrentCharset()
-       
+
         try:
                 request.content = str(template)
         except Exception, e:
             error = self.prepareError(e, request, user, login, view)
             request.content = str(load_template(error.template, error.dataset))
-            
+
         request.sendResponse()
 
