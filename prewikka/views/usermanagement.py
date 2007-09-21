@@ -45,7 +45,7 @@ class UserSettingsModifyParameters(UserSettingsDisplayParameters):
 class UserDeleteParameters(view.Parameters):
     def register(self):
         self.optional("users", list, [ ])
-    
+
 
 
 class UserListing(view.View):
@@ -56,7 +56,7 @@ class UserListing(view.View):
 
     def hasPermission(self, perm, permlist):
         return perm in permlist
-        
+
     def render(self):
         self.dataset["add_form_hiddens"] = [("view", "user_add_form")]
         self.dataset["permissions"] = User.ALL_PERMISSIONS
@@ -67,12 +67,12 @@ class UserListing(view.View):
         logins.sort()
         for login in logins:
             permissions = self.env.db.getPermissions(login)
-            
+
             tmp = { }
             tmp["login"] = login
             tmp["settings_link"] = utils.create_link("user_settings_display", { "login": login, "origin": self.view_name })
             tmp["permissions"] = map(lambda perm: self.hasPermission(perm, permissions), User.ALL_PERMISSIONS)
-            
+
             self.dataset["users"].append(tmp)
 
 
@@ -89,14 +89,14 @@ class UserAddForm(view.View):
         self.dataset["user.permissions"] = []
         for perm in User.ALL_PERMISSIONS:
             self.dataset["user.permissions"] += [(perm, False)]
-        
+
         self.dataset["errmsg"] = errmsg
         self.dataset["can_manage_user"] = self.user.has(User.PERM_USER_MANAGEMENT)
         self.dataset["can_change_password"] = self.env.auth.canSetPassword()
         self.dataset["ask_current_password"] = False
         self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
         self.dataset["user.language"] = localization._DEFAULT_LANGUAGE
-        
+
         self.dataset["hiddens"] = [ ("view", "user_add") ]
         self.dataset["properties"] = [ utils.text_property("Login", "login") ]
         if self.env.auth.canSetPassword():
@@ -114,7 +114,7 @@ class UserDelete(UserListing):
     def render(self):
         for user in self.parameters["users"]:
             self.env.db.deleteUser(user)
-        
+
         self.parameters.clear()
         UserListing.render(self)
 
@@ -129,7 +129,7 @@ class UserSettingsDisplay(view.View):
     def render(self):
         login = self.parameters.get("login", self.user.login)
 
-        if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):            
+        if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):
             raise Error.PrewikkaUserError("Permission Denied", "Access denied to other users settings", log=Log.WARNING)
 
         self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
@@ -143,7 +143,7 @@ class UserSettingsDisplay(view.View):
 
         if self.parameters.has_key("origin"):
             self.dataset["user.origin"] = self.parameters["origin"]
-        
+
         permissions = self.env.db.getPermissions(login)
         for perm in User.ALL_PERMISSIONS:
             self.dataset["user.permissions"].append((perm, perm in permissions))
@@ -157,24 +157,24 @@ class UserSettingsModify(UserSettingsDisplay):
 
     def render(self):
         login = self.parameters.get("login", self.user.login)
-        
-        if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):            
+
+        if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):
             raise Error.PrewikkaUserError("Permission Denied", "Cannot modify other users settings", log=Log.WARNING)
-        
+
         if self.user.has(User.PERM_USER_MANAGEMENT):
             self.env.db.setPermissions(login, self.parameters["permissions"])
             if login == self.user.login:
                 self.user.permissions = self.parameters["permissions"]
-        
+
         lang = self.parameters["language"]
         if not lang in localization.getLanguagesIdentifiers():
             raise Error.PrewikkaUserError("Invalid Language", "Specified language does not exist", log=Log.WARNING)
-        
+
         if login == self.user.login:
             self.user.setLanguage(lang)
-        
+
         self.env.db.setLanguage(login, lang)
-                    
+
         if self.parameters.has_key("password_new") and self.parameters.has_key("password_new_confirmation"):
             if login == self.user.login:
                 try:
@@ -189,11 +189,11 @@ class UserSettingsModify(UserSettingsDisplay):
 
         origin = self.parameters.get("origin", None)
         self.parameters.clear()
-        
+
         if origin:
             self.parameters["origin"] = origin
         self.parameters["login"] = login
-        
+
         return UserSettingsDisplay.render(self)
 
 class UserSettingsAdd(UserSettingsModify, UserAddForm):
