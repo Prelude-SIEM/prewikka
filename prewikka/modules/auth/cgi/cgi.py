@@ -18,21 +18,38 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import os
-
 from prewikka import Auth, User, Database
 
 
 class CGIAuth(Auth.Auth):
+    def __init__(self, env, config):
+        Auth.Auth.__init__(self, env)
+
+        default_admin_user = config.getOptionValue("default_admin_user", None)
+        if default_admin_user != None:
+            if not self.db.hasUser(default_admin_user):
+                self.db.createUser(default_admin_user)
+
+            self.db.setPermissions(default_admin_user, User.ALL_PERMISSIONS)
+
+    def deleteUser(self, login):
+        self.db.deleteUser(login)
+
     def getUser(self, request):
-	user = request.getRemoteUser()        
-    	if not user:
-	    raise Auth.AuthError(message=_("CGI Authentication failed: no user specified."))
-        
-        return User.User(self.db, user, self.db.getLanguage(user), User.ALL_PERMISSIONS, self.db.getConfiguration(user))
+        user = request.getRemoteUser()
+        if not user:
+            raise Auth.AuthError(message=_("CGI Authentication failed: no user specified."))
+
+        # Create the user in the Prewikka database, so that its permission
+        # might be modified by another administrative user.
+        if not self.db.hasUser(user):
+            self.db.createUser(user)
+
+        return self.db.getUser(user)
 
 
 
 def load(env, config):
-    return CGIAuth(env)
+    return CGIAuth(env, config)
 
 

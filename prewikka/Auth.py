@@ -46,30 +46,6 @@ class AuthSessionExpired(AuthError):
 
 
 
-class Auth:
-    def __init__(self, env):
-        self.db = env.db
-        self.log = env.log
-
-        has_user_manager = False
-        for login in self.db.getUserLogins():
-            permissions = self.db.getPermissions(login)
-            if User.PERM_USER_MANAGEMENT in permissions:
-                has_user_manager = True
-                break
-
-        if not has_user_manager:
-            self.db.createUser(User.ADMIN_LOGIN)
-            self.db.setPermissions(User.ADMIN_LOGIN, User.ALL_PERMISSIONS)
-
-    def canSetPassword(self):
-        return hasattr(self, "setPassword")
-
-    def canLogout(self):
-        return hasattr(self, "logout")
-
-
-
 class Session:
     def __init__(self, expiration):
         self._expiration = expiration
@@ -110,6 +86,29 @@ class Session:
         self.db.deleteSession(request.input_cookie["sessionid"].value)
 
 
+class Auth:
+    def __init__(self, env):
+        self.db = env.db
+        self.log = env.log
+
+    def canCreateUser(self):
+        return hasattr(self, "createUser")
+
+    def canDeleteUser(self):
+        return hasattr(self, "deleteUser")
+
+    def canSetPassword(self):
+        return hasattr(self, "setPassword")
+
+    def canLogout(self):
+        return hasattr(self, "logout")
+
+    def getUserLogins(self):
+        return self.db.getUserLogins()
+
+    def getUser(self, request):
+        pass
+
 
 class LoginPasswordAuth(Auth, Session):
     def __init__(self, env, session_expiration):
@@ -126,11 +125,7 @@ class LoginPasswordAuth(Auth, Session):
             except KeyError:
                 pass
 
-            try:
-                self.checkPassword(login, password)
-            except AuthError, e:
-                raise AuthError(message=_("Username and password do not match."), log_user=login)
-
+            self.checkPassword(login, password)
             self.createSession(request, login)
             self.log.info("User login", request, login)
         else:
@@ -143,9 +138,3 @@ class LoginPasswordAuth(Auth, Session):
         self.deleteSession(request)
 
         raise AuthSessionInvalid(message=_("Logged out"), login=login, log=Log.INFO)
-
-
-
-class AnonymousAuth(Auth):
-    def getUser(self, request):
-        return User.User(self.db, _("anonymous"), self.db.getLanguage("anonymous"), User.ALL_PERMISSIONS, self.db.getConfiguration("anonymous"))

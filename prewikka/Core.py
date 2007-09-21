@@ -189,7 +189,7 @@ class Core:
         if config.auth:
             self._env.auth = self._loadModule("auth", config.auth.name, config.auth)
         else:
-            self._env.auth = Auth.AnonymousAuth(self._env)
+            self._env.auth = self._loadModule("auth", "anonymous", config.auth)
 
     def _setupView(self, view, request, parameters, user):
         object = view["object"]
@@ -217,7 +217,6 @@ class Core:
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
         init_dataset(dataset, self._env.config, request)
 
-        is_anon = isinstance(self._env.auth, Auth.AnonymousAuth)
         sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.settings_section, \
                    prewikka.views.about_section
 
@@ -229,10 +228,7 @@ class Core:
             for tab_name, views in tabs:
                 view_name = views[0]
 
-                if is_anon and tab_name == "Users":
-                    continue
-
-                if not user or is_anon or user.has(self._views[view_name]["permissions"]):
+                if not user or user.has(self._views[view_name]["permissions"]):
                     if not first_tab:
                         first_tab = view_name
                         section_to_tabs[section_name] = []
@@ -262,10 +258,7 @@ class Core:
         dataset["prewikka.user"] = user
 
         if user:
-            if is_anon:
-                dataset["prewikka.userlink"] = "<b>%s</b>" % utils.escape_html_string(_(user.login))
-            else:
-                dataset["prewikka.userlink"] = "<b><a href=\"%s\">%s</a></b>" % (utils.create_link("user_settings_display"), utils.escape_html_string(user.login))
+            dataset["prewikka.userlink"] = "<b><a href=\"%s\">%s</a></b>" % (utils.create_link("user_settings_display"), utils.escape_html_string(user.login))
 
         dataset["interface.active_tab"] = active_tab
         dataset["interface.active_section"] = active_section

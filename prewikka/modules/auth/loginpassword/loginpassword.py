@@ -19,28 +19,46 @@
 
 
 import md5
-
 from prewikka import Auth, User, Database
 
 
 class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
     def __init__(self, env, config):
-        Auth.LoginPasswordAuth.__init__(self, env,
-                                        int(config.getOptionValue("expiration", 60)) * 60)
-        
-        if (self.db.hasUser(User.ADMIN_LOGIN) and not self.db.hasPassword(User.ADMIN_LOGIN)):
-            self.setPassword(User.ADMIN_LOGIN, User.ADMIN_LOGIN)
-        
+        expiration = int(config.getOptionValue("expiration", 60)) * 60
+        Auth.LoginPasswordAuth.__init__(self, env, expiration)
+
+        has_user_manager = False
+        for login in self.getUserLogins():
+            permissions = self.db.getPermissions(login)
+            if User.PERM_USER_MANAGEMENT in permissions:
+                has_user_manager = True
+                break
+
+        if not has_user_manager:
+            if not self.db.hasUser(User.ADMIN_LOGIN):
+                self.db.createUser(User.ADMIN_LOGIN)
+
+            if not self.db.hasPassword(User.ADMIN_LOGIN):
+                self.setPassword(User.ADMIN_LOGIN, User.ADMIN_LOGIN)
+
+            self.db.setPermissions(User.ADMIN_LOGIN, User.ALL_PERMISSIONS)
+
     def _hash(self, data):
         return md5.new(data).hexdigest()
-    
+
+    def createUser(self, login):
+        return self.db.createUser(login)
+
+    def deleteUser(self, login):
+        return self.db.deleteUser(login)
+
     def checkPassword(self, login, password):
         try:
             real_password = self.db.getPassword(login)
         except Database.DatabaseError:
             raise Auth.AuthError()
-        
-        if self._hash(password) != real_password:
+
+        if real_password == None or self._hash(password) != real_password:
             raise Auth.AuthError()
 
     def setPassword(self, login, password):
