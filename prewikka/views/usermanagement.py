@@ -87,6 +87,7 @@ class UserAddForm(view.View):
 
     def render(self, errmsg=None):
         self.dataset["user.login"] = None
+        self.dataset["user.origin"] = "user_listing"
 
         self.dataset["user.permissions"] = []
         for perm in User.ALL_PERMISSIONS:
