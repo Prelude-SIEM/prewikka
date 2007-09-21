@@ -58,12 +58,14 @@ class UserListing(view.View):
         return perm in permlist
 
     def render(self):
+        self.dataset["backend_can_create"] = self.env.auth.canCreateUser()
+        self.dataset["backend_can_delete"] = self.env.auth.canDeleteUser()
         self.dataset["add_form_hiddens"] = [("view", "user_add_form")]
         self.dataset["permissions"] = User.ALL_PERMISSIONS
         self.dataset["can_set_password"] = self.env.auth and self.env.auth.canSetPassword()
         self.dataset["users"] = [ ]
 
-        logins = self.env.db.getUserLogins()
+        logins = self.env.auth.getUserLogins()
         logins.sort()
         for login in logins:
             permissions = self.env.db.getPermissions(login)
@@ -104,7 +106,6 @@ class UserAddForm(view.View):
                                                utils.password_property("Password confirmation", "password2")))
         for perm in User.ALL_PERMISSIONS:
             self.dataset["properties"].append(utils.boolean_property(perm, perm))
-
 
 
 class UserDelete(UserListing):

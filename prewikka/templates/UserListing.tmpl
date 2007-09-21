@@ -34,12 +34,17 @@
 
   <tr>
     <td colspan="$perm_cnt" style="text-align: right;">
+#if $backend_can_delete
      <input style="float: right;" type="submit" value="$_("Delete user")"/></form>
+#end if
 
+#if $backend_can_create
      <form action="?" method="get">
       <input type="hidden" name="view" value="user_add_form"/>
       <input style="float: left;" type="submit" value="$_("Create user")"/>
      </form>
+#end if
+
     </td>
   </tr>
 
