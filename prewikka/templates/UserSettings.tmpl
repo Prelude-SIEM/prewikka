@@ -22,12 +22,11 @@
 
 <form id="usersettings" action="?" method="post">
 #if $user.login
+<input type="hidden" name="login" value="$user.login"/>
 <input type="hidden" name="view" value="user_settings_modify"/>
 #else
 <input type="hidden" name="view" value="user_settings_add"/>
 #end if
-
-<input type="hidden" name="login" value="$user.login"/>
 
 #if $user.origin
 <input type="hidden" name="origin" value="$user.origin" />
