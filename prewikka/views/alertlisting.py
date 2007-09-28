@@ -913,6 +913,10 @@ class AlertListing(MessageListing, view.View):
         selection = [ "%s/group_by" % path for path in ag_list ] + \
                     [ "count(alert.create_time)", "max(alert.create_time)/order_desc" ]
 
+        use_sensor_localtime = self.parameters["timezone"] == "sensor_localtime"
+        if not use_sensor_localtime:
+            selection += [ "min(alert.create_time)" ]
+
         results = self.env.idmef_db.getValues(selection, criteria)
         total_results = len(results)
 
@@ -946,7 +950,6 @@ class AlertListing(MessageListing, view.View):
 
 
             aggregated_count = values[start]
-            time_min = values[start + 1]
 
             criteria2 = criteria[:]
             delete_criteria = [ ]
@@ -976,8 +979,12 @@ class AlertListing(MessageListing, view.View):
                 criteria2.append(criterion)
                 delete_criteria.append(criterion)
 
-            time_min = self.env.idmef_db.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
-            time_max = self.env.idmef_db.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
+            if use_sensor_localtime:
+                time_min = self.env.idmef_db.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
+                time_max = self.env.idmef_db.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
+            else:
+                time_max = values[start + 1]
+                time_min = values[start + 2]
 
             parameters = self._createAggregationParameters(aggregated_classification_values,
                                                            aggregated_source_values, aggregated_target_values, aggregated_analyzer_values)
