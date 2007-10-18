@@ -1,3 +1,42 @@
+* 2007-10-18, prewikka-0.9.13:
+
+- Only perform additional database request when using Sensor localtime:
+  this bring a performance improvement of about 36% on aggregated query,
+  when using either frontend localtime (the default), or UTC time. 
+
+- JQuery support: Port most of the javascript code to make use of JQuery.
+  Add show/hide effect to CSS popup. More filtering functionality in the
+  SensorListing view.  
+
+- Cleanup the Authentication class, so that uper Prewikka layer can act
+  depending whether the backend support user creation / deletion. Anonymous
+  authentication is nowa plugin.
+
+- Better integration of CGI authentication allowing user listing and deletion.
+
+- Report template exception directly to the user.              
+
+- Fix exception if an alert analyzer name is empty.
+
+- Fix problem when adding new Prewikka users (#262).
+
+- Fix exception when user has no permission set.
+
+- When changing password, we didn't try to match an empty 'current password'
+  (which is a minor issue since the user is already authenticated). Thanks
+  to Helmut Azbest <helmut.azbest@gmail.com> for the fix.
+
+- Fix a typo making mod_python use the parent method (patch from 
+  Helmut Azbest <helmut.azbest@gmail.com>).
+
+- In the configuration file, recognize section even if there are whitespace 
+  at the beginning of the line. 
+
+- Localization fixes, by Sebastien Tricaud <toady@gscore.org>, and
+  Bjoern Weiland.
+
+
+
 * 2007-08-02, prewikka-0.9.12.1:
 
 - Fix a template compilation problem with certain version of Cheetah
