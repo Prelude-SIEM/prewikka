@@ -69,6 +69,7 @@ _LANGUAGES = {
                "Español": "es",
                "English": "en", 
                "Français": "fr", 
+               "Polski": "pl",
                "Portuguese (Brazilian)": "pt_BR",
                "Русский": "ru"
              }
