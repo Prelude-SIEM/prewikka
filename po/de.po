@@ -43,7 +43,7 @@ msgstr "Authentifizierung fehlgeschlagen"
 
 #: prewikka/Auth.py:38
 msgid "Invalid session"
-msgstr ""
+msgstr "Session ungültig"
 
 #: prewikka/Auth.py:44
 msgid "Session expired"
@@ -60,7 +60,7 @@ msgstr "Parameter-Normalisierung fehlgeschlagen"
 #: prewikka/Filter.py:78
 #, python-format
 msgid "Invalid filter element '%s' referenced from filter formula"
-msgstr "UngÃ¼ltiges Filterelement '%s' von Filterformel referenziert"
+msgstr "Ungültiges Filterelement '%s' von Filterformel referenziert"
 
 #: prewikka/localization.py:117
 msgid "January"
@@ -72,7 +72,7 @@ msgstr "Februar"
 
 #: prewikka/localization.py:119
 msgid "March"
-msgstr "MÃ¤rz"
+msgstr "März"
 
 #: prewikka/localization.py:120
 msgid "April"
@@ -156,7 +156,7 @@ msgstr "Sichern"
 #: prewikka/templates/MessageListing.py:373
 #: prewikka/templates/FilterEdition.py:231
 msgid "Delete"
-msgstr "LÃ¶schen"
+msgstr "Löschen"
 
 #: prewikka/views/messagesummary.py:303 prewikka/views/messagesummary.py:452
 #: prewikka/views/messagesummary.py:675 prewikka/views/messagesummary.py:692
@@ -172,7 +172,7 @@ msgstr "Code"
 
 #: prewikka/views/messagesummary.py:305
 msgid "Data length"
-msgstr "DatenlÃ¤nge"
+msgstr "Datenlänge"
 
 #: prewikka/views/messagesummary.py:306
 msgid "Data"
@@ -269,7 +269,7 @@ msgstr "Wert"
 
 #: prewikka/views/messagesummary.py:553 prewikka/views/messagesummary.py:574
 msgid "Header length"
-msgstr "Header LÃ¤nge"
+msgstr "Headerlänge"
 
 #: prewikka/views/messagesummary.py:554
 msgid "TOS"
@@ -277,7 +277,7 @@ msgstr "TOS"
 
 #: prewikka/views/messagesummary.py:555 prewikka/views/messagesummary.py:593
 msgid "Length"
-msgstr "LÃ¤nge"
+msgstr "Länge"
 
 #: prewikka/views/messagesummary.py:556 prewikka/views/messagesummary.py:602
 msgid "Id"
@@ -299,7 +299,7 @@ msgstr "Protokoll"
 #: prewikka/views/messagesummary.py:563 prewikka/views/messagesummary.py:585
 #: prewikka/views/messagesummary.py:594 prewikka/views/messagesummary.py:601
 msgid "Checksum"
-msgstr "PrÃ¼fsumme"
+msgstr "Prüfsumme"
 
 #: prewikka/views/messagesummary.py:564
 msgid "Source address"
@@ -376,7 +376,7 @@ msgstr "Payload"
 
 #: prewikka/views/messagesummary.py:655
 msgid "Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'"
-msgstr "UngÃ¼ltiges 'analyzerid:messageid' Paar, '%(analyzerid):%(messageid)'"
+msgstr "Ungültiges 'analyzerid:messageid' Paar, '%(analyzerid):%(messageid)'"
 
 #: prewikka/views/messagesummary.py:673 prewikka/views/messagesummary.py:949
 #: prewikka/views/alertlisting.py:599
@@ -446,11 +446,11 @@ msgstr "Rechte:"
 
 #: prewikka/views/messagesummary.py:816
 msgid "Change time"
-msgstr "Ã„nderungszeit"
+msgstr "Änderungszeit"
 
 #: prewikka/views/messagesummary.py:817
 msgid "Inode Number"
-msgstr "Inode NUmmer"
+msgstr "Inode Nummer"
 
 #: prewikka/views/messagesummary.py:818
 msgid "Major device"
@@ -479,7 +479,7 @@ msgstr "Pfad"
 
 #: prewikka/views/messagesummary.py:831
 msgid "Modify time"
-msgstr "Ã„nderungsdatum"
+msgstr "Änderungsdatum"
 
 #: prewikka/views/messagesummary.py:832
 msgid "Access time"
@@ -487,11 +487,11 @@ msgstr "Zugriffsdatum"
 
 #: prewikka/views/messagesummary.py:833
 msgid "Data size"
-msgstr "DatengrÃ¶ÃŸe"
+msgstr "Datengröße"
 
 #: prewikka/views/messagesummary.py:834
 msgid "Disk size"
-msgstr "PlattengrÃ¶ÃŸe"
+msgstr "Plattengröße"
 
 #: prewikka/views/messagesummary.py:853
 msgid "Web Service"
@@ -653,7 +653,7 @@ msgstr "Filter"
 
 #: prewikka/views/__init__.py:54
 msgid "My account"
-msgstr "Meni Konto"
+msgstr "Mein Konto"
 
 #: prewikka/views/__init__.py:57
 #, fuzzy
@@ -662,7 +662,7 @@ msgstr "Alarm-Liste"
 
 #: prewikka/views/__init__.py:61
 msgid "About"
-msgstr "Ãœber"
+msgstr "Über"
 
 #: prewikka/modules/auth/cgi/cgi.py:41
 msgid "CGI Authentication failed: no user specified."
@@ -672,8 +672,8 @@ msgstr "CGI Authentifizierung fehlgeschlagen: Kein Benutzer angegeben."
 #, python-format
 msgid "%d Node"
 msgid_plural "%d Nodes"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%d Knoten"
+msgstr[1] "%d Knoten"
 
 #: prewikka/templates/SensorListing.py:230
 #, python-format
@@ -720,9 +720,8 @@ msgid "Address information"
 msgstr "Adress Informationen"
 
 #: prewikka/templates/SensorListing.py:335
-#, fuzzy
 msgid "Total:"
-msgstr "Total"
+msgstr "Total:"
 
 #: prewikka/templates/SensorListing.py:398
 msgid "Last heartbeat"
@@ -750,8 +749,8 @@ msgid ""
 "around the world, to improve and strengthen the security of their systems "
 "and networks."
 msgstr ""
-"bietet UnterstÃ¼tzung fÃ¼r GroÃŸanbieter, Unternehmen und RegierungsbehÃ¶rden "
-"weltweit, um System- und Netzsicherheit zu stÃ¤rken und zu verbessern."
+"bietet Unterstützung für Großanbieter, Unternehmen und Regierungsbeörden "
+"weltweit, um System- und Netzsicherheit zu särken und zu verbessern."
 
 #: prewikka/templates/About.py:129
 msgid "Customizing Prelude"
@@ -770,14 +769,14 @@ msgid ""
 "operating systems."
 msgstr ""
 "Im Geiste der Open Source Community ermuntern wir Sie, zu der Entwicklung "
-"unserer Anwendung beizutragen. Sie kÃ¶nnen individuelle Versionen von Prelude "
-"bestellen, um Ihren AnsprÃ¼chen gerecht zu werden: Anpassung, HinzufÃ¼gen von "
-"FunktionalitÃ¤ten etc. Da die Ã„nderungen von PreludeIDS Technikern ausgefÃ¼hrt "
-"werden, kÃ¶nnen Sie sich sicher sein, dass alle System-Modifikationen "
+"unserer Anwendung beizutragen. Sie können individuelle Versionen von Prelude "
+"bestellen, um Ihren Ansprüchen gerecht zu werden: Anpassung, HinzufÃ¼gen von "
+"FunktionalitÃ¤ten etc. Da die Änderungen von PreludeIDS Technikern ausgefÃ¼hrt "
+"werden, können Sie sich sicher sein, dass alle System-Modifikationen "
 "garantiert optimal von unserer technischen Supportabteilung integriert "
-"werden. AuÃŸerdem kÃ¶nnen wir Prelude erweitern, um auch bisher nicht "
-"unterstÃ¼tzte oder proprietÃ¤re Sensoren sowie Rulesetserweiterungen fÃ¼r neue "
-"GerÃ¤te zu implementieren oder Prelude auf bisher nicht unterstÃ¼tzte "
+"werden. Außerdem können wir Prelude erweitern, um auch bisher nicht "
+"unterstützte oder proprietäre Sensoren sowie Rulesetserweiterungen für neue "
+"Geräte zu implementieren oder Prelude auf bisher nicht unterstützte "
 "Betriebssysteme portieren. "
 
 #: prewikka/templates/About.py:143
@@ -795,8 +794,8 @@ msgstr ""
 "Unser PreludeIDS Wartungs- und Support-Service garantiert den optimalen "
 "Betrieb der Prelude Plattform in Ihrer Infrastruktur. Mit unserem Support-"
 "Service profitieren Sie von priorisierter Hilfe und der Kompetenz unserer "
-"Techniker, wÃ¤hrend der Wartungs-Service Ihre Software auf dem aktuellsten "
-"Stand hÃ¤lt."
+"Techniker, während der Wartungs-Service Ihre Software auf dem aktuellsten "
+"Stand hält."
 
 #: prewikka/templates/About.py:157
 msgid "Commercial licenses"
@@ -811,9 +810,9 @@ msgid ""
 "PreludeIDS provides specific commercial licenses to allow proprietary "
 "systems based on Prelude to be developed and to interoperate."
 msgstr ""
-"PreludeIDS bietet spezifische kommerzielle Lizensen, um proprietÃ¤re auf "
+"PreludeIDS bietet spezifische kommerzielle Lizensen, um proprietäre auf "
 "Prelude basierende Systeme entwickeln und zwischen diesen interagieren zu "
-"kÃ¶nnen."
+"können."
 
 #: prewikka/templates/About.py:176
 msgid "Advice, Deployment and Training"
@@ -826,11 +825,11 @@ msgid ""
 "deploying Prelude and training your users, we provide a turnkey solution to "
 "secure your infrastructure, delivered by specialists."
 msgstr ""
-"Durch unsere Partner haben Sie Zugang zu einer groÃŸen Anzahl "
-"Ã¼berzeugenderSicherheitsdienste. Indem wir Ihnen mit Rat und Tat bei der "
+"Durch unsere Partner haben Sie Zugang zu einer großen Anzahl "
+"überzeugender Sicherheitsdienste. Indem wir Ihnen mit Rat und Tat bei der "
 "Sicherung Ihrer Infrastruktur, der Implementierung von Prelude und dem "
 "Training Ihrer Benutzer zur Seite stehen, bieten wir Ihnen eine komplette "
-"Sicherheits-LÃ¶sung, geliefert von Spezialisten."
+"Sicherheits-Lösung, geliefert von Spezialisten."
 
 #: prewikka/templates/About.py:200
 msgid "Contact"
@@ -894,7 +893,7 @@ msgstr "Neues Passwort bestÃ¤tigen:"
 
 #: prewikka/templates/UserSettings.py:338
 msgid "Submit Changes"
-msgstr "Ã„nderungen abschicken"
+msgstr "Änderungen abschicken"
 
 #: prewikka/templates/UserListing.py:104
 msgid "Login"
@@ -902,7 +901,7 @@ msgstr "Login:"
 
 #: prewikka/templates/UserListing.py:150
 msgid "Delete user"
-msgstr "Benutzer lÃ¶schen"
+msgstr "Benutzer löschen"
 
 #: prewikka/templates/UserListing.py:158
 msgid "Create user"
@@ -962,12 +961,12 @@ msgstr "Neu Laden"
 
 #: prewikka/templates/MessageListing.py:621
 msgid "Apply"
-msgstr "Ãœbernehmen"
+msgstr "Übernehmen"
 
 #: prewikka/templates/MessageListing.py:669
 #: prewikka/templates/MessageListing.py:677
 msgid "prev"
-msgstr "frÃ¼her"
+msgstr "früher"
 
 #: prewikka/templates/MessageListing.py:690
 #: prewikka/templates/MessageListing.py:698
@@ -977,7 +976,7 @@ msgstr "aktuell"
 #: prewikka/templates/MessageListing.py:711
 #: prewikka/templates/MessageListing.py:719
 msgid "next"
-msgstr "spÃ¤ter"
+msgstr "später"
 
 #: prewikka/templates/MessageListing.py:773
 msgid "total"
@@ -985,7 +984,7 @@ msgstr "Total"
 
 #: prewikka/templates/FilterEdition.py:195
 msgid "Available filters"
-msgstr "VerfÃ¼gbare Filter"
+msgstr "Verfügbare Filter"
 
 #: prewikka/templates/FilterEdition.py:246
 msgid "Edition"
@@ -1001,7 +1000,7 @@ msgstr "Name"
 
 #: prewikka/templates/FilterEdition.py:330
 msgid "Comment:"
-msgstr ""
+msgstr "Kommentar"
 
 #: prewikka/templates/HeartbeatListing.py:103
 msgid "Agent"
@@ -1014,7 +1013,7 @@ msgstr "Zeit"
 
 #: prewikka/templates/HeartbeatListing.py:188
 msgid "Heartbeat summary"
-msgstr "Heartbeat Ãœbersicht"
+msgstr "Heartbeat Übersicht"
 
 #: prewikka/templates/HeartbeatListing.py:196
 msgid "Filter on agent"
@@ -1039,7 +1038,7 @@ msgstr "Weniger als"
 
 #: prewikka/templates/AlertListing.py:136
 msgid "Greater than"
-msgstr "GrÃ¶ÃŸer als"
+msgstr "Größer als"
 
 #: prewikka/templates/AlertListing.py:138
 msgid "Lesser or equal"
@@ -1047,7 +1046,7 @@ msgstr "Kleiner oder gleich"
 
 #: prewikka/templates/AlertListing.py:140
 msgid "Greater or equal"
-msgstr "GrÃ¶ÃŸer oder gleich"
+msgstr "Größer oder gleich"
 
 #: prewikka/templates/AlertListing.py:142
 msgid "Substring"
@@ -1055,15 +1054,15 @@ msgstr "Teilstring"
 
 #: prewikka/templates/AlertListing.py:144
 msgid "Substring (case-insensitive)"
-msgstr "Teilstring (GroÃŸ-/Kleinschreibung egal)"
+msgstr "Teilstring (Groß-/Kleinschreibung egal)"
 
 #: prewikka/templates/AlertListing.py:146
 msgid "Regular expression"
-msgstr "RegulÃ¤rer Ausdruck"
+msgstr "Regulärer Ausdruck"
 
 #: prewikka/templates/AlertListing.py:148
 msgid "Regular expression (case-insensitive)"
-msgstr "RegulÃ¤rer Ausdruck (GroÃŸ-/Kleinschreibung egal)"
+msgstr "Regulärer Ausdruck (Groß-/Kleinschreibung egal)"
 
 #: prewikka/templates/AlertListing.py:266
 msgid "Group entry by:"
@@ -1087,7 +1086,7 @@ msgstr "Korrelations-Alarme"
 
 #: prewikka/templates/AlertListing.py:551
 msgid "OverflowAlert"
-msgstr ""
+msgstr "Overflow Alarm"
 
 #: prewikka/templates/AlertListing.py:553
 msgid "ToolAlert"
@@ -1151,12 +1150,12 @@ msgstr[1] "Alarme"
 #: prewikka/templates/AlertListing.py:893
 #, python-format
 msgid "%(hidden)d of %(total)d alerts not shown..."
-msgstr ""
+msgstr "%(hidden)d von %(total)d Alarmen nicht angezeigt..."
 
 #: prewikka/templates/AlertListing.py:903
 #: prewikka/templates/AlertListing.py:993
 msgid "expand"
-msgstr ""
+msgstr "aufklappen"
 
 #: prewikka/templates/AlertListing.py:970
 msgid "source"
@@ -1169,7 +1168,7 @@ msgstr "Ziel"
 #: prewikka/templates/AlertListing.py:983
 #, python-format
 msgid "%(hidden)d of %(total)d %(name)ss not shown..."
-msgstr ""
+msgstr "%(hidden)d von %(total)d %(name)ss nicht angezeigt..."
 
 #: prewikka/templates/AlertListing.py:1020
 #, fuzzy, python-format
@@ -1189,10 +1188,10 @@ msgstr "Filter"
 #~ msgstr "Die Prewikka Datenbank wurde anscheinend noch nicht erstellt"
 
 #~ msgid "Session invalid"
-#~ msgstr "Session ungÃ¼ltig"
+#~ msgstr "Session ungültig"
 
 #~ msgid "Username and password do not match."
-#~ msgstr "Benutzername und Passwort stimmen nicht Ã¼berein."
+#~ msgstr "Benutzername und Passwort stimmen nicht überein."
 
 #~ msgid "anonymous"
 #~ msgstr "anonym"
