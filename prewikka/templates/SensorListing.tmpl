@@ -99,10 +99,10 @@ $listing.sort()
        #set $alen = $locations[$entry]["total"]
        $str($ngettext("%d Node", "%d Nodes", $nlen) % $nlen), $str($ngettext("%d Analyzer", "%d Analyzers", $alen) % $alen)
       </td>
-       #for $i in ( ("online",  $ngettext("%d Online", "%d Onlines", $locations[$entry]["online"])),
-                    ("offline", $ngettext("%d Offline", "%d Offlines", $locations[$entry]["offline"])),
-                    ("unknown", $ngettext("%d Unknown", "%d Unknowns", $locations[$entry]["unknown"])),
-                    ("missing", $ngettext("%d Missing", "%d Missings", $locations[$entry]["missing"])))
+       #for $i in ( ("online",  $ngettext("%d Online", "%d Online", $locations[$entry]["online"])),
+                    ("offline", $ngettext("%d Offline", "%d Offline", $locations[$entry]["offline"])),
+                    ("unknown", $ngettext("%d Unknown", "%d Unknown", $locations[$entry]["unknown"])),
+                    ("missing", $ngettext("%d Missing", "%d Missing", $locations[$entry]["missing"])))
         #if $locations[$entry][$i[0]] > 0
       <td class="heartbeat_analyze_sensor_status_$i[0]">$str($i[1] % $locations[$entry][$i[0]])</td>
         #end if
