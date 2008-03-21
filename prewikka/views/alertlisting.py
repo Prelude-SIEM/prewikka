@@ -1034,7 +1034,6 @@ class AlertListing(MessageListing, view.View):
         return parameters
 
     def _setMessages(self, criteria):
-        self.dataset["messages"] = [ ]
         self.dataset["aggregated_source"] = self.parameters["aggregated_source"]
         self.dataset["aggregated_target"] = self.parameters["aggregated_target"]
         self.dataset["aggregated_classification"] = self.parameters["aggregated_classification"]
@@ -1052,14 +1051,7 @@ class AlertListing(MessageListing, view.View):
         if len(ag_s + ag_t + ag_c + ag_a) > 0:
             return self._setAggregatedMessagesNoValues(criteria, ag_s, ag_t, ag_c, ag_a)
 
-        results = self.env.idmef_db.getAlertIdents(criteria)
-
-        for ident in results[self.parameters["offset"] : self.parameters["offset"] + self.parameters["limit"]]:
-            message = self.env.idmef_db.getAlert(ident)
-            dataset = self._setMessage(message, ident)
-            self.dataset["messages"].append(dataset)
-
-        return len(results)
+        return MessageListing._setMessages(self, criteria)
 
     def _setDatasetConstants(self):
         self.dataset["classification_filters"] = CLASSIFICATION_FILTERS

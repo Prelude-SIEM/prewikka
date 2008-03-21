@@ -318,11 +318,14 @@ class MessageListing:
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
         
-        for ident in self._getMessageIdents(criteria, self.parameters["limit"], self.parameters["offset"]):
+        results = self._getMessageIdents(criteria)
+        for ident in results[self.parameters["offset"] : self.parameters["offset"] + self.parameters["limit"]]:
             message = self._fetchMessage(ident)
             dataset = self._setMessage(message, ident)
             self.dataset["messages"].append(dataset)
 
+        return len(results)
+        
     def _deleteMessages(self):        
         if len(self.parameters["delete"]) == 0:
             return

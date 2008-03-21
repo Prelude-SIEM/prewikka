@@ -76,9 +76,6 @@ class HeartbeatListing(MessageListing, view.View):
     def _getMessageIdents(self, criteria, limit=-1, offset=-1):
         return self.env.idmef_db.getHeartbeatIdents(criteria, limit, offset)
 
-    def _countMessages(self, criteria):
-        return self.env.idmef_db.countHeartbeats(criteria)
-
     def _fetchMessage(self, ident):
         return self.env.idmef_db.getHeartbeat(ident)
 
@@ -121,10 +118,7 @@ class HeartbeatListing(MessageListing, view.View):
         self._setTimeline(start, end)
         self._setNavPrev(self.parameters["offset"])
 
-        count = self.env.idmef_db.countHeartbeats(criteria and " && ".join(criteria) or None)
-
-        self._setMessages(criteria)
-
+        count = self._setMessages(criteria)
         self._setHiddenParameters()
         
         self.dataset["nav.from"] = self.parameters["offset"] + 1
