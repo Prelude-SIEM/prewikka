@@ -24,6 +24,11 @@ import prewikka.views
 from prewikka import view, Config, Log, Database, IDMEFDatabase, \
      User, Auth, DataSet, Error, utils, siteconfig, localization, resolve
 
+try:
+    from threading import Lock
+except ImportError:
+    from dummy_threading import Lock
+
 
 class InvalidQueryError(Error.PrewikkaUserError):
     def __init__(self, message):
@@ -92,29 +97,23 @@ def load_template(name, dataset):
 
 
 _core_cache = { }
-
-try:
-    import threading
-except ImportError:
-    _has_threads = False
-else:
-    _has_threads = True
-    _core_cache_lock = threading.Lock()
+_core_cache_lock = Lock()
 
 
 def get_core_from_config(path, threaded=False):
     global _core_cache
+    global _core_cache_lock
 
     if not path:
         path = siteconfig.conf_dir + "/prewikka.conf"
 
-    if _has_threads and threaded:
+    if threaded:
         _core_cache_lock.acquire()
 
     if not _core_cache.has_key(path):
         _core_cache[path] = Core(path)
 
-    if _has_threads and threaded:
+    if threaded:
         _core_cache_lock.release()
 
     return _core_cache[path]
