@@ -697,7 +697,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 
         self.beginSection(_("Tool Alert"))
         self.beginTable()
-        self.newTableEntry(_("Name"), ca["alert.tool_alert.name"])
+        self.newTableEntry(_("Name"), ta["alert.tool_alert.name"])
         self.endTable()
 
         self.beginTable()
