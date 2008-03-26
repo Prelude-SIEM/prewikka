@@ -367,7 +367,7 @@ class IDMEFDatabase:
         if self._db:
             self._db_destroy(self._db)
             
-    def _getMessageIdents(self, get_message_idents, criteria, limit, offset):
+    def _getMessageIdents(self, get_message_idents, criteria, limit, offset, order_by):
         if type(criteria) is list:
             if len(criteria) == 0:
                 criteria = None
@@ -379,9 +379,13 @@ class IDMEFDatabase:
 
         idents = [ ]
     
+        if order_by == "time_asc":
+            order_by = PRELUDEDB_RESULT_IDENTS_ORDER_BY_CREATE_TIME_ASC
+        else:
+            order_by = PRELUDEDB_RESULT_IDENTS_ORDER_BY_CREATE_TIME_DESC
+            
         try:    
-            result = get_message_idents(self._db, criteria, limit, offset,
-                                        PRELUDEDB_RESULT_IDENTS_ORDER_BY_CREATE_TIME_DESC)
+            result = get_message_idents(self._db, criteria, limit, offset, order_by)
         except:
             self._freeDbParams(criteria=criteria)
             raise
@@ -394,11 +398,11 @@ class IDMEFDatabase:
         
         return DbResultIdents(result)
         
-    def getAlertIdents(self, criteria=None, limit=-1, offset=-1):
-        return self._getMessageIdents(preludedb_get_alert_idents2, criteria, limit, offset)
+    def getAlertIdents(self, criteria=None, limit=-1, offset=-1, order_by="time_desc"):
+        return self._getMessageIdents(preludedb_get_alert_idents2, criteria, limit, offset, order_by)
 
-    def getHeartbeatIdents(self, criteria=None, limit=-1, offset=-1):
-        return self._getMessageIdents(preludedb_get_heartbeat_idents2, criteria, limit, offset)
+    def getHeartbeatIdents(self, criteria=None, limit=-1, offset=-1, order_by="time_desc"):
+        return self._getMessageIdents(preludedb_get_heartbeat_idents2, criteria, limit, offset, order_by)
 
     def _getLastMessageIdent(self, type, get_message_idents, analyzerid):
         criteria = None

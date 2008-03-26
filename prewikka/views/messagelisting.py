@@ -103,6 +103,7 @@ class MessageListingParameters(view.Parameters):
         self.optional("timeline_unit", str, default="hour", save=True)
         self.optional("timeline_end", long)
         self.optional("timeline_start", long)
+        self.optional("orderby", str, "time_desc", save=True)
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50, save=True)
         self.optional("timezone", str, "frontend_localtime", save=True)
@@ -135,6 +136,9 @@ class MessageListingParameters(view.Parameters):
         if not self["timezone"] in ("frontend_localtime", "sensor_localtime", "utc"):
             raise view.InvalidValueError("timezone", self["timezone"])
 
+        if self["orderby"] not in ("time_desc", "time_asc", "count_desc", "count_asc"):
+            raise view.InvalidParameterValueError("orderby", self["orderby"])
+        
         if not self.has_key("auto_apply_enable"):
             user.delConfigValue(view_name, "auto_apply_enable")
 
@@ -258,6 +262,11 @@ class MessageListing:
         return start, end
         
     def _setTimeline(self, start, end):
+        for t in "time_desc", "time_asc", "count_desc", "count_asc":
+            self.dataset["timeline.%s_selected" % t] = ""
+			
+        self.dataset["timeline.%s_selected" % self.parameters["orderby"]] = "selected='selected'"
+        
         for unit in "min", "hour", "day", "month", "year", "unlimited":
             self.dataset["timeline.%s_selected" % unit] = ""
 
@@ -319,7 +328,7 @@ class MessageListing:
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
         
-        results = self._getMessageIdents(criteria)
+        results = self._getMessageIdents(criteria, order_by=self.parameters["orderby"])
         for ident in results[self.parameters["offset"] : self.parameters["offset"] + self.parameters["limit"]]:
             message = self._fetchMessage(ident)
             dataset = self._setMessage(message, ident)

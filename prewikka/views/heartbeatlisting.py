@@ -73,8 +73,8 @@ class HeartbeatListing(MessageListing, view.View):
     details_view = "heartbeat_details"
     listed_heartbeat = ListedHeartbeat
 
-    def _getMessageIdents(self, criteria, limit=-1, offset=-1):
-        return self.env.idmef_db.getHeartbeatIdents(criteria, limit, offset)
+    def _getMessageIdents(self, criteria, limit=-1, offset=-1, order_by="time_desc"):
+        return self.env.idmef_db.getHeartbeatIdents(criteria, limit, offset, order_by)
 
     def _fetchMessage(self, ident):
         return self.env.idmef_db.getHeartbeat(ident)

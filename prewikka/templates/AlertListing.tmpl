@@ -623,6 +623,15 @@ function ${name}_add_entry(object, operator, value, num) {
 #end filter
 #end block message_fields
 
+
+#block orderby_option
+     <option value="time_desc" $timeline.time_desc_selected>By time (descending)</option>
+     <option value="time_asc" $timeline.time_asc_selected>By time (ascending)</option>
+     <option value="count_desc" $timeline.count_desc_selected>By count (descending)</option>
+     <option value="count_asc" $timeline.count_asc_selected>By count (ascending)</option>
+#end block
+
+
 #block timeline_extra_content
 #filter CleanOutput
 <tr>

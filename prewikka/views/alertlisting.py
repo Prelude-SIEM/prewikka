@@ -688,8 +688,8 @@ class AlertListing(MessageListing, view.View):
     def init(self, env):
         self._max_aggregated_classifications = int(env.config.general.getOptionValue("max_aggregated_classifications", 10))
 
-    def _getMessageIdents(self, criteria, limit=-1, offset=-1):
-        return self.env.idmef_db.getAlertIdents(criteria, limit, offset)
+    def _getMessageIdents(self, criteria, limit=-1, offset=-1, order_by="time_desc"):
+        return self.env.idmef_db.getAlertIdents(criteria, limit, offset, order_by)
 
     def _fetchMessage(self, ident):
         return self.env.idmef_db.getAlert(ident)
@@ -910,8 +910,16 @@ class AlertListing(MessageListing, view.View):
         ag_list = ag_s + ag_t + ag_c + ag_a
 
         ##
-        selection = [ "%s/group_by" % path for path in ag_list ] + \
-                    [ "count(alert.create_time)", "max(alert.create_time)/order_desc" ]
+        selection = [ "%s/group_by" % path for path in ag_list ]
+
+        if self.parameters["orderby"] == "time_asc":
+            selection += [ "count(alert.create_time)", "max(alert.create_time)/order_asc" ]
+        elif self.parameters["orderby"] == "time_desc":
+            selection += [ "count(alert.create_time)", "max(alert.create_time)/order_desc" ]
+        elif self.parameters["orderby"] == "count_desc":
+            selection += [ "count(alert.create_time)/order_desc", "max(alert.create_time)" ]
+        elif self.parameters["orderby"] == "count_asc":
+            selection += [ "count(alert.create_time)/order_asc", "max(alert.create_time)" ]
 
         use_sensor_localtime = self.parameters["timezone"] == "sensor_localtime"
         if not use_sensor_localtime:
