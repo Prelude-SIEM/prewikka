@@ -74,8 +74,7 @@ class DNSResolver:
 	end = now = time.time()
 	final = now + timeout
 
-        while True:
-            
+        while True:          
             self._lock.acquire()
             
             if self._query == 0:
@@ -109,7 +108,7 @@ class DNSResolver:
 	    return
 
         self.doQuery(addr, resolve_cb)
-	self.process()
+        self.process()
 
 
 class AddressResolve:
@@ -117,20 +116,20 @@ class AddressResolve:
 	self._name = value
 	
     def __init__(self, addr):
-	global resolver
+        global resolver
 	
-	self._addr = addr
-	self._name = None
+        self._addr = addr
+        self._name = None
             
         if resolver:
-	    resolver.resolve(addr, self._resolve_cb)
+            resolver.resolve(addr, self._resolve_cb)
 
     def __len__(self):
 	return len(str(self))
 
     def __str__(self):
         if resolver:
-	    resolver.process()
+            resolver.process()
 
 	return self._name or self._addr
 
@@ -148,6 +147,5 @@ def init(env):
        env.log.warning("Asynchronous DNS resolution disabled: twisted.names and twisted.internet required: %s" % err)
        return
     
-    print "resolver set"
     resolver = DNSResolver()
     
