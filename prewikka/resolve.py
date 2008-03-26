@@ -135,6 +135,13 @@ class AddressResolve:
         return str(self)
 
 
+def process(timeout=0):
+    global resolver
+
+    if resolver:
+        resolver.process(timeout)
+
+
 def init(env):
     global resolver
 

@@ -132,10 +132,10 @@ class Core:
         self._env.max_aggregated_source = int(self._env.config.general.getOptionValue("max_aggregated_source", 10))
         self._env.max_aggregated_target = int(self._env.config.general.getOptionValue("max_aggregated_target", 10))
         self._env.default_locale = self._env.config.general.getOptionValue("default_locale", None)
-        
+
         if self._env.dns_max_delay != -1:
             resolve.init(self._env)
-        
+
         preludedb.preludedb_init()
 
         self._database_schema_error = None
@@ -151,7 +151,7 @@ class Core:
         self._loadModules()
         self._initAuth()
 
-            
+
     def _initDatabase(self):
         config = { }
         for key in self._env.config.database.keys():
@@ -356,7 +356,7 @@ class Core:
         # We check the character set after loading the template,
         # since the template might trigger a language change.
         dataset["document.charset"] = localization.getCurrentCharset()
-        resolve.resolver.process(self._env.dns_max_delay)
+        resolve.process(self._env.dns_max_delay)
 
         try:
                 request.content = str(template)
