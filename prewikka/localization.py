@@ -21,41 +21,35 @@
 import locale, gettext, __builtin__, time
 from prewikka import siteconfig
 
-try: 
-    import threading    
-
+try:
+    from threading import local, Lock
 except ImportError:
-    _lock = None
-    currentThread = lambda: "none"
-
-else:
-    _lock = threading.Lock()
-    currentThread = threading.currentThread
+    # copy of _thread_local.py from python 2.5
+    from dummy_threading import Lock
+    from prewikka._threading_local import local
 
 
+_lock = Lock()
 _DEFAULT_LANGUAGE = "en"
-_localized_thread = { }
+_localized_thread = local()
 _all_locale = { _DEFAULT_LANGUAGE: None }
 
-
+        
 def _safeGettext(s):
-    tid = currentThread()
-    if _localized_thread.has_key(tid) and _localized_thread[tid] != None:
-        return _localized_thread[tid].gettext(s)
-    else:
+    try:
+        return _localized_thread.data.gettext(s)
+    except:
         return s
 
 def _safeNgettext(singular, plural, num):
-    tid = currentThread()
-    if _localized_thread.has_key(tid) and _localized_thread[tid] != None:
-        return _localized_thread[tid].ngettext(singular, plural, num)
-
-    elif num <= 1:
-        return singular
-        
-    else:
-        return plural
-        
+    try:
+        return _localized_thread.data.ngettext(singular, plural, num)
+    except:
+        if num <= 1:
+            return singular
+        else:
+            return plural
+            
 def _deferredGettext(s):
     return s
     
@@ -79,16 +73,13 @@ def setLocale(lang):
     if not lang:
         lang = _DEFAULT_LANGUAGE
         
-    if _lock:
-        _lock.acquire()
-    
+    _lock.acquire()   
+
     if not _all_locale.has_key(lang):
         _all_locale[lang] = gettext.translation("prewikka", siteconfig.locale_dir, languages=[lang])
-        
-    if _lock:
-        _lock.release()
-            
-    _localized_thread[currentThread()] = _all_locale[lang]
+
+    _lock.release()            
+    _localized_thread.data = _all_locale[lang]
 
 
 def getLanguages():
@@ -106,12 +97,10 @@ def getLanguagesAndIdentifiers():
     return [ (_(x), _LANGUAGES[x]) for x in l ]
 
 
-def getCurrentCharset():
-    tid = currentThread()
-    
-    if _localized_thread.has_key(tid) and _localized_thread[tid] != None:
-        return _localized_thread[currentThread()].charset()
-    else:
+def getCurrentCharset():  
+    try:  
+        return _localized_thread.data.charset()
+    except:
         return "iso-8859-1"
 
 def getDate():
@@ -138,5 +127,3 @@ def getDate():
                                 
     weekday, day, month, year = time.strftime("%A %d %B %Y").split()
     return " ".join((_(weekday).lower(), day, _(month).lower(), year))
-
-
