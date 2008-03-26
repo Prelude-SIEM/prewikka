@@ -22,7 +22,7 @@ import preludedb, CheetahFilters
 
 import prewikka.views
 from prewikka import view, Config, Log, Database, IDMEFDatabase, \
-     User, Auth, DataSet, Error, utils, siteconfig, localization
+     User, Auth, DataSet, Error, utils, siteconfig, localization, resolve
 
 
 class InvalidQueryError(Error.PrewikkaUserError):
@@ -127,6 +127,7 @@ class Core:
         self._env = Env()
         self._env.auth = None # In case of database error
         self._env.config = Config.Config(config)
+        self._env.dns_max_delay = float(self._env.config.general.getOptionValue("dns_max_delay", 0))
         self._env.max_aggregated_source = int(self._env.config.general.getOptionValue("max_aggregated_source", 10))
         self._env.max_aggregated_target = int(self._env.config.general.getOptionValue("max_aggregated_target", 10))
         self._env.default_locale = self._env.config.general.getOptionValue("default_locale", None)
@@ -350,6 +351,7 @@ class Core:
         # We check the character set after loading the template,
         # since the template might trigger a language change.
         dataset["document.charset"] = localization.getCurrentCharset()
+        resolve.resolver.process(self._env.dns_max_delay)
 
         try:
                 request.content = str(template)

@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import copy, time, urllib
-from prewikka import view, User, utils
+from prewikka import view, User, utils, resolve
 
 
 class _MyTime:
@@ -188,7 +188,8 @@ class ListedMessage(dict):
         field = self.createInlineFilteredField(object, value, direction)
         field["host_commands"] = [ ]
         field["category"] = category
-        
+        field["hostname"] = resolve.AddressResolve(value)
+
         for command in self.env.host_commands.keys():
             field["host_commands"].append((command.capitalize(),
                                            utils.create_link("Command",

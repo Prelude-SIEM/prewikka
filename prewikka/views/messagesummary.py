@@ -23,7 +23,7 @@ import time
 import struct
 import socket
 
-from prewikka import view, User, utils
+from prewikka import view, User, utils, resolve
 
 
 def getUriCriteria(parameters):
@@ -423,14 +423,16 @@ class MessageSummary(Table):
         if not node:
             return
 
-        self.newTableEntry(_("Node name"), node["name"])
         self.newTableEntry(_("Node location"), node["location"])
 
         addr_list = None
+        node_name = None
         for addr in node["address"]:
             address = addr["address"]
             if not address:
                 continue
+
+            node_name = resolve.AddressResolve(address)
 
             if addr_list:
                 addr_list += "<br/>"
@@ -442,6 +444,12 @@ class MessageSummary(Table):
             else:
                 addr_list += address
 
+        if node["name"]:
+            self.newTableEntry(_("Node name"), node["name"])
+	
+        elif node_name:
+            self.newTableEntry(_("Node name (resolved)"), node_name)
+            
         self.newTableEntry(_("Node address"), addr_list)
 
     def buildAnalyzer(self, analyzer):

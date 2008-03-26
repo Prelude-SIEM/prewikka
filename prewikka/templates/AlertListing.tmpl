@@ -547,7 +547,7 @@ function ${name}_add_entry(object, operator, value, num) {
       #end if
 
       #for $address in $direction.addresses
-       <a class="popup_menu_toggle">$address.value</a><span class="popup_menu">
+       <a class="popup_menu_toggle">$address.hostname</a><span class="popup_menu">
          - <a href="$address.inline_filter">$str($_("Filter on this %s") % ($name))</a><br />
 
        #if not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
