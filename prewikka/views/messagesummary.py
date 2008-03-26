@@ -899,6 +899,26 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
             port = str(service["port"])
             self.newTableEntry(_("Port"), self.getUrlLink(port, "https://www.prelude-ids.com/port_details.php?port=%s" % port))
 
+        portlist = service["portlist"]
+        if portlist:
+            out = ""
+            for port in portlist.replace(" ", "").split(","):
+                if len(out) > 0:
+                    out += ", "
+                    
+                if port.find("-") != -1:
+                    left, right = port.split("-")
+                    out += self.getUrlLink(left, "https://www.prelude-ids.com/port_details.php?port=%s" % left)
+                    out += " - "
+                    out += self.getUrlLink(right, "https://www.prelude-ids.com/port_details.php?port=%s" % right)
+                else:
+                    out += self.getUrlLink(port, "https://www.prelude-ids.com/port_details.php?port=%s" % port)
+                    
+            self.newTableEntry(_("PortList"), out)
+
+        if service["ip_version"]:
+            self.newTableEntry(_("ip_version"), service["ip_version"])
+            
         ipn = service["iana_protocol_number"]
         if ipn and utils.protocol_number_to_name(ipn) != None:
             self.newTableEntry(_("Protocol"), utils.protocol_number_to_name(ipn))
@@ -978,9 +998,13 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.dataset["sections"] = [ ]
 
         self.beginSection(self.getSectionName(alert))
-
+        
         self.buildTime(alert)
 
+        self.beginTable()
+        self.newTableEntry(_("MessageID"), alert["messageid"])
+        self.endTable()
+        
         self.beginTable()
         self.buildClassification(alert)
         self.buildImpact(alert)
