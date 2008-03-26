@@ -36,8 +36,8 @@ from prewikka import Core, Request, siteconfig
 
 
 class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
-    def __init__(self, config, *args, **kwargs):
-        self.core = Core.get_core_from_config(config, threaded=True)
+    def __init__(self, core, *args, **kwargs):
+        self.core = core
         apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
         
 
@@ -158,5 +158,7 @@ if __name__ == "__main__":
         elif opt in ("-c", "--config"):
             config = arg
 
-    server = PrewikkaServer(config, (addr, port), PrewikkaRequestHandler)
+    core = Core.get_core_from_config(config)
+    
+    server = PrewikkaServer(core, (addr, port), PrewikkaRequestHandler)
     server.serve_forever()
