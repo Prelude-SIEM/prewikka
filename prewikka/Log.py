@@ -27,9 +27,9 @@ WARNING = logging.WARNING
 CRITICAL = logging.CRITICAL
 
 class Log:
-    def __init__(self, conf):        
+    def __init__(self, conf):
         self._logger = None
-        
+
         for logconf in conf.logs:
             logtype = logconf.keys()[0]
 
@@ -41,7 +41,7 @@ class Log:
             self._logger.setLevel(logging.NOTSET)
             self._logger.addHandler(self._getHandler(config, logtype))
 
-        
+
     def _getHandler(self, config, logtype='syslog'):
         logtype = logtype.lower()
         level = config.get("level", "")
@@ -56,7 +56,7 @@ class Log:
             hdlr = logging.handlers.SysLogHandler('/dev/log')
 
         elif logtype in ['smtp']:
-            hdlr = logging.handlers.SMTPHandler(config["host"], config["from"], config["to"].split(", "), config["subject"]) 
+            hdlr = logging.handlers.SMTPHandler(config["host"], config["from"], config["to"].split(", "), config["subject"])
 
         elif logtype in ['stderr']:
             hdlr = logging.StreamHandler(sys.stderr)
@@ -66,11 +66,11 @@ class Log:
 
         format = 'Prewikka %(levelname)s: %(message)s'
         if logtype in ['file', 'stderr']:
-            format = '%(asctime)s ' + format 
+            format = '%(asctime)s ' + format
 
         datefmt = ''
         if logtype == 'stderr':
-            datefmt = '%X'        
+            datefmt = '%X'
 
         level = level.upper()
         if level in ['DEBUG', 'ALL']:
@@ -83,7 +83,7 @@ class Log:
             hdlr.setLevel(logging.CRITICAL)
         else:
             hdlr.setLevel(logging.WARNING)
-        
+
         formatter = logging.Formatter(format, datefmt)
         hdlr.setFormatter(formatter)
 
@@ -91,8 +91,11 @@ class Log:
 
 
     def _getLog(self, request, login, details):
+        if not request:
+            return details
+
         message = "["
-        
+
         addr = request.getClientAddr()
         message += "%s" % (addr)
 
@@ -104,14 +107,14 @@ class Log:
             message += " %s@" % (login)
         else:
             message += " "
-            
+
         message += "%s]" % (request.getView())
 
         if details:
             message += " " + details
 
         return message
-        
+
     def debug(self, message, request=None, user=None):
         if self._logger:
             self._logger.debug(self._getLog(request, user, message))
@@ -119,7 +122,7 @@ class Log:
     def info(self, message, request=None, user=None):
         if self._logger:
             self._logger.info(self._getLog(request, user, message))
-    
+
     def warning(self, message, request=None, user=None):
         if self._logger:
             self._logger.warning(self._getLog(request, user, message))
@@ -138,4 +141,4 @@ class Log:
                  WARNING: self.warning,
                  ERROR: self.error,
                  CRITICAL: self.critical }[priority](message, request, user)
-                 
+
