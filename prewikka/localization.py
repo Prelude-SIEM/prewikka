@@ -34,7 +34,7 @@ _DEFAULT_LANGUAGE = "en"
 _localized_thread = local()
 _all_locale = { _DEFAULT_LANGUAGE: None }
 
-        
+
 def _safeGettext(s):
     try:
         return _localized_thread.data.gettext(s)
@@ -49,36 +49,36 @@ def _safeNgettext(singular, plural, num):
             return singular
         else:
             return plural
-            
+
 def _deferredGettext(s):
     return s
-    
+
 gettext.install("prewikka", siteconfig.locale_dir)
 __builtin__._ = _safeGettext
 __builtin__.N_ = _deferredGettext
 __builtin__.ngettext = _safeNgettext
 
-_LANGUAGES = { 
+_LANGUAGES = {
                "Deutsch": "de",
                "Español": "es",
-               "English": "en", 
-               "Français": "fr", 
+               "English": "en",
+               "Français": "fr",
                "Polski": "pl",
                "Portuguese (Brazilian)": "pt_BR",
                "Русский": "ru"
              }
-    
+
 
 def setLocale(lang):
     if not lang:
         lang = _DEFAULT_LANGUAGE
-        
-    _lock.acquire()   
+
+    _lock.acquire()
 
     if not _all_locale.has_key(lang):
         _all_locale[lang] = gettext.translation("prewikka", siteconfig.locale_dir, languages=[lang])
 
-    _lock.release()            
+    _lock.release()
     _localized_thread.data = _all_locale[lang]
 
 
@@ -97,24 +97,24 @@ def getLanguagesAndIdentifiers():
     return [ (_(x), _LANGUAGES[x]) for x in l ]
 
 
-def getCurrentCharset():  
-    try:  
+def getCurrentCharset():
+    try:
         return _localized_thread.data.charset()
     except:
         return "iso-8859-1"
 
 def getDate():
-    _localized_month = [ _("January"), 
-                         _("February"), 
-                         _("March"), 
-                         _("April"), 
-                         _("May"), 
-                         _("June"), 
-                         _("July"), 
-                         _("August"), 
+    _localized_month = [ _("January"),
+                         _("February"),
+                         _("March"),
+                         _("April"),
+                         _("May"),
+                         _("June"),
+                         _("July"),
+                         _("August"),
                          _("September"),
-                         _("November"), 
-                         _("October"), 
+                         _("November"),
+                         _("October"),
                          _("December") ]
 
     _localized_weekday = [ _("Monday"),
@@ -124,6 +124,6 @@ def getDate():
                            _("Friday"),
                            _("Saturday"),
                            _("Sunday") ]
-                                
+
     weekday, day, month, year = time.strftime("%A %d %B %Y").split()
     return " ".join((_(weekday).lower(), day, _(month).lower(), year))
