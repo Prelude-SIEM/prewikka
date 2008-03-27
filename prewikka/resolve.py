@@ -111,13 +111,17 @@ class DNSResolver:
 
 class AddressResolve:
     def _resolve_cb(self, value):
+        if self._formater:
+            value = self._formater(self._addr, value)
+
         self._name = value
 
-    def __init__(self, addr):
+    def __init__(self, addr, format=None):
         global resolver
 
         self._addr = addr
         self._name = None
+        self._formater = format
 
         if resolver:
             resolver.resolve(addr, self._resolve_cb)
