@@ -31,7 +31,7 @@ class _MyTime:
             self._index = [ "year", "month", "day", "hour", "min", "sec" ].index(key)
         except ValueError:
             raise KeyError(key)
-        
+
         return self
 
     def round(self, unit):
@@ -57,7 +57,7 @@ class _MyTime:
                 t[4] += 1
         else:
             t[5] += 1
-        self._t = time.mktime(t)                
+        self._t = time.mktime(t)
 
     def __add__(self, value):
         t = time.localtime(self._t)
@@ -66,7 +66,7 @@ class _MyTime:
 
         try:
             t = time.mktime(t)
-            
+
         # Implementation specific: mktime might trigger an OverflowError
         # or a ValueError exception if the year member is out of range.
         # If this happen, we adjust the setting to a year known to work.
@@ -78,12 +78,12 @@ class _MyTime:
 
             elif t[0] <= 1970:
                 # Some implementation will fail with negative integer, we thus
-                # set the minimum value to be the Epoch.  
-                t = time.mktime(time.gmtime(0)) 
+                # set the minimum value to be the Epoch.
+                t = time.mktime(time.gmtime(0))
 
             else:
                 raise OverflowError
-        
+
         return _MyTime(t)
 
     def __sub__(self, value):
@@ -91,7 +91,7 @@ class _MyTime:
 
     def __str__(self):
         return utils.time_to_ymdhms(time.localtime(self._t))
-    
+
     def __int__(self):
         return int(self._t)
 
@@ -117,28 +117,28 @@ class MessageListingParameters(view.Parameters):
         # where the image was clicked
         self.optional("x", int)
         self.optional("y", int)
-        
+
     def normalize(self, view_name, user):
         do_save = self.has_key("_save")
-        
+
         # Filter out invalid limit which would trigger an exception.
         if self.has_key("limit") and int(self["limit"]) <= 0:
             self.pop("limit")
-            
+
         do_load = view.Parameters.normalize(self, view_name, user)
- 
+
         if not self.has_key("filter") and do_save:
             user.delConfigValue(view_name, "filter")
 
         if self.has_key("timeline_value") ^ self.has_key("timeline_unit"):
             raise view.MissingParameterError(self.has_key("timeline_value") and "timeline_value" or "timeline_unit")
-            
+
         if not self["timezone"] in ("frontend_localtime", "sensor_localtime", "utc"):
             raise view.InvalidValueError("timezone", self["timezone"])
 
         if self["orderby"] not in ("time_desc", "time_asc", "count_desc", "count_asc"):
             raise view.InvalidParameterValueError("orderby", self["orderby"])
-        
+
         if not self.has_key("auto_apply_enable"):
             user.delConfigValue(view_name, "auto_apply_enable")
 
@@ -170,15 +170,15 @@ class ListedMessage(dict):
         if t:
             if timezone == "utc":
                 t = time.gmtime(t)
-                
+
             elif timezone == "sensor_localtime":
                 t = time.gmtime(int(t) + t.gmt_offset)
 
             else: # timezone == "frontend_localtime"
                 t = time.localtime(t)
-            
+
             current = time.localtime()
-        
+
             if t[:3] == current[:3]: # message time is today
                 t = utils.time_to_hms(t)
             else:
@@ -211,7 +211,7 @@ class ListedMessage(dict):
 
 
 
-class MessageListing:    
+class MessageListing:
     def _adjustCriteria(self, criteria):
         pass
 
@@ -245,28 +245,28 @@ class MessageListing:
     def _setTimelinePrev(self, prev):
         parameters = self.parameters - [ "offset" ] + { "timeline_end": int(prev) }
         self.dataset["timeline.prev"] = utils.create_link(self.view_name, parameters)
-        
+
     def _getTimelineRange(self):
-        if self.parameters.has_key("timeline_start"):  
-            start = _MyTime(self.parameters["timeline_start"])  
-            end = start[self.parameters["timeline_unit"]] + self.parameters["timeline_value"]  
-        elif self.parameters.has_key("timeline_end"):  
-            end = _MyTime(self.parameters["timeline_end"])  
-            start = end[self.parameters["timeline_unit"]] - self.parameters["timeline_value"]  
-        else:  
-            end = _MyTime()  
-            if not self.parameters["timeline_unit"] in ("min", "hour"):  
-                end.round(self.parameters["timeline_unit"])  
-            start = end[self.parameters["timeline_unit"]] - self.parameters["timeline_value"]  
+        if self.parameters.has_key("timeline_start"):
+            start = _MyTime(self.parameters["timeline_start"])
+            end = start[self.parameters["timeline_unit"]] + self.parameters["timeline_value"]
+        elif self.parameters.has_key("timeline_end"):
+            end = _MyTime(self.parameters["timeline_end"])
+            start = end[self.parameters["timeline_unit"]] - self.parameters["timeline_value"]
+        else:
+            end = _MyTime()
+            if not self.parameters["timeline_unit"] in ("min", "hour"):
+                end.round(self.parameters["timeline_unit"])
+            start = end[self.parameters["timeline_unit"]] - self.parameters["timeline_value"]
 
         return start, end
-        
+
     def _setTimeline(self, start, end):
         for t in "time_desc", "time_asc", "count_desc", "count_asc":
             self.dataset["timeline.%s_selected" % t] = ""
-			
+
         self.dataset["timeline.%s_selected" % self.parameters["orderby"]] = "selected='selected'"
-        
+
         for unit in "min", "hour", "day", "month", "year", "unlimited":
             self.dataset["timeline.%s_selected" % unit] = ""
 
@@ -282,10 +282,10 @@ class MessageListing:
 
         if not start and not end:
             return
-        
+
         self.dataset["timeline.start"] = utils.time_to_ymdhms(func(int(start)))
         self.dataset["timeline.end"] = utils.time_to_ymdhms(func(int(end)))
-        self.dataset["timeline.current"] = utils.create_link(self.view_name, self.parameters - ["timeline_end"])        
+        self.dataset["timeline.current"] = utils.create_link(self.view_name, self.parameters - ["timeline_end"])
 
         if not self.parameters.has_key("timeline_end") and self.parameters["timeline_unit"] in ("min", "hour"):
             tmp = copy.copy(end)
@@ -305,7 +305,7 @@ class MessageListing:
                                                          { "offset": offset - self.parameters["limit"] })
         else:
             self.dataset["nav.prev"] = None
-            
+
     def _setNavNext(self, offset, count):
         if count > offset + self.parameters["limit"]:
             offset = offset + self.parameters["limit"]
@@ -327,7 +327,7 @@ class MessageListing:
 
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
-        
+
         results = self._getMessageIdents(criteria, order_by=self.parameters["orderby"])
         for ident in results[self.parameters["offset"] : self.parameters["offset"] + self.parameters["limit"]]:
             message = self._fetchMessage(ident)
@@ -335,8 +335,8 @@ class MessageListing:
             self.dataset["messages"].append(dataset)
 
         return len(results)
-        
-    def _deleteMessages(self):        
+
+    def _deleteMessages(self):
         if len(self.parameters["delete"]) == 0:
             return
 
