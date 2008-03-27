@@ -884,7 +884,7 @@ class AlertListing(MessageListing, view.View):
                 if classification:
                     entry_param["classification_object_%d" % self.parameters.max_index] = "alert.classification.text"
                     entry_param["classification_operator_%d" % self.parameters.max_index] = "="
-                    entry_param["classification_value_%d" % self.parameters.max_index] = utils.escape_criteria(classification)
+                    entry_param["classification_value_%d" % self.parameters.max_index] = classification
 
                 entry_param["alert.assessment.impact.severity"] = severity or "none"
                 entry_param["alert.assessment.impact.completion"] = completion or "none"
