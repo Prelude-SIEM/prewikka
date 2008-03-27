@@ -345,10 +345,17 @@ class ListedAlert(ListedMessage):
         if category == None:
             category = self._guessAddressCategory(address)
 
-        hfield = self.createHostField("alert.%s.node.address.address" % direction, address, category=category, direction=direction)
+        if dataset.has_key("no_dns"):
+            dns = False
+        else:
+            dns = True
+
+        hfield = self.createHostField("alert.%s.node.address.address" % direction, address,
+                                      category=category, direction=direction, dns=dns)
         dataset["addresses"].append(hfield)
 
     def _setMessageDirectionNodeName(self, dataset, direction, name):
+        dataset["no_dns"] = True
         dataset["addresses"].append(self.createHostField("alert.%s.node.name" % direction, name, direction=direction))
 
     def _setMessageDirectionOther(self, dataset, direction, path, value, extra_path=None, extra=None):

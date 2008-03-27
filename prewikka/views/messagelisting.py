@@ -188,11 +188,15 @@ class ListedMessage(dict):
 
         return { "value": t }
 
-    def createHostField(self, object, value, category=None, direction=None):
+    def createHostField(self, object, value, category=None, direction=None, dns=True):
         field = self.createInlineFilteredField(object, value, direction)
         field["host_commands"] = [ ]
         field["category"] = category
-        field["hostname"] = resolve.AddressResolve(value)
+
+        if dns is True:
+            field["hostname"] = resolve.AddressResolve(value)
+        else:
+            field["hostname"] = value
 
         for command in self.env.host_commands.keys():
             field["host_commands"].append((command.capitalize(),
