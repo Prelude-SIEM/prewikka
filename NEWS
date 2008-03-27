@@ -1,3 +1,33 @@
+* 2008-03-27, prewikka-0.9.14:
+
+- Let the user choose the type of sorting (default to time descending,
+  available: time asc/desc, count asc/desc).
+
+- Implement Prewikka Asynchronous DNS resolution in alert view
+  as well as message summary (require twisted.names and twisted.internet),
+  see the additional dns_max_delay settings parameters in prewikka.conf.
+
+- In the alert summary view, handle portlist and ip_version service fields, 
+  and show alert messageid.
+
+- Fix exception when rendering ToolAlert.
+
+- Fix double classification escaping (could result in non working link
+  for alert with classification containing escaped character).
+
+- Improvement to heartbeat retrieval (heartbeat view speedup).
+
+- Correct typo (fix #275), thanks Scott Olihovki <skippylou@gmail.com>
+  for pointing this out.
+
+- Polish translation, by Konrad Kosmowski <konrad@kosmosik.net>.
+
+- Update to pt_BR translation, by Edelberto Franco Silva <edeunix@edeunix.com>
+
+- Various bug fixes and cleanup.
+
+
+
 * 2007-10-18, prewikka-0.9.13:
 
 - Only perform additional database request when using Sensor localtime:
