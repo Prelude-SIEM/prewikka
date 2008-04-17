@@ -22,26 +22,26 @@ from mod_python import apache, util, Cookie
 
 class ModPythonRequest(Request.Request):
     def init(self, req):
-    	self._req = req
+        self._req = req
 
-	Request.Request.init(self)
+        Request.Request.init(self)
 
-	fs = util.FieldStorage(req)
-	for key in fs.keys():
+        fs = util.FieldStorage(req)
+        for key in fs.keys():
             self.arguments[key] = fs[key]
-       
+
     def write(self, data):
         self._req.write(data)
 
     def sendHeader(self, name, value):
         self._req.headers_out[name] = value
-         
+
     def endHeaders(self):
-    	pass
+        pass
 
     def addCookie(self, param, value, expires):
-    	c = Cookie.Cookie(param, value)
-	Cookie.add_cookie(self._req, c, expires)
+        c = Cookie.Cookie(param, value)
+        Cookie.add_cookie(self._req, c, expires)
 
     def getRemoteUser(self):
         self._req.get_basic_auth_pw()
@@ -51,20 +51,20 @@ class ModPythonRequest(Request.Request):
             user.strip()
 
         return user
-    
+
     def getQueryString(self):
-    	return self._req.unparsed_uri
+        return self._req.unparsed_uri
 
     def getCookieString(self):
-	return self._req.headers_in.get('cookie', '')
+        return self._req.headers_in.get('cookie', '')
 
     def getReferer(self):
-        return self._req.headers_in.get('Referer', '')	
+        return self._req.headers_in.get('Referer', '')
 
     def getClientAddr(self):
         return self._req.get_remote_host(apache.REMOTE_NOLOOKUP)
 
-	
+
 def handler(req):
     options = req.get_options()
     request = ModPythonRequest()
@@ -75,7 +75,7 @@ def handler(req):
         config = None
 
     core = Core.get_core_from_config(config, threaded=True)
-    
+
     request.init(req)
     req.content_type = 'text/html'
     req.send_http_header()
