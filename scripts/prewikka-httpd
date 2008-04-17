@@ -39,7 +39,7 @@ class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
     def __init__(self, core, *args, **kwargs):
         self.core = core
         apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
-        
+
 
 
 class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHandler):
@@ -57,10 +57,10 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
 
     def write(self, data):
         self.wfile.write(data)
-    
+
     def read(self, *args, **kwargs):
         return apply(self.rfile.read, args, kwargs)
-    
+
     def log_request(self, *args, **kwargs):
         pass
 
@@ -69,12 +69,12 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
 
     def _processDynamic(self, arguments):
         self.input_headers.update(self.headers)
-        
+
         for name, value in arguments.items():
             self.arguments[name] = (len(value) == 1) and value[0] or value
 
         self.server.core.process(self)
-        
+
     def sendResponse(self):
         self.send_response(200)
         Request.Request.sendResponse(self)
@@ -84,7 +84,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         if filename.find(os.path.abspath(siteconfig.htdocs_dir)) != 0:
             self.send_error(403, "Request Forbidden")
             return
-        
+
         # the following piece of code is from tracd of the trac project
         # (http://www.edgewall.com/products/trac/)
         try:
@@ -92,7 +92,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         except IOError:
             self.send_error(404, "File not found")
             return
-        
+
         self.send_response(200)
         mtype, enc = mimetypes.guess_type(filename)
         stat = os.fstat(f.fileno())
@@ -103,7 +103,7 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         self.send_header('Last-Modified', last_modified)
         self.end_headers()
         shutil.copyfileobj(f, self.wfile)
-        
+
     def do_GET(self):
         self._query_string = self.path
         self.init()
@@ -143,7 +143,7 @@ def usage():
 if __name__ == "__main__":
     config = None
     addr, port = "0.0.0.0", 8000
-    
+
     opts, args = getopt.getopt(sys.argv[1:], "hc:a:p:", ["help", "config=", "address=", "port="])
     for opt, arg in opts:
         if opt in ("-h", "--help"):
@@ -151,7 +151,7 @@ if __name__ == "__main__":
 
         elif opt in ("-a", "--address"):
             addr = arg
-		
+
         elif opt in ("-p", "--port"):
             port = int(arg)
 
@@ -159,6 +159,6 @@ if __name__ == "__main__":
             config = arg
 
     core = Core.get_core_from_config(config)
-    
+
     server = PrewikkaServer(core, (addr, port), PrewikkaRequestHandler)
     server.serve_forever()
