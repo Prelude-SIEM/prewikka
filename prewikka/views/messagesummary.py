@@ -22,6 +22,7 @@ import re
 import time
 import struct
 import socket
+import urllib
 
 from prewikka import view, User, utils, resolve
 
@@ -727,11 +728,11 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         for reference in alert["classification.reference"]:
             self.newTableCol(index, reference["origin"])
             if reference["origin"] in ("user-specific", "vendor-specific"):
-                urlstr="&url=%s" % reference["url"]
+                urlstr="&url=" + urllib.quote(reference["url"], safe="")
             else:
                 urlstr=""
 
-            self.newTableCol(index, self.getUrlLink(reference["name"], "http://www.prelude-ids.com/reference_details.php?origin=%s&name=%s%s" % (reference["origin"], reference["name"], urlstr)))
+            self.newTableCol(index, self.getUrlLink(reference["name"], "http://www.prelude-ids.com/reference_details.php?origin=%s&name=%s%s" % (urllib.quote(reference["origin"]), urllib.quote(reference["name"]), urlstr)))
             self.newTableCol(index, reference["meaning"])
             index += 1
 

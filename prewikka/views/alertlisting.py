@@ -484,9 +484,9 @@ class ListedAlert(ListedMessage):
             if name:
                 fstr += ":" + name
 
-            urlstr = "https://www.prelude-ids.com/reference_details.php?origin=%s&name=%s" % (ref["origin"], ref["name"])
+            urlstr = "https://www.prelude-ids.com/reference_details.php?origin=%s&name=%s" % (urllib.quote(ref["origin"]), urllib.quote(ref["name"]))
             if ref["origin"] in ("vendor-specific", "user-specific"):
-                urlstr += "&url=" + ref["url"]
+                urlstr += "&url=" + urllib.quote(ref["url"], safe="")
 
             dataset["classification_references"].append((urlstr, fstr))
 
