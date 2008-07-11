@@ -37,7 +37,10 @@ class ModPythonRequest(Request.Request):
         self._req.headers_out[name] = value
 
     def endHeaders(self):
-        pass
+        if self._req.headers_out.has_key("Content-type"):
+            self._req.content_type = self._req.headers_out["Content-type"]
+ 
+        self._req.send_http_header()
 
     def addCookie(self, param, value, expires):
         c = Cookie.Cookie(param, value)
@@ -77,9 +80,6 @@ def handler(req):
     core = Core.get_core_from_config(config, threaded=True)
 
     request.init(req)
-    req.content_type = 'text/html'
-    req.send_http_header()
-
     core.process(request)
 
     return apache.OK
