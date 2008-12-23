@@ -661,7 +661,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 
                 results = self.env.idmef_db.getAlertIdents(criteria)
                 if len(results) == 0:
-                    content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": messageid } + "</li>"
+                    content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": ident } + "</li>"
                 else:
                     alert = self.env.idmef_db.getAlert(results[0], htmlsafe=True)
                     link = utils.create_link("alert_summary", { "origin": self.parameters["origin"], "ident": results[0] })
