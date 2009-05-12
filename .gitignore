@@ -1,0 +1,5 @@
+*~
+build
+locale
+prewikka/siteconfig.py
+prewikka/templates/*.py
