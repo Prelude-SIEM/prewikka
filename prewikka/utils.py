@@ -33,7 +33,7 @@ read_done = False
 def _load_protocol():
     global port_dict
     global read_done
-    
+
     if read_done:
         return port_dict
 
@@ -43,9 +43,9 @@ def _load_protocol():
     try: fd = open("/etc/protocols", "r")
     except IOError:
         return port_dict
-	
+
     for line in fd.readlines():
-	
+
         ret = sreg.match(line)
         if not ret:
             continue
@@ -64,7 +64,7 @@ def protocol_number_to_name(num):
 
      return None
 
-def escape_attribute(value):   
+def escape_attribute(value):
     # Escape '\' since it's a valid js escape.
     return value.replace("\\", "\\\\").replace("\"", "\\\"").replace("/", "\\/")
 
@@ -139,7 +139,7 @@ def hexdump(content):
 
         content += "   " * (16 - len(chunk))
         content += "    "
-        
+
         for b in chunk:
             if b >= 32 and b < 127:
                 content += chr(b)

@@ -2,49 +2,49 @@
 #extends prewikka.templates.MessageListing
 
 #block head_extra_content
-#filter CleanOutput 
+#filter CleanOutput
 
 <script type="text/javascript">
 
-<!-- 
+<!--
 function del_entry(link) {
-	row = link.parentNode.parentNode
-	table = row.parentNode
-	if ( ! row.nextSibling ) {
+        row = link.parentNode.parentNode
+        table = row.parentNode
+        if ( ! row.nextSibling ) {
                 row.previousSibling.lastChild.appendChild(row.lastChild.firstChild)
-	}
+        }
 
-	table.removeChild(row)	
+        table.removeChild(row)
 }
 
 function end(row) {
-	field = document.createElement("td")
-	field.setAttribute("width", "11px")
-	row.appendChild(field)
+        field = document.createElement("td")
+        field.setAttribute("width", "11px")
+        row.appendChild(field)
 
-	if ( row.firstChild != row.lastChild ) {
-		link = document.createElement("a")
-		link.onclick = function(){ del_entry(this) }
-		content = document.createTextNode("-")
-		link.appendChild(content)
-		field.appendChild(link)		
-	} else {
-		content = document.createTextNode(" ")
-		field.appendChild(content)
-	}
+        if ( row.firstChild != row.lastChild ) {
+                link = document.createElement("a")
+                link.onclick = function(){ del_entry(this) }
+                content = document.createTextNode("-")
+                link.appendChild(content)
+                field.appendChild(link)
+        } else {
+                content = document.createTextNode(" ")
+                field.appendChild(content)
+        }
 }
 
 function get_operator_option(select, operator)
 {
 #end filter
-#for $operator, $desc in (("=", $_("Equal")), ("<", $_("Lesser than")), 
-                          (">", $_("Greater than")), ("<=", $_("Lesser or equal")), 
-                          (">=", $_("Greater or equal")), ("<>", $_("Substring")), 
-			  ("<>*", $_("Substring (case-insensitive)")), ("~", $_("Regular expression")), ("~*", $_("Regular expression (case-insensitive)")))
+#for $operator, $desc in (("=", $_("Equal")), ("<", $_("Lesser than")),
+                          (">", $_("Greater than")), ("<=", $_("Lesser or equal")),
+                          (">=", $_("Greater or equal")), ("<>", $_("Substring")),
+                          ("<>*", $_("Substring (case-insensitive)")), ("~", $_("Regular expression")), ("~*", $_("Regular expression (case-insensitive)")))
         option = document.createElement("option")
 
         option.setAttribute("value", '$operator')
-	option.setAttribute("title", '$desc')
+        option.setAttribute("title", '$desc')
         if ( operator == '$operator' ) {
                 option.setAttribute("selected", "true")
         }
@@ -69,7 +69,7 @@ function del_td(name, num)
                 return
 
         row = old.parentNode
-                
+
         td = document.createElement("td")
         td.setAttribute("id", "td_" + name + num)
 
@@ -80,35 +80,35 @@ function del_td(name, num)
 
 function filter_add_list(value, object, name, num) {
         td = document.getElementById("td_" + name + num)
-        
+
         var opt;
 
         select = document.createElement("select")
         select.setAttribute("name", name + '_value_' + num)
         select.setAttribute("class", "popup_input_field")
         td.appendChild(select)
-        
+
         for (key in options_array[object]) {
                 option = document.createElement("option")
-                
+
                 if ( options_array[object][key] == value ) {
                         option.setAttribute("selected", "true")
                 }
-                
+
                 option_value = document.createTextNode(options_array[object][key])
-	        option.appendChild(option_value)
-	        select.appendChild(option)
+                option.appendChild(option_value)
+                select.appendChild(option)
         }
 }
 
 function filter_add_input(value, object, name, num) {
         td = document.getElementById("td_" + name + num)
-        
+
         input = document.createElement("input")
-	input.setAttribute("class", "popup_input_field")
-	input.setAttribute("name", name + '_value_' + num)
-	input.setAttribute("type", "text")
-	input.setAttribute("value", value)
+        input.setAttribute("class", "popup_input_field")
+        input.setAttribute("name", name + '_value_' + num)
+        input.setAttribute("type", "text")
+        input.setAttribute("value", value)
         td.appendChild(input)
 }
 
@@ -123,7 +123,7 @@ function filter_add_input(value, object, name, num) {
 
 
 function aggregated_${category}_add_entry(path) {
-	table = document.getElementById("${category}_aggregation_table")
+        table = document.getElementById("${category}_aggregation_table")
 
         if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
                 table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
@@ -147,9 +147,9 @@ function aggregated_${category}_add_entry(path) {
         select = document.createElement("select")
         field.appendChild(select)
 
-	select.setAttribute("class", "popup_input_field")
-	select.setAttribute("name", "aggregated_${category}")
-        
+        select.setAttribute("class", "popup_input_field")
+        select.setAttribute("name", "aggregated_${category}")
+
         #for $aggregation_name, $aggregated_path, $unused in $aggregations
 
         option = document.createElement("option")
@@ -163,61 +163,61 @@ function aggregated_${category}_add_entry(path) {
         }
 #end if
 
-	option_value = document.createTextNode('$aggregation_name')
-	option.appendChild(option_value)
-	select.appendChild(option)
-        
+        option_value = document.createTextNode('$aggregation_name')
+        option.appendChild(option_value)
+        select.appendChild(option)
+
         #end for
 
-	end(row)
-	field = document.createElement("td")
-	field.setAttribute("width", "11px")
-	row.appendChild(field)
+        end(row)
+        field = document.createElement("td")
+        field.setAttribute("width", "11px")
+        row.appendChild(field)
 
-	link = document.createElement("a")
-	link.onclick = function(){ aggregated_${category}_add_entry('') }
-	content = document.createTextNode("+")
-	link.appendChild(content)
-	field.appendChild(link)
+        link = document.createElement("a")
+        link.onclick = function(){ aggregated_${category}_add_entry('') }
+        content = document.createTextNode("+")
+        link.appendChild(content)
+        field.appendChild(link)
 }
 #end for
 
 #for $name, $objects in (
-			  ("classification", $classification_filters),
-                          ("analyzer", $analyzer_filters), 
+                          ("classification", $classification_filters),
+                          ("analyzer", $analyzer_filters),
                           ("source", $source_filters),
                           ("target", $target_filters),
 )
 
 function ${name}_add_entry(object, operator, value, num) {
-	table = document.getElementById('${name}_table')
+        table = document.getElementById('${name}_table')
 
-	if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
-		table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
-	}
+        if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
+                table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
+        }
 
-	row = document.createElement("tr")
-	table.appendChild(row)
+        row = document.createElement("tr")
+        table.appendChild(row)
 
-	field = document.createElement("th")
-	content = document.createTextNode("$_('Filter on:')")
-	field.appendChild(content)
-	row.appendChild(field)
-	
-	field = document.createElement("td")
-	row.appendChild(field)
-	select = document.createElement("select")
-	field.appendChild(select)
+        field = document.createElement("th")
+        content = document.createTextNode("$_('Filter on:')")
+        field.appendChild(content)
+        row.appendChild(field)
 
-	select.setAttribute("class", "popup_select_field")
-	select.setAttribute("name", "${name}_object_" + num)
+        field = document.createElement("td")
+        row.appendChild(field)
+        select = document.createElement("select")
+        field.appendChild(select)
+
+        select.setAttribute("class", "popup_select_field")
+        select.setAttribute("name", "${name}_object_" + num)
         select.onchange = function() { del_td('${name}', num); functions_array[this.options[this.selectedIndex].value](value, this.options[this.selectedIndex].value, '${name}', num) }
-        
+
         var add_default
         var add_default_object
-        
-#for $object_name, $object, $obval in $objects        
-	option = document.createElement("option")
+
+#for $object_name, $object, $obval in $objects
+        option = document.createElement("option")
 
 #if $obval == None
         func = filter_add_input
@@ -233,62 +233,62 @@ function ${name}_add_entry(object, operator, value, num) {
 #end if
 
 #if $object == None
-	option.setAttribute("disabled", "disabled")
-	option.setAttribute("value", '')
+        option.setAttribute("disabled", "disabled")
+        option.setAttribute("value", '')
 #else
-	option.setAttribute("value", '$object')
-	if ( object == '$object' || ! object ) {
-		option.setAttribute("selected", "true")
-		add_default = func
-		add_default_object = '$object'
-		object = '$object'
-	}
+        option.setAttribute("value", '$object')
+        if ( object == '$object' || ! object ) {
+                option.setAttribute("selected", "true")
+                add_default = func
+                add_default_object = '$object'
+                object = '$object'
+        }
 #end if
 
-	option_value = document.createTextNode('$object_name')
-	option.appendChild(option_value)
-	select.appendChild(option)
+        option_value = document.createTextNode('$object_name')
+        option.appendChild(option_value)
+        select.appendChild(option)
 
 
         functions_array["$object"] = func
 #end for
 
         field = document.createElement("td")
-        row.appendChild(field)        
+        row.appendChild(field)
         select = document.createElement("select")
         field.appendChild(select)
-	select.setAttribute("class", "popup_operator_select")
+        select.setAttribute("class", "popup_operator_select")
         select.setAttribute("name", "${name}_operator_" + num)
-        
+
         if ( ! operator )
                 operator = "<>*";
-                
+
         get_operator_option(select, operator)
 
-	field = document.createElement("td")
-	field.setAttribute("id", "td_$name" + num)
-	row.appendChild(field)
+        field = document.createElement("td")
+        field.setAttribute("id", "td_$name" + num)
+        row.appendChild(field)
 
         if (add_default) {
                 add_default(value, add_default_object, '${name}', num);
         }
-                
-	end(row)
-	
-	field = document.createElement("td")
-	field.setAttribute("width", "11px")
-	row.appendChild(field)
-	link = document.createElement("a")
-	link.onclick = function(){ ${name}_add_entry('', '', '', (num + 1)) };
-	content = document.createTextNode("+")
-	link.appendChild(content)
-	field.appendChild(link)
+
+        end(row)
+
+        field = document.createElement("td")
+        field.setAttribute("width", "11px")
+        row.appendChild(field)
+        link = document.createElement("a")
+        link.onclick = function(){ ${name}_add_entry('', '', '', (num + 1)) };
+        content = document.createTextNode("+")
+        link.appendChild(content)
+        field.appendChild(link)
 }
 
 #end for
 //--></script>
 
-#end filter 
+#end filter
 #filter Filter
 #end filter
 #end block
@@ -314,15 +314,15 @@ function ${name}_add_entry(object, operator, value, num) {
       #else
        #set $disabled=""
       #end if
-      
-      #for name, path in (($N_("Alert"), "alert.create_time"), ($N_("CorrelationAlert"), "alert.correlation_alert.name"), 
+
+      #for name, path in (($N_("Alert"), "alert.create_time"), ($N_("CorrelationAlert"), "alert.correlation_alert.name"),
                           ($N_("OverflowAlert"), "alert.overflow_alert.program"), ($N_("ToolAlert"), "alert.tool_alert.name"))
         #if path in $alert.type
          #set $checked = "checked='checked'"
         #else
          #set $checked = ""
         #end if
-        
+
         <td>$_($name)<input class="checkbox" $disabled type="checkbox" name="alert.type" value="$path" $checked /></td>
       #end for
       </tr>
@@ -341,9 +341,9 @@ function ${name}_add_entry(object, operator, value, num) {
       </tr>
 
       <tr>
-       <th>$_("Completion:")</th>  
+       <th>$_("Completion:")</th>
        <td colspan="2">&nbsp;</td>
-       
+
       #for item in $N_("succeeded"), $N_("failed"), $N_("none")
         #if item in $alert.assessment.impact.completion
          #set $checked = "checked='checked'"
@@ -352,7 +352,7 @@ function ${name}_add_entry(object, operator, value, num) {
         #end if
         <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="$item" $checked /></td>
       #end for
-      
+
     </tr>
     </table>
       </td></tr>
@@ -387,12 +387,12 @@ function ${name}_add_entry(object, operator, value, num) {
       <tr><td><table class="inline_filter_content"><tbody id="source_table"></tbody></table></td></tr>
       <tr><td><table class="inline_filter_content"><tbody id="source_aggregation_table"></tbody></table></td></tr>
      </table>
-     
+
      <script type="text/javascript">
         #set $cnt = 0
         #for $object, $operator, $value in $source
           source_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
-	  #set $cnt += 1
+          #set $cnt += 1
         #end for
 
       #if len($aggregated_source) == 0
@@ -436,7 +436,7 @@ function ${name}_add_entry(object, operator, value, num) {
       <span class="filter_enabled_marker">*</span>
     #end if
   </th>
-  
+
   <th class="filter_popup">
     <a>$_("Sensor")</a>
     <div id="analyzer">
@@ -496,7 +496,7 @@ function ${name}_add_entry(object, operator, value, num) {
     #if $message.aggregated and (len($message.infos) > 1 or $info.count > 1)
       $info.count x
     #end if
-    
+
     #if $info.classification.value
       <a class="impact_severity_$info.severity.value" href="$info.display">$info.classification.value</a>
     #else
@@ -531,19 +531,19 @@ function ${name}_add_entry(object, operator, value, num) {
        <br/>
 #end if
 
-#for $direction in $direction 
+#for $direction in $direction
       #if $need_hr
-	<hr style="border: 1px dashed #808080; margin-top: 3px; margin-bottom: 0px;" />
+        <hr style="border: 1px dashed #808080; margin-top: 3px; margin-bottom: 0px;" />
       #end if
 
       #set $need_hr = 1
       #set $service = ""
       #set $proto_param = ""
       #set $proto_str = ""
-    
+
       #if $direction.protocol.value != None
        #set $proto_str = $direction.protocol.value.lower()
-       #set $proto_param = "&amp;protocol=" + $direction.protocol.value.upper() 
+       #set $proto_param = "&amp;protocol=" + $direction.protocol.value.upper()
       #end if
 
       #for $address in $direction.addresses
@@ -561,7 +561,7 @@ function ${name}_add_entry(object, operator, value, num) {
 #if $direction.service.value != None#:<a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$str($direction.service.value)$proto_param">$str($direction.service.value)#slurp
          #if $proto_str
 /$proto_str</a>
-         #else 
+         #else
 </a>
          #end if
        #elif $proto_str
@@ -569,9 +569,9 @@ function ${name}_add_entry(object, operator, value, num) {
        #end if
 <br />
       #end for
-     
+
       #if $len($direction.addresses) == 0 and $service
-	service: $service[1:]
+        service: $service[1:]
       #end if
 
      #set $cnt = 0
@@ -584,7 +584,7 @@ function ${name}_add_entry(object, operator, value, num) {
          #if $extra != None
           ($extra)
          #end if
-         
+
          #set $cnt += 1
      #end for
 #end for

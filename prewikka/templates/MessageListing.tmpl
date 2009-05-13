@@ -19,14 +19,14 @@ var autorefresh_enabled = true;
         \$("th.filter_popup > div").css("display", "block");
         \$("th.filter_popup > div").hide();
    }
-   
+
   \$("th.filter_popup > a").click(function(){
-	\$(this).next().popupUnique(function(data){data.show()}, function(data){data.hide()})
-	return false;
+        \$(this).next().popupUnique(function(data){data.show()}, function(data){data.hide()})
+        return false;
   });
 
   \$("input[@name=auto_apply_value], input[@type=submit]").focus(function(){
-	autorefresh_possible = false;
+        autorefresh_possible = false;
   });
 
   \$("input[@name=auto_apply_value]").blur(function(){
@@ -51,9 +51,9 @@ var autorefresh_enabled = true;
   });
 
   \$("a[@href]").click(function(){
-	autorefresh_possible = false;
+        autorefresh_possible = false;
   });
-}); 
+});
 
 
 function pad(number)
