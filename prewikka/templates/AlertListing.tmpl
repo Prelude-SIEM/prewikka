@@ -472,6 +472,23 @@ function ${name}_add_entry(object, operator, value, num) {
 #end block message_fields_header
 
 
+#def writeInlineFilter(inline_filter, optval=None)
+#if optval
+#if $inline_filter.already_filtered:
+<span>$optval</span>#slurp
+#else
+<a href="$inline_filter.inline_filter">$optval</a>#slurp
+#end if
+#else
+#if $inline_filter.already_filtered:
+<span>$inline_filter.value</span>#slurp
+#else
+<a href="$inline_filter.inline_filter">$inline_filter.value</a>#slurp
+#end if
+#end if
+#end def
+
+
 #block message_fields
 #filter CleanOutput
 
@@ -548,7 +565,8 @@ function ${name}_add_entry(object, operator, value, num) {
 
       #for $address in $direction.addresses
        <a class="popup_menu_toggle">$address.hostname</a><span class="popup_menu">
-         - <a href="$address.inline_filter">$str($_("Filter on this %s") % ($name))</a><br />
+         - #filter Filter $writeInlineFilter($address, $str($_("Filter on this %s") % ($name))) #end filter
+         <br />
 
        #if not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
          - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$str($_("%s information") % ($name)).capitalize()</a><br />
@@ -580,7 +598,7 @@ function ${name}_add_entry(object, operator, value, num) {
           <br />
          #end if
 
-         $name: <a href="$value.inline_filter">$value.value</a>
+         $name: #filter Filter $writeInlineFilter($value) #end filter
          #if $extra != None
           ($extra)
          #end if
@@ -595,10 +613,10 @@ function ${name}_add_entry(object, operator, value, num) {
 <td>
   #for $sensor in $message.sensors
     #if $sensor.name.value
-      <a href="$sensor.name.inline_filter">$sensor.name.value</a>
+     #filter Filter$writeInlineFilter($sensor.name)#end filter
     #end if
     #if $sensor.node_name.value
-      (<a href="$sensor.node_name.inline_filter">$sensor.node_name.value</a>)
+      (#filter Filter$writeInlineFilter($sensor.node_name)#end filter#)
     #end if
     <br/>
   #end for

@@ -152,19 +152,31 @@ class ListedMessage(dict):
         self.timezone = parameters["timezone"]
         self.view_name = view_name
 
+    def _isAlreadyFiltered(self, column, path, criterion, value):
+        if not self.parameters.has_key(column):
+            return False
+
+        for item in self.parameters[column]:
+            if item == (path, criterion, value):
+                return True
+
+        return False
+
     def createInlineFilteredField(self, object, value, direction=None):
         if value == None:
-            return { "value": None, "inline_filter": None }
+            return { "value": None, "inline_filter": None, "already_filtered": False }
 
         if direction:
+            alreadyf = self._isAlreadyFiltered(direction, object, "=", value)
             index = self.parameters.max_index
             extra = { "%s_object_%d" % (direction, index): object,
                       "%s_operator_%d" % (direction, index): "=",
                       "%s_value_%d" % (direction, index): value }
         else:
+            alreadyf = None
             extra = { object: value }
 
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra) }
+        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra), "already_filtered": alreadyf }
 
     def createTimeField(self, t, timezone=None):
         if t:
