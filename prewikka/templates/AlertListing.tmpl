@@ -331,18 +331,18 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
 #end block message_fields_header
 
 
-#def writeInlineFilter(inline_filter, optval=None)
+#def writeInlineFilter(inline_filter, optval=None, cl="")
 #if optval
 #if $inline_filter.already_filtered:
-<span>$optval</span>#slurp
+<span class="$cl">$optval</span>#slurp
 #else
-<a href="$inline_filter.inline_filter">$optval</a>#slurp
+<a class="$cl" href="$inline_filter.inline_filter">$optval</a>#slurp
 #end if
 #else
 #if $inline_filter.already_filtered:
-<span>$inline_filter.value</span>#slurp
+<span class="$cl">$inline_filter.value</span>#slurp
 #else
-<a href="$inline_filter.inline_filter">$inline_filter.value</a>#slurp
+<a class="$cl" href="$inline_filter.inline_filter">$inline_filter.value</a>#slurp
 #end if
 #end if
 #end def
@@ -380,7 +380,7 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
     #end if
 
     #if $info.completion.value
-      (<span class="impact_completion_$info.completion.value">$info.completion.value</span>)
+      (#filter Filter$writeInlineFilter($info.completion, cl="impact_completion_" + $info.completion.value)#end filter#)
     #end if
 
     <br/>
