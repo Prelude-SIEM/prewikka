@@ -25,11 +25,11 @@ var autorefresh_enabled = true;
         return false;
   });
 
-  \$("input[@name=auto_apply_value], input[@type=submit]").focus(function(){
+  \$("input[name='auto_apply_value'], input[type='submit']").focus(function(){
         autorefresh_possible = false;
   });
 
-  \$("input[@name=auto_apply_value]").blur(function(){
+  \$("input[name='auto_apply_value']").blur(function(){
         if ( second_reload <= second_count )
                 second_count = 0;
 
@@ -50,7 +50,7 @@ var autorefresh_enabled = true;
         }
   });
 
-  \$("a[@href]").click(function(){
+  \$("a[href]").click(function(){
         autorefresh_possible = false;
   });
 });
