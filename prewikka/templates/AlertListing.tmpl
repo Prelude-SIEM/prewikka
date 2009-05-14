@@ -5,374 +5,277 @@
 #filter CleanOutput
 
 <script type="text/javascript">
-
 <!--
-function del_entry(link) {
-        row = link.parentNode.parentNode
-        table = row.parentNode
-        if ( ! row.nextSibling ) {
-                row.previousSibling.lastChild.appendChild(row.lastChild.firstChild)
-        }
-
-        table.removeChild(row)
-}
-
-function end(row) {
-        field = document.createElement("td")
-        field.setAttribute("width", "11px")
-        row.appendChild(field)
-
-        if ( row.firstChild != row.lastChild ) {
-                link = document.createElement("a")
-                link.onclick = function(){ del_entry(this) }
-                content = document.createTextNode("-")
-                link.appendChild(content)
-                field.appendChild(link)
-        } else {
-                content = document.createTextNode(" ")
-                field.appendChild(content)
-        }
-}
-
-function get_operator_option(select, operator)
-{
 #end filter
-#for $operator, $desc in (("=", $_("Equal")), ("<", $_("Lesser than")),
-                          (">", $_("Greater than")), ("<=", $_("Lesser or equal")),
-                          (">=", $_("Greater or equal")), ("<>", $_("Substring")),
-                          ("<>*", $_("Substring (case-insensitive)")), ("~", $_("Regular expression")), ("~*", $_("Regular expression (case-insensitive)")))
-        option = document.createElement("option")
+#filter Filter
 
-        option.setAttribute("value", '$operator')
-        option.setAttribute("title", '$desc')
-        if ( operator == '$operator' ) {
-                option.setAttribute("selected", "true")
-        }
-        option_value = document.createTextNode('$operator')
-        option.appendChild(option_value)
-        select.appendChild(option)
-#end for
-#filter CleanOutput
-
-}
+var global_id = 0;
+var value_array = Array();
+var operator_array = Array();
+var title_array = Array();
+title_array["="] = "$_("Equal")";
+title_array["!="] = "$_("Not equal")";
+title_array["<"] = "$_("Lesser than")";
+title_array[">"] = "$_("Greater than")";
+title_array["<="] = "$_("Lesser or equal")";
+title_array[">="] = "$_("Greater or equal")";
+title_array["<>"] = "$_("Substring")";
+title_array["<>*"] = "$_("Substring (case-insensitive)")";
+title_array["~"] = "$_("Regular expression")";
+title_array["~*"] = "$_("Regular expression (case-insensitive)")";
 
 
+function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
+        var elem;
+        var select = document.createElement("select");
 
-options_array = new Array()
-functions_array = new Array()
-
-
-function del_td(name, num)
-{
-        old = document.getElementById("td_" + name + num)
-        if ( ! old )
-                return
-
-        row = old.parentNode
-
-        td = document.createElement("td")
-        td.setAttribute("id", "td_" + name + num)
-
-        row.insertBefore(td, old)
-        row.removeChild(old)
-}
-
-
-function filter_add_list(value, object, name, num) {
-        td = document.getElementById("td_" + name + num)
-
-        var opt;
-
-        select = document.createElement("select")
-        select.setAttribute("name", name + '_value_' + num)
-        select.setAttribute("class", "popup_input_field")
-        td.appendChild(select)
-
-        for (key in options_array[object]) {
+        for (elem in varray) {
                 option = document.createElement("option")
+                option.setAttribute("value", varray[elem]);
 
-                if ( options_array[object][key] == value ) {
-                        option.setAttribute("selected", "true")
-                }
+                if ( title_array[varray[elem]] )
+                        option.setAttribute("title", title_array[varray[elem]]);
 
-                option_value = document.createTextNode(options_array[object][key])
-                option.appendChild(option_value)
+                if ( varray[elem] == selected )
+                        option.setAttribute("selected", "selected");
+
+                option.appendChild(document.createTextNode(varray[elem]))
                 select.appendChild(option)
         }
-}
 
-function filter_add_input(value, object, name, num) {
-        td = document.getElementById("td_" + name + num)
+        select.setAttribute("name", name_attr);
+        select.setAttribute("class", sclass);
 
-        input = document.createElement("input")
-        input.setAttribute("class", "popup_input_field")
-        input.setAttribute("name", name + '_value_' + num)
-        input.setAttribute("type", "text")
-        input.setAttribute("value", value)
-        td.appendChild(input)
+        return select;
 }
 
 
+\$(document).ready(function() {
 
-#for $category, $aggregations in (
-                          ("classification", $classification_aggregations),
-                          ("analyzer", $analyzer_aggregations),
-                          ("source", $source_aggregations),
-                          ("target", $target_aggregations)
-)
+ \$(".remove_entry").live("click", function() {
+        \$(this).parent().parent().remove();
+ });
 
+ \$(".append_entry").live("click", function() {
+   global_id += 1;
 
-function aggregated_${category}_add_entry(path) {
-        table = document.getElementById("${category}_aggregation_table")
+   var tr = \$(this).parent().parent().clone();
+   var input = \$(tr).children("td.td_container_value").children();
+   var select = \$(tr).children("td.td_container_path").children();
+   var div_id = \$(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().attr("id");
 
-        if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
-                table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
-        }
+   \$(tr).children("td.td_container_operator").children().attr("name", div_id + "_operator_" + global_id);
+   \$(input).attr("name", div_id + "_value_" + global_id);
+   \$(input).attr("value", "");
+   \$(input).find("option[value='none']").attr("selected", "selected");
 
-        row = document.createElement("tr")
-        table.appendChild(row)
+   \$(select).attr("name", div_id + "_object_" + global_id);
+   \$(select).trigger("change");
 
-        field = document.createElement("th")
-        row.appendChild(field)
-        content = document.createTextNode("$_('Group entry by:')")
-        field.appendChild(content)
-
-        field = document.createElement("td")
-        row.appendChild(field)
-        field = document.createElement("td")
-        row.appendChild(field)
-
-        field = document.createElement("td")
-        row.appendChild(field)
-        select = document.createElement("select")
-        field.appendChild(select)
-
-        select.setAttribute("class", "popup_input_field")
-        select.setAttribute("name", "aggregated_${category}")
-
-        #for $aggregation_name, $aggregated_path, $unused in $aggregations
-
-        option = document.createElement("option")
-
-#if $aggregated_path == None
-        option.setAttribute("disabled", "disabled")
-#else
-        option.setAttribute("value", '$aggregated_path')
-        if ( path == '$aggregated_path' ) {
-                option.setAttribute("selected", "true")
-        }
-#end if
-
-        option_value = document.createTextNode('$aggregation_name')
-        option.appendChild(option_value)
-        select.appendChild(option)
-
-        #end for
-
-        end(row)
-        field = document.createElement("td")
-        field.setAttribute("width", "11px")
-        row.appendChild(field)
-
-        link = document.createElement("a")
-        link.onclick = function(){ aggregated_${category}_add_entry('') }
-        content = document.createTextNode("+")
-        link.appendChild(content)
-        field.appendChild(link)
-}
-#end for
-
-#for $name, $objects in (
-                          ("classification", $classification_filters),
-                          ("analyzer", $analyzer_filters),
-                          ("source", $source_filters),
-                          ("target", $target_filters),
-)
-
-function ${name}_add_entry(object, operator, value, num) {
-        table = document.getElementById('${name}_table')
-
-        if ( table.lastChild && table.lastChild.nodeName == "TR" ) {
-                table.lastChild.lastChild.removeChild(table.lastChild.lastChild.lastChild)
-        }
-
-        row = document.createElement("tr")
-        table.appendChild(row)
-
-        field = document.createElement("th")
-        content = document.createTextNode("$_('Filter on:')")
-        field.appendChild(content)
-        row.appendChild(field)
-
-        field = document.createElement("td")
-        row.appendChild(field)
-        select = document.createElement("select")
-        field.appendChild(select)
-
-        select.setAttribute("class", "popup_select_field")
-        select.setAttribute("name", "${name}_object_" + num)
-        select.onchange = function() { del_td('${name}', num); functions_array[this.options[this.selectedIndex].value](value, this.options[this.selectedIndex].value, '${name}', num) }
-
-        var add_default
-        var add_default_object
-
-#for $object_name, $object, $obval in $objects
-        option = document.createElement("option")
-
-#if $obval == None
-        func = filter_add_input
-#else
-        func = filter_add_list
-        options_array["$object"] = new Array()
-
-        #set $cnt = 0
-        #for $opt in $obval
-                options_array["$object"][$cnt] = '${opt}'
-                #set $cnt += 1
-        #end for
-#end if
-
-#if $object == None
-        option.setAttribute("disabled", "disabled")
-        option.setAttribute("value", '')
-#else
-        option.setAttribute("value", '$object')
-        if ( object == '$object' || ! object ) {
-                option.setAttribute("selected", "true")
-                add_default = func
-                add_default_object = '$object'
-                object = '$object'
-        }
-#end if
-
-        option_value = document.createTextNode('$object_name')
-        option.appendChild(option_value)
-        select.appendChild(option)
+   \$(tr).children("td.td_container_remove").html("<a class=\"remove_entry\">-</a>");
+   \$(this).parents(".inline_filter").after(tr);
+ });
 
 
-        functions_array["$object"] = func
-#end for
+ \$(".popup_select_field").live("change", function() {
+          var td = \$(this).parent();
+          var str = \$(this, "> option:selected").attr("value");
+          var input = \$(td).siblings(".td_container_value").children();
 
-        field = document.createElement("td")
-        row.appendChild(field)
-        select = document.createElement("select")
-        field.appendChild(select)
-        select.setAttribute("class", "popup_operator_select")
-        select.setAttribute("name", "${name}_operator_" + num)
+          if ( operator_array[str] ) {
+                var old_select = \$(td).siblings(".td_container_operator").children();
+                var old_value = \$(old_select).children(":selected").attr("value");
+                select = createSelectFromArray(operator_array[str], "popup_operator_select", \$(old_select).attr("name"), old_value);
+                \$(old_select).replaceWith(select);
+          }
 
-        if ( ! operator )
-                operator = "<>*";
+          if ( value_array[str] ) {
+                  select = createSelectFromArray(value_array[str], "popup_input_field", \$(input).attr("name"), \$(input).attr("value"));
+                  \$(input).replaceWith(select);
+          }
 
-        get_operator_option(select, operator)
+          else {
+                var n = document.createElement("input");
+                n.setAttribute("type", "text");
+                n.setAttribute("name", \$(input).attr("name"));
+                n.setAttribute("value", \$(input).attr("value"));
+                n.setAttribute("class", "popup_input_field");
+                \$(input).replaceWith(n);
+          }
+ });
 
-        field = document.createElement("td")
-        field.setAttribute("id", "td_$name" + num)
-        row.appendChild(field)
 
-        if (add_default) {
-                add_default(value, add_default_object, '${name}', num);
-        }
 
-        end(row)
+ #for $type, $table in ("classification", $classification), ("source", $source), ("target", $target), ("analyzer", $analyzer)
+  #set $cnt = 0
 
-        field = document.createElement("td")
-        field.setAttribute("width", "11px")
-        row.appendChild(field)
-        link = document.createElement("a")
-        link.onclick = function(){ ${name}_add_entry('', '', '', (num + 1)) };
-        content = document.createTextNode("+")
-        link.appendChild(content)
-        field.appendChild(link)
-}
+  /* trigger change for each empty filter, so that operator/value are positionned correctly */
+  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
 
-#end for
+  #for $path, $operator, $value in $table
+
+   #if $cnt > 0
+    \$("#${type} table.filter_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+  #if not $path
+   #continue
+  #end if
+
+  \$("#$type table.filter_table tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
+  \$("#$type table.filter_table tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
+  \$("#$type table.filter_table tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
+  \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
+  #end for
+ #end for
+
+ #for $type, $table in ("classification", $aggregated_classification), ("source", $aggregated_source), ("target", $aggregated_target), ("analyzer", $aggregated_analyzer)
+  #set $cnt = 0
+  #for $path in $table
+
+   #if $cnt > 0
+    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+  #end for
+ #end for
+});
+
 //--></script>
 
 #end filter
-#filter Filter
-#end filter
 #end block
+
+
+#def define_inline_filter($obname, $preselect)
+      <table class="inline_filter_content filter_table">
+       <tr class="inline_filter">
+        <th>$_('Filter on:')</th>
+        <td class="td_container_path">
+         <select class="popup_select_field" name="${obname}_object_0">
+          #for $name, $path, $oplist, $value in $all_filters[$obname]
+
+           #if $value or $oplist
+           <script type="text/javascript">
+            #if $value
+            value_array["$path"] = $value;
+            #end if
+            #if $oplist
+             operator_array["$path"] = $oplist;
+            #end if
+           </script>
+           #end if
+
+           #if $path == None
+            <option disabled="disabled" value="">$name</option>
+
+           #elif $path == $preselect
+            <option value="$path" selected="selected">$name</option>
+
+           #else
+            <option value="$path">$name</option>
+           #end if
+          #end for
+         </select>
+        </td>
+        <td class="td_container_operator">
+         <select class="popup_operator_select" name="${obname}_operator_0"></select>
+        </td>
+        <td class="td_container_value">
+         <input class="popup_input_field" type="text" name="${obname}_value_0"></input>
+        </td>
+        <td class="td_container_remove">&nbsp;</td>
+        <td class="td_container_add"><a class="append_entry">+</a></td>
+       </tr>
+      </table>
+#end def
+
+
+#def define_inline_aggreg($obname)
+      <table class="inline_filter_content aggregation_table">
+       <tr class="inline_filter">
+        <th>$_('Group entry by:')</th>
+        <td class="td_container_path">
+         <select class="popup_input_field" name="aggregated_${obname}">
+          #for $name, $path, $unuseda, $unusedb in $all_aggregs[$obname]
+           #if $path == None
+            <option disabled="disabled" value="">$name</option>
+           #else
+            <option value="$path">$name</option>
+           #end if
+          #end for
+         </select>
+        </td>
+        <td class="td_container_remove">&nbsp;</td>
+        <td class="td_container_add"><a class="append_entry">+</a></td>
+       </tr>
+      </table>
+#end def
 
 
 #block message_fields_header
 
 <thead>
-<tr style="height: 20px;">
+ <tr style="height: 20px;">
   <th class="filter_popup">
-    <a>$_("Classification")</a>
-    <div id="classification">
-     <table>
-      <tr><td><table class="inline_filter_content"><tbody id="classification_table"></tbody></table></td></tr>
-      <tr><td><table class="inline_filter_content"><tbody id="classification_aggregation_table"></tbody></table></td></tr>
-      <tr><td>
-      <table class="inline_filter_content">
-      <tr>
-       <th>$_("Type:")</th>
-       <td>&nbsp;</td>
-      #if $correlation_alert_view
-       #set $disabled="disabled=\"disabled\""
-      #else
-       #set $disabled=""
-      #end if
-
-      #for name, path in (($N_("Alert"), "alert.create_time"), ($N_("CorrelationAlert"), "alert.correlation_alert.name"),
-                          ($N_("OverflowAlert"), "alert.overflow_alert.program"), ($N_("ToolAlert"), "alert.tool_alert.name"))
-        #if path in $alert.type
-         #set $checked = "checked='checked'"
+   <a>$_("Classification")</a>
+   <div id="classification">
+    <table>
+     <tr><td>$define_inline_filter("classification", "alert.classification.text")</td></tr>
+     <tr><td>$define_inline_aggreg("classification")</td></tr>
+     <tr><td><table class="inline_filter_content">
+       <tr>
+        <th>$_("Type:")</th>
+        <td>&nbsp;</td>
+        #if $correlation_alert_view
+         #set $disabled="disabled=\"disabled\""
         #else
-         #set $checked = ""
+         #set $disabled=""
         #end if
+
+        #for name, path in (($N_("Alert"), "alert.create_time"), ($N_("CorrelationAlert"), "alert.correlation_alert.name"),
+                          ($N_("OverflowAlert"), "alert.overflow_alert.program"), ($N_("ToolAlert"), "alert.tool_alert.name"))
+         #if path in $alert.type
+          #set $checked = "checked='checked'"
+         #else
+          #set $checked = ""
+         #end if
 
         <td>$_($name)<input class="checkbox" $disabled type="checkbox" name="alert.type" value="$path" $checked /></td>
-      #end for
-      </tr>
+        #end for
+       </tr>
 
-
-      <tr>
-       <th>$_("Severity:")</th>
-      #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
-        #if $item in $alert.assessment.impact.severity
-         #set $checked = "checked='checked'"
-        #else
-         #set $checked = ""
-        #end if
+       <tr>
+        <th>$_("Severity:")</th>
+        #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
+         #if $item in $alert.assessment.impact.severity
+          #set $checked = "checked='checked'"
+         #else
+          #set $checked = ""
+         #end if
         <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="$item" $checked /></td>
-      #end for
-      </tr>
+        #end for
+       </tr>
 
-      <tr>
-       <th>$_("Completion:")</th>
-       <td colspan="2">&nbsp;</td>
+       <tr>
+        <th>$_("Completion:")</th>
+        <td colspan="2">&nbsp;</td>
 
-      #for item in $N_("succeeded"), $N_("failed"), $N_("none")
-        #if item in $alert.assessment.impact.completion
-         #set $checked = "checked='checked'"
-        #else
-         #set $checked = ""
-        #end if
+        #for item in $N_("succeeded"), $N_("failed"), $N_("none")
+         #if item in $alert.assessment.impact.completion
+          #set $checked = "checked='checked'"
+         #else
+          #set $checked = ""
+         #end if
         <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="$item" $checked /></td>
-      #end for
-
-    </tr>
+        #end for
+       </tr>
+      </table>
+     </td></tr>
     </table>
-      </td></tr>
-     </table>
-
-      <script type="text/javascript">
-        #set $cnt = 0
-        #for $object, $operator, $value in $classification
-          classification_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
-          #set $cnt = $cnt + 1
-        #end for
-
-      #if len($aggregated_classification) == 0
-        aggregated_classification_add_entry("")
-      #else
-        #for $path in $aggregated_classification
-          aggregated_classification_add_entry('$path')
-        #end for
-      #end if
-      </script>
     </div>
 
     #if $classification_filtered
@@ -381,89 +284,45 @@ function ${name}_add_entry(object, operator, value, num) {
   </th>
 
   <th class="filter_popup">
-    <a>$_("Source")</a>
-    <div id="source">
-     <table>
-      <tr><td><table class="inline_filter_content"><tbody id="source_table"></tbody></table></td></tr>
-      <tr><td><table class="inline_filter_content"><tbody id="source_aggregation_table"></tbody></table></td></tr>
-     </table>
+   <a>$_("Source")</a>
+   <div id="source">
+    <table>
+     <tr><td>$define_inline_filter("source", "alert.source.node.address.address")</td></tr>
+     <tr><td>$define_inline_aggreg("source")</td></tr>
+    </table>
 
-     <script type="text/javascript">
-        #set $cnt = 0
-        #for $object, $operator, $value in $source
-          source_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
-          #set $cnt += 1
-        #end for
-
-      #if len($aggregated_source) == 0
-        aggregated_source_add_entry("")
-      #else
-        #for $path in $aggregated_source
-          aggregated_source_add_entry('$path')
-        #end for
-      #end if
-     </script>
-    </div>
-    #if $source_filtered
-      <span class="filter_enabled_marker">[$_("filtered")]</span>
-    #end if
+   </div>
+   #if $source_filtered
+   <span class="filter_enabled_marker">[$_("filtered")]</span>
+   #end if
   </th>
 
   <th class="filter_popup">
-    <a>$_("Target")</a>
-    <div id="target">
-     <table>
-      <tr><td><table class="inline_filter_content"><tbody id="target_table"></tbody></table></td></tr>
-      <tr><td><table class="inline_filter_content"><tbody id="target_aggregation_table"></tbody></table></td></tr>
-     </table>
-     <script type="text/javascript">
-        #set $cnt = 0
-        #for $object, $operator, $value in $target
-          target_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
-          #set $cnt = $cnt + 1
-        #end for
+   <a>$_("Target")</a>
+   <div id="target">
+    <table>
+     <tr><td>$define_inline_filter("target", "alert.target.node.address.address")</td></tr>
+     <tr><td>$define_inline_aggreg("target")</td></tr>
+    </table>
+   </div>
 
-      #if len($aggregated_target) == 0
-        aggregated_target_add_entry("")
-      #else
-        #for $path in $aggregated_target
-          aggregated_target_add_entry('$path')
-        #end for
-      #end if
-     </script>
-    </div>
-    #if $target_filtered
-      <span class="filter_enabled_marker">[$_("filtered")]</span>
-    #end if
+   #if $target_filtered
+   <span class="filter_enabled_marker">[$_("filtered")]</span>
+   #end if
   </th>
 
   <th class="filter_popup">
-    <a>$_("Sensor")</a>
-    <div id="analyzer">
-     <table>
-      <tr><td><table class="inline_filter_content"><tbody id="analyzer_table"></tbody></table></td></tr>
-      <tr><td><table class="inline_filter_content"><tbody id="analyzer_aggregation_table"></tbody></table></td></tr>
-     </table>
+   <a>$_("Sensor")</a>
+   <div id="analyzer">
+    <table>
+     <tr><td>$define_inline_filter("analyzer", "alert.analyzer.name")</td></tr>
+     <tr><td>$define_inline_aggreg("analyzer")</td></tr>
+    </table>
+   </div>
 
-     <script  type="text/javascript">
-      #set $cnt = 0
-      #for $object, $operator, $value in $analyzer
-       analyzer_add_entry("$object", "$operator", "$utils.escape_attribute($value)", $cnt)
-       #set $cnt = $cnt + 1
-      #end for
-
-      #if len($aggregated_analyzer) == 0
-        aggregated_analyzer_add_entry("")
-      #else
-        #for $path in $aggregated_analyzer
-          aggregated_analyzer_add_entry('$path')
-        #end for
-      #end if
-     </script>
-    </div>
-    #if $analyzer_filtered
-      <span class="filter_enabled_marker">[$_("filtered")]</span>
-    #end if
+   #if $analyzer_filtered
+    <span class="filter_enabled_marker">[$_("filtered")]</span>
+   #end if
   </th>
 
   <td>$_("Time")</td>

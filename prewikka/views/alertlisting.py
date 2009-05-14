@@ -49,6 +49,16 @@ def _getEnumValue(class_id):
     return nlist
 
 
+def _getOperatorList(type):
+    if type == prelude.IDMEF_VALUE_TYPE_STRING:
+        return ["<>*", "<>", "=", "~*", "~"]
+
+    elif type == prelude.IDMEF_VALUE_TYPE_DATA:
+        return ["<>*", "<>", "~", "~*", "=", "<", ">" ]
+
+    else:
+        return ["=", "<", ">", "<=", ">=" ]
+
 def _getPathList(class_id, path, add_index=None, depth=0):
     plist = []
 
@@ -59,9 +69,9 @@ def _getPathList(class_id, path, add_index=None, depth=0):
         tmp = path[path.rfind(".") + 1:]
         elen = tmp.find("(")
         if elen == -1:
-            plist += [( _normalizeName(tmp), None, None) ]
+            plist += [( _normalizeName(tmp), None, None, None) ]
         else:
-            plist += [( _normalizeName(tmp[:elen]), None, None) ]
+            plist += [( _normalizeName(tmp[:elen]), None, None, None) ]
         depth += 1
 
     i = 0
@@ -73,7 +83,7 @@ def _getPathList(class_id, path, add_index=None, depth=0):
             break
 
         vtype = prelude.idmef_class_get_child_value_type(class_id, i)
-        space = "\u00a0\u00a0" * depth
+        space = "&nbsp;" * depth
 
         if vtype == prelude.IDMEF_VALUE_TYPE_CLASS:
             if add_index and prelude.idmef_class_is_child_list(class_id, i):
@@ -81,7 +91,7 @@ def _getPathList(class_id, path, add_index=None, depth=0):
             else:
                 index = ""
 
-            child_list += [ (space + _normalizeName(name), None, None) ]
+            child_list += [ (space + _normalizeName(name), None, None, None) ]
             child_list += _getPathList(prelude.idmef_class_get_child_class(class_id, i), path + "." + name + index, add_index, depth + 1)
         else:
             if vtype == prelude.IDMEF_VALUE_TYPE_ENUM:
@@ -89,7 +99,7 @@ def _getPathList(class_id, path, add_index=None, depth=0):
             else:
                 pval = None
 
-            plist += [( space + name, path + "." + name, pval) ]
+            plist += [( space + name, path + "." + name, _getOperatorList(vtype), pval) ]
 
         i += 1
 
@@ -99,10 +109,10 @@ def _getPathList(class_id, path, add_index=None, depth=0):
 def _getClassificationPath(add_empty=False, add_index=None):
     empty = [ ]
     if add_empty:
-        empty += [("", "none", None)]
+        empty += [("", "none", None, None)]
 
     return empty + \
-           [("messageid", "alert.messageid", None)] + \
+           [("messageid", "alert.messageid", _getOperatorList(prelude.IDMEF_VALUE_TYPE_STRING), None)] + \
            _getPathList(prelude.IDMEF_CLASS_ID_CLASSIFICATION, "alert.classification", add_index=add_index) + \
            _getPathList(prelude.IDMEF_CLASS_ID_ASSESSMENT, "alert.assessment", add_index=add_index) + \
            _getPathList(prelude.IDMEF_CLASS_ID_OVERFLOW_ALERT, "alert.overflow_alert", add_index=add_index) + \
@@ -113,21 +123,21 @@ def _getClassificationPath(add_empty=False, add_index=None):
 def _getSourcePath(add_empty=False, add_index=None):
     empty = [ ]
     if add_empty:
-        empty += [("", "none", None)]
+        empty += [("", "none", None, None)]
 
     return empty + _getPathList(prelude.IDMEF_CLASS_ID_SOURCE, "alert.source(0)", add_index=add_index)
 
 def _getTargetPath(add_empty=False, add_index=None):
     empty = [ ]
     if add_empty:
-        empty += [("", "none", None)]
+        empty += [("", "none", None, None)]
 
     return empty + _getPathList(prelude.IDMEF_CLASS_ID_TARGET, "alert.target(0)", add_index=add_index)
 
 def _getAnalyzerPath(add_empty=False, add_index=None):
     empty = [ ]
     if add_empty:
-        empty += [("", "none", None)]
+        empty += [("", "none", None, None)]
 
     return empty + _getPathList(prelude.IDMEF_CLASS_ID_ANALYZER, "alert.analyzer(-1)", add_index=add_index)
 
@@ -492,8 +502,7 @@ class ListedAlert(ListedMessage):
 
     def _setMessageClassification(self, dataset, message):
         self._setMessageClassificationReferences(dataset, message)
-        dataset["classification"] = self.createInlineFilteredField("alert.classification.text",
-                                                                   message["alert.classification.text"])
+        dataset["classification"] = self.createInlineFilteredField("alert.classification.text", message["alert.classification.text"], "classification")
 
     def _fetchInfoFromLinkedMessage(self, criteria, source, target):
         result = self.env.idmef_db.getAlertIdents(criteria)
@@ -668,7 +677,7 @@ class ListedAggregatedAlert(ListedAlert):
         infos = {
             "classification_references": "",
             "count": count,
-            "classification": self.createInlineFilteredField("alert.classification.text", classification),
+            "classification": self.createInlineFilteredField("alert.classification.text", classification, "classification"),
             "severity": { "value": severity },
             "completion": { "value": completion }
             }
@@ -1077,6 +1086,8 @@ class AlertListing(MessageListing, view.View):
         self.dataset["target_aggregations"] = TARGET_AGGREGATIONS
         self.dataset["analyzer_filters"] = ANALYZER_FILTERS
         self.dataset["analyzer_aggregations"] = ANALYZER_AGGREGATIONS
+        self.dataset["all_filters"] = { "classification" : CLASSIFICATION_FILTERS, "source": SOURCE_FILTERS, "target": TARGET_FILTERS, "analyzer": ANALYZER_FILTERS }
+        self.dataset["all_aggregs"] = { "classification" : CLASSIFICATION_AGGREGATIONS, "source": SOURCE_AGGREGATIONS, "target": TARGET_AGGREGATIONS, "analyzer": ANALYZER_AGGREGATIONS }
 
     def render(self):
         MessageListing.render(self)
