@@ -745,6 +745,13 @@ function ${type}_set_filter_saved() {
 #end if
 #end def
 
+#def classificationWrite(info, text)
+<a class="impact_severity_$info.severity.value popup_menu_toggle">$text</a><span class="popup_menu">
+- <a href="$info.display">$_("See alert detail")</a><br />
+- <a href="$info.classification.inline_filter">$_("Filter on this classification.text")</a><br />
+</span>#slurp
+#end def
+
 #def writeService($hstr, $direction)
 #if $direction.service.value != None#$hstr<a class="popup_menu_toggle">$str($direction.service.value)#end if
 </a>
@@ -757,6 +764,7 @@ function ${type}_set_filter_saved() {
         #end if
        </span>#slurp
 #end def
+
 
 #block message_fields
 #filter CleanOutput
@@ -779,14 +787,30 @@ function ${type}_set_filter_saved() {
   #end if
 
   #for $info in $message.infos
-    #if $message.aggregated and (len($message.infos) > 1 or $info.count > 1)
-      $info.count x
+    #if $info.classification.value
+     #set $text = $info.classification.value
+    #else
+     #set $text = "n/a"
     #end if
 
-    #if $info.classification.value
-      <a class="impact_severity_$info.severity.value" href="$info.display">$info.classification.value</a>
+    #if $message.aggregated and (len($message.infos) > 1 or $info.count > 1)
+      #if $info.count == 1
+       $info.count x
+        #filter Filter $classificationWrite($info, $text) #end filter
+      #else
+      <a href="$info.display">$info.count</a> x
+       #if $info.classification.already_filtered
+        <span class="impact_severity_$info.severity.value">$text</span>
+       #else
+        <a class="impact_severity_$info.severity.value" href="$info.classification.inline_filter">$text</a>
+       #end if
+      #end if
     #else
-      <a class="impact_severity_$info.severity.value" href="$info.display">n/a</a>
+      #if $info.classification.already_filtered
+      <a class="impact_severity_$info.severity.value" href="$info.display">$text</a>
+      #else
+       #filter Filter $classificationWrite($info, $text) #end filter
+      #end if
     #end if
 
     #if $info.completion.value
