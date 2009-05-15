@@ -573,7 +573,7 @@ class ListedAlert(ListedMessage):
         dataset["count"] = 1
         dataset["display"] = self.createMessageLink(ident, "alert_summary")
         dataset["severity"] = { "value": message["alert.assessment.impact.severity"] }
-        dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"], "classification")
+        dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"])
 
     def _setMessageTime(self, message):
         self["time"] = self.createTimeField(message["alert.create_time"], self.timezone)
@@ -679,7 +679,7 @@ class ListedAggregatedAlert(ListedAlert):
             "count": count,
             "classification": self.createInlineFilteredField("alert.classification.text", classification, "classification"),
             "severity": { "value": severity },
-            "completion": self.createInlineFilteredField("alert.assessment.impact.completion", completion, "classification")
+            "completion": self.createInlineFilteredField("alert.assessment.impact.completion", completion)
             }
 
         self["infos"].append(infos)
