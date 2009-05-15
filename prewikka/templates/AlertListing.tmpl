@@ -57,19 +57,24 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
  });
 
  \$(".append_entry").live("click", function() {
-   global_id += 1;
-
    var tr = \$(this).parent().parent().clone();
-   var input = \$(tr).children("td.td_container_value").children();
    var select = \$(tr).children("td.td_container_path").children();
    var div_id = \$(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().attr("id");
 
-   \$(tr).children("td.td_container_operator").children().attr("name", div_id + "_operator_" + global_id);
-   \$(input).attr("name", div_id + "_value_" + global_id);
-   \$(input).attr("value", "");
-   \$(input).find("option[value='none']").attr("selected", "selected");
+   if ( \$(this).parent().parent().parent().parent().is("table.aggregation_table") )
+        \$(select).attr("name", "aggregated_" + div_id);
 
-   \$(select).attr("name", div_id + "_object_" + global_id);
+   else {
+        global_id += 1;
+
+        var input = \$(tr).children("td.td_container_value").children();
+        \$(tr).children("td.td_container_operator").children().attr("name", div_id + "_operator_" + global_id);
+        \$(input).attr("name", div_id + "_value_" + global_id);
+        \$(input).attr("value", "");
+        \$(input).find("option[value='none']").attr("selected", "selected");
+        \$(select).attr("name", div_id + "_object_" + global_id);
+   }
+
    \$(select).trigger("change");
 
    \$(tr).children("td.td_container_remove").html("<a class=\"remove_entry\">-</a>");
