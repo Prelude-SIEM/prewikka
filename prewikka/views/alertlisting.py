@@ -784,40 +784,39 @@ class AlertListing(MessageListing, view.View):
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.type",
                                       ["other", "admin", "dos", "file", "recon", "user"])
 
+    def _filterTupleToString(self, (object, operator, value)):
+        return "%s %s '%s'" % (object, operator, utils.escape_criteria(value))
 
     def _applyFiltersForCategory(self, criteria, type):
-        def get_string((object, operator, value)):
-            return "%s %s '%s'" % (object, operator, utils.escape_criteria(value))
-
-        if self.parameters[type]:
-
-            # If one object is specified more than one time, and since this object
-            # can not have two different value, we want to apply an OR operator.
-            #
-            # We apply an AND operator between the different objects.
-
-            merge = { }
-            for obj in self.parameters[type]:
-                if merge.has_key(obj[0]):
-                    merge[obj[0]] += [ obj ]
-                else:
-                    merge[obj[0]] =  [ obj ]
-
-            newcrit = ""
-            for key in iter(merge):
-                if len(newcrit) > 0:
-                    newcrit += " && "
-
-                newcrit += "(" + " || ".join(map(get_string, merge[key])) + ")"
-
-            if newcrit:
-                criteria.append(newcrit)
-
-            self.dataset[type] = [ (path.replace("(0)", "").replace("(-1)", ""), operator, value) for path, operator, value in self.parameters[type] ]
-            self.dataset["%s_filtered" % type] = True
-        else:
+        if not self.parameters[type]:
             self.dataset[type] = [ ("", "", "") ]
             self.dataset["%s_filtered" % type] = False
+            return
+
+        # If one object is specified more than one time, and since this object
+        # can not have two different value, we want to apply an OR operator.
+        #
+        # We apply an AND operator between the different objects.
+
+        merge = { }
+        for obj in self.parameters[type]:
+            if merge.has_key(obj[0]):
+                merge[obj[0]] += [ obj ]
+            else:
+                merge[obj[0]] =  [ obj ]
+
+        newcrit = ""
+        for key in iter(merge):
+            if len(newcrit) > 0:
+                newcrit += " && "
+
+            newcrit += "(" + " || ".join(map(self._filterTupleToString, merge[key])) + ")"
+
+        if newcrit:
+            criteria.append(newcrit)
+
+        self.dataset[type] = [ (path.replace("(0)", "").replace("(-1)", ""), operator, value) for path, operator, value in self.parameters[type] ]
+        self.dataset["%s_filtered" % type] = True
 
     def _applyFilters(self, criteria):
         self._applyFiltersForCategory(criteria, "classification")
