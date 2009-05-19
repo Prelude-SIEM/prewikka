@@ -785,7 +785,7 @@ class AlertListing(MessageListing, view.View):
                                       ["other", "admin", "dos", "file", "recon", "user"])
 
 
-    def _applyCheckboxFilters(self, criteria, type):
+    def _applyFiltersForCategory(self, criteria, type):
         def get_string((object, operator, value)):
             return "%s %s '%s'" % (object, operator, utils.escape_criteria(value))
 
@@ -820,12 +820,12 @@ class AlertListing(MessageListing, view.View):
             self.dataset["%s_filtered" % type] = False
 
     def _applyFilters(self, criteria):
-        self._applyCheckboxFilters(criteria, "classification")
+        self._applyFiltersForCategory(criteria, "classification")
         self._applyClassificationFilters(criteria)
 
-        self._applyCheckboxFilters(criteria, "source")
-        self._applyCheckboxFilters(criteria, "target")
-        self._applyCheckboxFilters(criteria, "analyzer")
+        self._applyFiltersForCategory(criteria, "source")
+        self._applyFiltersForCategory(criteria, "target")
+        self._applyFiltersForCategory(criteria, "analyzer")
 
 
     def _getMissingAggregatedInfos(self, message, path_value_hash, parameters, criteria2, aggregated_count):
