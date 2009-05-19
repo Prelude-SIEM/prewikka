@@ -37,6 +37,8 @@ from Cheetah.CheetahWrapper import CheetahWrapper
 
 
 PREWIKKA_VERSION = "0.9.14"
+LIBPRELUDE_REQUIRED_VERSION = "0.9.23"
+LIBPRELUDEDB_REQUIRED_VERSION = "0.9.12"
 
 from fnmatch import fnmatch
 from distutils.dep_util import newer
@@ -178,6 +180,8 @@ class my_install(install):
         print >> config, "locale_dir = '%s'" % os.path.abspath((self.prefix + "/share/locale"))
         print >> config, "conf_dir = '%s'" % os.path.abspath((self.conf_prefix))
         print >> config, "version = '%s'" % PREWIKKA_VERSION
+        print >> config, "libprelude_required_version = '%s'" % LIBPRELUDE_REQUIRED_VERSION
+        print >> config, "libpreludedb_required_version = '%s'" % LIBPRELUDEDB_REQUIRED_VERSION
         config.close()
             
     def run(self):

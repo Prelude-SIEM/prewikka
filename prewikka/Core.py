@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import os, copy, time
-import preludedb, CheetahFilters
+import prelude, preludedb, CheetahFilters
 
 import prewikka.views
 from prewikka import view, Config, Log, Database, IDMEFDatabase, \
@@ -121,6 +121,15 @@ def get_core_from_config(path, threaded=False):
 
 
 class Core:
+    def _checkVersion(self):
+        self._prelude_version_error = None
+
+        if not prelude.prelude_check_version(siteconfig.libprelude_required_version):
+            self._prelude_version_error = "Prewikka %s require libprelude %s or higher" % (siteconfig.version, siteconfig.libprelude_required_version)
+
+        elif not preludedb.preludedb_check_version(siteconfig.libpreludedb_required_version):
+            self._prelude_version_error = "Prewikka %s require libpreludedb %s or higher" % (siteconfig.version, siteconfig.libpreludedb_required_version)
+
     def __init__(self, config=None):
         class Env: pass
         self._env = Env()
@@ -136,6 +145,8 @@ class Core:
             resolve.init(self._env)
 
         preludedb.preludedb_init()
+
+        self._checkVersion()
 
         self._database_schema_error = None
         try:
@@ -315,7 +326,11 @@ class Core:
         login = None
         view = None
         user = None
+
         try:
+            if self._prelude_version_error:
+                raise Error.PrewikkaUserError("Version Requirement error", self._prelude_version_error)
+
             if self._database_schema_error != None:
                 raise Error.PrewikkaUserError("Database error", self._database_schema_error)
 
