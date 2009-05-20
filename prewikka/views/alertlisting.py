@@ -144,16 +144,31 @@ def _getAnalyzerPath(add_empty=False, add_index=None):
 
 CLASSIFICATION_FILTERS = _getClassificationPath()
 CLASSIFICATION_AGGREGATIONS = _getClassificationPath(add_empty=True, add_index="(0)")
+CLASSIFICATION_GENERIC_SEARCH_FIELDS = [ "alert.classification.text", "alert.classification.reference.name", "alert.classification.reference.origin" ]
 
 SOURCE_FILTERS = _getSourcePath()
 SOURCE_AGGREGATIONS = _getSourcePath(add_empty=True, add_index="(0)")
+SOURCE_GENERIC_SEARCH_FIELDS = [ "alert.source.node.address.address", "alert.source.user.user_id.name",
+                                 "alert.source.user.user_id.number", "alert.source.process.name", "alert.source.process.pid",
+                                 "alert.source.service.protocol", "alert.source.service.iana_protocol_name", "alert.source.service.iana_protocol_number",
+                                 "alert.source.service.port" ]
 
 TARGET_FILTERS = _getTargetPath()
 TARGET_AGGREGATIONS = _getTargetPath(add_empty=True, add_index="(0)")
+TARGET_GENERIC_SEARCH_FIELDS = [ "alert.target.node.address.address", "alert.target.user.user_id.name",
+                                 "alert.target.user.user_id.number", "alert.target.process.name", "alert.target.process.pid",
+                                 "alert.target.service.protocol", "alert.target.service.iana_protocol_name", "alert.target.service.iana_protocol_number",
+                                 "alert.target.service.port" ]
+
 
 ANALYZER_FILTERS = _getAnalyzerPath()
 ANALYZER_AGGREGATIONS = _getAnalyzerPath(add_empty=True, add_index="(0)")
+ANALYZER_GENERIC_SEARCH_FIELDS = [ "alert.analyzer.name", "alert.analyzer.node.name" ]
 
+GENERIC_SEARCH_TABLE = { "classification": CLASSIFICATION_GENERIC_SEARCH_FIELDS,
+                         "source": SOURCE_GENERIC_SEARCH_FIELDS,
+                         "target": TARGET_GENERIC_SEARCH_FIELDS,
+                         "analyzer": ANALYZER_GENERIC_SEARCH_FIELDS }
 
 
 class AlertListingParameters(MessageListingParameters):
@@ -784,8 +799,34 @@ class AlertListing(MessageListing, view.View):
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.type",
                                       ["other", "admin", "dos", "file", "recon", "user"])
 
+
+    def _adjustFilterValue(self, op, value):
+        value = value.strip()
+        if op == "<>*" or op == "<>":
+            return "*" + value + "*"
+        else:
+            return value
+
     def _filterTupleToString(self, (object, operator, value)):
-        return "%s %s '%s'" % (object, operator, utils.escape_criteria(value))
+        return "%s %s '%s'" % (object, operator, utils.escape_criteria(self._adjustFilterValue(operator, value)))
+
+    def _getOperatorForPath(self, path, value):
+        # Check whether the path can handle substring comparison
+        # this need to be done first, since enum check with * won't work with "=" operator.
+        try:
+            c = prelude.idmef_criteria_new_from_string(path + " <>* '" + utils.escape_criteria(value) + "'")
+        except:
+            # Check whether this path can handle the provided value.
+            try:
+                c = prelude.idmef_criteria_new_from_string(path + " = '" + utils.escape_criteria(value) + "'")
+            except:
+                return None
+
+            prelude.idmef_criteria_destroy(c)
+            return "="
+
+        prelude.idmef_criteria_destroy(c)
+        return "<>*"
 
     def _applyFiltersForCategory(self, criteria, type):
         if not self.parameters[type]:
@@ -799,13 +840,26 @@ class AlertListing(MessageListing, view.View):
         # We apply an AND operator between the different objects.
 
         merge = { }
-        for obj in self.parameters[type]:
-            if merge.has_key(obj[0]):
-                merge[obj[0]] += [ obj ]
-            else:
-                merge[obj[0]] =  [ obj ]
-
         newcrit = ""
+        for obj in self.parameters[type]:
+            if obj[0] == "__all__":
+                # We want to lookup the value in our set of predefined path, but also in aggregated
+                # value (which the user can see in the filtered columns).
+                for path in GENERIC_SEARCH_TABLE[type] + self.parameters.get("aggregated_%s" % type):
+                    op = self._getOperatorForPath(path, obj[2])
+                    if op:
+                        if len(newcrit) > 0:
+                            newcrit += " || "
+                        newcrit += self._filterTupleToString((path, op, obj[2]))
+            else:
+                if merge.has_key(obj[0]):
+                    merge[obj[0]] += [ obj ]
+                else:
+                    merge[obj[0]] =  [ obj ]
+
+        if len(newcrit):
+            newcrit = "(" + newcrit + ")"
+
         for key in iter(merge):
             if len(newcrit) > 0:
                 newcrit += " && "
@@ -826,6 +880,7 @@ class AlertListing(MessageListing, view.View):
         self._applyFiltersForCategory(criteria, "target")
         self._applyFiltersForCategory(criteria, "analyzer")
 
+        print criteria
 
     def _getMissingAggregatedInfos(self, message, path_value_hash, parameters, criteria2, aggregated_count):
         selection = [ ]

@@ -52,6 +52,21 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
 
 \$(document).ready(function() {
 
+ \$(".expert_mode").live("click", function() {
+        if ( ! \$(this).parent().parent().children(".td_container_path").children().is(":visible") ) {
+                \$(this).parent().parent().children(".td_container_operator").children().show()
+                \$(this).parent().parent().children(".td_container_path").children("select").show()
+                \$(this).parent().parent().children(".td_container_path").children("input").attr("disabled", "disabled")
+                \$(this).parent().parent().children(".td_container_path").children("select").removeAttr("disabled")
+        } else {
+                \$(this).parent().parent().children(".td_container_path").children().hide()
+                \$(this).parent().parent().children(".td_container_operator").children().hide()
+                \$(this).parent().parent().children(".td_container_path").children("input").removeAttr("disabled")
+                \$(this).parent().parent().children(".td_container_path").children("select").attr("disabled", "disabled")
+        }
+});
+
+
  \$(".remove_entry").live("click", function() {
         \$(this).parent().parent().remove();
  });
@@ -75,10 +90,9 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
         \$(select).attr("name", div_id + "_object_" + global_id);
    }
 
-   \$(select).trigger("change");
-
-   \$(tr).children("td.td_container_remove").html("<a class=\"remove_entry\">-</a>");
    \$(this).parents(".inline_filter").after(tr);
+   \$(select).trigger("change");
+   \$(tr).children("td.td_container_remove").html("<a class=\"remove_entry\">-</a>");
  });
 
 
@@ -89,8 +103,13 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
 
           if ( operator_array[str] ) {
                 var old_select = \$(td).siblings(".td_container_operator").children();
+                var display = \$(old_select).is(":visible")
                 var old_value = \$(old_select).children(":selected").attr("value");
+
                 select = createSelectFromArray(operator_array[str], "popup_operator_select", \$(old_select).attr("name"), old_value);
+                if ( ! display )
+                        \$(select).hide();
+
                 \$(old_select).replaceWith(select);
           }
 
@@ -112,11 +131,11 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
 
 
  #for $type, $table in ("classification", $classification), ("source", $source), ("target", $target), ("analyzer", $analyzer)
-  #set $cnt = 0
 
   /* trigger change for each empty filter, so that operator/value are positionned correctly */
   \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
 
+  #set $cnt = 0
   #for $path, $operator, $value in $table
 
    #if $cnt > 0
@@ -128,8 +147,15 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
    #continue
   #end if
 
-  \$("#$type table.filter_table tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
-  \$("#$type table.filter_table tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
+  #if $path != "__all__"
+   \$("#$type table.filter_table tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
+   \$("#$type table.filter_table tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
+   \$("#$type table.filter_table tr:last .expert_mode").trigger("click");
+  #else
+   \$("#$type table.filter_table tr:last .popup_select_field").hide();
+   \$("#$type table.filter_table tr:last .popup_select_field").attr("disabled", "disabled");
+  #end if
+
   \$("#$type table.filter_table tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
   \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
   #end for
@@ -159,8 +185,11 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
       <table class="inline_filter_content filter_table">
        <tr class="inline_filter">
         <th>$_('Filter on:')</th>
+        <td><a class="expert_mode">[exp]</a></td>
+
         <td class="td_container_path">
-         <select class="popup_select_field" name="${obname}_object_0">
+         <input type="hidden" name="${obname}_object_0" value="__all__" />
+         <select style="display:none;" disabled="disabled" class="popup_select_field" name="${obname}_object_0">
           #for $name, $path, $oplist, $value in $all_filters[$obname]
 
            #if $value or $oplist
@@ -186,12 +215,15 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
           #end for
          </select>
         </td>
+
         <td class="td_container_operator">
-         <select class="popup_operator_select" name="${obname}_operator_0"></select>
+         <select style="display:none;" class="popup_operator_select" name="${obname}_operator_0" />
         </td>
+
         <td class="td_container_value">
-         <input class="popup_input_field" type="text" name="${obname}_value_0"></input>
+         <input class="popup_input_field" type="text" name="${obname}_value_0" />
         </td>
+
         <td class="td_container_remove">&nbsp;</td>
         <td class="td_container_add"><a class="append_entry">+</a></td>
        </tr>
@@ -203,6 +235,7 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
       <table class="inline_filter_content aggregation_table">
        <tr class="inline_filter">
         <th>$_('Group entry by:')</th>
+        <td>&nbsp;</td>
         <td class="td_container_path">
          <select class="popup_input_field" name="aggregated_${obname}">
           #for $name, $path, $unuseda, $unusedb in $all_aggregs[$obname]
