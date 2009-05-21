@@ -40,28 +40,28 @@ class PermissionDeniedError(Error.PrewikkaUserError):
     def __init__(self, action_name):
         Error.PrewikkaUserError.__init__(self, _("Permission Denied"),
                                          _("Access to view '%s' forbidden") % action_name, log=Log.WARNING)
-                                         
-                                         
+
+
 class User:
     def __init__(self, db, login, language, permissions, configuration):
         self._db = db
         self.login = login
         self.permissions = permissions
-        self.configuration = configuration    
+        self.configuration = configuration
         self.setLanguage(language)
-            
+
     def setLanguage(self, lang):
         self.language = lang
         localization.setLocale(lang)
-          
+
     def delConfigValue(self, view, key=None):
         login = self._db.escape(self.login)
-        
+
         if key != None:
             qstr = " AND name = %s" % (self._db.escape(key))
         else:
             qstr = ""
-            
+
         self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s%s" %
                        (self._db.escape(view), login, qstr))
 
@@ -70,22 +70,22 @@ class User:
 
     def delConfigValueMatch(self, view, key):
         login = self._db.escape(self.login)
-        
+
         self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s AND name LIKE %s"
                        % (self._db.escape(view), login, self._db.escape(key)))
 
         for k in self.configuration[view].keys():
             if k.find(key) != -1:
                 self.configuration.pop(key)
-    
+
     def getConfigValue(self, view, key):
         return self.configuration[view][key]
-    
+
     def setConfigValue(self, view, key, value):
         k = self._db.escape(key)
         v = self._db.escape(view)
         login = self._db.escape(self.login)
-        
+
         self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s AND name = %s" % (v, login, k))
         if not type(value) is list:
             self._db.query("INSERT INTO Prewikka_User_Configuration (view, login, name, value) VALUES (%s,%s,%s,%s)" %
@@ -97,9 +97,9 @@ class User:
 
         if not self.configuration.has_key(view):
             self.configuration[view] = { }
-        
+
         self.configuration[view][key] = value
-        
+
     def has(self, perm):
         if type(perm) in (list, tuple):
             return filter(lambda p: self.has(p), perm) == perm

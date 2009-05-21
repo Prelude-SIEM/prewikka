@@ -23,29 +23,29 @@ import Error, Log
 
 class ParameterError(Exception):
         pass
-        
+
 class InvalidParameterError(Error.PrewikkaUserError):
     def __init__(self, name):
-        Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"), 
+        Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
                                                "Parameter '%s' is not valid" % name, log=Log.WARNING)
 
 
 class InvalidParameterValueError(Error.PrewikkaUserError):
     def __init__(self, name, value):
-        Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"), 
+        Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
                                                "Invalid value '%s' for parameter '%s'" % (value, name), log=Log.WARNING)
 
 
 class MissingParameterError(Error.PrewikkaUserError):
     def __init__(self, name):
-        Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"), 
+        Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
                                          "Required parameter '%s' is missing" % name, log=Log.WARNING)
 
 
 
 class Parameters(dict):
     allow_extra_parameters = False
-    
+
     def __init__(self, *args, **kwargs):
         apply(dict.__init__, (self, ) + args, kwargs)
         self._parameters = { }
@@ -53,10 +53,10 @@ class Parameters(dict):
         self.optional("_error_back", str)
         self.optional("_error_retry", str)
         self.optional("_save", str)
-        
+
     def register(self):
         pass
-    
+
     def mandatory(self, name, type):
         self._parameters[name] = { "type": type, "mandatory": True, "save": False }
 
@@ -65,19 +65,19 @@ class Parameters(dict):
 
     def normalize(self, view, user):
         do_load = True
-        
+
         for name, value in self.items():
             try:
                 parameter_type = self._parameters[name]["type"]
             except KeyError:
                 if self.allow_extra_parameters:
                     continue
-                
+
                 raise InvalidParameterError(name)
-                
+
             if not self._parameters.has_key(name) or self._parameters[name]["mandatory"] is not True:
                 do_load = False
-                
+
             if parameter_type is list and not type(value) is list:
                 value = [ value ]
 
@@ -85,7 +85,7 @@ class Parameters(dict):
                 value = parameter_type(value)
             except (ValueError, TypeError):
                 raise InvalidParameterValueError(name, value)
-            
+
             if self._parameters[name]["save"] and self.has_key("_save"):
                 user.setConfigValue(view, name, value)
 
@@ -99,29 +99,29 @@ class Parameters(dict):
         for name in self._parameters.keys():
             if self.has_key(name):
                 continue
-            
+
             if self._parameters[name]["mandatory"]:
                 raise MissingParameterError(name)
-                
+
             elif self._parameters[name]["default"] != None:
                 self[name] = self._parameters[name]["default"]
 
             if self._parameters[name]["save"] and do_load:
                 try:
                     value = user.getConfigValue(view, name)
-                    
+
                     parameter_type = self._parameters[name]["type"]
                     if parameter_type is list and not type(value) is list:
                         value = [ value ]
-                            
+
                     self[name] = parameter_type(value)
-                                            
+
                 except KeyError:
                     pass
-        
+
         try: self.pop("_save")
         except: pass
-        
+
         return do_load
 
     def __add__(self, src):
@@ -141,7 +141,7 @@ class Parameters(dict):
     def copy(self):
         new = self.__class__()
         new.update(self)
-        
+
         return new
 
 

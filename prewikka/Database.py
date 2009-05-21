@@ -32,7 +32,7 @@ class DatabaseError(Exception):
 class _DatabaseInvalidError(DatabaseError):
     def __init__(self, resource):
         self._resource = resource
-    
+
     def __str__(self):
         return "invalid %s '%s'" % (self.type, self._resource)
 
@@ -53,7 +53,7 @@ class DatabaseInvalidFilterError(_DatabaseInvalidError):
 
 
 class DatabaseSchemaError(Exception):
-    pass       
+    pass
 
 
 def get_timestamp(s):
@@ -63,12 +63,12 @@ def get_timestamp(s):
 
 class Database:
     required_version = "0.9.11"
-    
+
     # We reference preludedb_sql_destroy since it might be deleted
     # prior Database.__del__() is called.
     _sql_destroy = preludedb_sql_destroy
     _sql = None
-    
+
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
         for name, default in (("file", None),
@@ -82,7 +82,7 @@ class Database:
                 preludedb_sql_settings_set(settings, name, value)
 
         db_type = config.get("type", "mysql")
-        
+
         self._sql = preludedb_sql_new(db_type, settings)
 
         if config.has_key("log"):
@@ -93,15 +93,15 @@ class Database:
             version = self.query("SELECT version FROM Prewikka_Version")[0][0]
         except PreludeDBError, e:
             raise DatabaseSchemaError(str(e))
-           
+
         if version != self.required_version:
             d = { "version": version, "reqversion": self.required_version }
             raise DatabaseSchemaError(_("Database schema version %(version)s found when %(reqversion)s was required") % d)
- 
+
     def __del__(self):
         if self._sql:
             self._sql_destroy(self._sql)
-        
+
     def queries_from_file(self, filename):
         content = open(filename).read()
         for query in content.split(";"):
@@ -114,7 +114,7 @@ class Database:
             _table = preludedb_sql_query(self._sql, query)
             if not _table:
                 return [ ]
-            
+
             columns = preludedb_sql_table_get_column_count(_table)
             table = [ ]
             while True:
@@ -126,13 +126,13 @@ class Database:
                 table.append(row)
                 for col in range(columns):
                     _field = preludedb_sql_row_fetch_field(_row, col)
-                    if _field:                
+                    if _field:
                         row.append(preludedb_sql_field_to_string(_field))
                     else:
                         row.append(None)
-                
+
             preludedb_sql_table_destroy(_table)
-        
+
         except PreludeDBError, e:
             raise PreludeDBError(e.errno)
 
@@ -148,7 +148,7 @@ class Database:
         preludedb_sql_transaction_abort(self._sql)
 
     def error(self):
-        return 
+        return
 
     def escape(self, data):
         return preludedb_sql_escape(self._sql, data)
@@ -160,7 +160,7 @@ class Database:
 
     def hasUser(self, login):
         rows = self.query("SELECT login FROM Prewikka_User WHERE login = %s" % self.escape(login))
-        
+
         return bool(rows)
 
     def createUser(self, login, email=None):
@@ -174,42 +174,42 @@ class Database:
             self.query("DELETE FROM Prewikka_User WHERE login = %s" % login)
             self.query("DELETE FROM Prewikka_Permission WHERE login = %s" % login)
             self.query("DELETE FROM Prewikka_Session WHERE login = %s" % login)
-            
-            rows = self.query("SELECT id FROM Prewikka_Filter WHERE login = %s" % login)            
+
+            rows = self.query("SELECT id FROM Prewikka_Filter WHERE login = %s" % login)
             if len(rows) > 0:
                 lst = ", ".join([ id[0] for id in rows ])
-                self.query("DELETE FROM Prewikka_Filter_Criterion WHERE Prewikka_Filter_Criterion.id IN (%s)" % lst)                       
-            
+                self.query("DELETE FROM Prewikka_Filter_Criterion WHERE Prewikka_Filter_Criterion.id IN (%s)" % lst)
+
             self.query("DELETE FROM Prewikka_Filter WHERE login = %s" % login)
         except:
             self.transaction_abort()
             raise
-            
+
         self.transaction_end()
-        
+
     def getConfiguration(self, login):
-    
+
         login = self.escape(login)
         rows = self.query("SELECT view, name, value FROM Prewikka_User_Configuration WHERE login = %s" % login)
-        
+
         config = { }
         for view, name, value in rows:
             if not config.has_key(view):
                 config[view] = { }
-                
+
             if not config[view].has_key(name):
                 config[view][name] = value
             else:
                 if type(config[view][name]) is str:
                     config[view][name] = [ config[view][name] ]
-                    
+
                 config[view][name] = config[view][name] + [ value ]
 
         return config
-    
+
     def getUserLogins(self):
         return map(lambda r: r[0], self.query("SELECT login FROM Prewikka_User"))
-        
+
     def getUser(self, login):
         return User.User(self, login, self.getLanguage(login), self.getPermissions(login), self.getConfiguration(login))
 
@@ -228,14 +228,14 @@ class Database:
 
     def setLanguage(self, login, lang):
         self.query("UPDATE Prewikka_User SET lang=%s WHERE login = %s" % (self.escape(lang), self.escape(login)))
-        
+
     def getLanguage(self, login):
         rows = self.query("SELECT lang FROM Prewikka_User WHERE login = %s" % (self.escape(login)))
         if len(rows) > 0:
             return rows[0][0]
-        
+
         return None
-        
+
     def setPermissions(self, login, permissions):
         self.transaction_start()
         self.query("DELETE FROM Prewikka_Permission WHERE login = %s" % self.escape(login))
@@ -275,7 +275,7 @@ class Database:
         if self.query("SELECT name FROM Prewikka_Filter WHERE login = %s AND name = %s" %
                       (self.escape(login), self.escape(filter.name))):
             self.deleteFilter(login, filter.name)
-        
+
         self.transaction_start()
         self.query("INSERT INTO Prewikka_Filter (login, name, comment, formula) VALUES (%s, %s, %s, %s)" %
                    (self.escape(login), self.escape(filter.name), self.escape(filter.comment), self.escape(filter.formula)))
@@ -290,7 +290,7 @@ class Database:
                           (self.escape(login), self.escape(name)))
         if len(rows) == 0:
             return None
-            
+
         id, comment, formula = rows[0]
         elements = { }
         for element_name, path, operator, value in \

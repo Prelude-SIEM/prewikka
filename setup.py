@@ -48,7 +48,7 @@ def listfiles(*dirs):
     return [os.path.join(dir, filename)
             for filename in os.listdir(os.path.abspath(dir))
                 if filename[0] != '.' and fnmatch(filename, pattern)]
-                
+
 class my_install_data(install_data):
     def run(self):
         self.data_files.extend(self._compile_po_files())
@@ -56,7 +56,7 @@ class my_install_data(install_data):
 
     def _compile_po_files(self):
         data_files = []
-        
+
         for po in listfiles("po", "*.po"):
             lang = os.path.basename(po[:-3])
             mo = os.path.join("locale", lang, "LC_MESSAGES", "prewikka.mo")
@@ -66,18 +66,18 @@ class my_install_data(install_data):
                 if not os.path.exists(directory):
                     print "creating %s" % directory
                     os.makedirs(directory)
-                    
+
                 cmd = 'msgfmt -o %s %s' % (mo, po)
                 print "compiling %s -> %s" % (po, mo)
                 if os.system(cmd) != 0:
                     raise SystemExit("Error while running msgfmt")
-            
+
             dest = os.path.dirname(os.path.join('share', mo))
             data_files.append((dest, [mo]))
-            
+
         return data_files
-        
-     
+
+
 
 class my_build_py(build_py):
     def finalize_options(self):
@@ -86,11 +86,11 @@ class my_build_py(build_py):
 
     def get_outputs(self, *args, **kwargs):
         return self.outfiles + apply(build_py.get_outputs, (self, ) + args, kwargs)
-    
+
     def build_templates(self):
         cheetah = CheetahWrapper()
         argbkp = sys.argv[0][:]
-        
+
         for package in self.packages:
             package_dir = self.get_package_dir(package)
             templates = glob.glob(package_dir + '/*.tmpl')
@@ -140,12 +140,12 @@ class my_install_scripts (install_scripts):
             self.run_command('build_scripts')
 
         self.outfiles = []
-        
+
         self.mkpath(os.path.normpath(self.install_dir))
         ofile, copied = self.copy_file(os.path.join(self.build_dir, 'prewikka-httpd'), self.install_dir)
         if copied:
             self.outfiles.append(ofile)
-            
+
         cgi_dir = os.path.join(self.install_data, 'share', 'prewikka', 'cgi-bin')
         if not os.path.exists(cgi_dir):
             os.makedirs(cgi_dir)
@@ -183,13 +183,13 @@ class my_install(install):
         print >> config, "libprelude_required_version = '%s'" % LIBPRELUDE_REQUIRED_VERSION
         print >> config, "libpreludedb_required_version = '%s'" % LIBPRELUDEDB_REQUIRED_VERSION
         config.close()
-            
+
     def run(self):
         os.umask(022)
         self.install_conf()
         self.init_siteconfig()
         install.run(self)
-        
+
         for dir in ("/",
                     "share/prewikka",
                     "share/prewikka/htdocs",
@@ -197,7 +197,7 @@ class my_install(install):
                     "share/prewikka/database", "share/prewikka/cgi-bin"):
             os.chmod((self.root or "") + self.prefix + "/" + dir, 0755)
         os.chmod((self.root or "") + self.conf_prefix, 0755)
-        
+
         if not self.dry_run:
             for filename in self.get_outputs():
                 if filename.find(".conf") != -1:
@@ -209,7 +209,7 @@ class my_install(install):
                 os.chmod(filename, mode)
 
 
-sqlite = open("database/sqlite.sql", "w")            
+sqlite = open("database/sqlite.sql", "w")
 for line in os.popen("database/mysql2sqlite.sh database/mysql.sql"):
     print >> sqlite, line.rstrip()
 sqlite.close()
