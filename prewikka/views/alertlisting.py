@@ -880,8 +880,6 @@ class AlertListing(MessageListing, view.View):
         self._applyFiltersForCategory(criteria, "target")
         self._applyFiltersForCategory(criteria, "analyzer")
 
-        print criteria
-
     def _getMissingAggregatedInfos(self, message, path_value_hash, parameters, criteria2, aggregated_count):
         selection = [ ]
         index = 0
