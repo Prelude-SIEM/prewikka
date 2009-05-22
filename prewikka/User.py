@@ -71,12 +71,9 @@ class User:
     def delConfigValueMatch(self, view, key):
         login = self._db.escape(self.login)
 
-        self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s AND name LIKE %s"
-                       % (self._db.escape(view), login, self._db.escape(key)))
-
         for k in self.configuration[view].keys():
             if k.find(key) != -1:
-                self.configuration.pop(key)
+                self.delConfigValue(view, k)
 
     def getConfigValue(self, view, key):
         return self.configuration[view][key]
