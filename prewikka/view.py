@@ -63,12 +63,24 @@ class Parameters(dict):
     def optional(self, name, type, default=None, save=False):
         self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
+    def _parseValue(self, name, value):
+        parameter_type = self._parameters[name]["type"]
+        if parameter_type is list and not type(value) is list:
+            value = [ value ]
+
+        try:
+            value = parameter_type(value)
+        except (ValueError, TypeError):
+            raise InvalidParameterValueError(name, value)
+
+        return value
+
     def normalize(self, view, user):
         do_load = True
 
         for name, value in self.items():
             try:
-                parameter_type = self._parameters[name]["type"]
+                value = self._parseValue(name, value)
             except KeyError:
                 if self.allow_extra_parameters:
                     continue
@@ -77,14 +89,6 @@ class Parameters(dict):
 
             if not self._parameters.has_key(name) or self._parameters[name]["mandatory"] is not True:
                 do_load = False
-
-            if parameter_type is list and not type(value) is list:
-                value = [ value ]
-
-            try:
-                value = parameter_type(value)
-            except (ValueError, TypeError):
-                raise InvalidParameterValueError(name, value)
 
             if self._parameters[name]["save"] and self.has_key("_save"):
                 user.setConfigValue(view, name, value)
@@ -108,13 +112,7 @@ class Parameters(dict):
 
             if self._parameters[name]["save"] and do_load:
                 try:
-                    value = user.getConfigValue(view, name)
-
-                    parameter_type = self._parameters[name]["type"]
-                    if parameter_type is list and not type(value) is list:
-                        value = [ value ]
-
-                    self[name] = parameter_type(value)
+                    self[name]= self._parseValue(name, user.getConfigValue(view, name))
 
                 except KeyError:
                     pass
