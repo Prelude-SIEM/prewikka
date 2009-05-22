@@ -48,6 +48,7 @@ class Parameters(dict):
 
     def __init__(self, *args, **kwargs):
         apply(dict.__init__, (self, ) + args, kwargs)
+        self._default = {}
         self._parameters = { }
         self.register()
         self.optional("_error_back", str)
@@ -61,6 +62,9 @@ class Parameters(dict):
         self._parameters[name] = { "type": type, "mandatory": True, "save": False }
 
     def optional(self, name, type, default=None, save=False):
+        if default is not None:
+            self._default[name] = default
+
         self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
     def _parseValue(self, name, value):
@@ -101,26 +105,30 @@ class Parameters(dict):
         # - Load last user value for parameter.
 
         for name in self._parameters.keys():
-            if self.has_key(name):
-                continue
+            got_param = self.has_key(name)
+            if not got_param:
+                if self._parameters[name]["mandatory"]:
+                    raise MissingParameterError(name)
 
-            if self._parameters[name]["mandatory"]:
-                raise MissingParameterError(name)
+                elif self._parameters[name]["default"] != None:
+                    self[name] = self._parameters[name]["default"]
 
-            elif self._parameters[name]["default"] != None:
-                self[name] = self._parameters[name]["default"]
-
-            if self._parameters[name]["save"] and do_load:
-                try:
-                    self[name]= self._parseValue(name, user.getConfigValue(view, name))
-
+            if self._parameters[name]["save"]:
+                try: value = self._parseValue(name, user.getConfigValue(view, name))
                 except KeyError:
-                    pass
+                    continue
+
+                self._default[name] = value
+                if do_load and not got_param:
+                    self[name] =  self._default[name]
 
         try: self.pop("_save")
         except: pass
 
         return do_load
+
+    def getDefaultValues(self):
+        return self._default
 
     def __add__(self, src):
         dst = copy(self)
