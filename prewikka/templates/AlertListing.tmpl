@@ -25,6 +25,84 @@ title_array["~"] = "$_("Regular expression")";
 title_array["~*"] = "$_("Regular expression (case-insensitive)")";
 
 
+ var saved_state = [ "classification", "source", "target", "analyzer" ];
+
+ var saved_forms = new Array();
+ saved_forms["classification"] = [ "default", "saved", "current" ];
+ saved_forms["source"] = [ "default", "saved", "current" ];
+ saved_forms["target"] = [ "default", "saved", "current" ];
+ saved_forms["analyzer"] = [ "default", "saved", "current" ];
+
+
+function input_equal(a, b) {
+        if ( a.type == "button" && b.type == "button" )
+                return true;
+
+        if ( a.name != b.name )
+                return false;
+
+        if ( a.checked != b.checked )
+                return false;
+
+        if ( a.selected != b.selected )
+                return false;
+
+        if ( a.value != b.value )
+                return false;
+
+        return true;
+}
+
+function Equals(a, b) {
+  if( ! a || ! b )
+        return false;
+
+  if ( a.length != b.length )
+        return false;
+
+  for ( var k = 0; k < a.length; k++ ) {
+        r = input_equal(a[k], b[k]);
+        if ( r == false )
+                return false;
+  }
+
+  return true;
+}
+
+
+function get_next_state(id, cstate) {
+        var nextstate = null;
+
+        if ( cstate == "current" ) {
+                if ( saved_forms[id]["saved"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["saved"]) )
+                        nextstate = "saved";
+
+                else if ( saved_forms[id]["default"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["default"]) )
+                        nextstate = "default";
+        }
+
+        else if ( cstate == "saved" ) {
+                if ( saved_forms[id]["default"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["default"]) )
+                        nextstate = "default";
+
+                else if ( saved_forms[id]["current"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["current"]) )
+                        nextstate = "current";
+        }
+
+        else if ( cstate == "default" ) {
+                if ( saved_forms[id]["current"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["current"]) )
+                        nextstate = "current";
+
+                else if ( saved_forms[id]["saved"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["saved"]) )
+                        nextstate = "saved";
+
+                else nextstate = "default";
+        }
+
+        return nextstate;
+}
+
+
 function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
         var elem;
         var select = document.createElement("select");
@@ -50,15 +128,271 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
 }
 
 
+###
+### Aggreg set saved/default/current
+###
+ #for $type, $table in ("classification", $aggregated_classification_saved), ("source", $aggregated_source_saved), ("target", $aggregated_target_saved), ("analyzer", $aggregated_analyzer_saved)
+function ${type}_set_aggregation_saved() {
+  #set $cnt = 0
+  #for $path in $table
+
+   #if $cnt > 0
+    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+  #end for
+ }
+#end for
+
+ #for $type, $table in ("classification", $aggregated_classification_default), ("source", $aggregated_source_default), ("target", $aggregated_target_default), ("analyzer", $aggregated_analyzer_default)
+function ${type}_set_aggregation_default() {
+
+  #set $cnt = 0
+  #for $path in $table
+
+   #if $cnt > 0
+    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+  #end for
+ }
+#end for
+
+ #for $type, $table in ("classification", $aggregated_classification), ("source", $aggregated_source), ("target", $aggregated_target), ("analyzer", $aggregated_analyzer)
+function ${type}_set_aggregation_current() {
+
+  #set $cnt = 0
+  #for $path in $table
+
+   #if $cnt > 0
+    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+  #end for
+ }
+ #end for
+
+
+
+###
+### Filter set saved/default
+###
+function classification_special_current() {
+ #for $path in "alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"
+  #if path in $alert.type
+   #set $checked = "checked='checked'"
+  #else
+   #set $checked = ""
+  #end if
+  \$("input[value='${path}']").attr("checked", "$checked");
+ #end for
+
+ #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
+  #if $item in $alert.assessment.impact.severity
+   #set $checked = "checked='checked'"
+  #else
+   #set $checked = ""
+  #end if
+  \$("input[name='alert.assessment.impact.severity'][value='$item']").attr("checked", "$checked");
+ #end for
+
+ #for item in $N_("succeeded"), $N_("failed"), $N_("none")
+  #if item in $alert.assessment.impact.completion
+   #set $checked = "checked='checked'"
+  #else
+   #set $checked = ""
+  #end if
+  \$("input[name='alert.assessment.impact.completion'][value='$item']").attr("checked", "$checked");
+ #end for
+}
+
+
+function classification_special_saved() {
+ #for $path in "alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"
+  #if path in $alert.type_saved
+   #set $checked = "checked='checked'"
+  #else
+   #set $checked = ""
+  #end if
+  \$("input[value='${path}']").attr("checked", "$checked");
+ #end for
+
+ #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
+  #if $item in $alert.assessment.impact.severity_saved
+   #set $checked = "checked='checked'"
+  #else
+   #set $checked = ""
+  #end if
+  \$("input[name='alert.assessment.impact.severity'][value='$item']").attr("checked", "$checked");
+ #end for
+
+ #for item in $N_("succeeded"), $N_("failed"), $N_("none")
+  #if item in $alert.assessment.impact.completion_saved
+   #set $checked = "checked='checked'"
+  #else
+   #set $checked = ""
+  #end if
+  \$("input[name='alert.assessment.impact.completion'][value='$item']").attr("checked", "$checked");
+ #end for
+}
+
+function classification_special_default() {
+ #for $path in "alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"
+  #if path in $alert.type_default
+   #set $checked = "checked='checked'"
+  #else
+   #set $checked = ""
+  #end if
+  \$("input[value='${path}']").attr("checked", "$checked");
+ #end for
+
+ #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
+  #if $item in $alert.assessment.impact.severity_default
+   #set $checked = "checked='checked'"
+  #else
+   #set $checked = ""
+  #end if
+  \$("input[name='alert.assessment.impact.severity'][value='$item']").attr("checked", "$checked");
+ #end for
+
+ #for item in $N_("succeeded"), $N_("failed"), $N_("none")
+  #if item in $alert.assessment.impact.completion_default
+   #set $checked = "checked='checked'"
+  #else
+   #set $checked = ""
+  #end if
+  \$("input[name='alert.assessment.impact.completion'][value='$item']").attr("checked", "$checked");
+ #end for
+}
+
+
+ #for $type, $table in ("classification", $classification), ("source", $source), ("target", $target), ("analyzer", $analyzer)
+
+function ${type}_filters_set_from_string(state) {
+        if ( state == "saved" ) {
+                ${type}_set_filter_saved();
+                ${type}_set_aggregation_saved();
+        }
+
+        else if ( state == "default" ) {
+                ${type}_set_filter_default();
+                ${type}_set_aggregation_default();
+        }
+
+        else if ( state == "current" ) {
+                ${type}_set_filter_current();
+                ${type}_set_aggregation_current();
+        }
+}
+
+
+function ${type}_set_filter_current() {
+  ${type}_set_filter_default()
+
+  #if $type == "classification"
+   ${type}_special_current();
+  #end if
+
+  /* trigger change for each empty filter, so that operator/value are positionned correctly */
+  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
+
+  #set $cnt = 0
+  #for $path, $operator, $value in $table
+
+   #if $cnt > 0
+    \$("#${type} table.filter_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+  #if not $path
+   #continue
+  #end if
+
+  #if $path != "__all__"
+   \$("#$type table.filter_table tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
+   \$("#$type table.filter_table tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
+   \$("#$type table.filter_table tr:last .expert_mode").trigger("click");
+  #else
+   \$("#$type table.filter_table tr:last .popup_select_field").hide();
+   \$("#$type table.filter_table tr:last .popup_select_field").attr("disabled", "disabled");
+  #end if
+
+  \$("#$type table.filter_table tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
+  \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
+  #end for
+ }
+
+ ${type}_set_filter_current();
+ #end for
+
+
+#for $type, $table in ("classification", $classification_saved), ("source", $source_saved), ("target", $target_saved), ("analyzer", $analyzer_saved)
+function ${type}_set_filter_default() {
+ \$("#${type} table.filter_table tr:not(':first'):not(':last')").remove()
+ \$("#${type} table.filter_table input[type=text]").val("")
+
+  #if $type == "classification"
+   ${type}_special_default();
+  #end if
+}
+
+function ${type}_set_filter_saved() {
+
+ ${type}_set_filter_default()
+
+  #if $type == "classification"
+   ${type}_special_saved();
+  #end if
+
+  /* trigger change for each empty filter, so that operator/value are positionned correctly */
+  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
+
+  #set $cnt = 0
+  #for $path, $operator, $value in $table
+
+   #if $cnt > 0
+    \$("#${type} table.filter_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+  #if not $path
+   #continue
+  #end if
+
+  #if $path != "__all__"
+   \$("#$type table.filter_table tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
+   \$("#$type table.filter_table tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
+   \$("#$type table.filter_table tr:last .expert_mode").trigger("click");
+  #else
+   \$("#$type table.filter_table tr:last .popup_select_field").hide();
+   \$("#$type table.filter_table tr:last .popup_select_field").attr("disabled", "disabled");
+  #end if
+
+  \$("#$type table.filter_table tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
+  \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
+  #end for
+ }
+ #end for
+
+
+
 \$(document).ready(function() {
 
  \$(".expert_mode").live("click", function() {
         if ( ! \$(this).parent().parent().children(".td_container_path").children().is(":visible") ) {
+                \$(this).text("simple");
                 \$(this).parent().parent().children(".td_container_operator").children().show()
                 \$(this).parent().parent().children(".td_container_path").children("select").show()
                 \$(this).parent().parent().children(".td_container_path").children("input").attr("disabled", "disabled")
                 \$(this).parent().parent().children(".td_container_path").children("select").removeAttr("disabled")
         } else {
+                \$(this).text("advanced");
                 \$(this).parent().parent().children(".td_container_path").children().hide()
                 \$(this).parent().parent().children(".td_container_operator").children().hide()
                 \$(this).parent().parent().children(".td_container_path").children("input").removeAttr("disabled")
@@ -131,48 +465,53 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
 
 
  #for $type, $table in ("classification", $classification), ("source", $source), ("target", $target), ("analyzer", $analyzer)
+ ${type}_set_filter_saved();
+ ${type}_set_aggregation_saved();
+ saved_forms["${type}"]["saved"] = \$("#${type} input").clone()
 
-  /* trigger change for each empty filter, so that operator/value are positionned correctly */
-  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
+ ${type}_set_filter_default();
+ ${type}_set_aggregation_default();
+ saved_forms["${type}"]["default"] = \$("#${type} input").clone()
 
-  #set $cnt = 0
-  #for $path, $operator, $value in $table
+ ${type}_set_filter_current();
+ ${type}_set_aggregation_current();
+ saved_forms["${type}"]["current"] = \$("#${type} input").clone()
 
-   #if $cnt > 0
-    \$("#${type} table.filter_table tr:last a.append_entry").trigger('click');
-   #end if
-   #set $cnt += 1
 
-  #if not $path
-   #continue
-  #end if
+ if ( Equals(saved_forms["${type}"]["default"], saved_forms["${type}"]["saved"]) )
+        saved_forms["${type}"]["saved"] = null;
 
-  #if $path != "__all__"
-   \$("#$type table.filter_table tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
-   \$("#$type table.filter_table tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
-   \$("#$type table.filter_table tr:last .expert_mode").trigger("click");
-  #else
-   \$("#$type table.filter_table tr:last .popup_select_field").hide();
-   \$("#$type table.filter_table tr:last .popup_select_field").attr("disabled", "disabled");
-  #end if
+ if ( Equals(saved_forms["${type}"]["current"], saved_forms["${type}"]["default"]) )
+        saved_forms["${type}"]["current"] = null;
 
-  \$("#$type table.filter_table tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
-  \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
-  #end for
+ ## Set the current state
+ if ( Equals(\$("#${type} input"), saved_forms["${type}"]["default"]) )
+        saved_state["$type"] = "default";
+
+ else if ( Equals(\$("#${type} input"), saved_forms["$type"]["saved"]) )
+        saved_state["$type"] = "saved";
+
+
+ else if ( Equals(\$("#${type} input"), saved_forms["$type"]["current"]) )
+        saved_state["$type"] = "current";
+
+ ##alert("$type: " + saved_state["$type"]);
+ \$("#${type} input.reset_filter").val("Reset to " + get_next_state("$type", saved_state["$type"]));
+
+
  #end for
 
- #for $type, $table in ("classification", $aggregated_classification), ("source", $aggregated_source), ("target", $aggregated_target), ("analyzer", $aggregated_analyzer)
-  #set $cnt = 0
-  #for $path in $table
+\$("input.reset_filter").click(function() {
+        var div_id = \$(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().attr("id");
+        saved_state[div_id] = get_next_state(div_id, saved_state[div_id]);
 
-   #if $cnt > 0
-    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
-   #end if
-   #set $cnt += 1
+        #for $t in "classification", "source", "target", "analyzer"
+                if ( div_id == "$t" )
+                        ${t}_filters_set_from_string(saved_state[div_id]);
+        #end for
 
-   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
-  #end for
- #end for
+        \$(this).val("Reset to " + get_next_state(div_id, saved_state[div_id]));
+ });
 });
 
 //--></script>
@@ -180,13 +519,10 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
 #end filter
 #end block
 
-
 #def define_inline_filter($obname, $preselect)
       <table class="inline_filter_content filter_table">
        <tr class="inline_filter">
-        <th>$_('Filter on:')</th>
-        <td><a class="expert_mode">[exp]</a></td>
-
+        <th>$_('Filter on') [<a class="expert_mode">advanced</a>]:</th>
         <td class="td_container_path">
          <input type="hidden" name="${obname}_object_0" value="__all__" />
          <select style="display:none;" disabled="disabled" class="popup_select_field" name="${obname}_object_0">
@@ -235,7 +571,6 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
       <table class="inline_filter_content aggregation_table">
        <tr class="inline_filter">
         <th>$_('Group entry by:')</th>
-        <td>&nbsp;</td>
         <td class="td_container_path">
          <select class="popup_input_field" name="aggregated_${obname}">
           #for $name, $path, $unuseda, $unusedb in $all_aggregs[$obname]
@@ -253,13 +588,35 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
       </table>
 #end def
 
+#def filter_enabled_marker($type)
+  <span style="float:right;">
+   #if $type == 2
+    <span class="filter_enabled_marker">[$_("filtered")]</span>
+   #else
+    <span class="filter_enabled_marker" style="color: gray;">[$_("filtered")]</span>
+   #end if
+  </span>
+#end def
+
+#def filter_reset()
+<tr><td>
+    <table class="inline_filter_content">
+     <tr class="inline_filter">
+      <td colspan="3">&nbsp;</td>
+      <td>
+       <input type="submit" value="Apply" />
+       <input type="button" class="reset_filter" value="Reset" />
+      </td>
+     </tr>
+    </table>
+</td></tr>
+#end def
 
 #block message_fields_header
-
 <thead>
  <tr style="height: 20px;">
   <th class="filter_popup">
-   <a>$_("Classification")</a>
+   <a class="filter_popup_link">$_("Classification")</a>
    <div id="classification">
     <table>
      <tr><td>$define_inline_filter("classification", "alert.classification.text")</td></tr>
@@ -289,12 +646,7 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
        <tr>
         <th>$_("Severity:")</th>
         #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
-         #if $item in $alert.assessment.impact.severity
-          #set $checked = "checked='checked'"
-         #else
-          #set $checked = ""
-         #end if
-        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="$item" $checked /></td>
+        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="$item" /></td>
         #end for
        </tr>
 
@@ -303,63 +655,62 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
         <td colspan="2">&nbsp;</td>
 
         #for item in $N_("succeeded"), $N_("failed"), $N_("none")
-         #if item in $alert.assessment.impact.completion
-          #set $checked = "checked='checked'"
-         #else
-          #set $checked = ""
-         #end if
-        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="$item" $checked /></td>
+        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="$item" /></td>
         #end for
        </tr>
       </table>
      </td></tr>
+     $filter_reset()
     </table>
     </div>
 
     #if $classification_filtered
-      <span class="filter_enabled_marker">[$_("filtered")]</span>
+     $filter_enabled_marker($classification_filtered)
     #end if
   </th>
 
   <th class="filter_popup">
-   <a>$_("Source")</a>
+   <a class="filter_popup_link">$_("Source")</a>
    <div id="source">
     <table>
      <tr><td>$define_inline_filter("source", "alert.source.node.address.address")</td></tr>
      <tr><td>$define_inline_aggreg("source")</td></tr>
+     $filter_reset()
     </table>
 
    </div>
    #if $source_filtered
-   <span class="filter_enabled_marker">[$_("filtered")]</span>
+     $filter_enabled_marker($source_filtered)
    #end if
   </th>
 
   <th class="filter_popup">
-   <a>$_("Target")</a>
+   <a class="filter_popup_link">$_("Target")</a>
    <div id="target">
     <table>
      <tr><td>$define_inline_filter("target", "alert.target.node.address.address")</td></tr>
      <tr><td>$define_inline_aggreg("target")</td></tr>
+     $filter_reset()
     </table>
    </div>
 
    #if $target_filtered
-   <span class="filter_enabled_marker">[$_("filtered")]</span>
+     $filter_enabled_marker($target_filtered)
    #end if
   </th>
 
   <th class="filter_popup">
-   <a>$_("Sensor")</a>
+   <a class="filter_popup_link">$_("Sensor")</a>
    <div id="analyzer">
     <table>
      <tr><td>$define_inline_filter("analyzer", "alert.analyzer.name")</td></tr>
      <tr><td>$define_inline_aggreg("analyzer")</td></tr>
+     $filter_reset()
     </table>
    </div>
 
    #if $analyzer_filtered
-    <span class="filter_enabled_marker">[$_("filtered")]</span>
+     $filter_enabled_marker($analyzer_filtered)
    #end if
   </th>
 

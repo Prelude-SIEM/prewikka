@@ -142,6 +142,8 @@ def _getAnalyzerPath(add_empty=False, add_index=None):
     return empty + _getPathList(prelude.IDMEF_CLASS_ID_ANALYZER, "alert.analyzer(-1)", add_index=add_index)
 
 
+COLUMN_LIST = [ "classification", "source", "target", "analyzer" ]
+
 CLASSIFICATION_FILTERS = _getClassificationPath()
 CLASSIFICATION_AGGREGATIONS = _getClassificationPath(add_empty=True, add_index="(0)")
 CLASSIFICATION_GENERIC_SEARCH_FIELDS = [ "alert.classification.text", "alert.classification.reference.name", "alert.classification.reference.origin" ]
@@ -174,6 +176,13 @@ GENERIC_SEARCH_TABLE = { "classification": CLASSIFICATION_GENERIC_SEARCH_FIELDS,
 class AlertListingParameters(MessageListingParameters):
     allow_extra_parameters = True
 
+    def __init__(self, *args, **kwargs):
+        apply(MessageListingParameters.__init__, (self, ) + args, kwargs)
+        MessageListingParameters.__init__(self)
+        self._dynamic_param = { "classification": {}, "source": {}, "target": {}, "analyzer": {} }
+        self._default_param = { "classification": {}, "source": {}, "target": {}, "analyzer": {} }
+        self._saved = { "classification": [], "source": [], "target": [], "analyzer": [] }
+
     def register(self):
         self.max_index = 0
         MessageListingParameters.register(self)
@@ -182,10 +191,8 @@ class AlertListingParameters(MessageListingParameters):
         self.optional("aggregated_classification", list, [ "none" ], save=True)
         self.optional("aggregated_analyzer", list, [ "none" ], save=True)
         self.optional("filter", str, save=True)
-        self.optional("alert.classification.text", list, [ ], save=True)
         self.optional("alert.assessment.impact.severity", list, [ "info", "low", "medium", "high", "none" ], save=True)
         self.optional("alert.assessment.impact.completion", list, [ "succeeded", "failed", "none" ], save=True)
-        self.optional("alert.assessment.impact.type", list, [ "other", "admin", "dos", "file", "recon", "user" ], save=True)
         self.optional("alert.type", list, ["alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"], save=True)
 
     def _checkOperator(self, operator):
@@ -195,11 +202,25 @@ class AlertListingParameters(MessageListingParameters):
         if not operator in ("=", "<", ">", "<=", ">=", "~", "~*", "<>", "<>*"):
             raise view.InvalidParameterValueError("operator", operator)
 
-    def _loadColumnParam(self, view_name, user, paramlist, column, do_save):
-        ret = False
-        sorted = [ ]
+    def _setParam(self, view_name, user, column, param, value, is_default=False):
+        self._dynamic_param[column][param] = value
 
-        for parameter, object in paramlist.items():
+        if is_default:
+            self._default_param[column][param] = value
+            user.setConfigValue(view_name, param, value)
+
+        elif user.configuration.has_key(view_name) and user.configuration[view_name].has_key(param) and user.configuration[view_name][param] != value:
+            self._default_param[column][param] = value
+
+        if not self.has_key(param):
+            # the parameter is loaded from config
+            self[param] = value
+
+    def _paramDictToList(self, params_dict, column):
+        sorted = []
+        ret = False
+
+        for parameter, object in params_dict.items():
             idx = parameter.find(column + "_object_")
             if idx == -1:
                 continue
@@ -209,11 +230,11 @@ class AlertListingParameters(MessageListingParameters):
                 self.max_index = num + 1
 
             ret = True
-            operator = paramlist.get(column + "_operator_" + str(num), "=")
+            operator = params_dict.get(column + "_operator_" + str(num), "=")
             self._checkOperator(operator)
 
             try:
-                value = paramlist[column + "_value_" + str(num)]
+                value = params_dict[column + "_value_" + str(num)]
             except KeyError:
                 continue
 
@@ -227,21 +248,26 @@ class AlertListingParameters(MessageListingParameters):
                 sorted.append((num, object, operator, value))
 
         sorted.sort()
-        self[column] = [ (i[1], i[2], i[3]) for i in sorted ]
+        return ret, sorted
 
+    def _loadColumnParam(self, view_name, user, paramlist, column, do_save):
+        is_saved = False
 
         if do_save:
+            paramlist = copy.copy(paramlist)
             user.delConfigValueMatch(view_name, "%s_object_" % (column))
             user.delConfigValueMatch(view_name, "%s_operator_" % (column))
             user.delConfigValueMatch(view_name, "%s_value_" % (column))
 
-            for num, obj, operator, value in sorted:
-                user.setConfigValue(view_name, "%s_object_%d" % (column, num), obj)
-                user.setConfigValue(view_name, "%s_operator_%d" % (column, num), operator)
-                user.setConfigValue(view_name, "%s_value_%d" % (column, num), value)
+        self[column] = []
+        ret, sorted = self._paramDictToList(paramlist, column)
+        for i in sorted:
+            self._setParam(view_name, user, column, "%s_object_%d" % (column, i[0]), i[1], is_default=do_save)
+            self._setParam(view_name, user, column, "%s_operator_%d" % (column, i[0]), i[2], is_default=do_save)
+            self._setParam(view_name, user, column, "%s_value_%d" % (column, i[0]), i[3], is_default=do_save)
+            self[column].append(i[1:]);
 
         return ret
-
 
     def normalize(self, view_name, user):
         do_save = self.has_key("_save")
@@ -254,10 +280,6 @@ class AlertListingParameters(MessageListingParameters):
         for completion in self["alert.assessment.impact.completion"]:
             if not completion in ("succeeded", "failed", "none"):
                 raise view.InvalidParameterValueError("alert.assessment.impact.completion", completion)
-
-        for type in self["alert.assessment.impact.type"]:
-            if not type in ("other", "admin", "dos", "file", "recon", "user"):
-                raise view.InvalidParameterValueError("alert.assessment.impact.type", type)
 
         for type in self["alert.type"]:
             if not type in ("alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"):
@@ -273,18 +295,48 @@ class AlertListingParameters(MessageListingParameters):
             for column in "classification", "source", "target", "analyzer":
                 self._loadColumnParam(view_name, user, user.configuration[view_name], column, do_save)
 
-        for category in "classification", "source", "target", "analyzer":
-            i = 0
-            for path in self["aggregated_%s" % category]:
+        for column in COLUMN_LIST:
+            if user.configuration.has_key(view_name):
+                for i in self._paramDictToList(user.configuration[view_name], column)[1]:
+                    self._saved[column].append(i[1:])
 
-                if self["aggregated_%s" % category].count(path) > 1:
-                    self["aggregated_%s" % category].remove(path)
+                for i in user.configuration[view_name].keys():
+                    if i.find(column + "_object_") != -1 or i.find(column + "_operator_") != -1 or i.find(column + "_value_") != -1:
+                        self._default_param[column][i] = user.configuration[view_name][i]
+
+            i = 0
+            for path in self["aggregated_%s" % column]:
+                if self["aggregated_%s" % column].count(path) > 1:
+                    self["aggregated_%s" % column].remove(path)
 
                 if path[0] == "!":
-                    self["aggregated_%s" % category][i] = path[1:]
+                    self["aggregated_%s" % column][i] = path[1:]
 
                 i += 1
 
+    def getDefaultParams(self, column):
+        return self._default_param[column]
+
+    def getDynamicParams(self, column):
+        return self._dynamic_param[column]
+
+    def _isSaved(self, column, param):
+        if not self._default_param[column].has_key(param):
+            return False
+
+        if not self.has_key(param):
+            return False
+
+        if self._default_param[column][param] == self[param]:
+            return True
+
+        return False
+
+    def isSaved(self, column, param):
+        if self._isSaved(column, param):
+            return True
+
+        return MessageListingParameters.isSaved(self, param)
 
 
 class SensorAlertListingParameters(AlertListingParameters):
@@ -300,8 +352,8 @@ class SensorAlertListingParameters(AlertListingParameters):
 class CorrelationAlertListingParameters(AlertListingParameters):
     def register(self):
         AlertListingParameters.register(self)
-        self.optional("aggregated_source", list, [ ], save=True)
-        self.optional("aggregated_target", list, [ ], save=True)
+        self.optional("aggregated_source", list, [ "none" ], save=True)
+        self.optional("aggregated_target", list, [ "none" ], save=True)
         self.optional("alert.type", list, ["alert.correlation_alert.name"], save=True)
 
     def normalize(self, view_name, user):
@@ -311,8 +363,8 @@ class CorrelationAlertListingParameters(AlertListingParameters):
 class ToolAlertListingParameters(AlertListingParameters):
     def register(self):
         AlertListingParameters.register(self)
-        self.optional("aggregated_source", list, [ ], save=True)
-        self.optional("aggregated_target", list, [ ], save=True)
+        self.optional("aggregated_source", list, [ "none" ], save=True)
+        self.optional("aggregated_target", list, [ "none" ], save=True)
         self.optional("alert.type", list, ["alert.tool_alert.name"], save=True)
 
     def normalize(self, view_name, user):
@@ -756,7 +808,6 @@ class AlertListing(MessageListing, view.View):
 
             criteria.append("(" + " || ".join(new) + ")")
             self.dataset[object] = self.parameters[object]
-            self.dataset[column + "_filtered"] = True
         else:
             self.dataset[object] = values
 
@@ -786,9 +837,6 @@ class AlertListing(MessageListing, view.View):
         else:
             criteria.append("(" + " && ".join(new) + ")")
 
-        if not self._lists_have_same_content(self.parameters["alert.type"], self.alert_type_default):
-            self.dataset["classification_filtered"] = True
-
     def _applyClassificationFilters(self, criteria):
         self._applyAlertTypeFilters(criteria)
 
@@ -796,16 +844,38 @@ class AlertListing(MessageListing, view.View):
                                       ["info", "low", "medium", "high", "none"])
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.completion",
                                       ["failed", "succeeded", "none"])
-        self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.type",
-                                      ["other", "admin", "dos", "file", "recon", "user"])
 
+
+    def _criteriaValueFind(self, str, clist=[]):
+        out=""
+        found = False
+        escaped = False
+
+        for c in str:
+            if escaped:
+                escaped = False
+            else:
+                if c in clist:
+                    found = True
+
+                if c == '\\':
+                    escaped = True
+
+            out += c
+
+        return out, found
 
     def _adjustFilterValue(self, op, value):
         value = value.strip()
-        if op == "<>*" or op == "<>":
-            return "*" + value + "*"
-        else:
+
+        if op != "<>*" and op != "<>":
             return value
+
+        value, has_wildcard = self._criteriaValueFind(value, ["*"])
+        if has_wildcard:
+            return value
+
+        return "*" + value + "*"
 
     def _filterTupleToString(self, (object, operator, value)):
         return "%s %s '%s'" % (object, operator, utils.escape_criteria(self._adjustFilterValue(operator, value)))
@@ -831,7 +901,6 @@ class AlertListing(MessageListing, view.View):
     def _applyFiltersForCategory(self, criteria, type):
         if not self.parameters[type]:
             self.dataset[type] = [ ("", "", "") ]
-            self.dataset["%s_filtered" % type] = False
             return
 
         # If one object is specified more than one time, and since this object
@@ -870,7 +939,6 @@ class AlertListing(MessageListing, view.View):
             criteria.append(newcrit)
 
         self.dataset[type] = [ (path.replace("(0)", "").replace("(-1)", ""), operator, value) for path, operator, value in self.parameters[type] ]
-        self.dataset["%s_filtered" % type] = True
 
     def _applyFilters(self, criteria):
         self._applyFiltersForCategory(criteria, "classification")
@@ -1129,7 +1197,56 @@ class AlertListing(MessageListing, view.View):
 
         return MessageListing._setMessages(self, criteria)
 
+    def _paramChanged(self, column, paramlist):
+        ret = 0
+
+        cd = self.parameters.getDefaultParams(column)
+        default = self.parameters.getDefaultValues()
+        default.update(cd)
+
+        for param in paramlist + cd.keys():
+            if ret != 2 and self.parameters.isSaved(column, param):
+                ret = 1
+
+            if not default.has_key(param):
+                if self.parameters.has_key(param):
+                    if self.parameters[param] != []:
+                        #print "[%s] -> %s" % (param, self.parameters[param])
+                        ret = 2
+                        break
+
+                    continue
+
+            if not self.parameters.has_key(param):
+                #print "[%s] default=%s -> " % (param, default[param])
+                #continue
+                ret = 2
+                break
+
+            if type(default[param]) is list:
+                default[param].sort()
+
+            if type(self.parameters[param]) is list:
+                self.parameters[param].sort()
+
+            if default[param] != self.parameters[param]:
+                #print "[%s] %s -> %s" % (param, default[param], self.parameters[param])
+                ret = 2
+                break
+
+        return ret
+
     def _setDatasetConstants(self):
+        for i in COLUMN_LIST:
+            n = "aggregated_" + i
+            self.dataset[n + "_saved"] = self.parameters.getDefault(n, usedb=True)
+            self.dataset[n + "_default"] = self.parameters.getDefault(n, usedb=False)
+            self.dataset[i + "_saved"] = self.parameters._saved[i]
+
+        for i in ("alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"):
+            self.dataset[i + "_saved"] = self.parameters.getDefault(i, usedb=True)
+            self.dataset[i + "_default"] = self.parameters.getDefault(i, usedb=False)
+
         self.dataset["classification_filters"] = CLASSIFICATION_FILTERS
         self.dataset["classification_aggregations"] = CLASSIFICATION_AGGREGATIONS
         self.dataset["source_filters"] = SOURCE_FILTERS
@@ -1140,6 +1257,17 @@ class AlertListing(MessageListing, view.View):
         self.dataset["analyzer_aggregations"] = ANALYZER_AGGREGATIONS
         self.dataset["all_filters"] = { "classification" : CLASSIFICATION_FILTERS, "source": SOURCE_FILTERS, "target": TARGET_FILTERS, "analyzer": ANALYZER_FILTERS }
         self.dataset["all_aggregs"] = { "classification" : CLASSIFICATION_AGGREGATIONS, "source": SOURCE_AGGREGATIONS, "target": TARGET_AGGREGATIONS, "analyzer": ANALYZER_AGGREGATIONS }
+
+        c_params = ["aggregated_classification"] + self.parameters.getDynamicParams("classification").keys()
+        c_params += ["alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion" ]
+        s_params = ["aggregated_source"] + self.parameters.getDynamicParams("source").keys()
+        t_params = ["aggregated_target"] + self.parameters.getDynamicParams("target").keys()
+        a_params = ["aggregated_analyzer"] + self.parameters.getDynamicParams("analyzer").keys()
+
+        self.dataset["classification_filtered"] = self._paramChanged("classification", c_params)
+        self.dataset["source_filtered"] = self._paramChanged("source", s_params)
+        self.dataset["target_filtered"] = self._paramChanged("target", t_params)
+        self.dataset["analyzer_filtered"] = self._paramChanged("analyzer", a_params)
 
     def render(self):
         MessageListing.render(self)

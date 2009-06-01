@@ -820,6 +820,7 @@ p {
         padding: 5px;
         margin: 0px;
         _width: 150px;
+	text-align: left;
 }
 
 
@@ -828,13 +829,8 @@ p {
  * Filter popup
  */
 
-.filter_popup a {
+.filter_popup_link {
         float: left;
-}
-
-.filter_popup span {
-        float: right;
-        display: inline;
 }
 
 .filter_popup div {
@@ -989,6 +985,8 @@ p {
 .filter_enabled_marker {
        font-weight: bold;
        color: red;
+       display: inline;
+       float: right;
 }
 
 

@@ -20,7 +20,7 @@ var autorefresh_enabled = true;
         \$("th.filter_popup > div").hide();
    }
 
-  \$("th.filter_popup > a").click(function(){
+  \$(".filter_popup_link").click(function(){
         \$(this).next().popupUnique(function(data){data.show()}, function(data){data.hide()})
         return false;
   });

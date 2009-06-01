@@ -48,6 +48,7 @@ class Parameters(dict):
 
     def __init__(self, *args, **kwargs):
         apply(dict.__init__, (self, ) + args, kwargs)
+        self._hard_default = {}
         self._default = {}
         self._parameters = { }
         self.register()
@@ -63,14 +64,17 @@ class Parameters(dict):
 
     def optional(self, name, type, default=None, save=False):
         if default is not None:
-            self._default[name] = default
+            self._hard_default[name] = default
 
         self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
     def _parseValue(self, name, value):
         parameter_type = self._parameters[name]["type"]
-        if parameter_type is list and not type(value) is list:
-            value = [ value ]
+        if parameter_type is list:
+            if not type(value) is list:
+                value = [ value ]
+
+            value.sort()
 
         try:
             value = parameter_type(value)
@@ -120,15 +124,48 @@ class Parameters(dict):
 
                 self._default[name] = value
                 if do_load and not got_param:
-                    self[name] =  self._default[name]
+                    self[name] =  value
 
         try: self.pop("_save")
         except: pass
 
         return do_load
 
-    def getDefaultValues(self):
-        return self._default
+    def getDefault(self, param, usedb=True):
+        return self.getDefaultValues(usedb)[param]
+
+    def getDefaultValues(self, usedb=True):
+        if not usedb:
+            return self._hard_default
+        else:
+            return self._default
+
+    def isSaved(self, param):
+        if not self._parameters.has_key(param):
+            return False
+
+        if not self._parameters[param].has_key("save") or not self._parameters[param]["save"]:
+            return False
+
+        val1 = self._hard_default[param]
+        val2 = self[param]
+
+        if type(val1) is list:
+            val1.sort()
+
+        if type(val2) is list:
+            val2.sort()
+
+        if val1 == val2:
+            return False
+
+        return True
+
+    def isDefault(self, param, usedb=True):
+        if not usedb:
+            return self._hard_default.has_key(param)
+        else:
+            return self._default.has_key(param)
 
     def __add__(self, src):
         dst = copy(self)
