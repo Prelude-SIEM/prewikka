@@ -986,9 +986,11 @@ p {
        font-weight: bold;
        color: red;
        display: inline;
-       float: right;
 }
 
+span.filter_enabled_marker {
+	float: right;
+}
 
 
 .message_summary_no_border, .message_summary_no_border tr, .message_summary_no_border td, .message_summary_no_border th {

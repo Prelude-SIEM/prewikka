@@ -21,7 +21,7 @@ var autorefresh_enabled = true;
    }
 
   \$(".filter_popup_link").click(function(){
-        \$(this).next().popupUnique(function(data){data.show()}, function(data){data.hide()})
+        \$(this).nextAll("div").popupUnique(function(data){data.show()}, function(data){data.hide()})
         return false;
   });
 

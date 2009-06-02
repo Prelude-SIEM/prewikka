@@ -589,11 +589,11 @@ function ${type}_set_filter_saved() {
 #end def
 
 #def filter_enabled_marker($type)
-  <span style="float:right;">
+  <span class="filter_enabled_marker filter_popup_link">
    #if $type == 2
-    <span class="filter_enabled_marker">[$_("filtered")]</span>
+    [<a class="filter_enabled_marker">$_("filtered")</a>]
    #else
-    <span class="filter_enabled_marker" style="color: gray;">[$_("filtered")]</span>
+    [<a style="color: gray;">$_("filtered")</a>]
    #end if
   </span>
 #end def
@@ -617,6 +617,9 @@ function ${type}_set_filter_saved() {
  <tr style="height: 20px;">
   <th class="filter_popup">
    <a class="filter_popup_link">$_("Classification")</a>
+    #if $classification_filtered
+     $filter_enabled_marker($classification_filtered)
+    #end if
    <div id="classification">
     <table>
      <tr><td>$define_inline_filter("classification", "alert.classification.text")</td></tr>
@@ -663,29 +666,27 @@ function ${type}_set_filter_saved() {
      $filter_reset()
     </table>
     </div>
-
-    #if $classification_filtered
-     $filter_enabled_marker($classification_filtered)
-    #end if
   </th>
 
   <th class="filter_popup">
    <a class="filter_popup_link">$_("Source")</a>
+   #if $source_filtered
+     $filter_enabled_marker($source_filtered)
+   #end if
    <div id="source">
     <table>
      <tr><td>$define_inline_filter("source", "alert.source.node.address.address")</td></tr>
      <tr><td>$define_inline_aggreg("source")</td></tr>
      $filter_reset()
     </table>
-
    </div>
-   #if $source_filtered
-     $filter_enabled_marker($source_filtered)
-   #end if
   </th>
 
   <th class="filter_popup">
    <a class="filter_popup_link">$_("Target")</a>
+   #if $target_filtered
+     $filter_enabled_marker($target_filtered)
+   #end if
    <div id="target">
     <table>
      <tr><td>$define_inline_filter("target", "alert.target.node.address.address")</td></tr>
@@ -693,14 +694,13 @@ function ${type}_set_filter_saved() {
      $filter_reset()
     </table>
    </div>
-
-   #if $target_filtered
-     $filter_enabled_marker($target_filtered)
-   #end if
   </th>
 
   <th class="filter_popup">
    <a class="filter_popup_link">$_("Sensor")</a>
+   #if $analyzer_filtered
+     $filter_enabled_marker($analyzer_filtered)
+   #end if
    <div id="analyzer">
     <table>
      <tr><td>$define_inline_filter("analyzer", "alert.analyzer.name")</td></tr>
@@ -708,10 +708,6 @@ function ${type}_set_filter_saved() {
      $filter_reset()
     </table>
    </div>
-
-   #if $analyzer_filtered
-     $filter_enabled_marker($analyzer_filtered)
-   #end if
   </th>
 
   <td>$_("Time")</td>
