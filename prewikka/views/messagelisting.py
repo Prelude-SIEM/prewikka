@@ -156,27 +156,43 @@ class ListedMessage(dict):
         if not self.parameters.has_key(column):
             return False
 
-        for item in self.parameters[column]:
-            if item == (path, criterion, value):
-                return True
+        return (path, criterion, value) in self.parameters[column]
 
-        return False
-
-    def createInlineFilteredField(self, object, value, direction=None):
+    def createInlineFilteredField(self, path, value, direction=None, real_value=None):
         if value == None:
             return { "value": None, "inline_filter": None, "already_filtered": False }
 
-        if direction:
-            alreadyf = self._isAlreadyFiltered(direction, object, "=", value)
-            index = self.parameters.max_index
-            extra = { "%s_object_%d" % (direction, index): object,
-                      "%s_operator_%d" % (direction, index): "=",
-                      "%s_value_%d" % (direction, index): value }
+        if type(path) is not list and type(path) is not tuple:
+            path = [ path ]
         else:
-            alreadyf = None
-            extra = { object: value }
+            if not path:
+                return { "value": None, "inline_filter": None, "already_filtered": False }
 
-        return { "value": value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra), "already_filtered": alreadyf }
+        if type(value) is not list and type(value) is not tuple:
+            if not real_value:
+                real_value = value
+            value = [ value ]
+
+        extra = { }
+        alreadyf = None
+
+        for p, v in zip(path, value):
+            v = str(v)
+            if direction:
+                if alreadyf is not False:
+                    alreadyf = self._isAlreadyFiltered(direction, p, "=", v)
+
+                index = self.parameters.max_index
+                extra["%s_object_%d" % (direction, index)] = p,
+                extra["%s_operator_%d" % (direction, index)] = "="
+                extra["%s_value_%d" % (direction, index)] = v
+                self.parameters.max_index += 1
+
+            else:
+                alreadyf = None
+                extra[p] = v
+
+        return { "value": real_value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra), "already_filtered": alreadyf }
 
     def createTimeField(self, t, timezone=None):
         if t:
