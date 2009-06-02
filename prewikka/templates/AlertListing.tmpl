@@ -34,6 +34,22 @@ title_array["~*"] = "$_("Regular expression (case-insensitive)")";
  saved_forms["analyzer"] = [ "default", "saved", "current" ];
 
 
+function cloneForm(form) {
+        var clone = \$(form).clone();
+        var selvals = [];
+
+        \$(form).filter("select").each(function() {
+                selvals.push(\$(this).val());
+        });
+
+        \$(clone).filter("select").each(function() {
+                \$(this).val(selvals.shift());
+        });
+
+        return clone;
+}
+
+
 function input_equal(a, b) {
         if ( a.type == "button" && b.type == "button" )
                 return true;
@@ -72,28 +88,29 @@ function Equals(a, b) {
 
 function get_next_state(id, cstate) {
         var nextstate = null;
+        var selector = "#" + id + " :input";
 
         if ( cstate == "current" ) {
-                if ( saved_forms[id]["saved"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["saved"]) )
+                if ( saved_forms[id]["saved"] && ! Equals(\$(selector), saved_forms[id]["saved"]) )
                         nextstate = "saved";
 
-                else if ( saved_forms[id]["default"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["default"]) )
+                else if ( saved_forms[id]["default"] && ! Equals(\$(selector), saved_forms[id]["default"]) )
                         nextstate = "default";
         }
 
         else if ( cstate == "saved" ) {
-                if ( saved_forms[id]["default"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["default"]) )
+                if ( saved_forms[id]["default"] && ! Equals(\$(selector), saved_forms[id]["default"]) )
                         nextstate = "default";
 
-                else if ( saved_forms[id]["current"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["current"]) )
+                else if ( saved_forms[id]["current"] && ! Equals(\$(selector), saved_forms[id]["current"]) )
                         nextstate = "current";
         }
 
         else if ( cstate == "default" ) {
-                if ( saved_forms[id]["current"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["current"]) )
+                if ( saved_forms[id]["current"] && ! Equals(\$(selector), saved_forms[id]["current"]) )
                         nextstate = "current";
 
-                else if ( saved_forms[id]["saved"] && ! Equals(\$("#" + id + " input"), saved_forms[id]["saved"]) )
+                else if ( saved_forms[id]["saved"] && ! Equals(\$(selector), saved_forms[id]["saved"]) )
                         nextstate = "saved";
 
                 else nextstate = "default";
@@ -327,8 +344,6 @@ function ${type}_set_filter_current() {
   \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
   #end for
  }
-
- ${type}_set_filter_current();
  #end for
 
 
@@ -465,18 +480,20 @@ function ${type}_set_filter_saved() {
 
 
  #for $type, $table in ("classification", $classification), ("source", $source), ("target", $target), ("analyzer", $analyzer)
+
+ var form = \$("#${type} :input");
+
  ${type}_set_filter_saved();
  ${type}_set_aggregation_saved();
- saved_forms["${type}"]["saved"] = \$("#${type} input").clone()
+ saved_forms["${type}"]["saved"] = cloneForm(form);
 
  ${type}_set_filter_default();
  ${type}_set_aggregation_default();
- saved_forms["${type}"]["default"] = \$("#${type} input").clone()
+ saved_forms["${type}"]["default"] = cloneForm(form);
 
  ${type}_set_filter_current();
  ${type}_set_aggregation_current();
- saved_forms["${type}"]["current"] = \$("#${type} input").clone()
-
+ saved_forms["${type}"]["current"] = cloneForm(form);
 
  if ( Equals(saved_forms["${type}"]["default"], saved_forms["${type}"]["saved"]) )
         saved_forms["${type}"]["saved"] = null;
@@ -485,21 +502,19 @@ function ${type}_set_filter_saved() {
         saved_forms["${type}"]["current"] = null;
 
  ## Set the current state
- if ( Equals(\$("#${type} input"), saved_forms["${type}"]["default"]) )
+ if ( Equals(form, saved_forms["${type}"]["default"]) )
         saved_state["$type"] = "default";
 
- else if ( Equals(\$("#${type} input"), saved_forms["$type"]["saved"]) )
+ else if ( Equals(form, saved_forms["$type"]["saved"]) )
         saved_state["$type"] = "saved";
 
-
- else if ( Equals(\$("#${type} input"), saved_forms["$type"]["current"]) )
+ else if ( Equals(form, saved_forms["$type"]["current"]) )
         saved_state["$type"] = "current";
 
- ##alert("$type: " + saved_state["$type"]);
  \$("#${type} input.reset_filter").val("Reset to " + get_next_state("$type", saved_state["$type"]));
 
-
  #end for
+
 
 \$("input.reset_filter").click(function() {
         var div_id = \$(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().attr("id");
