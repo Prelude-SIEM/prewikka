@@ -386,8 +386,9 @@ class ListedAlert(ListedMessage):
         dataset[name] = value
 
     def _initDirection(self, dataset):
+        self._initValue(dataset, "port", { "value": None })
         self._initValue(dataset, "protocol", { "value": None })
-        self._initValue(dataset, "service", { "value": None })
+        self._initValue(dataset, "service", { "value": None, "inline_filter": None, "already_filtered": False })
         self._initValue(dataset, "addresses", [ ])
         self._initValue(dataset, "listed_values", [ ])
         self._initValue(dataset, "aggregated_hidden", 0)
@@ -476,19 +477,41 @@ class ListedAlert(ListedMessage):
         self._setMessageDirectionOther(dataset, direction, "alert.%s.process.name" % direction, obj["process.name"],
                                                            "alert.%s.process.pid" % direction, extra=obj["process.pid"])
 
+        pl = []
+        vl = []
+
         proto = None
         if obj["service.iana_protocol_name"]:
             proto = obj["service.iana_protocol_name"]
+            ppath = "alert.%s.service.iana_protocol_name" % direction
+            pl.append("alert.%s.service.iana_protocol_name" % direction)
+            vl.append(proto)
 
         elif obj["service.iana_protocol_number"]:
             num = obj["service.iana_protocol_number"]
             proto = utils.protocol_number_to_name(num)
+            pl.append("alert.%s.service.iana_protocol_number" % direction)
+            vl.append(num)
 
-        if not proto:
+        if not proto and obj["service.protocol"]:
             proto = obj["service.protocol"]
+            pl.append("alert.%s.service.protocol" % direction)
+            vl.append(proto)
 
+        pstr = None
+        if proto or obj["service.port"]:
+            if obj["service.port"]:
+                pl.append("alert.%s.service.port" % direction)
+                vl.append(obj["service.port"])
+                pstr = str(obj["service.port"])
+                if proto:
+                    pstr += "/" + proto
+            elif proto:
+                pstr = proto
+
+        dataset["service"] = self.createInlineFilteredField(pl, vl, direction, real_value=pstr)
         self._setMainAndExtraValues(dataset, "protocol", proto, None)
-        self._setMainAndExtraValues(dataset, "service", obj["service.port"], None)
+        self._setMainAndExtraValues(dataset, "port", obj["service.port"], None)
 
         dataset["files"] = []
 

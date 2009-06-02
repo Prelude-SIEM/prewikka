@@ -736,6 +736,18 @@ function ${type}_set_filter_saved() {
 #end if
 #end def
 
+#def writeService($hstr, $direction)
+#if $direction.service.value != None#$hstr<a class="popup_menu_toggle">$str($direction.service.value)#end if
+</a>
+       <span class="popup_menu">
+        #filter Filter - $writeInlineFilter($direction.service, $_("Filter on this port/protocol"))<br/> #end filter
+        #if $direction.port.value
+        - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$str($direction.port.value)&amp;protocol=$direction.protocol.value.upper()">$_("Port/protocol information")</a>
+        #else
+        - <span>$_("Port/protocol information")</span>
+        #end if
+       </span>#slurp
+#end def
 
 #block message_fields
 #filter CleanOutput
@@ -802,14 +814,6 @@ function ${type}_set_filter_saved() {
       #end if
 
       #set $need_hr = 1
-      #set $service = ""
-      #set $proto_param = ""
-      #set $proto_str = ""
-
-      #if $direction.protocol.value != None
-       #set $proto_str = $direction.protocol.value.lower()
-       #set $proto_param = "&amp;protocol=" + $direction.protocol.value.upper()
-      #end if
 
       #for $address in $direction.addresses
        <a class="popup_menu_toggle">$address.hostname</a><span class="popup_menu">
@@ -824,20 +828,12 @@ function ${type}_set_filter_saved() {
           #end for
        #end if
        </span>#slurp
-#if $direction.service.value != None#:<a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$str($direction.service.value)$proto_param">$str($direction.service.value)#slurp
-         #if $proto_str
-/$proto_str</a>
-         #else
-</a>
-         #end if
-       #elif $proto_str
-:$proto_str
-       #end if
+#filter Filter $writeService(":", $direction) #end filter
 <br />
       #end for
 
-      #if $len($direction.addresses) == 0 and $service
-        service: $service[1:]
+      #if $len($direction.addresses) == 0
+        #filter Filter $writeService("service:", $direction) #end filter
       #end if
 
      #set $cnt = 0
