@@ -574,20 +574,27 @@ class ListedAlert(ListedMessage):
     def _setMessageClassificationReferences(self, dataset, message):
         dataset["classification_references"] = [ ]
         for ref in message["alert.classification.reference"]:
+            pl = []
+            vl = []
             fstr = ""
 
             origin = ref["origin"]
             if origin:
+                pl.append("alert.classification.reference.origin")
+                vl.append(origin)
                 fstr += origin
 
             name = ref["name"]
             if name:
+                pl.append("alert.classification.reference.name")
+                vl.append(name)
                 fstr += ":" + name
 
             urlstr = "https://www.prelude-ids.com/reference_details.php?origin=%s&name=%s" % (urllib.quote(ref["origin"]), urllib.quote(ref["name"]))
             if ref["origin"] in ("vendor-specific", "user-specific"):
                 urlstr += "&url=" + urllib.quote(ref["url"], safe="")
 
+            fstr = self.createInlineFilteredField(pl, vl, "classification", fstr)
             dataset["classification_references"].append((urlstr, fstr))
 
     def _setMessageClassification(self, dataset, message):

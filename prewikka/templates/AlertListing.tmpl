@@ -797,11 +797,18 @@ function ${type}_set_filter_saved() {
 
     <br/>
     #set $sep = "("
+
 #for url, name in $info.classification_references##slurp
-#if $url#$sep<a target="$prewikka.external_link_target" href="$url">$name</a>#else#$sep$name#end if##slurp
-      #set $sep = ", "
-#end for##if $info.classification_references#)#end if
+$sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $writeInlineFilter($name)#end filter##end if##slurp
+#set $sep = ", "
+<span class="popup_menu">
+ - #filter Filter $writeInlineFilter($name, $_("Filter on this reference"))#end filter#<br />
+ - <a target="$prewikka.external_link_target" href="$url">Reference information</a>
+</span>#end for##if $info.classification_references#)#end if
+
   #end for
+
+
 </td>
 
 #for $name, $direction, $hidden, $total, $expand in ($_("source"), $message.source, $message.aggregated_source_hidden, $message.aggregated_source_total, $message.aggregated_source_expand), ($_("target"), $message.target, $message.aggregated_target_hidden, $message.aggregated_target_total, $message.aggregated_target_expand)
