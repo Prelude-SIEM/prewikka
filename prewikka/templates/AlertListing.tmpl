@@ -316,9 +316,6 @@ function ${type}_set_filter_current() {
    ${type}_special_current();
   #end if
 
-  /* trigger change for each empty filter, so that operator/value are positionned correctly */
-  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
-
   #set $cnt = 0
   #for $path, $operator, $value in $table
 
@@ -343,6 +340,8 @@ function ${type}_set_filter_current() {
   \$("#$type table.filter_table tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
   \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
   #end for
+
+  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
  }
  #end for
 
@@ -365,9 +364,6 @@ function ${type}_set_filter_saved() {
    ${type}_special_saved();
   #end if
 
-  /* trigger change for each empty filter, so that operator/value are positionned correctly */
-  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
-
   #set $cnt = 0
   #for $path, $operator, $value in $table
 
@@ -392,6 +388,8 @@ function ${type}_set_filter_saved() {
   \$("#$type table.filter_table tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
   \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
   #end for
+
+  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
  }
  #end for
 
