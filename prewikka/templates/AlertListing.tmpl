@@ -450,7 +450,8 @@ function ${type}_set_filter_saved() {
 
           if ( operator_array[str] ) {
                 var old_select = \$(td).siblings(".td_container_operator").children();
-                var display = \$(old_select).is(":visible")
+                // do not use visible here, this is called before the parent element is visible
+                var display = \$(old_select).css("display") != "none";
                 var old_value = \$(old_select).children(":selected").attr("value");
 
                 select = createSelectFromArray(operator_array[str], "popup_operator_select", \$(old_select).attr("name"), old_value);
