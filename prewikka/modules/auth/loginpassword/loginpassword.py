@@ -24,6 +24,9 @@ from prewikka import Auth, User, Database
 
 class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
     def __init__(self, env, config):
+        user = config.getOptionValue("initial_admin_user", User.ADMIN_LOGIN)
+        passwd = config.getOptionValue("initial_admin_pass", User.ADMIN_LOGIN)
+
         expiration = int(config.getOptionValue("expiration", 60)) * 60
         Auth.LoginPasswordAuth.__init__(self, env, expiration)
 
@@ -35,13 +38,13 @@ class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
                 break
 
         if not has_user_manager:
-            if not self.db.hasUser(User.ADMIN_LOGIN):
-                self.db.createUser(User.ADMIN_LOGIN)
+            if not self.db.hasUser(user):
+                self.db.createUser(user)
 
-            if not self.db.hasPassword(User.ADMIN_LOGIN):
-                self.setPassword(User.ADMIN_LOGIN, User.ADMIN_LOGIN)
+            if not self.db.hasPassword(user):
+                self.setPassword(user, passwd)
 
-            self.db.setPermissions(User.ADMIN_LOGIN, User.ALL_PERMISSIONS)
+            self.db.setPermissions(user, User.ALL_PERMISSIONS)
 
     def _hash(self, data):
         return md5.new(data).hexdigest()
