@@ -64,7 +64,7 @@ class Parameters(dict):
 
     def optional(self, name, type, default=None, save=False):
         if default is not None:
-            self._hard_default[name] = default
+            self._default[name] = self._hard_default[name] = default
 
         self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
 
