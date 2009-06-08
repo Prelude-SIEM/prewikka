@@ -165,6 +165,7 @@ function ${type}_set_aggregation_saved() {
 
  #for $type, $table in ("classification", $aggregated_classification_default), ("source", $aggregated_source_default), ("target", $aggregated_target_default), ("analyzer", $aggregated_analyzer_default)
 function ${type}_set_aggregation_default() {
+ \$("#${type} table.aggregation_table tr:not(':first')").remove()
 
   #set $cnt = 0
   #for $path in $table
@@ -293,16 +294,22 @@ function classification_special_default() {
 
 function ${type}_filters_set_from_string(state) {
         if ( state == "saved" ) {
+                ${type}_set_filter_default()
+                ${type}_set_aggregation_default()
                 ${type}_set_filter_saved();
                 ${type}_set_aggregation_saved();
         }
 
         else if ( state == "default" ) {
+                ${type}_set_filter_default()
+                ${type}_set_aggregation_default()
                 ${type}_set_filter_default();
                 ${type}_set_aggregation_default();
         }
 
         else if ( state == "current" ) {
+                ${type}_set_filter_default()
+                ${type}_set_aggregation_default()
                 ${type}_set_filter_current();
                 ${type}_set_aggregation_current();
         }
@@ -310,8 +317,6 @@ function ${type}_filters_set_from_string(state) {
 
 
 function ${type}_set_filter_current() {
-  ${type}_set_filter_default()
-
   #if $type == "classification"
    ${type}_special_current();
   #end if
@@ -348,7 +353,7 @@ function ${type}_set_filter_current() {
 
 #for $type, $table in ("classification", $classification_saved), ("source", $source_saved), ("target", $target_saved), ("analyzer", $analyzer_saved)
 function ${type}_set_filter_default() {
- \$("#${type} table.filter_table tr:not(':first'):not(':last')").remove()
+ \$("#${type} table.filter_table tr:not(':first')").remove()
  \$("#${type} table.filter_table input[type=text]").val("")
 
   #if $type == "classification"
@@ -357,9 +362,6 @@ function ${type}_set_filter_default() {
 }
 
 function ${type}_set_filter_saved() {
-
- ${type}_set_filter_default()
-
   #if $type == "classification"
    ${type}_special_saved();
   #end if
@@ -480,18 +482,18 @@ function ${type}_set_filter_saved() {
 
  #for $type, $table in ("classification", $classification), ("source", $source), ("target", $target), ("analyzer", $analyzer)
 
- var form = \$("#${type} :input");
 
  ${type}_set_filter_saved();
  ${type}_set_aggregation_saved();
- saved_forms["${type}"]["saved"] = cloneForm(form);
+ saved_forms["${type}"]["saved"] = cloneForm(\$("#${type} :input"));
 
  ${type}_set_filter_default();
  ${type}_set_aggregation_default();
- saved_forms["${type}"]["default"] = cloneForm(form);
+ saved_forms["${type}"]["default"] = cloneForm(\$("#${type} :input"));
 
  ${type}_set_filter_current();
  ${type}_set_aggregation_current();
+ var form = \$("#${type} :input");
  saved_forms["${type}"]["current"] = cloneForm(form);
 
  if ( Equals(saved_forms["${type}"]["default"], saved_forms["${type}"]["saved"]) )
