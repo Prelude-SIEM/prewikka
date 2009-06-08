@@ -13,7 +13,7 @@
     <tbody>
       <tr class="table_row_even">
         <td>#echo $analyzer.name or "n/a" #</td>
-	<td>
+        <td>
           #if $analyzer.model
             $analyzer.model
             #if $analyzer.version
@@ -23,7 +23,7 @@
             n/a
           #end if
         </td>
-	<td>
+        <td>
           #if $analyzer.ostype
             $analyzer.ostype
             #if $analyzer.osversion
@@ -33,9 +33,9 @@
             n/a
           #end if
         </td>
-	<td>#echo $analyzer.node_name or "n/a" #</td>
+        <td>#echo $analyzer.node_name or "n/a" #</td>
         <td>#echo $analyzer.node_location or "n/a" #</td>
-	<td>
+        <td>
           #if len($analyzer.node_addresses) > 0
             #for $address in $analyzer.node_addresses
               $address<br/>
@@ -43,7 +43,7 @@
           #else
             n/a
           #end if
-	</td>
+        </td>
       </tr>
     </tbody>
   </table>

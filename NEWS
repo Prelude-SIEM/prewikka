@@ -7,7 +7,7 @@
   as well as message summary (require twisted.names and twisted.internet),
   see the additional dns_max_delay settings parameters in prewikka.conf.
 
-- In the alert summary view, handle portlist and ip_version service fields, 
+- In the alert summary view, handle portlist and ip_version service fields,
   and show alert messageid.
 
 - Fix exception when rendering ToolAlert.
@@ -32,11 +32,11 @@
 
 - Only perform additional database request when using Sensor localtime:
   this bring a performance improvement of about 36% on aggregated query,
-  when using either frontend localtime (the default), or UTC time. 
+  when using either frontend localtime (the default), or UTC time.
 
 - JQuery support: Port most of the javascript code to make use of JQuery.
   Add show/hide effect to CSS popup. More filtering functionality in the
-  SensorListing view.  
+  SensorListing view.
 
 - Cleanup the Authentication class, so that uper Prewikka layer can act
   depending whether the backend support user creation / deletion. Anonymous
@@ -44,7 +44,7 @@
 
 - Better integration of CGI authentication allowing user listing and deletion.
 
-- Report template exception directly to the user.              
+- Report template exception directly to the user.
 
 - Fix exception if an alert analyzer name is empty.
 
@@ -56,11 +56,11 @@
   (which is a minor issue since the user is already authenticated). Thanks
   to Helmut Azbest <helmut.azbest@gmail.com> for the fix.
 
-- Fix a typo making mod_python use the parent method (patch from 
+- Fix a typo making mod_python use the parent method (patch from
   Helmut Azbest <helmut.azbest@gmail.com>).
 
-- In the configuration file, recognize section even if there are whitespace 
-  at the beginning of the line. 
+- In the configuration file, recognize section even if there are whitespace
+  at the beginning of the line.
 
 - Localization fixes, by Sebastien Tricaud <toady@gscore.org>, and
   Bjoern Weiland.
@@ -110,11 +110,11 @@
 
 * 2007-05-26, prewikka-0.9.11.2:
 
-        - In case a database schema upgrade is required, or the Prewikka 
+        - In case a database schema upgrade is required, or the Prewikka
           database does not exist, make the error available from the Prewikka
-          console, rather than exiting badly (which previously required the 
+          console, rather than exiting badly (which previously required the
           user to parse its web server log in order to find out the problem).
-          
+
 
 * 2007-05-25, prewikka-0.9.11.1:
 
@@ -122,90 +122,90 @@
 
 	- Fix incorrect locale switch when accessing certain pages.
 
-	
+
 * 2007-05-21, prewikka-0.9.11:
 
         - Prewikka has been internationalized: user might choose the language
           used in their settings tabs. Additionally, you might specify
           a default locale using the "default_locale" configuration keyword.
 
-        - Brazilian Portuguese translation, by Edelberto Franco Silva<edeunix@edeunix.com>. 
+        - Brazilian Portuguese translation, by Edelberto Franco Silva<edeunix@edeunix.com>.
         - French translation, by Sebastien Tricaud <sebastien@gscore.org>.
         - German translation, by Bjoern Weiland <mail@bjou.de>.
-        - Russian translation, by Valentin Bogdanov <bogdanov.valentin@gmail.com>. 
+        - Russian translation, by Valentin Bogdanov <bogdanov.valentin@gmail.com>.
         - Spanish translation, by Carlo G. Añez M. <carlo.anez@gmail.com>.
 
-        - New powerfull and scalable agent view, grouping agent together by 
-          Location and Node. 
-        
+        - New powerfull and scalable agent view, grouping agent together by
+          Location and Node.
+
         - In the Alert/Heartbeat summary view, number analyzers backward so that
           it reflect the ordering in the analyzer list.
-          
-        - Improved support for resizing menu. 
-        
-        - Fix a konqueror rendering bug with the inline filter. 
+
+        - Improved support for resizing menu.
+
+        - Fix a konqueror rendering bug with the inline filter.
 
         - Various bug fixes.
-        
-        
+
+
 * 2007-04-05, prewikka-0.9.10:
 
-        - Don't show all source and target when they reach a predefined limit, instead 
+        - Don't show all source and target when they reach a predefined limit, instead
           provide an expansion link.
-        
+
         - Add two new view in the Events section: CorrelationAlert and ToolAlert.
-        
-        - Ability to filter and aggregate on all IDMEF path. If the filtered path is 
-          an enumeration, automatically provide the list of possible value. 
-          
-        - Add a combo box for the user to choose which criteria operator to use. 
-        
-        - Provide an enumeration filter for the type of alert (Alert, CorrelationAlert, 
+
+        - Ability to filter and aggregate on all IDMEF path. If the filtered path is
+          an enumeration, automatically provide the list of possible value.
+
+        - Add a combo box for the user to choose which criteria operator to use.
+
+        - Provide an enumeration filter for the type of alert (Alert, CorrelationAlert,
           ToolAlert, OverflowAlert).
-        
+
         - Prewikka can now aggregate by analyzer.
-        
-        - When a session expire and the user login, the user is redirected to the page 
+
+        - When a session expire and the user login, the user is redirected to the page
           he attempted to access when the session expired.
-          
+
         - When an error occur, the default Prewikka layout is now preserved.
-        
-        - Correct handling of empty value for hash key generation. Fix #204. 
-        
-        - Use new libpreludedb function that return the results as well as the number 
-          of results. This avoid using COUNT() in some places (namely, this speedup 
+
+        - Correct handling of empty value for hash key generation. Fix #204.
+
+        - Use new libpreludedb function that return the results as well as the number
+          of results. This avoid using COUNT() in some places (namely, this speedup
           non aggregated view by ~50%).
-          
+
         - Avoid iterating the list of database result more than needed.
-        
+
         - Support IDMEF Action, SNMPService, and WebService class.
-        
+
         - Improved support for small screen resolution.
-        
-        
+
+
 
 * 2007-02-06, prewikka-0.9.9:
 
         - Improve database performance by reducing the number of query. (Paul Robert Marino)
-        
+
         - Activate CleanOutput filtering (lot of escaping fixes).
-      
+
         - More action logging.
-        
+
         - Bug fixes with the error pages Back/Retry buttons.
-          
+
         - Fix error on group by user (#191).
-        
+
         - Fix template compilation error with Cheetah version 2 (#184).
-        
+
 
 * 2006-11-23, prewikka-0.9.8:
-	
+
 	- Save/load user configuration when using CGI authentication mode (#181).
 
 	- Show Prewikka version in the About page (#177).
 
-	- Use Python logging facility (available backend: stderr, file, smtp, syslog), 
+	- Use Python logging facility (available backend: stderr, file, smtp, syslog),
 	  multiple simultaneous handler supported (#113).
 
 	- Fix anonymous authentication.
@@ -222,7 +222,7 @@
 
 
 * 2006-08-18, prewikka-0.9.7.1:
-	
+
 	- Fix filter interface bug introduced in 0.9.7.
 
 	- Improved error reporting on filter creation.
@@ -232,24 +232,24 @@
 
 * 2006-08-16, prewikka-0.9.7:
 
-	- Use preludedb_delete_(alert|heartbeat)_from_list(). Require 
-	  libpreludedb 0.9.9. Provide a deletion performance improvement 
+	- Use preludedb_delete_(alert|heartbeat)_from_list(). Require
+	  libpreludedb 0.9.9. Provide a deletion performance improvement
 	  of around 3000%.
 
-	- Handle multiple listed source/target properly. Separate 
+	- Handle multiple listed source/target properly. Separate
 	  source/target in the message listing.
 
 	- Make host command/Information link available from the Sensor
 	  listing.
 
-	- Always take care of the "external_link_new_window" configuration 
-	  parameter. 
-	  
-	- Make external command handling more generic. Allow to specify 
+	- Always take care of the "external_link_new_window" configuration
+	  parameter.
+
+	- Make external command handling more generic. Allow to specify
 	  command line arguments.
 
-	- Allow to define unlimited number of external commands rather than 
-	  only a defined subset (fix #134). 
+	- Allow to define unlimited number of external commands rather than
+	  only a defined subset (fix #134).
 
 	- Avoid toggling several popup at once in the HeartbeatListing.
 
@@ -257,7 +257,7 @@
 
 	- New address and node name lookup provided through prelude-ids.com service.
 
-	- Link to new prelude-ids.com port lookup instead of broken portsdb 
+	- Link to new prelude-ids.com port lookup instead of broken portsdb
           database (fix #162).
 
 	- Various bug fixes.
@@ -271,7 +271,7 @@
 
 	- Show multiple source/target in message listing/summary.
 
-	- Fix invalid use of socket.inet_ntoa() to read ICMP Gateway Address, 
+	- Fix invalid use of socket.inet_ntoa() to read ICMP Gateway Address,
 	  which is stored as string (#156).
 
 	- Fix aggregation on IDMEF-Path that are not string.
@@ -299,7 +299,7 @@
 	- Intelligent display for CorrelationAlert. Include correlated
 	  alert information in the alert listing.
 
-	- Intelligent printing of Network centric information. 
+	- Intelligent printing of Network centric information.
 
 	- Fix Cheetah compilation for the heartbeat page.
 
@@ -319,20 +319,20 @@
 	- Distribute SQLite schema.
 
 	- Fix exception in the heartbeat analysis view when the heartbeat_count
-	  or heartbeat_error_margin settings are explicitly set (#124). 
+	  or heartbeat_error_margin settings are explicitly set (#124).
 
-	- Fix Cheetah 1.0 heartbeat listing exception (#119). 
+	- Fix Cheetah 1.0 heartbeat listing exception (#119).
 
 	- Open external link in new windows by default. Add a configuration option
 	  to disable opening external link in new window (#61).
 
-	- Provide the ability to specify the configuration file that Prewikka 
+	- Provide the ability to specify the configuration file that Prewikka
 	  use (#117).
 
 	- Sanitize the limit parameter in case the input value is not correct
-	  instead of triggering an exception (#118). 
+	  instead of triggering an exception (#118).
 
-	- Handle the preludeDB "file" setting (for use with SQLite like database). 
+	- Handle the preludeDB "file" setting (for use with SQLite like database).
 
 	- Fix filter saving issue in the heartbeat listing.
 
@@ -348,24 +348,24 @@
 
 	- Add an "Unlimited" timeline option.
 
-	- Fix classification escaping problem that could lead to empty 
+	- Fix classification escaping problem that could lead to empty
 	  listing when unwiding alert with classification text containing backslash.
 
-	- Don't print un-necessary separator when the protocol field is 
+	- Don't print un-necessary separator when the protocol field is
 	  empty in the alert listing.
 
-	- Improve Correlation Alert display. Allow focus both on the Correlation Alert 
+	- Improve Correlation Alert display. Allow focus both on the Correlation Alert
 	  summary and on the correlated alert listing.
 
-	- Don't propagate the "save" parameter, so that the user don't end up saving 
-	  settings without knowing about it. 
+	- Don't propagate the "save" parameter, so that the user don't end up saving
+	  settings without knowing about it.
 
 
 * 2005-11-30, prewikka-0.9.1:
 
-	- Resolve the protocol number from the message summary view. 
+	- Resolve the protocol number from the message summary view.
 
-	- Separate port and protocol value, so that we don't end up 
+	- Separate port and protocol value, so that we don't end up
 	  linking the protocol to portdb if there is no port.
 
 	- Ability to setup IDMEF filter using iana_protocol_name and iana_protocol_number.
@@ -373,9 +373,9 @@
 	- Sanitize timeline years value on system which does not support time
 	  exceeding 2^31-1. Fix #104.
 
-	- Mark CorrelationAlert explicitly in the AlertListing. 
+	- Mark CorrelationAlert explicitly in the AlertListing.
 
-	- Make inline filter mark more visible. 
+	- Make inline filter mark more visible.
 
 	- Ability for the user to save settings for the current view.
 
@@ -384,7 +384,7 @@
 	- Fix a bug where clicking the IP address popup would cause
 	  Firefox to go back to the top of the page. Fix #112.
 
-	- Don't hardcode path to /usr/bin/python, but resort to 
+	- Don't hardcode path to /usr/bin/python, but resort to
 	  /usr/bin/env to find it.
 
 
@@ -394,7 +394,7 @@
 
 	- Minor rendering fix.
 
-	- Handle service.iana_protocol_name / service.iana_protocol_number 
+	- Handle service.iana_protocol_name / service.iana_protocol_number
 	  as well as service.protocol.
 
 
@@ -436,7 +436,7 @@
 
 	- Show target file in the message listing.
 
-	- Much more information in the alert summary view. 
+	- Much more information in the alert summary view.
 	  Especially useful for users of integrity checker.
 
 
@@ -488,7 +488,7 @@
 	- XHTML conformance in most of the code.
 
 	- Fix possible exception with filtered classification text.
-	
+
 	- Allow filtering on heartbeat.analyzer.name.
 
 
@@ -503,19 +503,19 @@
 	  Fix Javascript warnings. Correct URL escaping. Make it work
 	  better in Apple's Safari browser.
 
-	- More error checking when saving custom filter. Error out in case a 
+	- More error checking when saving custom filter. Error out in case a
 	  filter reference non existing criteria. Add the substr operator.
 
-	- Fix bug in the whole alert/heartbeat navigation system, simplify 
-	  and cleanup the code, always report the current filtered field 'action' to 
+	- Fix bug in the whole alert/heartbeat navigation system, simplify
+	  and cleanup the code, always report the current filtered field 'action' to
 	  the user.
 
-	- Make the mouse pointer behave like it does for javascript links on Alert 
+	- Make the mouse pointer behave like it does for javascript links on Alert
 	  listing table head.
 
-	- Fix alert mixup when expanding an aggregated classification with different 
+	- Fix alert mixup when expanding an aggregated classification with different
 	  severity.
-	
+
 	- Fix low/mid/high/none severity filtering.
 
 	- Fix a bug where agents with multiple address would disappear.
@@ -530,8 +530,8 @@
 	- Add an heartbeat_error_margin configuration keyword.
 
 	- Saving modification to an existing filter now work.
-	
-	- Make prewikka.cgi catch exceptions that are raised during the prewikka 
+
+	- Make prewikka.cgi catch exceptions that are raised during the prewikka
 	  initialization step and display an error screen to the user instead of
 	  a server internal error.
 
@@ -565,7 +565,7 @@
 	- Update Auth cookie expiration time.
 
 	- Fix escaping issue.
-	
+
 
 * 2005-04-05, prewikka-0.9.0-rc4:
 
@@ -581,8 +581,8 @@
           login for no appearent reasons.
 
 	- Set default session expiration time to 60 minutes.
-	
-	
+
+
 * 2005-03-31, prewikka-0.9.0-rc3:
 
 	- Installation cleanup / bugfix.
