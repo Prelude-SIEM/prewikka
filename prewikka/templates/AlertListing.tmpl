@@ -198,13 +198,15 @@ function ${type}_filters_set_from_string(state) {
 }
 
 function ${type}_zero() {
- \$("#${type} table.filter_table tr:not(':first')").remove()
- \$("#${type} table.filter_table input[type=text]").val("")
+ var filter_table = \$("#${type} table.filter_table > tbody");
+ filter_table.find("tr:not(':first')").remove()
+ filter_table.find("input[type=text]").val("")
  \$("#${type} table.aggregation_table tr:not(':first')").remove()
 }
 
 function ${type}_set_default() {
  ${type}_zero();
+ var table = \$("#${type} table.aggregation_table > tbody");
 
   #if $type == "classification"
    ${type}_special_default();
@@ -216,17 +218,19 @@ function ${type}_set_default() {
   #for $path in $table_aggreg_default
 
    #if $cnt > 0
-    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+    table.find("tr:last a.append_entry").trigger('click');
    #end if
    #set $cnt += 1
 
-   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+   table.find("tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
   #end for
 }
 
 #for $state, $table, $table_aggreg in ("current", $table_current, $table_aggreg_current), ("saved", $table_saved, $table_aggreg_saved)
 function ${type}_set_${state}() {
   ${type}_zero();
+  var table = \$("#${type} table.filter_table > tbody");
+  var agtable = \$("#${type} table.aggregation_table > tbody");
 
   #if $type == "classification"
    ${type}_special_${state}();
@@ -236,7 +240,7 @@ function ${type}_set_${state}() {
   #for $path, $operator, $value in $table
 
    #if $cnt > 0
-    \$("#${type} table.filter_table tr:last a.append_entry").trigger('click');
+    table.find("tr:last a.append_entry").trigger('click');
    #end if
    #set $cnt += 1
 
@@ -245,30 +249,30 @@ function ${type}_set_${state}() {
   #end if
 
   #if $path != "__all__"
-   \$("#$type table.filter_table tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
-   \$("#$type table.filter_table tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
-   \$("#$type table.filter_table tr:last .expert_mode").trigger("click");
+   table.find("tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
+   table.find("tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
+   table.find("tr:last .expert_mode").trigger("click");
   #else
-   \$("#$type table.filter_table tr:last .popup_select_field").hide();
-   \$("#$type table.filter_table tr:last .popup_select_field").attr("disabled", "disabled");
+   table.find("tr:last .popup_select_field").hide();
+   table.find("tr:last .popup_select_field").attr("disabled", "disabled");
   #end if
 
-  \$("#$type table.filter_table tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
-  \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
+  table.find("tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
+  table.find("tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
   #end for
 
-  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
+  table.find("tr .popup_select_field").trigger("change");
 
 ### Aggregation stuff
   #set $cnt = 0
   #for $path in $table_aggreg
 
    #if $cnt > 0
-    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+    agtable.find("tr:last a.append_entry").trigger('click');
    #end if
    #set $cnt += 1
 
-   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+   agtable.find("tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
   #end for
  }
 #end for
@@ -277,23 +281,23 @@ function ${type}_set_${state}() {
 
 
 \$(document).ready(function() {
-
  \$(".expert_mode").live("click", function() {
-        if ( ! \$(this).parent().parent().children(".td_container_path").children().is(":visible") ) {
+        var td_container_path = \$(this).parent().parent().children(".td_container_path");
+
+        if ( ! \$(td_container_path).children().is(":visible") ) {
                 \$(this).text("simple");
                 \$(this).parent().parent().children(".td_container_operator").children().show()
-                \$(this).parent().parent().children(".td_container_path").children("select").show()
-                \$(this).parent().parent().children(".td_container_path").children("input").attr("disabled", "disabled")
-                \$(this).parent().parent().children(".td_container_path").children("select").removeAttr("disabled")
+                \$(td_container_path).children("select").show()
+                \$(td_container_path).children("input").attr("disabled", "disabled")
+                \$(td_container_path).children("select").removeAttr("disabled")
         } else {
                 \$(this).text("advanced");
-                \$(this).parent().parent().children(".td_container_path").children().hide()
+                \$(td_container_path).children().hide()
                 \$(this).parent().parent().children(".td_container_operator").children().hide()
-                \$(this).parent().parent().children(".td_container_path").children("input").removeAttr("disabled")
-                \$(this).parent().parent().children(".td_container_path").children("select").attr("disabled", "disabled")
+                \$(td_container_path).children("input").removeAttr("disabled")
+                \$(td_container_path).children("select").attr("disabled", "disabled")
         }
 });
-
 
  \$(".remove_entry").live("click", function() {
         \$(this).parent().parent().remove();
