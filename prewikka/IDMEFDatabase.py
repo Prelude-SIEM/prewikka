@@ -165,7 +165,7 @@ class Message:
         if idmef_value:
             ret = self._convert_value(idmef_value, key)
         else:
-            if idmef_path_is_list(path, -1):
+            if idmef_path_is_ambiguous(path):
                 ret = []
             else:
                 ret = None
