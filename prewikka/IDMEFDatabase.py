@@ -406,17 +406,20 @@ class IDMEFDatabase:
 
     def _getLastMessageIdent(self, type, get_message_idents, analyzerid):
         criteria = None
-        if analyzerid != None:
-            criteria = "%s.analyzer(-1).analyzerid == '%s'" % (type, str(analyzerid))
+        if analyzerid is not False:
+            if analyzerid is None:
+                criteria = "! %s.analyzer(-1).analyzerid" % (type)
+            else:
+                criteria = "%s.analyzer(-1).analyzerid == '%s'" % (type, str(analyzerid))
 
         idents = get_message_idents(criteria, limit=1)
 
         return idents[0]
 
-    def getLastAlertIdent(self, analyzer=None):
+    def getLastAlertIdent(self, analyzer=False):
         return self._getLastMessageIdent("alert", self.getAlertIdents, analyzer)
 
-    def getLastHeartbeatIdent(self, analyzer=None):
+    def getLastHeartbeatIdent(self, analyzer=False):
         return self._getLastMessageIdent("heartbeat", self.getHeartbeatIdents, analyzer)
 
     def getAlert(self, ident, htmlsafe=False):
