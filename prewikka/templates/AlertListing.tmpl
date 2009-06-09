@@ -12,6 +12,7 @@
 var global_id = 0;
 var value_array = Array();
 var operator_array = Array();
+
 var title_array = Array();
 title_array["="] = "$_("Equal")";
 title_array["!="] = "$_("Not equal")";
@@ -27,12 +28,11 @@ title_array["~*"] = "$_("Regular expression (case-insensitive)")";
 
  var saved_state = [ "classification", "source", "target", "analyzer" ];
 
- var saved_forms = new Array();
+ var saved_forms = Array();
  saved_forms["classification"] = [ "default", "saved", "current" ];
  saved_forms["source"] = [ "default", "saved", "current" ];
  saved_forms["target"] = [ "default", "saved", "current" ];
  saved_forms["analyzer"] = [ "default", "saved", "current" ];
-
 
 function cloneForm(form) {
         var clone = \$(form).clone();
@@ -147,95 +147,40 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
 
 
 ###
-### Filter set saved/default
+### Generate special classification function
 ###
-function classification_special_current() {
+#for $state, $type, $severity, $completion in ("current", $alert.type, $alert.assessment.impact.severity, $alert.assessment.impact.completion), ("saved", $alert.type_saved, $alert.assessment.impact.severity_saved, $alert.assessment.impact.completion_saved), ("default", $alert.type_default, $alert.assessment.impact.severity_default, $alert.assessment.impact.completion_default),
+
+function classification_special_${state}() {
  #for $path in "alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"
-  #if path in $alert.type
-   #set $checked = "checked='checked'"
+  #if path in $type
+   \$("input[value='${path}']").attr("checked", "checked");
   #else
-   #set $checked = ""
+   \$("input[value='${path}']").removeAttr("checked");
   #end if
-  \$("input[value='${path}']").attr("checked", "$checked");
  #end for
+
+ var input = \$("#classification input[name='alert.assessment.impact.severity']");
 
  #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
-  #if $item in $alert.assessment.impact.severity
-   #set $checked = "checked='checked'"
+  #if $item in $severity
+  \$(input).filter("[value='$item']").attr("checked", "checked");
   #else
-   #set $checked = ""
+  \$(input).filter("[value='$item']").removeAttr("checked");
   #end if
-  \$("input[name='alert.assessment.impact.severity'][value='$item']").attr("checked", "$checked");
  #end for
 
+ input = \$("#classification input[name='alert.assessment.impact.completion']");
  #for item in $N_("succeeded"), $N_("failed"), $N_("none")
-  #if item in $alert.assessment.impact.completion
-   #set $checked = "checked='checked'"
+  #if item in $completion
+  \$(input).filter("[value='$item']").attr("checked", "checked");
   #else
-   #set $checked = ""
+  \$(input).filter("[value='$item']").removeAttr("checked");
   #end if
-  \$("input[name='alert.assessment.impact.completion'][value='$item']").attr("checked", "$checked");
  #end for
 }
 
-
-function classification_special_saved() {
- #for $path in "alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"
-  #if path in $alert.type_saved
-   #set $checked = "checked='checked'"
-  #else
-   #set $checked = ""
-  #end if
-  \$("input[value='${path}']").attr("checked", "$checked");
- #end for
-
- #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
-  #if $item in $alert.assessment.impact.severity_saved
-   #set $checked = "checked='checked'"
-  #else
-   #set $checked = ""
-  #end if
-  \$("input[name='alert.assessment.impact.severity'][value='$item']").attr("checked", "$checked");
- #end for
-
- #for item in $N_("succeeded"), $N_("failed"), $N_("none")
-  #if item in $alert.assessment.impact.completion_saved
-   #set $checked = "checked='checked'"
-  #else
-   #set $checked = ""
-  #end if
-  \$("input[name='alert.assessment.impact.completion'][value='$item']").attr("checked", "$checked");
- #end for
-}
-
-function classification_special_default() {
- #for $path in "alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"
-  #if path in $alert.type_default
-   #set $checked = "checked='checked'"
-  #else
-   #set $checked = ""
-  #end if
-  \$("input[value='${path}']").attr("checked", "$checked");
- #end for
-
- #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
-  #if $item in $alert.assessment.impact.severity_default
-   #set $checked = "checked='checked'"
-  #else
-   #set $checked = ""
-  #end if
-  \$("input[name='alert.assessment.impact.severity'][value='$item']").attr("checked", "$checked");
- #end for
-
- #for item in $N_("succeeded"), $N_("failed"), $N_("none")
-  #if item in $alert.assessment.impact.completion_default
-   #set $checked = "checked='checked'"
-  #else
-   #set $checked = ""
-  #end if
-  \$("input[name='alert.assessment.impact.completion'][value='$item']").attr("checked", "$checked");
- #end for
-}
+#end for
 
 
 
@@ -258,15 +203,37 @@ function ${type}_zero() {
  \$("#${type} table.aggregation_table tr:not(':first')").remove()
 }
 
-function ${type}_set_current() {
+function ${type}_set_default() {
+ ${type}_zero();
+
+  #if $type == "classification"
+   ${type}_special_default();
+  #end if
+
+
+  ### Aggregation stuff
+  #set $cnt = 0
+  #for $path in $table_aggreg_default
+
+   #if $cnt > 0
+    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+  #end for
+}
+
+#for $state, $table, $table_aggreg in ("current", $table_current, $table_aggreg_current), ("saved", $table_saved, $table_aggreg_saved)
+function ${type}_set_${state}() {
   ${type}_zero();
 
   #if $type == "classification"
-   ${type}_special_current();
+   ${type}_special_${state}();
   #end if
 
   #set $cnt = 0
-  #for $path, $operator, $value in $table_current
+  #for $path, $operator, $value in $table
 
    #if $cnt > 0
     \$("#${type} table.filter_table tr:last a.append_entry").trigger('click');
@@ -294,7 +261,7 @@ function ${type}_set_current() {
 
 ### Aggregation stuff
   #set $cnt = 0
-  #for $path in $table_aggreg_current
+  #for $path in $table_aggreg
 
    #if $cnt > 0
     \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
@@ -304,75 +271,8 @@ function ${type}_set_current() {
    \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
   #end for
  }
-
-function ${type}_set_default() {
- ${type}_zero();
-
-  #if $type == "classification"
-   ${type}_special_default();
-  #end if
-
-
-  ### Aggregation stuff
-  #set $cnt = 0
-  #for $path in $table_aggreg_default
-
-   #if $cnt > 0
-    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
-   #end if
-   #set $cnt += 1
-
-   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
-  #end for
-}
-
-function ${type}_set_saved() {
- ${type}_zero();
-
- #if $type == "classification"
-   ${type}_special_saved();
-  #end if
-
-  #set $cnt = 0
-  #for $path, $operator, $value in $table_saved
-
-   #if $cnt > 0
-    \$("#${type} table.filter_table tr:last a.append_entry").trigger('click');
-   #end if
-   #set $cnt += 1
-
-  #if not $path
-   #continue
-  #end if
-
-  #if $path != "__all__"
-   \$("#$type table.filter_table tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
-   \$("#$type table.filter_table tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
-   \$("#$type table.filter_table tr:last .expert_mode").trigger("click");
-  #else
-   \$("#$type table.filter_table tr:last .popup_select_field").hide();
-   \$("#$type table.filter_table tr:last .popup_select_field").attr("disabled", "disabled");
-  #end if
-
-  \$("#$type table.filter_table tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
-  \$("#$type table.filter_table tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
-  #end for
-
-  \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
-
-
-  ### Aggregation stuff
-  #set $cnt = 0
-  #for $path in $table_aggreg_saved
-   #if $cnt > 0
-    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
-   #end if
-   #set $cnt += 1
-
-   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
-  #end for
- }
- #end for
+#end for
+#end for
 
 
 
