@@ -520,34 +520,25 @@ class IDMEFDatabase:
         ident = self.getLastHeartbeatIdent(analyzerid)
         heartbeat = self.getHeartbeat(ident)
 
-        index = 0
-        while True:
-            if not heartbeat["heartbeat.analyzer(%d).name" % (index + 1)]:
-                break
-            index += 1
+        path = []
+        analyzer = {}
+        analyzerd = { "path": path, "node_addresses": [], "node_name": None, "node_location": None }
 
-        analyzer = { }
-        analyzer["analyzerid"] = analyzerid
-        analyzer["name"] = heartbeat.get("heartbeat.analyzer(%d).name" % index)
-        analyzer["model"] = heartbeat.get("heartbeat.analyzer(%d).model" % index)
-        analyzer["version"] = heartbeat.get("heartbeat.analyzer(%d).version" % index)
-        analyzer["class"] = heartbeat.get("heartbeat.analyzer(%d).class" % index)
-        analyzer["ostype"] = heartbeat.get("heartbeat.analyzer(%d).ostype" % index)
-        analyzer["osversion"] = heartbeat.get("heartbeat.analyzer(%d).osversion" % index)
-        analyzer["node_name"] = heartbeat.get("heartbeat.analyzer(%d).node.name" % index)
-        analyzer["node_location"] = heartbeat.get("heartbeat.analyzer(%d).node.location" % index)
+        for a in heartbeat["analyzer"]:
+            path.append(a["analyzerid"])
+            analyzer = a
 
-        i = 0
-        analyzer["node_addresses"] = [ ]
-        while True:
-            address = heartbeat.get("heartbeat.analyzer(%d).node.address(%d).address" % (index, i))
-            if not address:
-                break
-            analyzer["node_addresses"].append(address)
-            i += 1
+        for column in "analyzerid", "name", "model", "version", "class", "ostype", "osversion":
+            analyzerd[column] = analyzer.get(column, None)
 
-        analyzer["last_heartbeat_time"] = heartbeat.get("heartbeat.create_time")
-        analyzer["last_heartbeat_interval"] = heartbeat["heartbeat.heartbeat_interval"]
-        analyzer["last_heartbeat_status"] = heartbeat.getAdditionalData("Analyzer status")
+        analyzerd["node_name"] = analyzer.get("node.name")
+        analyzerd["node_location"] = analyzer.get("node.location")
 
-        return analyzer
+        for addr in analyzer.get("node.address.address", []):
+            analyzerd["node_addresses"].append(addr)
+
+        analyzerd["last_heartbeat_time"] = heartbeat.get("heartbeat.create_time")
+        analyzerd["last_heartbeat_interval"] = heartbeat.get("heartbeat.heartbeat_interval")
+        analyzerd["last_heartbeat_status"] = heartbeat.getAdditionalData("Analyzer status")
+
+        return analyzerd

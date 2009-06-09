@@ -99,7 +99,6 @@ class SensorListing(view.View):
         self._heartbeat_count = int(env.config.general.getOptionValue("heartbeat_count", 30))
         self._heartbeat_error_margin = int(env.config.general.getOptionValue("heartbeat_error_margin", 3))
 
-
     def render(self):
         analyzers = { }
 
@@ -111,8 +110,7 @@ class SensorListing(view.View):
         locations = { }
         nodes = { }
 
-        for analyzer_path in self.env.idmef_db.getAnalyzerPaths():
-            analyzerid = analyzer_path[-1]
+        for analyzerid in self.env.idmef_db.getAnalyzerids():
             analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
 
             parameters = { "analyzerid": analyzer["analyzerid"] }
