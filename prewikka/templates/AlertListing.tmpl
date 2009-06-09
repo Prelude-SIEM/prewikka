@@ -145,58 +145,6 @@ function createSelectFromArray(varray, sclass, name_attr, selected, defsel) {
 }
 
 
-###
-### Aggreg set saved/default/current
-###
- #for $type, $table in ("classification", $aggregated_classification_saved), ("source", $aggregated_source_saved), ("target", $aggregated_target_saved), ("analyzer", $aggregated_analyzer_saved)
-function ${type}_set_aggregation_saved() {
-  #set $cnt = 0
-  #for $path in $table
-
-   #if $cnt > 0
-    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
-   #end if
-   #set $cnt += 1
-
-   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
-  #end for
- }
-#end for
-
- #for $type, $table in ("classification", $aggregated_classification_default), ("source", $aggregated_source_default), ("target", $aggregated_target_default), ("analyzer", $aggregated_analyzer_default)
-function ${type}_set_aggregation_default() {
- \$("#${type} table.aggregation_table tr:not(':first')").remove()
-
-  #set $cnt = 0
-  #for $path in $table
-
-   #if $cnt > 0
-    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
-   #end if
-   #set $cnt += 1
-
-   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
-  #end for
- }
-#end for
-
- #for $type, $table in ("classification", $aggregated_classification), ("source", $aggregated_source), ("target", $aggregated_target), ("analyzer", $aggregated_analyzer)
-function ${type}_set_aggregation_current() {
-
-  #set $cnt = 0
-  #for $path in $table
-
-   #if $cnt > 0
-    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
-   #end if
-   #set $cnt += 1
-
-   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
-  #end for
- }
- #end for
-
-
 
 ###
 ### Filter set saved/default
@@ -290,39 +238,35 @@ function classification_special_default() {
 }
 
 
- #for $type, $table in ("classification", $classification), ("source", $source), ("target", $target), ("analyzer", $analyzer)
+
+#for $type, $table_current, $table_saved, $table_aggreg_current, $table_aggreg_saved, $table_aggreg_default in ("classification", $classification, $classification_saved, $aggregated_classification, $aggregated_classification_saved, $aggregated_classification_default), ("source", $source, $source_saved, $aggregated_source, $aggregated_source_saved, $aggregated_source_default), ("target", $target, $target_saved, $aggregated_target, $aggregated_target_saved, $aggregated_target_default), ("analyzer", $analyzer, $analyzer_saved, $aggregated_analyzer, $aggregated_analyzer_saved, $aggregated_analyzer_default)
 
 function ${type}_filters_set_from_string(state) {
-        if ( state == "saved" ) {
-                ${type}_set_filter_default()
-                ${type}_set_aggregation_default()
-                ${type}_set_filter_saved();
-                ${type}_set_aggregation_saved();
-        }
+        if ( state == "saved" )
+                ${type}_set_saved();
 
-        else if ( state == "default" ) {
-                ${type}_set_filter_default()
-                ${type}_set_aggregation_default()
-                ${type}_set_filter_default();
-                ${type}_set_aggregation_default();
-        }
+        else if ( state == "default" )
+                ${type}_set_default()
 
-        else if ( state == "current" ) {
-                ${type}_set_filter_default()
-                ${type}_set_aggregation_default()
-                ${type}_set_filter_current();
-                ${type}_set_aggregation_current();
-        }
+        else if ( state == "current" )
+                ${type}_set_current();
 }
 
+function ${type}_zero() {
+ \$("#${type} table.filter_table tr:not(':first')").remove()
+ \$("#${type} table.filter_table input[type=text]").val("")
+ \$("#${type} table.aggregation_table tr:not(':first')").remove()
+}
 
-function ${type}_set_filter_current() {
+function ${type}_set_current() {
+  ${type}_zero();
+
   #if $type == "classification"
    ${type}_special_current();
   #end if
 
   #set $cnt = 0
-  #for $path, $operator, $value in $table
+  #for $path, $operator, $value in $table_current
 
    #if $cnt > 0
     \$("#${type} table.filter_table tr:last a.append_entry").trigger('click');
@@ -347,27 +291,50 @@ function ${type}_set_filter_current() {
   #end for
 
   \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
+
+### Aggregation stuff
+  #set $cnt = 0
+  #for $path in $table_aggreg_current
+
+   #if $cnt > 0
+    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+  #end for
  }
- #end for
 
-
-#for $type, $table in ("classification", $classification_saved), ("source", $source_saved), ("target", $target_saved), ("analyzer", $analyzer_saved)
-function ${type}_set_filter_default() {
- \$("#${type} table.filter_table tr:not(':first')").remove()
- \$("#${type} table.filter_table input[type=text]").val("")
+function ${type}_set_default() {
+ ${type}_zero();
 
   #if $type == "classification"
    ${type}_special_default();
   #end if
+
+
+  ### Aggregation stuff
+  #set $cnt = 0
+  #for $path in $table_aggreg_default
+
+   #if $cnt > 0
+    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+  #end for
 }
 
-function ${type}_set_filter_saved() {
-  #if $type == "classification"
+function ${type}_set_saved() {
+ ${type}_zero();
+
+ #if $type == "classification"
    ${type}_special_saved();
   #end if
 
   #set $cnt = 0
-  #for $path, $operator, $value in $table
+  #for $path, $operator, $value in $table_saved
 
    #if $cnt > 0
     \$("#${type} table.filter_table tr:last a.append_entry").trigger('click');
@@ -392,6 +359,18 @@ function ${type}_set_filter_saved() {
   #end for
 
   \$("#${type} table.filter_table tr .popup_select_field").trigger("change");
+
+
+  ### Aggregation stuff
+  #set $cnt = 0
+  #for $path in $table_aggreg_saved
+   #if $cnt > 0
+    \$("#${type} table.aggregation_table tr:last a.append_entry").trigger('click');
+   #end if
+   #set $cnt += 1
+
+   \$("#$type table.aggregation_table tr:last .popup_input_field option[value='$path']").attr("selected", "selected");
+  #end for
  }
  #end for
 
@@ -480,19 +459,15 @@ function ${type}_set_filter_saved() {
 
 
 
- #for $type, $table in ("classification", $classification), ("source", $source), ("target", $target), ("analyzer", $analyzer)
+ #for $type in "classification", "source", "target", "analyzer"
 
-
- ${type}_set_filter_saved();
- ${type}_set_aggregation_saved();
+ ${type}_set_saved();
  saved_forms["${type}"]["saved"] = cloneForm(\$("#${type} :input"));
 
- ${type}_set_filter_default();
- ${type}_set_aggregation_default();
+ ${type}_set_default();
  saved_forms["${type}"]["default"] = cloneForm(\$("#${type} :input"));
 
- ${type}_set_filter_current();
- ${type}_set_aggregation_current();
+ ${type}_set_current();
  var form = \$("#${type} :input");
  saved_forms["${type}"]["current"] = cloneForm(form);
 
