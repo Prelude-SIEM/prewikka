@@ -1,3 +1,70 @@
+* 2009-06-08, prewikka-0.9.15:
+
+- Make it obvious when a column is filtered by replacing the old sober
+  star with a big "[filtered]" red marker. If the column filter is
+  saved, then the marker color will go from red to black.
+
+- Once the user filtered a given field by clicking on it, deny further
+  click so that it is clear that the filter is currently active.
+
+- Re-write the inline filter implementation using Cheetah + Jquery, in
+  place of generating an enormous amount of javascript code. This
+  drastically reduce the size of the events listing HTML page, and will
+  allow for much easier modification of the inline-filters.
+
+- Only propose filter operator relevant to the selected path.
+
+- Inline filter now present a single input field (with no path and
+  operator selection). Using this field, the user can filter on what is
+  seen in the associated column. For example, in the classification
+  column, the filter will trigger a search on classification.text,
+  classification.reference.name and classification.reference.origin.
+
+  There is also an [advanced] button allowing the user to specify both
+  the path and the operator.
+
+- Implement a reset button in each inline filter column, that allow to
+  switch between different version of the filter: last saved filters,
+  default filters, or current filters.
+
+- The user can now click an alert completion to set an inline filter on
+  the completion value.
+
+- Clicking on a port / protocol now trigger a CSS menu allowing to
+  filter on the port and protocol information, or to get information
+  concerning this port / protocol.
+
+- Clicking on a classification reference now trigger a CSS menu which
+  allow to filter on the reference, or to get more information
+  concerning it.
+
+- Clicking on classification now add a filter on the selected
+  classification (previously, it would have unfolded aggregated alerts
+  for the selected entry, which is now done clicking the alert count).
+
+- Until now, the default user that was automatically created by Prewikka
+  if there was no administrative user was "admin". As of now you can
+  define the initial administrative username and password from the
+  configuration file. (fix #289).
+
+- Fix escaping for reference details URI parameters.
+
+- Fix ModPython content-type handling.
+
+- Invalid variable name, fix #339.
+
+- Update to JQuery 1.3.2, and fit small JQuery API change.
+
+- If the installed libprelude or libpreludedb version is too old,
+  Prewikka will require the user to upgrade. Currently, Prewikka depend
+  on libpreludedb 0.9.12, and libprelude 0.9.23.
+
+- Fix IDMEFDatabase exception on empty criteria string (fixes #346).
+
+- Analyzer retrieval fixes and speedup (fixes #350).
+
+
+
 * 2008-03-27, prewikka-0.9.14:
 
 - Let the user choose the type of sorting (default to time descending,
