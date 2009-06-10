@@ -368,11 +368,11 @@ class IDMEFDatabase:
             self._db_destroy(self._db)
 
     def _getMessageIdents(self, get_message_idents, criteria, limit, offset, order_by):
+        if len(criteria) == 0:
+            criteria = None
+
         if type(criteria) is list:
-            if len(criteria) == 0:
-                criteria = None
-            else:
-                criteria = " && ".join(criteria)
+            criteria = " && ".join(criteria)
 
         if criteria:
             criteria = idmef_criteria_new_from_string(criteria)
