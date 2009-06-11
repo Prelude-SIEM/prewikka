@@ -38,17 +38,17 @@ class Command(view.View):
     view_template = "Command"
     view_permissions = [ User.PERM_COMMAND ]
     view_parameters = HostCommandParameters
-            
+
     def render(self):
         cmd = self.parameters["command"]
-        
+
         try:
             command = self.env.host_commands[cmd]
         except KeyError:
             raise Error("Attempt to execute unregistered command '%s'" % cmd)
 
         command = command.replace("$host", self.parameters["host"]).split(" ")
-                
+
         pipe = popen2.Popen4(command)
         pipe.wait()
 
