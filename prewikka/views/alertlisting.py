@@ -146,7 +146,7 @@ COLUMN_LIST = [ "classification", "source", "target", "analyzer" ]
 
 CLASSIFICATION_FILTERS = _getClassificationPath()
 CLASSIFICATION_AGGREGATIONS = _getClassificationPath(add_empty=True, add_index="(0)")
-CLASSIFICATION_GENERIC_SEARCH_FIELDS = [ "alert.classification.text", "alert.classification.reference.name", "alert.classification.reference.origin" ]
+CLASSIFICATION_GENERIC_SEARCH_FIELDS = [ "alert.classification.text", "alert.classification.reference.name", "alert.classification.reference.origin", "alert.assessment.impact.completion" ]
 
 SOURCE_FILTERS = _getSourcePath()
 SOURCE_AGGREGATIONS = _getSourcePath(add_empty=True, add_index="(0)")
