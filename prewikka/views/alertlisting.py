@@ -930,7 +930,7 @@ class AlertListing(MessageListing, view.View):
 
     def _applyFiltersForCategory(self, criteria, type):
         if not self.parameters[type]:
-            self.dataset[type] = [ ("", "", "") ]
+            self.dataset[type] = [ ("__all__", "", "") ]
             return
 
         # If one object is specified more than one time, and since this object
