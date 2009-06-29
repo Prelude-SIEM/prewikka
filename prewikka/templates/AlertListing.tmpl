@@ -381,6 +381,9 @@ function ${type}_set_${state}() {
  if ( Equals(saved_forms["${type}"]["current"], saved_forms["${type}"]["default"]) )
         saved_forms["${type}"]["current"] = null;
 
+ if ( Equals(saved_forms["${type}"]["current"], saved_forms["${type}"]["saved"]) )
+        saved_forms["${type}"]["current"] = null;
+
  ## Set the current state
  if ( Equals(form, saved_forms["${type}"]["default"]) )
         saved_state["$type"] = "default";
