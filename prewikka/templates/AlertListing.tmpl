@@ -202,6 +202,10 @@ function ${type}_zero() {
  filter_table.find("tr:not(':first')").remove()
  filter_table.find("input[type=text]").val("")
  \$("#${type} table.aggregation_table tr:not(':first')").remove()
+
+ ## reset to non expert mode.
+ if ( filter_table.find(".td_container_path").children().is(":visible") )
+   filter_table.find(".expert_mode").click();
 }
 
 function ${type}_set_default() {
