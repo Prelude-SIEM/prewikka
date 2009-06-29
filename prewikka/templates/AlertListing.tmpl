@@ -252,20 +252,24 @@ function ${type}_set_${state}() {
    #continue
   #end if
 
+  table.find("tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
+  table.find("tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
+
   #if $path != "__all__"
    table.find("tr:last .popup_select_field option[value='$path']").attr("selected", "selected");
-   table.find("tr:last .popup_operator_select option[value='$operator']").attr("selected", "selected");
+
+   ## the option might not exist at this time, so we have to explicitly create it (otherwise,
+   ## using Equals() later on will always return false since there is no operator selected).
+   ## The other fields will be populated on the .trigger("change").
+   table.find("tr:last .popup_operator_select").html("<option value='$operator' selected='selected' />");
+
    table.find("tr:last .expert_mode").trigger("click");
   #else
    table.find("tr:last .popup_select_field").hide();
    table.find("tr:last .popup_select_field").attr("disabled", "disabled");
+   table.find("tr:last .popup_select_field").trigger("change");
   #end if
-
-  table.find("tr:last .popup_input_field").attr("value", "$utils.escape_attribute($value)");
-  table.find("tr:last .popup_input_field option[value='$value']").attr("selected", "selected");
   #end for
-
-  table.find("tr .popup_select_field").trigger("change");
 
 ### Aggregation stuff
   #set $cnt = 0
@@ -305,6 +309,9 @@ function ${type}_set_${state}() {
                 \$(td_container_path).children("select").attr("disabled", "disabled")
                 \$(td_container_operator).children("select").attr("disabled", "disabled");
         }
+
+        ## This is required so that the input is changed (from/to enum) when required.
+        \$(td_container_path).children("select").trigger("change");
 });
 
  \$(".remove_entry").live("click", function() {
@@ -341,22 +348,18 @@ function ${type}_set_${state}() {
           var str = \$(this, "> option:selected").attr("value");
           var input = \$(td).siblings(".td_container_value").children();
 
-          if ( operator_array[str] ) {
+          // do not use visible here, this is called before the parent element is visible
+          var advanced_mode = \$(this).css("display") != "none";
+
+          if ( operator_array[str] && advanced_mode ) {
                 var old_select = \$(td).siblings(".td_container_operator").children();
-                // do not use visible here, this is called before the parent element is visible
-                var display = \$(old_select).css("display") != "none";
                 var old_value = \$(old_select).children(":selected").attr("value");
 
                 select = createSelectFromArray(operator_array[str], "popup_operator_select", \$(old_select).attr("name"), old_value);
-                if ( ! display ) {
-                        \$(select).hide();
-                        \$(select).attr("disabled", "disabled");
-                }
-
                 \$(old_select).replaceWith(select);
           }
 
-          if ( value_array[str] ) {
+          if ( value_array[str] && advanced_mode ) {
                   select = createSelectFromArray(value_array[str], "popup_input_field", \$(input).attr("name"), \$(input).attr("value"));
                   \$(input).replaceWith(select);
           }
@@ -365,8 +368,11 @@ function ${type}_set_${state}() {
                 var n = document.createElement("input");
                 n.setAttribute("type", "text");
                 n.setAttribute("name", \$(input).attr("name"));
-                n.setAttribute("value", \$(input).attr("value"));
                 n.setAttribute("class", "popup_input_field");
+
+                if ( \$(input).attr("type") != "select-one" )
+                        n.setAttribute("value", \$(input).attr("value"));
+
                 \$(input).replaceWith(n);
           }
  });
