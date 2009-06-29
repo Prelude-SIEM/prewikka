@@ -286,7 +286,9 @@ function ${type}_set_${state}() {
 
 \$(document).ready(function() {
  \$(".expert_mode").live("click", function() {
-        var td_container_path = \$(this).parent().parent().children(".td_container_path");
+        var tr = \$(this).parent().parent();
+        var td_container_path = \$(tr).children(".td_container_path");
+        var td_container_operator = \$(tr).children(".td_container_operator");
 
         if ( ! \$(td_container_path).children().is(":visible") ) {
                 \$(this).text("simple");
@@ -294,12 +296,14 @@ function ${type}_set_${state}() {
                 \$(td_container_path).children("select").show()
                 \$(td_container_path).children("input").attr("disabled", "disabled")
                 \$(td_container_path).children("select").removeAttr("disabled")
+                \$(td_container_operator).children("select").removeAttr("disabled");
         } else {
                 \$(this).text("advanced");
                 \$(td_container_path).children().hide()
                 \$(this).parent().parent().children(".td_container_operator").children().hide()
                 \$(td_container_path).children("input").removeAttr("disabled")
                 \$(td_container_path).children("select").attr("disabled", "disabled")
+                \$(td_container_operator).children("select").attr("disabled", "disabled");
         }
 });
 
@@ -344,8 +348,10 @@ function ${type}_set_${state}() {
                 var old_value = \$(old_select).children(":selected").attr("value");
 
                 select = createSelectFromArray(operator_array[str], "popup_operator_select", \$(old_select).attr("name"), old_value);
-                if ( ! display )
+                if ( ! display ) {
                         \$(select).hide();
+                        \$(select).attr("disabled", "disabled");
+                }
 
                 \$(old_select).replaceWith(select);
           }
