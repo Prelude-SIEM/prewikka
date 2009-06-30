@@ -18,8 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import os, popen2
-
+import os, subprocess
 from prewikka import view, User, utils
 
 class Error(Exception):
@@ -49,10 +48,8 @@ class Command(view.View):
 
         command = command.replace("$host", self.parameters["host"]).split(" ")
 
-        pipe = popen2.Popen4(command)
-        pipe.wait()
+        output = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True).communicate()[0]
 
-        output = pipe.fromchild.read()
         output = utils.escape_html_string(output).replace(" ", "&nbsp;").replace("\n", "<br/>")
         self.dataset["command_output"] = output
 
