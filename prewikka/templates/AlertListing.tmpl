@@ -241,9 +241,12 @@ function ${type}_set_${state}() {
   #end if
 
   #set $cnt = 0
+  #set $got_append = 0
+
   #for $path, $operator, $value in $table
 
    #if $cnt > 0
+    #set $got_append = 1
     table.find("tr:last a.append_entry").trigger('click');
    #end if
    #set $cnt += 1
@@ -263,7 +266,11 @@ function ${type}_set_${state}() {
    ## The other fields will be populated on the .trigger("change").
    table.find("tr:last .popup_operator_select").html("<option value='$operator' selected='selected' />");
 
-   table.find("tr:last .expert_mode").trigger("click");
+   #if $got_append == 0
+    table.find("tr:last .expert_mode").trigger("click");
+   #else
+    table.find("tr:last .popup_select_field").trigger("change");
+   #end if
   #else
    table.find("tr:last .popup_select_field").hide();
    table.find("tr:last .popup_select_field").attr("disabled", "disabled");
@@ -319,7 +326,7 @@ function ${type}_set_${state}() {
  });
 
  \$(".append_entry").live("click", function() {
-   var tr = \$(this).parent().parent().clone();
+   var tr = cloneForm(\$(this).parent().parent());
    var select = \$(tr).children("td.td_container_path").children();
    var div_id = \$(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().attr("id");
 
