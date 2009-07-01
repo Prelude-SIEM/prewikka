@@ -192,7 +192,8 @@ class ListedMessage(dict):
                 alreadyf = None
                 extra[p] = v
 
-        return { "value": real_value, "inline_filter": utils.create_link(self.view_name, self.parameters + extra), "already_filtered": alreadyf }
+        link = utils.create_link(self.view_name, self.parameters + extra - [ "offset" ])
+        return { "value": real_value, "inline_filter": link, "already_filtered": alreadyf }
 
     def createTimeField(self, t, timezone=None):
         if t:
