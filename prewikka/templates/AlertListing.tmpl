@@ -661,12 +661,17 @@ function ${type}_set_${state}() {
 #end def
 
 #def writeService($hstr, $direction)
+#if $direction.protocol.value
+#set $protocol = $direction.protocol.value.upper()
+#else
+#set $protocol = ""
+#end if
 #if $direction.service.value != None#$hstr<a class="popup_menu_toggle">$str($direction.service.value)#end if
 </a>
        <span class="popup_menu">
         #filter Filter - $writeInlineFilter($direction.service, $_("Filter on this port/protocol"))<br/> #end filter
         #if $direction.port.value
-        - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$str($direction.port.value)&amp;protocol=$direction.protocol.value.upper()">$_("Port/protocol information")</a>
+        - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$str($direction.port.value)&amp;protocol=$protocol">$_("Port/protocol information")</a>
         #else
         - <span>$_("Port/protocol information")</span>
         #end if
