@@ -447,10 +447,10 @@ class MessageSummary(Table):
 
         if node["name"]:
             self.newTableEntry(_("Node name"), node["name"])
-	
+
         elif node_name:
             self.newTableEntry(_("Node name (resolved)"), node_name)
-            
+
         self.newTableEntry(_("Node address"), addr_list)
 
     def buildAnalyzer(self, analyzer):
@@ -906,7 +906,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
             for port in portlist.replace(" ", "").split(","):
                 if len(out) > 0:
                     out += ", "
-                    
+
                 if port.find("-") != -1:
                     left, right = port.split("-")
                     out += self.getUrlLink(left, "https://www.prelude-ids.com/port_details.php?port=%s" % left)
@@ -914,12 +914,12 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                     out += self.getUrlLink(right, "https://www.prelude-ids.com/port_details.php?port=%s" % right)
                 else:
                     out += self.getUrlLink(port, "https://www.prelude-ids.com/port_details.php?port=%s" % port)
-                    
+
             self.newTableEntry(_("PortList"), out)
 
         if service["ip_version"]:
             self.newTableEntry(_("ip_version"), service["ip_version"])
-            
+
         ipn = service["iana_protocol_number"]
         if ipn and utils.protocol_number_to_name(ipn) != None:
             self.newTableEntry(_("Protocol"), utils.protocol_number_to_name(ipn))
@@ -999,13 +999,13 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.dataset["sections"] = [ ]
 
         self.beginSection(self.getSectionName(alert))
-        
+
         self.buildTime(alert)
 
         self.beginTable()
         self.newTableEntry(_("MessageID"), alert["messageid"])
         self.endTable()
-        
+
         self.beginTable()
         self.buildClassification(alert)
         self.buildImpact(alert)

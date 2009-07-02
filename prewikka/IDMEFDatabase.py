@@ -91,7 +91,7 @@ def convert_idmef_value(value):
             IDMEF_VALUE_TYPE_DOUBLE:        idmef_value_get_double,
             IDMEF_VALUE_TYPE_STRING:        idmef_value_get_string,
             IDMEF_VALUE_TYPE_DATA:          idmef_value_get_data,
-	    IDMEF_VALUE_TYPE_CLASS:	    idmef_value_get_object,
+            IDMEF_VALUE_TYPE_CLASS:         idmef_value_get_object,
             IDMEF_VALUE_TYPE_ENUM:          get_enum,
             IDMEF_VALUE_TYPE_TIME:          get_time
             }[idmef_value_get_type(value)](value)
