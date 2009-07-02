@@ -326,6 +326,7 @@ class Core:
         login = None
         view = None
         user = None
+        encoding = self._env.config.general.getOptionValue("encoding", "utf8")
 
         try:
             if self._prelude_version_error:
@@ -373,10 +374,11 @@ class Core:
         resolve.process(self._env.dns_max_delay)
 
         try:
-                request.content = str(template)
+                request.content = template.respond()
         except Exception, e:
             error = self.prepareError(e, request, user, login, view)
-            request.content = str(load_template(error.template, error.dataset))
+            request.content = load_template(error.template, error.dataset).respond()
 
+        request.content = request.content.encode(encoding, "xmlcharrefreplace")
         request.sendResponse()
 

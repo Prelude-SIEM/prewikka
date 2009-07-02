@@ -159,7 +159,7 @@ class Message:
         return value
 
     def _get_raw_value(self, key):
-        path = idmef_path_new_fast(key)
+        path = idmef_path_new_fast(key.encode("utf8"))
         idmef_value = idmef_path_get(path, self._res)
 
         if idmef_value:
@@ -186,7 +186,7 @@ class Message:
         if type(criteria) is list:
             criteria = " && ".join(criteria)
 
-        criteria = idmef_criteria_new_from_string(criteria)
+        criteria = idmef_criteria_new_from_string(criteria.encode("utf8"))
         ret = idmef_criteria_match(criteria, self._res)
         idmef_criteria_destroy(criteria)
 
@@ -375,7 +375,7 @@ class IDMEFDatabase:
             criteria = " && ".join(criteria)
 
         if criteria:
-            criteria = idmef_criteria_new_from_string(criteria)
+            criteria = idmef_criteria_new_from_string(criteria.encode("utf8"))
 
         idents = [ ]
 
@@ -457,11 +457,11 @@ class IDMEFDatabase:
                 criteria = " && ".join([ "(" + c + ")" for c in criteria ])
 
         if criteria:
-            criteria = idmef_criteria_new_from_string(criteria)
+            criteria = idmef_criteria_new_from_string(criteria.encode("utf8"))
 
         my_selection = preludedb_path_selection_new()
         for selected in selection:
-            my_selected = preludedb_selected_path_new_string(selected)
+            my_selected = preludedb_selected_path_new_string(selected.encode("utf8"))
             preludedb_path_selection_add(my_selection, my_selected)
 
         try:

@@ -118,7 +118,9 @@ def boolean_property(name, parameter, value=False):
 
 
 def escape_html_string(s):
-    s = str(s)
+    if type(s) is not str and type(s) is not unicode:
+        s = str(s)
+
     s = s.replace("&", "&amp;")
     s = s.replace("<", "&lt;")
     s = s.replace(">", "&gt;")
@@ -150,3 +152,33 @@ def hexdump(content):
         i += 16
 
     return content
+
+
+def isUTF8(text):
+    try:
+        text = unicode(text, 'UTF-8', 'strict')
+        return True
+    except UnicodeDecodeError:
+        return False
+
+def toUnicode(text):
+    r"""
+    >>> toUnicode('ascii')
+    u'ascii'
+    >>> toUnicode(u'utf\xe9'.encode('UTF-8'))
+    u'utf\xe9'
+    >>> toUnicode(u'unicode')
+    u'unicode'
+    """
+    if isinstance(text, unicode):
+        return text
+
+    if not isinstance(text, str):
+        text = str(text)
+
+    try:
+        return unicode(text, "utf8")
+    except UnicodeError:
+        pass
+
+    return unicode(text, "ISO-8859-1")

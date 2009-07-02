@@ -911,6 +911,9 @@ class AlertListing(MessageListing, view.View):
         return "%s %s '%s'" % (object, operator, utils.escape_criteria(self._adjustFilterValue(operator, value)))
 
     def _getOperatorForPath(self, path, value):
+        path = path.encode("utf8")
+        value = value.encode("utf8")
+
         # Check whether the path can handle substring comparison
         # this need to be done first, since enum check with * won't work with "=" operator.
         try:
@@ -1067,7 +1070,7 @@ class AlertListing(MessageListing, view.View):
 
 
     def _getPathValueType(self, path):
-        p = prelude.idmef_path_new(path)
+        p = prelude.idmef_path_new(path.encode("utf8"))
         t = prelude.idmef_path_get_value_type(p, -1)
         prelude.idmef_path_destroy(p)
         return t

@@ -19,7 +19,7 @@
 
 
 from copy import copy
-import Error, Log
+import Error, Log, utils
 
 class ParameterError(Exception):
         pass
@@ -87,6 +87,9 @@ class Parameters(dict):
         do_load = True
 
         for name, value in self.items():
+            if isinstance(value, str):
+                value = self[name] = utils.toUnicode(value)
+
             try:
                 value = self._parseValue(name, value)
             except KeyError:
