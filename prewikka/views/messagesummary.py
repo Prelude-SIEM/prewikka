@@ -656,16 +656,21 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         for analyzerid in calist.keys():
 
             content = ""
+            missing = 0
             for ident in calist[analyzerid]:
                 criteria = "alert.analyzer.analyzerid = '%s' && alert.messageid = '%s'" % (analyzerid, ident)
 
                 results = self.env.idmef_db.getAlertIdents(criteria)
                 if len(results) == 0:
-                    content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": ident } + "</li>"
+                    missing += 1
+                    #content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": ident } + "</li>"
                 else:
                     alert = self.env.idmef_db.getAlert(results[0], htmlsafe=True)
                     link = utils.create_link("alert_summary", { "origin": self.parameters["origin"], "ident": results[0] })
                     content += "<li><a href=\"%s\">%s</a></li>" % (link, alert["classification.text"])
+
+            if missing > 0:
+                content += "<li>" + (_("%d linked alerts missing (probably deleted)") % missing) + "</li>"
 
             self.newTableCol(idx, "<ul style='padding: 0px; margin: 0px 0px 0px 10px;'>%s</ul>" % content)
             self.buildAnalyzer(alert["analyzer(-1)"])
