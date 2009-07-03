@@ -15,59 +15,8 @@
 
    <br/><br/>
 
-#set $curparam = $cgi.parse_qs($prewikka.url.current)
-
-#if $curparam.has_key('_error_back')
-    #set $referer_string = $curparam['_error_back'][0]
-    #set $referer = $cgi.parse_qs($referer_string)
-#else
-    #set $referer_string = $prewikka.url.referer
-    #set $referer = $cgi.parse_qs($referer_string)
-#end if
-
-#if $curparam.has_key('_error_retry')
-    #set $retry_string = $curparam['_error_retry'][0]
-    #set $retry = $cgi.parse_qs($retry_string)
-#else
-    #set $retry_string = $prewikka.url.current
-    #set $retry = $cgi.parse_qs($prewikka.url.current)
-#end if
-
-
-   <form method="POST" action="?">
-     #for $param, $values in $referer.items()
-       #for $value in $values
-         <input type="hidden" name="$param" value="$value"/>
-       #end for
-     #end for
-
-#if not $referer.has_key("_error_back")
-     <input type="hidden" name="_error_back" value="$referer_string" />
-#end if
-
-#if not $referer.has_key("_error_retry")
-     <input type="hidden" name="_error_retry" value="$retry_string" />
-#end if
-     <input style="float: left; position: relative;" type="submit" value="Back"/>
-   </form>
-
-   <form method="POST" action="?">
-     #for $param, $values in $retry.items()
-       #for $value in $values
-         <input type="hidden" name="$param" value="$value"/>
-       #end for
-     #end for
-
-#if not $retry.has_key("_error_back")
-     <input type="hidden" name="_error_back" value="$referer_string" />
-#end if
-
-#if not $retry.has_key("_error_retry")
-     <input type="hidden" name="_error_retry" value="$retry_string" />
-#end if
-
-     <input style="float: right; position: relative;" type="submit" value="Retry"/>
-   </form>
+   <input style="float: left; position: relative;" type="button" value="Back" onclick="history.back()" />
+   <input style="float: right; position: relative;" type="submit" value="Retry" onclick="location.reload()"/>
 
   </fieldset>
  </div>

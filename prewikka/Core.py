@@ -61,21 +61,6 @@ def init_dataset(dataset, config, request):
     else:
         dataset["prewikka.external_link_target"] = "_self"
 
-    qstring = request.getQueryString()
-    if qstring[0:2] == "/?":
-        qstring = qstring[2:]
-
-    dataset["prewikka.url.current"] = qstring
-
-    referer = request.getReferer()
-    idx = referer.rfind("/")
-    if idx != -1:
-        referer = referer[idx + 1:]
-        if referer[0:1] == "?":
-            referer = referer[1:]
-
-    dataset["prewikka.url.referer"] = referer
-
     dataset["arguments"] = []
     for name, value in request.arguments.items():
         if name in ("_login", "_password"):
