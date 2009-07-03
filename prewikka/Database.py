@@ -79,20 +79,19 @@ class Database:
                               ("pass", None)):
             value = config.get(name, default)
             if value:
-                preludedb_sql_settings_set(settings, name, value)
+                preludedb_sql_settings_set(settings, name.encode("utf8"), value.encode("utf8"))
 
         db_type = config.get("type", "mysql")
-
-        self._sql = preludedb_sql_new(db_type, settings)
+        self._sql = preludedb_sql_new(db_type.encode("utf8"), settings)
 
         if config.has_key("log"):
-            preludedb_sql_enable_query_logging(self._sql, config["log"])
+            preludedb_sql_enable_query_logging(self._sql, config["log"].encode("utf8"))
 
         # check if the database has been created
         try:
             version = self.query("SELECT version FROM Prewikka_Version")[0][0]
         except PreludeDBError, e:
-            raise DatabaseSchemaError(str(e))
+            raise DatabaseSchemaError(unicode(utils.toUnicode(e)))
 
         if version != self.required_version:
             d = { "version": version, "reqversion": self.required_version }
@@ -111,7 +110,7 @@ class Database:
 
     def query(self, query):
         try:
-            _table = preludedb_sql_query(self._sql, query)
+            _table = preludedb_sql_query(self._sql, query.encode("utf8"))
             if not _table:
                 return [ ]
 
@@ -127,7 +126,7 @@ class Database:
                 for col in range(columns):
                     _field = preludedb_sql_row_fetch_field(_row, col)
                     if _field:
-                        row.append(preludedb_sql_field_to_string(_field))
+                        row.append(utils.toUnicode(preludedb_sql_field_to_string(_field)))
                     else:
                         row.append(None)
 
@@ -151,7 +150,10 @@ class Database:
         return
 
     def escape(self, data):
-        return preludedb_sql_escape(self._sql, data)
+        if data:
+            data = data.encode("utf8")
+
+        return utils.toUnicode(preludedb_sql_escape(self._sql, data))
 
     def datetime(self, t):
         if t is None:
@@ -200,7 +202,7 @@ class Database:
             if not config[view].has_key(name):
                 config[view][name] = value
             else:
-                if type(config[view][name]) is str:
+                if isinstance(config[view][name], (str, unicode)):
                     config[view][name] = [ config[view][name] ]
 
                 config[view][name] = config[view][name] + [ value ]

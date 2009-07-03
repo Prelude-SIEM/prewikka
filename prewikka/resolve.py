@@ -51,10 +51,11 @@ class DNSResolver:
 
     def _resolve_cb(self, (ans, auth, add), ptr, resolve_cb):
         self._query -= 1
+        name = unicode(ans[0].payload.name)
 
-        resolve_cb(str(ans[0].payload.name))
+        resolve_cb(name)
 
-        q = dns.Query(str(ans[0].name), ans[0].type, ans[0].cls)
+        q = dns.Query(name, ans[0].type, ans[0].cls)
         self._cache.cacheResult(q, (ans, auth, add))
 
     def _ip_reverse(self, addr):
@@ -127,7 +128,7 @@ class AddressResolve:
             resolver.resolve(addr, self._resolve_cb)
 
     def __len__(self):
-        return len(str(self))
+        return len(unicode(self))
 
     def __str__(self):
         if resolver:
@@ -136,7 +137,7 @@ class AddressResolve:
         return self._name or self._addr
 
     def __repr__(self):
-        return str(self)
+        return unicode(self)
 
 
 def process(timeout=0):

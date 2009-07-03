@@ -666,12 +666,12 @@ function ${type}_set_${state}() {
 #else
 #set $protocol = ""
 #end if
-#if $direction.service.value != None#$hstr<a class="popup_menu_toggle">$str($direction.service.value)#end if
+#if $direction.service.value != None#$hstr<a class="popup_menu_toggle">$unicode($direction.service.value)#end if
 </a>
        <span class="popup_menu">
         #filter Filter - $writeInlineFilter($direction.service, $_("Filter on this port/protocol"))<br/> #end filter
         #if $direction.port.value
-        - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$str($direction.port.value)&amp;protocol=$protocol">$_("Port/protocol information")</a>
+        - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$unicode($direction.port.value)&amp;protocol=$protocol">$_("Port/protocol information")</a>
         #else
         - <span>$_("Port/protocol information")</span>
         #end if
@@ -694,7 +694,7 @@ function ${type}_set_${state}() {
 
   #if $message.aggregated and $message.aggregated_classifications_hidden > 0
     #set $string = $_("%(hidden)d of %(total)d alerts not shown...")
-    <b>($str($string % { "hidden": $message.aggregated_classifications_hidden, "total": $message.aggregated_classifications_total })
+    <b>($unicode($string % { "hidden": $message.aggregated_classifications_hidden, "total": $message.aggregated_classifications_total })
     <a href="$message.aggregated_classifications_hidden_expand">$_("expand")</a>)</b>
     <br/>
   #end if
@@ -756,7 +756,7 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
 
 #if $hidden > 0
        #set $string = $_("%(hidden)d of %(total)d %(name)ss not shown...")
-       <b>($str($string % { "hidden": $hidden, "total": $total, "name": $name })
+       <b>($unicode($string % { "hidden": $hidden, "total": $total, "name": $name })
        <a href="$expand">$_("expand")</a>)</b>
        <br/>
 #end if
@@ -770,11 +770,11 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
 
       #for $address in $direction.addresses
        <a class="popup_menu_toggle">$address.hostname</a><span class="popup_menu">
-         - #filter Filter $writeInlineFilter($address, $str($_("Filter on this %s") % ($name))) #end filter
+         - #filter Filter $writeInlineFilter($address, $unicode($_("Filter on this %s") % ($name))) #end filter
          <br />
 
        #if not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
-         - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$str($_("%s information") % ($name)).capitalize()</a><br />
+         - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$unicode($_("%s information") % ($name)).capitalize()</a><br />
 
           #for $cmdname, $link in $address.host_commands
          - <a href="$link">$cmdname</a><br />

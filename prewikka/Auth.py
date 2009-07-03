@@ -22,10 +22,7 @@ import md5
 import random
 
 from prewikka.Error import PrewikkaError, PrewikkaUserError
-from prewikka import DataSet
-from prewikka import Database
-from prewikka import Log
-from prewikka import User
+from prewikka import DataSet, Database, Log, User, utils
 
 
 class AuthError(PrewikkaUserError):
@@ -116,20 +113,21 @@ class LoginPasswordAuth(Auth, Session):
         Session.__init__(self, session_expiration)
 
     def getUser(self, request):
-        if request.arguments.has_key("_login"):
-            login = request.arguments["_login"]
+        login = request.arguments.get("_login", None)
+        if not login:
+            login = utils.toUnicode(self.checkSession(request))
+        else:
             del request.arguments["_login"]
-            password = request.arguments.get("_password", "")
+            password = utils.toUnicode(request.arguments.get("_password", ""))
             try:
                 del request.arguments["_password"]
             except KeyError:
                 pass
 
+            login = utils.toUnicode(login)
             self.checkPassword(login, password)
             self.createSession(request, login)
             self.log.info("User login", request, login)
-        else:
-            login = self.checkSession(request)
 
         return self.db.getUser(login)
 

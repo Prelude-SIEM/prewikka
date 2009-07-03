@@ -19,7 +19,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import locale, gettext, __builtin__, time
-from prewikka import siteconfig
+from prewikka import siteconfig, utils
 
 try:
     from threading import local, Lock
@@ -37,13 +37,13 @@ _all_locale = { _DEFAULT_LANGUAGE: None }
 
 def _safeGettext(s):
     try:
-        return _localized_thread.data.gettext(s)
+        return utils.toUnicode(_localized_thread.data.gettext(s))
     except:
         return s
 
 def _safeNgettext(singular, plural, num):
     try:
-        return _localized_thread.data.ngettext(singular, plural, num)
+        return utils.toUnicode(_localized_thread.data.ngettext(singular, plural, num))
     except:
         if num <= 1:
             return singular
@@ -125,5 +125,5 @@ def getDate():
                            _("Saturday"),
                            _("Sunday") ]
 
-    weekday, day, month, year = time.strftime("%A %d %B %Y").split()
-    return " ".join((_(weekday).lower(), day, _(month).lower(), year))
+    weekday, day, month, year = utils.toUnicode(time.strftime("%A %d %B %Y")).split()
+    return u" ".join((_(weekday).lower(), day, _(month).lower(), year))

@@ -341,12 +341,13 @@ class IDMEFDatabase:
     def __init__(self, config):
         settings = preludedb_sql_settings_new()
         for param in "file", "host", "port", "name", "user", "pass":
-            if config.getOptionValue(param):
-                preludedb_sql_settings_set(settings, param, config.getOptionValue(param))
+            value = config.getOptionValue(param)
+            if value:
+                preludedb_sql_settings_set(settings, param, value.encode("utf8"))
 
-        sql = preludedb_sql_new(config.getOptionValue("type", "mysql"), settings)
+        sql = preludedb_sql_new(config.getOptionValue("type", "mysql").encode("utf8"), settings)
         if config.getOptionValue("log"):
-            preludedb_sql_enable_query_logging(sql, config.getOptionValue("log"))
+            preludedb_sql_enable_query_logging(sql, config.getOptionValue("log").encode("utf8"))
 
         cur = ver = None
         wanted_version = "0.9.12"
@@ -410,7 +411,7 @@ class IDMEFDatabase:
             if analyzerid is None:
                 criteria = "! %s.analyzer(-1).analyzerid" % (type)
             else:
-                criteria = "%s.analyzer(-1).analyzerid == '%s'" % (type, str(analyzerid))
+                criteria = "%s.analyzer(-1).analyzerid == '%s'" % (type, unicode(analyzerid))
 
         idents = get_message_idents(criteria, limit=1)
 

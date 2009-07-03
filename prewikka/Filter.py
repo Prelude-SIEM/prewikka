@@ -63,7 +63,7 @@ class Filter:
         self.elements = elements
         self.formula = formula
 
-        crit = prelude.idmef_criteria_new_from_string(str(self))
+        crit = prelude.idmef_criteria_new_from_string(unicode(self).encode("utf8"))
         prelude.idmef_criteria_destroy(crit)
         
     def _replace(self, element):

@@ -222,7 +222,7 @@ class HeartbeatAnalyze(view.View):
         analyzerid = self.parameters["analyzerid"]
 
         analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
-        analyzer["last_heartbeat_time"] = str(analyzer["last_heartbeat_time"])
+        analyzer["last_heartbeat_time"] = unicode(analyzer["last_heartbeat_time"])
         analyzer["events"] = [ ]
         analyzer["status"] = "abnormal_offline"
         analyzer["status_meaning"] = "abnormal offline"

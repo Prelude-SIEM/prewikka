@@ -19,6 +19,7 @@
 
 
 import re
+from prewikka import utils
 
 class Error(Exception):
     pass
@@ -91,8 +92,8 @@ class ConfigParserSection(OrderedDict):
 
 class ConfigParserOption:
     def __init__(self, name, value, lineno, line):
-        self.name = name
-        self.value = value
+        self.name = utils.toUnicode(name)
+        self.value = utils.toUnicode(value)
         self.lineno = lineno
         self.line = line
 

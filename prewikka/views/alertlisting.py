@@ -346,7 +346,7 @@ class SensorAlertListingParameters(AlertListingParameters):
 
     def normalize(self, view_name, user):
         AlertListingParameters.normalize(self, view_name, user)
-        self["analyzer"].insert(0, ("alert.analyzer.analyzerid", "=", str(self["analyzerid"])))
+        self["analyzer"].insert(0, ("alert.analyzer.analyzerid", "=", unicode(self["analyzerid"])))
 
 
 class CorrelationAlertListingParameters(AlertListingParameters):
@@ -1149,7 +1149,7 @@ class AlertListing(MessageListing, view.View):
                     else:
                         criterion = "(! %s || %s == '')" % (path, path)
                 else:
-                    criterion = "%s == '%s'" % (path, utils.escape_criteria(str(value)))
+                    criterion = "%s == '%s'" % (path, utils.escape_criteria(unicode(value)))
                     if direction != None:
                         message.setMessageDirectionGeneric(direction, path, value)
 
@@ -1316,7 +1316,7 @@ class AlertListing(MessageListing, view.View):
         if self.parameters.has_key("filter"):
             filter = self.env.db.getAlertFilter(self.user.login, self.parameters["filter"])
             if filter:
-                criteria.append("(%s)" % str(filter))
+                criteria.append("(%s)" % unicode(filter))
 
         start = end = None
         if self.parameters.has_key("timeline_unit") and self.parameters["timeline_unit"] != "unlimited":

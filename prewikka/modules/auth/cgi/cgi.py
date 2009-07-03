@@ -40,6 +40,8 @@ class CGIAuth(Auth.Auth):
         if not user:
             raise Auth.AuthError(message=_("CGI Authentication failed: no user specified."))
 
+        user = user.toUnicode(user)
+
         # Create the user in the Prewikka database, so that its permission
         # might be modified by another administrative user.
         if not self.db.hasUser(user):

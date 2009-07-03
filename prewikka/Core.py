@@ -84,7 +84,7 @@ def init_dataset(dataset, config, request):
         if name == "view" and value == "logout":
             continue
 
-        dataset["arguments"].append((name, value))
+        dataset["arguments"].append((name, utils.toUnicode(value)))
 
 
 def load_template(name, dataset):
@@ -287,7 +287,7 @@ class Core:
                 print key + ":"
                 self._printDataSet(value, level + 1)
             else:
-                print "%s: %s" % (key, value)
+                print "%s: %s" % (key, repr(value))
 
     def _checkPermissions(self, request, view, user):
         if user and view.has_key("permissions"):
@@ -316,8 +316,9 @@ class Core:
         return user
 
     def prepareError(self, e, request, user, login, view):
-        self._env.log.error("%s" % str(e), request, login)
-        error = Error.PrewikkaUserError("Prewikka internal error", str(e),
+        e = unicode(e)
+        self._env.log.error(e, request, login)
+        error = Error.PrewikkaUserError("Prewikka internal error", e,
                                         display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
         self._setupDataSet(error.dataset, request, user, view=view)
         return error
@@ -356,7 +357,7 @@ class Core:
 
         except Error.PrewikkaUserError, e:
             if e._log_priority:
-                self._env.log.log(e._log_priority, "%s" % str(e), request=request, user=login or e._log_user)
+                self._env.log.log(e._log_priority, unicode(e), request=request, user=login or e._log_user)
 
             self._setupDataSet(e.dataset, request, user, view=view)
             dataset, template_name = e.dataset, e.template

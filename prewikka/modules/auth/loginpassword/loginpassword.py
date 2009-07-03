@@ -47,7 +47,7 @@ class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
             self.db.setPermissions(user, User.ALL_PERMISSIONS)
 
     def _hash(self, data):
-        return md5.new(data).hexdigest()
+        return md5.new(data.encode("utf8")).hexdigest()
 
     def createUser(self, login):
         return self.db.createUser(login)
