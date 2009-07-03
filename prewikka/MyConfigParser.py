@@ -59,7 +59,7 @@ class OrderedDict(dict):
 
     def items(self):
         return map(lambda key: (key, self[key]), self.ordered_key_list)
-    
+
     def copy(self):
         new = OrderedDict()
         for key in self.keys():
@@ -84,7 +84,7 @@ class ConfigParserSection(OrderedDict):
             return self[key].value
         except KeyError:
             return value
-    
+
     def getOptions(self):
         return self.values()
 
@@ -109,7 +109,7 @@ class MyConfigParser:
     - we need to keep the right order of options in sections (this is done via
       the OrderedDict class that subclass dict)
     """
-    
+
     EMPTY_LINE_REGEXP = re.compile("^\s*(\#.*)?$")
     SECTION_REGEXP = re.compile("^\s*\[(?P<name>.+)]")
     OPTION_REGEXP = re.compile("^\s*(?P<name>[\s]*[^:]+)(\:\s*(?P<value>.+))?$")
@@ -122,7 +122,7 @@ class MyConfigParser:
 
     def load(self):
         lineno = 0
-        
+
         for line in open(self.filename).readlines():
             lineno += 1
             result = self.EMPTY_LINE_REGEXP.match(line)
@@ -144,7 +144,7 @@ class MyConfigParser:
                         self._current_section[name] = ConfigParserOption(name, value, lineno, line)
                     else:
                         raise ParseError(file.name, lineno, line)
-    
+
     def getSection(self, name):
         return self._sections[name]
 
@@ -158,5 +158,5 @@ class MyConfigParser:
             for option in section.getOptions():
                 content += "%s: %s\n" % (option.name, option.value)
             content += "\n"
-            
+
         return content

@@ -37,9 +37,9 @@ class CriteriaIDMEF:
         i = 0
         while True:
             name = prelude.idmef_class_get_child_name(root, i)
-            if name == None: 
+            if name == None:
                 break
-            
+
             if criteria_root != None:
                 criteria = "%s.%s" % (criteria_root, name)
             else:
@@ -65,7 +65,7 @@ class Filter:
 
         crit = prelude.idmef_criteria_new_from_string(unicode(self).encode("utf8"))
         prelude.idmef_criteria_destroy(crit)
-        
+
     def _replace(self, element):
         element = element.group(1)
         if element in ("and", "AND", "&&"):
