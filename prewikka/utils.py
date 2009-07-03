@@ -95,7 +95,12 @@ def urlencode(parameters, doseq=False):
 
 def create_link(action_name, parameters=None):
     link = "?view=%s" % action_name
+
     if parameters:
+        for k in parameters.keys():
+            if isinstance(parameters[k], unicode):
+                parameters[k] = parameters[k].encode("utf8")
+
         link += "&%s" % urllib.urlencode(parameters, doseq=True)
 
     return link
@@ -118,8 +123,8 @@ def boolean_property(name, parameter, value=False):
 
 
 def escape_html_string(s):
-    if type(s) is not str and type(s) is not unicode:
-        s = str(s)
+    if not isinstance(s, str) and not isinstance(s, unicode):
+        s = toUnicode(s)
 
     s = s.replace("&", "&amp;")
     s = s.replace("<", "&lt;")
@@ -170,6 +175,14 @@ def toUnicode(text):
     >>> toUnicode(u'unicode')
     u'unicode'
     """
+    if isinstance(text, dict):
+        for k in text.keys():
+            text[k] = toUnicode(text[k])
+        return text
+
+    elif isinstance(text, list):
+        return [ toUnicode(i) for i in text ]
+
     if isinstance(text, unicode):
         return text
 
