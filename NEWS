@@ -1,3 +1,26 @@
+* 2009-07-07, prewikka-0.9.17:
+
+- Do not provide an exhaustive list of unreachable linked alert, rather,
+  tell the user how many linked alert are not reachable any more.
+
+- String encoding fixes, do not mix unicode and bytestring, and more
+  generally, use unicode for internal string storage. This fixes a lot
+  of possible exception with particular specific user input, or with
+  localization enabled.
+
+- Inline filter didn't work as expected when viewing events starting
+  with a specific offset, because the offset keyword wasn't removed
+  from the generated link.
+
+- Error handling improvement (back / retry button weren't always
+  working as expected).
+
+- Fix exception when no protocol was available.
+
+- Improve navigation button link (make the link cover the whole button).
+
+
+
 * 2009-06-30, prewikka-0.9.16:
 
 - Multiples advanced filter within the same column wouldn't display
