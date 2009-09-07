@@ -22,7 +22,7 @@ import time, types
 from prelude import *
 from preludedb import *
 
-from prewikka.utils import escape_html_string, time_to_ymdhms
+from prewikka.utils import escape_html_string, time_to_ymdhms, toUnicode
 
 
 
@@ -148,6 +148,9 @@ class Message:
             value = convert_idmef_value(idmef_value)
             if not self._value_list:
                 idmef_value_destroy(idmef_value)
+
+            if idmef_value_get_type(idmef_value) == IDMEF_VALUE_TYPE_STRING:
+                value = toUnicode(value)
 
         else:
             if not self._value_list:
