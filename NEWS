@@ -1,3 +1,9 @@
+* 2009-09-07, prewikka-0.9.17.1:
+
+- Fix possible encoding error in the message summary view (#360).
+
+
+
 * 2009-07-07, prewikka-0.9.17:
 
 - Do not provide an exhaustive list of unreachable linked alert, rather,
