@@ -195,3 +195,29 @@ def toUnicode(text):
         pass
 
     return unicode(text, "ISO-8859-1")
+
+
+
+class OrderedDict(dict):
+    def __init__(self, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
+        self._order = dict.keys(self)
+
+    def __setitem__(self, key, value):
+        dict.__setitem__(self, key, value)
+        if key in self._order:
+            self._order.remove(key)
+        self._order.append(key)
+
+    def __delitem__(self, key):
+        dict.__delitem__(self, key)
+        self._order.remove(key)
+
+    def keys(self):
+        return self._order[:]
+
+    def items(self):
+        return [(key,self[key]) for key in self._order]
+
+    def values(self):
+        return [ self[key] for key in self._order]

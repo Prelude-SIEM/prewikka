@@ -20,7 +20,7 @@
 
 from prewikka.views import \
      messagelisting, alertlisting, heartbeatlisting, messagesummary, messagedetails, sensor, \
-     commands, filter, usermanagement, misc
+     commands, filter, usermanagement, stats, misc
 
 objects = alertlisting.AlertListing(), \
           alertlisting.CorrelationAlertListing(), \
@@ -36,7 +36,9 @@ objects = alertlisting.AlertListing(), \
           usermanagement.UserListing(), \
           usermanagement.UserAddForm(), usermanagement.UserDelete(), \
           usermanagement.UserSettingsDisplay(), usermanagement.UserSettingsModify(), usermanagement.UserSettingsAdd(), \
-          misc.About()
+          misc.About(), \
+          stats.StatsSummary(), stats.CategorizationStats(), stats.SourceStats(), stats.TargetStats(), stats.AnalyzerStats(), \
+          stats.TimelineStats()
 
 
 
@@ -47,6 +49,14 @@ events_section = (_("Events"), [(_("Alerts"), ["alert_listing", "sensor_alert_li
 
 agents_section = (_("Agents"), [(_("Agents"), ["sensor_listing", "sensor_messages_delete", "heartbeat_analyze"]),
                              (_("Heartbeats"), ["heartbeat_listing", "sensor_heartbeat_listing"] )])
+
+stats_section = (_("Statistics"), [
+                           (_("Categorizations"), ["stats_categorization" ]),
+                           (_("Sources"), [ "stats_source" ]),
+                           (_("Targets"), [ "stats_target" ]),
+                           (_("Analyzers"), [ "stats_analyzer" ]),
+                           (_("Timeline"), [ "stats_timeline" ])])
+
 
 settings_section = (_("Settings"), [
                                     (_("Filters"), ["filter_edition"]),

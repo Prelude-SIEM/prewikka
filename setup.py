@@ -189,6 +189,7 @@ class my_install(install):
         self.install_conf()
         self.init_siteconfig()
         install.run(self)
+        self.mkpath(self.prefix + "/share/prewikka/htdocs/generated_images")
 
         for dir in ("/",
                     "share/prewikka",

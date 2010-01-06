@@ -169,7 +169,7 @@ class Core:
         self._view_to_tab = { }
         self._view_to_section = { }
 
-        for section, tabs in (prewikka.views.events_section, prewikka.views.agents_section,
+        for section, tabs in (prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.stats_section,
                               prewikka.views.settings_section, prewikka.views.about_section):
             for tab, views in tabs:
                 for view in views:
@@ -218,7 +218,7 @@ class Core:
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
         init_dataset(dataset, self._env.config, request)
 
-        sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.settings_section, \
+        sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.stats_section, prewikka.views.settings_section, \
                    prewikka.views.about_section
 
         section_to_tabs = { }

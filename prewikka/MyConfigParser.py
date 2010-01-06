@@ -36,41 +36,9 @@ class ParseError(Error):
         return "parse error in \"%s\" at %s line %d" % (self.line.rstrip(), self.filename, self.lineno)
 
 
-
-class OrderedDict(dict):
-    def __init__(self):
-        dict.__init__(self)
-        self.ordered_key_list = [ ]
-
-    def __delitem__(self, key):
-        dict.__delitem__(self, key)
-        self.ordered_key_list.remove(key)
-
-    def __setitem__(self, key, value):
-        dict.__setitem__(self, key, value)
-        if not key in self.ordered_key_list:
-            self.ordered_key_list.append(key)
-
-    def values(self):
-        return map(lambda k: self[k], self.ordered_key_list)
-
-    def keys(self):
-        return self.ordered_key_list
-
-    def items(self):
-        return map(lambda key: (key, self[key]), self.ordered_key_list)
-
-    def copy(self):
-        new = OrderedDict()
-        for key in self.keys():
-            new[key] = self[key]
-        return new
-
-
-
-class ConfigParserSection(OrderedDict):
+class ConfigParserSection(utils.OrderedDict):
     def __init__(self, name):
-        OrderedDict.__init__(self)
+        utils.OrderedDict.__init__(self)
         self.name = name
 
     def __nonzero__(self):
@@ -116,8 +84,8 @@ class MyConfigParser:
 
     def __init__(self, filename):
         self.filename = filename
-        self._sections = OrderedDict()
-        self._root_section = OrderedDict()
+        self._sections = utils.OrderedDict()
+        self._root_section = utils.OrderedDict()
         self._current_section = self._root_section
 
     def load(self):
