@@ -51,10 +51,10 @@ def _getEnumValue(class_id):
 
 def _getOperatorList(type):
     if type == prelude.IDMEF_VALUE_TYPE_STRING:
-        return ["<>*", "<>", "=", "~*", "~"]
+        return ["<>*", "<>", "=", "~*", "~", "!" ]
 
     elif type == prelude.IDMEF_VALUE_TYPE_DATA:
-        return ["<>*", "<>", "~", "~*", "=", "<", ">" ]
+        return ["<>*", "<>", "~", "~*", "=", "<", ">", "!" ]
 
     else:
         return ["=", "<", ">", "<=", ">=" ]
@@ -191,15 +191,12 @@ class AlertListingParameters(MessageListingParameters):
         self.optional("aggregated_classification", list, [ "none" ], save=True)
         self.optional("aggregated_analyzer", list, [ "none" ], save=True)
         self.optional("filter", str, save=True)
-        self.optional("alert.assessment.impact.severity", list, [ "info", "low", "medium", "high", "none" ], save=True)
-        self.optional("alert.assessment.impact.completion", list, [ "succeeded", "failed", "none" ], save=True)
+        self.optional("alert.assessment.impact.severity", list, [ "info", "low", "medium", "high", "n/a" ], save=True)
+        self.optional("alert.assessment.impact.completion", list, [ "succeeded", "failed", "n/a" ], save=True)
         self.optional("alert.type", list, ["alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"], save=True)
 
     def _checkOperator(self, operator):
-        if operator[0] == "!":
-            operator = operator[1:]
-
-        if not operator in ("=", "<", ">", "<=", ">=", "~", "~*", "<>", "<>*"):
+        if not operator in ("=", "<", ">", "<=", ">=", "~", "~*", "<>", "<>*", "!"):
             raise view.InvalidParameterValueError("operator", operator)
 
     def _setParam(self, view_name, user, column, param, value, is_default=False):
@@ -236,7 +233,9 @@ class AlertListingParameters(MessageListingParameters):
             try:
                 value = params_dict[column + "_value_" + str(num)]
             except KeyError:
-                continue
+                if operator != "!":
+                    continue
+                value = ""
 
             do_append = True
             for tmp in sorted:
@@ -274,11 +273,11 @@ class AlertListingParameters(MessageListingParameters):
         do_load = MessageListingParameters.normalize(self, view_name, user)
 
         for severity in self["alert.assessment.impact.severity"]:
-            if not severity in ("info", "low", "medium", "high", "none"):
+            if not severity in ("info", "low", "medium", "high", "n/a"):
                 raise view.InvalidParameterValueError("alert.assessment.impact.severity", severity)
 
         for completion in self["alert.assessment.impact.completion"]:
-            if not completion in ("succeeded", "failed", "none"):
+            if not completion in ("succeeded", "failed", "n/a"):
                 raise view.InvalidParameterValueError("alert.assessment.impact.completion", completion)
 
         for type in self["alert.type"]:
@@ -420,7 +419,7 @@ class ListedAlert(ListedMessage):
         return None
 
     def _setMessageDirectionAddress(self, dataset, direction, address, category=None):
-        if category == None:
+        if category == None and address:
             category = self._guessAddressCategory(address)
 
         if dataset.has_key("no_dns"):
@@ -436,14 +435,18 @@ class ListedAlert(ListedMessage):
         dataset["no_dns"] = True
         dataset["addresses"].append(self.createHostField("alert.%s.node.name" % direction, name, direction=direction))
 
-    def _setMessageDirectionOther(self, dataset, direction, path, value, extra_path=None, extra=None):
-        if value == None:
-           if extra == None:
+    def _setMessageDirectionOther(self, dataset, direction, path, value, extra_path=None, extra=None, allow_empty_value=False):
+        if path == "__all__":
                 return
 
-           value = extra
-           path = extra_path
-           extra = extra_path = None
+        if value == None:
+           if allow_empty_value is False and extra is None:
+               return
+
+           if extra is not None:
+               value = extra
+               path = extra_path
+               extra = extra_path = None
 
         l = path.split(".")
         l[-2] = l[-2].replace("(0)", "")
@@ -455,7 +458,7 @@ class ListedAlert(ListedMessage):
 
         name += l[-1]
 
-        item = (name, self.createInlineFilteredField(path, value, direction), extra)
+        item = (name, self.createInlineFilteredField(path, value, direction, real_value=value or "n/a"), extra)
         if not item in dataset["listed_values"]:
             dataset["listed_values"].append(item)
 
@@ -539,6 +542,10 @@ class ListedAlert(ListedMessage):
                 self._source_index += 1
                 self["source"].append(dataset)
 
+        if total == 0:
+            self._initDirectionIfNeeded("source")
+            self._setMessageDirectionAddress(self["source"][-1], "source", None)
+
         self["aggregated_source_total"] += total
         self["aggregated_source_hidden"] += (total - index)
 
@@ -567,6 +574,10 @@ class ListedAlert(ListedMessage):
                 index += 1
                 self._target_index += 1
                 self["target"].append(dataset)
+
+        if total == 0:
+            self._initDirectionIfNeeded("target")
+            self._setMessageDirectionAddress(self["target"][-1], "target", None)
 
         self["aggregated_target_total"] += total
         self["aggregated_target_hidden"] += (total - index)
@@ -680,28 +691,24 @@ class ListedAlert(ListedMessage):
         else:
             self["analyzer_time"] = { "value": None }
 
-    def addSensor(self, name, model, node_name):
+    def addSensor(self, message):
         sensor = { }
         self["sensors"].append(sensor)
 
-        if name:
-            val = name
-            path = "alert.analyzer.name"
+        for path in ("alert.analyzer(-1).name", "alert.analyzer(-1).model"):
+                val = message[path]
+                if val:
+                        sensor["name"] = self.createInlineFilteredField(path, val, direction="analyzer")
+                        break
+        if not val:
+                sensor["name"] = self.createInlineFilteredField("alert.analyzer(-1).name", val, direction="analyzer")
 
-        elif model:
-            val = model
-            path = "alert.analyzer.model"
-
-        else:
-            path = val = None
-
-        sensor["name"] = self.createInlineFilteredField(path, val, direction="analyzer")
-        sensor["node_name"] = self.createInlineFilteredField("alert.analyzer.node.name", node_name, direction="analyzer")
+        sensor["node_name"] = self.createInlineFilteredField("alert.analyzer(-1).node.name", message["alert.analyzer(-1).node.name"], direction="analyzer")
 
     def setMessage(self, message, ident):
         self["infos"] = [ { } ]
 
-        self.addSensor(message["alert.analyzer(-1).name"], message["alert.analyzer(-1).model"], message["alert.analyzer(-1).node.name"])
+        self.addSensor(message)
         self._setMessageTime(message)
 
         dataset = self["infos"][0]
@@ -722,14 +729,14 @@ class ListedAlert(ListedMessage):
         if not self["target"]:
             self._setMessageTarget(message)
 
-    def setMessageDirectionGeneric(self, direction, object, value):
+    def setMessageDirectionGeneric(self, direction, object, value, allow_empty_value=True):
         self._initDirectionIfNeeded(direction)
         dataset = self[direction][-1]
 
         try:
             dset_name, function = self._getKnownValue(direction, object.replace("(0)", ""))
         except KeyError:
-            return self._setMessageDirectionOther(dataset, direction, object, value)
+            return self._setMessageDirectionOther(dataset, direction, object, value, allow_empty_value=allow_empty_value)
 
         if function:
             function(dataset, direction, value)
@@ -774,7 +781,7 @@ class ListedAggregatedAlert(ListedAlert):
         infos = {
             "classification_references": "",
             "count": count,
-            "classification": self.createInlineFilteredField("alert.classification.text", classification, "classification"),
+            "classification": self.createInlineFilteredField("alert.classification.text", classification, direction="classification"),
             "severity": { "value": severity },
             "completion": self.createInlineFilteredField("alert.assessment.impact.completion", completion)
             }
@@ -831,7 +838,7 @@ class AlertListing(MessageListing, view.View):
             new = [ ]
             for value in values:
                 if value in self.parameters[object]:
-                    if value == "none":
+                    if value == "n/a":
                         new.append("!%s" % (object))
                     else:
                         new.append("%s = '%s'" % (object, utils.escape_criteria(value)))
@@ -871,9 +878,9 @@ class AlertListing(MessageListing, view.View):
         self._applyAlertTypeFilters(criteria)
 
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.severity",
-                                      ["info", "low", "medium", "high", "none"])
+                                      ["info", "low", "medium", "high", "n/a"])
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.completion",
-                                      ["failed", "succeeded", "none"])
+                                      ["failed", "succeeded", "n/a"])
 
 
     def _criteriaValueFind(self, str, clist=[]):
@@ -908,6 +915,9 @@ class AlertListing(MessageListing, view.View):
         return "*" + value + "*"
 
     def _filterTupleToString(self, (object, operator, value)):
+        if operator == "!":
+            return "!%s" % (object)
+
         return "%s %s '%s'" % (object, operator, utils.escape_criteria(self._adjustFilterValue(operator, value)))
 
     def _getOperatorForPath(self, path, value):
@@ -1023,7 +1033,7 @@ class AlertListing(MessageListing, view.View):
 
             nodekey = (analyzer_name or analyzer_model or "") + "-" + (analyzer_node_name or "")
             if not nodesraw.has_key(nodekey):
-               message.addSensor(analyzer_name, analyzer_model, analyzer_node_name)
+               message.addSensor(path_value_hash)
                nodesraw[nodekey] = True
 
         res = alertsraw.values()
@@ -1050,13 +1060,13 @@ class AlertListing(MessageListing, view.View):
             else:
                 entry_param = {}
 
-                if classification:
+                if classification is not None:
                     entry_param["classification_object_%d" % self.parameters.max_index] = "alert.classification.text"
                     entry_param["classification_operator_%d" % self.parameters.max_index] = "="
                     entry_param["classification_value_%d" % self.parameters.max_index] = classification
 
-                entry_param["alert.assessment.impact.severity"] = severity or "none"
-                entry_param["alert.assessment.impact.completion"] = completion or "none"
+                entry_param["alert.assessment.impact.severity"] = severity or "n/a"
+                entry_param["alert.assessment.impact.completion"] = completion or "n/a"
 
                 entry_param["aggregated_target"] = \
                 entry_param["aggregated_source"] = \
@@ -1150,8 +1160,9 @@ class AlertListing(MessageListing, view.View):
                         criterion = "(! %s || %s == '')" % (path, path)
                 else:
                     criterion = "%s == '%s'" % (path, utils.escape_criteria(unicode(value)))
-                    if direction != None:
-                        message.setMessageDirectionGeneric(direction, path, value)
+
+                if direction != None:
+                    message.setMessageDirectionGeneric(direction, path, value)
 
                 criteria2.append(criterion)
                 delete_criteria.append(criterion)
@@ -1199,12 +1210,14 @@ class AlertListing(MessageListing, view.View):
                                (aggregated_analyzer_values, "analyzer")):
             i = self.parameters.max_index
             for path, value in zip(self.parameters["aggregated_%s" % column], values):
-                if value == None:
-                    continue
-
                 parameters["%s_object_%d" % (column, i)] = path.replace("(0)", "").replace("(-1)", "")
-                parameters["%s_operator_%d" % (column, i)] = "="
-                parameters["%s_value_%d" % (column, i)] = value
+
+                if value:
+                    parameters["%s_operator_%d" % (column, i)] = "="
+                else:
+                    parameters["%s_operator_%d" % (column, i)] = "!"
+
+                parameters["%s_value_%d" % (column, i)] = value or ""
                 i += 1
 
 

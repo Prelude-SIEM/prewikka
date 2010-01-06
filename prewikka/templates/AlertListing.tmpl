@@ -162,7 +162,7 @@ function classification_special_${state}() {
 
  var input = \$("#classification input[name='alert.assessment.impact.severity']");
 
- #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
+ #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("n/a")
   #if $item in $severity
   \$(input).filter("[value='$item']").attr("checked", "checked");
   #else
@@ -171,7 +171,7 @@ function classification_special_${state}() {
  #end for
 
  input = \$("#classification input[name='alert.assessment.impact.completion']");
- #for item in $N_("succeeded"), $N_("failed"), $N_("none")
+ #for item in $N_("succeeded"), $N_("failed"), $N_("n/a")
   #if item in $completion
   \$(input).filter("[value='$item']").attr("checked", "checked");
   #else
@@ -380,6 +380,9 @@ function ${type}_set_${state}() {
                 if ( \$(input).attr("type") != "select-one" )
                         n.setAttribute("value", \$(input).attr("value"));
 
+                if ( old_value == '!' )
+                        n.setAttribute("disabled", "disabled");
+
                 \$(input).replaceWith(n);
           }
  });
@@ -433,6 +436,15 @@ function ${type}_set_${state}() {
 
         \$(this).val("Reset to " + get_next_state(div_id, saved_state[div_id]));
  });
+
+\$(".popup_operator_select").live("change", function() {
+        var str = \$(this, "> option:selected").attr("value");
+        if ( str == "!" )
+                \$(this).parent().next().children(".popup_input_field").attr("disabled", "disabled");
+        else
+                \$(this).parent().next().children(".popup_input_field").removeAttr("disabled");
+});
+
 });
 
 //--></script>
@@ -569,7 +581,7 @@ function ${type}_set_${state}() {
 
        <tr>
         <th>$_("Severity:")</th>
-        #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("none")
+        #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("n/a")
         <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="$item" /></td>
         #end for
        </tr>
@@ -578,7 +590,7 @@ function ${type}_set_${state}() {
         <th>$_("Completion:")</th>
         <td colspan="2">&nbsp;</td>
 
-        #for item in $N_("succeeded"), $N_("failed"), $N_("none")
+        #for item in $N_("succeeded"), $N_("failed"), $N_("n/a")
         <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="$item" /></td>
         #end for
        </tr>
@@ -748,10 +760,6 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
 
 #for $name, $direction, $hidden, $total, $expand in ($_("source"), $message.source, $message.aggregated_source_hidden, $message.aggregated_source_total, $message.aggregated_source_expand), ($_("target"), $message.target, $message.aggregated_target_hidden, $message.aggregated_target_total, $message.aggregated_target_expand)
 <td>
-#if len($direction) == 0
-       n/a
-#end if
-
 #set $need_hr = 0
 
 #if $hidden > 0
@@ -773,7 +781,7 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
          - #filter Filter $writeInlineFilter($address, $unicode($_("Filter on this %s") % ($name))) #end filter
          <br />
 
-       #if not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")
+       #if $address.value and (not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net"))
          - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$unicode($_("%s information") % ($name)).capitalize()</a><br />
 
           #for $cmdname, $link in $address.host_commands

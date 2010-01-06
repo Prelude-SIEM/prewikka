@@ -159,9 +159,6 @@ class ListedMessage(dict):
         return (path, criterion, value) in self.parameters[column]
 
     def createInlineFilteredField(self, path, value, direction=None, real_value=None):
-        if value == None:
-            return { "value": None, "inline_filter": None, "already_filtered": False }
-
         if type(path) is not list and type(path) is not tuple:
             path = [ path ]
         else:
@@ -177,20 +174,26 @@ class ListedMessage(dict):
         alreadyf = None
 
         for p, v in zip(path, value):
-            v = str(v)
             if direction:
+                if v is not None:
+                    operator = "="
+                else:
+                    operator = "!"
+
                 if alreadyf is not False:
-                    alreadyf = self._isAlreadyFiltered(direction, p, "=", v)
+                    alreadyf = self._isAlreadyFiltered(direction, p, operator, v or "")
 
                 index = self.parameters.max_index
-                extra["%s_object_%d" % (direction, index)] = p,
-                extra["%s_operator_%d" % (direction, index)] = "="
-                extra["%s_value_%d" % (direction, index)] = v
+                extra["%s_object_%d" % (direction, index)] = p
+                extra["%s_operator_%d" % (direction, index)] = operator
+                extra["%s_value_%d" % (direction, index)] = v or ""
                 self.parameters.max_index += 1
 
             else:
-                alreadyf = None
-                extra[p] = v
+                if alreadyf is not False and (self.parameters.has_key(p) and self.parameters[p] == [v]):
+                        alreadyf = True
+
+                extra[p] = v or ""
 
         link = utils.create_link(self.view_name, self.parameters + extra - [ "offset" ])
         return { "value": real_value, "inline_filter": link, "already_filtered": alreadyf }
@@ -222,10 +225,13 @@ class ListedMessage(dict):
         field["host_commands"] = [ ]
         field["category"] = category
 
-        if dns is True:
+        if value and dns is True:
             field["hostname"] = resolve.AddressResolve(value)
         else:
-            field["hostname"] = value
+            field["hostname"] = value or _("n/a")
+
+        if not value:
+            return field
 
         for command in self.env.host_commands.keys():
             field["host_commands"].append((command.capitalize(),
