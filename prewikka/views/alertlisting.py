@@ -707,6 +707,8 @@ class ListedAlert(ListedMessage):
 
     def setMessage(self, message, ident):
         self["infos"] = [ { } ]
+        self["aggregated"] = False
+        self["delete"] = ident
 
         self.addSensor(message)
         self._setMessageTime(message)
@@ -1196,7 +1198,9 @@ class AlertListing(MessageListing, view.View):
 
             self.dataset["messages"].append(message)
             message.setTime(time_min, time_max)
-            message.setCriteriaForDeletion(delete_criteria)
+
+            if not message.has_key("delete"):
+                message.setCriteriaForDeletion(delete_criteria)
 
         return total_results
 
