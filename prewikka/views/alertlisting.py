@@ -665,17 +665,9 @@ class ListedAlert(ListedMessage):
         self["sub_alert_name"] = alert["name"]
         self["sub_alert_link"] = self.createMessageLink(ident, "alert_summary")
 
-        tmp = self.parameters
-        tmp -= [ "timeline_unit", "timeline_value", "offset",
-                 "aggregated_classification", "aggregated_source",
-                 "aggregated_target", "aggregated_analyzer", "alert.type", "alert.assessment.impact.severity",
-                 "alert.assessment.impact.completion" ]
-
-        tmp["aggregated_target"] = tmp["aggregated_source"] = \
-        tmp["aggregated_classification"] = tmp["aggregated_analyzer"] = "none"
-
         params["timeline_unit"] = "unlimited"
-        self["sub_alert_display"] = utils.create_link("alert_listing", tmp + params)
+        params["aggregated_source"] = params["aggregated_target"] = params["aggregated_classification"] = params["aggregated_analyzer"] = "none"
+        self["sub_alert_display"] = utils.create_link("alert_listing", params)
 
     def _setClassificationInfos(self, dataset, message, ident):
         dataset["count"] = 1
