@@ -525,7 +525,7 @@ class ListedAlert(ListedMessage):
 
         return None
 
-    def _setMessageSource(self, message):
+    def _setMessageSource(self, message, ident):
         total = 0
         index = 0
         for source in message["alert.source"]:
@@ -549,7 +549,12 @@ class ListedAlert(ListedMessage):
         self["aggregated_source_total"] += total
         self["aggregated_source_hidden"] += (total - index)
 
-    def _setMessageTarget(self, message):
+        if message["alert.correlation_alert.name"]:
+            self["aggregated_source_expand"] = self["sub_alert_display"]
+        else:
+            self["aggregated_source_expand"] = self.createMessageLink(ident, "alert_summary")
+
+    def _setMessageTarget(self, message, ident):
         index = 0
         total = 0
 
@@ -582,6 +587,12 @@ class ListedAlert(ListedMessage):
         self["aggregated_target_total"] += total
         self["aggregated_target_hidden"] += (total - index)
 
+        if message["alert.correlation_alert.name"]:
+            self["aggregated_target_expand"] = self["sub_alert_display"]
+        else:
+            self["aggregated_source_expand"] = self.createMessageLink(ident, "alert_summary")
+
+
     def _setMessageClassificationReferences(self, dataset, message):
         dataset["classification_references"] = [ ]
         for ref in message["alert.classification.reference"]:
@@ -611,18 +622,6 @@ class ListedAlert(ListedMessage):
     def _setMessageClassification(self, dataset, message):
         self._setMessageClassificationReferences(dataset, message)
         dataset["classification"] = self.createInlineFilteredField("alert.classification.text", message["alert.classification.text"], "classification")
-
-    def _fetchInfoFromLinkedMessage(self, criteria, source, target):
-        result = self.env.idmef_db.getAlertIdents(criteria)
-        for ident in result:
-            idmef = self.env.idmef_db.getAlert(ident)
-
-            if not source:
-                self._setMessageSource(idmef)
-
-            if not target:
-                self._setMessageTarget(idmef)
-
 
     def _setMessageAlertIdentInfo(self, message, alert, ident):
         fetch_classification_info = fetch_source_info = fetch_target_info = True
@@ -655,11 +654,6 @@ class ListedAlert(ListedMessage):
             params["classification_value_%d" % i] = alertident["alertident"]
 
             criteria.append("(alert.messageid = '%s' && alert.analyzer.analyzerid = '%s')" % (utils.escape_criteria(alertident["alertident"]), utils.escape_criteria(analyzerid)))
-
-        source = message["alert.source"]
-        target = message["alert.target"]
-        if not source or not target:
-            self._fetchInfoFromLinkedMessage(" || ".join(criteria), source, target)
 
         self["sub_alert_number"] = i
         self["sub_alert_name"] = alert["name"]
@@ -718,10 +712,10 @@ class ListedAlert(ListedMessage):
             self._setMessageAlertIdentInfo(message, message["alert.tool_alert"], ident)
 
         if not self["source"]:
-            self._setMessageSource(message)
+            self._setMessageSource(message, ident)
 
         if not self["target"]:
-            self._setMessageTarget(message)
+            self._setMessageTarget(message, ident)
 
     def setMessageDirectionGeneric(self, direction, object, value, allow_empty_value=True):
         self._initDirectionIfNeeded(direction)
