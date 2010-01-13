@@ -22,6 +22,7 @@
 import stat
 import time
 import base64
+import urllib
 import os, os.path
 import glob, tempfile
 
@@ -162,7 +163,7 @@ class ChartCommon:
 
         os.chmod(self._filename, 0644)
 
-        self._href = "prewikka/generated_images/%s" % (user or "") + "/" + os.path.basename(self._filename)
+        self._href = urllib.quote("prewikka/generated_images/%s" % (user or "") + "/" + os.path.basename(self._filename))
         os.umask(old_mask)
 
         return self._filename
