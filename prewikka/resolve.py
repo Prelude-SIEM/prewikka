@@ -130,6 +130,12 @@ class AddressResolve:
     def __len__(self):
         return len(unicode(self))
 
+    def resolveSucceed(self):
+        if self._name:
+            return True
+        else:
+            return False
+
     def __str__(self):
         if resolver:
             resolver.process()
