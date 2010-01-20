@@ -79,9 +79,6 @@ class Parameters(dict):
         if parameter_type is list:
             if not type(value) is list:
                 value = [ value ]
-
-            value.sort()
-
         try:
             value = parameter_type(value)
         except (ValueError, TypeError):
