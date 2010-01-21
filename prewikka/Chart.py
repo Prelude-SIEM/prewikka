@@ -270,37 +270,22 @@ class CairoDistributionChart(ChartCommon):
         fname = self._getFilename(name, expire, user, uid, gid);
 
         color = []
-        idx = 0
-        data = {}
+        data = utils.OrderedDict()
         total = 0
 
-        for l, v in zip(self._labels, self._values):
+        lv = zip(self._labels, self._values)
+        lv.sort(lambda x, y: int(x[1] - y[1]))
+
+        for l, v in lv:
                 total += v
-                data[str(l)] = v
 
-                item_color = self.getItemColor(str(l))
-                if item_color:
-                        color.append(self.hex2rgb(item_color))
-                else:
-                        color.append(self.hex2rgb(self._color_map[idx % len(self._color_map)]))
+        if total:
+                share = 100.0 / total
 
-                idx += 1
-
-        other = 0
-        if data:
-            share = 100.0 / total
-
-        for key in data.keys():
-                if data[key] * share < 1:
-                        other += data[key]
-                else:
-                        nkey = key + ", %.1f%% (%d)" % (share * data[key], data[key])
-                        data[nkey] = data[key]
-
-                data.pop(key)
-
-        if other:
-                data["Other, %.1f%% (%d)" % (share * other, other)] = other
+        for l, v in lv:
+                l = str(l)
+                data["%s (%d, %.2f%%)" % (l, v, share * v)] = v
+                color.append(self.hex2rgb(self.getItemColor(l)))
 
         cairoplot.pie_plot(fname, data, self._width, self._height, gradient = True, shadow = True, colors=color)
 
@@ -310,8 +295,7 @@ class CairoTimelineChart(TimelineChartCommon):
         fname = self._getFilename(name, expire, user, uid, gid);
 
         colors = []
-        legend = []
-        values = {}
+        values = utils.OrderedDict()
         for name in self._values.keys():
                 nname = name[0:min(len(name), 25)]
                 if not values.has_key(nname):
@@ -321,6 +305,7 @@ class CairoTimelineChart(TimelineChartCommon):
                         values[nname].append(item[0])
 
                 colors.append(self.hex2rgb(self.getItemColor(name)))
+
         cairoplot.dot_line_plot(fname, values, self._width, self._height, border=0, axis=True, grid=True,
                                 x_labels = self._labels, series_legend=True, series_colors=colors)
 
