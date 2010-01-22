@@ -78,7 +78,7 @@ def convert_idmef_value(value):
         return idmef_class_enum_to_string(idmef_value_get_class(value), idmef_value_get_enum(value))
 
     try:
-        return {
+        ret = {
             IDMEF_VALUE_TYPE_INT8:          idmef_value_get_int8,
             IDMEF_VALUE_TYPE_UINT8:         idmef_value_get_uint8,
             IDMEF_VALUE_TYPE_INT16:         idmef_value_get_int16,
@@ -97,6 +97,11 @@ def convert_idmef_value(value):
             }[idmef_value_get_type(value)](value)
     except KeyError:
         return None
+
+    if idmef_value_get_type(value) == IDMEF_VALUE_TYPE_STRING and isinstance(ret, str):
+        ret = toUnicode(ret)
+
+    return ret
 
 
 
@@ -148,9 +153,6 @@ class Message:
             value = convert_idmef_value(idmef_value)
             if not self._value_list:
                 idmef_value_destroy(idmef_value)
-
-            if idmef_value_get_type(idmef_value) == IDMEF_VALUE_TYPE_STRING:
-                value = toUnicode(value)
 
         else:
             if not self._value_list:

@@ -542,6 +542,8 @@ class MessageSummary(Table):
                         value = utils.hexdump(value)
                 else:
                     value = ad.get("data")
+                    if isinstance(value, str):
+                        value = utils.toUnicode(value)
 
             for field in ignore:
                 if meaning != None and meaning == field[0]:
