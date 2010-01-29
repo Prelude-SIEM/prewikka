@@ -1,3 +1,29 @@
+* 2010-01-21, prewikka-1.0.0rc1:
+
+- OpenSource Graphical Statistics implementation: implement a set of
+  basic statistics for Prewikka, based on the (provided) Cairoplot
+  rendering engine. This initial implementation provides
+  Categorizations, Sources, Targets, Analyzers, and Timeline statistics.
+
+- Only use analyzerid/messageid pair when linking to a set of correlated
+  alerts. This fixes a problem where clicking on the link to expand the
+  CorrelatedAlert list would bring an empty alert view, since previous
+  filters where preserved.
+
+- The link used to expand a list of sources/target was always broken. It
+  now point to the detailed view for CorrelationAlert, or the detailed
+  event for alert.
+
+- Allow filtering empty value, by providing a new "Is Null" operator.
+
+- Improve non aggregated delete, by providing a precise deletion scheme.
+
+- Correctly provide the analyzer_time information.
+
+- Various bug fixes.
+
+
+
 * 2009-09-07, prewikka-0.9.17.1:
 
 - Fix possible encoding error in the message summary view (#360).
