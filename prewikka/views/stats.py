@@ -398,12 +398,15 @@ class GenericTimelineStats(DistributionStats):
         if limit > 0:
             res = self.env.idmef_db.getValues(self._getSelection(), criteria = criteria, limit=self._limit)
 
-            c = ""
+            c = u""
             for name, count in res:
                 if c:
                     c += " || "
-                c += "%s = '%s'" % (self._path, utils.escape_criteria(name))
 
+                if name:
+                    c += "%s = '%s'" % (self._path, utils.escape_criteria(name))
+                else:
+                    c += "! %s" % (self._path)
             if c:
                 criteria.append(c)
 
