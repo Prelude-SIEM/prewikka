@@ -286,7 +286,16 @@ class GenericTimelineStats(DistributionStats):
         else:
                 end = datetime.datetime.today()
 
-        if type == "hour":
+        if type == "min":
+                if not start:
+                        start = end - datetime.timedelta(seconds=60)
+                step = datetime.timedelta(seconds=1)
+                label_tm_index = "%Hh%M:%S"
+                zoom_view = "alert_listing"
+                timeline_type = "min"
+                timeline_unit = ""
+
+        elif type == "hour":
                 if not start:
                         start = end - datetime.timedelta(minutes=60)
                 step = datetime.timedelta(minutes=1)
@@ -376,8 +385,10 @@ class GenericTimelineStats(DistributionStats):
             unit = "month"
         elif delta > 3600:
             unit = "day"
-        else:
+        elif delta > 60:
             unit = "hour"
+        else:
+            unit = "min"
 
         return unit
 
