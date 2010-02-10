@@ -121,7 +121,7 @@ class DistributionStats(view.View):
         base_url = self._getBaseURL()
         chart = { "title": title, "value_name": value_name, "data": [ ] }
 
-        distribution = Chart.DistributionChart(width, height)
+        distribution = Chart.DistributionChart(self.user, width, height)
         if names_and_colors:
             distribution.setColorMap(self._namesAndColors2ColorMap(names_and_colors))
 
@@ -142,7 +142,7 @@ class DistributionStats(view.View):
                 chart["data"].append((v, base_url + "&amp;" + sub_url_handler(value), count, "%.1f" % (count / float(total) * 100)))
                 distribution.addLabelValuePair(v, count, base_url + "&amp;" + sub_url_handler(value))
 
-        distribution.render(title, user = self.user.login)
+        distribution.render(title)
         self.dataset["charts"].append(chart)
 
     def _processTimeCriteria(self):
@@ -255,11 +255,11 @@ class GenericTimelineStats(DistributionStats):
 
         return d
 
-    def _newTimeline(self, width, height, stacked=False):
+    def _newTimeline(self, user, width, height, stacked=False):
         if stacked:
-            timeline = Chart.StackedTimelineChart(width, height)
+            timeline = Chart.StackedTimelineChart(user, width, height)
         else:
-            timeline = Chart.TimelineChart(width, height)
+            timeline = Chart.TimelineChart(user, width, height)
 
         if not self.parameters.has_key("idmef_filter"):
             timeline.enableMultipleValues(self._namesAndColors2ColorMap(self._names_and_colors))
@@ -340,9 +340,9 @@ class GenericTimelineStats(DistributionStats):
         base_parameters["to_hour"] = end.hour
         base_parameters["to_min"] = end.minute
 
-    def _generateTimeline(self, width, height):
+    def _generateTimeline(self, user, width, height):
         start, end, step, format, zoom_view, timeline_type, timeline_time = self._getStep(self.parameters["timeline_type"])
-        timeline = self._newTimeline(width, height)
+        timeline = self._newTimeline(user, width, height)
 
         if timeline_type != "custom":
             base_parameters = { "timeline_unit": "min" }
@@ -410,8 +410,8 @@ class GenericTimelineStats(DistributionStats):
             if c:
                 criteria.append(c)
 
-        timeline = self._generateTimeline(width, height)
-        timeline.render(title, user = self.user.login)
+        timeline = self._generateTimeline(self.user, width, height)
+        timeline.render(title)
 
         chart["chart"] = timeline
         self.dataset["charts"].append(chart)
@@ -485,7 +485,7 @@ class SourceStats(DistributionStats, GenericTimelineStats):
     def _countryDistributionChart(self, criteria, width, height):
 
         base_url = self._getBaseURL()
-        distribution = Chart.WorldChart(width, height)
+        distribution = Chart.WorldChart(self.user, width, height)
 
         chart = { "title": _("Top Source Country"), "value_name": _("Country"), "data": [ ], "chart": distribution }
 
@@ -528,7 +528,7 @@ class SourceStats(DistributionStats, GenericTimelineStats):
                 distribution.addLabelValuePair(item[2], item[0])
                 chart["data"].append((item[2], base_url + item[3], item[0], "%.1f" % (item[0] / float(total) * 100)))
 
-        distribution.render("Top 10 Source Country", user = self.user.login)
+        distribution.render("Top 10 Source Country")
         chart["filename"] = distribution.getHref()
         chart["type"] = distribution.getType()
         self.dataset["charts"].append(chart)
@@ -580,7 +580,7 @@ class TargetStats(DistributionStats):
     def _renderPorts(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         base_url = self._getBaseURL()
         title = "Top 10 Targeted Ports"
-        distribution = Chart.DistributionChart(width, height)
+        distribution = Chart.DistributionChart(self.user, width, height)
         chart = { "title": title, "value_name": "Port", "data": [ ], "chart": distribution }
 
         criteria = criteria[:] + [ "(alert.target.service.iana_protocol_number == 6  ||"
@@ -638,7 +638,7 @@ class TargetStats(DistributionStats):
 
             distribution.addLabelValuePair(name, count, base_url + "&amp;" + "target_object_0=alert.target.service.port&amp;target_value_0=%d" % port)
 
-        distribution.render(title, user = self.user.login)
+        distribution.render(title)
         self.dataset["charts"].append(chart)
 
     def _renderAddresses(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
@@ -679,7 +679,7 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
     def _renderAnalyzers(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         base_url = self._getBaseURL()
         title = "Top 10 analyzers"
-        distribution = Chart.DistributionChart(width, height)
+        distribution = Chart.DistributionChart(self.user, width, height)
         chart = { "title": title, "value_name": "Analyzer", "data": [ ], "chart": distribution }
 
         results = self.env.idmef_db.getValues([ "alert.analyzer(-1).name/group_by", "alert.analyzer(-1).node.name/group_by",
@@ -704,7 +704,7 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
 
                 distribution.addLabelValuePair(value, count, base_url + "&amp;" + analyzer_criteria)
 
-            distribution.render(title, user = self.user.login)
+            distribution.render(title)
             self.dataset["charts"].append(chart)
 
     def _renderModels(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
@@ -758,48 +758,6 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
         self._renderNodeAddresses(criteria)
         self._renderNodeLocations(criteria)
 
-
-
-class RiskStats(GenericTimelineStats):
-    def _renderRisk(self):
-        tmap = { "hour": "day", "day": "month", "month": "year", "custom": "custom" }
-        start, end, step, format, zoom_view, timeline_type, timeline_time = self._getStep(tmap[self.parameters["timeline_type"]])
-
-        i = 0
-        total = 0
-        total_score = 0.0
-        score_table = { "info": 0.5, "low": 1, "n/a": 1, "medium": 1.5, "high": 2 }
-
-        while start < end:
-                c = self._getTimeCrit(start, step)
-                res = self.env.idmef_db.getValues([ "alert.assessment.impact.severity/group_by", "count(alert.create_time)/order_desc" ], criteria=c)
-
-                gscore = 0.0
-                for severity, count in res:
-                    total += count
-                    score = score_table[severity or "n/a"] * count
-                    gscore += score
-
-                start += step
-                total_score += gscore
-
-                if gscore or total > 0:
-                    i += 1
-
-        avg = share = slice = 0
-        if total_score:
-                avg = float(total_score) / i
-                share = 100 / float(avg * 2)
-                slice = (avg * 2) / 3
-
-        gauge = Chart.FlashVerticalGaugeChart()
-        gauge.addLabelValuePair("Low", 0, Chart.GREEN_STD)
-        gauge.addLabelValuePair("Moderate", 50, Chart.YELLOW_STD)
-        gauge.addLabelValuePair("High", 100, Chart.RED_STD)
-        gauge.setPointer(min(gscore * share, 100), 0)
-
-        gauge.render("Risk Evaluation", user = self.user.login)
-        self.dataset["charts"].append({"chart": gauge})
 
 
 class TimelineStats(GenericTimelineStats, AnalyzerStats, CategorizationStats, SourceStats):

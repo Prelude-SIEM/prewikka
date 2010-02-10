@@ -54,7 +54,8 @@ def userToHex(user):
 
 
 class ChartCommon:
-    def __init__(self, width=800, height=450):
+    def __init__(self, user, width=800, height=450):
+        self._user = user
         self._filename = None
         self._values = [ ]
         self._labels = [ ]
@@ -141,12 +142,12 @@ class ChartCommon:
             if not expire or (now - mtime) > (2 * expire):
                 os.remove(f)
 
-    def _getFilename(self, name, expire = None, user = None, uid=None, gid=None, suffix=".png"):
+    def _getFilename(self, name, expire = None, uid=None, gid=None, suffix=".png"):
         old_mask = os.umask(0)
         basename = base64.urlsafe_b64encode(name)
         pathname = os.path.join(siteconfig.htdocs_dir, "generated_images")
 
-        user = base64.urlsafe_b64encode(user)
+        user = base64.urlsafe_b64encode(self._user.login)
         pathname = os.path.normpath(os.path.join(pathname, user))
 
         try:
@@ -172,8 +173,8 @@ class TimelineChartCommon(ChartCommon):
     def getType(self):
         return "None"
 
-    def __init__(self, width, height):
-        ChartCommon.__init__(self, width, height)
+    def __init__(self, user, width, height):
+        ChartCommon.__init__(self, user, width, height)
         self._got_value = False
         self._color_map_idx = 0
         self._assigned_colors = {}
@@ -266,8 +267,8 @@ class CairoDistributionChart(ChartCommon):
     def getType(self):
         return "None"
 
-    def render(self, name, expire=None, user=None, suffix=".png", uid=None, gid=None):
-        fname = self._getFilename(name, expire, user, uid, gid);
+    def render(self, name, expire=None, suffix=".png", uid=None, gid=None):
+        fname = self._getFilename(name, expire, uid, gid);
 
         color = []
         data = utils.OrderedDict()
@@ -291,8 +292,8 @@ class CairoDistributionChart(ChartCommon):
 
 
 class CairoTimelineChart(TimelineChartCommon):
-    def render(self, name, expire=None, user=None, suffix=".png", uid=None, gid=None):
-        fname = self._getFilename(name, expire, user, uid, gid);
+    def render(self, name, expire=None, suffix=".png", uid=None, gid=None):
+        fname = self._getFilename(name, expire, uid, gid);
 
         colors = []
         values = utils.OrderedDict()
@@ -311,8 +312,8 @@ class CairoTimelineChart(TimelineChartCommon):
 
 
 class CairoStackedTimelineChart(TimelineChartCommon):
-    def render(self, name, expire=None, user=None, suffix=".png", uid=None, gid=None):
-        fname = self._getFilename(name, expire, user, uid, gid);
+    def render(self, name, expire=None, suffix=".png", uid=None, gid=None):
+        fname = self._getFilename(name, expire, uid, gid);
 
         colors = []
         legend = []
@@ -360,25 +361,25 @@ class CairoWorldChart(CairoDistributionChart):
             return False
 
 class TimelineChart(object):
-        def __new__(cls, width, height):
-                o = CairoTimelineChart(width, height)
+        def __new__(cls, user, width, height):
+                o = CairoTimelineChart(user, width, height)
                 o.isFlash = False
                 return o
 
 class StackedTimelineChart(object):
-        def __new__(cls, width, height):
-                o = CairoStackedTimelineChart(width, height)
+        def __new__(cls, user, width, height):
+                o = CairoStackedTimelineChart(user, width, height)
                 o.isFlash = False
                 return o
 
 class WorldChart(object):
-        def __new__(cls, width, height):
-                o = CairoWorldChart(width, height)
+        def __new__(cls, user, width, height):
+                o = CairoWorldChart(user, width, height)
                 o.isFlash = False
                 return o
 
 class DistributionChart(object):
-        def __new__(cls, width, height):
-                o = CairoDistributionChart(width, height)
+        def __new__(cls, user, width, height):
+                o = CairoDistributionChart(user, width, height)
                 o.isFlash = True
                 return o
