@@ -1,3 +1,20 @@
+* 2010-02-10, prewikka-1.0.0rc2:
+
+- The link to the logged-in user settings, when accessed through the
+  Statistics subpages, contained an invalid parameters which triggered
+  an exception.
+
+- An exception could be raised in case we were generating a distribution
+  Chart containing empty values. This close #369.
+
+- Upgrade old database fields values to fit latest Prewikka changes. Fix
+  a possible exception in the Events listing.
+
+- Fix possible exception with username/charts name containing unicode.
+
+- Correctly handle the setup.py installation 'root' argument.
+
+
 * 2010-01-21, prewikka-1.0.0rc1:
 
 - OpenSource Graphical Statistics implementation: implement a set of
