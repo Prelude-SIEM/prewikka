@@ -144,10 +144,10 @@ class ChartCommon:
 
     def _getFilename(self, name, expire = None, uid=None, gid=None, suffix=".png"):
         old_mask = os.umask(0)
-        basename = base64.urlsafe_b64encode(name)
+        basename = base64.urlsafe_b64encode(name.encode("utf-8"))
         pathname = os.path.join(siteconfig.htdocs_dir, "generated_images")
 
-        user = base64.urlsafe_b64encode(self._user.login)
+        user = base64.urlsafe_b64encode(self._user.login.encode("utf-8"))
         pathname = os.path.normpath(os.path.join(pathname, user))
 
         try:
