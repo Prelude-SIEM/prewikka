@@ -97,6 +97,10 @@ class Database:
             d = { "version": version, "reqversion": self.required_version }
             raise DatabaseSchemaError(_("Database schema version %(version)s found when %(reqversion)s was required") % d)
 
+        # We don't want to impose an SQL upgrade script for this specific change,
+        # but this can be moved to an SQL script upon the next schema update.
+        self.query("UPDATE Prewikka_User_Configuration SET value='n/a' WHERE (name='alert.assessment.impact.completion' OR name='alert.assessment.impact.severity') AND value='none'")
+
     def __del__(self):
         if self._sql:
             self._sql_destroy(self._sql)
