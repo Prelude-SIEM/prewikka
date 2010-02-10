@@ -119,7 +119,7 @@ class DistributionStats(view.View):
 
     def _addDistributionChart(self, title, value_name, width, height, path, criteria, sub_url_handler, limit=-1, dns=False, names_and_colors={}):
         base_url = self._getBaseURL()
-        chart = { "title": title, "value_name": value_name, "data": [ ] }
+        chart = { "title": title, "value_name": value_name }
 
         distribution = Chart.DistributionChart(self.user, width, height)
         if names_and_colors:
@@ -131,15 +131,12 @@ class DistributionStats(view.View):
         results = self.env.idmef_db.getValues([ path + "/group_by", "count(%s)/order_desc" % path ],
                                               criteria=criteria + [ path ], limit=limit)
         if results:
-            total = reduce(lambda x, y: x + y, [ count for value, count in results ])
-            chart["total"] = total
             for value, count in results:
                 if dns:
                     v = resolve.AddressResolve(value)
                 else:
                     v = self._getNameFromMap(value, names_and_colors)
 
-                chart["data"].append((v, base_url + "&amp;" + sub_url_handler(value), count, "%.1f" % (count / float(total) * 100)))
                 distribution.addLabelValuePair(v, count, base_url + "&amp;" + sub_url_handler(value))
 
         distribution.render(title)
@@ -404,7 +401,7 @@ class GenericTimelineStats(DistributionStats):
         self._names_and_colors = names_and_colors
 
         base_url = self._getBaseURL()
-        chart = { "title": title, "value_name": value_name, "data": [ ] }
+        chart = { "title": title, "value_name": value_name }
 
         if limit > 0:
             res = self.env.idmef_db.getValues(self._getSelection(), criteria = criteria, limit=self._limit)
@@ -498,16 +495,13 @@ class SourceStats(DistributionStats, GenericTimelineStats):
         base_url = self._getBaseURL()
         distribution = Chart.WorldChart(self.user, width, height)
 
-        chart = { "title": _("Top Source Country"), "value_name": _("Country"), "data": [ ], "chart": distribution }
+        chart = { "title": _("Top Source Country"), "value_name": _("Country"), "chart": distribution }
 
         results = self.env.idmef_db.getValues([ "alert.source.node.address.address/group_by",
                                                 "count(alert.source.node.address.address)"],
                                               criteria=criteria, limit=-1)
 
         if results:
-            total = reduce(lambda x, y: x + y, [ count for value, count in results ])
-            chart["total"] = total
-
             merge = { }
             for value, count in results:
                 if not value:
@@ -537,7 +531,6 @@ class SourceStats(DistributionStats, GenericTimelineStats):
 
             for item in results:
                 distribution.addLabelValuePair(item[2], item[0])
-                chart["data"].append((item[2], base_url + item[3], item[0], "%.1f" % (item[0] / float(total) * 100)))
 
         distribution.render("Top 10 Source Country")
         chart["filename"] = distribution.getHref()
@@ -592,7 +585,7 @@ class TargetStats(DistributionStats):
         base_url = self._getBaseURL()
         title = "Top 10 Targeted Ports"
         distribution = Chart.DistributionChart(self.user, width, height)
-        chart = { "title": title, "value_name": "Port", "data": [ ], "chart": distribution }
+        chart = { "title": title, "value_name": "Port", "chart": distribution }
 
         criteria = criteria[:] + [ "(alert.target.service.iana_protocol_number == 6  ||"
                                    "alert.target.service.iana_protocol_number == 17  ||"
@@ -639,14 +632,8 @@ class TargetStats(DistributionStats):
 
         results.sort(lambda x, y: int(y[2] - x[2]))
 
-        total = reduce(lambda x, y: x + y, [ count for port, protocol, count in results ])
-        chart["total"] = total
-
         for port, protocol, count in results:
             name = "%d (%s)" % (port, protocol)
-            chart["data"].append((name, base_url + "&amp;" + "target_object_0=alert.target.service.port&amp;target_value_0=%d" % port,
-                                  count, "%.1f" % (count / float(total) * 100)))
-
             distribution.addLabelValuePair(name, count, base_url + "&amp;" + "target_object_0=alert.target.service.port&amp;target_value_0=%d" % port)
 
         distribution.render(title)
@@ -691,14 +678,12 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
         base_url = self._getBaseURL()
         title = "Top 10 analyzers"
         distribution = Chart.DistributionChart(self.user, width, height)
-        chart = { "title": title, "value_name": "Analyzer", "data": [ ], "chart": distribution }
+        chart = { "title": title, "value_name": "Analyzer", "chart": distribution }
 
         results = self.env.idmef_db.getValues([ "alert.analyzer(-1).name/group_by", "alert.analyzer(-1).node.name/group_by",
                                                 "count(alert.analyzer(-1).name)/order_desc" ],
                                               criteria=criteria + [ "alert.analyzer(-1).name" ], limit=10)
         if results:
-            total = reduce(lambda x, y: x + y, [ row[-1] for row in results ])
-            chart["total"] = total
             for analyzer_name, node_name, count in results:
                 if node_name:
                     value = "%s on %s"  % (analyzer_name, node_name)
@@ -707,11 +692,6 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
 
                 analyzer_criteria = utils.urlencode({ "analyzer_object_0": "alert.analyzer(-1).name",
                                                        "analyzer_value_0": analyzer_name })
-
-                chart["data"].append((value,
-                                      base_url + "&amp;" + analyzer_criteria,
-                                      count,
-                                      "%.1f" % (count / float(total) * 100)))
 
                 distribution.addLabelValuePair(value, count, base_url + "&amp;" + analyzer_criteria)
 
