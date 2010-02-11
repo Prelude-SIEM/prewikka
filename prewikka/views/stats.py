@@ -237,6 +237,28 @@ class DistributionStats(view.View):
         else:
             self.dataset["period"] = "Period: %s" % period
 
+    def genPathValueURI(self, path, value, index=0, type=None):
+        if value:
+            operator = "="
+        else:
+            value = ""
+            operator = "!"
+
+        if type == None:
+            type = path.split(".")[1]
+
+            idx = type.find("(")
+            if idx != -1:
+                type = type[0: idx]
+
+            if type == "assessment":
+                type = "classification"
+
+            if type not in ("classification", "source", "target", "analyzer"):
+                raise Exception, "The path '%s' cannot be mapped to a column" % path
+
+        return utils.urlencode({ "%s_object_%d" % (type, index): path, "%s_operator_%d" % (type, index): operator, "%s_value_%d" % (type, index): value })
+
 
 
 class GenericTimelineStats(DistributionStats):
@@ -433,16 +455,14 @@ class CategorizationStats(DistributionStats, GenericTimelineStats):
         self._addDistributionChart(_("Top 10 Classifications"), _("Classification"), width, height,
                                    "alert.classification.text",
                                    criteria,
-                                   lambda value: utils.urlencode({"classification_object_0": "alert.classification.text",
-                                                                  "classification_value_0": value}),
+                                   lambda value: self.genPathValueURI("alert.classification.text", value, type="classification"),
                                    10)
 
     def _renderReferences(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         self._addDistributionChart(_("Top 10 Alert References"), _("References"), width, height,
                                    "alert.classification.reference.name",
                                    criteria,
-                                   lambda value: utils.urlencode({"classification_object_0": "alert.classification.reference.name",
-                                                                  "classification_value_0": value}),
+                                   lambda value: self.genPathValueURI("alert.classification.reference.name", value, type="classification"),
                                    10)
 
     def _renderImpactSeverities(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
@@ -456,15 +476,13 @@ class CategorizationStats(DistributionStats, GenericTimelineStats):
         self._addDistributionChart(_("Severities"), _("Severity"), width, height,
                                    "alert.assessment.impact.severity",
                                    criteria,
-                                   lambda value: utils.urlencode({"classification_object_0": "alert.assessment.impact.severity",
-                                                                  "classification_value_0": value}), names_and_colors=_severity_maps)
+                                   lambda value: self.genPathValueURI("alert.assessment.impact.severity", value, type="classification"), names_and_colors=_severity_maps)
 
     def _renderImpactTypes(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         self._addDistributionChart(_("Alert Impact Types"), _("Impact Types"), width, height,
                                    "alert.assessment.impact.type",
                                    criteria,
-                                   lambda value: utils.urlencode({"classification_object_0": "alert.assessment.impact.type",
-                                                                  "classification_value_0": value}))
+                                   lambda value: self.genPathValueURI("alert.assessment.impact.type", value, type="classification"))
 
     def _renderClassificationsTrend(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         GenericTimelineStats._addTimelineChart(self, "Top 10 Classifications Trend", None, width, height,
@@ -521,8 +539,7 @@ class SourceStats(DistributionStats, GenericTimelineStats):
                 else:
                    url_index = merge[nvalue][1]
 
-                encode = "&amp;" + utils.urlencode({"source_object_%d" % url_index: "alert.source.node.address.address",
-                                                    "source_value_%d" % url_index: value})
+                encode = "&amp;" + self.genPathValueURI("alert.source.node.address.address", value, type="source", index=url_index)
                 merge[nvalue] = (merge[nvalue][0] + count, url_index + 1, nvalue, merge[nvalue][3] + encode)
 
             s = [ t[1] for t in merge.items() ]
@@ -547,16 +564,14 @@ class SourceStats(DistributionStats, GenericTimelineStats):
         self._addDistributionChart(_("Top 10 Source Addresses"), _("Address"), width, height,
                                    "alert.source.node.address.address",
                                    criteria,
-                                   lambda value: utils.urlencode({"source_object_0": "alert.source.node.address.address",
-                                                                   "source_value_0": value}),
+                                   lambda value: self.genPathValueURI("alert.source.node.address.address", value, type="source"),
                                    10, dns=True)
 
     def _renderUsers(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         self._addDistributionChart(_("Top 10 Source Users"), _("User"), width, height,
                                    "alert.source.user.user_id.name",
                                    criteria,
-                                   lambda value: utils.urlencode({"source_object_0": "alert.source.user.user_id.name",
-                                                                   "source_value_0": value}),
+                                   lambda value: self.genPathValueURI("alert.source.user.user_id.name", value, type="source"),
                                    10)
 
     def _renderSourcesTrend(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
@@ -647,16 +662,14 @@ class TargetStats(DistributionStats):
         self._addDistributionChart(_("Top 10 Targeted Addresses"), _("Address"), width, height,
                                    "alert.target.node.address.address",
                                    criteria,
-                                   lambda value: utils.urlencode({"target_object_0": "alert.target.node.address.address",
-                                                                   "target_value_0": value}),
+                                   lambda value: self.genPathValueURI("alert.target.node.address.address", value, type="target"),
                                    10, dns=True)
 
     def _renderUsers(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         self._addDistributionChart(_("Top 10 Targeted Users"), _("User"), width, height,
                                    "alert.target.user.user_id.name",
                                    criteria,
-                                   lambda value: utils.urlencode({"target_object_0": "alert.target.user.user_id.name",
-                                                                  "target_value_0": value}),
+                                   lambda value: self.genPathValueURI("alert.target.user.user_id.name", value, type="target"),
                                    10)
 
     def render(self):
@@ -693,9 +706,7 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
                 if node_name:
                     value = "%s on %s"  % (value, node_name)
 
-                analyzer_criteria = utils.urlencode({ "analyzer_object_0": "alert.analyzer(-1).name",
-                                                       "analyzer_value_0": analyzer_name })
-
+                analyzer_criteria = self.genPathValueURI("alert.analyzer(-1).name", analyzer_name, type="analyzer")
                 distribution.addLabelValuePair(value, count, base_url + "&amp;" + analyzer_criteria)
 
             distribution.render(title)
@@ -705,32 +716,28 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
         self._addDistributionChart(_("Top 10 Analyzer Models"), _("Model"), width, height,
                                    "alert.analyzer(-1).model",
                                    criteria,
-                                   lambda value: utils.urlencode({ "analyzer_object_0": "alert.analyzer(-1).model",
-                                                                    "analyzer_value_0": value }),
+                                   lambda value: self.genPathValueURI("alert.analyzer(-1).model", value, type="analyzer"),
                                    10)
 
     def _renderClasses(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         self._addDistributionChart(_("Top 10 Analyzer Classes"), _("Class"), width, height,
                                    "alert.analyzer(-1).class",
                                    criteria,
-                                   lambda value: utils.urlencode({ "analyzer_object_0": "alert.analyzer(-1).class",
-                                                                    "analyzer_value_0": value }),
+                                   lambda value: self.genPathValueURI("alert.analyzer(-1).class", value, type="analyzer"),
                                    10)
 
     def _renderNodeAddresses(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         self._addDistributionChart(_("Top 10 Analyzer Node Addresses"), _("Address"), width, height,
                                    "alert.analyzer(-1).node.address.address",
                                    criteria,
-                                   lambda value: utils.urlencode({ "analyzer_object_0": "alert.analyzer(-1).node.address.address",
-                                                                    "analyzer_value_0": value }),
+                                   lambda value: self.genPathValueURI("alert.analyzer(-1).node.address.address", value, type="analyzer"),
                                    10)
 
     def _renderNodeLocations(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         self._addDistributionChart(_("Analyzer Locations"), _("Location"), width, height,
                                    "alert.analyzer(-1).node.location",
                                    criteria,
-                                   lambda value: utils.urlencode({ "analyzer_object_0": "alert.analyzer(-1).node.location",
-                                                                    "analyzer_value_0": value }))
+                                   lambda value: self.genPathValueURI("alert.analyzer(-1).node.location", value, type="analyzer"))
 
     def _renderClassesTrend(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         GenericTimelineStats._addTimelineChart(self, "Top 10 Analyzer Classes Trend", None, width, height,
