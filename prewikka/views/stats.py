@@ -132,10 +132,10 @@ class DistributionStats(view.View):
                                               criteria=criteria + [ path ], limit=limit)
         if results:
             for value, count in results:
-                if dns:
+                if dns and value:
                     v = resolve.AddressResolve(value)
                 else:
-                    v = self._getNameFromMap(value, names_and_colors)
+                    v = self._getNameFromMap(value or _(u"n/a"), names_and_colors)
 
                 distribution.addLabelValuePair(v, count, base_url + "&amp;" + sub_url_handler(value))
 
@@ -248,7 +248,7 @@ class GenericTimelineStats(DistributionStats):
             return d
 
         for name, count in results:
-            d[self._getNameFromMap(name, self._names_and_colors)] = (count, link)
+            d[self._getNameFromMap(name or _(u"n/a"), self._names_and_colors)] = (count, link)
 
         return d
 
@@ -504,15 +504,16 @@ class SourceStats(DistributionStats, GenericTimelineStats):
         if results:
             merge = { }
             for value, count in results:
-                if not value:
-                        continue
-
-                if distribution.needCountryCode():
-                    nvalue = geoip.country_code_by_addr(value)
+                if value:
+                    if distribution.needCountryCode():
+                        nvalue = geoip.country_code_by_addr(value)
+                    else:
+                        nvalue = geoip.country_name_by_addr(value)
                 else:
-                    nvalue = geoip.country_name_by_addr(value)
+                        nvalue = None
+
                 if not nvalue:
-                    nvalue = "Unknown"
+                    nvalue = _(u"n/a")
 
                 if not merge.has_key(nvalue):
                    url_index = 0
@@ -603,7 +604,7 @@ class TargetStats(DistributionStats):
         if not results:
             return
 
-        merge = { "TCP": { }, "UDP": { } }
+        merge = { _(u"n/a"): { }, u"tcp": { }, u"udp": { } }
 
         for port, iana_protocol_number, iana_protocol_name, protocol, count in results:
             if not port:
@@ -615,9 +616,12 @@ class TargetStats(DistributionStats):
             elif iana_protocol_name:
                 protocol = iana_protocol_name
 
-            protocol = protocol.upper()
+            if not protocol:
+                protocol = _(u"n/a")
+
+            protocol = protocol.lower()
             if not merge.has_key(protocol):
-                continue
+                protocol = _(u"n/a")
 
             if not merge[protocol].has_key(port):
                 merge[protocol][port] = 0
@@ -633,7 +637,7 @@ class TargetStats(DistributionStats):
         results.sort(lambda x, y: int(y[2] - x[2]))
 
         for port, protocol, count in results:
-            name = "%d (%s)" % (port, protocol)
+            name = "%d / %s" % (port, protocol)
             distribution.addLabelValuePair(name, count, base_url + "&amp;" + "target_object_0=alert.target.service.port&amp;target_value_0=%d" % port)
 
         distribution.render(title)
@@ -685,10 +689,9 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
                                               criteria=criteria + [ "alert.analyzer(-1).name" ], limit=10)
         if results:
             for analyzer_name, node_name, count in results:
+                value = analyzer_name or _(u"n/a")
                 if node_name:
-                    value = "%s on %s"  % (analyzer_name, node_name)
-                else:
-                    value = analyzer_name
+                    value = "%s on %s"  % (value, node_name)
 
                 analyzer_criteria = utils.urlencode({ "analyzer_object_0": "alert.analyzer(-1).name",
                                                        "analyzer_value_0": analyzer_name })
