@@ -262,7 +262,7 @@ class DistributionStats(view.View):
 
 
 class GenericTimelineStats(DistributionStats):
-    def _getAlertCount(self, criteria, link):
+    def _getAlertCount(self, criteria, link, zoom_view):
         d = {}
 
         results = self.env.idmef_db.getValues(self._getSelection(), criteria)
@@ -270,6 +270,9 @@ class GenericTimelineStats(DistributionStats):
             return d
 
         for name, count in results:
+            if zoom_view == "alert_listing":
+                link += "&amp;" + self.genPathValueURI(self._path, name)
+
             d[self._getNameFromMap(name or _(u"n/a"), self._names_and_colors)] = (count, link)
 
         return d
@@ -388,7 +391,7 @@ class GenericTimelineStats(DistributionStats):
                 self._setTimelineZoom(base_parameters, start, start + step)
 
             link = utils.create_link(zoom_view, base_parameters)
-            count = self._getAlertCount(c, link)
+            count = self._getAlertCount(c, link, zoom_view)
             label = start.strftime(format)
 
             start += step
