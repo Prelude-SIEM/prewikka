@@ -1,3 +1,14 @@
+* 2010-02-12, prewikka-1.0.0rc3:
+
+- Make sure we always use a replacement ("n/a") when we get a nil
+  value from the database. Fix exception since the underlying chart
+  backend didn't support nil value (#370).
+
+- If the requested timeline range is lower or equal 1 minute, use
+  a 1 second step. Fix an exception using the Cairoplot backend, and
+  allow to get meaningful by minute statistics (#370).
+
+
 * 2010-02-10, prewikka-1.0.0rc2:
 
 - The link to the logged-in user settings, when accessed through the
