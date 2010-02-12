@@ -18,7 +18,7 @@ function changeLinkUnit(unit) {
                 });
         }
 
-        \$("#topmenu").find("div:not(.topmenu_item_info) a").each(function() {
+        \$("#topmenu").find("div.topmenu_item_active a, div.topmenu_item_inactive a").each(function() {
                 \$(this).attr("href", \$(this).attr("href") + str);
         });
 }
