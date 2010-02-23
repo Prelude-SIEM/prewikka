@@ -891,10 +891,10 @@ class AlertListing(MessageListing, view.View):
         return out, found
 
     def _adjustFilterValue(self, op, value):
-        value = value.strip()
-
         if op != "<>*" and op != "<>":
             return value
+
+        value = value.strip()
 
         value, has_wildcard = self._criteriaValueFind(value, ["*"])
         if has_wildcard:
