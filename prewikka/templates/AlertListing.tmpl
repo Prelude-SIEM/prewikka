@@ -112,8 +112,6 @@ function get_next_state(id, cstate) {
 
                 else if ( saved_forms[id]["saved"] && ! Equals(\$(selector), saved_forms[id]["saved"]) )
                         nextstate = "saved";
-
-                else nextstate = "default";
         }
 
         return nextstate;
@@ -427,7 +425,8 @@ function ${type}_set_${state}() {
 
 \$("input.reset_filter").click(function() {
         var div_id = \$(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().attr("id");
-        saved_state[div_id] = get_next_state(div_id, saved_state[div_id]);
+
+        saved_state[div_id] = \$(this).val().substr(9);
 
         #for $t in "classification", "source", "target", "analyzer"
                 if ( div_id == "$t" )
