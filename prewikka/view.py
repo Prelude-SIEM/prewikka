@@ -101,7 +101,7 @@ class Parameters(dict):
 
                 raise InvalidParameterError(name)
 
-            if not self._parameters.has_key(name):
+            if not self._parameters.has_key(name) or self._parameters[name]["mandatory"] is not True:
                 do_load = False
 
             if self._parameters[name]["save"] and self.has_key("_save"):
