@@ -1,3 +1,14 @@
+* 2010-03-16, prewikka-1.0.0:
+
+- Fix logout link from the Statistics view.
+
+- Fix inline filtering problem for events name with start/ending space.
+
+- Fix possible inline filter null reset button.
+
+- Other, minor fixes.
+
+
 * 2010-02-12, prewikka-1.0.0rc3:
 
 - Make sure we always use a replacement ("n/a") when we get a nil
