@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import os
-from prewikka import Auth, User, Database
+from prewikka import Auth, User, Database, utils
 
 
 class CGIAuth(Auth.Auth):
@@ -40,7 +40,7 @@ class CGIAuth(Auth.Auth):
         if not user:
             raise Auth.AuthError(message=_("CGI Authentication failed: no user specified."))
 
-        user = user.toUnicode(user)
+        user = utils.toUnicode(user)
 
         # Create the user in the Prewikka database, so that its permission
         # might be modified by another administrative user.
