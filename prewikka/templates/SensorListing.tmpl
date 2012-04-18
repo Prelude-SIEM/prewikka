@@ -29,7 +29,7 @@
   });
 
   \$("td.offline, td.online, td.missing, td.unknown").click(function(){
-        var \$ctype = \$(this).attr('class');
+        var \$ctype = \$(this).attr('class').split(" ")[0];
         var \$div = \$(this).parents("table").next("div");
         var \$all_tr = \$("table tbody tr", \$div);
 
