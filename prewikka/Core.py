@@ -301,7 +301,7 @@ class Core:
         return user
 
     def prepareError(self, e, request, user, login, view):
-        e = unicode(e)
+        e = unicode(repr(e))
         self._env.log.error(e, request, login)
         error = Error.PrewikkaUserError("Prewikka internal error", e,
                                         display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
