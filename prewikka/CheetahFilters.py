@@ -1,4 +1,4 @@
-# Copyright (C) 2004,2005 PreludeIDS Technologies. All Rights Reserved.
+# Copyright (C) 2004-2012 CS-SI. All Rights Reserved.
 # Author: Rob Holland <tigger@gentoo.org>
 #
 # This file is part of the Prewikka program.

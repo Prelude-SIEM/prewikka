@@ -1,4 +1,4 @@
-# Copyright (C) 2006 PreludeIDS Technologies. All Rights Reserved.
+# Copyright (C) 2006-2012 CS-SI. All Rights Reserved.
 # Author: Tilman Baumann <tilman.baumann@collax.com>
 #
 # This file is part of the Prewikka program.
