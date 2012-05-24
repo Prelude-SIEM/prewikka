@@ -1,4 +1,4 @@
-# Copyright (C) 2004,2005 PreludeIDS Technologies. All Rights Reserved.
+# Copyright (C) 2004-2012 CS-SI. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 #
 # This file is part of the Prewikka program.
