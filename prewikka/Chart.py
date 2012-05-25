@@ -278,15 +278,15 @@ class CairoDistributionChart(ChartCommon):
         lv.sort(lambda x, y: int(x[1] - y[1]))
 
         for l, v in lv:
-                total += v
+            total += v
 
         if total:
-                share = 100.0 / total
+            share = 100.0 / total
 
         for l, v in lv:
-                l = str(l)
-                data["%s (%d, %.2f%%)" % (l, v, share * v)] = v
-                color.append(self.hex2rgb(self.getItemColor(l)))
+            l = str(l)
+            data["%s (%d, %.2f%%)" % (l, v, share * v)] = v
+            color.append(self.hex2rgb(self.getItemColor(l)))
 
         cairoplot.pie_plot(fname, data, self._width, self._height, gradient = True, shadow = True, colors=color)
 
@@ -298,14 +298,14 @@ class CairoTimelineChart(TimelineChartCommon):
         colors = []
         values = utils.OrderedDict()
         for name in self._values.keys():
-                nname = name[0:min(len(name), 25)]
-                if not values.has_key(nname):
-                        values[nname] = []
+            nname = name[0:min(len(name), 25)]
+            if not values.has_key(nname):
+                values[nname] = []
 
-                for item in self._values[name]:
-                        values[nname].append(item[0])
+            for item in self._values[name]:
+                values[nname].append(item[0])
 
-                colors.append(self.hex2rgb(self.getItemColor(name)))
+            colors.append(self.hex2rgb(self.getItemColor(name)))
 
         cairoplot.dot_line_plot(fname, values, self._width, self._height, border=0, axis=True, grid=True,
                                 x_labels = self._labels, series_legend=True, series_colors=colors)
@@ -344,42 +344,42 @@ class CairoStackedTimelineChart(TimelineChartCommon):
         idx = 0
 
         for name, color in self._names_and_colors.values():
-                if self._values.has_key(name):
-                        if color:
-                                colors.append(self.hex2rgb(color))
-                        else:
-                                colors.append(self.hex2rgb(COLOR_MAP[idx % len(COLOR_MAP)]))
-                                idx += 1
-                        legend.append(name)
+            if self._values.has_key(name):
+                if color:
+                    colors.append(self.hex2rgb(color))
+                else:
+                    colors.append(self.hex2rgb(COLOR_MAP[idx % len(COLOR_MAP)]))
+                    idx += 1
+                legend.append(name)
 
         cairoplot.vertical_bar_plot(fname, data, self._width, self._height, border=0, series_labels=legend, display_values=True, grid=True, rounded_corners=False, stack=True,
                                     three_dimension=False, y_labels=labels, x_labels = self._labels, colors=colors)
 
 
 class CairoWorldChart(CairoDistributionChart):
-        def needCountryCode(self):
-            return False
+    def needCountryCode(self):
+        return False
 
 class TimelineChart(object):
-        def __new__(cls, user, width, height):
-                o = CairoTimelineChart(user, width, height)
-                o.isFlash = False
-                return o
+    def __new__(cls, user, width, height):
+        o = CairoTimelineChart(user, width, height)
+        o.isFlash = False
+        return o
 
 class StackedTimelineChart(object):
-        def __new__(cls, user, width, height):
-                o = CairoStackedTimelineChart(user, width, height)
-                o.isFlash = False
-                return o
+    def __new__(cls, user, width, height):
+        o = CairoStackedTimelineChart(user, width, height)
+        o.isFlash = False
+        return o
 
 class WorldChart(object):
-        def __new__(cls, user, width, height):
-                o = CairoWorldChart(user, width, height)
-                o.isFlash = False
-                return o
+    def __new__(cls, user, width, height):
+        o = CairoWorldChart(user, width, height)
+        o.isFlash = False
+        return o
 
 class DistributionChart(object):
-        def __new__(cls, user, width, height):
-                o = CairoDistributionChart(user, width, height)
-                o.isFlash = True
-                return o
+    def __new__(cls, user, width, height):
+        o = CairoDistributionChart(user, width, height)
+        o.isFlash = True
+        return o

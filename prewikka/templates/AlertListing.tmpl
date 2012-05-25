@@ -300,14 +300,14 @@ function ${type}_set_${state}() {
         var td_container_operator = \$(tr).children(".td_container_operator");
 
         if ( ! \$(td_container_path).children().is(":visible") ) {
-                \$(this).text("simple");
+                \$(this).text("$_("simple")");
                 \$(this).parent().parent().children(".td_container_operator").children().show()
                 \$(td_container_path).children("select").show()
                 \$(td_container_path).children("input").attr("disabled", "disabled")
                 \$(td_container_path).children("select").removeAttr("disabled")
                 \$(td_container_operator).children("select").removeAttr("disabled");
         } else {
-                \$(this).text("advanced");
+                \$(this).text("$_("advanced")");
                 \$(td_container_path).children().hide()
                 \$(this).parent().parent().children(".td_container_operator").children().hide()
                 \$(td_container_path).children("input").removeAttr("disabled")
@@ -454,7 +454,7 @@ function ${type}_set_${state}() {
 #def define_inline_filter($obname, $preselect)
       <table class="inline_filter_content filter_table">
        <tr class="inline_filter">
-        <th>$_('Filter on') [<a class="expert_mode">advanced</a>]:</th>
+        <th>$_('Filter on') [<a class="expert_mode">$_("advanced")</a>]:</th>
         <td class="td_container_path">
          <input type="hidden" name="${obname}_object_0" value="__all__" />
          <select style="display:none;" disabled="disabled" class="popup_select_field" name="${obname}_object_0">
@@ -536,7 +536,7 @@ function ${type}_set_${state}() {
      <tr class="inline_filter">
       <td colspan="3">&nbsp;</td>
       <td>
-       <input type="submit" value="Apply" />
+       <input type="submit" value="$_("Apply")" />
        <input type="button" class="reset_filter" value="Reset" />
       </td>
      </tr>
@@ -681,8 +681,8 @@ function ${type}_set_${state}() {
 </a>
        <span class="popup_menu">
         #filter Filter - $writeInlineFilter($direction.service, $_("Filter on this port/protocol"))<br/> #end filter
-        #if $direction.port.value
-        - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/port_details.php?port=$unicode($direction.port.value)&amp;protocol=$protocol">$_("Port/protocol information")</a>
+        #if $direction.port.value and $prewikka.enable_details
+        - <a target="$prewikka.external_link_target" href="$prewikka.port_details_url?port=$unicode($direction.port.value)&amp;protocol=$protocol">$_("Port/protocol information")</a>
         #else
         - <span>$_("Port/protocol information")</span>
         #end if
@@ -749,7 +749,9 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
 #set $sep = ", "
 <span class="popup_menu">
  - #filter Filter $writeInlineFilter($name, $_("Filter on this reference"))#end filter#<br />
- - <a target="$prewikka.external_link_target" href="$url">Reference information</a>
+ #if $prewikka.enable_details
+ - <a target="$prewikka.external_link_target" href="$url">$_("Reference information")</a>
+ #end if
 </span>#end for##if $info.classification_references#)#end if
 
   #end for
@@ -781,8 +783,9 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
          <br />
 
        #if $address.value and (not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net"))
-         - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">$unicode($_("%s information") % ($name)).capitalize()</a><br />
-
+         #if $prewikka.enable_details
+         - <a target="$prewikka.external_link_target" href="$prewikka.host_details_url?host=$address.value">$unicode($_("%s information") % ($name)).capitalize()</a><br />
+	 #end if
           #for $cmdname, $link in $address.host_commands
          - <a href="$link">$cmdname</a><br />
           #end for
@@ -847,10 +850,10 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
 
 
 #block orderby_option
-     <option value="time_desc" $timeline.time_desc_selected>By time (descending)</option>
-     <option value="time_asc" $timeline.time_asc_selected>By time (ascending)</option>
-     <option value="count_desc" $timeline.count_desc_selected>By count (descending)</option>
-     <option value="count_asc" $timeline.count_asc_selected>By count (ascending)</option>
+     <option value="time_desc" $timeline.time_desc_selected>$_("By time") ($_("descending"))</option>
+     <option value="time_asc" $timeline.time_asc_selected>$_("By time") ($_("ascending"))</option>
+     <option value="count_desc" $timeline.count_desc_selected>$_("By count") ($_("descending"))</option>
+     <option value="count_asc" $timeline.count_asc_selected>$_("By count") ($_("ascending"))</option>
 #end block
 
 

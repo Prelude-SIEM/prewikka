@@ -160,7 +160,7 @@ def init(env):
         return
 
     if import_fail:
-       env.log.warning("Asynchronous DNS resolution disabled: twisted.names and twisted.internet required: %s" % err)
+       env.log.warning(_("Asynchronous DNS resolution disabled: twisted.names and twisted.internet required: %s") % err)
        return
 
     resolver = DNSResolver()
