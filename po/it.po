@@ -640,7 +640,7 @@ msgstr ""
 "Dans l'esprit Open Source, nous vous proposons de participer au "
 "développement de votre logiciel. Vous pouvez commander des développements "
 "personnalisés de Prelude en fonction de vos besoins : customisation, ajout "
-"de fonctionnalités, etc. Réalisées par les ingénieurs PreludeIDS, les "
+"de fonctionnalités, etc. Réalisées par les ingénieurs CS, les "
 "modifications apportées au système Prelude vous donneront l’assurance d’être "
 "intégrées de façon optimisée et garanties par notre Support Technique. De "
 "plus, notre entreprise peut mettre en compatibilité des sondes non encore "
@@ -656,10 +656,10 @@ msgstr "Supporto Tecnico e Manutenzione del software"
 #, fuzzy
 msgid "about_support"
 msgstr ""
-"Le support PreludeIDS vous garantit le fonctionnement optimal du système "
-"Prelude sur votre infrastructure. PreludeIDS a créé cinq offres de support "
+"Le support CS vous garantit le fonctionnement optimal du système "
+"Prelude sur votre infrastructure. CS a créé cinq offres de support "
 "technique packagées. En vous assurant une assistance en cas d'incident, le "
-"support PreludeIDS met à votre disposition nos experts pour vous fournir des "
+"support CS met à votre disposition nos experts pour vous fournir des "
 "solutions rapides et fiables."
 
 #: prewikka/templates/About.py:134
@@ -673,7 +673,7 @@ msgstr "La piattaforma Prelude è rilasciata sotto licenza"
 #: prewikka/templates/About.py:145
 msgid "about_licence2"
 msgstr ""
-"PreludeIDS Technologies offre licenze commerciali per consentire lo sviluppo "
+"CS offre licenze commerciali per consentire lo sviluppo "
 "e l’interoperabilità delle applicazioni proprietari."
 
 #: prewikka/templates/About.py:152
@@ -684,7 +684,7 @@ msgstr "Consulenza, Implementazione et Formazione"
 #, fuzzy
 msgid "about_advice"
 msgstr ""
-"Aux côtés de ses partenaires, PreludeIDS vous propose des solutions haut de "
+"Aux côtés de ses partenaires, CS vous propose des solutions haut de "
 "gamme associées à une grande qualité de conseils et de services (conseil, "
 "déploiement, formation, etc.) afin de concrétiser vos projets sécurité."
 
