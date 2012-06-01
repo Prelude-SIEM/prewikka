@@ -6,9 +6,9 @@
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Prewikka 0.99\n"
+"Project-Id-Version: Prewikka 1.01\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-05-25 10:14+0200\n"
+"POT-Creation-Date: 2012-06-01 10:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator:  Bjoern Weiland <bjoern.weiland@web.de>\n"
 "Language-Team: German\n"
@@ -20,6 +20,67 @@ msgstr ""
 #, python-format
 msgid "Unknown logtype specified: '%s'"
 msgstr "Unbekannter Logtyp: '%s'"
+
+#: prewikka/MyConfigParser.py:36
+#, python-format
+msgid "parse error in \"%(txt)s\" at %(file)s line %(line)d"
+msgstr ""
+
+#: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
+msgid "Parameters Normalization failed"
+msgstr "Parameter-Normalisierung fehlgeschlagen"
+
+#: prewikka/view.py:30
+#, python-format
+msgid "Parameter '%s' is not valid"
+msgstr ""
+
+#: prewikka/view.py:36
+#, python-format
+msgid "Invalid value '%(value)s' for parameter '%(name)s'"
+msgstr ""
+
+#: prewikka/view.py:42
+#, python-format
+msgid "Required parameter '%s' is missing"
+msgstr ""
+
+#: prewikka/Database.py:99
+#, python-format
+msgid ""
+"Database schema version %(version)s found when %(reqversion)s was required"
+msgstr ""
+"Datenbank Schema version %(version)s gefunden, aber %(reqversion)s benötigt"
+
+#: prewikka/cairoplot.py:58
+msgid "Theme not defined"
+msgstr ""
+
+#: prewikka/cairoplot.py:135
+#, python-format
+msgid "Surface should be either a Cairo surface or a filename, not %s"
+msgstr ""
+
+#: prewikka/cairoplot.py:245
+#, python-format
+msgid "Background should be either cairo.LinearGradient or a 3-tuple, not %s"
+msgstr ""
+
+#: prewikka/Auth.py:29
+msgid "Authentication failed"
+msgstr "Authentifizierung fehlgeschlagen"
+
+#: prewikka/Auth.py:35
+msgid "Invalid session"
+msgstr "Session ungültig"
+
+#: prewikka/Auth.py:41
+msgid "Session expired"
+msgstr "Session abgelaufen"
+
+#: prewikka/Auth.py:139
+msgid "Logged out"
+msgstr "Ausgeloggt"
 
 #: prewikka/Core.py:35
 msgid "Invalid query"
@@ -50,47 +111,6 @@ msgstr ""
 
 #: prewikka/Core.py:337
 msgid "Database error"
-msgstr ""
-
-#: prewikka/Auth.py:29
-msgid "Authentication failed"
-msgstr "Authentifizierung fehlgeschlagen"
-
-#: prewikka/Auth.py:35
-msgid "Invalid session"
-msgstr "Session ungültig"
-
-#: prewikka/Auth.py:41
-msgid "Session expired"
-msgstr "Session abgelaufen"
-
-#: prewikka/Auth.py:139
-msgid "Logged out"
-msgstr "Ausgeloggt"
-
-#: prewikka/Filter.py:78
-#, python-format
-msgid "Invalid filter element '%s' referenced from filter formula"
-msgstr "Ungültiges Filterelement '%s' von Filterformel referenziert"
-
-#: prewikka/_threading_local.py:159
-msgid "Initialization arguments are not supported"
-msgstr ""
-
-#: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
-msgid "Parameters Normalization failed"
-msgstr "Parameter-Normalisierung fehlgeschlagen"
-
-#: prewikka/MyConfigParser.py:36
-#, python-format
-msgid "parse error in \"%(txt)s\" at %(file)s line %(line)d"
-msgstr ""
-
-#: prewikka/resolve.py:163
-#, python-format
-msgid ""
-"Asynchronous DNS resolution disabled: twisted.names and twisted.internet "
-"required: %s"
 msgstr ""
 
 #: prewikka/localization.py:110
@@ -169,14 +189,15 @@ msgstr "Samstag"
 msgid "Sunday"
 msgstr "Sonntag"
 
-#: prewikka/Database.py:99
+#: prewikka/resolve.py:163
 #, python-format
 msgid ""
-"Database schema version %(version)s found when %(reqversion)s was required"
+"Asynchronous DNS resolution disabled: twisted.names and twisted.internet "
+"required: %s"
 msgstr ""
-"Datenbank Schema version %(version)s gefunden, aber %(reqversion)s benötigt"
 
-#: prewikka/User.py:41
+#: prewikka/User.py:41 prewikka/views/usermanagement.py:135
+#: prewikka/views/usermanagement.py:164
 msgid "Permission Denied"
 msgstr "Zugriff verweigert"
 
@@ -185,9 +206,354 @@ msgstr "Zugriff verweigert"
 msgid "Access to view '%s' forbidden"
 msgstr "Zugang zur Aussicht '%s' verboten"
 
-#: prewikka/modules/auth/cgi/cgi.py:41
-msgid "CGI Authentication failed: no user specified."
-msgstr "CGI Authentifizierung fehlgeschlagen: Kein Benutzer angegeben."
+#: prewikka/Filter.py:78
+#, python-format
+msgid "Invalid filter element '%s' referenced from filter formula"
+msgstr "Ungültiges Filterelement '%s' von Filterformel referenziert"
+
+#: prewikka/_threading_local.py:159
+msgid "Initialization arguments are not supported"
+msgstr ""
+
+#: prewikka/IDMEFDatabase.py:122
+msgid "Iteration over a non-sequence"
+msgstr ""
+
+#: prewikka/IDMEFDatabase.py:366
+#, python-format
+msgid "libpreludedb %(want)s or higher is required (%(curr)s found)."
+msgstr ""
+
+#: prewikka/IDMEFDatabase.py:368
+#, python-format
+msgid "libpreludedb %s or higher is required."
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:209
+#, python-format
+msgid "%d Node"
+msgid_plural "%d Nodes"
+msgstr[0] "%d Knoten"
+msgstr[1] "%d Knoten"
+
+#: prewikka/templates/SensorListing.py:214
+#, python-format
+msgid "%d Agent"
+msgid_plural "%d Agents"
+msgstr[0] "%d Agent"
+msgstr[1] "%d Agenten"
+
+#: prewikka/templates/SensorListing.py:220
+#, python-format
+msgid "%d Online"
+msgid_plural "%d Onlines"
+msgstr[0] "%d Online"
+msgstr[1] "%d Online"
+
+#: prewikka/templates/SensorListing.py:222
+#, python-format
+msgid "%d Offline"
+msgid_plural "%d Offlines"
+msgstr[0] "%d Offline"
+msgstr[1] "%d Offline"
+
+#: prewikka/templates/SensorListing.py:224
+#, python-format
+msgid "%d Unknown"
+msgid_plural "%d Unknowns"
+msgstr[0] "%d Unbekannt"
+msgstr[1] "%d Unbekannt"
+
+#: prewikka/templates/SensorListing.py:226
+#, python-format
+msgid "%d Missing"
+msgid_plural "%d Missings"
+msgstr[0] "%d Vermisst"
+msgstr[1] "%d Vermisst"
+
+#: prewikka/templates/SensorListing.py:289
+#: prewikka/templates/HeartbeatListing.py:229
+msgid "Filter on address"
+msgstr "Nach Adresse filtern"
+
+#: prewikka/templates/SensorListing.py:306
+msgid "Address information"
+msgstr "Adress Informationen"
+
+#: prewikka/templates/SensorListing.py:339
+msgid "Total:"
+msgstr "Total:"
+
+#: prewikka/templates/SensorListing.py:383
+#: prewikka/templates/SensorListing.py:534
+#: prewikka/templates/MessageListing.py:369
+#: prewikka/templates/FilterEdition.py:227 prewikka/views/filter.py:141
+msgid "Delete"
+msgstr "Löschen"
+
+#: prewikka/templates/SensorListing.py:389
+#: prewikka/templates/HeartbeatAnalyze.py:89 prewikka/templates/utils.py:88
+#: prewikka/views/messagesummary.py:304 prewikka/views/messagesummary.py:453
+#: prewikka/views/messagesummary.py:683 prewikka/views/messagesummary.py:700
+#: prewikka/views/messagesummary.py:723 prewikka/views/messagesummary.py:784
+#: prewikka/views/messagesummary.py:803 prewikka/views/messagesummary.py:839
+msgid "Name"
+msgstr "Name"
+
+#: prewikka/templates/SensorListing.py:395
+#: prewikka/templates/HeartbeatAnalyze.py:95
+#: prewikka/templates/HeartbeatListing.py:139 prewikka/views/stats.py:720
+#: prewikka/views/messagesummary.py:452
+msgid "Model"
+msgstr "Modell"
+
+#: prewikka/templates/SensorListing.py:401
+#: prewikka/views/messagesummary.py:455 prewikka/views/messagesummary.py:555
+msgid "Version"
+msgstr "Version"
+
+#: prewikka/templates/SensorListing.py:407 prewikka/views/stats.py:727
+#: prewikka/views/messagesummary.py:456
+msgid "Class"
+msgstr "Klasse"
+
+#: prewikka/templates/SensorListing.py:413
+#: prewikka/templates/HeartbeatAnalyze.py:125
+msgid "Latest heartbeat"
+msgstr "Neuster Heartbeat"
+
+#: prewikka/templates/SensorListing.py:419
+msgid "Status"
+msgstr "Status"
+
+#: prewikka/templates/SensorListing.py:458
+msgid "Alert listing"
+msgstr "Alarm-Liste"
+
+#: prewikka/templates/SensorListing.py:467
+msgid "Heartbeat listing"
+msgstr "Heartbeat-Liste"
+
+#: prewikka/templates/SensorListing.py:476
+msgid "Heartbeat analysis"
+msgstr "Heartbeat-Analyse"
+
+#: prewikka/templates/SensorListing.py:522 prewikka/views/__init__.py:45
+msgid "Alerts"
+msgstr "Alarme"
+
+#: prewikka/templates/SensorListing.py:528 prewikka/views/__init__.py:51
+msgid "Heartbeats"
+msgstr "Heartbeats"
+
+#: prewikka/templates/HeartbeatAnalyze.py:101 prewikka/templates/utils.py:100
+msgid "OS"
+msgstr ""
+
+#: prewikka/templates/HeartbeatAnalyze.py:107
+#: prewikka/templates/HeartbeatListing.py:126 prewikka/templates/utils.py:106
+#: prewikka/views/messagesummary.py:441
+msgid "Node name"
+msgstr "Knotenname"
+
+#: prewikka/templates/HeartbeatAnalyze.py:113 prewikka/templates/utils.py:112
+#: prewikka/views/messagesummary.py:419
+msgid "Node location"
+msgstr "Knoten Standort"
+
+#: prewikka/templates/HeartbeatAnalyze.py:119
+#: prewikka/templates/HeartbeatListing.py:113 prewikka/templates/utils.py:118
+#: prewikka/views/messagesummary.py:446
+msgid "Node address"
+msgstr "Knotenadresse"
+
+#: prewikka/templates/HeartbeatAnalyze.py:131
+msgid "Current status"
+msgstr "Aktueller Status"
+
+#: prewikka/templates/HeartbeatAnalyze.py:209
+msgid "Events"
+msgstr "Ereignisse"
+
+#: prewikka/templates/UserListing.py:100
+msgid "Login"
+msgstr "Login:"
+
+#: prewikka/templates/UserListing.py:156
+msgid "Delete user"
+msgstr "Benutzer löschen"
+
+#: prewikka/templates/UserListing.py:169
+msgid "Create user"
+msgstr "Benutzer erstellen"
+
+#: prewikka/templates/HeartbeatListing.py:100
+msgid "Agent"
+msgstr "Agent"
+
+#: prewikka/templates/HeartbeatListing.py:151
+#: prewikka/templates/AlertListing.py:1367
+msgid "Time"
+msgstr "Zeit"
+
+#: prewikka/templates/HeartbeatListing.py:199
+msgid "Heartbeat summary"
+msgstr "Heartbeat Übersicht"
+
+#: prewikka/templates/HeartbeatListing.py:208
+msgid "Filter on agent"
+msgstr "Nach Agent filtern"
+
+#: prewikka/templates/UserSettings.py:157
+msgid "Account information"
+msgstr "Kontoinformationen"
+
+#: prewikka/templates/UserSettings.py:168
+#: prewikka/templates/LoginPasswordForm.py:130
+msgid "Login:"
+msgstr "Login:"
+
+#: prewikka/templates/UserSettings.py:201
+msgid "Language:"
+msgstr "Sprache:"
+
+#: prewikka/templates/UserSettings.py:235
+msgid "Permissions:"
+msgstr "Rechte:"
+
+#: prewikka/templates/UserSettings.py:298
+msgid "Check All"
+msgstr "Alles wählen"
+
+#: prewikka/templates/UserSettings.py:324
+msgid "Change password"
+msgstr "Passwort ändern"
+
+#: prewikka/templates/UserSettings.py:334
+msgid "Current password:"
+msgstr "Aktuelles Passwort:"
+
+#: prewikka/templates/UserSettings.py:344
+msgid "New password:"
+msgstr "Neues Passwort:"
+
+#: prewikka/templates/UserSettings.py:353
+msgid "Confirm new password:"
+msgstr "Neues Passwort bestätigen:"
+
+#: prewikka/templates/UserSettings.py:366
+#, fuzzy
+msgid "Submit Changes"
+msgstr "Änderungen abschicken"
+
+#: prewikka/templates/ErrorTemplate.py:116
+msgid "Back"
+msgstr "Zurück"
+
+#: prewikka/templates/ErrorTemplate.py:122
+msgid "Retry"
+msgstr "Wiederholen"
+
+#: prewikka/templates/MessageListing.py:478
+msgid "Period"
+msgstr "Periode"
+
+#: prewikka/templates/MessageListing.py:493
+msgid "Minutes"
+msgstr "Minuten"
+
+#: prewikka/templates/MessageListing.py:502
+msgid "Hours"
+msgstr "Stunden"
+
+#: prewikka/templates/MessageListing.py:511
+msgid "Days"
+msgstr "Tage"
+
+#: prewikka/templates/MessageListing.py:520
+msgid "Months"
+msgstr "Monate"
+
+#: prewikka/templates/MessageListing.py:529
+msgid "Years"
+msgstr "Jahre"
+
+#: prewikka/templates/MessageListing.py:538
+#: prewikka/templates/MessageListing.py:678
+msgid "Unlimited"
+msgstr "Unbegrenzt"
+
+#: prewikka/templates/MessageListing.py:549
+msgid "Timezone"
+msgstr "Zeitzone"
+
+#: prewikka/templates/MessageListing.py:560
+msgid "Frontend localtime"
+msgstr "Frontend Lokalzeit"
+
+#: prewikka/templates/MessageListing.py:569
+msgid "Sensor localtime"
+msgstr "Sensor Lokalzeit"
+
+#: prewikka/templates/MessageListing.py:578
+msgid "UTC"
+msgstr ""
+
+#: prewikka/templates/MessageListing.py:589
+msgid "Limit"
+msgstr "Limit"
+
+#: prewikka/templates/MessageListing.py:613
+msgid "Refresh"
+msgstr "Neu Laden"
+
+#: prewikka/templates/MessageListing.py:660 prewikka/templates/Stats.py:531
+#: prewikka/templates/AlertListing.py:1089
+msgid "Apply"
+msgstr "Übernehmen"
+
+#: prewikka/templates/MessageListing.py:665
+#: prewikka/templates/FilterEdition.py:339 prewikka/templates/Stats.py:536
+#: prewikka/views/filter.py:139
+msgid "Save"
+msgstr "Sichern"
+
+#: prewikka/templates/MessageListing.py:713
+#: prewikka/templates/MessageListing.py:721
+msgid "prev"
+msgstr "früher"
+
+#: prewikka/templates/MessageListing.py:734
+#: prewikka/templates/MessageListing.py:742
+msgid "current"
+msgstr "aktuell"
+
+#: prewikka/templates/MessageListing.py:755
+#: prewikka/templates/MessageListing.py:763
+msgid "next"
+msgstr "später"
+
+#: prewikka/templates/MessageListing.py:817
+msgid "total"
+msgstr "Total"
+
+#: prewikka/templates/LoginPasswordForm.py:100
+msgid "User authentication"
+msgstr "Authentifizierung"
+
+#: prewikka/templates/LoginPasswordForm.py:139
+msgid "Password:"
+msgstr "Passwort:"
+
+#: prewikka/templates/LoginPasswordForm.py:149
+msgid "Submit"
+msgstr "Abschicken"
+
+#: prewikka/templates/utils.py:94 prewikka/views/messagesummary.py:602
+#: prewikka/views/messagesummary.py:750 prewikka/views/messagesummary.py:783
+#: prewikka/views/messagesummary.py:802
+msgid "Type"
+msgstr "Typ"
 
 #: prewikka/templates/FilterEdition.py:191
 msgid "Available filters"
@@ -196,13 +562,6 @@ msgstr "Verfügbare Filter"
 #: prewikka/templates/FilterEdition.py:221 prewikka/views/filter.py:137
 msgid "Load"
 msgstr "Laden"
-
-#: prewikka/templates/FilterEdition.py:227
-#: prewikka/templates/MessageListing.py:369
-#: prewikka/templates/SensorListing.py:383
-#: prewikka/templates/SensorListing.py:534 prewikka/views/filter.py:141
-msgid "Delete"
-msgstr "Löschen"
 
 #: prewikka/templates/FilterEdition.py:242
 msgid "Add / Modify"
@@ -220,10 +579,14 @@ msgstr "Name:"
 msgid "Comment:"
 msgstr "Kommentar:"
 
-#: prewikka/templates/FilterEdition.py:339 prewikka/templates/Stats.py:536
-#: prewikka/templates/MessageListing.py:665 prewikka/views/filter.py:139
-msgid "Save"
-msgstr "Sichern"
+#: prewikka/templates/ClassicLayout.py:227
+msgid "logout"
+msgstr "Ausloggen"
+
+#: prewikka/templates/ClassicLayout.py:239
+#, python-format
+msgid "%(username)s on %(date)s"
+msgstr "%(username)s, %(date)s"
 
 #: prewikka/templates/Stats.py:224 prewikka/templates/Stats.py:361
 msgid "Filter:"
@@ -256,11 +619,6 @@ msgstr "Von:"
 #: prewikka/templates/Stats.py:482
 msgid "To:"
 msgstr "Bis:"
-
-#: prewikka/templates/Stats.py:531 prewikka/templates/AlertListing.py:1089
-#: prewikka/templates/MessageListing.py:660
-msgid "Apply"
-msgstr "Übernehmen"
 
 #: prewikka/templates/About.py:100
 msgid "about_intro"
@@ -495,11 +853,6 @@ msgstr "Ziel"
 msgid "Analyzer"
 msgstr "Analysator"
 
-#: prewikka/templates/AlertListing.py:1367
-#: prewikka/templates/HeartbeatListing.py:151
-msgid "Time"
-msgstr "Zeit"
-
 #: prewikka/templates/AlertListing.py:1478
 msgid "See alert detail"
 msgstr "Alarm Detail sehen"
@@ -560,14 +913,19 @@ msgid "%(hidden)d of %(total)d %(name)ss not shown..."
 msgstr "%(hidden)d von %(total)d %(name)ss nicht angezeigt..."
 
 #: prewikka/templates/AlertListing.py:1886
-#, fuzzy, python-format
+#, python-format
 msgid "Filter on this %s"
-msgstr "Nach Adresse filtern"
+msgstr "Nach %s filtern"
 
 #: prewikka/templates/AlertListing.py:1908
 #, python-format
 msgid "%s information"
 msgstr "%s Information"
+
+#: prewikka/templates/AlertListing.py:2054
+#, python-format
+msgid "sent at %s"
+msgstr "um %s gesendet"
 
 #: prewikka/templates/AlertListing.py:2099
 #: prewikka/templates/AlertListing.py:2113
@@ -593,317 +951,199 @@ msgstr "Nach Zählung"
 msgid "Filter"
 msgstr "Filter"
 
-#: prewikka/templates/HeartbeatAnalyze.py:89 prewikka/templates/utils.py:88
-#: prewikka/templates/SensorListing.py:389
-#: prewikka/views/messagesummary.py:304 prewikka/views/messagesummary.py:453
-#: prewikka/views/messagesummary.py:683 prewikka/views/messagesummary.py:700
-#: prewikka/views/messagesummary.py:723 prewikka/views/messagesummary.py:784
-#: prewikka/views/messagesummary.py:803 prewikka/views/messagesummary.py:839
-msgid "Name"
-msgstr "Name"
+#: prewikka/modules/auth/cgi/cgi.py:41
+msgid "CGI Authentication failed: no user specified."
+msgstr "CGI Authentifizierung fehlgeschlagen: Kein Benutzer angegeben."
 
-#: prewikka/templates/HeartbeatAnalyze.py:95
-#: prewikka/templates/HeartbeatListing.py:139
-#: prewikka/templates/SensorListing.py:395 prewikka/views/stats.py:720
-#: prewikka/views/messagesummary.py:452
-msgid "Model"
-msgstr "Modell"
+#: prewikka/views/sensor.py:51
+msgid "Offline"
+msgstr "Offline"
 
-#: prewikka/templates/HeartbeatAnalyze.py:101 prewikka/templates/utils.py:100
-#, fuzzy
-msgid "OS"
-msgstr "TOS"
+#: prewikka/views/sensor.py:54
+msgid "Unknown"
+msgstr "Unbekannt"
 
-#: prewikka/templates/HeartbeatAnalyze.py:107
-#: prewikka/templates/HeartbeatListing.py:126 prewikka/templates/utils.py:106
-#: prewikka/views/messagesummary.py:441
-msgid "Node name"
-msgstr "Knotenname"
+#: prewikka/views/sensor.py:57
+msgid "Missing"
+msgstr "Vermisst"
 
-#: prewikka/templates/HeartbeatAnalyze.py:113 prewikka/templates/utils.py:112
-#: prewikka/views/messagesummary.py:419
-msgid "Node location"
-msgstr "Knoten Standort"
+#: prewikka/views/sensor.py:59
+msgid "Online"
+msgstr "Online"
 
-#: prewikka/templates/HeartbeatAnalyze.py:119
-#: prewikka/templates/HeartbeatListing.py:113 prewikka/templates/utils.py:118
-#: prewikka/views/messagesummary.py:446
-msgid "Node address"
-msgstr "Knotenadresse"
+#: prewikka/views/sensor.py:158
+msgid "Node location n/a"
+msgstr "Knoten Standort n/a"
 
-#: prewikka/templates/HeartbeatAnalyze.py:125
-#: prewikka/templates/SensorListing.py:413
-msgid "Latest heartbeat"
-msgstr "Neuster Heartbeat"
+#: prewikka/views/sensor.py:159
+msgid "Node name n/a"
+msgstr "Knotenname n/a"
 
-#: prewikka/templates/HeartbeatAnalyze.py:131
-msgid "Current status"
-msgstr "Aktueller Status"
+#: prewikka/views/sensor.py:160
+msgid "OS version n/a"
+msgstr "Betriebssystem Version n/a"
 
-#: prewikka/templates/HeartbeatAnalyze.py:209
-msgid "Events"
-msgstr "Ereignisse"
+#: prewikka/views/sensor.py:161
+msgid "OS type n/a"
+msgstr "Betriebssystem n/a"
 
-#: prewikka/templates/ErrorTemplate.py:116
-msgid "Back"
-msgstr "Zurück"
-
-#: prewikka/templates/ErrorTemplate.py:122
-msgid "Retry"
-msgstr "Wiederholen"
-
-#: prewikka/templates/MessageListing.py:478
-msgid "Period"
-msgstr "Periode"
-
-#: prewikka/templates/MessageListing.py:493
-msgid "Minutes"
-msgstr "Minuten"
-
-#: prewikka/templates/MessageListing.py:502
-msgid "Hours"
-msgstr "Stunden"
-
-#: prewikka/templates/MessageListing.py:511
-msgid "Days"
-msgstr "Tage"
-
-#: prewikka/templates/MessageListing.py:520
-msgid "Months"
-msgstr "Monate"
-
-#: prewikka/templates/MessageListing.py:529
-msgid "Years"
-msgstr "Jahre"
-
-#: prewikka/templates/MessageListing.py:538
-#: prewikka/templates/MessageListing.py:678
-msgid "Unlimited"
-msgstr "Unbegrenzt"
-
-#: prewikka/templates/MessageListing.py:549
-msgid "Timezone"
-msgstr "Zeitzone"
-
-#: prewikka/templates/MessageListing.py:560
-msgid "Frontend localtime"
-msgstr "Frontend Lokalzeit"
-
-#: prewikka/templates/MessageListing.py:569
-msgid "Sensor localtime"
-msgstr "Sensor Lokalzeit"
-
-#: prewikka/templates/MessageListing.py:578
-msgid "UTC"
+#: prewikka/views/sensor.py:254
+#, python-format
+msgid "Sensor is down since %s"
 msgstr ""
 
-#: prewikka/templates/MessageListing.py:589
-msgid "Limit"
-msgstr "Limit"
+#: prewikka/views/sensor.py:261
+#, python-format
+msgid "Normal sensor start at %s"
+msgstr ""
 
-#: prewikka/templates/MessageListing.py:613
-msgid "Refresh"
-msgstr "Neu Laden"
+#: prewikka/views/sensor.py:264
+#, python-format
+msgid "Unexpected sensor restart at %s"
+msgstr ""
 
-#: prewikka/templates/MessageListing.py:713
-#: prewikka/templates/MessageListing.py:721
-msgid "prev"
-msgstr "früher"
+#: prewikka/views/sensor.py:269
+#, python-format
+msgid "Abnormal heartbeat interval between %(old)s and %(new)s"
+msgstr ""
 
-#: prewikka/templates/MessageListing.py:734
-#: prewikka/templates/MessageListing.py:742
-msgid "current"
-msgstr "aktuell"
+#: prewikka/views/sensor.py:274
+#, python-format
+msgid "Normal sensor stop at %s"
+msgstr ""
 
-#: prewikka/templates/MessageListing.py:755
-#: prewikka/templates/MessageListing.py:763
-msgid "next"
-msgstr "später"
+#: prewikka/views/sensor.py:287
+#, python-format
+msgid ""
+"No anomaly in the last %(heart)d heartbeats (1 heartbeat every %(sec)d s "
+"average)"
+msgstr ""
 
-#: prewikka/templates/MessageListing.py:817
-msgid "total"
-msgstr "Total"
+#: prewikka/views/__init__.py:46
+msgid "CorrelationAlerts"
+msgstr "Korrelations-Alarme"
 
-#: prewikka/templates/HeartbeatListing.py:100
-msgid "Agent"
-msgstr "Agent"
+#: prewikka/views/__init__.py:47
+msgid "ToolAlerts"
+msgstr "Tool-Alarme"
 
-#: prewikka/templates/HeartbeatListing.py:199
-msgid "Heartbeat summary"
-msgstr "Heartbeat Übersicht"
+#: prewikka/views/__init__.py:50
+msgid "Agents"
+msgstr "Agenten"
 
-#: prewikka/templates/HeartbeatListing.py:208
-msgid "Filter on agent"
-msgstr "Nach Agent filtern"
+#: prewikka/views/__init__.py:53
+msgid "Statistics"
+msgstr "Statistiken"
 
-#: prewikka/templates/HeartbeatListing.py:229
-#: prewikka/templates/SensorListing.py:289
-msgid "Filter on address"
-msgstr "Nach Adresse filtern"
+#: prewikka/views/__init__.py:54
+msgid "Categorizations"
+msgstr "Kategorien"
 
-#: prewikka/templates/UserListing.py:100
-msgid "Login"
-msgstr "Login:"
+#: prewikka/views/__init__.py:55
+msgid "Sources"
+msgstr "Quellen"
 
-#: prewikka/templates/UserListing.py:156
-msgid "Delete user"
-msgstr "Benutzer löschen"
+#: prewikka/views/__init__.py:56
+msgid "Targets"
+msgstr "Ziele"
 
-#: prewikka/templates/UserListing.py:169
-msgid "Create user"
-msgstr "Benutzer erstellen"
+#: prewikka/views/__init__.py:57
+msgid "Analyzers"
+msgstr "Analysatoren"
 
-#: prewikka/templates/LoginPasswordForm.py:100
-msgid "User authentication"
-msgstr "Authentifizierung"
+#: prewikka/views/__init__.py:58 prewikka/views/stats.py:779
+#, fuzzy
+msgid "Timeline"
+msgstr "Zeitzone"
 
-#: prewikka/templates/LoginPasswordForm.py:130
-#: prewikka/templates/UserSettings.py:168
-msgid "Login:"
-msgstr "Login:"
+#: prewikka/views/__init__.py:61
+msgid "Settings"
+msgstr "Einstellungen"
 
-#: prewikka/templates/LoginPasswordForm.py:139
-msgid "Password:"
+#: prewikka/views/__init__.py:62
+msgid "Filters"
+msgstr "Filter"
+
+#: prewikka/views/__init__.py:64
+msgid "My account"
+msgstr "Mein Konto"
+
+#: prewikka/views/__init__.py:67
+msgid "User listing"
+msgstr "Benutzer-Liste"
+
+#: prewikka/views/__init__.py:71
+msgid "About"
+msgstr "Über"
+
+#: prewikka/views/usermanagement.py:135
+msgid "Access denied to other users settings"
+msgstr ""
+
+#: prewikka/views/usermanagement.py:164
+msgid "Cannot modify other users settings"
+msgstr ""
+
+#: prewikka/views/usermanagement.py:173
+#, fuzzy
+msgid "Invalid Language"
+msgstr "Ungültige Abfrage"
+
+#: prewikka/views/usermanagement.py:173
+#, fuzzy
+msgid "Specified language does not exist"
+msgstr "Die Aussicht '%s' existiert nicht"
+
+#: prewikka/views/usermanagement.py:185 prewikka/views/usermanagement.py:188
+#, fuzzy
+msgid "Password Error"
 msgstr "Passwort:"
 
-#: prewikka/templates/LoginPasswordForm.py:149
-msgid "Submit"
-msgstr "Abschicken"
+#: prewikka/views/usermanagement.py:185
+msgid "Invalid Password specified"
+msgstr ""
 
-#: prewikka/templates/utils.py:94 prewikka/views/messagesummary.py:602
-#: prewikka/views/messagesummary.py:750 prewikka/views/messagesummary.py:783
-#: prewikka/views/messagesummary.py:802
-msgid "Type"
-msgstr "Typ"
+#: prewikka/views/usermanagement.py:188
+#, fuzzy
+msgid "Password mismatch"
+msgstr "Passwort:"
 
-#: prewikka/templates/SensorListing.py:209
+#: prewikka/views/usermanagement.py:209
 #, python-format
-msgid "%d Node"
-msgid_plural "%d Nodes"
-msgstr[0] "%d Knoten"
-msgstr[1] "%d Knoten"
+msgid "User %s already exist"
+msgstr ""
 
-#: prewikka/templates/SensorListing.py:214
+#: prewikka/views/commands.py:47
 #, python-format
-msgid "%d Agent"
-msgid_plural "%d Agents"
-msgstr[0] "%d Agent"
-msgstr[1] "%d Agenten"
+msgid "Attempt to execute unregistered command '%s'"
+msgstr ""
 
-#: prewikka/templates/SensorListing.py:220
-#, python-format
-msgid "%d Online"
-msgid_plural "%d Onlines"
-msgstr[0] "%d Online"
-msgstr[1] "%d Online"
+#: prewikka/views/filter.py:55
+msgid "Example: (A AND B) OR (C AND D)"
+msgstr "Beispiel: (A AND B) OR (C AND D)"
 
-#: prewikka/templates/SensorListing.py:222
-#, python-format
-msgid "%d Offline"
-msgid_plural "%d Offlines"
-msgstr[0] "%d Offline"
-msgstr[1] "%d Offline"
+#: prewikka/views/filter.py:118 prewikka/views/filter.py:121
+#: prewikka/views/filter.py:124
+msgid "Could not save Filter"
+msgstr ""
 
-#: prewikka/templates/SensorListing.py:224
-#, python-format
-msgid "%d Unknown"
-msgid_plural "%d Unknowns"
-msgstr[0] "%d Unbekannt"
-msgstr[1] "%d Unbekannt"
+#: prewikka/views/filter.py:118 prewikka/views/filter.py:124
+msgid "No valid filter formula provided"
+msgstr ""
 
-#: prewikka/templates/SensorListing.py:226
-#, python-format
-msgid "%d Missing"
-msgid_plural "%d Missings"
-msgstr[0] "%d Vermisst"
-msgstr[1] "%d Vermisst"
+#: prewikka/views/filter.py:121
+msgid "No name for this filter was provided"
+msgstr ""
 
-#: prewikka/templates/SensorListing.py:306
-msgid "Address information"
-msgstr "Adress Informationen"
+#: prewikka/views/alertlisting.py:707 prewikka/views/messagesummary.py:681
+#: prewikka/views/messagesummary.py:986
+msgid "Correlation Alert"
+msgstr "Korrelations-Alarm"
 
-#: prewikka/templates/SensorListing.py:339
-msgid "Total:"
-msgstr "Total:"
-
-#: prewikka/templates/SensorListing.py:401
-#: prewikka/views/messagesummary.py:455 prewikka/views/messagesummary.py:555
-msgid "Version"
-msgstr "Version"
-
-#: prewikka/templates/SensorListing.py:407 prewikka/views/stats.py:727
-#: prewikka/views/messagesummary.py:456
-msgid "Class"
-msgstr "Klasse"
-
-#: prewikka/templates/SensorListing.py:419
-msgid "Status"
-msgstr "Status"
-
-#: prewikka/templates/SensorListing.py:458
-msgid "Alert listing"
-msgstr "Alarm-Liste"
-
-#: prewikka/templates/SensorListing.py:467
-msgid "Heartbeat listing"
-msgstr "Heartbeat-Liste"
-
-#: prewikka/templates/SensorListing.py:476
-msgid "Heartbeat analysis"
-msgstr "Heartbeat-Analyse"
-
-#: prewikka/templates/SensorListing.py:522 prewikka/views/__init__.py:45
-msgid "Alerts"
-msgstr "Alarme"
-
-#: prewikka/templates/SensorListing.py:528 prewikka/views/__init__.py:51
-msgid "Heartbeats"
-msgstr "Heartbeats"
-
-#: prewikka/templates/ClassicLayout.py:227
-msgid "logout"
-msgstr "Ausloggen"
-
-#: prewikka/templates/ClassicLayout.py:239
-#, python-format
-msgid "%(username)s on %(date)s"
-msgstr "%(username)s, %(date)s"
-
-#: prewikka/templates/UserSettings.py:157
-msgid "Account information"
-msgstr "Kontoinformationen"
-
-#: prewikka/templates/UserSettings.py:201
-msgid "Language:"
-msgstr "Sprache:"
-
-#: prewikka/templates/UserSettings.py:235
-msgid "Permissions:"
-msgstr "Rechte:"
-
-#: prewikka/templates/UserSettings.py:298
-msgid "Check All"
-msgstr "Alles wählen"
-
-#: prewikka/templates/UserSettings.py:324
-msgid "Change password"
-msgstr "Passwort ändern"
-
-#: prewikka/templates/UserSettings.py:334
-msgid "Current password:"
-msgstr "Aktuelles Passwort:"
-
-#: prewikka/templates/UserSettings.py:344
-msgid "New password:"
-msgstr "Neues Passwort:"
-
-#: prewikka/templates/UserSettings.py:353
-msgid "Confirm new password:"
-msgstr "Neues Passwort bestätigen:"
-
-#: prewikka/templates/UserSettings.py:366
-msgid "Submit Changes"
-msgstr "Änderungen abschicken"
+#: prewikka/views/alertlisting.py:711 prewikka/views/messagesummary.py:698
+#: prewikka/views/messagesummary.py:989
+msgid "Tool Alert"
+msgstr "Tool-Alarme"
 
 #: prewikka/views/stats.py:225
 msgid "from"
@@ -929,6 +1169,11 @@ msgstr "heute"
 #: prewikka/views/stats.py:237
 msgid "current hour"
 msgstr "aktuelle Stunde"
+
+#: prewikka/views/stats.py:259
+#, python-format
+msgid "The path '%s' cannot be mapped to a column"
+msgstr ""
 
 #: prewikka/views/stats.py:459
 #, fuzzy
@@ -1005,9 +1250,8 @@ msgid "Address"
 msgstr "Adresse"
 
 #: prewikka/views/stats.py:575
-#, fuzzy
 msgid "Top 10 Source Users"
-msgstr "Quelladresse"
+msgstr ""
 
 #: prewikka/views/stats.py:575 prewikka/views/stats.py:673
 msgid "User"
@@ -1029,9 +1273,8 @@ msgid "Top 10 Targeted Addresses"
 msgstr "Zieladresse"
 
 #: prewikka/views/stats.py:673
-#, fuzzy
 msgid "Top 10 Targeted Users"
-msgstr "Zieladresse"
+msgstr ""
 
 #: prewikka/views/stats.py:700
 #, fuzzy
@@ -1039,19 +1282,16 @@ msgid "Top 10 analyzers"
 msgstr "Analyzer-ID"
 
 #: prewikka/views/stats.py:720
-#, fuzzy
 msgid "Top 10 Analyzer Models"
-msgstr "Analyzer-ID"
+msgstr ""
 
 #: prewikka/views/stats.py:727
-#, fuzzy
 msgid "Top 10 Analyzer Classes"
-msgstr "Analyzer-ID"
+msgstr ""
 
 #: prewikka/views/stats.py:734
-#, fuzzy
 msgid "Top 10 Analyzer Node Addresses"
-msgstr "Zieladresse"
+msgstr ""
 
 #: prewikka/views/stats.py:741
 #, fuzzy
@@ -1066,77 +1306,6 @@ msgstr "Standort"
 #, fuzzy
 msgid "Top 10 Analyzer Classes Trend"
 msgstr "Analyzer-ID"
-
-#: prewikka/views/stats.py:779 prewikka/views/__init__.py:58
-#, fuzzy
-msgid "Timeline"
-msgstr "Zeitzone"
-
-#: prewikka/views/__init__.py:46
-msgid "CorrelationAlerts"
-msgstr "Korrelations-Alarme"
-
-#: prewikka/views/__init__.py:47
-msgid "ToolAlerts"
-msgstr "Tool-Alarme"
-
-#: prewikka/views/__init__.py:50
-msgid "Agents"
-msgstr "Agenten"
-
-#: prewikka/views/__init__.py:53
-msgid "Statistics"
-msgstr "Statistiken"
-
-#: prewikka/views/__init__.py:54
-msgid "Categorizations"
-msgstr "Kategorien"
-
-#: prewikka/views/__init__.py:55
-msgid "Sources"
-msgstr "Quellen"
-
-#: prewikka/views/__init__.py:56
-msgid "Targets"
-msgstr "Ziele"
-
-#: prewikka/views/__init__.py:57
-msgid "Analyzers"
-msgstr "Analysatoren"
-
-#: prewikka/views/__init__.py:61
-msgid "Settings"
-msgstr "Einstellungen"
-
-#: prewikka/views/__init__.py:62
-msgid "Filters"
-msgstr "Filter"
-
-#: prewikka/views/__init__.py:64
-msgid "My account"
-msgstr "Mein Konto"
-
-#: prewikka/views/__init__.py:67
-msgid "User listing"
-msgstr "Benutzer-Liste"
-
-#: prewikka/views/__init__.py:71
-msgid "About"
-msgstr "Über"
-
-#: prewikka/views/alertlisting.py:707 prewikka/views/messagesummary.py:681
-#: prewikka/views/messagesummary.py:986
-msgid "Correlation Alert"
-msgstr "Korrelations-Alarm"
-
-#: prewikka/views/alertlisting.py:711 prewikka/views/messagesummary.py:698
-#: prewikka/views/messagesummary.py:989
-msgid "Tool Alert"
-msgstr "Tool-Alarme"
-
-#: prewikka/views/filter.py:55
-msgid "Example: (A AND B) OR (C AND D)"
-msgstr "Beispiel: (A AND B) OR (C AND D)"
 
 #: prewikka/views/messagesummary.py:305 prewikka/views/messagesummary.py:603
 msgid "Code"
@@ -1322,8 +1491,9 @@ msgid "%d linked alerts missing (probably deleted)"
 msgstr ""
 
 #: prewikka/views/messagesummary.py:687
-msgid "Correlated Alert"
-msgstr "Korrelierter Alarm"
+#, fuzzy
+msgid "Correlated Alerts"
+msgstr "Korrelierte Alarme"
 
 #: prewikka/views/messagesummary.py:688 prewikka/views/messagesummary.py:705
 msgid "Source Analyzer"
@@ -1525,35 +1695,3 @@ msgstr ""
 #: prewikka/views/messagesummary.py:1100
 msgid "Heartbeat"
 msgstr "Heartbeat"
-
-#: prewikka/views/sensor.py:51
-msgid "Offline"
-msgstr "Offline"
-
-#: prewikka/views/sensor.py:54
-msgid "Unknown"
-msgstr "Unbekannt"
-
-#: prewikka/views/sensor.py:57
-msgid "Missing"
-msgstr "Vermisst"
-
-#: prewikka/views/sensor.py:59
-msgid "Online"
-msgstr "Online"
-
-#: prewikka/views/sensor.py:158
-msgid "Node location n/a"
-msgstr "Knoten Standort n/a"
-
-#: prewikka/views/sensor.py:159
-msgid "Node name n/a"
-msgstr "Knotenname n/a"
-
-#: prewikka/views/sensor.py:160
-msgid "OS version n/a"
-msgstr "Betriebssystem Version n/a"
-
-#: prewikka/views/sensor.py:161
-msgid "OS type n/a"
-msgstr "Betriebssystem n/a"

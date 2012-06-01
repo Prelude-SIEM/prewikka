@@ -256,7 +256,7 @@ class DistributionStats(view.View):
                 type = "classification"
 
             if type not in ("classification", "source", "target", "analyzer"):
-                raise Exception, "The path '%s' cannot be mapped to a column" % path
+                raise Exception, _("The path '%s' cannot be mapped to a column") % path
 
         return utils.urlencode({ "%s_object_%d" % (type, index): path, "%s_operator_%d" % (type, index): operator, "%s_value_%d" % (type, index): value })
 

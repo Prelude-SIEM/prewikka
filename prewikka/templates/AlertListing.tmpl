@@ -839,7 +839,7 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
   #else
     $message.time.value
     #if $message.analyzer_time.value
-      (sent at $message.analyzer_time.value)
+      #echo($_("sent at %s") % $message.analyzer_time.value)
     #end if
   #end if
 </td>

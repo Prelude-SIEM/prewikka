@@ -44,7 +44,7 @@ class Command(view.View):
         try:
             command = self.env.host_commands[cmd]
         except KeyError:
-            raise Error("Attempt to execute unregistered command '%s'" % cmd)
+            raise Error(_("Attempt to execute unregistered command '%s'") % cmd)
 
         command = command.replace("$host", self.parameters["host"]).split(" ")
 

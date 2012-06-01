@@ -119,7 +119,7 @@ class Message:
 
     def __iter__(self):
         if not self._value_list:
-            raise TypeError, "iteration over a non-sequence"
+            raise TypeError, _("Iteration over a non-sequence")
 
         self._list_iterator = 0
         return self
@@ -363,9 +363,9 @@ class IDMEFDatabase:
                 raise
         except:
             if cur:
-                raise "libpreludedb %s or higher is required (%s found)." % (wanted_version, cur)
+                raise _("libpreludedb %(want)s or higher is required (%(curr)s found).") % {'want': wanted_version, 'curr': cur}
             else:
-                raise "libpreludedb %s or higher is required." % wanted_version
+                raise _("libpreludedb %s or higher is required.") % wanted_version
 
         self._db = preludedb_new(sql, None)
 

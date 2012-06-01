@@ -684,7 +684,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.endTable()
 
         self.beginTable()
-        self.newTableCol(0, _("Correlated Alert"), header=True)
+        self.newTableCol(0, _("Correlated Alerts"), header=True)
         self.newTableCol(0, _("Source Analyzer"), header=True)
         self.buildAlertIdent(alert, ca)
         self.endTable()

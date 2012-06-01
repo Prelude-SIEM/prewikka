@@ -132,7 +132,7 @@ class UserSettingsDisplay(view.View):
         login = self.parameters.get("login", self.user.login)
 
         if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):
-            raise Error.PrewikkaUserError("Permission Denied", "Access denied to other users settings", log=Log.WARNING)
+            raise Error.PrewikkaUserError(_("Permission Denied"), _("Access denied to other users settings"), log=Log.WARNING)
 
         self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
         self.dataset["user.language"] = self.env.db.getLanguage(login) or localization._DEFAULT_LANGUAGE
@@ -161,7 +161,7 @@ class UserSettingsModify(UserSettingsDisplay):
         login = self.parameters.get("login", self.user.login)
 
         if login != self.user.login and not self.user.has(User.PERM_USER_MANAGEMENT):
-            raise Error.PrewikkaUserError("Permission Denied", "Cannot modify other users settings", log=Log.WARNING)
+            raise Error.PrewikkaUserError(_("Permission Denied"), _("Cannot modify other users settings"), log=Log.WARNING)
 
         if self.user.has(User.PERM_USER_MANAGEMENT):
             self.env.db.setPermissions(login, self.parameters["permissions"])
@@ -170,7 +170,7 @@ class UserSettingsModify(UserSettingsDisplay):
 
         lang = self.parameters["language"]
         if not lang in localization.getLanguagesIdentifiers():
-            raise Error.PrewikkaUserError("Invalid Language", "Specified language does not exist", log=Log.WARNING)
+            raise Error.PrewikkaUserError(_("Invalid Language"), _("Specified language does not exist"), log=Log.WARNING)
 
         if login == self.user.login:
             self.user.setLanguage(lang)
@@ -182,10 +182,10 @@ class UserSettingsModify(UserSettingsDisplay):
                 try:
                     self.env.auth.checkPassword(login, self.parameters.get("password_current", ""))
                 except Auth.AuthError, e:
-                    raise Error.PrewikkaUserError("Password Error", "Invalid Password specified")
+                    raise Error.PrewikkaUserError(_("Password Error"), _("Invalid Password specified"))
 
             if self.parameters["password_new"] != self.parameters["password_new_confirmation"]:
-                raise Error.PrewikkaUserError("Password Error", "Password mismatch")
+                raise Error.PrewikkaUserError(_("Password Error"), _("Password mismatch"))
 
             self.env.auth.setPassword(login, self.parameters["password_new"])
 
@@ -206,7 +206,7 @@ class UserSettingsAdd(UserSettingsModify, UserAddForm):
     def render(self):
         login = self.parameters.get("login", self.user.login)
         if self.env.db.hasUser(login):
-            UserAddForm.render(self, "User %s already exist" % login)
+            UserAddForm.render(self, _("User %s already exist") % login)
         else:
             self.env.db.createUser(login)
             permissions = filter(lambda perm: self.parameters.has_key(perm), User.ALL_PERMISSIONS)
