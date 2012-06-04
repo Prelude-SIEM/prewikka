@@ -42,7 +42,7 @@ objects = alertlisting.AlertListing(), \
 
 
 
-events_section = (_("Events"), [(_("Alerts"), ["alert_listing", "sensor_alert_listing"]),
+events_section = (_("Alerts"), [(_("Alerts"), ["alert_listing", "sensor_alert_listing"]),
                              (_("CorrelationAlerts"), ["correlation_alert_listing"]),
                              (_("ToolAlerts"), ["tool_alert_listing"])])
 

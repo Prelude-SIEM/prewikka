@@ -222,20 +222,21 @@ class DistributionStats(view.View):
     def _setPeriod(self):
         tm = time.localtime()
 
-        period = "from %s/%s/%s %s:%s to %s/%s/%s %s:%s" % \
+        period = _("from") + "  %s/%s/%s %s:%s " % \
                  (self.dataset["from_year"], self.dataset["from_month"], self.dataset["from_day"],
-                  self.dataset["from_hour"], self.dataset["from_min"],
-                  self.dataset["to_year"], self.dataset["to_month"], self.dataset["to_day"],
+                  self.dataset["from_hour"], self.dataset["from_min"]) \
+		+ _("to") + " %s/%s/%s %s:%s" % \
+                  (self.dataset["to_year"], self.dataset["to_month"], self.dataset["to_day"],
                   self.dataset["to_hour"], self.dataset["to_min"])
 
         if self.parameters["timeline_type"] == "month":
-            self.dataset["period"] = "Period: current month (%s)" % period
+            self.dataset["period"] = _("Period:") + " " + _("current month") + " (%s)" % period
         elif self.parameters["timeline_type"] == "day":
-            self.dataset["period"] = "Period: today (%s)" % period
+            self.dataset["period"] = _("Period:") + " " + _("today") + " (%s)" % period
         elif self.parameters["timeline_type"] == "hour":
-            self.dataset["period"] = "Period: current hour (%s)" % period
+            self.dataset["period"] = _("Period:") + " "+ _("current hour") + " (%s)" % period
         else:
-            self.dataset["period"] = "Period: %s" % period
+            self.dataset["period"] = _("Period:") + " %s" % period
 
     def genPathValueURI(self, path, value, index=0, type=None):
         if value:
@@ -255,7 +256,7 @@ class DistributionStats(view.View):
                 type = "classification"
 
             if type not in ("classification", "source", "target", "analyzer"):
-                raise Exception, "The path '%s' cannot be mapped to a column" % path
+                raise Exception, _("The path '%s' cannot be mapped to a column") % path
 
         return utils.urlencode({ "%s_object_%d" % (type, index): path, "%s_operator_%d" % (type, index): operator, "%s_value_%d" % (type, index): value })
 
@@ -488,7 +489,7 @@ class CategorizationStats(DistributionStats, GenericTimelineStats):
                                    lambda value: self.genPathValueURI("alert.assessment.impact.type", value, type="classification"))
 
     def _renderClassificationsTrend(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
-        GenericTimelineStats._addTimelineChart(self, "Top 10 Classifications Trend", None, width, height,
+        GenericTimelineStats._addTimelineChart(self, _("Top 10 Classifications Trend"), None, width, height,
                                                "alert.classification.text", criteria, limit = 10, zoom_type="classifications_trend")
 
     def render(self):
@@ -578,7 +579,7 @@ class SourceStats(DistributionStats, GenericTimelineStats):
                                    10)
 
     def _renderSourcesTrend(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
-        GenericTimelineStats._addTimelineChart(self, "Top 10 Sources Trend", None, DEFAULT_WIDTH, DEFAULT_HEIGHT,
+        GenericTimelineStats._addTimelineChart(self, _("Top 10 Sources Trend"), None, DEFAULT_WIDTH, DEFAULT_HEIGHT,
                                                "alert.source.node.address.address", criteria, 10, zoom_type="sources_trend")
 
     def render(self):
@@ -602,7 +603,7 @@ class TargetStats(DistributionStats):
 
     def _renderPorts(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         base_url = self._getBaseURL()
-        title = "Top 10 Targeted Ports"
+        title = _("Top 10 Targeted Ports")
         distribution = Chart.DistributionChart(self.user, width, height)
         chart = { "title": title, "value_name": "Port", "chart": distribution }
 
@@ -696,7 +697,7 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
 
     def _renderAnalyzers(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
         base_url = self._getBaseURL()
-        title = "Top 10 analyzers"
+        title = _("Top 10 analyzers")
         distribution = Chart.DistributionChart(self.user, width, height)
         chart = { "title": title, "value_name": "Analyzer", "chart": distribution }
 
@@ -743,7 +744,7 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
                                    lambda value: self.genPathValueURI("alert.analyzer(-1).node.location", value, type="analyzer"))
 
     def _renderClassesTrend(self, criteria, width=DEFAULT_WIDTH, height=DEFAULT_HEIGHT):
-        GenericTimelineStats._addTimelineChart(self, "Top 10 Analyzer Classes Trend", None, width, height,
+        GenericTimelineStats._addTimelineChart(self, _("Top 10 Analyzer Classes Trend"), None, width, height,
                                                "alert.analyzer(-1).class", criteria, limit = 10, zoom_type="analyzer_classes_trend")
 
     def render(self):
@@ -775,7 +776,7 @@ class TimelineStats(GenericTimelineStats, AnalyzerStats, CategorizationStats, So
         _severity_maps["info"] = (_("Informational"), Chart.BLUE_STD)
         _severity_maps[None] = (_("N/a"), "000000")
 
-        GenericTimelineStats._addTimelineChart(self, "Timeline", None, width, height,
+        GenericTimelineStats._addTimelineChart(self, _("Timeline"), None, width, height,
                                                "alert.assessment.impact.severity", criteria, names_and_colors=_severity_maps)
 
     def render(self):

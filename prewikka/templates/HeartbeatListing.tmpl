@@ -59,7 +59,9 @@
     <a class="popup_menu_toggle" href="#">$address.value</a>
     <span class="popup_menu">
       - <a href="$address.inline_filter">$_("Filter on address")</a><br />
-      - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$address.value">Address information</a><br />
+      #if $prewikka.enable_details
+      - <a target="$prewikka.external_link_target" href="$prewikka.host_details_url?host=$address.value">Address information</a><br />
+      #end if
       #for $name, $link in $address.host_commands
       - <a href="$link">$name</a><br />
       #end for

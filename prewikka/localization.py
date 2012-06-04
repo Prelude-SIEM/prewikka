@@ -19,7 +19,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import locale, gettext, __builtin__, time
-from prewikka import siteconfig, utils
+from prewikka import siteconfig, utils, Config
 
 try:
     from threading import local, Lock
@@ -30,9 +30,9 @@ except ImportError:
 
 
 _lock = Lock()
-_DEFAULT_LANGUAGE = "en"
+_DEFAULT_LANGUAGE = Config.Config(siteconfig.conf_dir + "/prewikka.conf").general.getOptionValue("default_locale", "en_GB")
 _localized_thread = local()
-_all_locale = { _DEFAULT_LANGUAGE: None }
+_all_locale = { }
 
 
 def _safeGettext(s):
@@ -59,19 +59,22 @@ __builtin__.N_ = _deferredGettext
 __builtin__.ngettext = _safeNgettext
 
 _LANGUAGES = {
-               "Deutsch": "de",
-               u"Español": "es",
-               "English": "en",
-               u"Français": "fr",
-               "Polski": "pl",
-               "Portuguese (Brazilian)": "pt_BR",
-               u"Русский": "ru"
+               "Deutsch": "de_DE",
+               u"Español": "es_ES",
+               "English": "en_GB",
+               u"Français": "fr_FR",
+	       "Italiano": "it_IT",
+               "Polski": "pl_PL",
+               u"Português (Brasileiro)": "pt_BR",
+               u"Русский": "ru_RU"
              }
 
 
 def setLocale(lang):
     if not lang:
         lang = _DEFAULT_LANGUAGE
+
+    locale.setlocale(locale.LC_ALL, lang.encode('utf8'))
 
     _lock.acquire()
 

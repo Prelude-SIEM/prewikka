@@ -1,13 +1,14 @@
 # Brazilian Portuguese Translation for Prewikka
-# Copyright (C) 2007 PreludeIDS Technologies
+# Copyright (C) 2007-2012 CS-SI
 # This file is distributed under the same license as the prewikka package.
 # edeunix@edeunix.com, 2007.
 #
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: Prewikka 0.99\n"
+"Project-Id-Version: Prewikka 1.01\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-02-10 13:34+0100\n"
+"POT-Creation-Date: 2012-06-01 10:56+0200\n"
 "PO-Revision-Date: 2008-02-26 13:12-0300\n"
 "Last-Translator: Edelberto Franco Silva <edeunix@edeunix.com>\n"
 "Language-Team: Portuguese\n"
@@ -18,14 +19,56 @@ msgstr ""
 "X-Poedit-Country: BRAZIL\n"
 "X-Poedit-SourceCharset: utf-8\n"
 
-#: prewikka/User.py:41
-msgid "Permission Denied"
-msgstr "Permissão Negada"
-
-#: prewikka/User.py:42
+#: prewikka/Log.py:65
 #, python-format
-msgid "Access to view '%s' forbidden"
-msgstr "A visualização de '%s' está proibida"
+msgid "Unknown logtype specified: '%s'"
+msgstr "Tipo de log especificado é desconhecido: '%s'"
+
+#: prewikka/MyConfigParser.py:36
+#, python-format
+msgid "parse error in \"%(txt)s\" at %(file)s line %(line)d"
+msgstr ""
+
+#: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
+msgid "Parameters Normalization failed"
+msgstr "A normalização dos parâmetros falhou"
+
+#: prewikka/view.py:30
+#, python-format
+msgid "Parameter '%s' is not valid"
+msgstr ""
+
+#: prewikka/view.py:36
+#, python-format
+msgid "Invalid value '%(value)s' for parameter '%(name)s'"
+msgstr ""
+
+#: prewikka/view.py:42
+#, python-format
+msgid "Required parameter '%s' is missing"
+msgstr ""
+
+#: prewikka/Database.py:99
+#, python-format
+msgid ""
+"Database schema version %(version)s found when %(reqversion)s was required"
+msgstr ""
+"Versão do esquema de banco de dados %(version)s encontrada quando %"
+"(reqversion)s foi requerida"
+
+#: prewikka/cairoplot.py:58
+msgid "Theme not defined"
+msgstr ""
+
+#: prewikka/cairoplot.py:135
+#, python-format
+msgid "Surface should be either a Cairo surface or a filename, not %s"
+msgstr ""
+
+#: prewikka/cairoplot.py:245
+#, python-format
+msgid "Background should be either cairo.LinearGradient or a 3-tuple, not %s"
+msgstr ""
 
 #: prewikka/Auth.py:29
 msgid "Authentication failed"
@@ -39,990 +82,310 @@ msgstr "Sessão inválida"
 msgid "Session expired"
 msgstr "Sessão expirada"
 
-#: prewikka/Auth.py:138
+#: prewikka/Auth.py:139
 msgid "Logged out"
 msgstr "Deslogado"
 
-#: prewikka/Log.py:65
-#, python-format
-msgid "Unknown logtype specified: '%s'"
-msgstr "Tipo de log especificado é desconhecido: '%s'"
+#: prewikka/Core.py:35
+#, fuzzy
+msgid "Invalid query"
+msgstr "Sessão inválida"
 
-#: prewikka/view.py:29 prewikka/view.py:35 prewikka/view.py:41
-msgid "Parameters Normalization failed"
-msgstr "A normalização dos parâmetros falhou"
-
-#: prewikka/Database.py:98
+#: prewikka/Core.py:84
 #, python-format
-msgid ""
-"Database schema version %(version)s found when %(reqversion)s was required"
+msgid "Prewikka %(vPre)s requires libprelude %(vLib)s or higher"
 msgstr ""
-"Versão do esquema de banco de dados %(version)s encontrada quando %"
-"(reqversion)s foi requerida"
 
-#: prewikka/localization.py:107
+#: prewikka/Core.py:87
+#, python-format
+msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
+msgstr ""
+
+#: prewikka/Core.py:309
+#, python-format
+msgid "View '%s' does not exist"
+msgstr ""
+
+#: prewikka/Core.py:321
+msgid "Prewikka internal error"
+msgstr ""
+
+#: prewikka/Core.py:334
+msgid "Version Requirement error"
+msgstr ""
+
+#: prewikka/Core.py:337
+msgid "Database error"
+msgstr ""
+
+#: prewikka/localization.py:110
 msgid "January"
 msgstr "Janeiro"
 
-#: prewikka/localization.py:108
+#: prewikka/localization.py:111
 msgid "February"
 msgstr "Fevereiro"
 
-#: prewikka/localization.py:109
+#: prewikka/localization.py:112
 msgid "March"
 msgstr "Março"
 
-#: prewikka/localization.py:110
+#: prewikka/localization.py:113
 msgid "April"
 msgstr "Abril"
 
-#: prewikka/localization.py:111
+#: prewikka/localization.py:114
 msgid "May"
 msgstr "Maio"
 
-#: prewikka/localization.py:112
+#: prewikka/localization.py:115
 msgid "June"
 msgstr "Junho"
 
-#: prewikka/localization.py:113
+#: prewikka/localization.py:116
 msgid "July"
 msgstr "Julho"
 
-#: prewikka/localization.py:114
+#: prewikka/localization.py:117
 msgid "August"
 msgstr "Agosto"
 
-#: prewikka/localization.py:115
+#: prewikka/localization.py:118
 msgid "September"
 msgstr "Setembro"
 
-#: prewikka/localization.py:116
+#: prewikka/localization.py:119
 msgid "November"
 msgstr "Novembro"
 
-#: prewikka/localization.py:117
+#: prewikka/localization.py:120
 msgid "October"
 msgstr "Outubro"
 
-#: prewikka/localization.py:118
+#: prewikka/localization.py:121
 msgid "December"
 msgstr "dezembro"
 
-#: prewikka/localization.py:120
+#: prewikka/localization.py:123
 msgid "Monday"
 msgstr "Segunda-feira"
 
-#: prewikka/localization.py:121
+#: prewikka/localization.py:124
 msgid "Tuesday"
 msgstr "Terça-feira"
 
-#: prewikka/localization.py:122
+#: prewikka/localization.py:125
 msgid "Wednesday"
 msgstr "Quarta-feira"
 
-#: prewikka/localization.py:123
+#: prewikka/localization.py:126
 msgid "Thursday"
 msgstr "Quinta-feira"
 
-#: prewikka/localization.py:124
+#: prewikka/localization.py:127
 msgid "Friday"
 msgstr "Sexta"
 
-#: prewikka/localization.py:125
+#: prewikka/localization.py:128
 msgid "Saturday"
 msgstr "Sábado"
 
-#: prewikka/localization.py:126
+#: prewikka/localization.py:129
 msgid "Sunday"
 msgstr "Domingo"
+
+#: prewikka/resolve.py:163
+#, python-format
+msgid ""
+"Asynchronous DNS resolution disabled: twisted.names and twisted.internet "
+"required: %s"
+msgstr ""
+
+#: prewikka/User.py:41 prewikka/views/usermanagement.py:135
+#: prewikka/views/usermanagement.py:164
+msgid "Permission Denied"
+msgstr "Permissão Negada"
+
+#: prewikka/User.py:42
+#, python-format
+msgid "Access to view '%s' forbidden"
+msgstr "A visualização de '%s' está proibida"
 
 #: prewikka/Filter.py:78
 #, python-format
 msgid "Invalid filter element '%s' referenced from filter formula"
 msgstr "Elemento de filtro '%s' inválido, referenciado pela fórmula do filtro"
 
-#: prewikka/views/messagesummary.py:304 prewikka/views/messagesummary.py:461
-#: prewikka/views/messagesummary.py:691 prewikka/views/messagesummary.py:708
-#: prewikka/views/messagesummary.py:731 prewikka/views/messagesummary.py:789
-#: prewikka/views/messagesummary.py:808 prewikka/views/messagesummary.py:844
-#: prewikka/templates/SensorListing.py:412
+#: prewikka/_threading_local.py:159
+msgid "Initialization arguments are not supported"
+msgstr ""
+
+#: prewikka/IDMEFDatabase.py:122
+msgid "Iteration over a non-sequence"
+msgstr ""
+
+#: prewikka/IDMEFDatabase.py:366
+#, python-format
+msgid "libpreludedb %(want)s or higher is required (%(curr)s found)."
+msgstr ""
+
+#: prewikka/IDMEFDatabase.py:368
+#, python-format
+msgid "libpreludedb %s or higher is required."
+msgstr ""
+
+#: prewikka/templates/SensorListing.py:209
+#, python-format
+msgid "%d Node"
+msgid_plural "%d Nodes"
+msgstr[0] ""
+msgstr[1] ""
+
+#: prewikka/templates/SensorListing.py:214
+#, fuzzy, python-format
+msgid "%d Agent"
+msgid_plural "%d Agents"
+msgstr[0] "Agente"
+msgstr[1] "Agente"
+
+#: prewikka/templates/SensorListing.py:220
+#, fuzzy, python-format
+msgid "%d Online"
+msgid_plural "%d Onlines"
+msgstr[0] "em"
+msgstr[1] "em"
+
+#: prewikka/templates/SensorListing.py:222
+#, fuzzy, python-format
+msgid "%d Offline"
+msgid_plural "%d Offlines"
+msgstr[0] "em"
+msgstr[1] "em"
+
+#: prewikka/templates/SensorListing.py:224
+#, python-format
+msgid "%d Unknown"
+msgid_plural "%d Unknowns"
+msgstr[0] ""
+msgstr[1] ""
+
+#: prewikka/templates/SensorListing.py:226
+#, python-format
+msgid "%d Missing"
+msgid_plural "%d Missings"
+msgstr[0] ""
+msgstr[1] ""
+
+#: prewikka/templates/SensorListing.py:289
+#: prewikka/templates/HeartbeatListing.py:229
+msgid "Filter on address"
+msgstr "Filtro no endereço"
+
+#: prewikka/templates/SensorListing.py:306
+msgid "Address information"
+msgstr "Endereço da informação"
+
+#: prewikka/templates/SensorListing.py:339
+#, fuzzy
+msgid "Total:"
+msgstr "total"
+
+#: prewikka/templates/SensorListing.py:383
+#: prewikka/templates/SensorListing.py:534
+#: prewikka/templates/MessageListing.py:369
+#: prewikka/templates/FilterEdition.py:227 prewikka/views/filter.py:141
+msgid "Delete"
+msgstr "Apagar"
+
+#: prewikka/templates/SensorListing.py:389
+#: prewikka/templates/HeartbeatAnalyze.py:89 prewikka/templates/utils.py:88
+#: prewikka/views/messagesummary.py:304 prewikka/views/messagesummary.py:453
+#: prewikka/views/messagesummary.py:683 prewikka/views/messagesummary.py:700
+#: prewikka/views/messagesummary.py:723 prewikka/views/messagesummary.py:784
+#: prewikka/views/messagesummary.py:803 prewikka/views/messagesummary.py:839
 #, fuzzy
 msgid "Name"
 msgstr "Nome do nó"
 
-#: prewikka/views/messagesummary.py:305 prewikka/views/messagesummary.py:611
-msgid "Code"
-msgstr "Código"
-
-#: prewikka/views/messagesummary.py:306
-msgid "Data length"
-msgstr "Tamanho dos dados"
-
-#: prewikka/views/messagesummary.py:307
-msgid "Data"
-msgstr "Dados"
-
-#: prewikka/views/messagesummary.py:403 prewikka/views/messagesummary.py:846
-#, fuzzy
-msgid "Create time"
-msgstr "Criar usuário"
-
-#: prewikka/views/messagesummary.py:406
-msgid "Detect time"
-msgstr "Tempo de descobrimento"
-
-#: prewikka/views/messagesummary.py:411
-msgid "Analyzer time"
-msgstr "Tempo de análise"
-
-#: prewikka/views/messagesummary.py:417
-msgid "Process"
-msgstr "Processo"
-
-#: prewikka/views/messagesummary.py:418
-msgid "Process Path"
-msgstr "Caminho do processo"
-
-#: prewikka/views/messagesummary.py:419
-msgid "Process PID"
-msgstr "PID do processo"
-
-#: prewikka/views/messagesummary.py:427
-msgid "Node location"
-msgstr "Localização do nó"
-
-#: prewikka/views/messagesummary.py:449
-#: prewikka/templates/HeartbeatListing.py:126
-#, fuzzy
-msgid "Node name"
-msgstr "Nome do nó"
-
+#: prewikka/templates/SensorListing.py:395
+#: prewikka/templates/HeartbeatAnalyze.py:95
+#: prewikka/templates/HeartbeatListing.py:139 prewikka/views/stats.py:720
 #: prewikka/views/messagesummary.py:452
-#, fuzzy
-msgid "Node name (resolved)"
-msgstr "Nome do nó"
-
-#: prewikka/views/messagesummary.py:454
-#: prewikka/templates/HeartbeatListing.py:113
-#, fuzzy
-msgid "Node address"
-msgstr "Endereço do nó"
-
-#: prewikka/views/messagesummary.py:460 prewikka/views/stats.py:711
-#: prewikka/templates/HeartbeatListing.py:139
-#: prewikka/templates/SensorListing.py:418
 msgid "Model"
 msgstr "Modelo"
 
-#: prewikka/views/messagesummary.py:462
-msgid "Analyzerid"
-msgstr "Analisador id"
-
-#: prewikka/views/messagesummary.py:463 prewikka/views/messagesummary.py:563
-#: prewikka/templates/SensorListing.py:424
+#: prewikka/templates/SensorListing.py:401
+#: prewikka/views/messagesummary.py:455 prewikka/views/messagesummary.py:555
 #, fuzzy
 msgid "Version"
 msgstr "Permissões:"
 
-#: prewikka/views/messagesummary.py:464 prewikka/views/stats.py:719
-#: prewikka/templates/SensorListing.py:430
+#: prewikka/templates/SensorListing.py:407 prewikka/views/stats.py:727
+#: prewikka/views/messagesummary.py:456
 msgid "Class"
 msgstr "Classe"
 
-#: prewikka/views/messagesummary.py:466
-msgid "Manufacturer"
-msgstr "Fabricante"
-
-#: prewikka/views/messagesummary.py:474
-msgid "Operating System"
-msgstr "Sistema Operacional"
-
-#: prewikka/views/messagesummary.py:492
-#, python-format
-msgid "Analyzer Path (%d not shown)"
-msgstr "Caminho do analisador (%d não mostrado)"
-
-#: prewikka/views/messagesummary.py:499 prewikka/views/messagesummary.py:1030
-#: prewikka/views/messagesummary.py:1102
-#, python-format
-msgid "Analyzer #%d"
-msgstr "Analisador #%d"
-
-#: prewikka/views/messagesummary.py:509
-msgid "Additional data"
-msgstr "Dados adicionais"
-
-#: prewikka/views/messagesummary.py:512 prewikka/views/messagesummary.py:732
-msgid "Meaning"
-msgstr "Querendo dizer"
-
-#: prewikka/views/messagesummary.py:513
+#: prewikka/templates/SensorListing.py:413
+#: prewikka/templates/HeartbeatAnalyze.py:125
 #, fuzzy
-msgid "Value"
-msgstr "Alertas"
-
-#: prewikka/views/messagesummary.py:564 prewikka/views/messagesummary.py:585
-msgid "Header length"
-msgstr "Compimento do cabeçalho"
-
-#: prewikka/views/messagesummary.py:565
-msgid "TOS"
-msgstr "TOS"
-
-#: prewikka/views/messagesummary.py:566 prewikka/views/messagesummary.py:604
-msgid "Length"
-msgstr "Comprimento"
-
-#: prewikka/views/messagesummary.py:567 prewikka/views/messagesummary.py:613
-msgid "Id"
-msgstr "Id"
-
-#: prewikka/views/messagesummary.py:571
-msgid "Ip offset"
-msgstr "Ip offset"
-
-#: prewikka/views/messagesummary.py:572
-msgid "TTL"
-msgstr "TTL"
-
-#: prewikka/views/messagesummary.py:573 prewikka/views/messagesummary.py:932
-#: prewikka/views/messagesummary.py:935 prewikka/views/messagesummary.py:938
-msgid "Protocol"
-msgstr "Protocolo"
-
-#: prewikka/views/messagesummary.py:574 prewikka/views/messagesummary.py:596
-#: prewikka/views/messagesummary.py:605 prewikka/views/messagesummary.py:612
-msgid "Checksum"
-msgstr "Checksum"
-
-#: prewikka/views/messagesummary.py:575
-#, fuzzy
-msgid "Source address"
-msgstr "Endereço do nó"
-
-#: prewikka/views/messagesummary.py:576
-#, fuzzy
-msgid "Target address"
-msgstr "Endereço do nó"
-
-#: prewikka/views/messagesummary.py:581 prewikka/views/messagesummary.py:602
-#, fuzzy
-msgid "Source port"
-msgstr "Fonte"
-
-#: prewikka/views/messagesummary.py:582 prewikka/views/messagesummary.py:603
-#, fuzzy
-msgid "Target port"
-msgstr "Alvo"
-
-#: prewikka/views/messagesummary.py:586
-msgid "Reserved"
-msgstr "Reservado"
-
-#: prewikka/views/messagesummary.py:595
-msgid "Window"
-msgstr "Janela"
-
-#: prewikka/views/messagesummary.py:597
-msgid "URP"
-msgstr "URP"
-
-#: prewikka/views/messagesummary.py:610 prewikka/views/messagesummary.py:755
-#: prewikka/views/messagesummary.py:788 prewikka/views/messagesummary.py:807
-msgid "Type"
-msgstr "Tipo"
-
-#: prewikka/views/messagesummary.py:614
-msgid "Seq #"
-msgstr "Seq #"
-
-#: prewikka/views/messagesummary.py:615
-msgid "Mask"
-msgstr "Máscara"
-
-#: prewikka/views/messagesummary.py:616
-#, fuzzy
-msgid "Gateway Address"
-msgstr "Endereço do nó"
-
-#: prewikka/views/messagesummary.py:617
-#, fuzzy
-msgid "Num address"
-msgstr "Endereço do nó"
-
-#: prewikka/views/messagesummary.py:618
-msgid "Wpa"
-msgstr "Wpa"
-
-#: prewikka/views/messagesummary.py:619
-msgid "Lifetime"
-msgstr "Tempo de vida"
-
-#: prewikka/views/messagesummary.py:620
-#, fuzzy
-msgid "Otime"
-msgstr "Tempo"
-
-#: prewikka/views/messagesummary.py:621
-#, fuzzy
-msgid "Rtime"
-msgstr "Tempo"
-
-#: prewikka/views/messagesummary.py:622
-#, fuzzy
-msgid "Ttime"
-msgstr "Tempo"
-
-#: prewikka/views/messagesummary.py:628 prewikka/views/messagesummary.py:1077
-msgid "Payload"
-msgstr "Carga exigida"
-
-#: prewikka/views/messagesummary.py:675
-#, python-format
-msgid "%d linked alerts missing (probably deleted)"
-msgstr ""
-
-#: prewikka/views/messagesummary.py:689 prewikka/views/messagesummary.py:985
-#: prewikka/views/alertlisting.py:707
-#, fuzzy
-msgid "Correlation Alert"
-msgstr "AlertasDeCorreção"
-
-#: prewikka/views/messagesummary.py:695
-#, fuzzy
-msgid "Correlated Alert"
-msgstr "AlertasDeCorreção"
-
-#: prewikka/views/messagesummary.py:696 prewikka/views/messagesummary.py:713
-msgid "Source Analyzer"
-msgstr "Analisador da fonte"
-
-#: prewikka/views/messagesummary.py:706 prewikka/views/messagesummary.py:988
-#: prewikka/views/alertlisting.py:711
-#, fuzzy
-msgid "Tool Alert"
-msgstr "AlertasDasFerramentas"
-
-#: prewikka/views/messagesummary.py:712
-msgid "Linked Alert"
-msgstr "Alerta ligado"
-
-#: prewikka/views/messagesummary.py:723
-#, fuzzy
-msgid "Text"
-msgstr "próximo"
-
-#: prewikka/views/messagesummary.py:725
-#, fuzzy
-msgid "Ident"
-msgstr "Agente"
-
-#: prewikka/views/messagesummary.py:730
-msgid "Origin"
-msgstr "Origem"
-
-#: prewikka/views/messagesummary.py:749 prewikka/views/stats.py:448
-msgid "Severity"
-msgstr "Severidade"
-
-#: prewikka/views/messagesummary.py:752
-msgid "Completion"
-msgstr "Conclusão"
-
-#: prewikka/views/messagesummary.py:756 prewikka/views/messagesummary.py:762
-msgid "Description"
-msgstr "Descrição"
-
-#: prewikka/views/messagesummary.py:761
-msgid "Category"
-msgstr "Categoria"
-
-#: prewikka/views/messagesummary.py:785
-msgid "User category"
-msgstr "Categoria do usuário"
-
-#: prewikka/views/messagesummary.py:790 prewikka/views/messagesummary.py:809
-#, fuzzy
-msgid "Number"
-msgstr "Novembro"
-
-#: prewikka/views/messagesummary.py:791
-msgid "Tty"
-msgstr "Tty"
-
-#: prewikka/views/messagesummary.py:810
-#, fuzzy
-msgid "Permission"
-msgstr "Permissões:"
-
-#: prewikka/views/messagesummary.py:832
-msgid "Change time"
-msgstr "Mudar o tempo"
-
-#: prewikka/views/messagesummary.py:833
-#, fuzzy
-msgid "Inode Number"
-msgstr "Nome do nó"
-
-#: prewikka/views/messagesummary.py:834
-msgid "Major device"
-msgstr "Dispositivo importante"
-
-#: prewikka/views/messagesummary.py:835
-msgid "Minor device"
-msgstr "Dispositivo secundário"
-
-#: prewikka/views/messagesummary.py:836
-msgid "C Major device"
-msgstr "C Dispositivo importante"
-
-#: prewikka/views/messagesummary.py:837
-msgid "C Minor device"
-msgstr "C Dispositivo secundário"
-
-#: prewikka/views/messagesummary.py:841
-#, fuzzy, python-format
-msgid "Target file %s"
-msgstr "Alvo"
-
-#: prewikka/views/messagesummary.py:845
-msgid "Path"
-msgstr "Caminho"
-
-#: prewikka/views/messagesummary.py:847
-msgid "Modify time"
-msgstr "Tempo modificado"
-
-#: prewikka/views/messagesummary.py:848
-msgid "Access time"
-msgstr "Tempo de acesso"
-
-#: prewikka/views/messagesummary.py:849
-msgid "Data size"
-msgstr "Tamanho dos dados"
-
-#: prewikka/views/messagesummary.py:850
-msgid "Disk size"
-msgstr "Tamanho do disco"
-
-#: prewikka/views/messagesummary.py:869
-msgid "Web Service"
-msgstr "Serviço da WEB"
-
-#: prewikka/views/messagesummary.py:872
-msgid "Url"
-msgstr "Url"
-
-#: prewikka/views/messagesummary.py:873
-msgid "Cgi"
-msgstr "Cgi"
-
-#: prewikka/views/messagesummary.py:874
-msgid "Http Method"
-msgstr "Método HTTP"
-
-#: prewikka/views/messagesummary.py:877
-msgid "CGI Argument"
-msgstr "Argumento CGI"
-
-#: prewikka/views/messagesummary.py:886
-msgid "SNMP Service"
-msgstr "Serviço SNMP"
-
-#: prewikka/views/messagesummary.py:889
-msgid "oid"
-msgstr "oid"
-
-#: prewikka/views/messagesummary.py:890
-msgid "messageProcessingModel"
-msgstr "messageProcessingModel"
-
-#: prewikka/views/messagesummary.py:891
-msgid "securityModel"
-msgstr "securityModel"
-
-#: prewikka/views/messagesummary.py:892
-msgid "securityName"
-msgstr "securityName"
-
-#: prewikka/views/messagesummary.py:893
-msgid "securityLevel"
-msgstr "securityLevel"
-
-#: prewikka/views/messagesummary.py:894
-#, fuzzy
-msgid "contextName"
-msgstr "Nome do nó"
-
-#: prewikka/views/messagesummary.py:895
-msgid "contextEngineID"
-msgstr "contextEngineID"
-
-#: prewikka/views/messagesummary.py:896
-msgid "command"
-msgstr "Comando"
-
-#: prewikka/views/messagesummary.py:908
-msgid "Port"
-msgstr "Porta"
-
-#: prewikka/views/messagesummary.py:925
-#, fuzzy
-msgid "PortList"
-msgstr "Porta"
-
-#: prewikka/views/messagesummary.py:928
-#, fuzzy
-msgid "ip_version"
-msgstr "Permissões:"
-
-#: prewikka/views/messagesummary.py:961
-#, fuzzy, python-format
-msgid "Source(%d)"
-msgstr "Fonte"
-
-#: prewikka/views/messagesummary.py:970
-#, fuzzy, python-format
-msgid "Target(%d)"
-msgstr "Alvo"
-
-#: prewikka/views/messagesummary.py:991
-msgid "Overflow Alert"
-msgstr "Estouro de alerta"
-
-#: prewikka/views/messagesummary.py:994
-#: prewikka/templates/AlertListing.py:1149
-#, fuzzy
-msgid "Alert"
-msgstr "Alertas"
-
-#: prewikka/views/messagesummary.py:1013
-msgid "MessageID"
-msgstr ""
-
-#: prewikka/views/messagesummary.py:1021
-msgid "Actions"
-msgstr "Ações"
-
-#: prewikka/views/messagesummary.py:1060
-#, fuzzy
-msgid "Network centric information"
-msgstr "Informações sobre a conta"
-
-#: prewikka/views/messagesummary.py:1080
-msgid "ASCII Payload"
-msgstr "Carga gasta ASCII"
-
-#: prewikka/views/messagesummary.py:1099
-#, fuzzy
-msgid "Heartbeat"
+msgid "Latest heartbeat"
 msgstr "Heartbeats"
 
-#: prewikka/views/__init__.py:45
-msgid "Events"
-msgstr "Eventos"
+#: prewikka/templates/SensorListing.py:419
+msgid "Status"
+msgstr "Status"
 
-#: prewikka/views/__init__.py:45 prewikka/templates/SensorListing.py:547
+#: prewikka/templates/SensorListing.py:458
+msgid "Alert listing"
+msgstr "Lista de alertas"
+
+#: prewikka/templates/SensorListing.py:467
+msgid "Heartbeat listing"
+msgstr "Lista de Heartbeats"
+
+#: prewikka/templates/SensorListing.py:476
+msgid "Heartbeat analysis"
+msgstr "Análise de Heartbeats"
+
+#: prewikka/templates/SensorListing.py:522 prewikka/views/__init__.py:45
 msgid "Alerts"
 msgstr "Alertas"
 
-#: prewikka/views/__init__.py:46
-msgid "CorrelationAlerts"
-msgstr "AlertasDeCorreção"
-
-#: prewikka/views/__init__.py:47
-msgid "ToolAlerts"
-msgstr "AlertasDasFerramentas"
-
-#: prewikka/views/__init__.py:50
-msgid "Agents"
-msgstr "Agentes"
-
-#: prewikka/views/__init__.py:51 prewikka/templates/SensorListing.py:553
+#: prewikka/templates/SensorListing.py:528 prewikka/views/__init__.py:51
 msgid "Heartbeats"
 msgstr "Heartbeats"
 
-#: prewikka/views/__init__.py:53
+#: prewikka/templates/HeartbeatAnalyze.py:101 prewikka/templates/utils.py:100
+msgid "OS"
+msgstr ""
+
+#: prewikka/templates/HeartbeatAnalyze.py:107
+#: prewikka/templates/HeartbeatListing.py:126 prewikka/templates/utils.py:106
+#: prewikka/views/messagesummary.py:441
 #, fuzzy
-msgid "Statistics"
-msgstr "Status"
-
-#: prewikka/views/__init__.py:54
-#, fuzzy
-msgid "Categorizations"
-msgstr "Categoria"
-
-#: prewikka/views/__init__.py:55
-#, fuzzy
-msgid "Sources"
-msgstr "Fonte"
-
-#: prewikka/views/__init__.py:56
-#, fuzzy
-msgid "Targets"
-msgstr "Alvo"
-
-#: prewikka/views/__init__.py:57
-#, fuzzy
-msgid "Analyzers"
-msgstr "Analisador id"
-
-#: prewikka/views/__init__.py:58
-#, fuzzy
-msgid "Timeline"
-msgstr "Tempo"
-
-#: prewikka/views/__init__.py:61
-msgid "Settings"
-msgstr "Ajustes"
-
-#: prewikka/views/__init__.py:62
-msgid "Filters"
-msgstr "Filtros"
-
-#: prewikka/views/__init__.py:64
-msgid "My account"
-msgstr "Minha conta"
-
-#: prewikka/views/__init__.py:67
-#, fuzzy
-msgid "User listing"
-msgstr "Lista de alertas"
-
-#: prewikka/views/__init__.py:71
-msgid "About"
-msgstr "Sobre"
-
-#: prewikka/views/sensor.py:51
-#, fuzzy
-msgid "Offline"
-msgstr "em"
-
-#: prewikka/views/sensor.py:54
-msgid "Unknown"
-msgstr "Desconhecido"
-
-#: prewikka/views/sensor.py:57
-msgid "Missing"
-msgstr "Perdido"
-
-#: prewikka/views/sensor.py:59
-#, fuzzy
-msgid "Online"
-msgstr "em"
-
-#: prewikka/views/sensor.py:158
-msgid "Node location n/a"
-msgstr "Localização do nó n/a"
-
-#: prewikka/views/sensor.py:159
-#, fuzzy
-msgid "Node name n/a"
+msgid "Node name"
 msgstr "Nome do nó"
 
-#: prewikka/views/sensor.py:160
+#: prewikka/templates/HeartbeatAnalyze.py:113 prewikka/templates/utils.py:112
+#: prewikka/views/messagesummary.py:419
+msgid "Node location"
+msgstr "Localização do nó"
+
+#: prewikka/templates/HeartbeatAnalyze.py:119
+#: prewikka/templates/HeartbeatListing.py:113 prewikka/templates/utils.py:118
+#: prewikka/views/messagesummary.py:446
 #, fuzzy
-msgid "OS version n/a"
-msgstr "Sessão inválida"
-
-#: prewikka/views/sensor.py:161
-msgid "OS type n/a"
-msgstr "Sistema Operacional n/a"
-
-#: prewikka/views/filter.py:55
-msgid "Example: (A AND B) OR (C AND D)"
-msgstr "Exemplo: (A AND B) OR (C AND D)"
-
-#: prewikka/views/filter.py:137 prewikka/templates/FilterEdition.py:221
-msgid "Load"
-msgstr "Carregar"
-
-#: prewikka/views/filter.py:139 prewikka/templates/FilterEdition.py:339
-#: prewikka/templates/MessageListing.py:665 prewikka/templates/Stats.py:531
-msgid "Save"
-msgstr "Salvar"
-
-#: prewikka/views/filter.py:141 prewikka/templates/FilterEdition.py:227
-#: prewikka/templates/SensorListing.py:406
-#: prewikka/templates/SensorListing.py:559
-#: prewikka/templates/MessageListing.py:369
-msgid "Delete"
-msgstr "Apagar"
-
-#: prewikka/views/messagelisting.py:231 prewikka/templates/AlertListing.py:327
-#: prewikka/templates/AlertListing.py:349
-#: prewikka/templates/AlertListing.py:1198
-#: prewikka/templates/AlertListing.py:1227
-msgid "n/a"
-msgstr ""
-
-#: prewikka/views/stats.py:425
-#, fuzzy
-msgid "Top 10 Classifications"
-msgstr "Classificação"
-
-#: prewikka/views/stats.py:425 prewikka/templates/AlertListing.py:1111
-msgid "Classification"
-msgstr "Classificação"
-
-#: prewikka/views/stats.py:433
-msgid "Top 10 Alert References"
-msgstr ""
-
-#: prewikka/views/stats.py:433
-#, fuzzy
-msgid "References"
-msgstr "Atualizar"
-
-#: prewikka/views/stats.py:442 prewikka/views/stats.py:768
-#, fuzzy
-msgid "High"
-msgstr "alta"
-
-#: prewikka/views/stats.py:443 prewikka/views/stats.py:769
-#, fuzzy
-msgid "Medium"
-msgstr "média"
-
-#: prewikka/views/stats.py:444 prewikka/views/stats.py:770
-#, fuzzy
-msgid "Low"
-msgstr "baixa"
-
-#: prewikka/views/stats.py:445 prewikka/views/stats.py:771
-#, fuzzy
-msgid "Informational"
-msgstr "Endereço da informação"
-
-#: prewikka/views/stats.py:446 prewikka/views/stats.py:772
-msgid "N/a"
-msgstr ""
-
-#: prewikka/views/stats.py:448
-#, fuzzy
-msgid "Severities"
-msgstr "Severidade"
-
-#: prewikka/views/stats.py:455
-msgid "Alert Impact Types"
-msgstr ""
-
-#: prewikka/views/stats.py:455
-msgid "Impact Types"
-msgstr ""
-
-#: prewikka/views/stats.py:490
-#, fuzzy
-msgid "Top Source Country"
-msgstr "Fonte"
-
-#: prewikka/views/stats.py:490
-msgid "Country"
-msgstr ""
-
-#: prewikka/views/stats.py:542
-#, fuzzy
-msgid "Top 10 Source Addresses"
+msgid "Node address"
 msgstr "Endereço do nó"
 
-#: prewikka/views/stats.py:542 prewikka/views/stats.py:645
-#: prewikka/views/stats.py:727
+#: prewikka/templates/HeartbeatAnalyze.py:131
 #, fuzzy
-msgid "Address"
-msgstr "Endereço do nó"
+msgid "Current status"
+msgstr "Senha atual:"
 
-#: prewikka/views/stats.py:550
-msgid "Top 10 Source Users"
-msgstr ""
-
-#: prewikka/views/stats.py:550 prewikka/views/stats.py:653
-#, fuzzy
-msgid "User"
-msgstr "Usuários"
-
-#: prewikka/views/stats.py:645
-#, fuzzy
-msgid "Top 10 Targeted Addresses"
-msgstr "Endereço do nó"
-
-#: prewikka/views/stats.py:653
-msgid "Top 10 Targeted Users"
-msgstr ""
-
-#: prewikka/views/stats.py:711
-msgid "Top 10 Analyzer Models"
-msgstr ""
-
-#: prewikka/views/stats.py:719
-msgid "Top 10 Analyzer Classes"
-msgstr ""
-
-#: prewikka/views/stats.py:727
-msgid "Top 10 Analyzer Node Addresses"
-msgstr ""
-
-#: prewikka/views/stats.py:735
-#, fuzzy
-msgid "Analyzer Locations"
-msgstr "Tempo de análise"
-
-#: prewikka/views/stats.py:735
-#, fuzzy
-msgid "Location"
-msgstr "Usuário:"
-
-#: prewikka/templates/About.py:107
-msgid ""
-"provides support to Large Accounts, Major Companies and Government Agencies "
-"around the world, to improve and strengthen the security of their systems "
-"and networks."
-msgstr ""
-"ornece suporte a grandes clientes, grandes companhias e agências do governo "
-"ao redor do mundo, a fim de melhorar a segurança dos sistemas e das redes."
-
-#: prewikka/templates/About.py:125
-msgid "Customizing Prelude"
-msgstr "Customizando o Prelude"
-
-#: prewikka/templates/About.py:132
-msgid ""
-"In keeping with the Open Source spirit, we encourage you to participate in "
-"the development of your application. You can order customized versions of "
-"Prelude to suit your needs: adapting, adding on functionality etc. Because "
-"they are carried out by PreludeIDS engineers, you know that any "
-"modifications made to the system will be integrated optimally and guaranteed "
-"by our technical support department. Additionally, the company can extend "
-"Prelude to handle yet unsupported sensors (including proprietary), ruleset "
-"extension to handle new devices and porting of Prelude to unsupported "
-"operating systems."
-msgstr ""
-"De acordo com a filosofia do Código Aberto, nós o incentivamos a participar "
-"do desenvolvimento de sua aplicação. Você pode ter versões customizadas do "
-"Preludepara suprir suas necessidade: adaptando, adicionando funcionalidades, "
-"etc. Porque são realizados por coordenadores do PreludeIDS, você sabe que "
-"algumas modificações feitas no sistema estarão integradas otimizadamente e "
-"garantidas por nosso departamento de suporte técnico. Adicionalmente, a "
-"companhia pode estender o Prelude para integrar sensores não suportados "
-"(incluindo os proprietários), extensões de regras para integrar novos "
-"dispositivos e portas de outros sistemas operacionais que o Prelude não "
-"suportava também podem ser integrados."
-
-#: prewikka/templates/About.py:141
-msgid "Software Maintenance and Technical Support"
-msgstr "Manutenção do software e Suporte Técnico"
-
-#: prewikka/templates/About.py:148
-#, fuzzy
-msgid ""
-"PreludeIDS maintenance and support services guarantee optimal operation of "
-"the Prelude platform on your infrastructure. There are five support packages "
-"that provide our customers with peace of mind,  knowing that they are not "
-"only covered for all outcomes, but that our experts are at hand to provide "
-"rapid and reliable solutions."
-msgstr ""
-"PreludeIDS serviços de manutenção e suporte garantem a ótima operação da "
-"plataforma Prelude em sua infraestrutura. Com nossos serviços de suporte, "
-"você será beneficiado com a assistência prioritária e a perícia de nossos "
-"engenheiros, enquanto os serviço de manutenção compreenderão a atualização "
-"de seu software."
-
-#: prewikka/templates/About.py:157
-msgid "Commercial licenses"
-msgstr "Licenças comerciais"
-
-#: prewikka/templates/About.py:164
-msgid "The Prelude framework is licensed under the"
-msgstr "A estrutura do Prelude é licenciada sob"
-
-#: prewikka/templates/About.py:170
-msgid ""
-"PreludeIDS provides specific commercial licenses to allow proprietary "
-"systems based on Prelude to be developed and to interoperate."
-msgstr ""
-"PreludeIDS fornece licenças comerciais específicas para aceitar sistemas "
-"proprietários baseados no Prelude a serem desenvolvidos e interoperantes."
-
-#: prewikka/templates/About.py:179
-msgid "Advice, Deployment and Training"
-msgstr "Conselho, desenvolvimento e treinamento"
-
-#: prewikka/templates/About.py:186
-msgid ""
-"Through our partners, you have access to an array of top-of-the-line "
-"security services. By advising you on how to secure your infrastructure, "
-"deploying Prelude and training your users, we provide a turnkey solution to "
-"secure your infrastructure, delivered by specialists."
-msgstr ""
-"Como sócio, você tem acesso a serviços de segurança tops de linha. "
-"Recomendado para criar sua infraestrutura com segurança, instalando o "
-"Preludee treinando seus usuários. Nós forneceremos soluções de segurança "
-"turnkey, ou seja, uma solução empacotada para sua infraestrutura e estregue "
-"por especialistas."
-
-#: prewikka/templates/About.py:205
-msgid "Contact"
-msgstr "Contato"
-
-#: prewikka/templates/About.py:211
-#, fuzzy
-msgid "Office"
-msgstr "em"
-
-#: prewikka/templates/About.py:217
-msgid "Website"
-msgstr "Site na WEB"
-
-#: prewikka/templates/About.py:230
-#, fuzzy
-msgid "Phone:"
-msgstr "em"
-
-#: prewikka/templates/About.py:240
-msgid "Fax:"
-msgstr "Fax:"
-
-#: prewikka/templates/HeartbeatListing.py:100
-msgid "Agent"
-msgstr "Agente"
-
-#: prewikka/templates/HeartbeatListing.py:151
-#: prewikka/templates/AlertListing.py:1348
-msgid "Time"
-msgstr "Tempo"
-
-#: prewikka/templates/HeartbeatListing.py:199
-msgid "Heartbeat summary"
-msgstr "Heartbeat sumário"
-
-#: prewikka/templates/HeartbeatListing.py:208
-msgid "Filter on agent"
-msgstr "Filtro no agente"
-
-#: prewikka/templates/HeartbeatListing.py:229
-#: prewikka/templates/SensorListing.py:316
-msgid "Filter on address"
-msgstr "Filtro no endereço"
-
-#: prewikka/templates/FilterEdition.py:191
-msgid "Available filters"
-msgstr "Filtros disponíveis"
-
-#: prewikka/templates/FilterEdition.py:242
-msgid "Edition"
-msgstr "Edição"
-
-#: prewikka/templates/FilterEdition.py:302
-msgid "Formula:"
-msgstr "Fórmula:"
-
-#: prewikka/templates/FilterEdition.py:314
-#, fuzzy
-msgid "Name:"
-msgstr "Nome do nó"
-
-#: prewikka/templates/FilterEdition.py:326
-msgid "Comment:"
-msgstr "Comentário"
+#: prewikka/templates/HeartbeatAnalyze.py:209
+msgid "Events"
+msgstr "Eventos"
 
 #: prewikka/templates/UserListing.py:100
 #, fuzzy
@@ -1037,86 +400,22 @@ msgstr "Apagar usuário"
 msgid "Create user"
 msgstr "Criar usuário"
 
-#: prewikka/templates/SensorListing.py:232
-#, python-format
-msgid "%d Node"
-msgid_plural "%d Nodes"
-msgstr[0] ""
-msgstr[1] ""
+#: prewikka/templates/HeartbeatListing.py:100
+msgid "Agent"
+msgstr "Agente"
 
-#: prewikka/templates/SensorListing.py:237
-#, python-format
-msgid "%d Analyzer"
-msgid_plural "%d Analyzers"
-msgstr[0] ""
-msgstr[1] ""
+#: prewikka/templates/HeartbeatListing.py:151
+#: prewikka/templates/AlertListing.py:1367
+msgid "Time"
+msgstr "Tempo"
 
-#: prewikka/templates/SensorListing.py:244
-#, fuzzy, python-format
-msgid "%d Online"
-msgid_plural "%d Online"
-msgstr[0] "em"
-msgstr[1] "em"
+#: prewikka/templates/HeartbeatListing.py:199
+msgid "Heartbeat summary"
+msgstr "Heartbeat sumário"
 
-#: prewikka/templates/SensorListing.py:246
-#, fuzzy, python-format
-msgid "%d Offline"
-msgid_plural "%d Offline"
-msgstr[0] "em"
-msgstr[1] "em"
-
-#: prewikka/templates/SensorListing.py:248
-#, python-format
-msgid "%d Unknown"
-msgid_plural "%d Unknown"
-msgstr[0] ""
-msgstr[1] ""
-
-#: prewikka/templates/SensorListing.py:250
-#, python-format
-msgid "%d Missing"
-msgid_plural "%d Missing"
-msgstr[0] ""
-msgstr[1] ""
-
-#: prewikka/templates/SensorListing.py:328
-msgid "Address information"
-msgstr "Endereço da informação"
-
-#: prewikka/templates/SensorListing.py:362
-#, fuzzy
-msgid "Total:"
-msgstr "total"
-
-#: prewikka/templates/SensorListing.py:436
-#, fuzzy
-msgid "Last heartbeat"
-msgstr "Heartbeats"
-
-#: prewikka/templates/SensorListing.py:442
-msgid "Status"
-msgstr "Status"
-
-#: prewikka/templates/SensorListing.py:481
-msgid "Alert listing"
-msgstr "Lista de alertas"
-
-#: prewikka/templates/SensorListing.py:490
-msgid "Heartbeat listing"
-msgstr "Lista de Heartbeats"
-
-#: prewikka/templates/SensorListing.py:499
-msgid "Heartbeat analysis"
-msgstr "Análise de Heartbeats"
-
-#: prewikka/templates/ClassicLayout.py:231
-msgid "logout"
-msgstr "sair"
-
-#: prewikka/templates/ClassicLayout.py:243
-#, python-format
-msgid "%(username)s on %(date)s"
-msgstr "%(username)s em %(date)s"
+#: prewikka/templates/HeartbeatListing.py:208
+msgid "Filter on agent"
+msgstr "Filtro no agente"
 
 #: prewikka/templates/UserSettings.py:157
 #, fuzzy
@@ -1124,6 +423,7 @@ msgid "Account information"
 msgstr "Informações sobre a conta"
 
 #: prewikka/templates/UserSettings.py:168
+#: prewikka/templates/LoginPasswordForm.py:130
 msgid "Login:"
 msgstr "Usuário:"
 
@@ -1156,8 +456,17 @@ msgid "Confirm new password:"
 msgstr "Confirmação da nova senha:"
 
 #: prewikka/templates/UserSettings.py:366
+#, fuzzy
 msgid "Submit Changes"
 msgstr "Confirmar mudanças"
+
+#: prewikka/templates/ErrorTemplate.py:116
+msgid "Back"
+msgstr ""
+
+#: prewikka/templates/ErrorTemplate.py:122
+msgid "Retry"
+msgstr ""
 
 #: prewikka/templates/MessageListing.py:478
 #, fuzzy
@@ -1185,6 +494,7 @@ msgid "Years"
 msgstr "Anos"
 
 #: prewikka/templates/MessageListing.py:538
+#: prewikka/templates/MessageListing.py:678
 msgid "Unlimited"
 msgstr "Ilimitado"
 
@@ -1214,28 +524,214 @@ msgstr "Limite"
 msgid "Refresh"
 msgstr "Atualizar"
 
-#: prewikka/templates/MessageListing.py:660 prewikka/templates/Stats.py:526
+#: prewikka/templates/MessageListing.py:660 prewikka/templates/Stats.py:531
+#: prewikka/templates/AlertListing.py:1089
 msgid "Apply"
 msgstr "Aplicar"
 
-#: prewikka/templates/MessageListing.py:708
-#: prewikka/templates/MessageListing.py:716
+#: prewikka/templates/MessageListing.py:665
+#: prewikka/templates/FilterEdition.py:339 prewikka/templates/Stats.py:536
+#: prewikka/views/filter.py:139
+msgid "Save"
+msgstr "Salvar"
+
+#: prewikka/templates/MessageListing.py:713
+#: prewikka/templates/MessageListing.py:721
 msgid "prev"
 msgstr "anterior"
 
-#: prewikka/templates/MessageListing.py:729
-#: prewikka/templates/MessageListing.py:737
+#: prewikka/templates/MessageListing.py:734
+#: prewikka/templates/MessageListing.py:742
 msgid "current"
 msgstr "atual"
 
-#: prewikka/templates/MessageListing.py:750
-#: prewikka/templates/MessageListing.py:758
+#: prewikka/templates/MessageListing.py:755
+#: prewikka/templates/MessageListing.py:763
 msgid "next"
 msgstr "próximo"
 
-#: prewikka/templates/MessageListing.py:812
+#: prewikka/templates/MessageListing.py:817
 msgid "total"
 msgstr "total"
+
+#: prewikka/templates/LoginPasswordForm.py:100
+#, fuzzy
+msgid "User authentication"
+msgstr "A auntenticação falhou"
+
+#: prewikka/templates/LoginPasswordForm.py:139
+#, fuzzy
+msgid "Password:"
+msgstr "Nova senha:"
+
+#: prewikka/templates/LoginPasswordForm.py:149
+msgid "Submit"
+msgstr "Enviar"
+
+#: prewikka/templates/utils.py:94 prewikka/views/messagesummary.py:602
+#: prewikka/views/messagesummary.py:750 prewikka/views/messagesummary.py:783
+#: prewikka/views/messagesummary.py:802
+msgid "Type"
+msgstr "Tipo"
+
+#: prewikka/templates/FilterEdition.py:191
+msgid "Available filters"
+msgstr "Filtros disponíveis"
+
+#: prewikka/templates/FilterEdition.py:221 prewikka/views/filter.py:137
+msgid "Load"
+msgstr "Carregar"
+
+#: prewikka/templates/FilterEdition.py:242
+msgid "Add / Modify"
+msgstr ""
+
+#: prewikka/templates/FilterEdition.py:302
+msgid "Formula:"
+msgstr "Fórmula:"
+
+#: prewikka/templates/FilterEdition.py:314
+#, fuzzy
+msgid "Name:"
+msgstr "Nome do nó"
+
+#: prewikka/templates/FilterEdition.py:326
+msgid "Comment:"
+msgstr "Comentário"
+
+#: prewikka/templates/ClassicLayout.py:227
+msgid "logout"
+msgstr "sair"
+
+#: prewikka/templates/ClassicLayout.py:239
+#, python-format
+msgid "%(username)s on %(date)s"
+msgstr "%(username)s em %(date)s"
+
+#: prewikka/templates/Stats.py:224 prewikka/templates/Stats.py:361
+#, fuzzy
+msgid "Filter:"
+msgstr "Filtros"
+
+#: prewikka/templates/Stats.py:391
+#, fuzzy
+msgid "Time:"
+msgstr "Tempo"
+
+#: prewikka/templates/Stats.py:402
+#, fuzzy
+msgid "Hour"
+msgstr "Horas"
+
+#: prewikka/templates/Stats.py:411
+#, fuzzy
+msgid "Day"
+msgstr "Dias"
+
+#: prewikka/templates/Stats.py:420
+#, fuzzy
+msgid "Month"
+msgstr "Meses"
+
+#: prewikka/templates/Stats.py:429
+msgid "Custom"
+msgstr ""
+
+#: prewikka/templates/Stats.py:439
+#, fuzzy
+msgid "From:"
+msgstr "Fórmula:"
+
+#: prewikka/templates/Stats.py:482
+#, fuzzy
+msgid "To:"
+msgstr "Tz"
+
+#: prewikka/templates/About.py:100
+msgid "about_intro"
+msgstr ""
+"ornece suporte a grandes clientes, grandes companhias e agências do governo "
+"ao redor do mundo, a fim de melhorar a segurança dos sistemas e das redes."
+
+#: prewikka/templates/About.py:108
+msgid "Customizing Prelude"
+msgstr "Customizando o Prelude"
+
+#: prewikka/templates/About.py:114
+msgid "about_customizing"
+msgstr ""
+"De acordo com a filosofia do Código Aberto, nós o incentivamos a participar "
+"do desenvolvimento de sua aplicação. Você pode ter versões customizadas do "
+"Preludepara suprir suas necessidade: adaptando, adicionando funcionalidades, "
+"etc. Porque são realizados por coordenadores do CS, você sabe que "
+"algumas modificações feitas no sistema estarão integradas otimizadamente e "
+"garantidas por nosso departamento de suporte técnico. Adicionalmente, a "
+"companhia pode estender o Prelude para integrar sensores não suportados "
+"(incluindo os proprietários), extensões de regras para integrar novos "
+"dispositivos e portas de outros sistemas operacionais que o Prelude não "
+"suportava também podem ser integrados."
+
+#: prewikka/templates/About.py:121
+msgid "Software Maintenance and Technical Support"
+msgstr "Manutenção do software e Suporte Técnico"
+
+#: prewikka/templates/About.py:127
+msgid "about_support"
+msgstr ""
+"CS serviços de manutenção e suporte garantem a ótima operação da "
+"plataforma Prelude em sua infraestrutura. Com nossos serviços de suporte, "
+"você será beneficiado com a assistência prioritária e a perícia de nossos "
+"engenheiros, enquanto os serviço de manutenção compreenderão a atualização "
+"de seu software."
+
+#: prewikka/templates/About.py:134
+msgid "Commercial licenses"
+msgstr "Licenças comerciais"
+
+#: prewikka/templates/About.py:140
+msgid "about_licence1"
+msgstr "A estrutura do Prelude é licenciada sob"
+
+#: prewikka/templates/About.py:145
+msgid "about_licence2"
+msgstr ""
+"CS fornece licenças comerciais específicas para aceitar sistemas "
+"proprietários baseados no Prelude a serem desenvolvidos e interoperantes."
+
+#: prewikka/templates/About.py:152
+msgid "Advice, Deployment and Training"
+msgstr "Conselho, desenvolvimento e treinamento"
+
+#: prewikka/templates/About.py:158
+msgid "about_advice"
+msgstr ""
+"Como sócio, você tem acesso a serviços de segurança tops de linha. "
+"Recomendado para criar sua infraestrutura com segurança, instalando o "
+"Preludee treinando seus usuários. Nós forneceremos soluções de segurança "
+"turnkey, ou seja, uma solução empacotada para sua infraestrutura e estregue "
+"por especialistas."
+
+#: prewikka/templates/About.py:167
+msgid "Contact"
+msgstr "Contato"
+
+#: prewikka/templates/About.py:174
+#, fuzzy
+msgid "Phone:"
+msgstr "em"
+
+#: prewikka/templates/About.py:180
+msgid "Fax:"
+msgstr "Fax:"
+
+#: prewikka/templates/About.py:188
+#, fuzzy
+msgid "Office"
+msgstr "em"
+
+#: prewikka/templates/About.py:199
+msgid "Website"
+msgstr "Site na WEB"
 
 #: prewikka/templates/AlertListing.py:112
 msgid "Equal"
@@ -1278,266 +774,1010 @@ msgstr "Expressão regular"
 msgid "Regular expression (case-insensitive)"
 msgstr "Expressão regular (case-insensitive)"
 
-#: prewikka/templates/AlertListing.py:319
-#: prewikka/templates/AlertListing.py:1190
+#: prewikka/templates/AlertListing.py:317
+#: prewikka/templates/AlertListing.py:1209
 msgid "info"
 msgstr "informações"
 
-#: prewikka/templates/AlertListing.py:321
-#: prewikka/templates/AlertListing.py:1192
+#: prewikka/templates/AlertListing.py:319
+#: prewikka/templates/AlertListing.py:1211
 msgid "low"
 msgstr "baixa"
 
-#: prewikka/templates/AlertListing.py:323
-#: prewikka/templates/AlertListing.py:1194
+#: prewikka/templates/AlertListing.py:321
+#: prewikka/templates/AlertListing.py:1213
 msgid "medium"
 msgstr "média"
 
-#: prewikka/templates/AlertListing.py:325
-#: prewikka/templates/AlertListing.py:1196
+#: prewikka/templates/AlertListing.py:323
+#: prewikka/templates/AlertListing.py:1215
 msgid "high"
 msgstr "alta"
 
-#: prewikka/templates/AlertListing.py:345
-#: prewikka/templates/AlertListing.py:1223
+#: prewikka/templates/AlertListing.py:325
+#: prewikka/templates/AlertListing.py:347
+#: prewikka/templates/AlertListing.py:1217
+#: prewikka/templates/AlertListing.py:1246 prewikka/views/stats.py:138
+#: prewikka/views/stats.py:277 prewikka/views/stats.py:538
+#: prewikka/views/stats.py:626 prewikka/views/stats.py:639
+#: prewikka/views/stats.py:643 prewikka/views/stats.py:709
+#: prewikka/views/messagelisting.py:231
+msgid "n/a"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:343
+#: prewikka/templates/AlertListing.py:1242
 msgid "succeeded"
 msgstr "sucesso"
 
-#: prewikka/templates/AlertListing.py:347
-#: prewikka/templates/AlertListing.py:1225
+#: prewikka/templates/AlertListing.py:345
+#: prewikka/templates/AlertListing.py:1244
 msgid "failed"
 msgstr "falhou"
 
-#: prewikka/templates/AlertListing.py:843
+#: prewikka/templates/AlertListing.py:573
+#, fuzzy
+msgid "simple"
+msgstr "Tempo"
+
+#: prewikka/templates/AlertListing.py:585
+#: prewikka/templates/AlertListing.py:857
+msgid "advanced"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:852
 #, fuzzy
 msgid "Filter on"
 msgstr "Filtro em:"
 
-#: prewikka/templates/AlertListing.py:963
+#: prewikka/templates/AlertListing.py:977
 msgid "Group entry by:"
 msgstr "Entrada do grupo em:"
 
-#: prewikka/templates/AlertListing.py:1027
-#: prewikka/templates/AlertListing.py:1035
+#: prewikka/templates/AlertListing.py:1041
+#: prewikka/templates/AlertListing.py:1049
 #, fuzzy
 msgid "filtered"
-msgstr "falhou"
+msgstr "Filtros"
 
-#: prewikka/templates/AlertListing.py:1136
+#: prewikka/templates/AlertListing.py:1130 prewikka/views/stats.py:459
+msgid "Classification"
+msgstr "Classificação"
+
+#: prewikka/templates/AlertListing.py:1155
 #, fuzzy
 msgid "Type:"
 msgstr "Tipo"
 
-#: prewikka/templates/AlertListing.py:1151
+#: prewikka/templates/AlertListing.py:1168
+#: prewikka/views/messagesummary.py:995
+#, fuzzy
+msgid "Alert"
+msgstr "Alertas"
+
+#: prewikka/templates/AlertListing.py:1170
 #, fuzzy
 msgid "CorrelationAlert"
 msgstr "AlertasDeCorreção"
 
-#: prewikka/templates/AlertListing.py:1153
+#: prewikka/templates/AlertListing.py:1172
 msgid "OverflowAlert"
 msgstr "OverflowAlert"
 
-#: prewikka/templates/AlertListing.py:1155
+#: prewikka/templates/AlertListing.py:1174
 #, fuzzy
 msgid "ToolAlert"
 msgstr "AlertasDasFerramentas"
 
-#: prewikka/templates/AlertListing.py:1184
+#: prewikka/templates/AlertListing.py:1203
 msgid "Severity:"
 msgstr "Severidade:"
 
-#: prewikka/templates/AlertListing.py:1215
+#: prewikka/templates/AlertListing.py:1234
 msgid "Completion:"
 msgstr "Conclusão:"
 
-#: prewikka/templates/AlertListing.py:1253
+#: prewikka/templates/AlertListing.py:1272
 msgid "Source"
 msgstr "Fonte"
 
-#: prewikka/templates/AlertListing.py:1285
+#: prewikka/templates/AlertListing.py:1304
 msgid "Target"
 msgstr "Alvo"
 
-#: prewikka/templates/AlertListing.py:1317
+#: prewikka/templates/AlertListing.py:1336
 #, fuzzy
 msgid "Analyzer"
-msgstr "Analisador id"
+msgstr "Alertas"
 
-#: prewikka/templates/AlertListing.py:1459
+#: prewikka/templates/AlertListing.py:1478
 msgid "See alert detail"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:1468
+#: prewikka/templates/AlertListing.py:1487
 #, fuzzy
 msgid "Filter on this classification.text"
 msgstr "Filtro no agente"
 
-#: prewikka/templates/AlertListing.py:1522
+#: prewikka/templates/AlertListing.py:1541
 #, fuzzy
 msgid "Filter on this port/protocol"
 msgstr "Filtro no agente"
 
-#: prewikka/templates/AlertListing.py:1541
-#: prewikka/templates/AlertListing.py:1549
+#: prewikka/templates/AlertListing.py:1563
+#: prewikka/templates/AlertListing.py:1571
 #, fuzzy
 msgid "Port/protocol information"
 msgstr "Informações sobre a conta"
 
-#: prewikka/templates/AlertListing.py:1598
+#: prewikka/templates/AlertListing.py:1620
 #, fuzzy
 msgid "alert"
 msgid_plural "alerts"
 msgstr[0] "Alertas"
 msgstr[1] "Alertas"
 
-#: prewikka/templates/AlertListing.py:1622
+#: prewikka/templates/AlertListing.py:1644
 #, python-format
 msgid "%(hidden)d of %(total)d alerts not shown..."
 msgstr "%(hidden)d of %(total)d alertas não exibidas.."
 
-#: prewikka/templates/AlertListing.py:1633
-#: prewikka/templates/AlertListing.py:1825
+#: prewikka/templates/AlertListing.py:1655
+#: prewikka/templates/AlertListing.py:1855
 msgid "expand"
 msgstr "expandir"
 
-#: prewikka/templates/AlertListing.py:1778
+#: prewikka/templates/AlertListing.py:1800
 #, fuzzy
 msgid "Filter on this reference"
 msgstr "Filtro no agente"
 
-#: prewikka/templates/AlertListing.py:1802
+#: prewikka/templates/AlertListing.py:1815
+#, fuzzy
+msgid "Reference information"
+msgstr "Informações sobre a conta"
+
+#: prewikka/templates/AlertListing.py:1832
 #, fuzzy
 msgid "source"
 msgstr "Fonte"
 
-#: prewikka/templates/AlertListing.py:1804
+#: prewikka/templates/AlertListing.py:1834
 #, fuzzy
 msgid "target"
 msgstr "Alvo"
 
-#: prewikka/templates/AlertListing.py:1814
+#: prewikka/templates/AlertListing.py:1844
 #, python-format
 msgid "%(hidden)d of %(total)d %(name)ss not shown..."
 msgstr "%(hidden)d of %(total)d %(name)ss não exibido..."
 
-#: prewikka/templates/AlertListing.py:1856
+#: prewikka/templates/AlertListing.py:1886
 #, fuzzy, python-format
 msgid "Filter on this %s"
 msgstr "Filtro no agente"
 
-#: prewikka/templates/AlertListing.py:1874
+#: prewikka/templates/AlertListing.py:1908
 #, fuzzy, python-format
 msgid "%s information"
 msgstr "Endereço da informação"
 
-#: prewikka/templates/AlertListing.py:2114
+#: prewikka/templates/AlertListing.py:2054
+#, fuzzy, python-format
+msgid "sent at %s"
+msgstr "Reservado"
+
+#: prewikka/templates/AlertListing.py:2099
+#: prewikka/templates/AlertListing.py:2113
+#, fuzzy
+msgid "By time"
+msgstr "Tempo"
+
+#: prewikka/templates/AlertListing.py:2104
+#: prewikka/templates/AlertListing.py:2132
+msgid "descending"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:2118
+#: prewikka/templates/AlertListing.py:2146
+#, fuzzy
+msgid "ascending"
+msgstr "Querendo dizer"
+
+#: prewikka/templates/AlertListing.py:2127
+#: prewikka/templates/AlertListing.py:2141
+#, fuzzy
+msgid "By count"
+msgstr "Minha conta"
+
+#: prewikka/templates/AlertListing.py:2187
 #, fuzzy
 msgid "Filter"
 msgstr "Filtros"
-
-#: prewikka/templates/LoginPasswordForm.py:130
-msgid "Submit"
-msgstr "Enviar"
-
-#: prewikka/templates/Stats.py:356
-#, fuzzy
-msgid "Filter:"
-msgstr "Filtros"
-
-#: prewikka/templates/Stats.py:386
-#, fuzzy
-msgid "Time:"
-msgstr "Tempo"
-
-#: prewikka/templates/Stats.py:397
-#, fuzzy
-msgid "Hour"
-msgstr "Horas"
-
-#: prewikka/templates/Stats.py:406
-#, fuzzy
-msgid "Day"
-msgstr "Dias"
-
-#: prewikka/templates/Stats.py:415
-#, fuzzy
-msgid "Month"
-msgstr "Meses"
-
-#: prewikka/templates/Stats.py:424
-msgid "Custom"
-msgstr ""
-
-#: prewikka/templates/Stats.py:434
-#, fuzzy
-msgid "From:"
-msgstr "Fórmula:"
-
-#: prewikka/templates/Stats.py:477
-#, fuzzy
-msgid "To:"
-msgstr "total"
 
 #: prewikka/modules/auth/cgi/cgi.py:41
 msgid "CGI Authentication failed: no user specified."
 msgstr "Autenticação CGI falhou: usuário não especificado"
 
-#~ msgid "Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'"
-#~ msgstr "Inválido 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'"
-
+#: prewikka/views/sensor.py:51
 #, fuzzy
-#~ msgid "none"
-#~ msgstr "em"
+msgid "Offline"
+msgstr "em"
 
-#~ msgid "Sensor"
-#~ msgstr "Sensor"
+#: prewikka/views/sensor.py:54
+msgid "Unknown"
+msgstr "Desconhecido"
 
-#~ msgid "Session invalid"
-#~ msgstr "Sessão inválida"
+#: prewikka/views/sensor.py:57
+msgid "Missing"
+msgstr "Perdido"
 
-#~ msgid "Username and password do not match."
-#~ msgstr "Usuário e senha não conferem"
-
+#: prewikka/views/sensor.py:59
 #, fuzzy
-#~ msgid "SSLcert Authentication failed: Not in a SSL session."
-#~ msgstr "Autenticação CGI falhou: usuário não especificado"
+msgid "Online"
+msgstr "em"
 
+#: prewikka/views/sensor.py:158
+msgid "Node location n/a"
+msgstr "Localização do nó n/a"
+
+#: prewikka/views/sensor.py:159
 #, fuzzy
-#~ msgid "SSLcert Authentication failed: no user specified in x509 CN."
-#~ msgstr "Autenticação CGI falhou: usuário não especificado"
+msgid "Node name n/a"
+msgstr "Nome do nó"
 
-#~ msgid "on"
-#~ msgstr "em"
-
+#: prewikka/views/sensor.py:160
 #, fuzzy
-#~ msgid "Node Address"
-#~ msgstr "Endereço do nó"
+msgid "OS version n/a"
+msgstr "Sessão inválida"
 
-#~ msgid "Node Name"
-#~ msgstr "Nome do nó"
+#: prewikka/views/sensor.py:161
+msgid "OS type n/a"
+msgstr "Sistema Operacional n/a"
 
-#~ msgid "No agent available"
-#~ msgstr "Nenhum agente disponível"
+#: prewikka/views/sensor.py:254
+#, python-format
+msgid "Sensor is down since %s"
+msgstr ""
 
-#~ msgid "French"
-#~ msgstr "Français"
+#: prewikka/views/sensor.py:261
+#, python-format
+msgid "Normal sensor start at %s"
+msgstr ""
 
+#: prewikka/views/sensor.py:264
+#, python-format
+msgid "Unexpected sensor restart at %s"
+msgstr ""
+
+#: prewikka/views/sensor.py:269
+#, python-format
+msgid "Abnormal heartbeat interval between %(old)s and %(new)s"
+msgstr ""
+
+#: prewikka/views/sensor.py:274
+#, python-format
+msgid "Normal sensor stop at %s"
+msgstr ""
+
+#: prewikka/views/sensor.py:287
+#, python-format
+msgid ""
+"No anomaly in the last %(heart)d heartbeats (1 heartbeat every %(sec)d s "
+"average)"
+msgstr ""
+
+#: prewikka/views/__init__.py:46
+msgid "CorrelationAlerts"
+msgstr "AlertasDeCorreção"
+
+#: prewikka/views/__init__.py:47
+msgid "ToolAlerts"
+msgstr "AlertasDasFerramentas"
+
+#: prewikka/views/__init__.py:50
+msgid "Agents"
+msgstr "Agentes"
+
+#: prewikka/views/__init__.py:53
+msgid "Statistics"
+msgstr ""
+
+#: prewikka/views/__init__.py:54
+msgid "Categorizations"
+msgstr ""
+
+#: prewikka/views/__init__.py:55
 #, fuzzy
-#~ msgid "Step:"
-#~ msgstr "Etapa"
+msgid "Sources"
+msgstr "Fonte"
 
+#: prewikka/views/__init__.py:56
 #, fuzzy
-#~ msgid "Tz:"
-#~ msgstr "Tz"
+msgid "Targets"
+msgstr "Alvo"
 
+#: prewikka/views/__init__.py:57
 #, fuzzy
-#~ msgid "IDMEF Correlation Alert"
-#~ msgstr "AlertasDeCorreção"
+msgid "Analyzers"
+msgstr "Alertas"
 
+#: prewikka/views/__init__.py:58 prewikka/views/stats.py:779
 #, fuzzy
-#~ msgid "IDMEF Tool Alert"
-#~ msgstr "AlertasDasFerramentas"
+msgid "Timeline"
+msgstr "Tempo"
 
+#: prewikka/views/__init__.py:61
+msgid "Settings"
+msgstr "Ajustes"
+
+#: prewikka/views/__init__.py:62
+msgid "Filters"
+msgstr "Filtros"
+
+#: prewikka/views/__init__.py:64
+msgid "My account"
+msgstr "Minha conta"
+
+#: prewikka/views/__init__.py:67
 #, fuzzy
-#~ msgid "IDMEF Alert"
-#~ msgstr "Alertas"
+msgid "User listing"
+msgstr "Lista de alertas"
+
+#: prewikka/views/__init__.py:71
+msgid "About"
+msgstr "Sobre"
+
+#: prewikka/views/usermanagement.py:135
+msgid "Access denied to other users settings"
+msgstr ""
+
+#: prewikka/views/usermanagement.py:164
+msgid "Cannot modify other users settings"
+msgstr ""
+
+#: prewikka/views/usermanagement.py:173
+#, fuzzy
+msgid "Invalid Language"
+msgstr "Sessão inválida"
+
+#: prewikka/views/usermanagement.py:173
+msgid "Specified language does not exist"
+msgstr ""
+
+#: prewikka/views/usermanagement.py:185 prewikka/views/usermanagement.py:188
+#, fuzzy
+msgid "Password Error"
+msgstr "Nova senha:"
+
+#: prewikka/views/usermanagement.py:185
+msgid "Invalid Password specified"
+msgstr ""
+
+#: prewikka/views/usermanagement.py:188
+#, fuzzy
+msgid "Password mismatch"
+msgstr "Nova senha:"
+
+#: prewikka/views/usermanagement.py:209
+#, python-format
+msgid "User %s already exist"
+msgstr ""
+
+#: prewikka/views/commands.py:47
+#, python-format
+msgid "Attempt to execute unregistered command '%s'"
+msgstr ""
+
+#: prewikka/views/filter.py:55
+msgid "Example: (A AND B) OR (C AND D)"
+msgstr "Exemplo: (A AND B) OR (C AND D)"
+
+#: prewikka/views/filter.py:118 prewikka/views/filter.py:121
+#: prewikka/views/filter.py:124
+msgid "Could not save Filter"
+msgstr ""
+
+#: prewikka/views/filter.py:118 prewikka/views/filter.py:124
+msgid "No valid filter formula provided"
+msgstr ""
+
+#: prewikka/views/filter.py:121
+msgid "No name for this filter was provided"
+msgstr ""
+
+#: prewikka/views/alertlisting.py:707 prewikka/views/messagesummary.py:681
+#: prewikka/views/messagesummary.py:986
+#, fuzzy
+msgid "Correlation Alert"
+msgstr "AlertasDeCorreção"
+
+#: prewikka/views/alertlisting.py:711 prewikka/views/messagesummary.py:698
+#: prewikka/views/messagesummary.py:989
+#, fuzzy
+msgid "Tool Alert"
+msgstr "AlertasDasFerramentas"
+
+#: prewikka/views/stats.py:225
+#, fuzzy
+msgid "from"
+msgstr "Fórmula:"
+
+#: prewikka/views/stats.py:228
+msgid "to"
+msgstr ""
+
+#: prewikka/views/stats.py:233 prewikka/views/stats.py:235
+#: prewikka/views/stats.py:237 prewikka/views/stats.py:239
+#, fuzzy
+msgid "Period:"
+msgstr "Permissões:"
+
+#: prewikka/views/stats.py:233
+#, fuzzy
+msgid "current month"
+msgstr "atual"
+
+#: prewikka/views/stats.py:235
+#, fuzzy
+msgid "today"
+msgstr "Segunda-feira"
+
+#: prewikka/views/stats.py:237
+#, fuzzy
+msgid "current hour"
+msgstr "atual"
+
+#: prewikka/views/stats.py:259
+#, python-format
+msgid "The path '%s' cannot be mapped to a column"
+msgstr ""
+
+#: prewikka/views/stats.py:459
+#, fuzzy
+msgid "Top 10 Classifications"
+msgstr "Classificação"
+
+#: prewikka/views/stats.py:466
+#, fuzzy
+msgid "Top 10 Alert References"
+msgstr "Classificação"
+
+#: prewikka/views/stats.py:466
+#, fuzzy
+msgid "References"
+msgstr "Atualizar"
+
+#: prewikka/views/stats.py:474 prewikka/views/stats.py:773
+#, fuzzy
+msgid "High"
+msgstr "alta"
+
+#: prewikka/views/stats.py:475 prewikka/views/stats.py:774
+#, fuzzy
+msgid "Medium"
+msgstr "média"
+
+#: prewikka/views/stats.py:476 prewikka/views/stats.py:775
+#, fuzzy
+msgid "Low"
+msgstr "baixa"
+
+#: prewikka/views/stats.py:477 prewikka/views/stats.py:776
+#, fuzzy
+msgid "Informational"
+msgstr "Endereço da informação"
+
+#: prewikka/views/stats.py:478 prewikka/views/stats.py:777
+msgid "N/a"
+msgstr ""
+
+#: prewikka/views/stats.py:480
+#, fuzzy
+msgid "Severities"
+msgstr "Severidade"
+
+#: prewikka/views/stats.py:480 prewikka/views/messagesummary.py:744
+msgid "Severity"
+msgstr "Severidade"
+
+#: prewikka/views/stats.py:486
+msgid "Alert Impact Types"
+msgstr ""
+
+#: prewikka/views/stats.py:486
+msgid "Impact Types"
+msgstr ""
+
+#: prewikka/views/stats.py:492
+#, fuzzy
+msgid "Top 10 Classifications Trend"
+msgstr "Classificação"
+
+#: prewikka/views/stats.py:520
+#, fuzzy
+msgid "Top Source Country"
+msgstr "Fonte"
+
+#: prewikka/views/stats.py:520
+msgid "Country"
+msgstr ""
+
+#: prewikka/views/stats.py:568
+#, fuzzy
+msgid "Top 10 Source Addresses"
+msgstr "Endereço do nó"
+
+#: prewikka/views/stats.py:568 prewikka/views/stats.py:666
+#: prewikka/views/stats.py:734
+#, fuzzy
+msgid "Address"
+msgstr "Endereço do nó"
+
+#: prewikka/views/stats.py:575
+msgid "Top 10 Source Users"
+msgstr ""
+
+#: prewikka/views/stats.py:575 prewikka/views/stats.py:673
+#, fuzzy
+msgid "User"
+msgstr "Usuários"
+
+#: prewikka/views/stats.py:582
+#, fuzzy
+msgid "Top 10 Sources Trend"
+msgstr "Endereço do nó"
+
+#: prewikka/views/stats.py:606
+#, fuzzy
+msgid "Top 10 Targeted Ports"
+msgstr "Endereço do nó"
+
+#: prewikka/views/stats.py:666
+#, fuzzy
+msgid "Top 10 Targeted Addresses"
+msgstr "Endereço do nó"
+
+#: prewikka/views/stats.py:673
+msgid "Top 10 Targeted Users"
+msgstr ""
+
+#: prewikka/views/stats.py:700
+#, fuzzy
+msgid "Top 10 analyzers"
+msgstr "Alertas"
+
+#: prewikka/views/stats.py:720
+msgid "Top 10 Analyzer Models"
+msgstr ""
+
+#: prewikka/views/stats.py:727
+msgid "Top 10 Analyzer Classes"
+msgstr ""
+
+#: prewikka/views/stats.py:734
+msgid "Top 10 Analyzer Node Addresses"
+msgstr ""
+
+#: prewikka/views/stats.py:741
+#, fuzzy
+msgid "Analyzer Locations"
+msgstr "Tempo de análise"
+
+#: prewikka/views/stats.py:741
+#, fuzzy
+msgid "Location"
+msgstr "Usuário:"
+
+#: prewikka/views/stats.py:747
+#, fuzzy
+msgid "Top 10 Analyzer Classes Trend"
+msgstr "Alertas"
+
+#: prewikka/views/messagesummary.py:305 prewikka/views/messagesummary.py:603
+msgid "Code"
+msgstr "Código"
+
+#: prewikka/views/messagesummary.py:306
+msgid "Data length"
+msgstr "Tamanho dos dados"
+
+#: prewikka/views/messagesummary.py:307
+msgid "Data"
+msgstr "Dados"
+
+#: prewikka/views/messagesummary.py:395 prewikka/views/messagesummary.py:841
+#, fuzzy
+msgid "Create time"
+msgstr "Criar usuário"
+
+#: prewikka/views/messagesummary.py:398
+msgid "Detect time"
+msgstr "Tempo de descobrimento"
+
+#: prewikka/views/messagesummary.py:403
+msgid "Analyzer time"
+msgstr "Tempo de análise"
+
+#: prewikka/views/messagesummary.py:409
+msgid "Process"
+msgstr "Processo"
+
+#: prewikka/views/messagesummary.py:410
+msgid "Process Path"
+msgstr "Caminho do processo"
+
+#: prewikka/views/messagesummary.py:411
+msgid "Process PID"
+msgstr "PID do processo"
+
+#: prewikka/views/messagesummary.py:444
+#, fuzzy
+msgid "Node name (resolved)"
+msgstr "Nome do nó"
+
+#: prewikka/views/messagesummary.py:454
+msgid "Analyzerid"
+msgstr "Analisador id"
+
+#: prewikka/views/messagesummary.py:458
+msgid "Manufacturer"
+msgstr "Fabricante"
+
+#: prewikka/views/messagesummary.py:466
+msgid "Operating System"
+msgstr "Sistema Operacional"
+
+#: prewikka/views/messagesummary.py:484
+#, python-format
+msgid "Analyzer Path (%d not shown)"
+msgstr "Caminho do analisador (%d não mostrado)"
+
+#: prewikka/views/messagesummary.py:491 prewikka/views/messagesummary.py:1031
+#: prewikka/views/messagesummary.py:1103
+#, python-format
+msgid "Analyzer #%d"
+msgstr "Analisador #%d"
+
+#: prewikka/views/messagesummary.py:501
+msgid "Additional data"
+msgstr "Dados adicionais"
+
+#: prewikka/views/messagesummary.py:504 prewikka/views/messagesummary.py:724
+msgid "Meaning"
+msgstr "Querendo dizer"
+
+#: prewikka/views/messagesummary.py:505
+#, fuzzy
+msgid "Value"
+msgstr "Alertas"
+
+#: prewikka/views/messagesummary.py:556 prewikka/views/messagesummary.py:577
+msgid "Header length"
+msgstr "Compimento do cabeçalho"
+
+#: prewikka/views/messagesummary.py:557
+msgid "TOS"
+msgstr "TOS"
+
+#: prewikka/views/messagesummary.py:558 prewikka/views/messagesummary.py:596
+msgid "Length"
+msgstr "Comprimento"
+
+#: prewikka/views/messagesummary.py:559 prewikka/views/messagesummary.py:605
+msgid "Id"
+msgstr "Id"
+
+#: prewikka/views/messagesummary.py:563
+msgid "Ip offset"
+msgstr "Ip offset"
+
+#: prewikka/views/messagesummary.py:564
+msgid "TTL"
+msgstr "TTL"
+
+#: prewikka/views/messagesummary.py:565 prewikka/views/messagesummary.py:933
+#: prewikka/views/messagesummary.py:936 prewikka/views/messagesummary.py:939
+msgid "Protocol"
+msgstr "Protocolo"
+
+#: prewikka/views/messagesummary.py:566 prewikka/views/messagesummary.py:588
+#: prewikka/views/messagesummary.py:597 prewikka/views/messagesummary.py:604
+msgid "Checksum"
+msgstr "Checksum"
+
+#: prewikka/views/messagesummary.py:567
+#, fuzzy
+msgid "Source address"
+msgstr "Endereço do nó"
+
+#: prewikka/views/messagesummary.py:568
+#, fuzzy
+msgid "Target address"
+msgstr "Endereço do nó"
+
+#: prewikka/views/messagesummary.py:573 prewikka/views/messagesummary.py:594
+#, fuzzy
+msgid "Source port"
+msgstr "Fonte"
+
+#: prewikka/views/messagesummary.py:574 prewikka/views/messagesummary.py:595
+#, fuzzy
+msgid "Target port"
+msgstr "Alvo"
+
+#: prewikka/views/messagesummary.py:578
+msgid "Reserved"
+msgstr "Reservado"
+
+#: prewikka/views/messagesummary.py:587
+msgid "Window"
+msgstr "Janela"
+
+#: prewikka/views/messagesummary.py:589
+msgid "URP"
+msgstr "URP"
+
+#: prewikka/views/messagesummary.py:606
+msgid "Seq #"
+msgstr "Seq #"
+
+#: prewikka/views/messagesummary.py:607
+msgid "Mask"
+msgstr "Máscara"
+
+#: prewikka/views/messagesummary.py:608
+#, fuzzy
+msgid "Gateway Address"
+msgstr "Endereço do nó"
+
+#: prewikka/views/messagesummary.py:609
+#, fuzzy
+msgid "Num address"
+msgstr "Endereço do nó"
+
+#: prewikka/views/messagesummary.py:610
+msgid "Wpa"
+msgstr "Wpa"
+
+#: prewikka/views/messagesummary.py:611
+msgid "Lifetime"
+msgstr "Tempo de vida"
+
+#: prewikka/views/messagesummary.py:612
+#, fuzzy
+msgid "Otime"
+msgstr "Tempo"
+
+#: prewikka/views/messagesummary.py:613
+#, fuzzy
+msgid "Rtime"
+msgstr "Tempo"
+
+#: prewikka/views/messagesummary.py:614
+#, fuzzy
+msgid "Ttime"
+msgstr "Tempo"
+
+#: prewikka/views/messagesummary.py:620 prewikka/views/messagesummary.py:1078
+msgid "Payload"
+msgstr "Carga exigida"
+
+#: prewikka/views/messagesummary.py:667
+#, python-format
+msgid "%d linked alerts missing (probably deleted)"
+msgstr ""
+
+#: prewikka/views/messagesummary.py:687
+#, fuzzy
+msgid "Correlated Alerts"
+msgstr "AlertasDeCorreção"
+
+#: prewikka/views/messagesummary.py:688 prewikka/views/messagesummary.py:705
+msgid "Source Analyzer"
+msgstr "Analisador da fonte"
+
+#: prewikka/views/messagesummary.py:704
+msgid "Linked Alert"
+msgstr "Alerta ligado"
+
+#: prewikka/views/messagesummary.py:715
+#, fuzzy
+msgid "Text"
+msgstr "próximo"
+
+#: prewikka/views/messagesummary.py:717
+#, fuzzy
+msgid "Ident"
+msgstr "Agente"
+
+#: prewikka/views/messagesummary.py:722
+msgid "Origin"
+msgstr "Origem"
+
+#: prewikka/views/messagesummary.py:747
+msgid "Completion"
+msgstr "Conclusão"
+
+#: prewikka/views/messagesummary.py:751 prewikka/views/messagesummary.py:757
+msgid "Description"
+msgstr "Descrição"
+
+#: prewikka/views/messagesummary.py:756
+msgid "Category"
+msgstr "Categoria"
+
+#: prewikka/views/messagesummary.py:780
+msgid "User category"
+msgstr "Categoria do usuário"
+
+#: prewikka/views/messagesummary.py:785 prewikka/views/messagesummary.py:804
+#, fuzzy
+msgid "Number"
+msgstr "Novembro"
+
+#: prewikka/views/messagesummary.py:786
+msgid "Tty"
+msgstr "Tty"
+
+#: prewikka/views/messagesummary.py:805
+#, fuzzy
+msgid "Permission"
+msgstr "Permissões:"
+
+#: prewikka/views/messagesummary.py:827
+msgid "Change time"
+msgstr "Mudar o tempo"
+
+#: prewikka/views/messagesummary.py:828
+#, fuzzy
+msgid "Inode Number"
+msgstr "Nome do nó"
+
+#: prewikka/views/messagesummary.py:829
+msgid "Major device"
+msgstr "Dispositivo importante"
+
+#: prewikka/views/messagesummary.py:830
+msgid "Minor device"
+msgstr "Dispositivo secundário"
+
+#: prewikka/views/messagesummary.py:831
+msgid "C Major device"
+msgstr "C Dispositivo importante"
+
+#: prewikka/views/messagesummary.py:832
+msgid "C Minor device"
+msgstr "C Dispositivo secundário"
+
+#: prewikka/views/messagesummary.py:836
+#, fuzzy, python-format
+msgid "Target file %s"
+msgstr "Alvo"
+
+#: prewikka/views/messagesummary.py:840
+msgid "Path"
+msgstr "Caminho"
+
+#: prewikka/views/messagesummary.py:842
+msgid "Modify time"
+msgstr "Tempo modificado"
+
+#: prewikka/views/messagesummary.py:843
+msgid "Access time"
+msgstr "Tempo de acesso"
+
+#: prewikka/views/messagesummary.py:844
+msgid "Data size"
+msgstr "Tamanho dos dados"
+
+#: prewikka/views/messagesummary.py:845
+msgid "Disk size"
+msgstr "Tamanho do disco"
+
+#: prewikka/views/messagesummary.py:864
+msgid "Web Service"
+msgstr "Serviço da WEB"
+
+#: prewikka/views/messagesummary.py:867
+msgid "Url"
+msgstr "Url"
+
+#: prewikka/views/messagesummary.py:868
+msgid "Cgi"
+msgstr "Cgi"
+
+#: prewikka/views/messagesummary.py:869
+msgid "Http Method"
+msgstr "Método HTTP"
+
+#: prewikka/views/messagesummary.py:872
+msgid "CGI Argument"
+msgstr "Argumento CGI"
+
+#: prewikka/views/messagesummary.py:881
+msgid "SNMP Service"
+msgstr "Serviço SNMP"
+
+#: prewikka/views/messagesummary.py:884
+msgid "oid"
+msgstr "oid"
+
+#: prewikka/views/messagesummary.py:885
+msgid "messageProcessingModel"
+msgstr "messageProcessingModel"
+
+#: prewikka/views/messagesummary.py:886
+msgid "securityModel"
+msgstr "securityModel"
+
+#: prewikka/views/messagesummary.py:887
+msgid "securityName"
+msgstr "securityName"
+
+#: prewikka/views/messagesummary.py:888
+msgid "securityLevel"
+msgstr "securityLevel"
+
+#: prewikka/views/messagesummary.py:889
+#, fuzzy
+msgid "contextName"
+msgstr "Nome do nó"
+
+#: prewikka/views/messagesummary.py:890
+msgid "contextEngineID"
+msgstr "contextEngineID"
+
+#: prewikka/views/messagesummary.py:891
+msgid "command"
+msgstr "Comando"
+
+#: prewikka/views/messagesummary.py:904 prewikka/views/messagesummary.py:906
+msgid "Port"
+msgstr "Porta"
+
+#: prewikka/views/messagesummary.py:926
+#, fuzzy
+msgid "PortList"
+msgstr "Porta"
+
+#: prewikka/views/messagesummary.py:929
+#, fuzzy
+msgid "ip_version"
+msgstr "Permissões:"
+
+#: prewikka/views/messagesummary.py:962
+#, fuzzy, python-format
+msgid "Source(%d)"
+msgstr "Fonte"
+
+#: prewikka/views/messagesummary.py:971
+#, fuzzy, python-format
+msgid "Target(%d)"
+msgstr "Alvo"
+
+#: prewikka/views/messagesummary.py:992
+msgid "Overflow Alert"
+msgstr "Estouro de alerta"
+
+#: prewikka/views/messagesummary.py:1014
+msgid "MessageID"
+msgstr ""
+
+#: prewikka/views/messagesummary.py:1022
+msgid "Actions"
+msgstr "Ações"
+
+#: prewikka/views/messagesummary.py:1061
+#, fuzzy
+msgid "Network centric information"
+msgstr "Informações sobre a conta"
+
+#: prewikka/views/messagesummary.py:1081
+msgid "ASCII Payload"
+msgstr "Carga gasta ASCII"
+
+#: prewikka/views/messagesummary.py:1100
+#, fuzzy
+msgid "Heartbeat"
+msgstr "Heartbeats"

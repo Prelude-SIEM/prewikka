@@ -115,13 +115,13 @@ class AlertFilterEdition(view.View):
         for name, obj, operator, value in self.parameters["elements"]:
             elements[name] = (obj, operator, value)    
             if name not in self.parameters["formula"]:
-                raise Error.PrewikkaUserError("Could not save Filter", "No valid filter formula provided")
+                raise Error.PrewikkaUserError(_("Could not save Filter"), _("No valid filter formula provided"))
 
         if not self.parameters.has_key("save_as"):
-            raise Error.PrewikkaUserError("Could not save Filter", "No name for this filter was provided")
+            raise Error.PrewikkaUserError(_("Could not save Filter"), _("No name for this filter was provided"))
 
         if self.parameters["formula"] == _(self.example_formula):
-            raise Error.PrewikkaUserError("Could not save Filter", "No valid filter formula provided")
+            raise Error.PrewikkaUserError(_("Could not save Filter"), _("No valid filter formula provided"))
 
         filter = Filter.Filter(self.parameters["save_as"],
                                self.parameters.get("filter_comment", ""),

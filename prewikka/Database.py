@@ -20,6 +20,7 @@
 
 import sys
 import time
+import calendar
 
 from preludedb import *
 from prewikka import User, Filter, utils, siteconfig
@@ -57,12 +58,12 @@ class DatabaseSchemaError(Exception):
 
 
 def get_timestamp(s):
-    return s and time.mktime(time.strptime(s, "%Y-%m-%d %H:%M:%S")) or None
+    return s and calendar.timegm(time.strptime(s, "%Y-%m-%d %H:%M:%S")) or None
 
 
 
 class Database:
-    required_version = "0.9.11"
+    required_version = "0.9.12.1"
 
     # We reference preludedb_sql_destroy since it might be deleted
     # prior Database.__del__() is called.
@@ -156,13 +157,15 @@ class Database:
     def escape(self, data):
         if data:
             data = data.encode("utf8")
-
-        return utils.toUnicode(preludedb_sql_escape(self._sql, data))
+            return utils.toUnicode(preludedb_sql_escape(self._sql, data))
+        # Fix for #482 : return '' if data is empty
+        else:
+            return "''"
 
     def datetime(self, t):
         if t is None:
             return "NULL"
-        return "'" + utils.time_to_ymdhms(time.localtime(t)) + "'"
+        return "'" + utils.time_to_ymdhms(time.gmtime(t)) + "'"
 
     def hasUser(self, login):
         rows = self.query("SELECT login FROM Prewikka_User WHERE login = %s" % self.escape(login))

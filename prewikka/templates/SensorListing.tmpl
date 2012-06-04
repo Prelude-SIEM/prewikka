@@ -9,15 +9,12 @@
 \$(document).ready(function() {
 
  \$(".fieldset_toggle").click(function(){
-    var \$d1 = \$(this).parent().parent().next("div");
-    var \$d2 = \$(this).parent().parent().next("div").next("div");
+    var \$d = \$(this).parent().next("div").next("div");
 
-    if ( \$d1.is(':visible') ) {
-       \$d1.hide('normal');
-       \$d2.show('normal');
+    if ( \$d.is(':visible') ) {
+       \$d.hide('normal');
     } else {
-       \$d2.hide('normal');
-       \$d1.show('normal');
+       \$d.show('normal');
     }
 
     return false;
@@ -40,10 +37,9 @@
         return false;
   });
 
-  \$("td.show_all").click(function(){
+  \$("td.show_all, th.show_all").click(function(){
         var \$div = \$(this).parents("table").next("div");
         var \$all_tr = \$("table tbody tr", \$div);
-
         if ( \$div.is(':visible') && ! \$all_tr.is(':hidden') ) {
                 \$div.hide('normal');
         } else {
@@ -79,38 +75,25 @@ $listing.sort()
 
   #if $dominant != "online"
    #set $display = "block"
-   #set $display_tmp = "none"
   #else
    #set $display = "none"
-   #set $display_tmp = "block"
   #end if
 
   <legend>
-   <b>
-    <a href="#" class="fieldset_toggle"; return false;">$entry</a>
-   </b>
+    <a href="#" class="fieldset_toggle">$entry</a>
   </legend>
-
-   <div style="display: $display_tmp" class="$dclass fieldset_toggle2">
-    <table style="border: 1px solid black;">
-     <tr class="nodash" style="cursor: pointer;">
-      <td style="background-color: white; width:150px;">
        #set $nlen = $len($locations[$entry]["nodes"])
        #set $alen = $locations[$entry]["total"]
-       $unicode($ngettext("%d Node", "%d Nodes", $nlen) % $nlen), $unicode($ngettext("%d Analyzer", "%d Analyzers", $alen) % $alen)
-      </td>
-       #for $i in ( ("online",  $ngettext("%d Online", "%d Online", $locations[$entry]["online"])),
-                    ("offline", $ngettext("%d Offline", "%d Offline", $locations[$entry]["offline"])),
-                    ("unknown", $ngettext("%d Unknown", "%d Unknown", $locations[$entry]["unknown"])),
-                    ("missing", $ngettext("%d Missing", "%d Missing", $locations[$entry]["missing"])))
+       <div>$unicode($ngettext("%d Node", "%d Nodes", $nlen) % $nlen), $unicode($ngettext("%d Agent", "%d Agents", $alen) % $alen),
+       #for $i in ( ("online",  $ngettext("%d Online", "%d Onlines", $locations[$entry]["online"])),
+                    ("offline", $ngettext("%d Offline", "%d Offlines", $locations[$entry]["offline"])),
+                    ("unknown", $ngettext("%d Unknown", "%d Unknowns", $locations[$entry]["unknown"])),
+                    ("missing", $ngettext("%d Missing", "%d Missings", $locations[$entry]["missing"])))
         #if $locations[$entry][$i[0]] > 0
-      <td class="heartbeat_analyze_sensor_status_$i[0]">$unicode($i[1] % $locations[$entry][$i[0]])</td>
+      <span class="heartbeat_analyze_sensor_status_$i[0]">$unicode($i[1] % $locations[$entry][$i[0]])</span>
         #end if
        #end for
-     </tr>
-    </table>
-   </div>
-
+      </div>
    <div style="display: $display">
    #set $nlisting = $locations[$entry]["nodes"].values()
    $nlisting.sort(node_cmp)
@@ -128,17 +111,18 @@ $listing.sort()
      #set $display = "none"
     #end if
 
-    <table style="width:100%; border: 1px solid black;">
+    <table class="nodes">
      <thead style="width: 100%;">
       <tr class="$dclass">
-        <th>$node.node_name</th>
+        <th class="show_all">$node.node_name</th>
         <th>
          #for $addr in $node.node_addresses
           <a class="popup_menu_toggle" href="#">$addr.value</a>
           <span class="popup_menu">
            - <a href="$addr.inline_filter">$_("Filter on address")</a><br />
-           - <a target="$prewikka.external_link_target" href="https://www.prelude-ids.com/host_details.php?host=$addr.value">$_("Address information")</a><br />
-
+	   #if $prewikka.enable_details
+           - <a target="$prewikka.external_link_target" href="$prewikka.host_details_url?host=$addr.value">$_("Address information")</a><br />
+	   #end if
            #for $name, $link in $addr.host_commands
            - <a href="$link">$name</a><br />
            #end for
@@ -150,9 +134,9 @@ $listing.sort()
         <th>$node.osversion</th>
         <th>
 
-         <table align="right" style="border: 1px solid black; width: 200px; text-align: center;">
-          <tr class="nodash">
-           <td class="show_all" style="cursor: pointer; background-color: white; width: 60px; text-align: center;">
+         <table class="sensors">
+          <tr>
+           <td class="show_all" style="background-color: white; width: 60px; text-align: center;">
             $_("Total:") <a href="#">$node["total"]</a>
            </td>
            #for $i in ("online", "offline", "unknown", "missing")
@@ -171,16 +155,16 @@ $listing.sort()
     </table>
 
     <div style="display: $display">
-    <table style="width: 100%; border: 1px solid black;">
+    <table class="analyzers">
      <thead>
       <tr class="tr_header $row_classes[$cnt%2]">
-       <th>$_("Delete")</th>
-       <th>$_("Name")</th>
-       <th>$_("Model")</th>
-       <th>$_("Version")</th>
-       <th>$_("Class")</th>
-       <th>$_("Last heartbeat")</th>
-       <th style="text-align: center;">$_("Status")</th>
+       <th style="width: 5%">$_("Delete")</th>
+       <th style="width: 20%">$_("Name")</th>
+       <th style="width: 20%">$_("Model")</th>
+       <th style="width: 5%">$_("Version")</th>
+       <th style="width: 20%">$_("Class")</th>
+       <th style="width: 20%">$_("Latest heartbeat")</th>
+       <th style="style="width: 10%; text-align: center;">$_("Status")</th>
       </tr>
      </thead>
      #set $alisting = $node.analyzers
@@ -209,8 +193,6 @@ $listing.sort()
      </tbody>
     </table>
     </div>
-
-    <br />
    #end for
   </div>
  </fieldset>

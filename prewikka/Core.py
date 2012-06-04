@@ -32,7 +32,7 @@ except ImportError:
 
 class InvalidQueryError(Error.PrewikkaUserError):
     def __init__(self, message):
-        Error.PrewikkaUserError.__init__(self, "Invalid query", message, log=Log.ERROR)
+        Error.PrewikkaUserError.__init__(self, _("Invalid query"), message, log=Log.ERROR)
 
 
 class Logout(view.View):
@@ -42,35 +42,6 @@ class Logout(view.View):
 
     def render(self):
         self.env.auth.logout(self.request)
-
-
-def init_dataset(dataset, config, request):
-    interface = config.interface
-    dataset["document.title"] = "[PREWIKKA]"
-    dataset["document.charset"] = localization.getCurrentCharset()
-    dataset["document.css_files"] = [ "prewikka/css/style.css" ]
-    dataset["document.js_files"] = [ "prewikka/js/jquery.js", "prewikka/js/functions.js" ]
-    dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
-    dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
-    dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
-    dataset["prewikka.date"] = localization.getDate()
-
-    val = config.general.getOptionValue("external_link_new_window", "true")
-    if (not val and config.general.has_key("external_link_new_window")) or (val == None or val.lower() in ["true", "yes"]):
-        dataset["prewikka.external_link_target"] = "_blank"
-    else:
-        dataset["prewikka.external_link_target"] = "_self"
-
-    dataset["arguments"] = []
-    for name, value in request.arguments.items():
-        if name in ("_login", "_password"):
-            continue
-
-        if name == "view" and value == "logout":
-            continue
-
-        dataset["arguments"].append((name, utils.toUnicode(value)))
-
 
 def load_template(name, dataset):
     template = getattr(__import__("prewikka.templates." + name, globals(), locals(), [ name ]), name)(filtersLib=CheetahFilters)
@@ -110,10 +81,10 @@ class Core:
         self._prelude_version_error = None
 
         if not prelude.prelude_check_version(siteconfig.libprelude_required_version):
-            self._prelude_version_error = "Prewikka %s require libprelude %s or higher" % (siteconfig.version, siteconfig.libprelude_required_version)
+            self._prelude_version_error = _("Prewikka %(vPre)s requires libprelude %(vLib)s or higher") % {'vPre':siteconfig.version, 'vLib':siteconfig.libprelude_required_version}
 
         elif not preludedb.preludedb_check_version(siteconfig.libpreludedb_required_version):
-            self._prelude_version_error = "Prewikka %s require libpreludedb %s or higher" % (siteconfig.version, siteconfig.libpreludedb_required_version)
+            self._prelude_version_error = _("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher") % {'vPre':siteconfig.version, 'vLib':siteconfig.libpreludedb_required_version}
 
     def __init__(self, config=None):
         class Env: pass
@@ -125,6 +96,22 @@ class Core:
         self._env.max_aggregated_source = int(self._env.config.general.getOptionValue("max_aggregated_source", 10))
         self._env.max_aggregated_target = int(self._env.config.general.getOptionValue("max_aggregated_target", 10))
         self._env.default_locale = self._env.config.general.getOptionValue("default_locale", None)
+
+	val = self._env.config.general.getOptionValue("external_link_new_window", "true")
+        if val.lower() in ["true", "yes"]:
+            self._env.external_link_target = "_blank"
+        else:
+            self._env.external_link_target = "_self"
+
+        val = self._env.config.general.getOptionValue("enable_details", "false")
+        if val.lower() in ["true", "yes"]:
+            self._env.enable_details = True
+        else:
+            self._env.enable_details = False
+
+        self._env.host_details_url = self._env.config.general.getOptionValue("host_details_url", "https://www.prelude-ids.com/host_details.php")
+        self._env.port_details_url = self._env.config.general.getOptionValue("port_details_url", "https://www.prelude-ids.com/port_details.php")
+        self._env.reference_details_url = self._env.config.general.getOptionValue("reference_details_url", "https://www.prelude-ids.com/reference_details.php")
 
         if self._env.dns_max_delay != -1:
             resolve.init(self._env)
@@ -215,8 +202,36 @@ class Core:
         del view.dataset
         del view.env
 
+    def _init_dataset(self, dataset, request):
+        interface = self._env.config.interface
+    	dataset["document.title"] = "[PREWIKKA]"
+    	dataset["document.charset"] = localization.getCurrentCharset()
+    	dataset["document.css_files"] = [ "prewikka/css/style.css" ]
+    	dataset["document.js_files"] = [ "prewikka/js/jquery.js", "prewikka/js/functions.js" ]
+    	dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
+    	dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
+    	dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
+    	dataset["prewikka.date"] = localization.getDate()
+        dataset["prewikka.external_link_target"] = self._env.external_link_target
+        dataset["prewikka.enable_details"] = self._env.enable_details
+        dataset["prewikka.host_details_url"] = self._env.host_details_url
+        dataset["prewikka.port_details_url"] = self._env.port_details_url
+        dataset["prewikka.reference_details_url"] = self._env.reference_details_url
+
+	dataset["arguments"] = []
+        for name, value in request.arguments.items():
+            if name in ("_login", "_password"):
+                continue
+
+            if name == "view" and value == "logout":
+                continue
+
+            dataset["arguments"].append((name, utils.toUnicode(value)))
+
+        return dataset
+
     def _setupDataSet(self, dataset, request, user, view=None, parameters={}):
-        init_dataset(dataset, self._env.config, request)
+        dataset = self._init_dataset(dataset, request)
 
         sections = prewikka.views.events_section, prewikka.views.agents_section, prewikka.views.stats_section, prewikka.views.settings_section, \
                    prewikka.views.about_section
@@ -291,7 +306,7 @@ class Core:
             return self._views[name]
 
         except KeyError:
-            raise InvalidQueryError("View '%s' does not exist" % name)
+            raise InvalidQueryError(_("View '%s' does not exist") % name)
 
     def checkAuth(self, request):
         user = self._env.auth.getUser(request)
@@ -303,7 +318,7 @@ class Core:
     def prepareError(self, e, request, user, login, view):
         e = unicode(repr(e))
         self._env.log.error(e, request, login)
-        error = Error.PrewikkaUserError("Prewikka internal error", e,
+        error = Error.PrewikkaUserError(_("Prewikka internal error"), e,
                                         display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
         self._setupDataSet(error.dataset, request, user, view=view)
         return error
@@ -316,10 +331,10 @@ class Core:
 
         try:
             if self._prelude_version_error:
-                raise Error.PrewikkaUserError("Version Requirement error", self._prelude_version_error)
+                raise Error.PrewikkaUserError(_("Version Requirement error"), self._prelude_version_error)
 
             if self._database_schema_error != None:
-                raise Error.PrewikkaUserError("Database error", self._database_schema_error)
+                raise Error.PrewikkaUserError(_("Database error"), self._database_schema_error)
 
             user = self.checkAuth(request)
             login = user.login

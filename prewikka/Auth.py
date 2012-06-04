@@ -22,7 +22,7 @@ import md5
 import random
 
 from prewikka.Error import PrewikkaError, PrewikkaUserError
-from prewikka import DataSet, Database, Log, User, utils
+from prewikka import DataSet, Database, Log, User, utils, localization
 
 
 class AuthError(PrewikkaUserError):
@@ -132,6 +132,7 @@ class LoginPasswordAuth(Auth, Session):
         return self.db.getUser(login)
 
     def logout(self, request):
+	localization.setLocale(localization._DEFAULT_LANGUAGE)
         login = self.checkSession(request)
         self.deleteSession(request)
 

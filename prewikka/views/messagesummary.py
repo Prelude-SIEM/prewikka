@@ -374,15 +374,7 @@ class MessageSummary(Table):
             else:
                 return name
 
-        external_link_new_window = self.env.config.general.getOptionValue("external_link_new_window", "true")
-
-        if (not external_link_new_window and self.env.config.general.has_key("external_link_new_window")) or \
-               (external_link_new_window == None or external_link_new_window.lower() in [ "true", "yes" ]):
-            target = "_blank"
-        else:
-            target = "_self"
-
-        return "<a target='%s' href='%s'>%s</a>" % (target, url, name)
+        return '<a target="%s" href="%s">%s</a>' % (self.env.external_link_target, url, name)
 
     def getTime(self, t):
         if not t:
@@ -440,8 +432,8 @@ class MessageSummary(Table):
             else:
                 addr_list = ""
 
-            if addr["category"] in ("ipv4-addr", "ipv6-addr", "ipv4-net", "ipv6-net"):
-                addr_list += self.getUrlLink(address, "https://www.prelude-ids.com/host_details.php?host=%s" % address)
+            if addr["category"] in ("ipv4-addr", "ipv6-addr", "ipv4-net", "ipv6-net") and self.env.enable_details:
+                addr_list += self.getUrlLink(address, "%s?host=%s" %(self.env.host_details_url, address))
             else:
                 addr_list += address
 
@@ -692,7 +684,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.endTable()
 
         self.beginTable()
-        self.newTableCol(0, _("Correlated Alert"), header=True)
+        self.newTableCol(0, _("Correlated Alerts"), header=True)
         self.newTableCol(0, _("Source Analyzer"), header=True)
         self.buildAlertIdent(alert, ca)
         self.endTable()
@@ -734,12 +726,15 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         index = 1
         for reference in alert["classification.reference"]:
             self.newTableCol(index, reference["origin"])
-            if reference["origin"] in ("user-specific", "vendor-specific"):
-                urlstr="&url=" + urllib.quote(reference["url"], safe="")
-            else:
-                urlstr=""
 
-            self.newTableCol(index, self.getUrlLink(reference["name"], "http://www.prelude-ids.com/reference_details.php?origin=%s&name=%s%s" % (urllib.quote(reference["origin"]), urllib.quote(reference["name"]), urlstr)))
+            if self.env.enable_details:
+                if reference["origin"] in ("user-specific", "vendor-specific"):
+                    urlstr="&url=" + urllib.quote(reference["url"], safe="")
+                else:
+                    urlstr=""
+                self.newTableCol(index, self.getUrlLink(reference["name"], "%s?origin=%s&name=%s%s" % (self.env.reference_details_url, urllib.quote(reference["origin"]), urllib.quote(reference["name"]), urlstr)))
+            else:
+                self.newTableCol(index, reference["name"])
             self.newTableCol(index, reference["meaning"])
             index += 1
 
@@ -905,7 +900,10 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 
         if service["port"]:
             port = str(service["port"])
-            self.newTableEntry(_("Port"), self.getUrlLink(port, "https://www.prelude-ids.com/port_details.php?port=%s" % port))
+            if self.env.enable_details:
+                self.newTableEntry(_("Port"), self.getUrlLink(port, "%s?port=%s" % (self.env.port_details_url, port)))
+            else:
+                self.newTableEntry(_("Port"), port)
 
         portlist = service["portlist"]
         if portlist:
@@ -914,13 +912,16 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                 if len(out) > 0:
                     out += ", "
 
-                if port.find("-") != -1:
-                    left, right = port.split("-")
-                    out += self.getUrlLink(left, "https://www.prelude-ids.com/port_details.php?port=%s" % left)
-                    out += " - "
-                    out += self.getUrlLink(right, "https://www.prelude-ids.com/port_details.php?port=%s" % right)
+                if self.env.enable_details:
+                    if port.find("-") != -1:
+                        left, right = port.split("-")
+                        out += self.getUrlLink(left, "%s?port=%s" % (left, self.env.port_details_url))
+                        out += " - "
+                        out += self.getUrlLink(right, "%s?port=%s" % (right, self.env.port_details_url))
+                    else:
+                        out += self.getUrlLink(port, "%s?port=%s" % (port, self.env.port_details_url))
                 else:
-                    out += self.getUrlLink(port, "https://www.prelude-ids.com/port_details.php?port=%s" % port)
+                    out += port
 
             self.newTableEntry(_("PortList"), out)
 

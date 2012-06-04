@@ -55,7 +55,7 @@ THEMES = {"black_red"         : [(0.0,0.0,0.0,1.0), (1.0,0.0,0.0,1.0)],
 def colors_from_theme( theme, series_length, mode = 'solid' ):
     colors = []
     if theme not in THEMES.keys() :
-        raise Exception, "Theme not defined"
+        raise Exception, _("Theme not defined")
     color_steps = THEMES[theme]
     n_colors = len(color_steps)
     if series_length <= n_colors:
@@ -132,7 +132,7 @@ class Plot(object):
             self.surface = surface
             return
         if not type(surface) in (str, unicode):
-            raise TypeError("Surface should be either a Cairo surface or a filename, not %s" % surface)
+            raise TypeError(_("Surface should be either a Cairo surface or a filename, not %s") % surface)
         sufix = surface.rsplit(".")[-1].lower()
         self.filename = surface
         if sufix == "png":
@@ -242,7 +242,7 @@ class Plot(object):
                 for index,color in enumerate(colors):
                     self.background.add_color_stop_rgba(float(index)/(len(colors)-1),*COLORS[color])
         else:
-            raise TypeError ("Background should be either cairo.LinearGradient or a 3-tuple, not %s" % type(background))
+            raise TypeError (_("Background should be either cairo.LinearGradient or a 3-tuple, not %s") % type(background))
 
     def render_background(self):
         if isinstance(self.background, cairo.LinearGradient):

@@ -222,7 +222,8 @@ class HeartbeatAnalyze(view.View):
         analyzerid = self.parameters["analyzerid"]
 
         analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
-        analyzer["last_heartbeat_time"] = unicode(analyzer["last_heartbeat_time"])
+        analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(int(analyzer["last_heartbeat_time"]))) + \
+                                              " %+.2d:%.2d" % utils.get_gmt_offset()
         analyzer["events"] = [ ]
         analyzer["status"] = "abnormal_offline"
         analyzer["status_meaning"] = "abnormal offline"
@@ -241,6 +242,7 @@ class HeartbeatAnalyze(view.View):
             if not older_status or not older_interval:
                 continue
             older_time = older["heartbeat.create_time"]
+            older_time_str = utils.time_to_ymdhms(time.localtime(int(older_time))) + " %+.2d:%.2d" % utils.get_gmt_offset()
             total_interval += int(older_interval)
 
             if latest:
@@ -249,26 +251,27 @@ class HeartbeatAnalyze(view.View):
                                     get_analyzer_status_from_latest_heartbeat(older_status, older_time, older_interval,
                                                                               self._heartbeat_error_margin)
                 if analyzer["status"] == "abnormal_offline":
-                    analyzer["events"].append({ "value": "sensor is down since %s" % older_time, "type": "down"})
+                    analyzer["events"].append({ "value": _("Sensor is down since %s") % older_time_str, "type": "down"})
             if newer:
                 event = None
+                newer_time_str = utils.time_to_ymdhms(time.localtime(int(newer_time))) + " %+.2d:%.2d" % utils.get_gmt_offset()
 
                 if newer_status == "starting":
                     if older_status == "exiting":
-                        event = { "value": "normal sensor start at %s" % str(newer_time),
+                        event = { "value": _("Normal sensor start at %s") % newer_time_str,
                                   "type": "start" }
                     else:
-                        event = { "value": "unexpected sensor restart at %s" % str(newer_time),
+                        event = { "value": _("Unexpected sensor restart at %s") % newer_time_str,
                                   "type": "unexpected_restart" }
 
                 if newer_status == "running":
                     if abs(int(newer_time) - int(older_time) - int(older_interval)) > self._heartbeat_error_margin:
-                        event = { "value": "abnormal heartbeat interval between %s and %s" % (str(older_time), str(newer_time)),
-                                  "type": "abnormal_heartbeat_interval" }
+                        event = { "value": _("Abnormal heartbeat interval between %(old)s and %(new)s") % {'old': older_time_str, 'new': 
+                                  newer_time_str}, "type": "abnormal_heartbeat_interval" }
 
 
                 if newer_status == "exiting":
-                    event = { "value": "normal sensor stop at %s" % str(newer_time),
+                    event = { "value": _("Normal sensor stop at %s") % newer_time_str,
                               "type": "normal_stop" }
 
                 if event:
@@ -281,8 +284,8 @@ class HeartbeatAnalyze(view.View):
 
         if not analyzer["events"]:
             analyzer["events"].append({ "value":
-                                        "No anomaly in the last %d heartbeats (1 heartbeat every %d s average)" %
-                                        (self._heartbeat_count, total_interval / self._heartbeat_count),
+                                        _("No anomaly in the last %(heart)d heartbeats (1 heartbeat every %(sec)d s average)") %
+                                        {'heart': self._heartbeat_count, 'sec': total_interval / self._heartbeat_count},
                                         "type": "no_anomaly" })
 
         self.dataset["analyzer"] = analyzer

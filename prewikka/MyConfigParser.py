@@ -33,7 +33,7 @@ class ParseError(Error):
         self.line = line
 
     def __str__(self):
-        return "parse error in \"%s\" at %s line %d" % (self.line.rstrip(), self.filename, self.lineno)
+        return _("parse error in \"%(txt)s\" at %(file)s line %(line)d") % {'txt':self.line.rstrip(), 'file':self.filename, 'line':self.lineno}
 
 
 class ConfigParserSection(utils.OrderedDict):
