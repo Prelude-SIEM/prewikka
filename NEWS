@@ -1,3 +1,32 @@
+* 2012-06-04, prewikka-1.0.1:
+
+- Updated french, german and italian translations
+
+- Added missing translations msgid
+
+- The login page uses now the default language defined in prewikka.conf
+
+- Added packaging for rhel6
+
+- Changed copyrights
+
+- Updated About and SensorListing views
+
+- CSS enhancements, texts more readable
+
+- New  parameters (#471) : enable_details, host_details_url, port_details_url, reference_details_url
+
+- Fixed #482 : TypeError in alertlisting view
+
+- Fixed UnicodeDecodeError in prepareError
+
+- Fixed #469 : Heartbeat analyser failed
+
+- Fixed #475 : Filtering on sensors status hides all sensors
+
+- Fixed #381 : exception with CGI authentication
+
+
 * 2010-03-16, prewikka-1.0.0:
 
 - Fix logout link from the Statistics view.

@@ -49,7 +49,7 @@ Help development
 1. SUBMITTING PATCHES
 
 The Prelude source is constantly changing. If you want to submit a patch,
-please do so from the most recent CVS source tree, subscribe to the
+please do so from the most recent GIT source tree, subscribe to the
 prelude-devel mailing list by sending a mail to:
 
         prelude-devel-subscribe@prelude-ids.org
@@ -57,14 +57,14 @@ prelude-devel mailing list by sending a mail to:
 and post your patch with a description of functionality.
 You can also attach patches to bugs on
 
-        http://trac.prelude-ids.org
+        https://dev.prelude-ids.com
 
 
 2. BUGS
 
 If you find any bugs, please report them to:
 
-        http://trac.prelude-ids.org
+        https://dev.prelude-ids.com
 
 Please make sure that what you're reporting is actually a BUG and not
 a problem on your side.
