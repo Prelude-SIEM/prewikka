@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.01\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-06-01 10:56+0200\n"
+"POT-Creation-Date: 2012-06-13 14:44+0200\n"
 "PO-Revision-Date: 2008-02-26 13:12-0300\n"
 "Last-Translator: Edelberto Franco Silva <edeunix@edeunix.com>\n"
 "Language-Team: Portuguese\n"
@@ -405,7 +405,7 @@ msgid "Agent"
 msgstr "Agente"
 
 #: prewikka/templates/HeartbeatListing.py:151
-#: prewikka/templates/AlertListing.py:1367
+#: prewikka/templates/AlertListing.py:1389
 msgid "Time"
 msgstr "Tempo"
 
@@ -525,7 +525,7 @@ msgid "Refresh"
 msgstr "Atualizar"
 
 #: prewikka/templates/MessageListing.py:660 prewikka/templates/Stats.py:531
-#: prewikka/templates/AlertListing.py:1089
+#: prewikka/templates/AlertListing.py:1111
 msgid "Apply"
 msgstr "Aplicar"
 
@@ -663,8 +663,8 @@ msgstr ""
 "De acordo com a filosofia do Código Aberto, nós o incentivamos a participar "
 "do desenvolvimento de sua aplicação. Você pode ter versões customizadas do "
 "Preludepara suprir suas necessidade: adaptando, adicionando funcionalidades, "
-"etc. Porque são realizados por coordenadores do CS, você sabe que "
-"algumas modificações feitas no sistema estarão integradas otimizadamente e "
+"etc. Porque são realizados por coordenadores do CS, você sabe que algumas "
+"modificações feitas no sistema estarão integradas otimizadamente e "
 "garantidas por nosso departamento de suporte técnico. Adicionalmente, a "
 "companhia pode estender o Prelude para integrar sensores não suportados "
 "(incluindo os proprietários), extensões de regras para integrar novos "
@@ -678,11 +678,11 @@ msgstr "Manutenção do software e Suporte Técnico"
 #: prewikka/templates/About.py:127
 msgid "about_support"
 msgstr ""
-"CS serviços de manutenção e suporte garantem a ótima operação da "
-"plataforma Prelude em sua infraestrutura. Com nossos serviços de suporte, "
-"você será beneficiado com a assistência prioritária e a perícia de nossos "
-"engenheiros, enquanto os serviço de manutenção compreenderão a atualização "
-"de seu software."
+"CS serviços de manutenção e suporte garantem a ótima operação da plataforma "
+"Prelude em sua infraestrutura. Com nossos serviços de suporte, você será "
+"beneficiado com a assistência prioritária e a perícia de nossos engenheiros, "
+"enquanto os serviço de manutenção compreenderão a atualização de seu "
+"software."
 
 #: prewikka/templates/About.py:134
 msgid "Commercial licenses"
@@ -775,29 +775,29 @@ msgid "Regular expression (case-insensitive)"
 msgstr "Expressão regular (case-insensitive)"
 
 #: prewikka/templates/AlertListing.py:317
-#: prewikka/templates/AlertListing.py:1209
+#: prewikka/templates/AlertListing.py:1231
 msgid "info"
 msgstr "informações"
 
 #: prewikka/templates/AlertListing.py:319
-#: prewikka/templates/AlertListing.py:1211
+#: prewikka/templates/AlertListing.py:1233
 msgid "low"
 msgstr "baixa"
 
 #: prewikka/templates/AlertListing.py:321
-#: prewikka/templates/AlertListing.py:1213
+#: prewikka/templates/AlertListing.py:1235
 msgid "medium"
 msgstr "média"
 
 #: prewikka/templates/AlertListing.py:323
-#: prewikka/templates/AlertListing.py:1215
+#: prewikka/templates/AlertListing.py:1237
 msgid "high"
 msgstr "alta"
 
 #: prewikka/templates/AlertListing.py:325
 #: prewikka/templates/AlertListing.py:347
-#: prewikka/templates/AlertListing.py:1217
-#: prewikka/templates/AlertListing.py:1246 prewikka/views/stats.py:138
+#: prewikka/templates/AlertListing.py:1239
+#: prewikka/templates/AlertListing.py:1268 prewikka/views/stats.py:138
 #: prewikka/views/stats.py:277 prewikka/views/stats.py:538
 #: prewikka/views/stats.py:626 prewikka/views/stats.py:639
 #: prewikka/views/stats.py:643 prewikka/views/stats.py:709
@@ -806,12 +806,12 @@ msgid "n/a"
 msgstr ""
 
 #: prewikka/templates/AlertListing.py:343
-#: prewikka/templates/AlertListing.py:1242
+#: prewikka/templates/AlertListing.py:1264
 msgid "succeeded"
 msgstr "sucesso"
 
 #: prewikka/templates/AlertListing.py:345
-#: prewikka/templates/AlertListing.py:1244
+#: prewikka/templates/AlertListing.py:1266
 msgid "failed"
 msgstr "falhou"
 
@@ -821,176 +821,194 @@ msgid "simple"
 msgstr "Tempo"
 
 #: prewikka/templates/AlertListing.py:585
-#: prewikka/templates/AlertListing.py:857
+#: prewikka/templates/AlertListing.py:879
 msgid "advanced"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:852
+#: prewikka/templates/AlertListing.py:670
+msgid "Reset to null"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:675
+msgid "Reset to default"
+msgstr ""
+
+#: prewikka/templates/AlertListing.py:681
+#, fuzzy
+msgid "Reset to saved"
+msgstr "Reservado"
+
+#: prewikka/templates/AlertListing.py:686
+#, fuzzy
+msgid "Reset to current"
+msgstr "atual"
+
+#: prewikka/templates/AlertListing.py:874
 #, fuzzy
 msgid "Filter on"
 msgstr "Filtro em:"
 
-#: prewikka/templates/AlertListing.py:977
+#: prewikka/templates/AlertListing.py:999
 msgid "Group entry by:"
 msgstr "Entrada do grupo em:"
 
-#: prewikka/templates/AlertListing.py:1041
-#: prewikka/templates/AlertListing.py:1049
+#: prewikka/templates/AlertListing.py:1063
+#: prewikka/templates/AlertListing.py:1071
 #, fuzzy
 msgid "filtered"
 msgstr "Filtros"
 
-#: prewikka/templates/AlertListing.py:1130 prewikka/views/stats.py:459
+#: prewikka/templates/AlertListing.py:1152 prewikka/views/stats.py:459
 msgid "Classification"
 msgstr "Classificação"
 
-#: prewikka/templates/AlertListing.py:1155
+#: prewikka/templates/AlertListing.py:1177
 #, fuzzy
 msgid "Type:"
 msgstr "Tipo"
 
-#: prewikka/templates/AlertListing.py:1168
+#: prewikka/templates/AlertListing.py:1190
 #: prewikka/views/messagesummary.py:995
 #, fuzzy
 msgid "Alert"
 msgstr "Alertas"
 
-#: prewikka/templates/AlertListing.py:1170
+#: prewikka/templates/AlertListing.py:1192
 #, fuzzy
 msgid "CorrelationAlert"
 msgstr "AlertasDeCorreção"
 
-#: prewikka/templates/AlertListing.py:1172
+#: prewikka/templates/AlertListing.py:1194
 msgid "OverflowAlert"
 msgstr "OverflowAlert"
 
-#: prewikka/templates/AlertListing.py:1174
+#: prewikka/templates/AlertListing.py:1196
 #, fuzzy
 msgid "ToolAlert"
 msgstr "AlertasDasFerramentas"
 
-#: prewikka/templates/AlertListing.py:1203
+#: prewikka/templates/AlertListing.py:1225
 msgid "Severity:"
 msgstr "Severidade:"
 
-#: prewikka/templates/AlertListing.py:1234
+#: prewikka/templates/AlertListing.py:1256
 msgid "Completion:"
 msgstr "Conclusão:"
 
-#: prewikka/templates/AlertListing.py:1272
+#: prewikka/templates/AlertListing.py:1294
 msgid "Source"
 msgstr "Fonte"
 
-#: prewikka/templates/AlertListing.py:1304
+#: prewikka/templates/AlertListing.py:1326
 msgid "Target"
 msgstr "Alvo"
 
-#: prewikka/templates/AlertListing.py:1336
+#: prewikka/templates/AlertListing.py:1358
 #, fuzzy
 msgid "Analyzer"
 msgstr "Alertas"
 
-#: prewikka/templates/AlertListing.py:1478
+#: prewikka/templates/AlertListing.py:1500
 msgid "See alert detail"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:1487
+#: prewikka/templates/AlertListing.py:1509
 #, fuzzy
 msgid "Filter on this classification.text"
 msgstr "Filtro no agente"
 
-#: prewikka/templates/AlertListing.py:1541
+#: prewikka/templates/AlertListing.py:1563
 #, fuzzy
 msgid "Filter on this port/protocol"
 msgstr "Filtro no agente"
 
-#: prewikka/templates/AlertListing.py:1563
-#: prewikka/templates/AlertListing.py:1571
+#: prewikka/templates/AlertListing.py:1585
+#: prewikka/templates/AlertListing.py:1593
 #, fuzzy
 msgid "Port/protocol information"
 msgstr "Informações sobre a conta"
 
-#: prewikka/templates/AlertListing.py:1620
+#: prewikka/templates/AlertListing.py:1642
 #, fuzzy
 msgid "alert"
 msgid_plural "alerts"
 msgstr[0] "Alertas"
 msgstr[1] "Alertas"
 
-#: prewikka/templates/AlertListing.py:1644
+#: prewikka/templates/AlertListing.py:1666
 #, python-format
 msgid "%(hidden)d of %(total)d alerts not shown..."
 msgstr "%(hidden)d of %(total)d alertas não exibidas.."
 
-#: prewikka/templates/AlertListing.py:1655
-#: prewikka/templates/AlertListing.py:1855
+#: prewikka/templates/AlertListing.py:1677
+#: prewikka/templates/AlertListing.py:1877
 msgid "expand"
 msgstr "expandir"
 
-#: prewikka/templates/AlertListing.py:1800
+#: prewikka/templates/AlertListing.py:1822
 #, fuzzy
 msgid "Filter on this reference"
 msgstr "Filtro no agente"
 
-#: prewikka/templates/AlertListing.py:1815
+#: prewikka/templates/AlertListing.py:1837
 #, fuzzy
 msgid "Reference information"
 msgstr "Informações sobre a conta"
 
-#: prewikka/templates/AlertListing.py:1832
+#: prewikka/templates/AlertListing.py:1854
 #, fuzzy
 msgid "source"
 msgstr "Fonte"
 
-#: prewikka/templates/AlertListing.py:1834
+#: prewikka/templates/AlertListing.py:1856
 #, fuzzy
 msgid "target"
 msgstr "Alvo"
 
-#: prewikka/templates/AlertListing.py:1844
+#: prewikka/templates/AlertListing.py:1866
 #, python-format
 msgid "%(hidden)d of %(total)d %(name)ss not shown..."
 msgstr "%(hidden)d of %(total)d %(name)ss não exibido..."
 
-#: prewikka/templates/AlertListing.py:1886
+#: prewikka/templates/AlertListing.py:1908
 #, fuzzy, python-format
 msgid "Filter on this %s"
 msgstr "Filtro no agente"
 
-#: prewikka/templates/AlertListing.py:1908
+#: prewikka/templates/AlertListing.py:1930
 #, fuzzy, python-format
 msgid "%s information"
 msgstr "Endereço da informação"
 
-#: prewikka/templates/AlertListing.py:2054
+#: prewikka/templates/AlertListing.py:2076
 #, fuzzy, python-format
 msgid "sent at %s"
 msgstr "Reservado"
 
-#: prewikka/templates/AlertListing.py:2099
-#: prewikka/templates/AlertListing.py:2113
+#: prewikka/templates/AlertListing.py:2121
+#: prewikka/templates/AlertListing.py:2135
 #, fuzzy
 msgid "By time"
 msgstr "Tempo"
 
-#: prewikka/templates/AlertListing.py:2104
-#: prewikka/templates/AlertListing.py:2132
+#: prewikka/templates/AlertListing.py:2126
+#: prewikka/templates/AlertListing.py:2154
 msgid "descending"
 msgstr ""
 
-#: prewikka/templates/AlertListing.py:2118
-#: prewikka/templates/AlertListing.py:2146
+#: prewikka/templates/AlertListing.py:2140
+#: prewikka/templates/AlertListing.py:2168
 #, fuzzy
 msgid "ascending"
 msgstr "Querendo dizer"
 
-#: prewikka/templates/AlertListing.py:2127
-#: prewikka/templates/AlertListing.py:2141
+#: prewikka/templates/AlertListing.py:2149
+#: prewikka/templates/AlertListing.py:2163
 #, fuzzy
 msgid "By count"
 msgstr "Minha conta"
 
-#: prewikka/templates/AlertListing.py:2187
+#: prewikka/templates/AlertListing.py:2209
 #, fuzzy
 msgid "Filter"
 msgstr "Filtros"

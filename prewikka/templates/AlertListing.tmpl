@@ -386,6 +386,8 @@ function ${type}_set_${state}() {
  });
 
 
+ var stateText = {"null":"$_("Reset to null")", "default":"$_("Reset to default")",
+ "saved":"$_("Reset to saved")", "current":"$_("Reset to current")"}
 
  #for $type in "classification", "source", "target", "analyzer"
 
@@ -418,7 +420,7 @@ function ${type}_set_${state}() {
  else if ( Equals(form, saved_forms["$type"]["current"]) )
         saved_state["$type"] = "current";
 
- \$("#${type} input.reset_filter").val("Reset to " + get_next_state("$type", saved_state["$type"]));
+ \$("#${type} input.reset_filter").val(stateText[get_next_state("$type", saved_state["$type"])]);
 
  #end for
 
@@ -433,7 +435,7 @@ function ${type}_set_${state}() {
                         ${t}_filters_set_from_string(saved_state[div_id]);
         #end for
 
-        \$(this).val("Reset to " + get_next_state(div_id, saved_state[div_id]));
+        \$(this).val(stateText[get_next_state(div_id, saved_state[div_id])]);
  });
 
 \$(".popup_operator_select").live("change", function() {
