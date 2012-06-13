@@ -13,7 +13,6 @@ Prewikka is a professional looking application providing advanced feature like
 contextual filtering, aggregation, etc.
 
 
-
 Functionality Enhancement
 =========================
 
@@ -35,7 +34,9 @@ Get Support
 
 
 Prelude-user mailing list archives can be accessed at:
-        http://www.prelude-ids.org/mailman/listinfo
+	http://www.freelists.org/list/prelude-announce
+	http://www.freelists.org/list/prelude-dev
+	http://www.freelists.org/list/prelude-user 
 
 
 Commercial Support is available through the CS-SI company:
@@ -50,11 +51,7 @@ Help development
 
 The Prelude source is constantly changing. If you want to submit a patch,
 please do so from the most recent GIT source tree, subscribe to the
-prelude-devel mailing list by sending a mail to:
-
-        prelude-devel-subscribe@prelude-ids.org
-
-and post your patch with a description of functionality.
+prelude-devel mailing list and post your patch with a description of functionality.
 You can also attach patches to bugs on
 
         https://dev.prelude-ids.com
