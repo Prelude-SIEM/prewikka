@@ -607,17 +607,20 @@ p {
 .impact_severity_high, .impact_completion_succeeded {
         text-decoration: none;
         font-weight: bold;
-        color: red;
+        /*color: red;*/
+	color: #d02a2a;
 }
 
 .impact_severity_medium {
         text-decoration: none;
-        color: brown;
+        /* color: brown; */
+        color: #ff8e33;
 }
 
 .impact_severity_low, .impact_completion_failed {
         text-decoration: none;
-        color: darkorange;
+        /*color: darkorange;*/
+	color: #418c3d;
 }
 
 .impact_severity_info {
