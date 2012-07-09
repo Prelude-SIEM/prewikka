@@ -23,22 +23,7 @@ Prewikka requires:
 - libpreludedb with python bindings
 - The cheetah template engine (http://www.cheetahtemplate.org/)
 
-
-To install prewikka from the source distribution::
-
-  $ python setup.py install
-
-Upgrade
-=======
-
-From versions < 1.0.1 to >= 1.0.1
----------------------------------
-
-You **must** run the INSTALL_ROOT/share/prewikka/database/fixlanguage-1.0.1.sql to convert the users lang settings in database::
-
-  $ mysql -u prewikka prewikka -p prewikka < INSTALL_ROOT/share/prewikka/database/fixlanguage-1.0.1.sql
-  or
-  $ psql -U prewikka -W -d prewikka -f INSTALL_ROOT/share/prewikka/database/fixlanguage-1.0.1.sql
+Go to https://dev.prelude-ids.com/wiki/prelude/InstallingPreludePrewikka for installation instructions.
 
 
 Get Support
