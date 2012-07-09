@@ -13,35 +13,48 @@ Prewikka is a professional looking application providing advanced feature like
 contextual filtering, aggregation, etc.
 
 
-Functionality Enhancement
-=========================
+Installation
+============
 
-Prewikka functionality enhancements are available from the CS-SI company:
-	http://www.prelude-ids.com, info@prelude-ids.com
+Prewikka requires:
+
+- python >= 2.5 (not python 3.x)
+- libprelude with python bindings
+- libpreludedb with python bindings
+- The cheetah template engine (http://www.cheetahtemplate.org/)
 
 
+To install prewikka from the source distribution::
 
-IRC
-===
+  $ python setup.py install
 
-If there's something you just can't find out elsewhere, you want to
-give feedback directly to the authors or you're just bored, visit
-#prelude on irc.freenode.net
+Upgrade
+=======
+
+From versions < 1.0.1 to >= 1.0.1
+---------------------------------
+
+You **must** run the INSTALL_ROOT/share/prewikka/database/fixlanguage-1.0.1.sql to convert the users lang settings in database::
+
+  $ mysql -u prewikka prewikka -p prewikka < INSTALL_ROOT/share/prewikka/database/fixlanguage-1.0.1.sql
+  or
+  $ psql -U prewikka -W -d prewikka -f INSTALL_ROOT/share/prewikka/database/fixlanguage-1.0.1.sql
 
 
 Get Support
 ===========
 
-
 Prelude-user mailing list archives can be accessed at:
-	http://www.freelists.org/list/prelude-announce
-	http://www.freelists.org/list/prelude-dev
-	http://www.freelists.org/list/prelude-user 
+
+- http://www.freelists.org/list/prelude-announce
+- http://www.freelists.org/list/prelude-dev
+- http://www.freelists.org/list/prelude-user 
 
 
-Commercial Support is available through the CS-SI company:
-        http://www.prelude-ids.com, info@prelude-ids.com
+Commercial Support and functionality enhancements is available through the CS-SI company:
 
+- http://www.prelude-ids.com
+- info@prelude-ids.com
 
 
 Help development

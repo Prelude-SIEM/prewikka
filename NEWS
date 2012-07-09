@@ -26,6 +26,8 @@
 
 - Fixed #381 : exception with CGI authentication
 
+- Python 2.5 is now required
+
 
 * 2010-03-16, prewikka-1.0.0:
 

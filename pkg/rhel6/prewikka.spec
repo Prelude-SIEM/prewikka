@@ -4,7 +4,7 @@
 Name:           prewikka
 Epoch:          1
 Version:        1.0.1
-Release:        1%{?dist}
+Release:        2%{?dist}
 Summary:        Graphical front-end analysis console for the Prelude Hybrid IDS Framework
 Group:          Applications/Internet
 License:        GPLv2+
