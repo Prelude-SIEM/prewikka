@@ -63,7 +63,7 @@ def get_timestamp(s):
 
 
 class Database:
-    required_version = "0.9.12.1"
+    required_version = "0.9.11"
 
     # We reference preludedb_sql_destroy since it might be deleted
     # prior Database.__del__() is called.
