@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 import time
-import md5
+import hashlib
 import random
 
 from prewikka.Error import PrewikkaError, PrewikkaUserError
@@ -75,7 +75,7 @@ class Session:
     def createSession(self, request, login):
         t = int(time.time())
         self.db.deleteExpiredSessions(t - self._expiration)
-        sessionid = md5.new(str(t * random.random())).hexdigest()
+        sessionid = hashlib.md5(str(t * random.random())).hexdigest()
         self.db.createSession(sessionid, login, t)
         self.setSession(request, sessionid)
 

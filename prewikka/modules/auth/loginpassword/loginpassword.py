@@ -18,7 +18,7 @@
 # the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
 
 
-import md5
+import hashlib
 from prewikka import Auth, User, Database
 
 
@@ -47,7 +47,7 @@ class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
             self.db.setPermissions(user, User.ALL_PERMISSIONS)
 
     def _hash(self, data):
-        return md5.new(data.encode("utf8")).hexdigest()
+        return hashlib.md5(data.encode("utf8")).hexdigest()
 
     def createUser(self, login):
         return self.db.createUser(login)

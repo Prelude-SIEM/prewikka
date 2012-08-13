@@ -229,7 +229,7 @@ class TcpIpOptions(Table):
 
 
     def _decodeOptionMd5(self, data):
-        md = md5.md5(struct.unpack(">B" * 16, data)[0])
+        md = hashlib.md5(struct.unpack(">B" * 16, data)[0])
         return md.hexdigest()
 
     def _decodeOptionPartialOrderProfile(self, data):
