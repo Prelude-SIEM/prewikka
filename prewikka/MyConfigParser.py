@@ -13,9 +13,9 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; see the file COPYING.  If not, write to
-# the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
 import re
@@ -72,7 +72,7 @@ class MyConfigParser:
     A config parser class ala ConfigParser.ConfigParser (only read operations
     are (will be) supported).
     ConfigParser.ConfigParser did not feed all our needs:
-    - we need the '= value' part of option to be optionnal
+    - we need the '= value' part of option to be optional
     - we need to support special characters (like ':') in option name (for urls)
     - we need to keep the right order of options in sections (this is done via
       the OrderedDict class that subclass dict)
