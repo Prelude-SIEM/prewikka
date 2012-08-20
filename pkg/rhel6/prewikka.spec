@@ -12,7 +12,7 @@ URL:            http://www.prelude-ids.org
 Source0:        http://www.prelude-ids.org/download/releases/%{name}/%{name}-%{version}.tar.gz
 BuildRoot:      %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
 BuildRequires:  python-devel python-cheetah gettext
-Requires:       python-cheetah, libprelude-python, libpreludedb-python
+Requires:       python-cheetah, libprelude-python, libpreludedb-python, pycairo
 BuildArch:      noarch
 
 
@@ -21,7 +21,7 @@ Prewikka is the graphical front-end analysis console for the
 Prelude Universal SIM. Providing numerous features, Prewikka
 facilitates the work of users and analysts. It provides alert
 aggregation and sensor and hearbeat views, and has user management
-and configurable filters.Prewikka also provides access to external
+and configurable filters. Prewikka also provides access to external
 tools such as whois and traceroute.
 
 %prep
