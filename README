@@ -9,7 +9,7 @@ Originally written by Markus Alkio and Miika Keskinen, re-written and maintained
 Nicolas Delon with the help of Yoann Vandoorselaere and Audrey Girard, on behalf of 
 PreludeIDS Technologies, it was rapidly adopted as the new Prelude frontend. 
 
-Prewikka is a professional looking application providing advanced feature like 
+Prewikka is a professional looking application providing advanced features like
 contextual filtering, aggregation, etc.
 
 
@@ -23,7 +23,7 @@ Prewikka requires:
 - libpreludedb with python bindings
 - The cheetah template engine (http://www.cheetahtemplate.org/)
 
-Go to https://dev.prelude-ids.com/wiki/prelude/InstallingPreludePrewikka for installation instructions.
+Go to https://www.prelude-ids.org/wiki/prelude/InstallingPreludePrewikka for installation instructions.
 
 
 Get Support
@@ -31,9 +31,9 @@ Get Support
 
 Prelude-user mailing list archives can be accessed at:
 
-- http://www.freelists.org/list/prelude-announce
-- http://www.freelists.org/list/prelude-dev
-- http://www.freelists.org/list/prelude-user 
+- https://www.prelude-ids.org/lists/prelude-announce
+- https://www.prelude-ids.org/lists/prelude-devel
+- https://www.prelude-ids.org/lists/prelude-user
 
 
 Commercial Support and functionality enhancements is available through the CS-SI company:
@@ -52,14 +52,14 @@ please do so from the most recent GIT source tree, subscribe to the
 prelude-devel mailing list and post your patch with a description of functionality.
 You can also attach patches to bugs on
 
-        https://dev.prelude-ids.com
+        https://www.prelude-ids.org
 
 
 2. BUGS
 
 If you find any bugs, please report them to:
 
-        https://dev.prelude-ids.com
+        https://www.prelude-ids.org
 
 Please make sure that what you're reporting is actually a BUG and not
 a problem on your side.
