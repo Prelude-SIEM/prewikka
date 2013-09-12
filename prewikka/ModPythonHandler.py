@@ -26,6 +26,9 @@ class ModPythonRequest(Request.Request):
 
         Request.Request.init(self)
 
+        # Copy headers in input_headers to share headers between modpython and internal http server
+        self.input_headers = req.headers_in
+
         fs = util.FieldStorage(req)
         for key in fs.keys():
             self.arguments[key] = fs[key]
