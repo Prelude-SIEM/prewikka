@@ -13,5 +13,6 @@ include NEWS
 include AUTHORS
 include README
 include HACKING.README
+include COPYING*
 include prewikka.pot
 recursive-include prewikka *.py *.tmpl

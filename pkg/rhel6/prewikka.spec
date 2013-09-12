@@ -3,8 +3,8 @@
 
 Name:           prewikka
 Epoch:          1
-Version:        1.0.1
-Release:        2%{?dist}
+Version:        1.1.0
+Release:        1%{?dist}
 Summary:        Graphical front-end analysis console for the Prelude Hybrid IDS Framework
 Group:          Applications/Internet
 License:        GPLv2+
@@ -54,7 +54,7 @@ rm -rf %{buildroot}
 %{_sbindir}/%{name}-httpd
 %{python_sitelib}/%{name}/
 %{python_sitelib}/%{name}*.egg-info
-%doc AUTHORS README NEWS HACKING.README
+%doc COPYING* AUTHORS README NEWS HACKING.README
 
 %changelog
 * Wed Jun 15 2011 Vincent Quéméner <vincent.quemener@c-s.fr> - 1:1.0.0-5
