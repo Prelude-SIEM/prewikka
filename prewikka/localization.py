@@ -30,7 +30,9 @@ except ImportError:
 
 
 _lock = Lock()
-_DEFAULT_LANGUAGE = Config.Config(siteconfig.conf_dir + "/prewikka.conf").general.getOptionValue("default_locale", "en_GB")
+_config = Config.Config()
+_DEFAULT_LANGUAGE = _config.general.getOptionValue("default_locale", "en_GB")
+_DEFAULT_ENCODING = _config.general.getOptionValue("encoding", "utf8")
 _localized_thread = local()
 _all_locale = { }
 
@@ -63,7 +65,7 @@ _LANGUAGES = {
                u"Español": "es_ES",
                "English": "en_GB",
                u"Français": "fr_FR",
-	       "Italiano": "it_IT",
+               "Italiano": "it_IT",
                "Polski": "pl_PL",
                u"Português (Brasileiro)": "pt_BR",
                u"Русский": "ru_RU"
@@ -74,7 +76,7 @@ def setLocale(lang):
     if not lang:
         lang = _DEFAULT_LANGUAGE
 
-    locale.setlocale(locale.LC_ALL, lang.encode('utf8'))
+    locale.setlocale(locale.LC_ALL, "%s.%s" %(lang.encode('utf8'), str(_DEFAULT_ENCODING)))
 
     _lock.acquire()
 
