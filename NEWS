@@ -1,3 +1,26 @@
+* Unreleased, prewikka-1.1.0:
+
+- Set INNODB engine for MySQL
+
+- Fixed no css bug when adding a final slash to url
+
+- Config :
+  - Removed useless path to prewikka.conf
+  - Changed locales encoding to support non-latin characters in the top date
+
+- CGI module : removed useless imports
+
+- ModPythonHandler : Copy HTTP headers in Request.input_headers to share headers between modpython and internal http server
+
+- Packaging :
+  - RHEL6 : Added missing dependency to pycairo
+  - Added Makefile
+
+- Fixed #519 : Deprecation warnings in the apache log
+
+- Updated Free Software Foundation headers- 
+
+
 * 2012-06-04, prewikka-1.0.1:
 
 - Updated french, german and italian translations

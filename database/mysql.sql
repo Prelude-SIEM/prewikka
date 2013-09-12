@@ -2,7 +2,7 @@ DROP TABLE IF EXISTS Prewikka_Version;
 
 CREATE TABLE Prewikka_Version (
 	version VARCHAR(255) NOT NULL
-);
+) ENGINE=InnoDB;
 INSERT INTO Prewikka_Version (version) VALUES('0.9.11');
 
 
@@ -14,7 +14,7 @@ CREATE TABLE Prewikka_User (
 	lang VARCHAR(32) NULL, 
 	password VARCHAR(32) NULL,
 	email VARCHAR(64) NULL
-);
+) ENGINE=InnoDB;
 
 
 
@@ -23,7 +23,7 @@ DROP TABLE IF EXISTS Prewikka_Permission;
 CREATE TABLE Prewikka_Permission (
 	login VARCHAR(32) NOT NULL,
 	permission VARCHAR(32) NOT NULL
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX prewikka_permission_index_login ON Prewikka_Permission (login);
 
@@ -34,7 +34,7 @@ CREATE TABLE Prewikka_Session (
 	sessionid VARCHAR(128) NOT NULL PRIMARY KEY,
 	login VARCHAR(32) NOT NULL,
 	time DATETIME NOT NULL
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX prewikka_session_index_login ON Prewikka_Session (login);
 
@@ -47,7 +47,7 @@ CREATE TABLE Prewikka_Filter (
 	name VARCHAR(64) NOT NULL,
 	comment VARCHAR(255) NULL,
 	formula VARCHAR(255) NOT NULL
-);
+) ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX prewikka_filter_index_login_name ON Prewikka_Filter (login, name);
 
@@ -60,7 +60,7 @@ CREATE TABLE Prewikka_Filter_Criterion (
 	path VARCHAR(255) NOT NULL,
 	operator VARCHAR(8) NULL,
 	value VARCHAR(255) NULL
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX prewikka_filter_criterion_index_id ON Prewikka_Filter_Criterion (id);
 
@@ -71,6 +71,6 @@ CREATE TABLE Prewikka_User_Configuration (
 	view  VARCHAR(32) NOT NULL,
 	name  VARCHAR(255) NOT NULL,
 	value VARCHAR(255) NULL
-);
+) ENGINE=InnoDB;
 
 CREATE INDEX prewikka_user_configuration_index ON Prewikka_User_Configuration (name, login, view);
