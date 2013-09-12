@@ -41,12 +41,12 @@ var autorefresh_enabled = true;
                 autorefresh_enabled = false;
 
                 document.messagelisting.auto_apply_enable.value = "false";
-                document.messagelisting.auto_apply_image.src = "prewikka/images/play.png";
+                document.messagelisting.auto_apply_image.src = "/prewikka/images/play.png";
         } else {
                 autorefresh_enabled = true;
 
                 document.messagelisting.auto_apply_enable.value = "true";
-                document.messagelisting.auto_apply_image.src = "prewikka/images/pause.png";
+                document.messagelisting.auto_apply_image.src = "/prewikka/images/pause.png";
         }
   });
 
@@ -252,9 +252,9 @@ $message_listing_header
 
     <td colspan="2">
     #if $auto_apply_enable == "true"
-        #set $img = "prewikka/images/pause.png"
+        #set $img = "/prewikka/images/pause.png"
     #else:
-        #set $img = "prewikka/images/play.png"
+        #set $img = "/prewikka/images/play.png"
     #end if
 
 <input type="hidden" name="auto_apply_enable" value="$auto_apply_enable" />

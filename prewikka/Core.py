@@ -206,8 +206,8 @@ class Core:
         interface = self._env.config.interface
     	dataset["document.title"] = "[PREWIKKA]"
     	dataset["document.charset"] = localization.getCurrentCharset()
-    	dataset["document.css_files"] = [ "prewikka/css/style.css" ]
-    	dataset["document.js_files"] = [ "prewikka/js/jquery.js", "prewikka/js/functions.js" ]
+    	dataset["document.css_files"] = [ "/prewikka/css/style.css" ]
+    	dataset["document.js_files"] = [ "/prewikka/js/jquery.js", "/prewikka/js/functions.js" ]
     	dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
     	dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
     	dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
