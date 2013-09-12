@@ -296,6 +296,7 @@ class Core:
 
     def _getParameters(self, request, view, user):
         parameters = view["parameters"](request.arguments) - [ "view" ]
+        parameters.add_params(self._env.idmef_db)
         parameters.normalize(view["name"], user)
 
         return parameters

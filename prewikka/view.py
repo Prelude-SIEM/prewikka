@@ -86,6 +86,9 @@ class Parameters(dict):
 
         return value
 
+    def add_params(self, idmef_db):
+        pass
+
     def normalize(self, view, user):
         do_load = True
 

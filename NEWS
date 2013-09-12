@@ -1,5 +1,7 @@
 * Unreleased, prewikka-1.1.0:
 
+- Fixed #495 : Request-URI Too Large
+
 - Set INNODB engine for MySQL
 
 - Fixed no css bug when adding a final slash to url

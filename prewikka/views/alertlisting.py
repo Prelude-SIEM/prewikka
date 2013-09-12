@@ -183,6 +183,21 @@ class AlertListingParameters(MessageListingParameters):
         self._default_param = { "classification": {}, "source": {}, "target": {}, "analyzer": {} }
         self._saved = { "classification": [], "source": [], "target": [], "analyzer": [] }
 
+    def add_params(self, idmef_db):
+        i = 0
+        if "aggregated_alert_id" in self:
+            alert = idmef_db.getAlert(int(self.pop("aggregated_alert_id")))
+            if alert["alert.correlation_alert"]:
+                aggreg_type = "alert.correlation_alert"
+            elif message["alert.tool_alert"]:
+                aggreg_type = "alert.tool_alert"
+            else:
+                pass
+            for alertident in alert[aggreg_type]["alertident"]:
+                self.setdefault("classification_object_%d" % i, "alert.messageid")
+                self.setdefault("classification_value_%d" % i, alertident["alertident"])
+                i += 1
+
     def register(self):
         self.max_index = 0
         MessageListingParameters.register(self)
@@ -624,43 +639,15 @@ class ListedAlert(ListedMessage):
         dataset["classification"] = self.createInlineFilteredField("alert.classification.text", message["alert.classification.text"], "classification")
 
     def _setMessageAlertIdentInfo(self, message, alert, ident):
-        fetch_classification_info = fetch_source_info = fetch_target_info = True
 
-        i = 0
-        params = { }
-        criteria = [ ]
-        source_analyzer = None
-
-        for alertident in alert["alertident"]:
-            i += 1
-
-            # IDMEF draft 14 page 27
-            # If the "analyzerid" is not provided, the alert is assumed to have come
-            # from the same analyzer that is sending the Alert.
-
-            analyzerid = alertident["analyzerid"]
-            if not analyzerid:
-                if source_analyzer:
-                    analyzerid = source_analyzer
-                else:
-                    for a in message["analyzer"]:
-                        if a["analyzerid"]:
-                            source_analyzer = analyzerid = a["analyzerid"]
-                            break
-
-            params["analyzer_object_%d" % i] = "alert.analyzer.analyzerid"
-            params["analyzer_value_%d" % i] = analyzerid
-            params["classification_object_%d" % i] = "alert.messageid"
-            params["classification_value_%d" % i] = alertident["alertident"]
-
-            criteria.append("(alert.messageid = '%s' && alert.analyzer.analyzerid = '%s')" % (utils.escape_criteria(alertident["alertident"]), utils.escape_criteria(analyzerid)))
-
-        self["sub_alert_number"] = i
+        self["sub_alert_number"] = len(alert["alertident"])
         self["sub_alert_name"] = alert["name"]
         self["sub_alert_link"] = self.createMessageLink(ident, "alert_summary")
 
+        params = {}
         params["timeline_unit"] = "unlimited"
         params["aggregated_source"] = params["aggregated_target"] = params["aggregated_classification"] = params["aggregated_analyzer"] = "none"
+        params["aggregated_alert_id"] = ident
         self["sub_alert_display"] = utils.create_link("alert_listing", params)
 
     def _setClassificationInfos(self, dataset, message, ident):
