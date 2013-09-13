@@ -49,6 +49,22 @@
 
         return false;
   });
+
+  \$(".global_toggle").click(function(){
+        var \$div = \$("td.show_all").parents("table").next("div");
+        var \$all_tr = \$("table tbody tr", \$div);
+        var \$d = \$(".fieldset_toggle").parent().next("div").next("div");
+        if ( \$div.is(':visible') && ! \$all_tr.is(':hidden') ) {
+                \$div.hide('normal');
+                \$d.hide('normal');
+        } else {
+                \$all_tr.show();
+                \$div.show('normal');
+                \$d.show('normal');
+        }
+
+        return false;
+  });
 });
 
 //--></script>
@@ -64,6 +80,8 @@
 #end if
 
 <div id="fieldset_page">
+
+<input type="submit" class="global_toggle" value="$_("Show/Hide all")" />
 
 #set $listing = $locations.keys()
 $listing.sort()

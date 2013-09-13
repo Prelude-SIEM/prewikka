@@ -1,5 +1,7 @@
 * Unreleased, prewikka-1.1.0:
 
+- Added a hideall/showall button in sensor listing
+
 - Fixed non-display of popup menu with Internet Explorer
 
 - SensorListing : fixed a malformed style attribute
