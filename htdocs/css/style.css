@@ -135,11 +135,6 @@ p {
 }
 
 #top_view_header {
-        z-index: 3;
-        position: fixed;
-        top: 0px;
-        left: 0px;
-        right: 0px;
         height: 56px;
         padding-top: 10px;
         padding-left: 10px;
@@ -181,12 +176,6 @@ p {
  * top menu
  */
 #topmenu {
-        z-index: 3;
-        position: fixed;
-        _position: absolute;
-        top: 58px;
-        left: 200px;
-        right: 0px;
         background: #eeeeee;
         height: 21px;
         border: 1px white solid;
@@ -264,25 +253,30 @@ p {
         border-left: 1px solid white;
 }
 
+#rightcol {
+	float: left;
+	width: 100%;
+	margin-top: -23px;
+	height: 0;
+}
 
+#rightcol-inner {
+	margin-left: 200px;
+}
 /*
  * menu
  */
 
 #menu {
+	float: left;
         width: 200px;
-        margin-top: 80px;
-        top: 0px;
-        bottom: 0px;
-        z-index: 1;
-        position: fixed;
-        _position: absolute;
+	margin-right: -100%;
         border-width: 0 1px 0 0;
         border-color: white;
         border-style: solid;
         background: #acacac;
         height: 100%;
-        _height: expression((document.body.clientHeight - 80) + 'px');
+	z-index: 100;
 }
 
 #menu a {
@@ -329,15 +323,13 @@ p {
 /* menu timeline control */
 #timeline {
         background-color: gainsboro;
-        border: 1px solid white;
-        width: 194px;
-        position: fixed;
-        _position: absolute;
-        left: 3px;
+        width: 196px;
         bottom: 43px;
         height: 163px;
 	padding: 0.3em;
-	border-radius: 5px 5px 0 0;
+	border-radius: 0;
+	margin-left: 2px;
+	margin-right: 2px;
 }
 
 #timeline tr {
@@ -479,12 +471,8 @@ p {
 
 /* menu message nav */
 #message_list_nav {
-        position: fixed;
-        _position: absolute;
-        bottom: 0px;
-        left: 1px;
         height: 43px;
-        width: 198px;
+        width: 200px;
 	border: none;
 	background-color: transparent;
 }
@@ -526,23 +514,11 @@ p {
  */
 #main {
         font-size: 100%;
-
-        _position: absolute;
-        _top: 0px;
-        _left: 0px;
-
         padding-top: 10px;
-        margin-top: 80px;
-        padding-left: 210px;
         padding-right: 10px;
-        _padding-right: 25px;
+        padding-left: 10px;
 
 
-        _bottom: 0px;
-        _overflow-x: hidden;
-        _overflow-y: auto;
-        _width: expression((document.body.clientWidth  - 195) + 'px');
-        _height: expression((document.body.clientHeight - 90) + 'px');
 }
 
 /*
@@ -607,20 +583,17 @@ p {
 .impact_severity_high, .impact_completion_succeeded {
         text-decoration: none;
         font-weight: bold;
-        /*color: red;*/
-	color: #d02a2a;
+        color: #d02a2a;
 }
 
 .impact_severity_medium {
         text-decoration: none;
-        /* color: brown; */
         color: #ff8e33;
 }
 
 .impact_severity_low, .impact_completion_failed {
         text-decoration: none;
-        /*color: darkorange;*/
-	color: #418c3d;
+        color: #418c3d;
 }
 
 .impact_severity_info {

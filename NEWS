@@ -1,5 +1,9 @@
 * Unreleased, prewikka-1.1.0:
 
+- Fixed prewikka layout : replace fixed positions by floats
+
+- Fixed #468 : Division by zero in stats
+
 - Fixed #495 : Request-URI Too Large
 
 - Set INNODB engine for MySQL

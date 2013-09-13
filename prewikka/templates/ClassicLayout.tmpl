@@ -5,31 +5,6 @@ classic_body
 #end def
 
 #block toplayout_content
-#filter CleanOutput
-
-<div id="topmenu">
-  #for $name, $link in $interface.tabs
-    #if $name == $interface.active_tab
-      #set $class_ = 'topmenu_item_active'
-    #else
-      #set $class_ = 'topmenu_item_inactive'
-    #end if
-    <div class="$class_"><p><a href="$link">$_($name)</a></p></div>
-  #end for
-
-  <div class="topmenu_item_special">
-  #if $prewikka.logout_link
-    <p><a href="$prewikka.logout_link">$_("logout")</a></p>
-  #end if
-  </div>
-
-  <div class="topmenu_item_info">
-    #end filter
-    <p>$unicode($_("%(username)s on %(date)s") % { "username": $prewikka.userlink, "date": $prewikka.date })</p>
-    #filter CleanOutput
-  </div>
-</div>
-#end filter
 #filter Filter
 
 #def layout_start_hook
@@ -54,8 +29,36 @@ $layout_start_hook
   #end def
   $menu_extra_content
 </div>
-
-<div id="main">$main_content</div>
+#filter CleanOutput
+<div id="rightcol">
+  <div id="rightcol-inner">
+    <div id="topmenu">
+      #for $name, $link in $interface.tabs
+        #if $name == $interface.active_tab
+          #set $class_ = 'topmenu_item_active'
+        #else
+          #set $class_ = 'topmenu_item_inactive'
+        #end if
+        <div class="$class_"><p><a href="$link">$_($name)</a></p></div>
+      #end for
+    
+      <div class="topmenu_item_special">
+      #if $prewikka.logout_link
+        <p><a href="$prewikka.logout_link">$_("logout")</a></p>
+      #end if
+      </div>
+    
+      <div class="topmenu_item_info">
+        #end filter
+        <p>$unicode($_("%(username)s on %(date)s") % { "username": $prewikka.userlink, "date": $prewikka.date })</p>
+        #filter CleanOutput
+      </div>
+    </div>
+    #end filter
+    
+    <div id="main">$main_content</div>
+  </div>
+</div>
 
 #def layout_end_hook
 #end def
