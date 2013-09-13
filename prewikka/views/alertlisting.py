@@ -434,7 +434,7 @@ class ListedAlert(ListedMessage):
         return None
 
     def _setMessageDirectionAddress(self, dataset, direction, address, category=None):
-        if category == None and address:
+        if (category == None or category == "unknown") and address:
             category = self._guessAddressCategory(address)
 
         if dataset.has_key("no_dns"):

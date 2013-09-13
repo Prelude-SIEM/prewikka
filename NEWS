@@ -1,5 +1,8 @@
 * Unreleased, prewikka-1.1.0:
 
+- Fixed a display problem of url-related links : 
+  When the address category is unknown, two values are possible : None or "unknown".
+
 - Fixed prewikka layout : replace fixed positions by floats
 
 - Fixed #468 : Division by zero in stats
