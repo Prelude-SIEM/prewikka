@@ -5,7 +5,7 @@ $(document).ready(function(){
   var $cachef = null;
 
   $.fn.popupUnique = function(animshow, animhide) {
-	if ( this.is(':visible') ) {
+	if ( $cache && this.is(':visible') ) {
 		$cachef($cache);
 		$cache = null;
 		autorefresh_possible = true;
