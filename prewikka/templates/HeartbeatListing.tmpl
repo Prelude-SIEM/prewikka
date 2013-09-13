@@ -46,7 +46,7 @@
 #block message_fields
 
 <td>
-  <a class="popup_menu_toggle" href="#">$message.agent.value</a>
+  <a class="popup_menu_toggle">$message.agent.value</a>
   <span class="popup_menu">
    - <a href="$message.summary">$_("Heartbeat summary")</a><br />
    - <a href="$message.agent.inline_filter">$_("Filter on agent")</a>
@@ -56,7 +56,7 @@
 <td>
   #if len($message.node_addresses) > 0
     #for $address in $message.node_addresses
-    <a class="popup_menu_toggle" href="#">$address.value</a>
+    <a class="popup_menu_toggle">$address.value</a>
     <span class="popup_menu">
       - <a href="$address.inline_filter">$_("Filter on address")</a><br />
       #if $prewikka.enable_details

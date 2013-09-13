@@ -117,7 +117,7 @@ $listing.sort()
         <th class="show_all">$node.node_name</th>
         <th>
          #for $addr in $node.node_addresses
-          <a class="popup_menu_toggle" href="#">$addr.value</a>
+          <a class="popup_menu_toggle">$addr.value</a>
           <span class="popup_menu">
            - <a href="$addr.inline_filter">$_("Filter on address")</a><br />
 	   #if $prewikka.enable_details
@@ -176,7 +176,7 @@ $listing.sort()
        <td style="padding-top: 0px; padding-bottom: 0px;"><input class="checkbox" type="checkbox" name="analyzerid" value="$analyzer["analyzerid"]" /></td>
 
        <td>
-        <a class="popup_menu_toggle" href="#">$analyzer.name</a>
+        <a class="popup_menu_toggle">$analyzer.name</a>
         <span class="popup_menu">
          - <a href="$analyzer.alert_listing">$_("Alert listing")</a><br />
          - <a href="$analyzer.heartbeat_listing">$_("Heartbeat listing")</a><br />

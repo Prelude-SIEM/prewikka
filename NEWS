@@ -1,5 +1,7 @@
 * Unreleased, prewikka-1.1.0:
 
+- Sensors and Heartbeat listing : Fixed a bug leading to the page top when clicking on a popup menu link
+
 - Fixed a display problem of url-related links : 
   When the address category is unknown, two values are possible : None or "unknown".
 
