@@ -219,10 +219,6 @@ class TimelineChartCommon(ChartCommon):
                 empty = False
                 break
 
-        if not self._got_value and empty:
-            # do not add 0 only values at the beginning of the chart
-            return
-
         if self._support_link and total_link:
             total_link = utils.escape_html_string(total_link)
 
