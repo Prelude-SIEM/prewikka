@@ -204,7 +204,12 @@ $listing.sort()
          - <a href="$analyzer.heartbeat_analyze">$_("Heartbeat analysis")</a><br />
         </span>
        </td>
-       <td><a href="$analyzer.model.inline_filter">$analyzer.model.value</a></td>
+       <td>
+         <a class="popup_menu_toggle">$analyzer.model.value</a>
+         <span class="popup_menu">
+          - <a href="$analyzer.model.inline_filter">$_("Filter on model")</a>
+        </span>
+       </td>
        <td>$analyzer["version"]</td>
        <td>$analyzer["class"]</td>
        <td>$analyzer["last_heartbeat_time"]</td>

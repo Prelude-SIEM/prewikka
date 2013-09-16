@@ -1,5 +1,7 @@
 * Unreleased, prewikka-1.1.0:
 
+- Added a popup for filtering by analyzer model
+
 - Allowed filtering in sensors listing view
 
 - Added the host_url feature
