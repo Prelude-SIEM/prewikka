@@ -144,7 +144,7 @@ $listing.sort()
            #for $name, $link in $addr.host_commands
            - <a href="$link">$name</a><br />
            #end for
-           #for $name, $link in $address.host_url
+           #for $name, $link in $addr.host_url
            - <a href="$link" target="_$name">$name</a><br />
            #end for
           </span>
@@ -204,7 +204,7 @@ $listing.sort()
          - <a href="$analyzer.heartbeat_analyze">$_("Heartbeat analysis")</a><br />
         </span>
        </td>
-       <td>$analyzer["model"]</td>
+       <td><a href="$analyzer.model.inline_filter">$analyzer.model.value</a></td>
        <td>$analyzer["version"]</td>
        <td>$analyzer["class"]</td>
        <td>$analyzer["last_heartbeat_time"]</td>

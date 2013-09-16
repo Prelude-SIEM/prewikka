@@ -110,7 +110,7 @@ class SensorListing(view.View):
         locations = { }
         nodes = { }
 
-        for analyzerid in self.env.idmef_db.getAnalyzerids():
+        for analyzerid in self.env.idmef_db.getAnalyzerids(criteria):
             analyzer = self.env.idmef_db.getAnalyzer(analyzerid)
 
             parameters = { "analyzerid": analyzer["analyzerid"] }
@@ -145,6 +145,17 @@ class SensorListing(view.View):
                                                                            utils.create_link("Command",
                                                                                              { "origin": self.view_name,
                                                                                                "command": command, "host": addr })))
+
+                analyzer["node_addresses"][i]["host_url"] = []
+                if "host" in self.env.url:
+                    for urlname, url in self.env.url["host"].items():
+                        analyzer["node_addresses"][i]["host_url"].append((urlname.capitalize(), url.replace("$host", addr)))
+
+            model = analyzer["model"]
+            analyzer["model"] = {}
+            analyzer["model"]["value"] = model
+            analyzer["model"]["inline_filter"] = utils.create_link(self.view_name, { "filter_path": "heartbeat.analyzer(-1).model",
+                                                                                     "filter_value": model })
 
             analyzer["status"], analyzer["status_meaning"] = \
                                 get_analyzer_status_from_latest_heartbeat(analyzer["last_heartbeat_status"],

@@ -494,12 +494,15 @@ class IDMEFDatabase:
     def countHeartbeats(self, criteria=None):
         return self._countMessages("heartbeat", criteria)
 
-    def getAnalyzerids(self):
+    def getAnalyzerids(self, criteria=None):
         analyzerids = [ ]
         rows = self.getValues([ "heartbeat.analyzer(-1).analyzerid/group_by" ])
         for row in rows:
             analyzerid = row[0]
-            analyzerids.append(analyzerid)
+            ident = self.getLastHeartbeatIdent(analyzerid)
+            heartbeat = self.getHeartbeat(ident)
+            if not criteria or heartbeat.match(criteria):
+                analyzerids.append(analyzerid)
 
         return analyzerids
 

@@ -1,5 +1,7 @@
 * Unreleased, prewikka-1.1.0:
 
+- Allowed filtering in sensors listing view
+
 - Added the host_url feature
 
 - Added missing _set_host_commands function
