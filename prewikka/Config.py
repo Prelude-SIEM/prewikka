@@ -55,6 +55,12 @@ class Config:
     def _set_interface(self, interface):
         self.interface = interface
 
+    def _set_host_commands(self, host_commands):
+        """
+        Set local host_commands value
+        """
+        self.host_commands = host_commands
+
     def _set_database(self, database):
         self.database = database
         
