@@ -33,6 +33,7 @@ class Config:
         self.idmef_database = MyConfigParser.ConfigParserSection("idmef_database")
         self.admin = None
         self.auth = None
+        self.url = { }
         self.logs = [ ]
         self.views = [ ]
 
@@ -60,6 +61,9 @@ class Config:
         Set local host_commands value
         """
         self.host_commands = host_commands
+
+    def _set_url(self, url):
+        self.url[url.name] = url
 
     def _set_database(self, database):
         self.database = database

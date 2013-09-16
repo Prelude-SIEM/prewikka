@@ -634,8 +634,15 @@ class ListedAlert(ListedMessage):
             fstr = self.createInlineFilteredField(pl, vl, "classification", fstr)
             dataset["classification_references"].append((urlstr, fstr))
 
+    def _setMessageClassificationURL(self, dataset, classification):
+        dataset["classification_url"] = [ ]
+        if "classification" in self.env.url:
+            for urlname, url in self.env.url["classification"].items():
+                dataset["classification_url"].append((urlname.capitalize(), url.replace("$classification", classification)))
+
     def _setMessageClassification(self, dataset, message):
         self._setMessageClassificationReferences(dataset, message)
+        self._setMessageClassificationURL(dataset, message["alert.classification.text"])
         dataset["classification"] = self.createInlineFilteredField("alert.classification.text", message["alert.classification.text"], "classification")
 
     def _setMessageAlertIdentInfo(self, message, alert, ident):
@@ -656,8 +663,20 @@ class ListedAlert(ListedMessage):
         dataset["severity"] = { "value": message["alert.assessment.impact.severity"] }
         dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"])
 
+    def _setMessageTimeURL(self, t, host):
+        if "time" in self.env.url and t:
+            self["time"]["time_url"] = [ ]
+            t = str(int(t) + t.gmt_offset)
+
+            for urlname, url in self.env.url["time"].items():
+                url = url.replace("$time", t)
+                if host:
+                    url = url.replace("$host", host)
+                self["time"]["time_url"].append((urlname.capitalize(), url))
+
     def _setMessageTime(self, message):
         self["time"] = self.createTimeField(message["alert.create_time"], self.timezone)
+        self._setMessageTimeURL(message["alert.analyzer_time"], message["alert.analyzer(-1).node.name"])
         if (message["alert.analyzer_time"] != None and
             abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
             self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"], self.timezone)
@@ -755,11 +774,13 @@ class ListedAggregatedAlert(ListedAlert):
     def setInfos(self, count, classification, severity, completion):
         infos = {
             "classification_references": "",
+            "classification_url": "",
             "count": count,
             "classification": self.createInlineFilteredField("alert.classification.text", classification, direction="classification"),
             "severity": { "value": severity },
             "completion": self.createInlineFilteredField("alert.assessment.impact.completion", completion)
             }
+        self._setMessageClassificationURL(infos, classification)
 
         self["infos"].append(infos)
 

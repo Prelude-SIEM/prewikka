@@ -223,6 +223,7 @@ class ListedMessage(dict):
     def createHostField(self, object, value, category=None, direction=None, dns=True):
         field = self.createInlineFilteredField(object, value, direction)
         field["host_commands"] = [ ]
+        field["host_url"] = [ ]
         field["category"] = category
 
         if value and dns is True:
@@ -237,6 +238,10 @@ class ListedMessage(dict):
             field["host_commands"].append((command.capitalize(),
                                            utils.create_link("Command",
                                                              { "origin": self.view_name, "command": command, "host": value })))
+
+        if "host" in self.env.url:
+            for urlname, url in self.env.url["host"].items():
+                field["host_url"].append((urlname.capitalize(), url.replace("$host", value)))
 
         return field
 

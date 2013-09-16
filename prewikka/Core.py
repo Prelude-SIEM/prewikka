@@ -129,6 +129,7 @@ class Core:
 
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
         self._initHostCommands()
+        self._initURL()
         self._loadViews()
         self._loadModules()
         self._initAuth()
@@ -147,6 +148,13 @@ class Core:
         for option in self._env.config.host_commands.getOptions():
             if os.access(option.value.split(" ")[0], os.X_OK):
                 self._env.host_commands[option.name] = option.value
+
+    def _initURL(self):
+        self._env.url = {}
+        for urltype in self._env.config.url:
+            self._env.url[urltype] = {}
+            for option in self._env.config.url[urltype].getOptions():
+                self._env.url[urltype][option.name] = option.value
 
     def _initAuth(self):
         if self._env.auth.canLogout():

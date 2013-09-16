@@ -668,9 +668,28 @@ function ${type}_set_${state}() {
 
 #def classificationWrite(info, text)
 <a class="impact_severity_$info.severity.value popup_menu_toggle">$text</a><span class="popup_menu">
+#if $info.count == 1
 - <a href="$info.display">$_("See alert detail")</a><br />
+#end if
+#if not $info.classification.already_filtered
 - <a href="$info.classification.inline_filter">$_("Filter on this classification.text")</a><br />
+#end if
+#for name, url in $info.classification_url
+- <a href="$url">$name</a><br />
+#end for
 </span>#slurp
+#end def
+
+#def timeWrite(time_url, text)
+#if $time_url
+<a class="popup_menu_toggle">$text</a><span class="popup_menu">
+#for name, url in $time_url
+- <a href="$url">$name</a><br />
+#end for
+</span>#slurp
+#else
+$text
+#end if
 #end def
 
 #def writeService($hstr, $direction)
@@ -722,22 +741,11 @@ function ${type}_set_${state}() {
     #if $message.aggregated and (len($message.infos) > 1 or $info.count > 1)
       #if $info.count == 1
        $info.count x
-        #filter Filter $classificationWrite($info, $text) #end filter
       #else
-      <a href="$info.display">$info.count</a> x
-       #if $info.classification.already_filtered
-        <span class="impact_severity_$info.severity.value">$text</span>
-       #else
-        <a class="impact_severity_$info.severity.value" href="$info.classification.inline_filter">$text</a>
-       #end if
-      #end if
-    #else
-      #if $info.classification.already_filtered
-      <a class="impact_severity_$info.severity.value" href="$info.display">$text</a>
-      #else
-       #filter Filter $classificationWrite($info, $text) #end filter
+       <a href="$info.display">$info.count</a> x
       #end if
     #end if
+    #filter Filter $classificationWrite($info, $text) #end filter
 
     #if $info.completion.value
       (#filter Filter$writeInlineFilter($info.completion, cl="impact_completion_" + $info.completion.value)#end filter#)
@@ -791,6 +799,9 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
           #for $cmdname, $link in $address.host_commands
          - <a href="$link">$cmdname</a><br />
           #end for
+          #for $urlname, $link in $address.host_url
+         - <a href="$link" target="_$urlname">$urlname</a><br />
+          #end for
        #end if
        </span>#slurp
 #filter Filter $writeService(":", $direction) #end filter
@@ -839,7 +850,7 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
       $message.time_min.value
     #end if
   #else
-    $message.time.value
+    #filter Filter $timeWrite($message.time.time_url, $message.time.value) #end filter
     #if $message.analyzer_time.value
       #echo($_("sent at %s") % $message.analyzer_time.value)
     #end if
