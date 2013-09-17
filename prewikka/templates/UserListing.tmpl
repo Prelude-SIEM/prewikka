@@ -4,8 +4,6 @@
 #filter CleanOutput
 
 <form action="?" method="post">
-<input type="hidden" name="view" value="user_delete"/>
-
 <table class="user_list_table">
   <thead>
     <tr>
@@ -34,24 +32,19 @@
 
   <tr>
     <td colspan="$perm_cnt" style="text-align: right;">
-#if $backend_can_delete
-     <input style="float: right;" type="submit" value="$_("Delete user")"/>
-#end if
-     </form>
-
-#if $backend_can_create
-     <form action="?" method="get">
-      <input type="hidden" name="view" value="user_add_form"/>
-      <input style="float: left;" type="submit" value="$_("Create user")"/>
-     </form>
-#end if
-
+       <input id="view" type="hidden" name="view" value="user_add_form"/>
+       #if $backend_can_create
+       <input style="float: left;" type="submit" value="$_("Create user")"/>
+       #end if
+       #if $backend_can_delete
+       <input style="float: right;" onclick="javascript:\$('#view').val('user_delete')" type="submit" value="$_("Delete user")"/>
+       #end if
     </td>
   </tr>
-
   </tbody>
 </table>
 </form>
 
 #end filter
 #end block main_content
+

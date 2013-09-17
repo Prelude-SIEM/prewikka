@@ -1,5 +1,11 @@
 * Unreleased, prewikka-1.1.0:
 
+- More XHTML compliant : 
+  - Fixed some missing closing tags
+  - Fixed & encoding in URL
+  - Fixed empty options in aggregated filters,
+  - Fixed bad forms in users listing
+
 - Added a popup for filtering by analyzer model
 
 - Allowed filtering in sensors listing view

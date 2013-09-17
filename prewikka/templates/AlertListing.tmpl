@@ -344,7 +344,7 @@ function ${type}_set_${state}() {
 
    \$(this).parents(".inline_filter").after(tr);
    \$(select).trigger("change");
-   \$(tr).children("td.td_container_remove").html("<a class=\"remove_entry\">-</a>");
+   \$(tr).children("td.td_container_remove").html("<a class=\"remove_entry\">-<\/a>");
  });
 
 
@@ -478,7 +478,6 @@ function ${type}_set_${state}() {
 
            #elif $path == $preselect
             <option value="$path" selected="selected">$name</option>
-
            #else
             <option value="$path">$name</option>
            #end if
@@ -510,6 +509,8 @@ function ${type}_set_${state}() {
           #for $name, $path, $unuseda, $unusedb in $all_aggregs[$obname]
            #if $path == None
             <option disabled="disabled" value="">$name</option>
+           #elif $path == "none"
+            <option value="$path">&nbsp;</option>
            #else
             <option value="$path">$name</option>
            #end if
@@ -667,7 +668,8 @@ function ${type}_set_${state}() {
 #end def
 
 #def classificationWrite(info, text)
-<a class="impact_severity_$info.severity.value popup_menu_toggle">$text</a><span class="popup_menu">
+<a class="impact_severity_$info.severity.value popup_menu_toggle">$text</a>
+<span class="popup_menu">
 #if $info.count == 1
 - <a href="$info.display">$_("See alert detail")</a><br />
 #end if
@@ -682,7 +684,8 @@ function ${type}_set_${state}() {
 
 #def timeWrite(time_url, text)
 #if $time_url
-<a class="popup_menu_toggle">$text</a><span class="popup_menu">
+<a class="popup_menu_toggle">$text</a>
+<span class="popup_menu">
 #for name, url in $time_url
 - <a href="$url">$name</a><br />
 #end for
@@ -698,16 +701,15 @@ $text
 #else
 #set $protocol = ""
 #end if
-#if $direction.service.value != None#$hstr<a class="popup_menu_toggle">$unicode($direction.service.value)#end if
-</a>
+#if $direction.service.value != None#$hstr
+    <a class="popup_menu_toggle">$unicode($direction.service.value)</a>
        <span class="popup_menu">
         #filter Filter - $writeInlineFilter($direction.service, $_("Filter on this port/protocol"))<br/> #end filter
         #if $direction.port.value and $prewikka.enable_details
         - <a target="$prewikka.external_link_target" href="$prewikka.port_details_url?port=$unicode($direction.port.value)&amp;protocol=$protocol">$_("Port/protocol information")</a>
-        #else
-        - <span>$_("Port/protocol information")</span>
         #end if
        </span>#slurp
+#end if
 #end def
 
 
@@ -850,7 +852,7 @@ $sep#if $url#<a class="popup_menu_toggle">$name.value</a>#else##filter Filter $w
       $message.time_min.value
     #end if
   #else
-    #filter Filter $timeWrite($message.time.time_url, $message.time.value) #end filter
+    #filter Filter $timeWrite($getVar('message.time.time_url', None), $message.time.value) #end filter
     #if $message.analyzer_time.value
       #echo($_("sent at %s") % $message.analyzer_time.value)
     #end if

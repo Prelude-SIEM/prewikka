@@ -101,7 +101,7 @@ def create_link(action_name, parameters=None):
             if isinstance(parameters[k], unicode):
                 parameters[k] = parameters[k].encode("utf8")
 
-        link += "&%s" % urllib.urlencode(parameters, doseq=True)
+        link += "&amp;%s" % urlencode(parameters, doseq=True)
 
     return link
 
@@ -126,7 +126,6 @@ def escape_html_string(s):
     if not isinstance(s, str) and not isinstance(s, unicode):
         s = toUnicode(s)
 
-    s = s.replace("&", "&amp;")
     s = s.replace("<", "&lt;")
     s = s.replace(">", "&gt;")
     s = s.replace("\"", "&quot;")
