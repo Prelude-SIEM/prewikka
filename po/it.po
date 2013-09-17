@@ -596,7 +596,6 @@ msgid "Confirm new password:"
 msgstr "Confermare il password :"
 
 #: prewikka/templates/UserSettings.py:366
-#, fuzzy
 msgid "Submit Changes"
 msgstr "Proporre modifiche"
 
