@@ -1,4 +1,6 @@
-* Unreleased, prewikka-1.1.0:
+* 2013-09-19, prewikka-1.1.0:
+
+- Raise DatabaseSchemaError only if schema version does not match
 
 - More XHTML compliant : 
   - Fixed some missing closing tags
