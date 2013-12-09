@@ -627,7 +627,7 @@ class ListedAlert(ListedMessage):
                 vl.append(name)
                 fstr += ":" + name
 
-            urlstr = "%s?origin=%s&name=%s" % (self.env.reference_details_url, urllib.quote(ref["origin"]), urllib.quote(ref["name"]))
+            urlstr = "%s?origin=%s&name=%s" % (self.env.reference_details_url, urllib.quote(ref["origin"]), urllib.quote(ref["name"].encode('utf-8')))
             if ref["origin"] in ("vendor-specific", "user-specific"):
                 urlstr += "&url=" + urllib.quote(ref["url"], safe="")
 
