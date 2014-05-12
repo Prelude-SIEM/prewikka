@@ -958,14 +958,23 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
     def buildSource(self, alert):
         i = 0
 
+	if len(alert["source"]) > 1:
+            self.beginSection("Sources")
+
         for source in alert["source"]:
             self.beginSection(_("Source(%d)") % i)
             self.buildDirection(source)
             self.endSection()
             i += 1
 
+        if i > 1:
+            self.endSection()
+
     def buildTarget(self, alert):
         i = 0
+
+        if len(alert["target"]) > 1:
+            self.beginSection("Targets")
 
         for target in alert["target"]:
             self.beginSection(_("Target(%d)") % i)
@@ -976,6 +985,9 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 
             self.endSection()
             i += 1
+
+        if i > 1:
+            self.endSection()
 
     def buildSourceTarget(self, alert):
         self.buildSource(alert)
