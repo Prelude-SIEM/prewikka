@@ -125,6 +125,7 @@ class Core:
             self._initDatabase()
         except Database.DatabaseSchemaError, e:
             self._database_schema_error = e
+            return
 
         self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
         self._initHostCommands()

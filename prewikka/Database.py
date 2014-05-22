@@ -92,7 +92,7 @@ class Database:
         try:
             version = self.query("SELECT version FROM Prewikka_Version")[0][0]
         except PreludeDBError, e:
-            raise DatabaseError(unicode(utils.toUnicode(e)))
+            raise DatabaseSchemaError(unicode(utils.toUnicode(e)))
 
         if version != self.required_version:
             d = { "version": version, "reqversion": self.required_version }
