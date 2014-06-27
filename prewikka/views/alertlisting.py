@@ -183,21 +183,6 @@ class AlertListingParameters(MessageListingParameters):
         self._default_param = { "classification": {}, "source": {}, "target": {}, "analyzer": {} }
         self._saved = { "classification": [], "source": [], "target": [], "analyzer": [] }
 
-    def add_params(self, idmef_db):
-        i = 0
-        if "aggregated_alert_id" in self:
-            alert = idmef_db.getAlert(int(self.pop("aggregated_alert_id")))
-            if alert["alert.correlation_alert"]:
-                aggreg_type = "alert.correlation_alert"
-            elif message["alert.tool_alert"]:
-                aggreg_type = "alert.tool_alert"
-            else:
-                pass
-            for alertident in alert[aggreg_type]["alertident"]:
-                self.setdefault("classification_object_%d" % i, "alert.messageid")
-                self.setdefault("classification_value_%d" % i, alertident["alertident"])
-                i += 1
-
     def register(self):
         self.max_index = 0
         MessageListingParameters.register(self)
@@ -936,6 +921,38 @@ class AlertListing(MessageListing, view.View):
 
         prelude.idmef_criteria_destroy(c)
         return "<>*"
+
+    def _adjustCriteria(self, criteria):
+        if "aggregated_alert_id" in self.parameters:
+            alert = self.env.idmef_db.getAlert(int(self.parameters["aggregated_alert_id"]))
+            if alert["alert.correlation_alert"]:
+                aggreg_type = "alert.correlation_alert"
+            elif alert["alert.tool_alert"]:
+                aggreg_type = "alert.tool_alert"
+            else:
+                pass
+
+            source_analyzer = None
+            newcrit = [ ]
+
+            for alertident in alert[aggreg_type]["alertident"]:
+                # IDMEF draft 14 page 27
+                # If the "analyzerid" is not provided, the alert is assumed to have come
+                # from the same analyzer that is sending the [Correlation|Tool]Alert.
+                analyzerid = alertident["analyzerid"]
+                if not analyzerid:
+                    if source_analyzer:
+                        analyzerid = source_analyzer
+                    else:
+                        for a in alert["analyzer"]:
+                            if a["analyzerid"]:
+                                source_analyzer = analyzerid = a["analyzerid"]
+                                break
+
+                newcrit.append("(alert.messageid = '%s' && alert.analyzer.analyzerid = '%s')" %
+                               (utils.escape_criteria(alertident["alertident"]),
+                                utils.escape_criteria(analyzerid)))
+            criteria.append("(" + " || ".join(newcrit) + ")")
 
     def _applyFiltersForCategory(self, criteria, type):
         if not self.parameters[type]:
