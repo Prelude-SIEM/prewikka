@@ -1,3 +1,18 @@
+* 2014-07-07, prewikka-1.2.5:
+
+- Better fix for #495 : Request-URI Too Large
+  IDs of linked alerts are no longer sent as parameters when filtering
+
+- Correctly displays database schema error
+
+- Support (un)folding Source and Target, when there is more than one
+
+- Removed rhel6 packaging
+
+- Fix problem of character encoding in field classification.reference(x).name
+
+
+
 * 2013-09-19, prewikka-1.1.0:
 
 - Raise DatabaseSchemaError only if schema version does not match
