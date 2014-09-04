@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-import logging, logging.handlers, sys
+import logging, logging.handlers, os, stat, sys
 
 DEBUG = logging.DEBUG
 INFO = logging.INFO
@@ -42,6 +42,17 @@ class Log:
             self._logger.addHandler(self._getHandler(config, logtype))
 
 
+    def _getSyslogHandlerAddress(self):
+        for f in ("/dev/log", "/var/run/log", "/var/run/syslog"):
+            try:
+                if stat.S_ISSOCK(os.stat(f).st_mode):
+                    return f
+            except:
+                pass
+
+        return ("localhost", 514)
+
+
     def _getHandler(self, config, logtype='syslog'):
         logtype = logtype.lower()
         level = config.get("level", "")
@@ -53,7 +64,7 @@ class Log:
             hdlr = logging.handlers.NTEventLogHandler(logid, logtype='Application')
 
         elif logtype in ['syslog', 'unix']:
-            hdlr = logging.handlers.SysLogHandler('/dev/log')
+            hdlr = logging.handlers.SysLogHandler(self._getSyslogHandlerAddress(), facility=logging.handlers.SysLogHandler.LOG_DAEMON)
 
         elif logtype in ['smtp']:
             hdlr = logging.handlers.SMTPHandler(config["host"], config["from"], config["to"].split(", "), config["subject"])
