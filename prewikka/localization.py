@@ -1,5 +1,5 @@
 # coding=UTF-8
-# Copyright (C) 2007-2012 CS-SI. All Rights Reserved.
+# Copyright (C) 2007-2014 CS-SI. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 #
 # This file is part of the Prewikka program.
