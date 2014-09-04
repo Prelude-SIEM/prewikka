@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.01\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-16 17:25+0200\n"
+"POT-Creation-Date: 2014-09-04 16:08+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator:  Bjoern Weiland <bjoern.weiland@web.de>\n"
 "Language-Team: German\n"
@@ -210,7 +210,7 @@ msgstr "Zugang zur Aussicht '%s' verboten"
 msgid "Initialization arguments are not supported"
 msgstr ""
 
-#: prewikka/Log.py:65
+#: prewikka/Log.py:76
 #, python-format
 msgid "Unknown logtype specified: '%s'"
 msgstr "Unbekannter Logtyp: '%s'"
@@ -890,7 +890,7 @@ msgstr "Alarm Detail sehen"
 
 #: prewikka/templates/AlertListing.py:1519
 #, fuzzy
-msgid "Filter on this classification.text"
+msgid "Filter on this classification"
 msgstr "Nach Adresse filtern"
 
 #: prewikka/templates/AlertListing.py:1631

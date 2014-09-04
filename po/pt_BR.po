@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.01\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-16 17:25+0200\n"
+"POT-Creation-Date: 2014-09-04 16:08+0200\n"
 "PO-Revision-Date: 2008-02-26 13:12-0300\n"
 "Last-Translator: Edelberto Franco Silva <edeunix@edeunix.com>\n"
 "Language-Team: Portuguese\n"
@@ -215,7 +215,7 @@ msgstr "A visualização de '%s' está proibida"
 msgid "Initialization arguments are not supported"
 msgstr ""
 
-#: prewikka/Log.py:65
+#: prewikka/Log.py:76
 #, python-format
 msgid "Unknown logtype specified: '%s'"
 msgstr "Tipo de log especificado é desconhecido: '%s'"
@@ -929,7 +929,7 @@ msgstr ""
 
 #: prewikka/templates/AlertListing.py:1519
 #, fuzzy
-msgid "Filter on this classification.text"
+msgid "Filter on this classification"
 msgstr "Filtro no agente"
 
 #: prewikka/templates/AlertListing.py:1631

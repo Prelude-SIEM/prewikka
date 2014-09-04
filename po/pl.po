@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.01\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-16 17:25+0200\n"
+"POT-Creation-Date: 2014-09-04 16:08+0200\n"
 "PO-Revision-Date: 2008-03-04 09:30+0100\n"
 "Last-Translator: Konrad Kosmowski <konrad@kosmosik.net>\n"
 "Language-Team: Polish\n"
@@ -215,7 +215,7 @@ msgstr "Odmowa dostępu do widoku '%s'"
 msgid "Initialization arguments are not supported"
 msgstr ""
 
-#: prewikka/Log.py:65
+#: prewikka/Log.py:76
 #, python-format
 msgid "Unknown logtype specified: '%s'"
 msgstr "Nieznany typ pliku dziennika '%s'"
@@ -892,7 +892,7 @@ msgstr ""
 
 #: prewikka/templates/AlertListing.py:1519
 #, fuzzy
-msgid "Filter on this classification.text"
+msgid "Filter on this classification"
 msgstr "Filtr: %s"
 
 #: prewikka/templates/AlertListing.py:1631

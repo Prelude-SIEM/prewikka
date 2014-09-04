@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.01\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2014-07-16 17:25+0200\n"
+"POT-Creation-Date: 2014-09-04 16:08+0200\n"
 "PO-Revision-Date: \n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -211,7 +211,7 @@ msgstr "Accesso vietato alla vista '%s'"
 msgid "Initialization arguments are not supported"
 msgstr "Gli argomenti d'inizializzazione non sono supportati"
 
-#: prewikka/Log.py:65
+#: prewikka/Log.py:76
 #, python-format
 msgid "Unknown logtype specified: '%s'"
 msgstr "Tipo sconosciuto di log : '%s'"
@@ -894,7 +894,7 @@ msgstr "Vedere il dettaglio dell'allerta"
 
 #: prewikka/templates/AlertListing.py:1519
 #, fuzzy
-msgid "Filter on this classification.text"
+msgid "Filter on this classification"
 msgstr "Filtrare su %s"
 
 #: prewikka/templates/AlertListing.py:1631
