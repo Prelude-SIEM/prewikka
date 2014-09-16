@@ -1,3 +1,11 @@
+* 2014-09-16, prewikka-1.2.6rc1:
+
+Author: Antoine Luong
+
+- Syslog logging fallback to UDP localhost if no socket is found
+
+
+
 * 2014-07-07, prewikka-1.2.5:
 
 - Better fix for #495 : Request-URI Too Large
