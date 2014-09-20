@@ -19,8 +19,8 @@
 
 
 import time, types
-from prelude import *
-from preludedb import *
+from preludeold import *
+from preludedbold import *
 
 from prewikka.utils import escape_html_string, time_to_ymdhms, toUnicode
 

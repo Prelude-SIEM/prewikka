@@ -19,7 +19,6 @@
 
 
 import Cheetah
-import prelude
 
 from Cheetah.Filters import *
 from prewikka import utils

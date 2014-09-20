@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import copy, re, urllib, time, prelude, preludedb, operator
+import copy, re, urllib, time, preludeold, operator
 from prewikka import view, User, utils
 from prewikka.views.messagelisting import MessageListingParameters, MessageListing, ListedMessage
 
@@ -36,7 +36,7 @@ def _getEnumValue(class_id):
     nlist = [ ]
 
     while True:
-        value = prelude.idmef_class_enum_to_string(class_id, i)
+        value = preludeold.idmef_class_enum_to_string(class_id, i)
         i += 1
         if value == None:
             if i == 1:
@@ -50,10 +50,10 @@ def _getEnumValue(class_id):
 
 
 def _getOperatorList(type):
-    if type == prelude.IDMEF_VALUE_TYPE_STRING:
+    if type == preludeold.IDMEF_VALUE_TYPE_STRING:
         return ["<>*", "<>", "=", "~*", "~", "!" ]
 
-    elif type == prelude.IDMEF_VALUE_TYPE_DATA:
+    elif type == preludeold.IDMEF_VALUE_TYPE_DATA:
         return ["<>*", "<>", "~", "~*", "=", "<", ">", "!" ]
 
     else:
@@ -78,24 +78,24 @@ def _getPathList(class_id, path, add_index=None, depth=0):
     child_list = []
 
     while True:
-        name = prelude.idmef_class_get_child_name(class_id, i)
-        if not name or (name == "file" and class_id == prelude.IDMEF_CLASS_ID_LINKAGE):
+        name = preludeold.idmef_class_get_child_name(class_id, i)
+        if not name or (name == "file" and class_id == preludeold.IDMEF_CLASS_ID_LINKAGE):
             break
 
-        vtype = prelude.idmef_class_get_child_value_type(class_id, i)
+        vtype = preludeold.idmef_class_get_child_value_type(class_id, i)
         space = "&nbsp;" * depth
 
-        if vtype == prelude.IDMEF_VALUE_TYPE_CLASS:
-            if add_index and prelude.idmef_class_is_child_list(class_id, i):
+        if vtype == preludeold.IDMEF_VALUE_TYPE_CLASS:
+            if add_index and preludeold.idmef_class_is_child_list(class_id, i):
                 index = add_index
             else:
                 index = ""
 
             child_list += [ (space + _normalizeName(name), None, None, None) ]
-            child_list += _getPathList(prelude.idmef_class_get_child_class(class_id, i), path + "." + name + index, add_index, depth + 1)
+            child_list += _getPathList(preludeold.idmef_class_get_child_class(class_id, i), path + "." + name + index, add_index, depth + 1)
         else:
-            if vtype == prelude.IDMEF_VALUE_TYPE_ENUM:
-                pval = _getEnumValue(prelude.idmef_class_get_child_class(class_id, i))
+            if vtype == preludeold.IDMEF_VALUE_TYPE_ENUM:
+                pval = _getEnumValue(preludeold.idmef_class_get_child_class(class_id, i))
             else:
                 pval = None
 
@@ -112,34 +112,34 @@ def _getClassificationPath(add_empty=False, add_index=None):
         empty += [("", "none", None, None)]
 
     return empty + \
-           [("messageid", "alert.messageid", _getOperatorList(prelude.IDMEF_VALUE_TYPE_STRING), None)] + \
-           _getPathList(prelude.IDMEF_CLASS_ID_CLASSIFICATION, "alert.classification", add_index=add_index) + \
-           _getPathList(prelude.IDMEF_CLASS_ID_ASSESSMENT, "alert.assessment", add_index=add_index) + \
-           _getPathList(prelude.IDMEF_CLASS_ID_OVERFLOW_ALERT, "alert.overflow_alert", add_index=add_index) + \
-           _getPathList(prelude.IDMEF_CLASS_ID_CORRELATION_ALERT, "alert.correlation_alert", add_index=add_index) + \
-           _getPathList(prelude.IDMEF_CLASS_ID_TOOL_ALERT, "alert.tool_alert", add_index=add_index) + \
-           _getPathList(prelude.IDMEF_CLASS_ID_ADDITIONAL_DATA, "alert.additional_data", add_index=add_index)
+           [("messageid", "alert.messageid", _getOperatorList(preludeold.IDMEF_VALUE_TYPE_STRING), None)] + \
+           _getPathList(preludeold.IDMEF_CLASS_ID_CLASSIFICATION, "alert.classification", add_index=add_index) + \
+           _getPathList(preludeold.IDMEF_CLASS_ID_ASSESSMENT, "alert.assessment", add_index=add_index) + \
+           _getPathList(preludeold.IDMEF_CLASS_ID_OVERFLOW_ALERT, "alert.overflow_alert", add_index=add_index) + \
+           _getPathList(preludeold.IDMEF_CLASS_ID_CORRELATION_ALERT, "alert.correlation_alert", add_index=add_index) + \
+           _getPathList(preludeold.IDMEF_CLASS_ID_TOOL_ALERT, "alert.tool_alert", add_index=add_index) + \
+           _getPathList(preludeold.IDMEF_CLASS_ID_ADDITIONAL_DATA, "alert.additional_data", add_index=add_index)
 
 def _getSourcePath(add_empty=False, add_index=None):
     empty = [ ]
     if add_empty:
         empty += [("", "none", None, None)]
 
-    return empty + _getPathList(prelude.IDMEF_CLASS_ID_SOURCE, "alert.source(0)", add_index=add_index)
+    return empty + _getPathList(preludeold.IDMEF_CLASS_ID_SOURCE, "alert.source(0)", add_index=add_index)
 
 def _getTargetPath(add_empty=False, add_index=None):
     empty = [ ]
     if add_empty:
         empty += [("", "none", None, None)]
 
-    return empty + _getPathList(prelude.IDMEF_CLASS_ID_TARGET, "alert.target(0)", add_index=add_index)
+    return empty + _getPathList(preludeold.IDMEF_CLASS_ID_TARGET, "alert.target(0)", add_index=add_index)
 
 def _getAnalyzerPath(add_empty=False, add_index=None):
     empty = [ ]
     if add_empty:
         empty += [("", "none", None, None)]
 
-    return empty + _getPathList(prelude.IDMEF_CLASS_ID_ANALYZER, "alert.analyzer(-1)", add_index=add_index)
+    return empty + _getPathList(preludeold.IDMEF_CLASS_ID_ANALYZER, "alert.analyzer(-1)", add_index=add_index)
 
 
 COLUMN_LIST = [ "classification", "source", "target", "analyzer" ]
@@ -908,18 +908,18 @@ class AlertListing(MessageListing, view.View):
         # Check whether the path can handle substring comparison
         # this need to be done first, since enum check with * won't work with "=" operator.
         try:
-            c = prelude.idmef_criteria_new_from_string(path + " <>* '" + utils.escape_criteria(value) + "'")
+            c = preludeold.idmef_criteria_new_from_string(path + " <>* '" + utils.escape_criteria(value) + "'")
         except:
             # Check whether this path can handle the provided value.
             try:
-                c = prelude.idmef_criteria_new_from_string(path + " = '" + utils.escape_criteria(value) + "'")
+                c = preludeold.idmef_criteria_new_from_string(path + " = '" + utils.escape_criteria(value) + "'")
             except:
                 return None
 
-            prelude.idmef_criteria_destroy(c)
+            preludeold.idmef_criteria_destroy(c)
             return "="
 
-        prelude.idmef_criteria_destroy(c)
+        preludeold.idmef_criteria_destroy(c)
         return "<>*"
 
     def _adjustCriteria(self, criteria):
@@ -1093,9 +1093,9 @@ class AlertListing(MessageListing, view.View):
 
 
     def _getPathValueType(self, path):
-        p = prelude.idmef_path_new(path.encode("utf8"))
-        t = prelude.idmef_path_get_value_type(p, -1)
-        prelude.idmef_path_destroy(p)
+        p = preludeold.idmef_path_new(path.encode("utf8"))
+        t = preludeold.idmef_path_get_value_type(p, -1)
+        preludeold.idmef_path_destroy(p)
         return t
 
     def _setAggregatedMessagesNoValues(self, criteria, ag_s, ag_t, ag_c, ag_a):
@@ -1167,7 +1167,7 @@ class AlertListing(MessageListing, view.View):
                     direction = None
 
                 if value == None:
-                    if self._getPathValueType(path) != prelude.IDMEF_VALUE_TYPE_STRING:
+                    if self._getPathValueType(path) != preludeold.IDMEF_VALUE_TYPE_STRING:
                         criterion = "! %s" % (path)
                     else:
                         criterion = "(! %s || %s == '')" % (path, path)

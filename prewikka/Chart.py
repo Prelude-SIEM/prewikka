@@ -27,7 +27,7 @@ import os, os.path
 import glob, tempfile
 
 from prewikka import utils, siteconfig, cairoplot
-from preludedb import PreludeDBError
+from preludedbold import PreludeDBError
 
 from xml.dom.minidom import parse, parseString
 

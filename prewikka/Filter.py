@@ -19,7 +19,7 @@
 
 
 import re
-import prelude
+import preludeold
 
 from prewikka import utils
 
@@ -28,7 +28,7 @@ class Error(Exception):
 
 
 class CriteriaIDMEF:
-    def __init__(self, root=prelude.IDMEF_CLASS_ID_MESSAGE, text=""):
+    def __init__(self, root=preludeold.IDMEF_CLASS_ID_MESSAGE, text=""):
         self.CriteriaList = []
         self._idmef_class_tree(root, text, self.CriteriaList)
 
@@ -36,7 +36,7 @@ class CriteriaIDMEF:
 
         i = 0
         while True:
-            name = prelude.idmef_class_get_child_name(root, i)
+            name = preludeold.idmef_class_get_child_name(root, i)
             if name == None:
                 break
 
@@ -48,8 +48,8 @@ class CriteriaIDMEF:
             if criteria == "alert.target.file.linkage":
                 break
 
-            if prelude.idmef_class_get_child_value_type(root, i) == prelude.IDMEF_VALUE_TYPE_CLASS:
-                self._idmef_class_tree(prelude.idmef_class_get_child_class(root, i), criteria, outlist)
+            if preludeold.idmef_class_get_child_value_type(root, i) == preludeold.IDMEF_VALUE_TYPE_CLASS:
+                self._idmef_class_tree(preludeold.idmef_class_get_child_class(root, i), criteria, outlist)
             else:
                 outlist.append(criteria)
 
@@ -63,8 +63,8 @@ class Filter:
         self.elements = elements
         self.formula = formula
 
-        crit = prelude.idmef_criteria_new_from_string(unicode(self).encode("utf8"))
-        prelude.idmef_criteria_destroy(crit)
+        crit = preludeold.idmef_criteria_new_from_string(unicode(self).encode("utf8"))
+        preludeold.idmef_criteria_destroy(crit)
 
     def _replace(self, element):
         element = element.group(1)
@@ -85,8 +85,8 @@ class Filter:
 
 
 
-AlertFilterList = CriteriaIDMEF(prelude.IDMEF_CLASS_ID_ALERT, "alert").CriteriaList
-HeartbeatFilterList = CriteriaIDMEF(prelude.IDMEF_CLASS_ID_HEARTBEAT, "heartbeat").CriteriaList
+AlertFilterList = CriteriaIDMEF(preludeold.IDMEF_CLASS_ID_ALERT, "alert").CriteriaList
+HeartbeatFilterList = CriteriaIDMEF(preludeold.IDMEF_CLASS_ID_HEARTBEAT, "heartbeat").CriteriaList
 
 
 if __name__ == "__main__":

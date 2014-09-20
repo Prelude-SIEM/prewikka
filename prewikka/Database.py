@@ -22,7 +22,7 @@ import sys
 import time
 import calendar
 
-from preludedb import *
+from preludedbold import *
 from prewikka import User, Filter, utils, siteconfig
 
 class DatabaseError(Exception):

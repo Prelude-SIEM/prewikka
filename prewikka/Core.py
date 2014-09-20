@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import os, copy, time
-import prelude, preludedb, CheetahFilters
+import preludeold, preludedbold, CheetahFilters
 
 import prewikka.views
 from prewikka import view, Config, Log, Database, IDMEFDatabase, \
@@ -80,10 +80,10 @@ class Core:
     def _checkVersion(self):
         self._prelude_version_error = None
 
-        if not prelude.prelude_check_version(siteconfig.libprelude_required_version):
+        if not preludeold.prelude_check_version(siteconfig.libprelude_required_version):
             self._prelude_version_error = _("Prewikka %(vPre)s requires libprelude %(vLib)s or higher") % {'vPre':siteconfig.version, 'vLib':siteconfig.libprelude_required_version}
 
-        elif not preludedb.preludedb_check_version(siteconfig.libpreludedb_required_version):
+        elif not preludedbold.preludedb_check_version(siteconfig.libpreludedb_required_version):
             self._prelude_version_error = _("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher") % {'vPre':siteconfig.version, 'vLib':siteconfig.libpreludedb_required_version}
 
     def __init__(self, config=None):
@@ -116,7 +116,7 @@ class Core:
         if self._env.dns_max_delay != -1:
             resolve.init(self._env)
 
-        preludedb.preludedb_init()
+        preludedbold.preludedb_init()
 
         self._checkVersion()
 
