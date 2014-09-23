@@ -36,9 +36,9 @@ from distutils.core import Command
 from Cheetah.CheetahWrapper import CheetahWrapper
 
 
-PREWIKKA_VERSION = "1.2.6rc1"
-LIBPRELUDE_REQUIRED_VERSION = "1.2.5"
-LIBPRELUDEDB_REQUIRED_VERSION = "1.2.5"
+PREWIKKA_VERSION = "1.2.6rc2"
+LIBPRELUDE_REQUIRED_VERSION = "1.2.6rc2"
+LIBPRELUDEDB_REQUIRED_VERSION = "1.2.6rc2"
 
 from fnmatch import fnmatch
 from distutils.dep_util import newer

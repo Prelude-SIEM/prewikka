@@ -1,3 +1,15 @@
+* 2014-09-23, prewikka-1.2.6rc2:
+
+Author: Yoann Vandoorselaere
+
+- Update to fit libprelude(db) bindings API changes
+
+    High level bindings in libprelude(db) are now the standard, so old
+    level bindings got renamed to "preludeold" and "preludedbold".
+    Update to fit the new naming scheme.
+
+
+
 * 2014-09-16, prewikka-1.2.6rc1:
 
 Author: Antoine Luong
