@@ -83,7 +83,7 @@ class LangAdmin:
                     if isdir(join(directory, filename))]
             for d in dirs:
                 files += self._list_files(d, recurse, ext)
-        return files
+        return sorted(files)
 
     def generate_pot_file(self, recurse=True, directories=[]):
         """Get all the python files in the directories parameter and create
