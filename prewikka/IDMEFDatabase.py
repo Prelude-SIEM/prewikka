@@ -465,7 +465,7 @@ class IDMEFDatabase:
         if criteria:
             criteria = idmef_criteria_new_from_string(criteria.encode("utf8"))
 
-        my_selection = preludedb_path_selection_new()
+        my_selection = preludedb_path_selection_new(self._db)
         for selected in selection:
             my_selected = preludedb_selected_path_new_string(selected.encode("utf8"))
             preludedb_path_selection_add(my_selection, my_selected)
