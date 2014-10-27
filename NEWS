@@ -1,3 +1,13 @@
+* 2014-10-27, prewikka-1.2.6rc4:
+
+Author: Antoine Luong
+
+- Update to latest libpreludedb changes
+
+- Sort files passed as arguments to xgettext command
+
+
+
 * 2014-09-23, prewikka-1.2.6rc2:
 
 Author: Yoann Vandoorselaere
