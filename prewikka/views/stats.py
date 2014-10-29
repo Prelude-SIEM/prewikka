@@ -1,4 +1,5 @@
 # Copyright (C) 2005-2014 CS-SI. All Rights Reserved.
+# -*- coding: utf-8 -*-
 # Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
 # Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 #
@@ -135,7 +136,7 @@ class DistributionStats(view.View):
                 if dns and value:
                     v = resolve.AddressResolve(value)
                 else:
-                    v = self._getNameFromMap(value or _(u"n/a"), names_and_colors)
+                    v = self._getNameFromMap(value or _("n/a"), names_and_colors)
 
                 distribution.addLabelValuePair(v, count, base_url + "&amp;" + sub_url_handler(value))
 
@@ -193,13 +194,13 @@ class DistributionStats(view.View):
     def _processFilterCriteria(self):
         c = [ ]
         if self.parameters.has_key("idmef_filter"):
-            c.append(unicode(self.parameters["idmef_filter"]))
+            c.append(self.parameters["idmef_filter"])
 
         self.dataset["current_filter"] = self.parameters.get("filter", "")
         if self.parameters.has_key("filter"):
             f = self.env.db.getAlertFilter(self.user.login, self.parameters["filter"])
             if f:
-                c.append(unicode(f))
+                c.append(f)
 
         return c
 
@@ -258,7 +259,9 @@ class DistributionStats(view.View):
             if type not in ("classification", "source", "target", "analyzer"):
                 raise Exception, _("The path '%s' cannot be mapped to a column") % path
 
-        return utils.urlencode({ "%s_object_%d" % (type, index): path, "%s_operator_%d" % (type, index): operator, "%s_value_%d" % (type, index): value })
+        return utils.urlencode({ "%s_object_%d" % (type, index): path,
+                                 "%s_operator_%d" % (type, index): operator,
+                                 "%s_value_%d" % (type, index): value })
 
 
 
@@ -274,7 +277,7 @@ class GenericTimelineStats(DistributionStats):
             if zoom_view == "alert_listing":
                 link += "&amp;" + self.genPathValueURI(self._path, name)
 
-            d[self._getNameFromMap(name or _(u"n/a"), self._names_and_colors)] = (count, link)
+            d[self._getNameFromMap(name or _("n/a"), self._names_and_colors)] = (count, link)
 
         return d
 
@@ -432,7 +435,7 @@ class GenericTimelineStats(DistributionStats):
         if limit > 0:
             res = self.env.idmef_db.getValues(self._getSelection(), criteria = criteria, limit=self._limit)
 
-            c = u""
+            c = ""
             for name, count in res:
                 if c:
                     c += " || "
@@ -535,13 +538,13 @@ class SourceStats(DistributionStats, GenericTimelineStats):
                         nvalue = None
 
                 if not nvalue:
-                    nvalue = _(u"n/a")
+                    nvalue = _("n/a")
 
                 if not merge.has_key(nvalue):
-                   url_index = 0
-                   merge[nvalue] = (0, 0, nvalue, "")
+                    url_index = 0
+                    merge[nvalue] = (0, 0, nvalue, "")
                 else:
-                   url_index = merge[nvalue][1]
+                    url_index = merge[nvalue][1]
 
                 encode = "&amp;" + self.genPathValueURI("alert.source.node.address.address", value, type="source", index=url_index)
                 merge[nvalue] = (merge[nvalue][0] + count, url_index + 1, nvalue, merge[nvalue][3] + encode)
@@ -623,7 +626,7 @@ class TargetStats(DistributionStats):
         if not results:
             return
 
-        merge = { _(u"n/a"): { }, u"tcp": { }, u"udp": { } }
+        merge = { _("n/a"): { }, "tcp": { }, "udp": { } }
 
         for port, iana_protocol_number, iana_protocol_name, protocol, count in results:
             if not port:
@@ -636,11 +639,11 @@ class TargetStats(DistributionStats):
                 protocol = iana_protocol_name
 
             if not protocol:
-                protocol = _(u"n/a")
+                protocol = _("n/a")
 
             protocol = protocol.lower()
             if not merge.has_key(protocol):
-                protocol = _(u"n/a")
+                protocol = _("n/a")
 
             if not merge[protocol].has_key(port):
                 merge[protocol][port] = 0
@@ -706,7 +709,7 @@ class AnalyzerStats(DistributionStats, GenericTimelineStats):
                                               criteria=criteria + [ "alert.analyzer(-1).name" ], limit=10)
         if results:
             for analyzer_name, node_name, count in results:
-                value = analyzer_name or _(u"n/a")
+                value = analyzer_name or _("n/a")
                 if node_name:
                     value = "%s on %s"  % (value, node_name)
 

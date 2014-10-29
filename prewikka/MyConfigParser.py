@@ -60,10 +60,13 @@ class ConfigParserSection(utils.OrderedDict):
 
 class ConfigParserOption:
     def __init__(self, name, value, lineno, line):
-        self.name = utils.toUnicode(name)
-        self.value = utils.toUnicode(value)
+        self.name = name
+        self.value = value
         self.lineno = lineno
         self.line = line
+
+    def __str__(self):
+        return self.value
 
 
 

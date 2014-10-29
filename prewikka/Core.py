@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import os, copy, time
-import preludeold, preludedbold, CheetahFilters
+import prelude, preludedb, CheetahFilters
 
 import prewikka.views
 from prewikka import view, Config, Log, Database, IDMEFDatabase, \
@@ -78,13 +78,12 @@ def get_core_from_config(path, threaded=False):
 
 class Core:
     def _checkVersion(self):
-        self._prelude_version_error = None
+        error_type = _("Version Requirement error")
+        if not prelude.checkVersion(siteconfig.libprelude_required_version):
+            raise Error.PrewikkaUserError(error_type, _("Prewikka %(vPre)s requires libprelude %(vLib)s or higher") % {'vPre':siteconfig.version, 'vLib':siteconfig.libprelude_required_version})
 
-        if not preludeold.prelude_check_version(siteconfig.libprelude_required_version):
-            self._prelude_version_error = _("Prewikka %(vPre)s requires libprelude %(vLib)s or higher") % {'vPre':siteconfig.version, 'vLib':siteconfig.libprelude_required_version}
-
-        elif not preludedbold.preludedb_check_version(siteconfig.libpreludedb_required_version):
-            self._prelude_version_error = _("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher") % {'vPre':siteconfig.version, 'vLib':siteconfig.libpreludedb_required_version}
+        elif not preludedb.checkVersion(siteconfig.libpreludedb_required_version):
+            raise Error.PrewikkaUserError(error_type, _("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher") % {'vPre':siteconfig.version, 'vLib':siteconfig.libpreludedb_required_version})
 
     def __init__(self, config=None):
         class Env: pass
@@ -97,7 +96,7 @@ class Core:
         self._env.max_aggregated_target = int(self._env.config.general.getOptionValue("max_aggregated_target", 10))
         self._env.default_locale = self._env.config.general.getOptionValue("default_locale", None)
 
-	val = self._env.config.general.getOptionValue("external_link_new_window", "true")
+        val = self._env.config.general.getOptionValue("external_link_new_window", "true")
         if val.lower() in ["true", "yes"]:
             self._env.external_link_target = "_blank"
         else:
@@ -116,23 +115,23 @@ class Core:
         if self._env.dns_max_delay != -1:
             resolve.init(self._env)
 
-        preludedbold.preludedb_init()
+        self._prelude_error = None
 
-        self._checkVersion()
-
-        self._database_schema_error = None
         try:
+            self._checkVersion()
             self._initDatabase()
-        except Database.DatabaseSchemaError, e:
-            self._database_schema_error = e
-            return
-
-        self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
-        self._initHostCommands()
-        self._initURL()
-        self._loadViews()
-        self._loadModules()
-        self._initAuth()
+            self._env.idmef_db = IDMEFDatabase.IDMEFDatabase(self._env.config.idmef_database)
+            self._initHostCommands()
+            self._initURL()
+            self._loadViews()
+            self._loadModules()
+            self._initAuth()
+        except Error.PrewikkaUserError, e:
+            self._prelude_error = e
+        except (Database.DatabaseSchemaError, preludedb.PreludeDBError), e:
+            self._prelude_error = Error.PrewikkaUserError(_("Database error"), e)
+        except Exception, e:
+            self._prelude_error = Error.PrewikkaUserError(_("Initialization error"), e)
 
 
     def _initDatabase(self):
@@ -140,7 +139,7 @@ class Core:
         for key in self._env.config.database.keys():
             config[key] = self._env.config.database.getOptionValue(key)
 
-        self._env.db = Database.Database(config)
+        self._env.db = Database.Database(self._env, config)
 
     def _initHostCommands(self):
         self._env.host_commands = { }
@@ -212,21 +211,21 @@ class Core:
 
     def _init_dataset(self, dataset, request):
         interface = self._env.config.interface
-    	dataset["document.title"] = "[PREWIKKA]"
-    	dataset["document.charset"] = localization.getCurrentCharset()
-    	dataset["document.css_files"] = [ "/prewikka/css/style.css" ]
-    	dataset["document.js_files"] = [ "/prewikka/js/jquery.js", "/prewikka/js/functions.js" ]
-    	dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
-    	dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
-    	dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
-    	dataset["prewikka.date"] = localization.getDate()
+        dataset["document.title"] = "[PREWIKKA]"
+        dataset["document.charset"] = localization.getCurrentCharset()
+        dataset["document.css_files"] = [ "prewikka/css/style.css" ]
+        dataset["document.js_files"] = [ "prewikka/js/jquery.js", "prewikka/js/functions.js" ]
+        dataset["prewikka.title"] = interface.getOptionValue("title", "&nbsp;")
+        dataset["prewikka.software"] = interface.getOptionValue("software", "&nbsp;")
+        dataset["prewikka.place"] = interface.getOptionValue("place", "&nbsp;")
+        dataset["prewikka.date"] = localization.getDate()
         dataset["prewikka.external_link_target"] = self._env.external_link_target
         dataset["prewikka.enable_details"] = self._env.enable_details
         dataset["prewikka.host_details_url"] = self._env.host_details_url
         dataset["prewikka.port_details_url"] = self._env.port_details_url
         dataset["prewikka.reference_details_url"] = self._env.reference_details_url
 
-	dataset["arguments"] = []
+        dataset["arguments"] = []
         for name, value in request.arguments.items():
             if name in ("_login", "_password"):
                 continue
@@ -234,7 +233,7 @@ class Core:
             if name == "view" and value == "logout":
                 continue
 
-            dataset["arguments"].append((name, utils.toUnicode(value)))
+            dataset["arguments"].append((name, value))
 
         return dataset
 
@@ -323,26 +322,26 @@ class Core:
 
         return user
 
-    def prepareError(self, e, request, user, login, view):
-        e = unicode(repr(e))
-        self._env.log.error(e, request, login)
-        error = Error.PrewikkaUserError(_("Prewikka internal error"), e,
-                                        display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
-        self._setupDataSet(error.dataset, request, user, view=view)
-        return error
+    def handleError(self, request, error, user, view):
+        if not isinstance(error, Error.PrewikkaUserError):
+            error = Error.PrewikkaUserError(_("Prewikka internal error"), error,
+                                            display_traceback=not self._env.config.general.has_key("disable_error_traceback"))
+
+        login = user.login if user else error.log_user
+        self._env.log.log(error.log_priority, error, request=request, user=login)
+
+        dataset, template_name = error.setupDataset(), error.template
+        self._setupDataSet(dataset, request, user, view)
+        return dataset, template_name
 
     def process(self, request):
-        login = None
         view = None
         user = None
         encoding = self._env.config.general.getOptionValue("encoding", "utf8")
 
         try:
-            if self._prelude_version_error:
-                raise Error.PrewikkaUserError(_("Version Requirement error"), self._prelude_version_error)
-
-            if self._database_schema_error != None:
-                raise Error.PrewikkaUserError(_("Database error"), self._database_schema_error)
+            if self._prelude_error:
+                raise self._prelude_error
 
             user = self.checkAuth(request)
             login = user.login
@@ -363,31 +362,19 @@ class Core:
 
             self._cleanupView(view_object)
 
-        except Error.PrewikkaUserError, e:
-            if e._log_priority:
-                self._env.log.log(e._log_priority, unicode(e), request=request, user=login or e._log_user)
+            dataset["document.charset"] = localization.getCurrentCharset()
+            resolve.process(self._env.dns_max_delay)
 
-            self._setupDataSet(e.dataset, request, user, view=view)
-            dataset, template_name = e.dataset, e.template
+            if request.content is None and request.force_download != True and template_name:
+                request.content = load_template(template_name, dataset).respond()
 
-        except Exception, e:
-            error = self.prepareError(e, request, user, login, view)
-            dataset, template_name = error.dataset, error.template
+        except Exception, error:
+            dataset, template_name = self.handleError(request, error, user, view)
+            if dataset and template_name:
+                request.content = load_template(template_name, dataset).respond()
 
-        #self._printDataSet(dataset)
-        template = load_template(template_name, dataset)
+        if request.content and request.force_download != True:
+            request.content = request.content.encode(encoding, "xmlcharrefreplace")
 
-        # We check the character set after loading the template,
-        # since the template might trigger a language change.
-        dataset["document.charset"] = localization.getCurrentCharset()
-        resolve.process(self._env.dns_max_delay)
-
-        try:
-                request.content = template.respond()
-        except Exception, e:
-            error = self.prepareError(e, request, user, login, view)
-            request.content = load_template(error.template, error.dataset).respond()
-
-        request.content = request.content.encode(encoding, "xmlcharrefreplace")
         request.sendResponse()
 

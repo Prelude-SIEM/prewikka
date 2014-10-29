@@ -60,15 +60,9 @@ class Parameters(dict):
         pass
 
     def mandatory(self, name, type):
-        if type is str:
-           type = unicode
-
         self._parameters[name] = { "type": type, "mandatory": True, "save": False }
 
     def optional(self, name, type, default=None, save=False):
-        if type is str:
-            type = unicode
-
         if default is not None:
             self._default[name] = self._hard_default[name] = default
 
@@ -93,9 +87,6 @@ class Parameters(dict):
         do_load = True
 
         for name, value in self.items():
-            if isinstance(value, str):
-                value = self[name] = utils.toUnicode(value)
-
             try:
                 value = self._parseValue(name, value)
             except KeyError:

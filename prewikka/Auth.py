@@ -115,16 +115,15 @@ class LoginPasswordAuth(Auth, Session):
     def getUser(self, request):
         login = request.arguments.get("_login", None)
         if not login:
-            login = utils.toUnicode(self.checkSession(request))
+            login = self.checkSession(request)
         else:
             del request.arguments["_login"]
-            password = utils.toUnicode(request.arguments.get("_password", ""))
+            password = request.arguments.get("_password", "")
             try:
                 del request.arguments["_password"]
             except KeyError:
                 pass
 
-            login = utils.toUnicode(login)
             self.checkPassword(login, password)
             self.createSession(request, login)
             self.log.info("User login", request, login)

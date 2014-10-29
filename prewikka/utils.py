@@ -97,10 +97,6 @@ def create_link(action_name, parameters=None):
     link = "?view=%s" % action_name
 
     if parameters:
-        for k in parameters.keys():
-            if isinstance(parameters[k], unicode):
-                parameters[k] = parameters[k].encode("utf8")
-
         link += "&amp;%s" % urlencode(parameters, doseq=True)
 
     return link
@@ -123,8 +119,8 @@ def boolean_property(name, parameter, value=False):
 
 
 def escape_html_string(s):
-    if not isinstance(s, str) and not isinstance(s, unicode):
-        s = toUnicode(s)
+    if not isinstance(s, (str, unicode)):
+        s = str(s)
 
     s = s.replace("<", "&lt;")
     s = s.replace(">", "&gt;")
@@ -156,45 +152,6 @@ def hexdump(content):
         i += 16
 
     return content
-
-
-def isUTF8(text):
-    try:
-        text = unicode(text, 'UTF-8', 'strict')
-        return True
-    except UnicodeDecodeError:
-        return False
-
-def toUnicode(text):
-    r"""
-    >>> toUnicode('ascii')
-    u'ascii'
-    >>> toUnicode(u'utf\xe9'.encode('UTF-8'))
-    u'utf\xe9'
-    >>> toUnicode(u'unicode')
-    u'unicode'
-    """
-    if isinstance(text, dict):
-        for k in text.keys():
-            text[k] = toUnicode(text[k])
-        return text
-
-    elif isinstance(text, list):
-        return [ toUnicode(i) for i in text ]
-
-    if isinstance(text, unicode):
-        return text
-
-    if not isinstance(text, str):
-        text = str(text)
-
-    try:
-        return unicode(text, "utf8")
-    except UnicodeError:
-        pass
-
-    return unicode(text, "ISO-8859-1")
-
 
 
 class OrderedDict(dict):

@@ -380,12 +380,12 @@ class MessageSummary(Table):
         if not t:
             return None
 
-        s = t.toYMDHMS()
-        if t.usec:
-            s += ".%d" % t.usec
+        s = utils.time_to_ymdhms(time.localtime(t))
+        if t.getUSec():
+            s += ".%d" % t.getUSec()
 
-        if t.gmt_offset:
-            s += " %+.2d:00" % (t.gmt_offset / (60 * 60))
+        if t.getGmtOffset():
+            s += " %+.2d:00" % (t.getGmtOffset() / (60 * 60))
 
         return s
 
@@ -534,8 +534,6 @@ class MessageSummary(Table):
                         value = utils.hexdump(value)
                 else:
                     value = ad.get("data")
-                    if isinstance(value, str):
-                        value = utils.toUnicode(value)
 
             for field in ignore:
                 if meaning != None and meaning == field[0]:
@@ -659,7 +657,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                     missing += 1
                     #content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": ident } + "</li>"
                 else:
-                    alert = self.env.idmef_db.getAlert(results[0], htmlsafe=True)
+                    alert = self.env.idmef_db.getAlert(results[0], htmlsafe=True)["alert"]
                     link = utils.create_link("alert_summary", { "origin": self.parameters["origin"], "ident": results[0] })
                     content += "<li><a href=\"%s\">%s</a></li>" % (link, alert["classification.text"])
 
@@ -674,13 +672,13 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
 
 
     def buildCorrelationAlert(self, alert):
-        ca = alert["correlation_alert"]
+        ca = alert.get("correlation_alert")
         if not ca:
             return
 
         self.beginSection(_("Correlation Alert"))
         self.beginTable()
-        self.newTableEntry(_("Name"), ca["alert.correlation_alert.name"])
+        self.newTableEntry(_("Name"), ca["name"])
         self.endTable()
 
         self.beginTable()
@@ -691,13 +689,13 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.endSection()
 
     def buildToolAlert(self, alert):
-        ta = alert["tool_alert"]
+        ta = alert.get("tool_alert")
         if not ta:
             return
 
         self.beginSection(_("Tool Alert"))
         self.beginTable()
-        self.newTableEntry(_("Name"), ta["alert.tool_alert.name"])
+        self.newTableEntry(_("Name"), ta["name"])
         self.endTable()
 
         self.beginTable()
@@ -994,13 +992,13 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         self.buildTarget(alert)
 
     def getSectionName(self, alert):
-        if alert["correlation_alert"]:
+        if alert.get("correlation_alert"):
             section = _("Correlation Alert")
 
-        elif alert["tool_alert"]:
+        elif alert.get("tool_alert"):
             section = _("Tool Alert")
 
-        elif alert["overflow_alert"]:
+        elif alert.get("overflow_alert"):
             section = _("Overflow Alert")
 
         else:
@@ -1015,7 +1013,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
         else:
             ident = self.parameters["ident"]
 
-        alert = self.env.idmef_db.getAlert(ident, htmlsafe=True)
+        alert = self.env.idmef_db.getAlert(ident, htmlsafe=True)["alert"]
         self.dataset["sections"] = [ ]
 
         self.beginSection(self.getSectionName(alert))
@@ -1089,7 +1087,7 @@ class AlertSummary(TcpIpOptions, MessageSummary, view.View):
                 val["payload"] = "<span class='fixed'>%s</span>" % payload
                 data.render_table(self, _("Payload"), val)
 
-                val["payload"] = "<div style='overflow: auto;'>%s</div>" % utils.escape_html_string(utils.toUnicode(ignored_value["payload"])).replace("\n", "<br/>")
+                val["payload"] = "<div style='overflow: auto;'>%s</div>" % utils.escape_html_string(ignored_value["payload"]).replace("\n", "<br/>")
                 data.render_table(self, _("ASCII Payload"), val)
 
             self.endTable()
@@ -1106,7 +1104,7 @@ class HeartbeatSummary(MessageSummary, view.View):
         else:
             ident = self.parameters["ident"]
 
-        heartbeat = self.env.idmef_db.getHeartbeat(ident, htmlsafe=True)
+        heartbeat = self.env.idmef_db.getHeartbeat(ident, htmlsafe=True)["heartbeat"]
         self.dataset["sections"] = [ ]
 
         self.beginSection(_("Heartbeat"))

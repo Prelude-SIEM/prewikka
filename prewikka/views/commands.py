@@ -49,7 +49,6 @@ class Command(view.View):
         command = command.replace("$host", self.parameters["host"]).split(" ")
 
         output = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, close_fds=True).communicate()[0]
-        output = utils.toUnicode(output)
 
         output = utils.escape_html_string(output).replace(" ", "&nbsp;").replace("\n", "<br/>")
         self.dataset["command_output"] = output

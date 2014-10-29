@@ -18,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
+import prelude
 from prewikka import view, Filter, Error, User
 
 
@@ -53,10 +54,19 @@ class AlertFilterEdition(view.View):
     view_template = "FilterEdition"
     view_permissions = [ User.PERM_IDMEF_VIEW ]
     example_formula = N_("Example: (A AND B) OR (C AND D)")
+
+    def _flatten(self, rootcl):
+        ret = []
+        for subcl in rootcl:
+            if subcl.getValueType() == prelude.IDMEFValue.TYPE_CLASS:
+                ret += self._flatten(subcl)
+            else:
+                ret.append('"' + subcl.getPath(rootidx=1) + '"')
+        return ret
  
     def _setCommon(self):        
         self.dataset["filters"] = self.env.db.getAlertFilterNames(self.user.login)
-        self.dataset["objects"] = ",".join(map(lambda x: '"%s"' % x, Filter.AlertFilterList))
+        self.dataset["objects"] = ", ".join(self._flatten(Filter.AlertFilterList))
 
         self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("=", "=*", "!=", "!=*",
                                                                         "~", "~*", "!~", "!~*",

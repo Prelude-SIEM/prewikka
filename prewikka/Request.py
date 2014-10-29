@@ -18,10 +18,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-import sys
-import os, os.path, time
-import copy
-import Cookie
+import sys, os, os.path, time, copy, Cookie
+import mimetypes, urllib
+from prewikka import siteconfig
 
 
 class Request:
@@ -46,19 +45,37 @@ class Request:
 
         self.content = None
         self.user = None
-      
+        self.force_download = False
+
+    def forceDownload(self, filename, type="application/force-download"):
+        self.force_download = True
+        self.output_headers = [ ("Content-Type", type),
+                                ("Content-Disposition", "attachment; filename=%s" % filename),
+                                ("Content-length", str(len(self.content))),
+                                ("Pragma", "public"),
+                                ("Cache-Control", "max-age=0") ]
+
     def addCookie(self, param, value, expires):
-    	if not self.output_cookie:
+        if not self.output_cookie:
             self.output_cookie = Cookie.SimpleCookie()
 
-    	self.output_cookie[param] = value
-	self.output_cookie[param]["expires"] = expires
-	
+        self.output_cookie[param] = value
+        self.output_cookie[param]["expires"] = expires
+
     def read(self, *args):
         pass
 
     def write(self, data):
         pass
+
+    def sendHeaders(self):
+        if self.output_cookie:
+            self.output_headers.extend(("Set-Cookie", c.OutputString()) for c in self.output_cookie.values())
+
+        for name, value in self.output_headers:
+            self.sendHeader(name, value)
+
+        self.endHeaders()
 
     def sendHeader(self, name, value):
         self.write("%s: %s\r\n" % (name, value))
@@ -66,17 +83,34 @@ class Request:
     def endHeaders(self):
         self.write("\r\n")
 
-    def sendResponse(self):        
-        for name, value in self.output_headers:
-            self.sendHeader(name, value)
-            
-        if self.output_cookie:
-            self.write(self.output_cookie.output() + "\r\n")
-            
-        self.endHeaders()
-        
+    def sendResponse(self, code=200, status_text=None):
+        self.sendHeaders(code, status_text)
+
         if self.content:
             self.write(self.content)
+
+    def processStatic(self, fname, copyfunc):
+        if not fname.startswith("/prewikka/"):
+                raise
+
+        path = os.path.abspath(os.path.join(siteconfig.htdocs_dir, urllib.unquote(fname[10:])))
+        if not path.startswith(siteconfig.htdocs_dir):
+                self.sendResponse(403, status_text="Request Forbidden")
+                return
+        try:
+                fd = open(path, "r")
+        except:
+                self.sendResponse(404, status_text="File not found")
+                return
+
+        stat = os.fstat(fd.fileno())
+
+        self.output_headers = [ ('Content-Type', mimetypes.guess_type(path)[0]),
+                                ('Content-Length', str(stat[6])),
+                                ('Last-Modified', time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8]))) ]
+
+        self.sendHeaders()
+        return copyfunc(fd)
 
     def getView(self):
         return self.arguments.get("view", "alert_listing")

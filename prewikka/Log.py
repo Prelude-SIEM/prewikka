@@ -122,7 +122,7 @@ class Log:
         message += "%s]" % (request.getView())
 
         if details:
-            message += " " + details
+            message += " " + str(details)
 
         return message
 

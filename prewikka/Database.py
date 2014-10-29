@@ -22,12 +22,11 @@ import sys
 import time
 import calendar
 
-from preludedbold import *
-from prewikka import User, Filter, utils, siteconfig
+import prelude, preludedb
+from prewikka import Error, User, Filter, utils, siteconfig
 
 class DatabaseError(Exception):
     pass
-
 
 
 class _DatabaseInvalidError(DatabaseError):
@@ -62,37 +61,32 @@ def get_timestamp(s):
 
 
 
-class Database:
+class Database(preludedb.SQL):
     required_version = "0.9.11"
 
-    # We reference preludedb_sql_destroy since it might be deleted
-    # prior Database.__del__() is called.
-    _sql_destroy = preludedb_sql_destroy
-    _sql = None
+    def __init__(self, env, config):
+        self._env = env
 
-    def __init__(self, config):
-        settings = preludedb_sql_settings_new()
+        settings = {}
         for name, default in (("file", None),
                               ("host", "localhost"),
                               ("port", None),
                               ("name", "prewikka"),
                               ("user", "prewikka"),
-                              ("pass", None)):
+                              ("pass", None),
+                              ("type", "mysql"),
+                              ("log", None)):
             value = config.get(name, default)
             if value:
-                preludedb_sql_settings_set(settings, name.encode("utf8"), value.encode("utf8"))
+                settings[name] = value
 
-        db_type = config.get("type", "mysql")
-        self._sql = preludedb_sql_new(db_type.encode("utf8"), settings)
-
-        if config.has_key("log"):
-            preludedb_sql_enable_query_logging(self._sql, config["log"].encode("utf8"))
+        preludedb.SQL.__init__(self, settings)
 
         # check if the database has been created
         try:
             version = self.query("SELECT version FROM Prewikka_Version")[0][0]
-        except PreludeDBError, e:
-            raise DatabaseSchemaError(unicode(utils.toUnicode(e)))
+        except preludedb.PreludeDBError as e:
+            raise DatabaseSchemaError(e)
 
         if version != self.required_version:
             d = { "version": version, "reqversion": self.required_version }
@@ -102,75 +96,20 @@ class Database:
         # but this can be moved to an SQL script upon the next schema update.
         self.query("UPDATE Prewikka_User_Configuration SET value='n/a' WHERE (name='alert.assessment.impact.completion' OR name='alert.assessment.impact.severity') AND value='none'")
 
-    def __del__(self):
-        if self._sql:
-            self._sql_destroy(self._sql)
-
-    def queries_from_file(self, filename):
-        content = open(filename).read()
-        for query in content.split(";"):
-            query = query.strip()
-            if len(query) > 0:
-                self.query(query)
-
-    def query(self, query):
-        try:
-            _table = preludedb_sql_query(self._sql, query.encode("utf8"))
-            if not _table:
-                return [ ]
-
-            columns = preludedb_sql_table_get_column_count(_table)
-            table = [ ]
-            while True:
-                _row = preludedb_sql_table_fetch_row(_table)
-                if not _row:
-                    break
-
-                row = [ ]
-                table.append(row)
-                for col in range(columns):
-                    _field = preludedb_sql_row_fetch_field(_row, col)
-                    if _field:
-                        row.append(utils.toUnicode(preludedb_sql_field_to_string(_field)))
-                    else:
-                        row.append(None)
-
-            preludedb_sql_table_destroy(_table)
-
-        except PreludeDBError, e:
-            raise PreludeDBError(e.errno)
-
-        return table
-
-    def transaction_start(self):
-        preludedb_sql_transaction_start(self._sql)
-
-    def transaction_end(self):
-        preludedb_sql_transaction_end(self._sql)
-
-    def transaction_abort(self):
-        preludedb_sql_transaction_abort(self._sql)
-
-    def error(self):
-        return
-
     def escape(self, data):
-        if data:
-            data = data.encode("utf8")
-            return utils.toUnicode(preludedb_sql_escape(self._sql, data))
-        # Fix for #482 : return '' if data is empty
-        else:
-            return "''"
+        if not isinstance(data, str):
+            return data if data is not None else "NULL"
+
+        return preludedb.SQL.escape(self, data)
 
     def datetime(self, t):
         if t is None:
             return "NULL"
+
         return "'" + utils.time_to_ymdhms(time.gmtime(t)) + "'"
 
     def hasUser(self, login):
-        rows = self.query("SELECT login FROM Prewikka_User WHERE login = %s" % self.escape(login))
-
-        return bool(rows)
+        return bool(self.query("SELECT login FROM Prewikka_User WHERE login = %s" % self.escape(login)))
 
     def createUser(self, login, email=None):
         self.query("INSERT INTO Prewikka_User (login, email) VALUES (%s,%s)" % \
@@ -178,7 +117,7 @@ class Database:
 
     def deleteUser(self, login):
         login = self.escape(login)
-        self.transaction_start()
+        self.transactionStart()
         try:
             self.query("DELETE FROM Prewikka_User WHERE login = %s" % login)
             self.query("DELETE FROM Prewikka_Permission WHERE login = %s" % login)
@@ -191,10 +130,10 @@ class Database:
 
             self.query("DELETE FROM Prewikka_Filter WHERE login = %s" % login)
         except:
-            self.transaction_abort()
+            self.transactionAbort()
             raise
 
-        self.transaction_end()
+        self.transactionEnd()
 
     def getConfiguration(self, login):
 
@@ -209,7 +148,7 @@ class Database:
             if not config[view].has_key(name):
                 config[view][name] = value
             else:
-                if isinstance(config[view][name], (str, unicode)):
+                if isinstance(config[view][name], str):
                     config[view][name] = [ config[view][name] ]
 
                 config[view][name] = config[view][name] + [ value ]
@@ -268,7 +207,6 @@ class Database:
             raise DatabaseInvalidSessionError(sessionid)
 
         login, t = rows[0]
-
         return login, get_timestamp(t)
 
     def deleteSession(self, sessionid):
@@ -285,14 +223,14 @@ class Database:
                       (self.escape(login), self.escape(filter.name))):
             self.deleteFilter(login, filter.name)
 
-        self.transaction_start()
+        self.transactionStart()
         self.query("INSERT INTO Prewikka_Filter (login, name, comment, formula) VALUES (%s, %s, %s, %s)" %
                    (self.escape(login), self.escape(filter.name), self.escape(filter.comment), self.escape(filter.formula)))
         id = int(self.query("SELECT MAX(id) FROM Prewikka_Filter")[0][0])
         for name, element in filter.elements.items():
             self.query("INSERT INTO Prewikka_Filter_Criterion (id, name, path, operator, value) VALUES (%d, %s, %s, %s, %s)" %
                        ((id, self.escape(name)) + tuple([ self.escape(e) for e in element ])))
-        self.transaction_end()
+        self.transactionEnd()
 
     def getAlertFilter(self, login, name):
         rows = self.query("SELECT id, comment, formula FROM Prewikka_Filter WHERE login = %s AND name = %s" %

@@ -86,7 +86,7 @@ class User:
         self._db.query("DELETE FROM Prewikka_User_Configuration WHERE view = %s AND login = %s AND name = %s" % (v, login, k))
         if not type(value) is list:
             self._db.query("INSERT INTO Prewikka_User_Configuration (view, login, name, value) VALUES (%s,%s,%s,%s)" %
-                           (v, login, k, self._db.escape(unicode(value))))
+                           (v, login, k, self._db.escape(value)))
         else:
             for val in value:
                 self._db.query("INSERT INTO Prewikka_User_Configuration (view, login, name, value) VALUES (%s, %s,%s,%s)" %

@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import copy, re, urllib, time, preludeold, operator
+import copy, re, urllib, time, prelude, operator
 from prewikka import view, User, utils
 from prewikka.views.messagelisting import MessageListingParameters, MessageListing, ListedMessage
 
@@ -31,140 +31,21 @@ def _normalizeName(name):
     return "".join([ i.capitalize() for i in name.split("_") ])
 
 
-def _getEnumValue(class_id):
-    i = 0
-    nlist = [ ]
-
-    while True:
-        value = preludeold.idmef_class_enum_to_string(class_id, i)
-        i += 1
-        if value == None:
-            if i == 1:
-                continue
-
-            break
-
-        nlist += [ value ]
-
-    return nlist
-
-
-def _getOperatorList(type):
-    if type == preludeold.IDMEF_VALUE_TYPE_STRING:
-        return ["<>*", "<>", "=", "~*", "~", "!" ]
-
-    elif type == preludeold.IDMEF_VALUE_TYPE_DATA:
-        return ["<>*", "<>", "~", "~*", "=", "<", ">", "!" ]
-
-    else:
-        return ["=", "<", ">", "<=", ">=" ]
-
-def _getPathList(class_id, path, add_index=None, depth=0):
-    plist = []
-
-    if depth == 0:
-        if not add_index:
-            path = path.replace("(0)", "").replace("(-1)", "")
-
-        tmp = path[path.rfind(".") + 1:]
-        elen = tmp.find("(")
-        if elen == -1:
-            plist += [( _normalizeName(tmp), None, None, None) ]
-        else:
-            plist += [( _normalizeName(tmp[:elen]), None, None, None) ]
-        depth += 1
-
-    i = 0
-    child_list = []
-
-    while True:
-        name = preludeold.idmef_class_get_child_name(class_id, i)
-        if not name or (name == "file" and class_id == preludeold.IDMEF_CLASS_ID_LINKAGE):
-            break
-
-        vtype = preludeold.idmef_class_get_child_value_type(class_id, i)
-        space = "&nbsp;" * depth
-
-        if vtype == preludeold.IDMEF_VALUE_TYPE_CLASS:
-            if add_index and preludeold.idmef_class_is_child_list(class_id, i):
-                index = add_index
-            else:
-                index = ""
-
-            child_list += [ (space + _normalizeName(name), None, None, None) ]
-            child_list += _getPathList(preludeold.idmef_class_get_child_class(class_id, i), path + "." + name + index, add_index, depth + 1)
-        else:
-            if vtype == preludeold.IDMEF_VALUE_TYPE_ENUM:
-                pval = _getEnumValue(preludeold.idmef_class_get_child_class(class_id, i))
-            else:
-                pval = None
-
-            plist += [( space + name, path + "." + name, _getOperatorList(vtype), pval) ]
-
-        i += 1
-
-    return plist + child_list
-
-
-def _getClassificationPath(add_empty=False, add_index=None):
-    empty = [ ]
-    if add_empty:
-        empty += [("", "none", None, None)]
-
-    return empty + \
-           [("messageid", "alert.messageid", _getOperatorList(preludeold.IDMEF_VALUE_TYPE_STRING), None)] + \
-           _getPathList(preludeold.IDMEF_CLASS_ID_CLASSIFICATION, "alert.classification", add_index=add_index) + \
-           _getPathList(preludeold.IDMEF_CLASS_ID_ASSESSMENT, "alert.assessment", add_index=add_index) + \
-           _getPathList(preludeold.IDMEF_CLASS_ID_OVERFLOW_ALERT, "alert.overflow_alert", add_index=add_index) + \
-           _getPathList(preludeold.IDMEF_CLASS_ID_CORRELATION_ALERT, "alert.correlation_alert", add_index=add_index) + \
-           _getPathList(preludeold.IDMEF_CLASS_ID_TOOL_ALERT, "alert.tool_alert", add_index=add_index) + \
-           _getPathList(preludeold.IDMEF_CLASS_ID_ADDITIONAL_DATA, "alert.additional_data", add_index=add_index)
-
-def _getSourcePath(add_empty=False, add_index=None):
-    empty = [ ]
-    if add_empty:
-        empty += [("", "none", None, None)]
-
-    return empty + _getPathList(preludeold.IDMEF_CLASS_ID_SOURCE, "alert.source(0)", add_index=add_index)
-
-def _getTargetPath(add_empty=False, add_index=None):
-    empty = [ ]
-    if add_empty:
-        empty += [("", "none", None, None)]
-
-    return empty + _getPathList(preludeold.IDMEF_CLASS_ID_TARGET, "alert.target(0)", add_index=add_index)
-
-def _getAnalyzerPath(add_empty=False, add_index=None):
-    empty = [ ]
-    if add_empty:
-        empty += [("", "none", None, None)]
-
-    return empty + _getPathList(preludeold.IDMEF_CLASS_ID_ANALYZER, "alert.analyzer(-1)", add_index=add_index)
-
 
 COLUMN_LIST = [ "classification", "source", "target", "analyzer" ]
 
-CLASSIFICATION_FILTERS = _getClassificationPath()
-CLASSIFICATION_AGGREGATIONS = _getClassificationPath(add_empty=True, add_index="(0)")
 CLASSIFICATION_GENERIC_SEARCH_FIELDS = [ "alert.classification.text", "alert.classification.reference.name", "alert.classification.reference.origin", "alert.assessment.impact.completion" ]
 
-SOURCE_FILTERS = _getSourcePath()
-SOURCE_AGGREGATIONS = _getSourcePath(add_empty=True, add_index="(0)")
 SOURCE_GENERIC_SEARCH_FIELDS = [ "alert.source.node.address.address", "alert.source.user.user_id.name",
                                  "alert.source.user.user_id.number", "alert.source.process.name", "alert.source.process.pid",
                                  "alert.source.service.protocol", "alert.source.service.iana_protocol_name", "alert.source.service.iana_protocol_number",
                                  "alert.source.service.port" ]
 
-TARGET_FILTERS = _getTargetPath()
-TARGET_AGGREGATIONS = _getTargetPath(add_empty=True, add_index="(0)")
 TARGET_GENERIC_SEARCH_FIELDS = [ "alert.target.node.address.address", "alert.target.user.user_id.name",
                                  "alert.target.user.user_id.number", "alert.target.process.name", "alert.target.process.pid",
                                  "alert.target.service.protocol", "alert.target.service.iana_protocol_name", "alert.target.service.iana_protocol_number",
                                  "alert.target.service.port" ]
 
-
-ANALYZER_FILTERS = _getAnalyzerPath()
-ANALYZER_AGGREGATIONS = _getAnalyzerPath(add_empty=True, add_index="(0)")
 ANALYZER_GENERIC_SEARCH_FIELDS = [ "alert.analyzer.name", "alert.analyzer.node.name" ]
 
 GENERIC_SEARCH_TABLE = { "classification": CLASSIFICATION_GENERIC_SEARCH_FIELDS,
@@ -269,6 +150,7 @@ class AlertListingParameters(MessageListingParameters):
         return ret
 
     def normalize(self, view_name, user):
+
         do_save = self.has_key("_save")
         do_load = MessageListingParameters.normalize(self, view_name, user)
 
@@ -345,7 +227,7 @@ class SensorAlertListingParameters(AlertListingParameters):
 
     def normalize(self, view_name, user):
         AlertListingParameters.normalize(self, view_name, user)
-        self["analyzer"].insert(0, ("alert.analyzer.analyzerid", "=", unicode(self["analyzerid"])))
+        self["analyzer"].insert(0, ("alert.analyzer.analyzerid", "=", self["analyzerid"]))
 
 
 class CorrelationAlertListingParameters(AlertListingParameters):
@@ -612,7 +494,7 @@ class ListedAlert(ListedMessage):
                 vl.append(name)
                 fstr += ":" + name
 
-            urlstr = "%s?origin=%s&name=%s" % (self.env.reference_details_url, urllib.quote(ref["origin"]), urllib.quote(ref["name"].encode('utf-8')))
+            urlstr = "%s?origin=%s&name=%s" % (self.env.reference_details_url, urllib.quote(ref["origin"]), urllib.quote(ref["name"]))
             if ref["origin"] in ("vendor-specific", "user-specific"):
                 urlstr += "&url=" + urllib.quote(ref["url"], safe="")
 
@@ -662,7 +544,7 @@ class ListedAlert(ListedMessage):
     def _setMessageTime(self, message):
         self["time"] = self.createTimeField(message["alert.create_time"], self.timezone)
         self._setMessageTimeURL(message["alert.analyzer_time"], message["alert.analyzer(-1).node.name"])
-        if (message["alert.analyzer_time"] != None and
+        if (message["alert.analyzer_time"] is not None and
             abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
             self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"], self.timezone)
         else:
@@ -902,24 +784,19 @@ class AlertListing(MessageListing, view.View):
         return "%s %s '%s'" % (object, operator, utils.escape_criteria(self._adjustFilterValue(operator, value)))
 
     def _getOperatorForPath(self, path, value):
-        path = path.encode("utf8")
-        value = value.encode("utf8")
-
         # Check whether the path can handle substring comparison
         # this need to be done first, since enum check with * won't work with "=" operator.
         try:
-            c = preludeold.idmef_criteria_new_from_string(path + " <>* '" + utils.escape_criteria(value) + "'")
+            c = prelude.IDMEFCriteria(path + " <>* '" + utils.escape_criteria(value) + "'")
         except:
             # Check whether this path can handle the provided value.
             try:
-                c = preludeold.idmef_criteria_new_from_string(path + " = '" + utils.escape_criteria(value) + "'")
+                c = prelude.IDMEFCriteria(path + " = '" + utils.escape_criteria(value) + "'")
             except:
                 return None
 
-            preludeold.idmef_criteria_destroy(c)
             return "="
 
-        preludeold.idmef_criteria_destroy(c)
         return "<>*"
 
     def _adjustCriteria(self, criteria):
@@ -1092,12 +969,6 @@ class AlertListing(MessageListing, view.View):
                                                      parameters + entry_param)
 
 
-    def _getPathValueType(self, path):
-        p = preludeold.idmef_path_new(path.encode("utf8"))
-        t = preludeold.idmef_path_get_value_type(p, -1)
-        preludeold.idmef_path_destroy(p)
-        return t
-
     def _setAggregatedMessagesNoValues(self, criteria, ag_s, ag_t, ag_c, ag_a):
         ag_list = ag_s + ag_t + ag_c + ag_a
 
@@ -1167,12 +1038,12 @@ class AlertListing(MessageListing, view.View):
                     direction = None
 
                 if value == None:
-                    if self._getPathValueType(path) != preludeold.IDMEF_VALUE_TYPE_STRING:
+                    if prelude.IDMEFPath(path).getValueType() != prelude.IDMEFValue.TYPE_STRING:
                         criterion = "! %s" % (path)
                     else:
                         criterion = "(! %s || %s == '')" % (path, path)
                 else:
-                    criterion = "%s == '%s'" % (path, utils.escape_criteria(unicode(value)))
+                    criterion = "%s == '%s'" % (path, utils.escape_criteria(value))
 
                 if direction != None:
                     message.setMessageDirectionGeneric(direction, path, value)
@@ -1204,8 +1075,8 @@ class AlertListing(MessageListing, view.View):
 
             self._getMissingAggregatedInfos(message, valueshash, parameters, criteria2, aggregated_count)
 
-            delete_criteria.append("alert.create_time >= '%s'" % time_min.toYMDHMS())
-            delete_criteria.append("alert.create_time <= '%s'" % time_max.toYMDHMS())
+            delete_criteria.append("alert.create_time >= '%s'" % utils.time_to_ymdhms(time.localtime(time_min)))
+            delete_criteria.append("alert.create_time <= '%s'" % utils.time_to_ymdhms(time.localtime(time_max)))
 
             self.dataset["messages"].append(message)
             message.setTime(time_min, time_max)
@@ -1308,16 +1179,11 @@ class AlertListing(MessageListing, view.View):
             self.dataset[i + "_saved"] = self.parameters.getDefault(i, usedb=True)
             self.dataset[i + "_default"] = self.parameters.getDefault(i, usedb=False)
 
-        self.dataset["classification_filters"] = CLASSIFICATION_FILTERS
-        self.dataset["classification_aggregations"] = CLASSIFICATION_AGGREGATIONS
-        self.dataset["source_filters"] = SOURCE_FILTERS
-        self.dataset["source_aggregations"] = SOURCE_AGGREGATIONS
-        self.dataset["target_filters"] = TARGET_FILTERS
-        self.dataset["target_aggregations"] = TARGET_AGGREGATIONS
-        self.dataset["analyzer_filters"] = ANALYZER_FILTERS
-        self.dataset["analyzer_aggregations"] = ANALYZER_AGGREGATIONS
-        self.dataset["all_filters"] = { "classification" : CLASSIFICATION_FILTERS, "source": SOURCE_FILTERS, "target": TARGET_FILTERS, "analyzer": ANALYZER_FILTERS }
-        self.dataset["all_aggregs"] = { "classification" : CLASSIFICATION_AGGREGATIONS, "source": SOURCE_AGGREGATIONS, "target": TARGET_AGGREGATIONS, "analyzer": ANALYZER_AGGREGATIONS }
+        root = prelude.IDMEFClass().get("alert")
+        self.dataset["all_filters"] = { "classification" : root.get("classification"),
+                                        "source": root.get("source"),
+                                        "target": root.get("target"),
+                                        "analyzer": root.get("analyzer")}
 
         c_params = ["aggregated_classification"] + self.parameters.getDynamicParams("classification").keys()
         c_params += ["alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion" ]
@@ -1344,7 +1210,7 @@ class AlertListing(MessageListing, view.View):
         if self.parameters.has_key("filter"):
             filter = self.env.db.getAlertFilter(self.user.login, self.parameters["filter"])
             if filter:
-                criteria.append("(%s)" % unicode(filter))
+                criteria.append("(%s)" % filter)
 
         start = end = None
         if self.parameters.has_key("timeline_unit") and self.parameters["timeline_unit"] != "unlimited":

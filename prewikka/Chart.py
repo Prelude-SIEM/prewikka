@@ -1,4 +1,5 @@
 # Copyright (C) 2005-2014 CS-SI. All Rights Reserved.
+# -*- coding: utf-8 -*-
 # Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
 # Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 #
@@ -27,7 +28,6 @@ import os, os.path
 import glob, tempfile
 
 from prewikka import utils, siteconfig, cairoplot
-from preludedbold import PreludeDBError
 
 from xml.dom.minidom import parse, parseString
 
@@ -144,10 +144,10 @@ class ChartCommon:
 
     def _getFilename(self, name, expire = None, uid=None, gid=None, suffix=".png"):
         old_mask = os.umask(0)
-        basename = base64.urlsafe_b64encode(name.encode("utf-8"))
+        basename = base64.urlsafe_b64encode(name)
         pathname = os.path.join(siteconfig.htdocs_dir, "generated_images")
 
-        user = base64.urlsafe_b64encode(self._user.login.encode("utf-8"))
+        user = base64.urlsafe_b64encode(self._user.login)
         pathname = os.path.normpath(os.path.join(pathname, user))
 
         try:
@@ -159,12 +159,13 @@ class ChartCommon:
         self._remove_old_chart_files(os.path.join(pathname, basename), expire)
 
         fd, self._filename = tempfile.mkstemp(prefix = basename + "_", suffix = suffix, dir = pathname)
+        self._filename = bytes(self._filename)
         if uid != None and gid != None:
             os.lchown(self._filename, uid, gid)
 
         os.chmod(self._filename, 0644)
 
-        self._href = urllib.quote("/prewikka/generated_images/%s" % (user or "") + "/" + os.path.basename(self._filename))
+        self._href = urllib.quote("prewikka/generated_images/%s" % (user or "") + "/" + os.path.basename(self._filename))
         os.umask(old_mask)
 
         return self._filename
@@ -294,7 +295,8 @@ class CairoTimelineChart(TimelineChartCommon):
         colors = []
         values = utils.OrderedDict()
         for name in self._values.keys():
-            nname = name[0:min(len(name), 25)]
+            # We need unicode to prevent partial truncate
+            nname = name.decode("utf8")[0:min(len(name), 25)].encode("utf8")
             if not values.has_key(nname):
                 values[nname] = []
 

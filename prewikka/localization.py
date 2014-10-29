@@ -39,13 +39,13 @@ _all_locale = { }
 
 def _safeGettext(s):
     try:
-        return utils.toUnicode(_localized_thread.data.gettext(s))
+        return _localized_thread.data.gettext(s)
     except:
         return s
 
 def _safeNgettext(singular, plural, num):
     try:
-        return utils.toUnicode(_localized_thread.data.ngettext(singular, plural, num))
+        return _localized_thread.data.ngettext(singular, plural, num)
     except:
         if num <= 1:
             return singular
@@ -62,13 +62,13 @@ __builtin__.ngettext = _safeNgettext
 
 _LANGUAGES = {
                "Deutsch": "de_DE",
-               u"Español": "es_ES",
+               "Español": "es_ES",
                "English": "en_GB",
-               u"Français": "fr_FR",
+               "Français": "fr_FR",
                "Italiano": "it_IT",
                "Polski": "pl_PL",
-               u"Português (Brasileiro)": "pt_BR",
-               u"Русский": "ru_RU"
+               "Português (Brasileiro)": "pt_BR",
+               "Русский": "ru_RU"
              }
 
 
@@ -76,7 +76,7 @@ def setLocale(lang):
     if not lang:
         lang = _DEFAULT_LANGUAGE
 
-    locale.setlocale(locale.LC_ALL, "%s.%s" %(lang.encode('utf8'), str(_DEFAULT_ENCODING)))
+    locale.setlocale(locale.LC_ALL, "%s.%s" %(lang, _DEFAULT_ENCODING))
 
     _lock.acquire()
 
@@ -130,5 +130,5 @@ def getDate():
                            _("Saturday"),
                            _("Sunday") ]
 
-    weekday, day, month, year = utils.toUnicode(time.strftime("%A %d %B %Y")).split()
-    return u" ".join((_(weekday).lower(), day, _(month).lower(), year))
+    weekday, day, month, year = time.strftime("%A %d %B %Y").split()
+    return " ".join((_(weekday).lower(), day, _(month).lower(), year))

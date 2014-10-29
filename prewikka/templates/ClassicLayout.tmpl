@@ -50,7 +50,7 @@ $layout_start_hook
     
       <div class="topmenu_item_info">
         #end filter
-        <p>$unicode($_("%(username)s on %(date)s") % { "username": $prewikka.userlink, "date": $prewikka.date })</p>
+        <p>$str($_("%(username)s on %(date)s") % { "username": $prewikka.userlink, "date": $prewikka.date })</p>
         #filter CleanOutput
       </div>
     </div>

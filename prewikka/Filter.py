@@ -19,41 +19,12 @@
 
 
 import re
-import preludeold
+import prelude
 
 from prewikka import utils
 
 class Error(Exception):
     pass
-
-
-class CriteriaIDMEF:
-    def __init__(self, root=preludeold.IDMEF_CLASS_ID_MESSAGE, text=""):
-        self.CriteriaList = []
-        self._idmef_class_tree(root, text, self.CriteriaList)
-
-    def _idmef_class_tree(self, root, criteria_root, outlist):
-
-        i = 0
-        while True:
-            name = preludeold.idmef_class_get_child_name(root, i)
-            if name == None:
-                break
-
-            if criteria_root != None:
-                criteria = "%s.%s" % (criteria_root, name)
-            else:
-                criteria = "%s" % (name)
-
-            if criteria == "alert.target.file.linkage":
-                break
-
-            if preludeold.idmef_class_get_child_value_type(root, i) == preludeold.IDMEF_VALUE_TYPE_CLASS:
-                self._idmef_class_tree(preludeold.idmef_class_get_child_class(root, i), criteria, outlist)
-            else:
-                outlist.append(criteria)
-
-            i = i + 1
 
 
 class Filter:
@@ -62,9 +33,7 @@ class Filter:
         self.comment = comment
         self.elements = elements
         self.formula = formula
-
-        crit = preludeold.idmef_criteria_new_from_string(unicode(self).encode("utf8"))
-        preludeold.idmef_criteria_destroy(crit)
+        crit = prelude.IDMEFCriteria(str(self))
 
     def _replace(self, element):
         element = element.group(1)
@@ -78,15 +47,15 @@ class Filter:
             raise Error(_("Invalid filter element '%s' referenced from filter formula") % element)
 
         criteria, operator, value = self.elements[element]
-        return "%s %s '%s'" % (criteria, operator, utils.escape_criteria(value))
+        return "alert.%s %s '%s'" % (criteria, operator, utils.escape_criteria(value))
 
     def __str__(self):
         return re.sub("(\w+)", self._replace, self.formula)
 
 
 
-AlertFilterList = CriteriaIDMEF(preludeold.IDMEF_CLASS_ID_ALERT, "alert").CriteriaList
-HeartbeatFilterList = CriteriaIDMEF(preludeold.IDMEF_CLASS_ID_HEARTBEAT, "heartbeat").CriteriaList
+AlertFilterList = prelude.IDMEFClass("alert")
+HeartbeatFilterList = prelude.IDMEFClass("heartbeat")
 
 
 if __name__ == "__main__":

@@ -47,7 +47,7 @@ class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
             self.db.setPermissions(user, User.ALL_PERMISSIONS)
 
     def _hash(self, data):
-        return hashlib.md5(data.encode("utf8")).hexdigest()
+        return hashlib.md5(data).hexdigest()
 
     def createUser(self, login):
         return self.db.createUser(login)
@@ -61,7 +61,7 @@ class MyLoginPasswordAuth(Auth.LoginPasswordAuth):
         except Database.DatabaseError:
             raise Auth.AuthError()
 
-        if real_password == None or self._hash(password) != real_password:
+        if real_password is None or self._hash(password) != real_password:
             raise Auth.AuthError()
 
     def setPassword(self, login, password):

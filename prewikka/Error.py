@@ -21,7 +21,7 @@
 import traceback
 import StringIO
 
-from prewikka import DataSet
+from prewikka import DataSet, Log
 from prewikka.templates import ErrorTemplate
 
 
@@ -29,24 +29,39 @@ from prewikka.templates import ErrorTemplate
 class PrewikkaError(Exception):
     pass
 
+
 class PrewikkaUserError(PrewikkaError):
+    template = "ErrorTemplate"
+
     def __init__(self, name, message, display_traceback=False, log=None, log_user=None):
-        self.dataset = DataSet.DataSet()
-        self.template = "ErrorTemplate"
-        self.dataset["message"] = message
-        self.dataset["name"] = name
-        self._log_priority = log
-        self._log_user = log_user
-        
+        PrewikkaError.__init__(self, message)
+
+        self.name = name
+        self.message = str(message)
+        self.log_priority = log or Log.ERROR
+        self.log_user = log_user
+
         if display_traceback:
             output = StringIO.StringIO()
             traceback.print_exc(file=output)
             output.seek(0)
             tmp = output.read()
-            self.dataset["traceback"] = tmp
+            self.traceback = tmp
         else:
-            self.dataset["traceback"] = None
+            self.traceback = None
+
+    def setupDataset(self):
+        self.dataset = DataSet.DataSet()
+        self.dataset["name"] = self.name
+        self.dataset["message"] = self.message
+        self.dataset["traceback"] = self.traceback
+
+        return self.dataset
 
     def __str__(self):
-        return self.dataset["message"]
-        
+        return self.message
+
+
+class PrewikkaInvalidQueryError(PrewikkaUserError):
+    def __init__(self, message):
+        PrewikkaUserError.__init__(self, "Invalid query", message, log_priority=Log.ERROR)

@@ -118,38 +118,38 @@ class SensorListing(view.View):
             analyzer["heartbeat_listing"] = utils.create_link("sensor_heartbeat_listing", parameters)
             analyzer["heartbeat_analyze"] = utils.create_link("heartbeat_analyze", parameters)
 
-            if analyzer["node_name"]:
+            if analyzer["node.name"]:
                 analyzer["node_name_link"] = utils.create_link(self.view_name,
                                                                { "filter_path": "heartbeat.analyzer(-1).node.name",
-                                                                 "filter_value": analyzer["node_name"] })
+                                                                 "filter_value": analyzer["node.name"] })
 
-            if analyzer["node_location"]:
+            if analyzer["node.location"]:
                 analyzer["node_location_link"] = utils.create_link(self.view_name,
                                                                    { "filter_path": "heartbeat.analyzer(-1).node.location",
-                                                                     "filter_value": analyzer["node_location"] })
+                                                                     "filter_value": analyzer["node.location"] })
 
             node_key = ""
-            for i in range(len(analyzer["node_addresses"])):
-                addr = analyzer["node_addresses"][i]
+            for i in range(len(analyzer["node.address.address"])):
+                addr = analyzer["node.address.address"][i]
                 node_key += addr
 
-                analyzer["node_addresses"][i] = {}
-                analyzer["node_addresses"][i]["value"] = addr
-                analyzer["node_addresses"][i]["inline_filter"] = utils.create_link(self.view_name,
+                analyzer["node.address.address"][i] = {}
+                analyzer["node.address.address"][i]["value"] = addr
+                analyzer["node.address.address"][i]["inline_filter"] = utils.create_link(self.view_name,
                                                                    { "filter_path": "heartbeat.analyzer(-1).node.address.address",
                                                                      "filter_value": addr })
 
-                analyzer["node_addresses"][i]["host_commands"] = []
+                analyzer["node.address.address"][i]["host_commands"] = []
                 for command in self.env.host_commands.keys():
-                    analyzer["node_addresses"][i]["host_commands"].append((command.capitalize(),
+                    analyzer["node.address.address"][i]["host_commands"].append((command.capitalize(),
                                                                            utils.create_link("Command",
                                                                                              { "origin": self.view_name,
                                                                                                "command": command, "host": addr })))
 
-                analyzer["node_addresses"][i]["host_url"] = []
+                analyzer["node.address.address"][i]["host_url"] = []
                 if "host" in self.env.url:
                     for urlname, url in self.env.url["host"].items():
-                        analyzer["node_addresses"][i]["host_url"].append((urlname.capitalize(), url.replace("$host", addr)))
+                        analyzer["node.address.address"][i]["host_url"].append((urlname.capitalize(), url.replace("$host", addr)))
 
             model = analyzer["model"]
             analyzer["model"] = {}
@@ -166,11 +166,11 @@ class SensorListing(view.View):
             analyzer["last_heartbeat_time"] = utils.time_to_ymdhms(time.localtime(int(analyzer["last_heartbeat_time"]))) + \
                                               " %+.2d:%.2d" % utils.get_gmt_offset()
 
-            node_location = analyzer["node_location"] or _("Node location n/a")
-            node_name = analyzer.get("node_name") or _("Node name n/a")
+            node_location = analyzer["node.location"] or _("Node location n/a")
+            node_name = analyzer.get("node.name") or _("Node name n/a")
             osversion = analyzer["osversion"] or _("OS version n/a")
             ostype = analyzer["ostype"] or _("OS type n/a")
-            addresses = analyzer["node_addresses"]
+            addresses = analyzer["node.address.address"]
 
             node_key = node_name + osversion + ostype
 
@@ -248,7 +248,7 @@ class HeartbeatAnalyze(view.View):
 
         for ident in idents:
             older = self.env.idmef_db.getHeartbeat(ident)
-            older_status = older.getAdditionalData("Analyzer status")
+            older_status = older.get("heartbeat.additional_data('Analyzer status').data")
             older_interval = older["heartbeat.heartbeat_interval"]
             if not older_status or not older_interval:
                 continue

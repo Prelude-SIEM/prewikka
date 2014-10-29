@@ -20,17 +20,10 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import sys
-import os, os.path
-import time
-
 import cgi
-import urllib
-import mimetypes
 import shutil
 import getopt
-
-import SocketServer
-import BaseHTTPServer
+import SocketServer, BaseHTTPServer
 from prewikka import localization
 from prewikka import Core, Request, siteconfig
 
@@ -68,51 +61,27 @@ class PrewikkaRequestHandler(Request.Request, BaseHTTPServer.BaseHTTPRequestHand
         pass
 
     def _processDynamic(self, arguments):
-        self.input_headers.update(self.headers)
-
         for name, value in arguments.items():
             self.arguments[name] = (len(value) == 1) and value[0] or value
 
         self.server.core.process(self)
 
-    def sendResponse(self):
-        self.send_response(200)
-        Request.Request.sendResponse(self)
-
-    def _processStatic(self):
-        filename = os.path.abspath(siteconfig.htdocs_dir + "/" + urllib.unquote(self.path[len("prewikka/"):]))
-        if filename.find(os.path.abspath(siteconfig.htdocs_dir)) != 0:
-            self.send_error(403, "Request Forbidden")
-            return
-
-        # the following piece of code is from tracd of the trac project
-        # (http://www.edgewall.com/products/trac/)
-        try:
-            f = open(filename, 'r')
-        except IOError:
-            self.send_error(404, "File not found")
-            return
-
-        self.send_response(200)
-        mtype, enc = mimetypes.guess_type(filename)
-        stat = os.fstat(f.fileno())
-        content_length = stat[6]
-        last_modified = time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8]))
-        self.send_header('Content-Type', mtype)
-        self.send_header('Content-Length', str(content_length))
-        self.send_header('Last-Modified', last_modified)
-        self.end_headers()
-        shutil.copyfileobj(f, self.wfile)
+    def sendHeaders(self, code=200, status_text=None):
+        self.send_response(code)
+        Request.Request.sendHeaders(self)
 
     def do_GET(self):
         self._query_string = self.path
+
         self.init()
-        if self.path == "/":
-            self._processDynamic({ })
+        if self.path.startswith("/prewikka/"):
+            self.processStatic(self.path, lambda fd: shutil.copyfileobj(fd, self.wfile))
+
         elif self.path.find("?") == 1:
             self._processDynamic(cgi.parse_qs(self.path[2:]))
+
         else:
-            self._processStatic()
+            self._processDynamic({ })
 
     def do_HEAD(self):
         self.do_GET()
@@ -158,7 +127,6 @@ if __name__ == "__main__":
         elif opt in ("-c", "--config"):
             config = arg
 
-    mimetypes.init()
     core = Core.get_core_from_config(config)
 
     server = PrewikkaServer(core, (addr, port), PrewikkaRequestHandler)

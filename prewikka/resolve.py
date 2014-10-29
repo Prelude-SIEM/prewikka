@@ -51,7 +51,7 @@ class DNSResolver:
 
     def _resolve_cb(self, (ans, auth, add), ptr, resolve_cb):
         self._query -= 1
-        name = unicode(ans[0].payload.name)
+        name = str(ans[0].payload.name)
 
         resolve_cb(name)
 
@@ -128,7 +128,7 @@ class AddressResolve:
             resolver.resolve(addr, self._resolve_cb)
 
     def __len__(self):
-        return len(unicode(self))
+        return len(self)
 
     def resolveSucceed(self):
         if self._name:
@@ -141,9 +141,6 @@ class AddressResolve:
             resolver.process()
 
         return self._name or self._addr
-
-    def __repr__(self):
-        return unicode(self)
 
 
 def process(timeout=0):
