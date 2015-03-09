@@ -191,7 +191,10 @@ class MessageListing(view.View):
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
 
-        results = self._getMessageIdents(criteria, order_by=self.parameters["orderby"])
+        # count_asc and count_desc methods are not valid for message enumeration
+        order_by = "time_asc" if self.parameters["orderby"] in ("count_asc", "count_desc") else self.parameters["orderby"]
+
+        results = self._getMessageIdents(criteria, order_by=order_by)
         for ident in results[self.parameters["offset"] : self.parameters["offset"] + self.parameters["limit"]]:
             message = self._fetchMessage(ident)
             dataset = self._setMessage(message, ident)
