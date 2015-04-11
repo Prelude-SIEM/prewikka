@@ -1,0 +1,83 @@
+#message_list_result {
+    width: 100%;
+}
+
+#message_list_result td, #message_list_result th {
+    padding: 0.2em 0.5em;
+}
+
+.filter_popup_link {
+    float: left;
+}
+
+.filter_popup div {
+    display: none;
+    margin-top: 22px;
+    text-align: left;
+    white-space: nowrap;
+    position: absolute;
+    z-index: 2;
+}
+
+.filtered_column div {
+    float: left;
+}
+
+.filtered_column span {
+    float: right;
+    display: inline;
+}
+
+.inline_filter_content {
+    width: 100%;
+}
+
+.inline_filter_content td {
+    width: 100%;
+    text-align: right;
+    font-size: 8pt;
+    padding: 1px 5px 1px;
+    margin: 0;
+    border-spacing: 0;
+    border-bottom: 1px dashed @border;
+}
+
+.inline_filter_content td input[type="text"] {
+    height: 15px;
+}
+
+.inline_filter_content th {
+    font-size: 9pt;
+    color: #950;
+    font-weight: normal;
+    text-align: left;
+    border-bottom: 1px dashed @border;
+}
+
+#classification table, #source table, #target table, #analyzer table {
+    border-collapse: collapse;
+    vertical-align: top;
+    border-spacing: 0;
+}
+
+#target {
+    margin-left: -100px;
+}
+
+#analyzer {
+    margin-left: -222px;
+}
+
+#status {
+    margin-left: -150px;
+}
+
+.filter_enabled_marker {
+    font-weight: bold;
+    color: red;
+    display: inline;
+}
+
+span.filter_enabled_marker {
+    float: right;
+}

@@ -1,5 +1,6 @@
-# Copyright (C) 2004-2014 CS-SI. All Rights Reserved.
+# Copyright (C) 2004-2015 CS-SI. All Rights Reserved.
 # Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
+# Author: Yoann Vandoorselaere <yoannv@gmail.com>
 #
 # This file is part of the Prewikka program.
 #
@@ -17,89 +18,125 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-
+import operator, json, time
 from copy import copy
-import Error, Log, utils
+from prewikka import pluginmanager, template, usergroup, error, log, utils, env
+
+
+logger = log.getLogger(__name__)
+
 
 class ParameterError(Exception):
         pass
 
-class InvalidParameterError(Error.PrewikkaUserError):
+class InvalidParameterError(error.PrewikkaUserError):
     def __init__(self, name):
-        Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
-                                               _("Parameter '%s' is not valid") % name, log=Log.WARNING)
+        error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
+                                               _("Parameter '%s' is not valid") % name, log_priority=log.WARNING)
 
 
-class InvalidParameterValueError(Error.PrewikkaUserError):
+class InvalidParameterValueError(error.PrewikkaUserError):
     def __init__(self, name, value):
-        Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
-                                               _("Invalid value '%(value)s' for parameter '%(name)s'") % {'value':value, 'name':name}, log=Log.WARNING)
+        error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
+                                               _("Invalid value '%(value)s' for parameter '%(name)s'") % {'value':value, 'name':name}, log_priority=log.WARNING)
 
 
-class MissingParameterError(Error.PrewikkaUserError):
+class MissingParameterError(error.PrewikkaUserError):
     def __init__(self, name):
-        Error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
-                                         _("Required parameter '%s' is missing") % name, log=Log.WARNING)
+        error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
+                                         _("Required parameter '%s' is missing") % name, log_priority=log.WARNING)
 
+class InvalidViewError(error.PrewikkaUserError):
+    code = 404
+
+    def __init__(self, message):
+        error.PrewikkaUserError.__init__(self, _("Invalid view"), message, log_priority=log.ERROR)
+
+
+
+class ParameterDesc(object):
+    def __init__(self, name, type, mandatory=False, default=None, save=False):
+        self.name = name
+        self.save = save
+        self.default = default
+        self.mandatory = mandatory
+
+        if type is list:
+            self.type = [ str ]
+        else:
+            self.type = type
+
+    def has_default(self):
+        return self.default is not None
+
+    def _mklist(self, value):
+        if not isinstance(value, list):
+            return [ value ]
+
+        return value
+
+    def parse(self, value):
+        try:
+            if isinstance(self.type, list):
+                value = map(self.type[0], self._mklist(value))
+            else:
+                value = self.type(value)
+
+        except (ValueError, TypeError):
+            raise InvalidParameterValueError(self.name, value)
+
+        return value
 
 
 class Parameters(dict):
     allow_extra_parameters = False
 
-    def __init__(self, *args, **kwargs):
-        apply(dict.__init__, (self, ) + args, kwargs)
+    def __init__(self, view, *args, **kwargs):
+        dict.__init__(self, *args, **kwargs)
+
         self._hard_default = {}
         self._default = {}
         self._parameters = { }
+
         self.register()
-        self.optional("_error_back", str)
-        self.optional("_error_retry", str)
         self.optional("_save", str)
+        self.optional("_download", str)
+
+        # In case the view was dynamically added through HOOK_VIEW_LOAD, the hook isn't available
+        hook = "HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper()
+        if env.hookmgr.hasListener(hook):
+            list(env.hookmgr.trigger(hook, self))
 
     def register(self):
         pass
 
     def mandatory(self, name, type):
-        self._parameters[name] = { "type": type, "mandatory": True, "save": False }
+        self._parameters[name] = ParameterDesc(name, type, mandatory=True, save=True)
 
     def optional(self, name, type, default=None, save=False):
         if default is not None:
             self._default[name] = self._hard_default[name] = default
 
-        self._parameters[name] = { "type": type, "mandatory": False, "default": default, "save": save }
-
-    def _parseValue(self, name, value):
-        parameter_type = self._parameters[name]["type"]
-        if parameter_type is list:
-            if not type(value) is list:
-                value = [ value ]
-        try:
-            value = parameter_type(value)
-        except (ValueError, TypeError):
-            raise InvalidParameterValueError(name, value)
-
-        return value
-
-    def add_params(self, idmef_db):
-        pass
+        self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save)
 
     def normalize(self, view, user):
         do_load = True
+        do_save = "_save" in self
 
         for name, value in self.items():
-            try:
-                value = self._parseValue(name, value)
-            except KeyError:
-                if self.allow_extra_parameters:
-                    continue
+            param = self._parameters.get(name)
+            if not param:
+                if not(self.allow_extra_parameters):
+                    raise InvalidParameterError(name)
 
-                raise InvalidParameterError(name)
+                continue
 
-            if not self._parameters.has_key(name) or self._parameters[name]["mandatory"] is not True:
+            if not name in self._parameters or param.mandatory is False:
                 do_load = False
 
-            if self._parameters[name]["save"] and self.has_key("_save"):
-                user.setConfigValue(view, name, value)
+            value = param.parse(value)
+            if param.save and value != param.default and do_save:
+                user.set_property(name, value, view=view)
 
             self[name] = value
 
@@ -108,28 +145,81 @@ class Parameters(dict):
         # - Load default value for optional parameters that got one.
         # - Load last user value for parameter.
 
-        for name in self._parameters.keys():
-            got_param = self.has_key(name)
-            if not got_param:
-                if self._parameters[name]["mandatory"]:
-                    raise MissingParameterError(name)
+        for name in set(self._parameters.keys()) - set(self.keys()):
+            param = self._parameters[name]
 
-                elif self._parameters[name]["default"] != None:
-                    self[name] = self._parameters[name]["default"]
+            if param.mandatory:
+                raise MissingParameterError(name)
 
-            if self._parameters[name]["save"]:
-                try: value = self._parseValue(name, user.getConfigValue(view, name))
-                except KeyError:
+            elif param.has_default():
+                self[name] = param.default
+
+            if not param.save:
+                continue
+
+            if do_save:
+                user.del_property(name, view=view)
+            else:
+                if not name in user.configuration.get(view, {}):
                     continue
 
+                value = param.parse(user.get_property(name, view=view))
+
                 self._default[name] = value
-                if do_load and not got_param:
-                    self[name] =  value
+                if do_load:
+                    self[name] = value
 
-        try: self.pop("_save")
-        except: pass
+        # In case the view was dynamically added through HOOK_VIEW_LOAD, the hook isn't available
+        hook = "HOOK_%s_PARAMETERS_NORMALIZE" % view.upper()
+        if env.hookmgr.hasListener(hook):
+            list(env.hookmgr.trigger(hook, self, view, user))
 
+        self.pop("_save", None)
         return do_load
+
+    def handleLists(self):
+        pass
+
+    def handleList(self, list_name, prefix, separator="_", ordered=False, has_value=True):
+        """
+        Return the object list from POST parameters
+        """
+        obj_list = [ ]
+        obj_dict = { }
+        obj_order = [ ]
+        for key, value in self.items():
+            if not key.startswith('%s%s' % (prefix, separator)):
+                continue
+
+            field = key[len(prefix) + len(separator):]
+            if ordered:
+                l = key[len(prefix) + len(separator):].split(separator, 1)
+                field = l[0]
+                order = len(l) == 2 and int(l[1]) or 0
+            else:
+                field = key[len(prefix) + len(separator):]
+                order = 0
+
+
+            if order not in obj_dict:
+                obj_dict[order] = { } if has_value else [ ]
+                obj_order.append(order)
+            if has_value:
+                obj_dict[order][field] = value
+            else:
+                obj_dict[order].append(field)
+            self.pop(key)
+
+        obj_order.sort()
+        for obj in obj_order:
+            obj_list.append(obj_dict[obj])
+
+        if ordered or not obj_list:
+            self[list_name] = obj_list
+        elif has_value:
+            self[list_name] = obj_list[0].items()
+        else:
+            self[list_name] = obj_list[0]
 
     def getDefault(self, param, usedb=True):
         return self.getDefaultValues(usedb)[param]
@@ -141,10 +231,10 @@ class Parameters(dict):
             return self._default
 
     def isSaved(self, param):
-        if not self._parameters.has_key(param):
+        if not param in self._parameters:
             return False
 
-        if not self._parameters[param].has_key("save") or not self._parameters[param]["save"]:
+        if not self._parameters[param].save:
             return False
 
         val1 = self._hard_default[param]
@@ -189,38 +279,196 @@ class Parameters(dict):
 
 
 
-class RelativeViewParameters(Parameters):
-    def register(self):
-        self.mandatory("origin", str)
+_VIEWS = {}
+_sentinel = object()
+
+def getViewPath(view_id, default=_sentinel):
+    view_id = view_id.lower()
+
+    if default is _sentinel:
+        return _VIEWS[view_id].view_path
+
+    v = _VIEWS.get(view_id)
+    return v.view_path if v else default
 
 
-
-class Views:
-    view_initialized = False
-    view_slots = { }
-
-    def init(self, env):
-        pass
-
-    def get(self):
-        for name, attrs in self.view_slots.items():
-            attrs["name"] = name
-            attrs["object"] = self
-            attrs["handler"] = "render_" + name
-        return self.view_slots
-
-
-
-class View(Views):
+class _View(object):
+    view_id = None
     view_name = None
     view_parameters = None
     view_permissions = [ ]
     view_template = None
+    view_section = None
+    view_order = 10
+    view_parent = None
+    view_help = None
+    view_extensions = []
 
-    def get(self):
-        return { self.view_name: { "name": self.view_name,
-                                   "object": self,
-                                   "handler": "render",
-                                   "parameters": self.view_parameters,
-                                   "permissions": self.view_permissions,
-                                   "template": self.view_template } }
+    def render(self):
+        for name, classobj in self.view_extensions:
+            obj = classobj(self)
+            setattr(self, name, obj)
+
+            obj.user = self.user
+            obj.parameters = self.parameters
+            obj.render(self.parameters)
+
+    def respond(self):
+        content = self.render()
+
+        if not content and self.dataset is not None:
+            content = self.dataset.render()
+
+        if self.request.is_xhr:
+            data = { "content": content }
+
+            if self.dataset:
+                for name, clname in self.view_extensions:
+                    obj = getattr(self, name)
+                    data[name] = obj.dataset.render([dict(self.dataset or {})])
+
+            content = json.dumps(data)
+
+        return content
+
+    def __init__(self):
+        if not self.view_id:
+            self.view_id = self.__class__.__name__.lower()
+
+        if not self.view_section:
+            self.view_section = _("Unknown")
+
+        if self.view_parent:
+            self.view_section, self.view_name = self.view_parent.view_section, self.view_parent.view_name
+
+        self.view_path = None
+
+        if self.view_name:
+                self.view_path = self.view_section + "/" + self.view_name
+
+        if self.view_parent:
+                self.view_path += "/" + self.view_id
+
+        if self.view_path:
+                self.view_path = utils.nameToPath(self.view_path)
+
+        _VIEWS[self.view_id] = self
+
+    def __copy__(self):
+        ret = self.__class__.__new__(self.__class__)
+        ret.__dict__.update(self.__dict__)
+        return ret
+
+
+
+
+class View(_View, pluginmanager.PluginBase):
+    def __init__(self):
+        _View.__init__(self)
+        pluginmanager.PluginBase.__init__(self)
+
+
+
+class ViewManager:
+    def getSections(self, user=None):
+        def _merge(d1, d2):
+                for section, tabs in d2.items():
+                        d1[section] = copy(d1.get(section, {}))
+                        for tab, views in tabs.items():
+                                d1[section][tab] = views
+
+        d = copy(self._sections)
+        [_merge(d, i) for i in env.hookmgr.trigger("HOOK_MENU_LOAD", user) if i]
+
+        return d
+
+    def getViewPath(self, view_id, default=_sentinel):
+        return getViewPath(view_id, default)
+
+    def getViewID(self, request):
+        sections = self._sections_path
+        paths = request.getViewElements()
+
+        view_id = None
+        try:
+                views = sections.get(paths[0], {}).get(paths[1])
+                if not views:
+                        return
+
+                view_id = views.keys()[0] if len(paths) == 2 else paths[-1]
+        except:
+                return paths[-1] if paths else None # View identified solely by ID, like /logout
+
+        return view_id
+
+    def getView(self, view_id):
+        return self._views.get(view_id.lower())
+
+    def loadView(self, request, userl):
+        view_id = self.getViewID(request)
+        if not request.is_xhr and not request.is_stream and not view_id == "logout" and not "_download" in request.arguments:
+            view_id = "BaseView"
+
+        if view_id:
+            view = self.getView(view_id)
+        else:
+            view = next((x for x in env.hookmgr.trigger("HOOK_VIEW_LOAD", request, userl) if x), None)
+
+        if not view:
+            raise InvalidViewError(_("View '%s' does not exist") % request.getView())
+
+        env.log.info("Loading view %s" % view.view_id, request, userl)
+        if userl and view.view_permissions and not userl.has(view.view_permissions):
+            raise usergroup.PermissionDeniedError(view.view_id)
+
+        parameters = {}
+        if view.view_parameters:
+            parameters = view.view_parameters(view, request.arguments)
+            parameters.normalize(view.view_id, userl)
+            parameters.handleLists()
+
+        view = copy(view)
+        view.request = request
+        view.parameters = parameters
+        view.user = userl
+        view.dataset = template.PrewikkaTemplate(view.view_template) if view.view_template else None
+
+        return view
+
+    def addView(self, view):
+        if view.view_name:
+            self._addSectionInfo(view)
+
+        self._views[view.view_id] = view
+
+        env.hookmgr.declare("HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper())
+        env.hookmgr.declare("HOOK_%s_PARAMETERS_NORMALIZE" % view.view_id.upper())
+
+    def _addSectionInfo(self, view):
+        self._sections.setdefault(view.view_section, utils.OrderedDict()) \
+                      .setdefault(view.view_name, utils.OrderedDict())[view.view_id] = view
+
+        self._sections_path.setdefault(utils.nameToPath(view.view_section), {}) \
+                           .setdefault(utils.nameToPath(view.view_name), utils.OrderedDict())[utils.nameToPath(view.view_id)] = view.view_path
+
+    def loadViews(self):
+        for view_class in sorted(pluginmanager.PluginManager("prewikka.views"), key=operator.attrgetter("view_order")):
+                try:
+                        vi = view_class()
+                except error.PrewikkaUserError as e:
+                        logger.warning("%s: plugin loading failed: %s", view_class.__name__, e)
+                        continue
+                except Exception as e:
+                        logger.exception("%s: plugin loading failed: %s", view_class.__name__, e)
+                        continue
+
+                self.addView(vi)
+
+    def __init__(self):
+        self._views = {}
+
+        self._sections = utils.OrderedDict((k, utils.OrderedDict()) for k in env.config.section_order.keys())
+        self._sections_path = {}
+
+        env.hookmgr.declare("HOOK_VIEW_LOAD", multi=True)
+        env.hookmgr.declare("HOOK_MENU_LOAD", multi=True)

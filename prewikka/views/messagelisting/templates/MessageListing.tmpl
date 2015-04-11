@@ -1,0 +1,100 @@
+#from prewikka import usergroup
+
+#block messagelisting_scripts
+$messagelisting_scripts
+#end block
+
+<link rel="stylesheet" type="text/css" href="messagelisting/css/messagelisting.css">
+
+<script type="text/javascript">
+<!--
+\$(document).ready(function() {
+  \$(document).on("click", "#main form input[name=pdfgen], #main form input[name=csvgen]", function(event) {
+        \$("#main form").data("enable-download", true);
+  });
+
+  \$("#allbox").click(function(){
+    \$('input[name=selection]').check(\$(this).prop('checked'));
+  });
+
+  if ( navigator.userAgent.indexOf("Konqueror") != -1 ) {
+        \$("th.filter_popup > div").css("display", "block");
+        \$("th.filter_popup > div").hide();
+   }
+
+  \$(".filter_popup_link").click(function(){
+        \$(this).nextAll("div").popupUnique(function(data){data.show()}, function(data){data.hide()})
+        return false;
+  });
+});
+//--></script>
+
+#def message_listing_header
+#end def
+$message_listing_header
+
+<form action="$document.href" id="messagelisting" name="messagelisting" method="post">
+<div class="prewikka-view-config" title="View Settings">
+  <p>
+    <label>Limit</label>
+    <input name="limit" type="number" min="-1" value="$limit" />
+  </p>
+</div>
+
+#for $name, $value in $hidden_parameters
+  <input type="hidden" name="$name" value="$value"/>
+#end for
+
+<table id="message_list_result">
+  $message_fields_header
+  <tbody>
+    #set $row_classes = ("table_row_even", "table_row_odd")
+    #set $cnt = 0
+
+    #for $message in $messages
+      #set global $message = $message
+        <tr class="$row_classes[$cnt % 2]">
+          $message_fields
+          #if $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
+          <td>
+            <input class="checkbox" type="checkbox" name="selection" value="$message.selection"/>
+          </td>
+          #end if
+        </tr>
+        #set $cnt += 1
+      #end for
+    </tbody>
+
+   <tfoot>
+#if $cnt
+     <tr><table id="message_list_nav" style="width:100%;">
+         <tr>
+            #if $nav.prev
+              <td class="message_list_nav_button"><a href="$nav.first">&lt;&lt;</a></td>
+              <td class="message_list_nav_button"><a href="$nav.prev">&lt;</a></td>
+            #else
+              <td class="message_list_nav_button_empty">&lt;&lt;</td>
+              <td class="message_list_nav_button_empty">&lt;</td>
+            #end if
+            #if $nav.next
+              <td class="message_list_nav_button"><a href="$nav.next">&gt;</a></td>
+              <td class="message_list_nav_button"><a href="$nav.last">&gt;&gt;</a></td>
+            #else
+              <td class="message_list_nav_button_empty">&gt;</td>
+              <td class="message_list_nav_button_empty">&gt;&gt;</td>
+            #end if
+          </tr>
+          <tr>
+            <td class="message_list_nav_infos" colspan="4">
+              $nav.from ... $nav.to ($_("total"):$total)
+            </td>
+          </tr>
+        </table>
+       </tr>
+     <tr>
+       $message_extra_footer
+     </tr>
+#end if
+    </tfoot>
+</table>
+</form>

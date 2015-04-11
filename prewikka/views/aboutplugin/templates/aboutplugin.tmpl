@@ -1,0 +1,239 @@
+
+<script type="text/javascript">
+    var slice = 0;
+    var progressbar = \$("#progressbar"), progressLabel = \$(".progress-label");
+
+\$.fn.shiftcheckbox = function() {
+    var allbox = \$(this);
+
+    var lastChecked = null;
+
+    \$(allbox).click(function(e) {
+        if ( ! lastChecked ) {
+            lastChecked = this;
+            return;
+        }
+
+        if ( e.shiftKey ) {
+            var start = allbox.index(this);
+            var end = allbox.index(lastChecked);
+            allbox.slice(Math.min(start, end), Math.max(start, end) + 1).prop("checked", lastChecked.checked);
+
+        }
+
+        lastChecked = this;
+    });
+};
+
+    \$("input[type=checkbox]").shiftcheckbox();
+
+    function update_log(data, is_error) {
+            if ( ! data )
+                data = "";
+
+            curval = \$(".update-log").text();
+            if ( curval.length )
+                curval += (is_error) ? "\n" : "done.\n";
+
+            \$(".update-log").text(curval + data);
+            \$(".update-log").scrollTop(\$(".update-log")[0].scrollHeight);
+    }
+
+    progressbar.progressbar({
+        value: false,
+        change: function() {
+            progressLabel.text( Math.round(progressbar.progressbar("value")) + "%" );
+        },
+        complete: function() {
+            progressLabel.text('$_("Update complete")');
+        }
+    });
+
+    \$("#update-dialog" ).dialog({
+        modal: true,
+        autoOpen: false,
+        draggable: false,
+        resizable: false,
+        width: 600,
+        appendTo: \$("#main"),
+        position: { my: "center bottom", at: "center", of: "#_main_viewport", within: "#_main_viewport" },
+        closeOnEscape: false,
+        dialogClass: "update-ui-dialog",
+
+        buttons: {
+            Ok: function() {
+                 \$(this).dialog("close");
+
+                 /*
+                  * Fully reload the interface (menu might have been activated).
+                  */
+                 location.replace(prewikka_location().href);
+                 return false;
+            }
+        }
+    });
+
+    \$(".activate-button").click(function() {
+            \$.ajax({url: prewikka_location().href, data: \$("input[type=checkbox]").serialize(), dataType: "json"}).done(function(data) {
+                location.reload();
+                return false;
+            });
+            return false;
+    });
+
+    \$(".update-button").click(function() {
+        \$("#update-dialog").dialog("open");
+        \$("#update-button").prop("disabled", true);
+        \$(".update-ui-dialog button").button("disable");
+
+        prewikka_EventSource({
+            url: prewikka_location().pathname + "?apply_update=true",
+
+            events: {
+                "begin": function(data) { slice = 100 / data["total"]; },
+                "finish": function(data) { update_log(); \$(".update-ui-dialog button").button("enable"); },
+            },
+
+            message: function(data) {
+                if ( data["error"] ) {
+                    update_log(data["error"], true);
+                    progressLabel.text('$_("Update failed")');
+                    \$(".update-ui-dialog button").button("enable");
+                    return;
+                }
+
+                var curval = progressbar.progressbar("value") || 0;
+                progressbar.progressbar("value", curval + slice);
+
+                update_log(data["label"]);
+            }
+        });
+
+        return false;
+    });
+</script>
+
+<style>
+    .ui-progressbar {
+        position: relative;
+    }
+
+    .progress-label {
+        width: 100%;
+        position: absolute;
+        text-align: center;
+        top: 4px;
+        font-weight: bold;
+        text-shadow: 1px 1px 0 #fff;
+    }
+
+    .update-log {
+        width: 100%;
+        height: 100px;
+    }
+
+    .button {
+        margin-top: 15pt;
+        float: right;
+    }
+
+    .fieldset_heading .right {
+        text-align: right;
+    }
+</style>
+
+
+<div id="update-dialog" title="Applying Updates">
+  <div id="progressbar">
+   <div class="progress-label">Applying Updates...</div>
+  </div>
+
+  <fieldset>
+   <legend>Update log</legend>
+   <textarea class="update-log" readonly=""></textarea>
+  </fieldset>
+</div>
+
+
+#set $row_classes = ("table_row_even", "table_row_odd")
+
+<div id="fieldset_page">
+#if $len($maintenance) > 0:
+ <fieldset class="fieldset_heading">
+  <legend style="color:red;">$_("Plugin Maintenance")</legend>
+  <p>
+   <center><b style="color:red;">$_("The following plugins need to be updated before they can be loaded into the system")</b></center>
+  </p>
+
+  #for $name, $list in $sorted($maintenance.items())
+  <fieldset>
+   <legend>$_($name)</legend>
+   <table>
+    <tr><th style="width:20%">$_("Name")</th><th>$_("Description")</th><th style="width:10%">$_("Version")</th><th style="width:15%">$_("Current Database Version")</th><th class="right" style="width:15%">$_("Required Database Update")</th></tr>
+
+    #set $cnt = 0
+    #for $mod, $fv, $tv in $sorted($list, $key=lambda x: $x[0].__module__)
+     #set $plugin_name = $mod.plugin_name or $mod.__module__
+    <tr class="$row_classes[$cnt % 2]">
+     <td>$plugin_name</td><td>$_($mod.plugin_description)</td><td>$mod.plugin_version</td>
+     <td>
+      #if $fv
+       $fv
+      #else
+       -
+      #end if
+     </td>
+     <td class="right">$tv</td>
+    </tr>
+     #set $cnt += 1
+    #end for
+   </table>
+  </fieldset>
+  #end for
+
+  #if $maintenance_total == 0
+  #set $disabled = 'disabled="disabled"'
+  #else
+  #set $disabled = ""
+  #end if
+  <button class="update-button button" $disabled>$_("Install Update")</button>
+ </fieldset>
+#end if
+
+ <fieldset class="fieldset_heading">
+  <legend>$_("Installed Plugins")</legend>
+
+   #for $name, $list in $sorted($installed.items())
+   <fieldset>
+    <legend>$_($name)</legend>
+    <table>
+     <tr><th style="width:20%">$_("Name")</th><th>$_("Description")</th><th style="width:10%">$_("Version")</th><th style="width:10%">$_("Database Version")</th><th class="right" style="width:5%">$_("Active")</th></tr>
+
+     #set $cnt = 0
+     #for $mod, $enabled in $sorted($list, key=lambda x: $x[0].__module__)
+      #if $enabled
+      #set $checked = "checked=\"checked\""
+      #else
+      #set $checked = ""
+      #end if
+      #set $plugin_name = $mod.plugin_name or $mod.__module__
+
+     <tr class="$row_classes[$cnt % 2]">
+      <td>$plugin_name</td><td>$_($mod.plugin_description)</td><td>$mod.plugin_version</td>
+      <td>#if $mod.plugin_database_version
+           $mod.plugin_database_version
+          #else
+           -
+          #end if
+      </td>
+      <td class="right"><input type="checkbox" name="enable_plugin" value="$mod.__module__" $checked /></td></tr>
+      #set $cnt += 1
+     #end for
+    </table>
+
+   </fieldset>
+   #end for
+
+  <button class="activate-button button">$_("Update")</button>
+ </fieldset>
+</div>

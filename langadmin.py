@@ -11,8 +11,8 @@
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
-# You should have received a copy of the GNU Lesser General Public License
-# along with this program; if not, write to the Free Software Foundation, Inc.,
+# You should have received a copy of the GNU Lesser General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
@@ -138,8 +138,8 @@ class LangAdmin:
                 if not exists(join(self.lang_dir, lang)):
                     os.mkdir(join(self.lang_dir, lang))
                 os.mkdir(join(self.lang_dir, lang, 'LC_MESSAGES'))
-       		
-	    # Skip files which are not modified
+
+            # Skip files which are not modified
             if not newer(src, dst):
                 continue
             cmd = 'msgfmt -o %s %s' % (dst, src)

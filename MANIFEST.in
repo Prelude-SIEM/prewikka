@@ -1,18 +1,11 @@
-include database/*.sh
-include database/*.sql
-include cgi-bin/*.cgi
-include scripts/*
-include htdocs/images/*
-include htdocs/css/*.css
-include htdocs/js/*.js
-include conf/*.conf
-include doc/*
-include po/*.po
-include *.py
-include NEWS
 include AUTHORS
-include README
-include HACKING.README
 include COPYING*
+include HACKING.README
+include NEWS
+include README
+include ez_setup.py
 include prewikka.pot
-recursive-include prewikka *.py *.tmpl
+include conf/prewikka.conf
+include po/*.po
+include themes/*.less
+recursive-include prewikka *

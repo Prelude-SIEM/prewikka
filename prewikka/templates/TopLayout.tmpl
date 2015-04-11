@@ -4,14 +4,27 @@
 #end def
 
 #block body
+<script>
+    \$(document).ready(function() {
+        \$("div.traceback").accordion({collapsible: true, active: false, heightStyle: "content"});
+    });
+</script>
+
 <body class="$body_class">
-	<div id="top_view">
-		<div id="top_view_header">
-			<div id="top_view_header_software">$prewikka.software</div>
-			<div id="top_view_header_place">$prewikka.place</div>
-			<div id="top_view_header_title">$prewikka.title</div>
-		</div>
-		$toplayout_content
-	</div>
+    <div id="prewikka-dialog">
+        <div class="content"></div>
+        <br/><div class="traceback" style="display:none;">
+            <h3>$_("Detail")</h3>
+            <div style="padding: 5px"><textarea style="width: calc(100% - 10px);" class="traceback" rows="10" readonly="readonly"></textarea></div>
+        </div>
+    </div>
+    <div id="top_view">
+        <div id="top_view_header">
+            <div id="top_view_header_software">$prewikka.software</div>
+            <div id="top_view_header_place">$prewikka.place</div>
+            $toplayout_extra_content
+        </div>
+        $toplayout_content
+    </div>
 </body>
 #end block body

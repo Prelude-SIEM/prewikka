@@ -1,0 +1,27 @@
+<script type="text/javascript">
+    \$(document).ready(function() {
+        \$('div.warning').dialog({
+            title: 'Prelude OSS',
+            modal: true,
+            draggable: false,
+            resizable: false,
+            width: 500,
+            buttons: {
+                Ok: function() {
+                    \$(this).dialog("close");
+                }
+            }
+        });
+    });
+</script>
+
+<div class="warning" style="display: none">
+  <p style="text-align: center; margin-bottom: 30px; margin-top: 30px; font-size: 1.1em">
+    <span style="font-weight: bold; color: red">$_("Prelude OSS is the open-source version of the Prelude SIEM")</span>
+    <br><br><b><a href="http://www.prelude-siem.com">www.prelude-siem.com</a></b>
+    <br><br>
+    #set $text = $_("This OSS version has <span style='font-weight: bold'>lower performance</span> and <span style='font-weight: bold'>less <a href='%s'>features</a></span> than the Pro/Enterprise versions.") % "http://www.prelude-siem.com/index.php/uk/products/oss-pro-enterprise"
+    $text
+    <br>$_("It is intended for tests and small environments, and should not be used in critical environments.")
+  </p>
+</div>

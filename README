@@ -1,5 +1,5 @@
-Prewikka: The Prelude-IDS console.
-Prewikka is brought to you by CS-SI (http://www.prelude-ids.com).
+Prewikka: The Prelude-SIEM console.
+Prewikka is brought to you by CS-SI (http://www.prelude-siem.com).
 
 
 Prewikka Overview
@@ -18,12 +18,12 @@ Installation
 
 Prewikka requires:
 
-- python >= 2.5 (not python 3.x)
+- python >= 2.6 (not python 3.x)
 - libprelude with python bindings
 - libpreludedb with python bindings
 - The cheetah template engine (http://www.cheetahtemplate.org/)
 
-Go to https://www.prelude-ids.org/wiki/prelude/InstallingPreludePrewikka for installation instructions.
+Go to https://www.prelude-siem.org/projects/prelude/wiki/InstallingPreludePrewikka for installation instructions.
 
 
 Get Support
@@ -31,15 +31,15 @@ Get Support
 
 Prelude-user mailing list archives can be accessed at:
 
-- https://www.prelude-ids.org/lists/prelude-announce
-- https://www.prelude-ids.org/lists/prelude-devel
-- https://www.prelude-ids.org/lists/prelude-user
+- https://www.prelude-siem.org/lists/prelude-announce
+- https://www.prelude-siem.org/lists/prelude-devel
+- https://www.prelude-siem.org/lists/prelude-user
 
 
 Commercial Support and functionality enhancements is available through the CS-SI company:
 
-- http://www.prelude-ids.com
-- info@prelude-ids.com
+- http://www.prelude-siem.com
+- contact@prelude-siem.com
 
 
 Help development
@@ -52,14 +52,14 @@ please do so from the most recent GIT source tree, subscribe to the
 prelude-devel mailing list and post your patch with a description of functionality.
 You can also attach patches to bugs on
 
-        https://www.prelude-ids.org
+        https://www.prelude-siem.org
 
 
 2. BUGS
 
 If you find any bugs, please report them to:
 
-        https://www.prelude-ids.org
+        https://www.prelude-siem.org
 
 Please make sure that what you're reporting is actually a BUG and not
 a problem on your side.

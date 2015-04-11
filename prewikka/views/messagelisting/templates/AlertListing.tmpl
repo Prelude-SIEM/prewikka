@@ -1,0 +1,501 @@
+#from prewikka import usergroup, utils, env
+#extends MessageListing
+
+#block messagelisting_scripts
+#filter CleanOutput
+
+<script type="text/javascript">
+<!--
+#end filter
+#filter Filter
+
+/*
+ * FIXME: move this to a pre-compiled JS file.
+ */
+if ( window._messagelisting_title_array == undefined ) {
+	window._messagelisting_title_array = Array();
+	window._messagelisting_title_array["="] = "$_("Equal")";
+	window._messagelisting_title_array["!="] = "$_("Not equal")";
+	window._messagelisting_title_array["<"] = "$_("Lesser than")";
+	window._messagelisting_title_array[">"] = "$_("Greater than")";
+	window._messagelisting_title_array["<="] = "$_("Lesser or equal")";
+	window._messagelisting_title_array[">="] = "$_("Greater or equal")";
+	window._messagelisting_title_array["<>"] = "$_("Substring")";
+	window._messagelisting_title_array["<>*"] = "$_("Substring (case-insensitive)")";
+	window._messagelisting_title_array["~"] = "$_("Regular expression")";
+	window._messagelisting_title_array["~*"] = "$_("Regular expression (case-insensitive)")";
+	window._messagelisting_operator_array = Array();
+	window._messagelisting_value_array = Array();
+}
+
+\$LAB.script("messagelisting/js/alertlisting.js").wait(function() {
+        var stateArray = [ "default", "saved", "current" ];
+        var saved_forms = Array();
+        var columns_data = $columns_data;
+
+        var saved_state = columns_data["column_names"];
+        \$(saved_state).each(function() {
+                saved_forms[this] = [ "default", "saved", "current" ];
+        });
+
+        var messagelisting = MessageListing();
+
+        \$(document).ready(function() {
+                var stateText = {"null":"$_("Reset to null")", "default":"$_("Reset to default")", "saved":"$_("Reset to saved")", "current":"$_("Reset to current")"}
+
+                \$(saved_state).each(function(idx, type) {
+                        \$(stateArray).each(function(idx, state) {
+                                messagelisting.set(type, state, columns_data);
+                                saved_forms[type][state] = messagelisting._cloneForm(\$("#" + type + " :input"));
+                        });
+
+                        var form = \$("#" + type + " :input");
+                        saved_forms[type]["current"] = messagelisting._cloneForm(form);
+
+                        if ( messagelisting._equals(saved_forms[type]["default"], saved_forms[type]["saved"]) )
+                                saved_forms[type]["saved"] = null;
+
+                        if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["default"]) )
+                                saved_forms[type]["current"] = null;
+
+                        if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["saved"]) )
+                                saved_forms[type]["current"] = null;
+
+                        ## Set the current state
+                        \$(stateArray).each(function(idx, state) {
+                                if ( messagelisting._equals(form, saved_forms[type][state]) )
+                                        saved_state[type] = state;
+                        });
+
+                        \$("#" + type + " input.reset_filter").val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
+                });
+
+
+                \$("input.reset_filter").click(function() {
+                        var type = \$(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().prop("id");
+
+                        saved_state[type] = messagelisting.get_next_state(saved_forms, type, saved_state[type]);
+
+                        messagelisting.set(type, saved_state[type], columns_data);
+                        \$(this).val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
+                });
+
+        });
+});
+
+//--></script>
+
+#end filter
+#end block
+
+#import prelude
+#from prewikka import idmefbrowser
+
+#def define_inline_filter_options($rootcl, $preselect, $depth)
+         <option disabled="disabled" value="">$str($depth * "&nbsp;") $rootcl.getName().capitalize()</option>
+
+          #for $subcl in $rootcl
+           #if $subcl.getValueType() == $prelude.IDMEFValue.TYPE_CLASS
+                $define_inline_filter_options($subcl, $preselect, $depth + 1)
+                #continue
+           #end if
+
+           #set $oplist = $idmefbrowser.getOperatorList($subcl.getValueType())
+           #set $is_enum = $subcl.getValueType() == $prelude.IDMEFValue.TYPE_ENUM
+
+           #if $is_enum or $oplist
+           <script type="text/javascript">
+            #if $is_enum
+            window._messagelisting_value_array["$subcl.getPath()"] = $list($subcl.getEnumValues());
+            #end if
+            #if $oplist
+            window._messagelisting_operator_array["$subcl.getPath()"] = $oplist;
+            #end if
+           </script>
+           #end if
+
+           #if $subcl.getPath() == None
+            <option disabled="disabled" value="">$str(($depth + 1) * "&nbsp;")$subcl.getName().capitalize()</option>
+
+           #elif $subcl.getPath() == $preselect
+            <option value="$subcl.getPath()" selected="selected">$str(($depth + 1) * "&nbsp;")$subcl.getName()</option>
+
+           #else
+            <option value="$subcl.getPath()">$str(($depth + 1) * "&nbsp;")$subcl.getName()</option>
+           #end if
+        #end for
+#end def
+
+#def define_inline_filter($obname, $preselect)
+      <table class="inline_filter_content filter_table">
+       <tr class="inline_filter">
+        <th>$_('Filter on') [<a class="expert_mode">$_("advanced")</a>]:</th>
+        <td class="td_container_path">
+         <input type="hidden" name="${obname}_object_0" value="__all__" />
+         <select style="display:none;" disabled="disabled" class="popup_select_field" name="${obname}_object_0">
+            #for $i in $all_filters[$obname]
+             $define_inline_filter_options($i, $preselect, 0);
+            #end for
+           </select>
+        </td>
+
+        <td class="td_container_operator">
+         <select style="display:none;" class="popup_operator_select" name="${obname}_operator_0" />
+        </td>
+
+        <td class="td_container_value">
+         <input class="popup_input_field" type="text" name="${obname}_value_0" />
+        </td>
+
+        <td class="td_container_remove">&nbsp;</td>
+        <td class="td_container_add"><a class="append_entry">+</a></td>
+       </tr>
+      </table>
+#end def
+
+#def define_inline_aggreg_options($rootcl, $depth)
+        <option disabled="disabled" value="">$str($depth * "&nbsp;")$rootcl.getName().capitalize()</option>
+
+          #for $subcl in $rootcl
+           #if $subcl.getValueType() == $prelude.IDMEFValue.TYPE_CLASS
+                $define_inline_aggreg_options($subcl, $depth + 1)
+                #continue
+           #end if
+            <option value="$subcl.getPath(listidx='(0)')">$str(($depth + 1) * "&nbsp;")$subcl.getName()</option>
+          #end for
+#end def
+
+#def define_inline_aggreg($obname)
+      <table class="inline_filter_content aggregation_table">
+       <tr class="inline_filter">
+        <th>$_('Group entry by:')</th>
+        <td class="td_container_path">
+         <select class="popup_input_field" name="aggregated_${obname}">
+          <option value="none"></option>
+          #for $i in $all_filters[$obname]
+           $define_inline_aggreg_options($i, 0)
+          #end for
+         </select>
+        </td>
+        <td class="td_container_remove">&nbsp;</td>
+        <td class="td_container_add"><a class="append_entry">+</a></td>
+       </tr>
+      </table>
+#end def
+
+#def filter_enabled_marker($type)
+  <span class="filter_enabled_marker filter_popup_link">
+   #if $type == 2
+    [<a class="filter_enabled_marker">$_("filtered")</a>]
+   #else
+    [<a style="color: gray;">$_("filtered")</a>]
+   #end if
+  </span>
+#end def
+
+#def filter_reset()
+<tr><td>
+    <table class="inline_filter_content">
+     <tr class="inline_filter nodash">
+      <td colspan="3">&nbsp;</td>
+      <td>
+       <input type="submit" value="$_("Apply")" />
+       <input type="button" class="reset_filter" value="Reset" />
+      </td>
+     </tr>
+    </table>
+</td></tr>
+#end def
+
+#block message_fields_header
+<thead>
+ <tr style="height: 20px;">
+  <td style="text-align: right">#</td>
+  <th class="filter_popup">
+   <a class="filter_popup_link">$_("Classification")</a>
+    #if $classification_filtered
+     $filter_enabled_marker($classification_filtered)
+    #end if
+   <div id="classification" style="display: none">
+    <table class="shadow">
+     <tr><td>$define_inline_filter("classification", "alert.classification.text")</td></tr>
+     <tr><td>$define_inline_aggreg("classification")</td></tr>
+     <tr><td><table class="inline_filter_content">
+       <tr>
+        <th>$_("Type:")</th>
+        <td>&nbsp;</td>
+        #if $correlation_alert_view
+         #set $disabled="disabled=\"disabled\""
+        #else
+         #set $disabled=""
+        #end if
+
+        #for name, path in (($N_("Alert"), "alert.create_time"), ($N_("CorrelationAlert"), "alert.correlation_alert.name"),
+                          ($N_("OverflowAlert"), "alert.overflow_alert.program"), ($N_("ToolAlert"), "alert.tool_alert.name"))
+         #if path in $alert.type
+          #set $checked = "checked='checked'"
+         #else
+          #set $checked = ""
+         #end if
+
+        <td>$_($name)<input class="checkbox" $disabled type="checkbox" name="alert.type" value="$path" $checked /></td>
+        #end for
+       </tr>
+
+       <tr>
+        <th>$_("Severity:")</th>
+        #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("n/a")
+        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="$item" /></td>
+        #end for
+       </tr>
+
+       <tr>
+        <th>$_("Completion:")</th>
+        <td colspan="2">&nbsp;</td>
+
+        #for item in $N_("succeeded"), $N_("failed"), $N_("n/a")
+        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="$item" /></td>
+        #end for
+       </tr>
+      </table>
+     </td></tr>
+     $filter_reset()
+    </table>
+    </div>
+  </th>
+
+  <th class="filter_popup">
+   <a class="filter_popup_link">$_("Source")</a>
+   #if $source_filtered
+     $filter_enabled_marker($source_filtered)
+   #end if
+   <div id="source" style="display: none">
+    <table class="shadow">
+     <tr><td>$define_inline_filter("source", "alert.source.node.address.address")</td></tr>
+     <tr><td>$define_inline_aggreg("source")</td></tr>
+     $filter_reset()
+    </table>
+   </div>
+  </th>
+
+  <th class="filter_popup">
+   <a class="filter_popup_link">$_("Target")</a>
+   #if $target_filtered
+     $filter_enabled_marker($target_filtered)
+   #end if
+   <div id="target" style="display: none">
+    <table class="shadow">
+     <tr><td>$define_inline_filter("target", "alert.target.node.address.address")</td></tr>
+     <tr><td>$define_inline_aggreg("target")</td></tr>
+     $filter_reset()
+    </table>
+   </div>
+  </th>
+
+  <td>$_("Date")</td>
+
+  #for $column in $extra_column
+  <td>$column</td>
+  #end for
+
+  #if $messages and $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
+  <td><input class="checkbox" type="checkbox" id="allbox" /></td>
+  #end if
+
+</tr>
+</thead>
+#end block message_fields_header
+
+
+#def writeInlineFilter(inline_filter, optval=None, cl="", help="")
+#if optval
+#if $inline_filter.already_filtered:
+<span class="$cl" title="$help">$optval</span>#slurp
+#else
+<a class="$cl" href="$inline_filter.inline_filter" title="$help">$optval</a>#slurp
+#end if
+#else
+#if $inline_filter.already_filtered:
+<span class="$cl" title="$help">$_($inline_filter.value)</span>#slurp
+#else
+<a class="$cl" href="$inline_filter.inline_filter" title="$help">$_($inline_filter.value)</a>#slurp
+#end if
+#end if
+#end def
+
+#def classificationWrite(info, text)
+<a class="impact_severity_$info.severity.value popup_menu_toggle">$text</a><span class="popup_menu">
+#if $info.count == 1
+- <a class="widget-link" title="$_('Alert details')" href="$info.display">$_("See alert detail")</a><br />
+#end if
+#if not $info.classification.already_filtered
+- <a href="$info.classification.inline_filter">$_("Filter on this classification")</a><br />
+#end if
+#for name, url in $info.classification_url
+- <a href="$url">$name</a><br />
+#end for
+</span>#slurp
+#end def
+
+#def timeWrite(time_url, text)
+#if $time_url
+<a class="popup_menu_toggle">$text</a><span class="popup_menu">
+#for name, url in $time_url
+- <a href="$url">$name</a><br />
+#end for
+</span>#slurp
+#else
+$text
+#end if
+#end def
+
+#def writeService($hstr, $direction)
+#if $direction.protocol.value
+#set $protocol = $direction.protocol.value.upper()
+#else
+#set $protocol = ""
+#end if
+#if $direction.service.value != None#$hstr
+       <a class="popup_menu_toggle">$direction.service.value</a>
+       <span class="popup_menu">
+        #filter Filter - $writeInlineFilter($direction.service, $_("Filter on this port/protocol"))<br/> #end filter
+        #if $direction.port.value and $env.enable_details
+        - <a target="$env.external_link_target" href="$env.port_details_url?port=$str($direction.port.value)&amp;protocol=$protocol">$_("Port/protocol information")</a>
+        #end if
+       </span>#slurp
+#end if
+#end def
+
+
+#block message_fields
+#filter CleanOutput
+
+<td style="text-align: right; width: 20px">
+  #for $info in $message.infos
+    #if $message.aggregated and $info.count > 1
+      <a href="$info.display">$info.count</a>
+    #else
+      $info.count
+    #end if
+    <br/>
+  #end for
+</td>
+
+<td>
+  #if $message.aggregated and $message.aggregated_classifications_hidden > 0
+    #set $string = $_("%(hidden)d of %(total)d alerts not shown...")
+    <b>($str($string % { "hidden": $message.aggregated_classifications_hidden, "total": $message.aggregated_classifications_total })
+    <a href="$message.aggregated_classifications_hidden_expand">$_("expand")</a>)</b>
+    <br/>
+  #end if
+
+  #for $info in $message.infos
+    #if $info.classification.value
+     #set $text = $info.classification.value
+    #else
+     #set $text = "n/a"
+    #end if
+
+    #filter Filter $classificationWrite($info, $text) #end filter
+
+    #if $message.sub_alert_name
+      #if $message.sub_alert_display
+        #set $string = $ngettext("alert", "alerts", $message.sub_alert_number)
+        <b>(<a href="$message.sub_alert_display">$message.sub_alert_number</a> $string)</b>#slurp
+      #end if
+      : <i>$message.sub_alert_name</i><br/>
+    #end if
+
+    <br/>
+    #set $sep = "("
+
+  #end for
+
+</td>
+
+
+#for $name, $direction, $hidden, $total, $expand in ($_("source"), $message.source, $message.aggregated_source_hidden, $message.aggregated_source_total, $message.aggregated_source_expand), ($_("target"), $message.target, $message.aggregated_target_hidden, $message.aggregated_target_total, $message.aggregated_target_expand)
+<td>
+#set $need_hr = 0
+
+#if $hidden > 0
+       #set $string = $_("%(hidden)d of %(total)d %(name)ss not shown...")
+       <b>($str($string % { "hidden": $hidden, "total": $total, "name": $name })
+       <a href="$expand">$_("expand")</a>)</b>
+       <br/>
+#end if
+
+#for $direction in $direction
+      #if $need_hr
+        <hr style="border: 1px dashed #808080; margin-top: 3px; margin-bottom: 0px;" />
+      #end if
+
+      #set $need_hr = 1
+
+      #for $address in $direction.addresses
+
+       <a class="popup_menu_toggle">$address.hostname</a><span class="popup_menu">
+         - #filter Filter $writeInlineFilter($address, $str($_("Filter on this %s") % ($name))) #end filter
+         <br />
+
+       #if $address.value and (not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net"))
+         #if $env.enable_details
+         - <a target="$env.external_link_target" href="$env.host_details_url?host=$address.value">$str($_("%s information") % ($name)).capitalize()</a><br />
+         #end if
+         #for $linkname, $link, $widget in $address.host_links
+          #if $widget
+          - <a href="$link" class="widget-link" title="$linkname">$linkname</a><br />
+          #else
+          - <a href="$link" target="_$linkname">$linkname</a><br />
+          #end if
+         #end for
+       #end if
+       </span>#slurp
+#filter Filter $writeService(":", $direction) #end filter
+<br />
+      #end for
+
+#end for
+
+</td>
+#end for
+
+<td>
+  #if $message.aggregated
+    #if $message.time_min.value == $message.time_max.value
+      $message.time_min.value
+    #else
+      $message.time_max.value<br />
+      $message.time_min.value
+    #end if
+  #else
+    #filter Filter $timeWrite($message.time.time_url, $message.time.value) #end filter
+    #if $message.analyzer_time.value
+      #echo($_("sent at %s") % $message.analyzer_time.value)
+    #end if
+  #end if
+</td>
+
+#end filter
+#for $link in $message.extra_link
+<td>
+<div style="float:left;">
+    $link
+</div>
+</td>
+#end for
+#end block message_fields
+
+
+#block message_extra_footer
+  <td>
+    #if $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
+    <div style="float: right;">
+      <input type="submit" name="listing_apply" value="$_("Apply")" />
+      <select style="display:inline;" name="action" id="action">
+        <option value="delete_message">$_('Delete')</option>
+      </select>
+    #end if
+    </div>
+  </td>
+#end block

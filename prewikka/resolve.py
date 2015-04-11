@@ -1,5 +1,5 @@
-# Copyright (C) 2008-2014 CS-SI. All Rights Reserved.
-# Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
+# Copyright (C) 2008-2015 CS-SI. All Rights Reserved.
+# Author: Yoann Vandoorselaere <yoannv@gmail.com>
 #
 # This file is part of the Prewikka program.
 #
@@ -19,6 +19,7 @@
 
 import time
 import socket
+from prewikka import env
 
 resolver = None
 import_fail = None
@@ -150,7 +151,7 @@ def process(timeout=0):
         resolver.process(timeout)
 
 
-def init(env):
+def init():
     global resolver
 
     if env.dns_max_delay == -1:

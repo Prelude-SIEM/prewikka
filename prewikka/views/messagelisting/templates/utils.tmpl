@@ -1,0 +1,50 @@
+#def display_analyzer(analyzer)
+  <table>
+    <thead>
+      <tr>
+        <td>$_("Name")</td>
+        <td>$_("Type")</td>
+        <td>$_("OS")</td>
+        <td>$_("Node name")</td>
+        <td>$_("Node location")</td>
+        <td>$_("Node address")</td>
+      </tr>
+    </thead>
+    <tbody>
+      <tr class="table_row_even">
+        <td>#echo $analyzer.name or "n/a" #</td>
+        <td>
+          #if $analyzer.model
+            $analyzer.model
+            #if $analyzer.version
+              $analyzer.version
+            #end if
+          #else
+            n/a
+          #end if
+        </td>
+        <td>
+          #if $analyzer.ostype
+            $analyzer.ostype
+            #if $analyzer.osversion
+              $analyzer.osversion
+            #end if
+          #else
+            n/a
+          #end if
+        </td>
+        <td>#echo $analyzer.node.name or "n/a" #</td>
+        <td>#echo $analyzer.node.location or "n/a" #</td>
+        <td>
+          #if len($analyzer["node.address(*).address"]) > 0
+            #for $address in $analyzer["node.address(*).address"]
+              $address<br/>
+            #end for
+          #else
+            n/a
+          #end if
+        </td>
+      </tr>
+    </tbody>
+  </table>
+#end def

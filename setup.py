@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2005-2014 CS-SI. All Rights Reserved.
+# Copyright (C) 2005-2015 CS-SI. All Rights Reserved.
 # Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
 #
 # This file is part of the Prewikka program.
@@ -19,67 +19,78 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import sys
+import sys, re
 import os, os.path
-import stat
-import glob
+import stat, fnmatch
+from glob import glob
 
+from ez_setup import use_setuptools
+use_setuptools()
+
+from setuptools import setup, find_packages
+
+from distutils.sysconfig import get_python_lib
 from distutils.dist import Distribution
-from distutils.core import setup
 from distutils.command.build import build
 from distutils.command.build_py import build_py
 from distutils.command.install import install
 from distutils.command.install_scripts import install_scripts
 from distutils.command.install_data import install_data
+from distutils.command.sdist import sdist
 from distutils.core import Command
+from distutils.errors import *
+from distutils import log
+from distutils import util
 
-from Cheetah.CheetahWrapper import CheetahWrapper
-
-
-PREWIKKA_VERSION = "1.2.6rc4"
 LIBPRELUDE_REQUIRED_VERSION = "1.2.6rc4"
 LIBPRELUDEDB_REQUIRED_VERSION = "1.2.6rc4"
 
-from fnmatch import fnmatch
 from distutils.dep_util import newer
 
 def listfiles(*dirs):
     dir, pattern = os.path.split(os.path.join(*dirs))
     return [os.path.join(dir, filename)
             for filename in os.listdir(os.path.abspath(dir))
-                if filename[0] != '.' and fnmatch(filename, pattern)]
+                if filename[0] != '.' and fnmatch.fnmatch(filename, pattern)]
 
-class my_install_data(install_data):
-    def run(self):
-        self.data_files.extend(self._compile_po_files())
-        install_data.run(self)
 
-    def _compile_po_files(self):
-        data_files = []
-
-        for po in listfiles("po", "*.po"):
-            lang = os.path.basename(po[:-3])
-            mo = os.path.join("locale", lang, "LC_MESSAGES", "prewikka.mo")
-
-            if not os.path.exists(mo) or newer(po, mo):
-                directory = os.path.dirname(mo)
-                if not os.path.exists(directory):
-                    print "creating %s" % directory
-                    os.makedirs(directory)
-
-                cmd = 'msgfmt -o %s %s' % (mo, po)
-                print "compiling %s -> %s" % (po, mo)
-                if os.system(cmd) != 0:
-                    raise SystemExit("Error while running msgfmt")
-
-            dest = os.path.dirname(os.path.join('share', mo))
-            data_files.append((dest, [mo]))
-
-        return data_files
-
+def template_compile(input, output_dir):
+    from Cheetah.CheetahWrapper import CheetahWrapper
+    CheetahWrapper().main([ sys.argv[0], "compile", "--nobackup", input ])
 
 
 class my_build_py(build_py):
+
+    def _generic_compile(self, compile_fmt, template, outfile):
+        if not os.path.exists(outfile) or any([newer(tmpl, outfile) for tmpl in template]):
+            directory = os.path.dirname(outfile)
+            if not os.path.exists(directory):
+                print "creating %s" % directory
+                os.makedirs(directory)
+
+            cmd = compile_fmt % (template + (outfile,))
+            print "compiling %s -> %s" % (template, outfile)
+            if os.system(cmd) != 0:
+                raise SystemExit("Error while running command")
+
+    def _compile_po_files(self):
+        for po in listfiles("po", "*.po"):
+            lang = os.path.basename(po[:-3])
+            mo = os.path.join(self.build_lib, "prewikka", "locale", lang, "LC_MESSAGES", "prewikka.mo")
+            self._generic_compile("msgfmt %s -o %s", (po,), mo)
+
+
+    def _compile_less_files(self):
+        style = os.path.join("prewikka", "htdocs", "css", "style.less")
+
+        for less in listfiles("themes", "*.less"):
+            theme = os.path.basename(less[:-5])
+            css = os.path.join(self.build_lib, "prewikka", "htdocs", "css", "themes", "%s.css" % theme)
+            self._generic_compile("lesscpy -I %s %s > %s", (less, style), css)
+
+    def initialize_options(self):
+        build_py.initialize_options(self)
+
     def finalize_options(self):
         build_py.finalize_options(self)
         self.outfiles = [ ]
@@ -88,13 +99,9 @@ class my_build_py(build_py):
         return self.outfiles + apply(build_py.get_outputs, (self, ) + args, kwargs)
 
     def build_templates(self):
-        cheetah = CheetahWrapper()
-        argbkp = sys.argv[0][:]
-
         for package in self.packages:
             package_dir = self.get_package_dir(package)
-            templates = glob.glob(package_dir + '/*.tmpl')
-
+            templates = glob(package_dir + '/*.tmpl')
             for template in templates:
                 compiled = self.build_lib + "/" + template.replace(".tmpl", ".py")
                 self.outfiles.append(compiled)
@@ -103,12 +110,22 @@ class my_build_py(build_py):
                     compiled_stat = os.stat(compiled)
                     if compiled_stat.st_mtime > template_stat.st_mtime:
                         continue
+                template_compile(template, self.build_lib)
 
-                argv = [ sys.argv[0], "compile", "--nobackup", template ]
-                cheetah.main(argv)
-                sys.argv[0] = argbkp
+    def check_package(self, package, package_dir):
+        return None
+
+    def copy_file(self, infile, outfile, **kwargs):
+        return apply(build_py.copy_file, (self, infile, outfile), kwargs)
+
+    def get_module_outfile(self, dir, package, module):
+        ret = build_py.get_module_outfile(self, dir, package, module)
+
+        return ret
 
     def run(self):
+        self._compile_po_files()
+        self._compile_less_files()
         self.build_templates()
         build_py.run(self)
 
@@ -122,7 +139,26 @@ class MyDistribution(Distribution):
             pass
 
         self.conf_files = [ ]
+        self.closed_source = os.path.exists("PKG-INFO")
         Distribution.__init__(self, attrs)
+
+
+
+class my_bdist(sdist):
+    def copy_file(self, infile, outfile, **kwargs):
+        if outfile[-5:] == ".tmpl":
+            output_dir = os.path.split(outfile)[0]
+            output_dir = output_dir[:output_dir.find(os.path.dirname(infile))]
+            template_compile(infile, output_dir)
+            outfile = output_dir + "/" + infile.replace(".tmpl", ".pyc")
+        else:
+            apply(sdist.copy_file, (self, infile, outfile), kwargs)
+
+        if infile[:7] != "Cheetah" and outfile[-3:] == ".py":
+            util.byte_compile([ outfile ])
+            print "delete", outfile, "after byte compiling"
+            os.remove(outfile)
+
 
 
 class my_install_scripts (install_scripts):
@@ -165,6 +201,10 @@ class my_install(install):
 
         install.finalize_options(self)
 
+    def get_outputs(self):
+        tmp = [ self.conf_prefix + "/prewikka.conf" ] + install.get_outputs(self)
+        return tmp
+
     def install_conf(self):
         self.mkpath((self.root or "") + self.conf_prefix)
         for file in self.distribution.conf_files:
@@ -177,9 +217,7 @@ class my_install(install):
         config = open("prewikka/siteconfig.py", "w")
         print >> config, "htdocs_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/htdocs"))
         print >> config, "database_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/database"))
-        print >> config, "locale_dir = '%s'" % os.path.abspath((self.prefix + "/share/locale"))
         print >> config, "conf_dir = '%s'" % os.path.abspath((self.conf_prefix))
-        print >> config, "version = '%s'" % PREWIKKA_VERSION
         print >> config, "libprelude_required_version = '%s'" % LIBPRELUDE_REQUIRED_VERSION
         print >> config, "libpreludedb_required_version = '%s'" % LIBPRELUDEDB_REQUIRED_VERSION
         config.close()
@@ -194,8 +232,8 @@ class my_install(install):
         for dir in ("/",
                     "share/prewikka",
                     "share/prewikka/htdocs",
-                    "share/prewikka/htdocs/images", "share/prewikka/htdocs/js", "share/prewikka/htdocs/css",
-                    "share/prewikka/database", "share/prewikka/cgi-bin"):
+                    "share/prewikka/cgi-bin"):
+            self.mkpath((self.root or "") + self.prefix + "/" + dir)
             os.chmod((self.root or "") + self.prefix + "/" + dir, 0755)
         os.chmod((self.root or "") + self.conf_prefix, 0755)
 
@@ -210,34 +248,60 @@ class my_install(install):
                 os.chmod(filename, mode)
 
 
-sqlite = open("database/sqlite.sql", "w")
-for line in os.popen("database/mysql2sqlite.sh database/mysql.sql"):
-    print >> sqlite, line.rstrip()
-sqlite.close()
 
-pgsql = open("database/pgsql.sql", "w")
-for line in os.popen("database/mysql2pgsql.sh database/mysql.sql"):
-    print >> pgsql, line.rstrip()
-pgsql.close()
-
+exec(open('prewikka/version.py').read())
 
 setup(name="prewikka",
-      version=PREWIKKA_VERSION,
-      maintainer = "Yoann Vandoorselaere",
-      maintainer_email = "yoann.v@prelude-ids.com",
-      url = "http://www.prelude-ids.org",
-      packages=[ 'prewikka', 'prewikka.views', 'prewikka.templates',
-                 'prewikka.modules',
-                 'prewikka.modules.auth', 'prewikka.modules.auth.anonymous', 'prewikka.modules.auth.loginpassword', 'prewikka.modules.auth.cgi' ],
-      data_files=[ ("share/prewikka/cgi-bin", [ "cgi-bin/prewikka.cgi" ]),
-                   ("share/prewikka/htdocs/images", glob.glob("htdocs/images/*")),
-                   ("share/prewikka/htdocs/css", glob.glob("htdocs/css/*.css")),
-                   ("share/prewikka/htdocs/js", glob.glob("htdocs/js/*.js")),
-                   ("share/prewikka/database", glob.glob("database/*.sql") + glob.glob("database/*.sh") )],
+      version=__version__,
+      maintainer = "Equipe Prelude",
+      maintainer_email = "support.prelude@c-s.fr",
+      url = "http://www.prelude-siem.com",
+      packages = find_packages(),
+      entry_points = {
+                'prewikka.renderer.backend': [
+                ],
+
+                'prewikka.renderer.type': [
+                ],
+
+                'prewikka.plugins': [
+                ],
+
+                'prewikka.session': [
+                        'Anonymous = prewikka.session.anonymous:AnonymousSession',
+                ],
+
+                'prewikka.auth': [
+                ],
+
+                'prewikka.views': [
+                        'About = prewikka.views.about:About',
+                        'AboutPlugin = prewikka.views.aboutplugin:AboutPlugin',
+                        'MessageSummary = prewikka.views.messagesummary:MessageSummary',
+                        'MessageListing = prewikka.views.messagelisting:MessageListing',
+                        'AgentPlugin = prewikka.views.agents:AgentPlugin',
+                        'Filter = prewikka.views.filter:AlertFilterEdition',
+                        'UserManagement = prewikka.views.usermanagement:UserManagement',
+                        'Warning = prewikka.views.warning:Warning',
+                ],
+      },
+
+      package_data= { '': ["htdocs/images/*.*",
+                           "htdocs/js/*.js",
+                           "htdocs/css/*.*", "htdocs/css/themes/*.*",
+                           "htdocs/css/images/*.*", "htdocs/css/images/*.*",
+                           "locale/*.pot",
+                           "locale/*/LC_MESSAGES/*.mo",
+                           "sql/*.py"],
+                      'prewikka.views.messagelisting': [ "htdocs/images/*.*", "htdocs/js/*.js" ],
+                      'prewikka.views.messagesummary': [ "htdocs/css/*.css", "htdocs/js/*.js" ],
+      },
+
       scripts=[ "scripts/prewikka-httpd", "cgi-bin/prewikka.cgi" ],
       conf_files=[ "conf/prewikka.conf" ],
       cmdclass={ 'build_py': my_build_py,
                  'install': my_install,
                  'install_scripts': my_install_scripts,
-                 'install_data': my_install_data },
+                 'my_bdist': my_bdist
+      },
       distclass=MyDistribution)

@@ -1,0 +1,126 @@
+<script type="text/javascript">
+\$LAB.script("prewikka/js/mainmenu.js").wait(function() {
+        window.mainmenu.reset();
+
+        #if $auto_apply_enable == "true"
+        window.mainmenu.start();
+        #end if
+});
+</script>
+
+      <div id="timeline_nav">
+        <input type="button" id="timeline_toggle" value="^"/>
+        <table id="timeline">
+#for $i in $menu_extra
+	$i
+#end for
+
+          <tr>
+           <th id="timeline_step_label">$_("Period")</th>
+           <td colspan="2">
+            <input name="timeline_value" type="text" size="2" value="$timeline_value"/>
+            <select name="timeline_unit">
+             <option value="minute" $timeline.minute_selected>$_("Minutes")</option>
+             <option value="hour" $timeline.hour_selected>$_("Hours")</option>
+             <option value="day" $timeline.day_selected>$_("Days")</option>
+             <option value="month" $timeline.month_selected>$_("Months")</option>
+             <option value="year" $timeline.year_selected>$_("Years")</option>
+             <option value="unlimited" $timeline.unlimited_selected>$_("Unlimited")</option>
+            </select>
+           </td>
+          </tr>
+
+          <tr>
+            <th id="timezone_control_label">$_("Timezone")</th>
+            <td colspan="2">
+              <select name="timezone">
+                <option value="frontend_localtime" $timeline.frontend_localtime_selected>$_("Frontend localtime")</option>
+                <option value="sensor_localtime" $timeline.sensor_localtime_selected>$_("Sensor localtime")</option>
+                <option value="utc" $timeline.utc_selected>$_("UTC")</option>
+               </select>
+             </td>
+          </tr>
+
+          <tr>
+           <th id="timeline_limit_label">$_("Order")</th>
+           <td colspan="2">
+            <select name="orderby">
+     <option value="time_desc" $timeline.time_desc_selected>$_("By time") ($_("descending"))</option>
+     <option value="time_asc" $timeline.time_asc_selected>$_("By time") ($_("ascending"))</option>
+     <option value="count_desc" $timeline.count_desc_selected>$_("By count") ($_("descending"))</option>
+     <option value="count_asc" $timeline.count_asc_selected>$_("By count") ($_("ascending"))</option>
+            </select>
+           </td>
+          </tr>
+
+          <tr>
+            <th id="auto_apply_label">$_("Refresh")</th>
+
+            <td colspan="2">
+            #if $auto_apply_enable == "true"
+                #set $img = "prewikka/images/pause.png"
+            #else:
+                #set $img = "prewikka/images/play.png"
+            #end if
+
+        <input type="hidden" name="auto_apply_enable" value="$auto_apply_enable" />
+
+        <div class="auto_apply_current" id="auto_apply_current">0:00</div>
+        <input type="text" size="3" name="auto_apply_value" value="$auto_apply_value" />
+        <a class="auto_apply_button"><img id="auto_apply_image" src="$img" alt="Play/Pause" /></a>
+
+            </td>
+          </tr>
+
+        <tr id="view-settings">
+          <td colspan="3">
+            <input type="button" id="view-settings-button" value="$_('View settings')" />
+          </td>
+        </tr>
+
+        <tr>
+         <td colspan="3" style="text-align: center">
+          <div class="timeline_save">
+           <label>$_("Save")</label><input type="checkbox" name="_save" />
+           <input id="form_apply" type="submit" value="$_("Apply")" />
+          </div>
+
+          <div class="timeline_range">
+          #if not $timeline.start
+           $_("Unlimited")<br/>
+           -<br/>
+          #else
+           $timeline.start<br/>
+           $timeline.end<br/>
+          #end if
+           $timeline.range_timezone
+          </div>
+         </td>
+        </tr>
+
+         <tr>
+          <td colspan="3">
+           <table><tr>
+            #if $timeline.prev
+             <td class="timeline_control_prev"><a href="$timeline.prev"><b>$_("prev")</b></a></td>
+            #else
+             <td class="timeline_control_inactive"><b>$_("prev")</b></td>
+            #end if
+
+            #if $timeline.current
+             <td class="timeline_control_cur"><a href="$timeline.current"><b>$_("current")</b></a></td>
+            #else
+             <td class="timeline_control_cur_inactive"><b>$_("current")</b></td>
+            #end if
+
+            #if $timeline.next
+             <td class="timeline_control_next"><a href="$timeline.next"><b>$_("next")</b></a></td>
+            #else
+             <td class="timeline_control_inactive"><b>$_("next")</b></td>
+            #end if
+
+           </tr></table>
+          </td>
+         </tr>
+        </table>
+       </div>

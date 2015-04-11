@@ -1,0 +1,68 @@
+.hearbeat_analyze {
+    font-size: 120%;
+    width: 100%;
+}
+
+.heartbeat_analyzer_event_start,
+.heartbeat_analyzer_event_normal_stop,
+.heartbeat_analyzer_event_no_anomaly {
+    color: green;
+}
+
+.heartbeat_analyzer_event_unexpected_restart,
+.heartbeat_analyzer_event_abnormal_heartbeat_interval {
+    color: rgb(255,165,0);
+}
+
+.heartbeat_analyzer_event_down {
+    color: red;
+}
+
+.heartbeat_analyze_sensor_status_offline {
+    background-color: lightGray;
+    text-align: center;
+}
+
+.heartbeat_analyze_sensor_status_missing {
+    text-align: center;
+    background-color: lightCoral;
+}
+
+.heartbeat_analyze_sensor_status_unknown {
+    background-color: lightSalmon;
+}
+
+.heartbeat_analyze_sensor_status_online {
+    text-align: center;
+    background-color: lightGreen;
+}
+
+.heartbeat_analyze_sensor_info {
+    font-weight: bold;
+    border-top: 10px;
+}
+
+table.locations, table.nodes, table.analyzers {
+    border-collapse: separate !important;
+}
+
+table.locations {
+    border: 2px solid @table-header;
+    border-spacing: 0;
+    border-radius: 5px 5px 0 0;
+}
+
+table.nodes {
+    margin-top: 1em;
+    border: 2px solid @table-header;
+    border-spacing: 0;
+    border-radius: 5px 5px 0 0;
+}
+
+table.analyzers {
+    border-radius: 0 0 5px 5px;
+}
+
+.show_all {
+    cursor: pointer;
+}

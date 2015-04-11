@@ -1,0 +1,252 @@
+#from prewikka import utils
+
+<script type="text/javascript"><!--
+
+#if $fltr.type
+ #set $ftype = $fltr.type
+#else
+ #set $ftype = "alert"
+#end if
+
+var current_type = '$ftype'
+
+function resetFilterType(type)
+{
+    current_type = type
+
+    tbody = document.getElementById("elements")
+
+    while ( tbody.hasChildNodes() && tbody.lastChild != tbody ) {
+        tbody.removeChild(tbody.lastChild);
+     }
+
+    newFilterElement('A', '', '', '')
+}
+
+
+
+function newFilterElement(name, object, operator, object_value) {
+    if ( current_type == 'alert' ) {
+        objects = new Array($alert_objects)
+    } else {
+        objects = new Array($generic_objects)
+    }
+
+    operators = new Array($operators)
+
+    table = document.getElementById("elements")
+
+    if ( ! name ) {
+        if ( table.lastChild.nodeName == "TR" ) {
+            child = table.lastChild.firstChild.firstChild
+            name = new String(child.nodeValue)
+            if ( name.charAt(name.length - 1) == "Z" ) {
+                name = name.concat("A")
+            } else {
+                name = name.substr(0, name.length - 1) +
+                           String.fromCharCode(name.charCodeAt(name.length - 1) + 1)
+            }
+        } else {
+            name = "A"
+        }
+    }
+
+    row = document.createElement("tr")
+    table.appendChild(row)
+
+    field = document.createElement("td")
+    row.appendChild(field)
+    value = document.createTextNode(name)
+    field.appendChild(value)
+
+    field = document.createElement("td")
+    row.appendChild(field)
+    select = document.createElement("select")
+    field.appendChild(select)
+    select.setAttribute("name", "object_" + name)
+    select.setAttribute("style", "width: 250px;")
+    for ( var i = 0; i < objects.length; i++ ) {
+        option = document.createElement("option")
+        if ( object == objects[i] ) {
+            option.setAttribute("selected", "true")
+        }
+        option.setAttribute("value", objects[i])
+        select.appendChild(option)
+        value = document.createTextNode(objects[i])
+        option.appendChild(value)
+    }
+
+    field = document.createElement("td")
+    row.appendChild(field)
+    select = document.createElement("select")
+    field.appendChild(select)
+    select.setAttribute("name", "operator_" + name)
+    for ( var i = 0; i < operators.length; i++ ) {
+        /* NB: setting selected to true before adding option to select is mandatory,
+                   if it is done after, it won't work  */
+        option = document.createElement("option")
+        if ( operator == operators[i] ) {
+            option.setAttribute("selected", "true")
+        }
+        select.appendChild(option)
+        option.setAttribute("value", operators[i])
+        value = document.createTextNode(operators[i])
+        option.appendChild(value)
+    }
+
+    field = document.createElement("td")
+    row.appendChild(field)
+    input = document.createElement("input")
+    field.appendChild(input)
+    /* NB: if type=text is set before value=something, the value won't be displayed */
+    /*input.setAttribute("type", "text")*/
+    input.setAttribute("name", "value_" + name)
+    input.setAttribute("value", object_value)
+
+    field = document.createElement("td")
+    row.appendChild(field)
+    link = document.createElement("a")
+    link.setAttribute("href", "#")
+    field.appendChild(link)
+    link.onclick = function() { this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode); return false; }
+    link.setAttribute("style", "position: relative; float: right;")
+    value = document.createTextNode("-")
+    link.appendChild(value)
+}
+
+\$(document).ready(function() {
+
+  \$("input[value=filter]").click(function() {
+        \$(".fieldset_heading legend").text("$_("Available filters")");
+        \$("#curtype").prop("value", "filter")
+        \$(".filter_only").show();
+  });
+
+  \$("input[value=filter]").trigger("click");
+});
+
+//--></script>
+
+
+#filter CleanOutput
+
+<div id="fieldset_page" style="max-width:500px;">
+
+<form action="$document.href" method="post">
+
+<fieldset class="fieldset_heading" style="display: table-cell;">
+<legend>$_("Available filters")</legend>
+  <select class="filter_only" style="width: 70%;" name="filter_name">
+    <option value="">&nbsp;</option>
+  #for $f in $filters
+    #if $f == $fltr.name
+      #set $selected = "selected=\"selected\""
+    #else
+      #set $selected =""
+    #end if
+    <option value="$f" $selected>$f</option>
+  #end for
+  </select>
+
+  <input type="submit" name="mode" value="$_("Load")"/>
+  <input type="submit" name="mode" value="$_("Delete")"/>
+</fieldset>
+
+</form>
+
+<br/>
+
+<form action="$document.href" method="post">
+
+<fieldset>
+<legend>$_("Add / Modify")</legend>
+#set $alert_default = ""
+#set $heartbeat_default = ""
+#set $generic_default = ""
+
+#if $fltr.type == "alert"
+ #set $alert_default = "selected=\"selected\""
+#end if
+
+#if $fltr.type == "heartbeat"
+ #set $heartbeat_default = "selected=\"true\""
+#end if
+
+#if $fltr.type == "generic"
+ #set $generic_default = "selected=\"true\""
+#end if
+
+
+<div class="filter_only">
+<p>
+ <i>$_("filter_intro")</i>
+</p>
+<p>
+ <i>$_("filter_advice")</i>
+</p>
+</div>
+
+<br />
+
+<table class="filter_only">
+<tr class="nodash">
+ <th class="nodash">$_("Filter Type:")</th>
+ <td class="nodash">
+
+  <select name="filter_type" style="width: 400px;" onchange="javascript:resetFilterType(this.options[this.selectedIndex].value);">
+   <option $alert_default value="alert">$_("Alert")</option>
+   <option $heartbeat_default value="heartbeat">$_("Heartbeat")</option>
+   <option $generic_default value="generic">$_("Generic (Alert and Heartbeat)")</option>
+  </select>
+
+ </td>
+</tr>
+</table>
+
+<hr class="filter_only" />
+
+<table class="filter_only">
+ <tfoot>
+  <tr>
+   <td style="text-align: right;" colspan="4">&nbsp;</td>
+   <td><a style="text-align: right;" onclick="javascript:newFilterElement('', '', '', ''); return false;">+</a></td>
+  </tr>
+ </tfoot>
+ <tbody id="elements"></tbody>
+</table>
+
+#end filter
+#filter Filter
+
+<script type="text/javascript"><!--
+#for $element in $elements
+    newFilterElement("$utils.escape_attribute($element.name)", "$utils.escape_attribute($element.object)", "$utils.escape_attribute($element.operator)", "$utils.escape_attribute($element.value)");
+#end for
+//--></script>
+
+#end filter
+#filter CleanOutput
+
+<br />
+
+<table class="filter_only">
+ <tr>
+  <th>$_("Formula:")</th>
+  <td><input style="width: 400px;" type="text" name="filter_formula" value="$fltr.formula"/></td>
+ </tr>
+ <tr>
+  <th>$_("Name:")</th>
+  <td><input style="width: 400px;" type="text" name="filter_name" value="$fltr.name"/></td>
+ </tr>
+ <tr>
+  <th style="vertical-align: top;">$_("Comment:")</th>
+  <td><textarea style="width: 400px;" name="filter_comment" rows="4" cols="55">$fltr.comment</textarea></td>
+ </tr>
+</table>
+
+<input style="float: right;" type="submit" name="mode" value="$_("Save")"/>
+</fieldset>
+</form>
+
+</div>
+#end filter

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# Copyright (C) 2004-2014 CS-SI. All Rights Reserved.
+# Copyright (C) 2004-2015 CS-SI. All Rights Reserved.
 # Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
 #
 # This file is part of the Prewikka program.
@@ -23,23 +23,26 @@ import sys, os
 import copy
 import cgi
 
-from prewikka import Core, Request, Error, localization
+from prewikka.web import request
+from prewikka import main
 
 
-class CGIRequest(Request.Request):
-    def init(self):
-        Request.Request.init(self)
+class CGIRequest(request.Request):
+    def init(self, core):
+        request.Request.init(self, core)
         fs = cgi.FieldStorage()
         for key in fs.keys():
             self.arguments[key] = fs.getvalue(key)
-        for key in fs.headers.keys():
-            self.input_headers[key] = fs.headers.get(key)
         
     def read(self, *args):
         return apply(sys.stdin.read, args)
     
     def write(self, data):
         sys.stdout.write(data)
+
+    def sendHeaders(self, code=200, status_text=None):
+        self.write("HTTP/1.0 %d %s\r\n" % (code, status_text or "Undefined"))
+        request.Request.sendHeaders(self, code, status_text)
         
     def getQueryString(self):
         return os.environ.get("REQUEST_URI", "").strip()
@@ -79,8 +82,9 @@ class CGIRequest(Request.Request):
         return user
 
 
-request = CGIRequest()
-request.init()
+core = main.get_core_from_config(os.environ.get("PREWIKKA_CONFIG", None), threaded=False)
 
-core = Core.get_core_from_config(os.environ.get("PREWIKKA_CONFIG", None), threaded=False)
-core.process(request)
+req = CGIRequest()
+req.init(core)
+
+core.process(req)

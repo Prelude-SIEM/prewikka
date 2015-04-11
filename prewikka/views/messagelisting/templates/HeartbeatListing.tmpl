@@ -1,0 +1,113 @@
+#extends MessageListing
+
+#from prewikka import usergroup, env
+
+#def messagelisting_scripts
+#end def
+
+#block message_fields_header
+#filter CleanOutput
+
+#set global $cnt = 0
+
+<thead>
+<tr>
+<td class="filtered_column">
+  <div>$_("Agent")</div>
+  #if $name_filtered
+    <span>*</span>
+  #end if 
+</td>
+
+<td class="filtered_column">
+  <div>$_("Node address")</div>
+  #if $address_filtered
+    <span>*</span>
+  #end if 
+</td>
+
+<td class="filtered_column">
+  <div>$_("Node name")</div>
+  #if $node.name_filtered
+    <span>*</span>
+  #end if 
+</td>
+
+<td class="filtered_column">
+  <div>$_("Model")</div>
+  #if $model_filtered
+    <span>*</span>
+  #end if 
+</td>
+
+<td>$_("Date")</td>
+
+#if $messages and $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
+<td><input class="checkbox" type="checkbox" id="allbox" /></td>
+#end if
+
+</tr>
+
+</thead>
+#end filter
+#end block message_fields_header
+
+#block message_fields
+
+<td>
+  <a class="popup_menu_toggle">$message.agent.value</a>
+  <span class="popup_menu">
+   - <a href="$message.summary">$_("Heartbeat summary")</a><br />
+   - <a href="$message.agent.inline_filter">$_("Filter on agent")</a>
+  </span>
+</td>
+
+<td>
+  #if len($message["node.address(*).address"]) > 0
+    #for $address in $message["node.address(*).address"]
+    <a class="popup_menu_toggle">$address.value</a>
+    <span class="popup_menu">
+      - <a href="$address.inline_filter">$_("Filter on address")</a><br />
+      #if $env.enable_details
+      - <a target="$env.external_link_target" href="$env.host_details_url?host=$address.value">Address information</a><br />
+      #end if
+      #for $name, $link, $widget in $address.host_links
+      #if $widget
+       - <a href="$link" class="widget-link" title="$name">$name</a><br />
+      #else
+       - <a href="$link" target="_$name">$name</a><br />
+      #end if
+      #end for
+    </span>
+    <br />
+    #end for
+  #else
+    n/a
+  #end if
+</td>
+
+<td>
+ <a href="$message["node.name"].inline_filter">$message["node.name"].value</a><br />
+</td>
+
+<td>
+  <a href="$message.model.inline_filter">$message.model.value</a>
+</td>
+
+<td>$message.time.value</td>
+
+#set global $cnt += 1
+#end block message_fields
+
+#block message_extra_footer
+  <td>
+    #if $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
+    <div style="float: right;">
+      <input type="submit" name="listing_apply" value="$_("Apply")" />
+      <select style="display:inline;" name="action" id="action">
+        <option value="delete_message">$_('Delete')</option>
+      </select>
+    </div>
+    #end if
+  </td>
+#end block
