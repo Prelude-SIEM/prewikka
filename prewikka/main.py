@@ -194,8 +194,8 @@ class Core:
             except error.PrewikkaUserError as err:
                 env.log.warning("%s: plugin loading failed: %s" % (i.__name__, err))
 
-        _AUTH_PLUGINS = pluginmanager.PluginManager("prewikka.auth", dbapply=True)
-        _SESSION_PLUGINS = pluginmanager.PluginManager("prewikka.session", dbapply=True)
+        _AUTH_PLUGINS = pluginmanager.PluginManager("prewikka.auth", autoupdate=True)
+        _SESSION_PLUGINS = pluginmanager.PluginManager("prewikka.session", autoupdate=True)
         cfg = env.config
 
         if cfg.session:

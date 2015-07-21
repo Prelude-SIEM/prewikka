@@ -104,6 +104,8 @@ class PluginBase(object):
 
     plugin_database_branch = None
     plugin_database_version = None
+    plugin_database_autoupdate = False
+
     plugin_htdocs = None
     plugin_locale = None
 
@@ -125,7 +127,7 @@ class PluginManager:
         self[name or plugin_class.__name__] = plugin_class
         self._count += 1
 
-    def __init__(self, entrypoint, dbapply=False):
+    def __init__(self, entrypoint, autoupdate=False):
         self._count = 0
         self.__instances = []
         self.__dinstances = {}
@@ -141,7 +143,7 @@ class PluginManager:
 
             try:
                 dh = database.DatabaseUpdateHelper(plugin_class.__module__, plugin_class.plugin_database_version, plugin_class.plugin_database_branch)
-                if dbapply:
+                if autoupdate or plugin_class.plugin_database_autoupdate:
                     dh.apply()
                 else:
                     dh.check()
