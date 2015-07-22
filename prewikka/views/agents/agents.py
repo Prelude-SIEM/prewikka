@@ -185,6 +185,7 @@ class HeartbeatAnalyze(SensorListing):
         delta = float(heartbeat["create_time"]) - time.time()
         analyzer.last_heartbeat_time = localization.format_timedelta(delta, add_direction=True)
 
+        analyzer.status = None
         analyzer.events = [ ]
 
         idents = env.idmef_db.getHeartbeatIdents(criteria="heartbeat.analyzer(-1).analyzerid == %s" % analyzerid,
@@ -238,6 +239,9 @@ class HeartbeatAnalyze(SensorListing):
             if event:
                 analyzer.events.append(event)
 
+
+        if not analyzer.status:
+            analyzer.status, analyzer.status_meaning = "unknown", _("Unknown")
 
         if not analyzer.events:
             delta = localization.format_timedelta(total_interval / self._heartbeat_count)
