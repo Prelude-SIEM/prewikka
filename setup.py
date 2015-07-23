@@ -29,7 +29,6 @@ use_setuptools()
 
 from setuptools import setup, find_packages
 
-from distutils.sysconfig import get_python_lib
 from distutils.dist import Distribution
 from distutils.command.build import build
 from distutils.command.build_py import build_py
@@ -37,9 +36,7 @@ from distutils.command.install import install
 from distutils.command.install_scripts import install_scripts
 from distutils.command.install_data import install_data
 from distutils.command.sdist import sdist
-from distutils.core import Command
 from distutils.errors import *
-from distutils import log
 from distutils import util
 
 LIBPRELUDE_REQUIRED_VERSION = "1.2.6rc4"
@@ -182,11 +179,11 @@ class my_install_scripts (install_scripts):
         if copied:
             self.outfiles.append(ofile)
 
-        cgi_dir = os.path.join(self.install_data, 'share', 'prewikka', 'cgi-bin')
-        if not os.path.exists(cgi_dir):
-            os.makedirs(cgi_dir)
+        share_dir = os.path.join(self.install_data, 'share', 'prewikka')
+        if not os.path.exists(share_dir):
+            os.makedirs(share_dir)
 
-        ofile, copied = self.copy_file(os.path.join(self.build_dir, 'prewikka.cgi'), cgi_dir)
+        ofile, copied = self.copy_file(os.path.join(self.build_dir, 'prewikka.wsgi'), share_dir)
         if copied:
             self.outfiles.append(ofile)
 
@@ -215,8 +212,6 @@ class my_install(install):
 
     def init_siteconfig(self):
         config = open("prewikka/siteconfig.py", "w")
-        print >> config, "htdocs_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/htdocs"))
-        print >> config, "database_dir = '%s'" % os.path.abspath((self.prefix + "/share/prewikka/database"))
         print >> config, "conf_dir = '%s'" % os.path.abspath((self.conf_prefix))
         print >> config, "libprelude_required_version = '%s'" % LIBPRELUDE_REQUIRED_VERSION
         print >> config, "libpreludedb_required_version = '%s'" % LIBPRELUDEDB_REQUIRED_VERSION
@@ -227,14 +222,7 @@ class my_install(install):
         self.install_conf()
         self.init_siteconfig()
         install.run(self)
-        self.mkpath((self.root or "") + self.prefix + "/share/prewikka/htdocs/generated_images")
 
-        for dir in ("/",
-                    "share/prewikka",
-                    "share/prewikka/htdocs",
-                    "share/prewikka/cgi-bin"):
-            self.mkpath((self.root or "") + self.prefix + "/" + dir)
-            os.chmod((self.root or "") + self.prefix + "/" + dir, 0755)
         os.chmod((self.root or "") + self.conf_prefix, 0755)
 
         if not self.dry_run:
@@ -293,11 +281,11 @@ setup(name="prewikka",
                            "locale/*.pot",
                            "locale/*/LC_MESSAGES/*.mo",
                            "sql/*.py"],
-                      'prewikka.views.messagelisting': [ "htdocs/images/*.*", "htdocs/js/*.js" ],
+                      'prewikka.views.messagelisting': [ "htdocs/css/*.css", "htdocs/js/*.js" ],
                       'prewikka.views.messagesummary': [ "htdocs/css/*.css", "htdocs/js/*.js" ],
       },
 
-      scripts=[ "scripts/prewikka-httpd", "cgi-bin/prewikka.cgi" ],
+      scripts=[ "scripts/prewikka-httpd", "scripts/prewikka.wsgi" ],
       conf_files=[ "conf/prewikka.conf" ],
       cmdclass={ 'build_py': my_build_py,
                  'install': my_install,
