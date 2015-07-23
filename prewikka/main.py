@@ -151,8 +151,15 @@ class Core:
         env.viewmanager = None
         env.htdocs_mapping.update((("prewikka", pkg_resources.resource_filename(__name__, 'htdocs')),))
 
-        self._prelude_error = None
-        self._last_plugin_activation_change = None
+        try:
+            self._prewikka_initialized = False
+            self._prewikka_init_if_needed()
+        except:
+            pass
+
+    def _prewikka_init_if_needed(self):
+        if self._prewikka_initialized is True:
+            return self._reload_plugin_if_needed()
 
         try:
             self._checkVersion()
@@ -160,15 +167,17 @@ class Core:
             env.idmef_db = idmefdatabase.IDMEFDatabase(env.config.idmef_database)
             self._initURL()
             self._loadPlugins()
+            self._prewikka_initialized = True
         except error.PrewikkaUserError, e:
-            self._prelude_error = e
+            self._prewikka_initialized = e
         except (database.DatabaseSchemaError, preludedb.PreludeDBError), e:
-            self._prelude_error = error.PrewikkaUserError(_("Database error"), e)
+            self._prewikka_initialized = error.PrewikkaUserError(_("Database error"), e)
         except Exception, e:
-            self._prelude_error = error.PrewikkaUserError(_("Initialization error"), e)
+            self._prewikka_initialized = error.PrewikkaUserError(_("Initialization error"), e)
 
-        if self._prelude_error:
-                env.log.log(self._prelude_error.log_priority, str(self._prelude_error))
+        if isinstance(self._prewikka_initialized, Exception):
+            env.log.log(self._prewikka_initialized.log_priority, str(self._prewikka_initialized))
+            raise self._prewikka_initialized
 
     def _initURL(self):
         env.url = {}
@@ -286,10 +295,7 @@ class Core:
 
         encoding = env.config.general.getOptionValue("encoding", "utf8")
         try:
-            if self._prelude_error:
-                raise self._prelude_error
-
-            self._reload_plugin_if_needed()
+            self._prewikka_init_if_needed()
 
             env.threadlocal.user = user = env.session.get_user(request)
             user.set_locale()
