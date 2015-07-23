@@ -14,7 +14,7 @@ CREATE TABLE Prewikka_Module_Changed (
     time DATETIME NOT NULL
 ) ENGINE=InnoDB;
 
-INSERT INTO Prewikka_Module_Changed (time) VALUES(NOW());
+INSERT INTO Prewikka_Module_Changed (time) VALUES(current_timestamp);
 
 
 DROP TABLE IF EXISTS Prewikka_Module_Registry;

@@ -67,7 +67,7 @@ class SQLScript(object):
     def __init__(self, dbup):
         self.db = dbup
         self._module_name = dbup._module_name
-        self._query_filter = { "sqlite": self._mysql2sqlite, "pgsql": self._mysql2pgsql, "mysql": self._mysqlhandler }[self.db.getType()]
+        self._query_filter = { "sqlite3": self._mysql2sqlite, "pgsql": self._mysql2pgsql, "mysql": self._mysqlhandler }[self.db.getType()]
 
         if self.type in ("install", "update"):
            if not self.version:
@@ -95,13 +95,13 @@ class SQLScript(object):
                   (" SMALLINT ", " INT4 "),
                   (" BIGINT UNSIGNED ", " NUMERIC(20) "),
                   (" BIGINT ", " INT8 "),
-                  (" INT\(EGER\)\? UNSIGNED ", " INT8 "),
-                  (" INT\(EGER\)\? ", " INT4 "),
+                  (" INT(EGER)? UNSIGNED ", " INT8 "),
+                  (" INT(EGER)? ", " INT4 "),
                   ("DATETIME", "TIMESTAMP"),
                   ("ENGINE=InnoDB", ""),
+                  ("\"([^\"]*)\"", "'\\1'"),
                   ("\"\([^\"]*\)\"", "'\1'"),
-                  ("\(\S*\) ENUM(\(.*\))", "\1 TEXT CHECK \(\1 IN \(\2\)\)"),
-                  ("\([[:lower:]_]\+\)([0-9]\+)", "\1"),
+                  ("(\S*) ENUM\((.*)\)", "\\1 TEXT CHECK (\\1 IN (\\2))"),
                   ("VARCHAR[ ]*[^)]+\)", "TEXT") ]
 
         return self._sub(_stbl, input)
@@ -404,7 +404,7 @@ class Database(preludedb.SQL):
         return utils.timeutil.get_timestamp_from_string(d)
 
     def trigger_plugin_change(self):
-        self.query("UPDATE Prewikka_Module_Changed SET time=NOW()")
+        self.query("UPDATE Prewikka_Module_Changed SET time=current_timestamp")
 
     def get_property_fail(self, user, key, view=None, default=__sentinel):
         config = {}
