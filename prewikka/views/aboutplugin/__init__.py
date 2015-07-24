@@ -115,13 +115,26 @@ class AboutPlugin(view.View):
         data.maintenance = {}
         data.maintenance_total = 0
 
+        plist = []
+        ignore = []
+
         for catname, entrypoint in self._all_plugins:
             for p in pkg_resources.iter_entry_points(entrypoint):
+                if p.module_name in ignore:
+                    continue
+
                 try:
                     mod = p.load()
-                    self._add_plugin_info(data, catname, mod)
+                    ignore.extend(mod.plugin_deprecate)
                 except Exception as e:
                     env.log.error("[%s]: error loading plugin, %s" % (p.module_name, e))
+                    continue
+
+                plist.append((catname, p.module_name, mod))
+
+        for catname, mname, mod in plist:
+            if mname not in ignore:
+                self._add_plugin_info(data, catname, mod)
 
         if "apply_update" in self.parameters or "enable_plugin" in self.parameters:
             env.db.trigger_plugin_change()

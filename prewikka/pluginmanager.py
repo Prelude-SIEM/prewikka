@@ -109,21 +109,30 @@ class PluginBase(object):
     plugin_htdocs = None
     plugin_locale = None
 
+    plugin_deprecate = []
 
 class PluginPreload(PluginBase):
     plugin_classes = []
 
 
 class PluginManager:
-    def _handle_attributes(self, plugin_class):
+    @staticmethod
+    def _handle_attributes(plugin_class, autoupdate):
         if plugin_class.plugin_htdocs:
             env.htdocs_mapping.update(plugin_class.plugin_htdocs)
 
         if plugin_class.plugin_locale:
             translation.addDomain(*plugin_class.plugin_locale)
 
-    def _addPlugin(self, plugin_class, name=None):
-        self._handle_attributes(plugin_class)
+        dh = database.DatabaseUpdateHelper(plugin_class.__module__, plugin_class.plugin_database_version, plugin_class.plugin_database_branch)
+        if autoupdate or plugin_class.plugin_database_autoupdate:
+            dh.apply()
+        else:
+            dh.check()
+
+    def _addPlugin(self, plugin_class, autoupdate, name=None):
+        self._handle_attributes(plugin_class, autoupdate)
+
         self[name or plugin_class.__name__] = plugin_class
         self._count += 1
 
@@ -132,7 +141,12 @@ class PluginManager:
         self.__instances = []
         self.__dinstances = {}
 
+        plist = {}
+        ignore = []
+
         for i in pkg_resources.iter_entry_points(entrypoint):
+            if i.module_name in ignore:
+                continue
 
             logger.debug("loading plugin '%s'" % i.name)
             try:
@@ -141,22 +155,19 @@ class PluginManager:
                 logger.exception("%s: %s", i.module_name, e)
                 continue
 
-            try:
-                dh = database.DatabaseUpdateHelper(plugin_class.__module__, plugin_class.plugin_database_version, plugin_class.plugin_database_branch)
-                if autoupdate or plugin_class.plugin_database_autoupdate:
-                    dh.apply()
-                else:
-                    dh.check()
-            except Exception, e:
-                logger.warning("%s: %s", plugin_class.__module__, e)
+            plist[i.module_name] = i.name, plugin_class
+            ignore.extend(plugin_class.plugin_deprecate)
+
+        for mname, (name, plugin_class) in plist.items():
+            if mname in ignore:
                 continue
 
             try:
                 if issubclass(plugin_class, PluginPreload):
-                    self._handle_attributes(plugin_class)
-                    map(self._addPlugin, plugin_class().plugin_classes)
+                    self._handle_attributes(plugin_class, autoupdate)
+                    [self._addPlugin(x, autoupdate) for x in plugin_class().plugin_classes]
                 else:
-                    self._addPlugin(plugin_class, name=i.name)
+                    self._addPlugin(plugin_class, autoupdate, name=name)
 
             except error.PrewikkaUserError as e:
                 logger.warning("%s: plugin loading failed: %s", plugin_class.__module__, e)
