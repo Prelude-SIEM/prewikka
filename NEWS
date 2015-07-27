@@ -1,3 +1,107 @@
+* 2015-08-06, prewikka-1.2.6:
+
+Author: Yoann Vandoorselaere
+
+- Core evolutions
+
+    - Plugin infrastructure
+      New API for session, auth, and view module, as well as generic plugin.
+
+    - Hookmanager implementation
+      The plugin hookmanager allows different parts of the system to communicate transparently.
+
+    - Tabs are now AJAX loaded
+
+        - Prewikka pages are now accessible through URL path instead of parameters
+        - Avoid updating session on every request (improve Prewikka response time)
+        - Redirects are now supported and used when required
+        - Initial support for prewikka widget
+
+    - [#521,#561] Automatic SQL installation and update for plugins
+
+        - Keep track of each installed plugin schema version
+
+            - for Prewikka main schema: automatic installation at initialisation time
+            - for plugins: disabled until interactive installation
+
+        - Ability for the user to enable / disable a plugin.
+
+        - [#679] Use Python scripts instead of SQL scripts for more flexibility
+
+            - install : responsible for initial schema installation
+            - update : responsible for updating an already installed schema
+            - branch : responsible for migrating from one branch to another
+
+- Improvements
+
+    - Factorize code for control menu
+      Time handling within the menu is now done with the help of dateutil.
+
+    - Standardized date and time formatting
+      Use babel for date/time formatting, character set detection bug fixes
+
+    - [#610,#ext597] Add more fields to classification filtering
+
+    - [#rel697] Pluggable configuration file
+
+- Bugfixes
+
+    - [#477] Fix sensor-localtime
+
+    - AlertListing bug fixes
+
+    - Fix various WSGI issues
+
+    - Translation multithreading fixes
+
+    - [#598] Fix ViewManagement exception on dynamic view access
+
+Author: Antoine Luong
+
+- Improvements
+
+    - Factorize help dialog/button, and make it available to each view
+
+    - [#505] UserSettings template cleanup
+      Define a common plugin_htdocs attribute for plugins, views and renderers.
+
+    - [#697] Support multiple domains for translation
+
+        Each plugin can now define its own localization domain,
+        via the plugin_locale attribute.
+
+    - [#559] Simplify AlertListing view
+
+    - Global translation update
+
+- Bugfixes
+
+    - [#453] Groupby selection problem in alert listing
+
+    - [#445] Sensor node name/location ignored in agent listing
+
+    - Fix wrong display of analyzer heartbeats
+
+    - [#463,#ext572] Fix error displaying summary of Snort alerts
+
+    - [#589] Fix various JavaScript possible injections
+
+    - Fix numerous problems with IE9
+
+Author: Camille Gardet
+
+- [#538] Put view parameters inside the control menu
+
+- Fix bad closure in eventstream
+
+Author: Thomas Andrejak
+
+- Fix sending configuration to auth and session plugins
+
+- IE fixes
+
+
+
 * 2014-10-27, prewikka-1.2.6rc4:
 
 Author: Antoine Luong

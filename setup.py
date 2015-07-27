@@ -39,8 +39,8 @@ from distutils.command.sdist import sdist
 from distutils.errors import *
 from distutils import util
 
-LIBPRELUDE_REQUIRED_VERSION = "1.2.6rc4"
-LIBPRELUDEDB_REQUIRED_VERSION = "1.2.6rc4"
+LIBPRELUDE_REQUIRED_VERSION = "1.2.6"
+LIBPRELUDEDB_REQUIRED_VERSION = "1.2.6"
 
 from distutils.dep_util import newer
 
