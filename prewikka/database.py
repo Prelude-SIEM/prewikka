@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import time, abc
-import re, operator, pkg_resources, glob, os.path, sys
+import re, operator, pkg_resources, pkgutil, glob, os.path, sys
 
 import preludedb
 from prewikka import log, error, utils, version, env
@@ -216,22 +216,6 @@ class DatabaseUpdateHelper(DatabaseHelper):
         self._from_branch = branch
         self._from_version = version
 
-    def _load_py_update(self, filename):
-        mdir, fname = os.path.split(filename)
-        mname = os.path.splitext(fname)[0]
-
-        sys.path.insert(0, mdir)
-        try:
-            mod = __import__(mname)
-        except Exception as e:
-            sys.path.pop(0)
-            raise e
-
-        sys.path.pop(0)
-        del(sys.modules[mname])
-
-        return mod.SQLUpdate(self)
-
 
     def _get_schema_list(self, **kwargs):
         from_version = to_version = None
@@ -242,25 +226,20 @@ class DatabaseUpdateHelper(DatabaseHelper):
         if "to_version" in kwargs:
             to_version = pkg_resources.parse_version(kwargs.pop("to_version"))
 
-        for dirname, subdirlist, filelist in os.walk(pkg_resources.resource_filename(self._module_name, "sql")):
-            for fname in filelist:
-                if not fname.endswith(".py"):
-                    continue
+        dirname = pkg_resources.resource_filename(self._module_name, "sql")
+        for importer, package_name, _ in pkgutil.iter_modules([dirname]):
+            try:
+                mod = importer.find_module(package_name).load_module(package_name).SQLUpdate(self)
+            except Exception as e:
+                log.getLogger().exception("[%s]: error loading SQL update '%s' : %s" % (self._module_name, package_name, e))
+                continue
 
-                f = os.path.join(dirname, fname)
-                try:
-                    mod = self._load_py_update(f)
+            if any(kwargs[k] != getattr(mod, k) for k in kwargs.keys()):
+                continue
 
-                except Exception as e:
-                    log.getLogger().exception("error on script loading: %s", e)
-                    continue
-
-                if any(kwargs[k] != getattr(mod, k) for k in kwargs.keys()):
-                    continue
-
-                version = pkg_resources.parse_version(mod.version)
-                if (not from_version or (version >= from_version)) and (not to_version or (version <= to_version)):
-                        yield mod
+            version = pkg_resources.parse_version(mod.version)
+            if (not from_version or (version >= from_version)) and (not to_version or (version <= to_version)):
+                    yield mod
 
 
     def _resolve_branch_switch(self, curbranch, curversion, outstack=[]):
