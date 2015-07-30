@@ -68,18 +68,14 @@ function check_same_origin(url) {
         });
 
         \$(document).on("submit", "#main form", function() {
-                var subdata = "";
                 \$(this).find("input[name=_download]").remove();
 
-                \$(this).find(":input[type=submit]").each(function(idx, sub) {
-                        if ( ! \$(sub).data("clicked") )
-                                return true;
-
-                        subdata += "&" + \$(sub).data("clicked");
-                        \$(sub).removeData("clicked");
-                });
-
                 var data = \$(this).serialize();
+
+                if ( \$(this).data("clicked") ) {
+                        data += "&" + \$(this).data("clicked");
+                        \$(this).removeData("clicked");
+                }
 
                 if ( \$(this).data("enable-download") ) {
                         \$(this).removeData("enable-download");
@@ -92,7 +88,7 @@ function check_same_origin(url) {
                 prewikka_loadTab({
                         url: \$(this).attr("action"),
                         type: \$(this).attr("method"),
-                        data: data + subdata
+                        data: data
                 });
 
                 return false;
@@ -103,7 +99,7 @@ function check_same_origin(url) {
                 var value = \$(this).attr("value");
 
                 if ( name && value )
-                        \$(this).data("clicked", encodeURIComponent(name) + "=" + encodeURIComponent(value));
+                        \$(this).closest("form").data("clicked", encodeURIComponent(name) + "=" + encodeURIComponent(value));
         });
 });
 </script>
