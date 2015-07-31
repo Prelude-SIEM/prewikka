@@ -76,6 +76,7 @@ class TimeUnit(object):
 
     def __init__(self, unit):
         if isinstance(unit, int):
+            assert(unit >= 0)
             self._idx = unit
         else:
             self._idx = self._unit.index(unit)
@@ -163,7 +164,9 @@ class MainMenu:
         totsec = delta.seconds + (delta.days * 24 * 60 * 60)
 
         if self._timeunit != "unlimited" and self._timevalue > 1:
-            unit = TimeUnit(self._timeunit) - 1
+            unit = TimeUnit(self._timeunit)
+            if int(unit) > 0:
+                unit = unit - 1
 
         elif totsec > 365 * 24 * 60 * 60:
             unit = TimeUnit("year")
