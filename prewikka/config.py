@@ -18,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
+import os, glob
 from prewikka import myconfigparser, siteconfig, utils
 
 
@@ -32,12 +33,22 @@ class Config(object):
         self.database = myconfigparser.ConfigParserSection("database")
         self.idmef_database = myconfigparser.ConfigParserSection("idmef_database")
         self.renderer_defaults = myconfigparser.ConfigParserSection("renderer_defaults")
+        self.include = myconfigparser.ConfigParserSection("include")
 
         self.log = {}
         self.auth = None
         self.session = None
         self.url = { }
 
+        self._load_config(filename)
+        for fpattern in self.include:
+            if not os.path.isabs(fpattern):
+                fpattern = os.path.join(siteconfig.conf_dir, fpattern)
+
+            for fname in glob.glob(fpattern):
+                self._load_config(fname)
+
+    def _load_config(self, filename):
         file = myconfigparser.MyConfigParser(filename)
         file.load()
 
@@ -56,5 +67,15 @@ class Config(object):
 
         d[section_name] = section_object
 
+    def _section_has_list(self, section_object):
+        l = section_object.items()
+        if not l:
+            return False
+
+        return l[0][1].value is None
+
     def _set_generic(self, section_name, section_object):
-        setattr(self, section_name, section_object)
+        if hasattr(self, section_name) and not self._section_has_list(section_object):
+            getattr(self, section_name).update(section_object)
+        else:
+            setattr(self, section_name, section_object)

@@ -54,9 +54,9 @@ class BaseView(view._View):
         # The database attribute might be None in case of initialisation error
         # FIXME: move me to a plugin !
         try:
-                theme_name = user.get_property("theme", default=theme._DEFAULT_THEME)
+                theme_name = user.get_property("theme", default=env.config.default_theme)
         except:
-                theme_name = theme._DEFAULT_THEME
+                theme_name = env.config.default_theme
 
         dataset["document.title"] = interface.getOptionValue("browser_title", "Prelude SIEM")
         dataset["document.css_files"] = [ "prewikka/css/jquery-ui.min.css" , "prewikka/css/demo_table_jui.css", "prewikka/css/jquery.jstree.css", "prewikka/css/themes/%s.css" % theme_name ]
@@ -119,6 +119,10 @@ class Core:
         env.auth = None # In case of database error
         env.config = config.Config(filename)
 
+        env.config.default_theme = env.config.general.getOptionValue("default_theme", "cs")
+        env.config.default_locale = env.config.general.getOptionValue("default_locale", "en_GB")
+        env.config.default_encoding = env.config.general.getOptionValue("encoding", "UTF-8")
+
         env.log = log.Log(env.config)
         env.log.info("Starting Prewikka")
 
@@ -128,7 +132,6 @@ class Core:
         env.hookmgr.declare("HOOK_LINK")
 
         env.dns_max_delay = float(env.config.general.getOptionValue("dns_max_delay", 0))
-        env.default_locale = env.config.general.getOptionValue("default_locale", None)
 
         val = env.config.general.getOptionValue("external_link_new_window", "true")
         if val.lower() in ["true", "yes"]:

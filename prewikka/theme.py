@@ -17,11 +17,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from prewikka import config
-import os, glob, pkg_resources
 
-_config = config.Config()
-_DEFAULT_THEME = _config.general.getOptionValue("default_theme", "cs")
+import os, glob, pkg_resources
 
 def getThemes():
     theme_list = []

@@ -19,7 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import pkg_resources, locale, gettext, __builtin__, datetime
-from prewikka import utils, config, log
+from prewikka import utils, env, log
 
 from threading import local, Lock
 
@@ -33,10 +33,6 @@ except ImportError:
 
 
 logger = log.getLogger(__name__)
-
-_config = config.Config()
-_DEFAULT_LANGUAGE = _config.general.getOptionValue("default_locale", "en_GB")
-_DEFAULT_ENCODING = _config.general.getOptionValue("encoding", "UTF-8")
 
 
 class TranslationProxy(object):
@@ -67,13 +63,13 @@ class TranslationProxy(object):
         try:
            return self._data.catalog.charset()
         except:
-           return _DEFAULT_ENCODING
+           return env.config.default_encoding
 
     def getLocale(self):
         try:
             return self._data.lang
         except:
-            return _DEFAULT_LANGUAGE
+            return env.config.default_locale
 
     def setLocale(self, lang):
         first = None
@@ -135,9 +131,9 @@ _LANGUAGES = {
 
 def setLocale(lang):
     if not lang:
-            lang = _DEFAULT_LANGUAGE
+        lang = env.config.default_locale
 
-    translation.setLocale("%s.%s" % (lang, _DEFAULT_ENCODING))
+    translation.setLocale("%s.%s" % (lang, env.config.default_encoding))
 
 
 def getLanguages():

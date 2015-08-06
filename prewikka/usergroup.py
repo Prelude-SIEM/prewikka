@@ -18,8 +18,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import abc, hashlib
-from prewikka import config, error, log, localization, env
+from prewikka import error, log, localization, env
 
+ADMIN_LOGIN = "admin"
 
 PERM_IDMEF_VIEW = "IDMEF_VIEW"
 PERM_IDMEF_ALTER = "IDMEF_ALTER"
@@ -46,13 +47,6 @@ ALL_PERMISSIONS = [ PERM_IDMEF_VIEW,
                     PERM_INTRUSIVE_COMMAND,
                     PERM_ASSET_CREATE,
                     PERM_ASSET_ALTER ]
-
-config = config.Config()
-for perm in config.section_permissions:
-    if perm not in ALL_PERMISSIONS:
-        ALL_PERMISSIONS.append(perm)
-
-ADMIN_LOGIN = "admin"
 
 
 class PermissionDeniedError(error.PrewikkaUserError):
@@ -150,7 +144,7 @@ class User(NameID):
         return self._configuration
 
     def set_locale(self):
-        lang = self.get_property("language", default=env.default_locale)
+        lang = self.get_property("language", default=env.config.default_locale)
         if lang:
             localization.setLocale(lang)
 
