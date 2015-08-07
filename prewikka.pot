@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-03 10:30+0200\n"
+"POT-Creation-Date: 2015-08-07 14:33+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -143,11 +143,11 @@ msgstr ""
 msgid "Invalid session"
 msgstr ""
 
-#: prewikka/session/session.py:42 prewikka/session/session.py:112
+#: prewikka/session/session.py:42 prewikka/session/session.py:113
 msgid "Session expired"
 msgstr ""
 
-#: prewikka/session/session.py:154
+#: prewikka/session/session.py:165
 msgid "Logged out"
 msgstr ""
 
@@ -370,27 +370,10 @@ msgid ""
 msgstr ""
 
 #: prewikka/views/about/templates/About.py:113
-msgid "Prelude OSS is the open-source version of the Prelude SIEM"
-msgstr ""
-
-#: prewikka/views/about/templates/About.py:121
-#, python-format
-msgid ""
-"This OSS version has lower performance and less <a href='%s'>features</a> "
-"than the Pro/Enterprise versions."
-msgstr ""
-
-#: prewikka/views/about/templates/About.py:128
-msgid ""
-"It is intended for tests and small environments, and should not be used in "
-"critical environments."
-msgstr ""
-
-#: prewikka/views/about/templates/About.py:136
 msgid "Vigilo is a NMS (Network Management System)"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:143
+#: prewikka/views/about/templates/About.py:120
 #, python-format
 msgid ""
 "%s is a complete monitoring and performance management solution capable of "
@@ -400,30 +383,30 @@ msgid ""
 "metrology, cartography, event correlation and reporting."
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:151
+#: prewikka/views/about/templates/About.py:128
 #, python-format
 msgid ""
 "Prelude SIEM and Vigilo NMS are being developed by the %s company, designer, "
 "integrator and operator of mission critical systems."
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:169
+#: prewikka/views/about/templates/About.py:146
 msgid "Contact"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:176
+#: prewikka/views/about/templates/About.py:153
 msgid "Phone:"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:182
+#: prewikka/views/about/templates/About.py:159
 msgid "Fax:"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:190
+#: prewikka/views/about/templates/About.py:167
 msgid "Office"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:201
+#: prewikka/views/about/templates/About.py:178
 msgid "Websites"
 msgstr ""
 
@@ -487,7 +470,7 @@ msgid ""
 msgstr ""
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:283
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:399
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:388
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:89
 #: prewikka/views/agents/templates/SensorListing.py:438
 #: prewikka/views/messagelisting/templates/utils.py:88
@@ -503,14 +486,14 @@ msgid "Name"
 msgstr ""
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:288
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:404
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:393
 #: prewikka/views/messagesummary/messagesummary.py:764
 #: prewikka/views/messagesummary/messagesummary.py:770
 msgid "Description"
 msgstr ""
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:293
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:409
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:398
 #: prewikka/views/agents/templates/SensorListing.py:450
 #: prewikka/views/messagesummary/messagesummary.py:461
 #: prewikka/views/messagesummary/messagesummary.py:566
@@ -518,35 +501,30 @@ msgid "Version"
 msgstr ""
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:298
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:419
-msgid "Author"
-msgstr ""
-
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:303
 msgid "Current Database Version"
 msgstr ""
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:308
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:303
 msgid "Required Database Update"
 msgstr ""
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:372
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:361
 msgid "Install Update"
 msgstr ""
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:382
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:371
 msgid "Installed Plugins"
 msgstr ""
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:414
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:403
 msgid "Database Version"
 msgstr ""
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:424
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:408
 msgid "Active"
 msgstr ""
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:488
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:466
 msgid "Update"
 msgstr ""
 
@@ -641,7 +619,6 @@ msgid "Current status"
 msgstr ""
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:209
-#: prewikka/views/messagelisting/alertlisting.py:689
 msgid "Events"
 msgstr ""
 
@@ -740,6 +717,7 @@ msgstr ""
 
 #: prewikka/views/agents/templates/SensorListing.py:578
 #: prewikka/views/messagelisting/alertlisting.py:684
+#: prewikka/views/messagelisting/alertlisting.py:689
 msgid "Alerts"
 msgstr ""
 
@@ -1550,4 +1528,26 @@ msgstr ""
 
 #: prewikka/views/usermanagement/usermanagement.py:63
 msgid "Specified language does not exist"
+msgstr ""
+
+#: prewikka/views/warning/__init__.py:29
+msgid "Prewikka Warning message"
+msgstr ""
+
+#: prewikka/views/warning/templates/warning.py:103
+msgid "Prelude OSS is the open-source version of the Prelude SIEM"
+msgstr ""
+
+#: prewikka/views/warning/templates/warning.py:111
+#, python-format
+msgid ""
+"This OSS version has <span style='font-weight: bold'>lower performance</"
+"span> and <span style='font-weight: bold'>less <a href='%s'>features</a></"
+"span> than the Pro/Enterprise versions."
+msgstr ""
+
+#: prewikka/views/warning/templates/warning.py:119
+msgid ""
+"It is intended for tests and small environments, and should not be used in "
+"critical environments."
 msgstr ""
