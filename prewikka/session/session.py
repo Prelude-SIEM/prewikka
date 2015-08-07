@@ -106,11 +106,17 @@ class Session(pluginmanager.PluginBase):
             request.deleteCookie("sessionid")
             raise SessionInvalid(template=self.template)
 
+        # Check that the session is still alive...
         now = int(time.time())
-
         if now - t > self._expiration:
             self.__delete_session(request)
             raise SessionExpired(login, message=_("Session expired"), template=self.template)
+
+        # And that the user it carry still exist in the current authentication
+        # backend (which might have changed)
+        if not(env.auth.hasUser(usergroup.User(login))):
+            self.__delete_session(request)
+            raise SessionInvalid(login, template=self.template)
 
         if (now - t) / 60 >= 5:
             self._db.update_session(sessionid, now)
