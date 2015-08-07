@@ -137,7 +137,7 @@ class Session(pluginmanager.PluginBase):
             try:
                 login = self.__check_session(request)
                 return usergroup.User(login)
-            except SessionInvalid, SessionExpired:
+            except (SessionInvalid, SessionExpired):
                 if not self.autologin:
                     raise
 
