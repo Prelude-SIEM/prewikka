@@ -102,7 +102,7 @@ class ListedMessage(dict):
         timeval = float(timeobj)
 
         tzobj = { "utc": utils.timeutil.tzutc,
-                  "sensor_localtime": lambda: utils.timeutil.tzoffset(None, timeobj.getGmtOffset()),
+                  "sensor_localtime": lambda: utils.timeutil.tzoffset("UTC", timeobj.getGmtOffset()),
                   "frontend_localtime": utils.timeutil.tzlocal
         }[timezone]()
 
