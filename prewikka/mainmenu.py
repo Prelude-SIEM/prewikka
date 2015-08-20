@@ -138,19 +138,11 @@ class MainMenu:
 
         self.dataset["timeline.%s_selected" % self.parameters["timeline_unit"]] = "selected='selected'"
 
-        tzobj = None
-        if self.parameters["timezone"] == "utc":
-            tzobj = utils.timeutil.tzutc()
-            self.dataset["timeline.range_timezone"] = "UTC"
-        else:
-            tzobj = utils.timeutil.tzlocal()
-            self.dataset["timeline.range_timezone"] = _("localtime")
-
         if not start and not end:
             return
 
-        self.dataset["timeline.start"] = localization.format_datetime(start.astimezone(tzobj), format="medium")
-        self.dataset["timeline.end"] = localization.format_datetime(end.astimezone(tzobj), format="medium")
+        self.dataset["timeline.start"] = localization.format_datetime(start, format="medium", tzinfo=self._tzobj)
+        self.dataset["timeline.end"] = localization.format_datetime(end, format="medium", tzinfo=self._tzobj)
         self.dataset["timeline.current"] = utils.create_link(self.main.view_path, self.parameters - ["timeline_end"])
 
         timeunit = self.parameters["timeline_unit"]
@@ -206,7 +198,7 @@ class MainMenu:
     def _round_datetime(dtime, timeunit):
         d = {}
 
-        tvaluelist = [ "year", "month", "day", "hour", "minute", "second" ]
+        tvaluelist = [ "year", "month", "day", "hour", "minute", "second", "microsecond" ]
 
         idx = tvaluelist.index(timeunit) + 1
         for i, unit in enumerate(tvaluelist[idx:]):
@@ -217,10 +209,10 @@ class MainMenu:
     def _setup_timeline_range(self):
         self.start = self.end = None
         if "timeline_start" in self.parameters:
-            self.start = datetime.datetime.fromtimestamp(self.parameters["timeline_start"], utils.timeutil.tzlocal())
+            self.start = datetime.datetime.fromtimestamp(self.parameters["timeline_start"], utils.timeutil.tzlocal()).astimezone(self._tzobj)
 
         if "timeline_end" in self.parameters:
-            self.end = datetime.datetime.fromtimestamp(self.parameters["timeline_end"], utils.timeutil.tzlocal())
+            self.end = datetime.datetime.fromtimestamp(self.parameters["timeline_end"], utils.timeutil.tzlocal()).astimezone(self._tzobj)
 
         self._timeunit, self._timevalue = self.parameters["timeline_unit"], self.parameters["timeline_value"]
         if self._timeunit == "unlimited":
@@ -235,20 +227,24 @@ class MainMenu:
             self.start = self.end - delta
 
         elif self.start is None and self.end is None:
-            self.start = self.end = datetime.datetime.now(utils.timeutil.tzlocal())
+            self.start = self.end = datetime.datetime.now(self._tzobj)
             if self._timeunit in ("hour", "minute", "second"): #relative
                 self.start = self.end - delta
 
             else: # absolute
                 self.end = self._round_datetime(self.end, self._timeunit)
                 if self.parameters["timeline_unit"] == "unlimited":
-                        self.start = datetime.datetime.fromtimestamp(0, utils.timeutil.tzlocal())
+                    self.start = datetime.datetime(1970, 1, 1, tzinfo=utils.timeutil.tzutc()).astimezone(self._tzobj)
                 else:
-                        self.start = self.end - delta
+                    self.start = self.end - delta
 
-    def _set_timezone(self):
-        for timezone in "utc", "sensor_localtime", "frontend_localtime":
+    def _setup_timezone(self):
+        for timezone, tzobj, tzname in (("utc", utils.timeutil.tzutc, "UTC"),
+                                        ("sensor_localtime", utils.timeutil.tzlocal, _("localtime")),
+                                        ("frontend_localtime", utils.timeutil.tzlocal, _("localtime"))):
             if timezone == self.parameters["timezone"]:
+                self._tzobj = tzobj()
+                self.dataset["timeline.range_timezone"] = tzname
                 self.dataset["timeline.%s_selected" % timezone] = "selected='selected'"
             else:
                 self.dataset["timeline.%s_selected" % timezone] = ""
@@ -281,7 +277,7 @@ class MainMenu:
 
     def render(self, parameters):
         self.parameters = parameters
-
+        self._setup_timezone()
         self._setup_timeline_range()
 
         for t in "time_desc", "time_asc", "count_desc", "count_asc":
@@ -295,7 +291,6 @@ class MainMenu:
         self.dataset["timeline.value"] = parameters["timeline_value"]
         self.dataset["timeline.%s_selected" % parameters["timeline_unit"]] = "selected='selected'"
 
-        self._set_timezone()
         self._set_timeline(self.start, self.end)
 
         self.dataset["auto_apply_value"] = self.parameters["auto_apply_value"]
