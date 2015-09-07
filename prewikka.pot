@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-08-07 14:33+0200\n"
+"POT-Creation-Date: 2015-10-30 11:38+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -255,8 +255,8 @@ msgid "Save"
 msgstr ""
 
 #: prewikka/templates/MainMenu.py:339
-#: prewikka/views/messagelisting/templates/AlertListing.py:627
-#: prewikka/views/messagelisting/templates/AlertListing.py:1520
+#: prewikka/views/messagelisting/templates/AlertListing.py:634
+#: prewikka/views/messagelisting/templates/AlertListing.py:1527
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:370
 msgid "Apply"
 msgstr ""
@@ -685,7 +685,7 @@ msgstr ""
 #: prewikka/views/agents/templates/SensorListing.py:590
 #: prewikka/views/filter/filter.py:332
 #: prewikka/views/filter/templates/FilterEdition.py:281
-#: prewikka/views/messagelisting/templates/AlertListing.py:1527
+#: prewikka/views/messagelisting/templates/AlertListing.py:1534
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:377
 msgid "Delete"
 msgstr ""
@@ -787,7 +787,7 @@ msgid "Filter Type:"
 msgstr ""
 
 #: prewikka/views/filter/templates/FilterEdition.py:358
-#: prewikka/views/messagelisting/templates/AlertListing.py:707
+#: prewikka/views/messagelisting/templates/AlertListing.py:714
 #: prewikka/views/messagesummary/messagesummary.py:1020
 msgid "Alert"
 msgstr ""
@@ -847,209 +847,213 @@ msgid "Agents"
 msgstr ""
 
 #: prewikka/views/messagelisting/messagelisting.py:125
-#: prewikka/views/messagelisting/templates/AlertListing.py:756
-#: prewikka/views/messagelisting/templates/AlertListing.py:785
+#: prewikka/views/messagelisting/templates/AlertListing.py:763
+#: prewikka/views/messagelisting/templates/AlertListing.py:792
 msgid "n/a"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:114
-msgid "Equal"
+msgid "Not defined"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:120
-msgid "Not equal"
+msgid "Equal"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:126
-msgid "Lesser than"
+msgid "Not equal"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:132
-msgid "Greater than"
+msgid "Lesser than"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:138
-msgid "Lesser or equal"
+msgid "Greater than"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:144
-msgid "Greater or equal"
+msgid "Lesser or equal"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:150
-msgid "Substring"
+msgid "Greater or equal"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:156
-msgid "Substring (case-insensitive)"
+msgid "Substring"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:162
-msgid "Regular expression"
+msgid "Substring (case-insensitive)"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:168
+msgid "Regular expression"
+msgstr ""
+
+#: prewikka/views/messagelisting/templates/AlertListing.py:174
 msgid "Regular expression (case-insensitive)"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:194
+#: prewikka/views/messagelisting/templates/AlertListing.py:201
 msgid "Reset to null"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:199
+#: prewikka/views/messagelisting/templates/AlertListing.py:206
 msgid "Reset to default"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:204
+#: prewikka/views/messagelisting/templates/AlertListing.py:211
 msgid "Reset to saved"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:209
+#: prewikka/views/messagelisting/templates/AlertListing.py:216
 msgid "Reset to current"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:395
+#: prewikka/views/messagelisting/templates/AlertListing.py:402
 msgid "Filter on"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:400
+#: prewikka/views/messagelisting/templates/AlertListing.py:407
 msgid "advanced"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:524
+#: prewikka/views/messagelisting/templates/AlertListing.py:531
 msgid "Group entry by:"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:579
-#: prewikka/views/messagelisting/templates/AlertListing.py:587
+#: prewikka/views/messagelisting/templates/AlertListing.py:586
+#: prewikka/views/messagelisting/templates/AlertListing.py:594
 msgid "filtered"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:669
+#: prewikka/views/messagelisting/templates/AlertListing.py:676
 msgid "Classification"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:694
+#: prewikka/views/messagelisting/templates/AlertListing.py:701
 msgid "Type:"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:709
+#: prewikka/views/messagelisting/templates/AlertListing.py:716
 msgid "CorrelationAlert"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:711
+#: prewikka/views/messagelisting/templates/AlertListing.py:718
 msgid "OverflowAlert"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:713
+#: prewikka/views/messagelisting/templates/AlertListing.py:720
 msgid "ToolAlert"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:742
+#: prewikka/views/messagelisting/templates/AlertListing.py:749
 msgid "Severity:"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:748
+#: prewikka/views/messagelisting/templates/AlertListing.py:755
 msgid "info"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:750
+#: prewikka/views/messagelisting/templates/AlertListing.py:757
 msgid "low"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:752
+#: prewikka/views/messagelisting/templates/AlertListing.py:759
 msgid "medium"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:754
+#: prewikka/views/messagelisting/templates/AlertListing.py:761
 msgid "high"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:773
+#: prewikka/views/messagelisting/templates/AlertListing.py:780
 msgid "Completion:"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:781
+#: prewikka/views/messagelisting/templates/AlertListing.py:788
 msgid "succeeded"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:783
+#: prewikka/views/messagelisting/templates/AlertListing.py:790
 msgid "failed"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:811
+#: prewikka/views/messagelisting/templates/AlertListing.py:818
 msgid "Source"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:843
+#: prewikka/views/messagelisting/templates/AlertListing.py:850
 msgid "Target"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:874
+#: prewikka/views/messagelisting/templates/AlertListing.py:881
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:178
 msgid "Date"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1014
+#: prewikka/views/messagelisting/templates/AlertListing.py:1021
 msgid "Alert details"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1022
+#: prewikka/views/messagelisting/templates/AlertListing.py:1029
 msgid "See alert detail"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1033
+#: prewikka/views/messagelisting/templates/AlertListing.py:1040
 msgid "Filter on this classification"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1144
+#: prewikka/views/messagelisting/templates/AlertListing.py:1151
 msgid "Filter on this port/protocol"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1166
+#: prewikka/views/messagelisting/templates/AlertListing.py:1173
 msgid "Port/protocol information"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1233
+#: prewikka/views/messagelisting/templates/AlertListing.py:1240
 #, python-format
 msgid "%(hidden)d of %(total)d alerts not shown..."
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1244
-#: prewikka/views/messagelisting/templates/AlertListing.py:1329
+#: prewikka/views/messagelisting/templates/AlertListing.py:1251
+#: prewikka/views/messagelisting/templates/AlertListing.py:1336
 msgid "expand"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1277
+#: prewikka/views/messagelisting/templates/AlertListing.py:1284
 msgid "alert"
 msgid_plural "alerts"
 msgstr[0] ""
 msgstr[1] ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1306
+#: prewikka/views/messagelisting/templates/AlertListing.py:1313
 msgid "source"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1308
+#: prewikka/views/messagelisting/templates/AlertListing.py:1315
 msgid "target"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1318
+#: prewikka/views/messagelisting/templates/AlertListing.py:1325
 #, python-format
 msgid "%(hidden)d of %(total)d %(name)ss not shown..."
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1361
+#: prewikka/views/messagelisting/templates/AlertListing.py:1368
 #, python-format
 msgid "Filter on this %s"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1383
+#: prewikka/views/messagelisting/templates/AlertListing.py:1390
 #, python-format
 msgid "%s information"
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1471
+#: prewikka/views/messagelisting/templates/AlertListing.py:1478
 #, python-format
 msgid "sent at %s"
 msgstr ""
