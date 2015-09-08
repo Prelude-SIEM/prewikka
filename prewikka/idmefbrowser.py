@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import prelude
-from prewikka.utils import OrderedDict
+from prewikka.utils import OrderedDict, escape_html_string
 
 def _normalizeName(name):
     return "".join([ i.capitalize() for i in name.split("_") ])
@@ -85,21 +85,46 @@ def get_html_select(selected_path, default_paths=None):
     return """
 <link rel="stylesheet" type="text/css" href="prewikka/css/chosen.min.css">
 
-<select class="data-paths" multiple name="selected_path" data-placeholder="Select path...">
-    <optgroup label="Default path">
+<select class="data-paths chosen-sortable" multiple name="selected_path" data-placeholder="%s">
+    <optgroup label="%s">
     %s
     </optgroup>
-    <optgroup label="All path">
+    <optgroup label="%s">
     %s
     </optgroup>
 </select>
 
 <script type="text/javascript">
-    $LAB.script("prewikka/js/chosen.jquery.min.js").wait(function() {
-        $(".data-paths").chosen({
-            width: "100%%",
-            search_contains: true
-        });
-    });
+    $LAB.script("prewikka/js/chosen.jquery.min.js").wait()
+        .script("prewikka/js/jquery-chosen-sortable.js").wait(function() {
+            $(".data-paths").chosen({
+                width: "100%%",
+                search_contains: true
+             }).chosenSortable();
+
+            var select = $(".data-paths");
+            var container = select.siblings('.chosen-container');
+            var list = container.find('.chosen-choices');
+            var sorted_elements = "%s".split(',').reverse();
+
+            for (var i = 0; i < sorted_elements.length; ++i) {
+                var value = sorted_elements[i];
+                var elem = select.find('option[value="' + value + '"]');
+                var index = elem[0].index;
+
+                index = index + elem.parent().index() + 1;
+                list.find('a.search-choice-close[data-option-array-index="' + index + '"]')
+                    .parent()
+                    .detach()
+                    .prependTo(list);
+            }
+         });
 </script>
-""" % (_html_default_value, _html_all_value)
+""" % (
+    escape_html_string(_("Select paths...")),
+    escape_html_string(_("Default paths")),
+    _html_default_value,
+    escape_html_string(_("All paths")),
+    _html_all_value,
+    ','.join(selected_path)
+)
