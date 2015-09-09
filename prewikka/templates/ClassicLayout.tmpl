@@ -64,6 +64,7 @@ function check_same_origin(url) {
         \$(document).on("click", ":input.widget-link", function() {
                 prewikka_widget({
                         url: \$(this).closest("form").attr("action"),
+                        data: \$(this).closest("form").serialize(),
                         dialog: { title: \$(this).attr("title") }
                 });
 
