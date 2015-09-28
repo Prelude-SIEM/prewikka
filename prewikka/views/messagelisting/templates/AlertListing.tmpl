@@ -326,7 +326,7 @@ if ( window._messagelisting_title_array == undefined ) {
 #def classificationWrite(info, text)
 <a class="impact_severity_$info.severity.value popup_menu_toggle">$text</a><span class="popup_menu">
 #if $info.count == 1
-- <a class="widget-link" title="$_('Alert details')" href="$info.display">$_("See alert detail")</a><br />
+- <a class="widget-link" title="$_('Alert details')" href="$info.display">$_("See alert details")</a><br />
 #end if
 #if not $info.classification.already_filtered
 - <a href="$info.classification.inline_filter">$_("Filter on this classification")</a><br />
