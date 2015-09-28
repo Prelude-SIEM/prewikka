@@ -774,38 +774,6 @@ class AlertListing(MessageListing):
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.completion",
                                       ["failed", "succeeded", "n/a"])
 
-
-    def _criteriaValueFind(self, str, clist=[]):
-        out=""
-        found = False
-        escaped = False
-
-        for c in str:
-            if escaped:
-                escaped = False
-            else:
-                if c in clist:
-                    found = True
-
-                if c == '\\':
-                    escaped = True
-
-            out += c
-
-        return out, found
-
-    def _adjustFilterValue(self, op, value):
-        if op != "<>*" and op != "<>":
-            return value
-
-        value = value.strip()
-
-        value, has_wildcard = self._criteriaValueFind(value, ["*"])
-        if has_wildcard:
-            return value
-
-        return "*" + value + "*"
-
     def _filterTupleToString(self, filtertpl):
         prev_val = filtertpl
 
@@ -819,7 +787,7 @@ class AlertListing(MessageListing):
             return "! %s" % (object)
 
         if prev_val == filtertpl:
-            value = "'" + utils.escape_criteria(self._adjustFilterValue(operator, filtertpl[2])) + "'"
+            value = "'%s'" % utils.escape_criteria(utils.filter_value_adjust(operator, value))
 
         return "%s %s %s" % (object, operator, value)
 

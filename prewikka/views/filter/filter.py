@@ -53,7 +53,7 @@ class Filter:
 
         criteria, operator, value = elements
         if value == prev_val:
-            value = "'" + utils.escape_criteria(value) + "'"
+            value = "'%s'" % utils.escape_criteria(utils.filter_value_adjust(operator, value))
 
         if self.type:
             criteria = ".".join((self._typetbl[self.type], criteria))

@@ -109,6 +109,33 @@ def escape_html_string(s):
     return s
 
 
+def _criteria_value_find(value, clist=[]):
+    escaped = False
+
+    for char in value:
+        if escaped:
+            escaped = False
+        elif char in clist:
+            return True
+        elif char == '\\':
+            escaped = True
+
+    return False
+
+
+def filter_value_adjust(operator, value):
+    if operator not in ("<>*", "<>"):
+        return value
+
+    value = value.strip()
+
+    has_wildcard = _criteria_value_find(value, ["*"])
+    if has_wildcard:
+        return value
+
+    return "*%s*" % value
+
+
 def hexdump(content):
     decoded = struct.unpack("B" * len(content), content)
     content = ""
