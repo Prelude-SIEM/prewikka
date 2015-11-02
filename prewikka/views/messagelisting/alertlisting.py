@@ -250,14 +250,6 @@ class CorrelationAlertListingParameters(AlertListingParameters):
         self.optional("alert.type", list, ["alert.correlation_alert.name"], save=True)
 
 
-class ToolAlertListingParameters(AlertListingParameters):
-    def register(self):
-        AlertListingParameters.register(self)
-        self.optional("aggregated_source", list, [ "none" ], save=True)
-        self.optional("aggregated_target", list, [ "none" ], save=True)
-        self.optional("alert.type", list, ["alert.tool_alert.name"], save=True)
-
-
 class ListedAlert(ListedMessage):
     def __init__(self, *args, **kwargs):
         apply(ListedMessage.__init__, (self, ) + args, kwargs)
@@ -1313,13 +1305,6 @@ class CorrelationAlertListing(AlertListing, view.View):
     view_parameters = CorrelationAlertListingParameters
     alert_type_default = [ "alert.correlation_alert.name" ]
     view_order = 1
-
-class ToolAlertListing(AlertListing, view.View):
-    view_name = N_("ToolAlerts")
-    view_parameters = ToolAlertListingParameters
-    alert_type_default = [ "alert.tool_alert.name" ]
-    view_order = 2
-
 
 
 class SensorAlertListing(AlertListing, view.View):

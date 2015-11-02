@@ -1,4 +1,4 @@
-from alertlisting import AlertListing, SensorAlertListing, CorrelationAlertListing, ToolAlertListing
+from alertlisting import AlertListing, SensorAlertListing, CorrelationAlertListing
 from heartbeatlisting import HeartbeatListing, SensorHeartbeatListing
 from prewikka import pluginmanager, version
 
@@ -11,5 +11,5 @@ class MessageListing(pluginmanager.PluginPreload):
     plugin_description = _("Alert and Heartbeat listing page")
 
     plugin_classes = [ AlertListing, SensorAlertListing,
-                       CorrelationAlertListing, ToolAlertListing,
+                       CorrelationAlertListing,
                        HeartbeatListing, SensorHeartbeatListing ]
