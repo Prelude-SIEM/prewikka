@@ -167,7 +167,7 @@ class AlertFilterEdition(view.View):
     plugin_license = version.__license__
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
-    plugin_description = _("Filters management page")
+    plugin_description = N_("Filters management page")
     plugin_database_branch = version.__branch__
     plugin_database_version = "0"
 

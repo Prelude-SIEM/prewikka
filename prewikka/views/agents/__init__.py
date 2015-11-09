@@ -7,5 +7,5 @@ class AgentPlugin(pluginmanager.PluginPreload):
     plugin_license = version.__license__
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
-    plugin_description = _("Agents status information page")
+    plugin_description = N_("Agents status information page")
     plugin_classes = [ SensorListing, SensorMessagesDelete, HeartbeatAnalyze ]

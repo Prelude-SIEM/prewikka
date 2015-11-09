@@ -8,7 +8,7 @@ class MessageListing(pluginmanager.PluginPreload):
     plugin_license = version.__license__
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
-    plugin_description = _("Alert and Heartbeat listing page")
+    plugin_description = N_("Alert and Heartbeat listing page")
 
     plugin_classes = [ AlertListing, SensorAlertListing,
                        CorrelationAlertListing,

@@ -30,7 +30,7 @@ class AboutPlugin(view.View):
     plugin_license = version.__license__
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
-    plugin_description = _("Plugin installation and activation management page")
+    plugin_description = N_("Plugin installation and activation management page")
 
     view_name = N_("Plugins")
     view_template = templates.aboutplugin

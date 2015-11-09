@@ -26,7 +26,7 @@ class Warning(view.View):
     plugin_license = version.__license__
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
-    plugin_description = _("Prewikka Warning message")
+    plugin_description = N_("Prewikka Warning message")
 
     view_template = templates.warning
 

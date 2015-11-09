@@ -9,7 +9,7 @@ class About(view.View):
     plugin_license = version.__license__
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
-    plugin_description = _("Prewikka About page")
+    plugin_description = N_("Prewikka About page")
     plugin_htdocs = (("about", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     view_name = N_("About")
