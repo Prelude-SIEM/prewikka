@@ -199,8 +199,8 @@ function _MessageListing() {
                 $(varray).each(function() {
                         var option = $("<option>").attr("value", this).text(this);
 
-                        if ( _messagelisting_title_array[varray[this]] )
-                                option.attr("title", _messagelisting_title_array[varray[this]]);
+                        if ( _messagelisting_title_array[this] )
+                                option.attr("title", _messagelisting_title_array[this]);
 
                         select.append(option);
                 });

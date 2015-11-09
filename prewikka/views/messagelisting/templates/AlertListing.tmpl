@@ -13,19 +13,21 @@
  * FIXME: move this to a pre-compiled JS file.
  */
 if ( window._messagelisting_title_array == undefined ) {
-	window._messagelisting_title_array = Array();
-	window._messagelisting_title_array["="] = "$_("Equal")";
-	window._messagelisting_title_array["!="] = "$_("Not equal")";
-	window._messagelisting_title_array["<"] = "$_("Lesser than")";
-	window._messagelisting_title_array[">"] = "$_("Greater than")";
-	window._messagelisting_title_array["<="] = "$_("Lesser or equal")";
-	window._messagelisting_title_array[">="] = "$_("Greater or equal")";
-	window._messagelisting_title_array["<>"] = "$_("Substring")";
-	window._messagelisting_title_array["<>*"] = "$_("Substring (case-insensitive)")";
-	window._messagelisting_title_array["~"] = "$_("Regular expression")";
-	window._messagelisting_title_array["~*"] = "$_("Regular expression (case-insensitive)")";
-	window._messagelisting_operator_array = Array();
-	window._messagelisting_value_array = Array();
+    window._messagelisting_title_array = {
+        "!": "$_("Not defined")",
+        "=": "$_("Equal")",
+        "!=": "$_("Not equal")",
+        "<": "$_("Lesser than")",
+        ">": "$_("Greater than")",
+        "<=": "$_("Lesser or equal")",
+        ">=": "$_("Greater or equal")",
+        "<>": "$_("Substring")",
+        "<>*": "$_("Substring (case-insensitive)")",
+        "~": "$_("Regular expression")",
+        "~*": "$_("Regular expression (case-insensitive)")"
+    };
+    window._messagelisting_operator_array = Array();
+    window._messagelisting_value_array = Array();
 }
 
 \$LAB.script("messagelisting/js/alertlisting.js").wait(function() {
