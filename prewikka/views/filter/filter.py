@@ -231,21 +231,21 @@ class AlertFilterEdition(view.View):
             if subcl.getValueType() == prelude.IDMEFValue.TYPE_CLASS:
                 ret += self._flatten(subcl)
             else:
-                ret.append('"' + subcl.getPath(rootidx=1) + '"')
+                ret.append(subcl.getPath(rootidx=1))
         return ret
 
     def _set_common(self):
         self.dataset["type"] = self.parameters.get("type", "filter")
         self.dataset["filters"] = self._db.get_filter_list(self.user)
 
-        self.dataset["alert_objects"] = ", ".join(self._flatten(prelude.IDMEFClass("alert")))
-        self.dataset["generic_objects"] = ", ".join(self._flatten(prelude.IDMEFClass("heartbeat")))
+        self.dataset["alert_objects"] = self._flatten(prelude.IDMEFClass("alert"))
+        self.dataset["generic_objects"] = self._flatten(prelude.IDMEFClass("heartbeat"))
 
-        self.dataset["operators"] = ",".join(map(lambda x: '"%s"' % x, ("=", "=*", "!=", "!=*",
-                                                                        "~", "~*", "!~", "!~*",
-                                                                        "<", "<=", ">", ">=",
-                                                                        "<>", "<>*", "!<>", "!<>*")))
-        self.dataset["elements"] = [ self._element("A") ]
+        self.dataset["operators"] = ["=", "=*", "!=", "!=*", "~", "~*",
+                                     "!~", "!~*", "<", "<=", ">", ">=",
+                                     "<>", "<>*", "!<>", "!<>*"]
+
+        self.dataset["elements"] = [self._element("A")]
         self.dataset["fltr.name"] = ""
         self.dataset["fltr.type"] = ""
         self.dataset["fltr.comment"] = ""

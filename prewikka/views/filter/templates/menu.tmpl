@@ -1,16 +1,14 @@
-  <tr>
-    <th>$_("Filter:")</th>
-    <td colspan="2">
-     <select name="filter" class="filter_control_select">
-          <option value="">&nbsp;</option>
-        #for $fltr in $filters
-          #if $fltr == $current_filter
+#filter CleanOutput
+<label for="menu_filter_select" class="label-xs">$_("Filter:")</label>
+<select id="menu_filter_select" name="filter" class="form-control input-sm">
+    <option value="">$_("Select your filter")</option>
+    #for $fltr in $filters
+        #if $fltr == $current_filter
             #set $selected = "selected=\"selected\""
-          #else
+        #else
             #set $selected = ""
-          #end if
-          <option value="$fltr" $selected>$fltr</option>
-        #end for
-     </select>
-    </td>
-  </tr>
+        #end if
+    <option value="$fltr" $selected>$fltr</option>
+    #end for
+</select>
+#end filter
