@@ -23,6 +23,10 @@ class UserSettingsModifyParameters(view.Parameters):
 
 
 class UserSettingsDisplay(view.View):
+    view_section = N_("Settings")
+    view_name = N_("My account")
+    view_order = 0
+
     view_parameters = UserSettingsDisplayParameters
     view_permissions = [ ]
     view_template = templates.UserSettings

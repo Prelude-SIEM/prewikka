@@ -8,68 +8,70 @@
 #set $targetView = ""
 
 #if $document.href.split("/")[-1].find("UserSettingsModify") == -1
-  #set $targetView = "UserSettingsModify"
+    #set $targetView = "UserSettingsModify"
 #end if
 
-<form class="usersettings" action="${targetView}" method="POST">
-<input type="hidden" name="name" value="$object.name"/>
+<div class="container">
+    <form class="form-horizontal usersettings" action="${targetView}" method="POST">
+        <input type="hidden" name="name" value="$object.name"/>
 
-<fieldset class="fieldset_heading">
-  <table>
-   <tr>
-    <th style="vertical-align: middle;">$_("Login:")</th>
-    <td style="text-align:right; vertical-align: middle;">
-     <h2 style="vertical-align: middle; padding:0px; margin:0px;"><b>$object.name</b></h2>
-    </td>
-   </tr>
+        <div class="form-group">
+            <label for="inputUserId" class="col-sm-2 control-label">$_("Login:")</label>
+            <div class="col-sm-10">
+                <input type="text" id="inputUserId" class="form-control disabled" disabled value="$object.name">
+            </div>
+        </div>
 
-<tr>
-    <th>$_("Name:")</th>
-    <td style="text-align: right;"><input type="text" name="fullname" value="$fullname"/></td>
-</tr>
-<tr>
-    <th>$_("Email:")</th>
-    <td style="text-align: right;"><input type="text" name="email" value="$email"/></td>
-</tr>
+        <div class="form-group">
+            <label for="inputUserName" class="col-sm-2 control-label">$_("Name:")</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="text" name="fullname" id="inputUserName" value="$fullname" placeholder="$_("Name")"/>
+            </div>
+        </div>
 
-<tr>
-    <th style="vertical-align: middle;">$_("Language:")</th>
-    <td style="text-align:right; vertical-align: middle;">
-     <select name="language">
-#for $lang, $identifier in $available_languages
-#if $language == $identifier
-    #set $selected=" selected=\"selected\""
-#else
-    #set $selected=""
-#end if
-     <option value="$identifier"$selected>$lang</option>
-#end for
-     </select>
-    </td>
-</tr>
+        <div class="form-group">
+            <label for="inputUserEmail" class="col-sm-2 control-label">$_("Email:")</label>
+            <div class="col-sm-10">
+                <input class="form-control" type="email" name="email" id="inputUserEmail" value="$fullname" placeholder="$_("Email")"/>
+            </div>
+        </div>
 
-<tr>
-    <th style="vertical-align: middle;">$_("Theme:")</th>
-    <td style="text-align:right; vertical-align: middle;">
-     <select name="theme">
-#for $theme in $available_themes
-#set $selected = ""
-#if $theme == $user.theme
-    #set $selected = "selected=\"selected\""
-#end if
- <option value="$theme" $selected>$theme</option>
-#end for
-     </select>
-    </td>
-</tr>
+        <div class="form-group">
+            <label for="inputUserLanguage" class="col-sm-2 control-label">$_("Language:")</label>
+            <div class="col-sm-10">
+                <select id="inputUserLanguage" class="form-control need_reload" name="language">
+                #for $lang, $identifier in $available_languages
+                    #if $language == $identifier
+                        #set $selected=" selected=\"selected\""
+                    #else
+                        #set $selected=""
+                    #end if
+                    <option value="$identifier"$selected>$lang</option>
+                #end for
+                </select>
+            </div>
+        </div>
 
-</table>
+        <div class="form-group">
+            <label for="inputUserTheme" class="col-sm-2 control-label">$_("Theme:")</label>
+            <div class="col-sm-10">
+                <select id="inputUserTheme" class="form-control need_reload" name="theme">
+                #for $theme in $available_themes
+                    #set $selected = ""
+                    #if $theme == $user.theme
+                        #set $selected = "selected=\"selected\""
+                    #end if
+                    <option value="$theme" $selected>$theme</option>
+                #end for
+                </select>
+            </div>
+        </div>
 
-</fieldset>
-
-
-<input class="widget-control usersettings cancel" type="button" value="$_('Cancel')" />
-<input class="widget-control usersettings submit" type="submit" value="$_('Save')" />
-</form>
+        <div class="pull-right">
+            <input class="btn btn-default widget-control usersettings cancel" type="button" value="$_('Cancel')" />
+            <input class="btn btn-primary widget-control usersettings submit" type="submit" value="$_('Save')" />
+        </div>
+    </form>
+</div>
 
 #end filter
