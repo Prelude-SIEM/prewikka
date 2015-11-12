@@ -183,9 +183,15 @@ class Request:
 
         stat = os.fstat(fd.fileno())
 
-        self.output_headers = [ ('Content-Type', mimetypes.guess_type(path)[0]),
-                                ('Content-Length', str(stat[6])),
-                                ('Last-Modified', time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8]))) ]
+        content_type = mimetypes.guess_type(path)[0]
+        if not content_type:
+            env.log.warning("Serving file with unknown MIME type: %s" % path)
+            content_type = "application/octet-stream"
+
+        self.output_headers = [
+            ('Content-Type', content_type),
+            ('Content-Length', str(stat[6])),
+            ('Last-Modified', time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8])))]
 
         self.sendHeaders()
         return copyfunc(fd)
