@@ -5,21 +5,19 @@
 #filter CleanOutput
 
 <div id="fieldset_page" style="position: absolute; top: 25%; left: 50%; width:600px; margin-left:-220px;">
-  <fieldset style="text-align: center; vertical-align: middle;">
-   <legend class="error_name">$name</legend>
-   <p><b>$message</b></p>
-   #if $traceback
-     <br/><br/>
-     <textarea rows="10" cols=75 readonly="readonly">$traceback</textarea>
-   #end if
+    <fieldset style="text-align: center; vertical-align: middle;">
+    <div class="alert alert-danger"><b>$message</b></div>
+    #if $traceback
+    <pre>$traceback</pre>
+    <textarea rows="10" cols=75 readonly="readonly">$traceback</textarea>
+    #end if
+    <br/><br/>
 
-   <br/><br/>
+    <input class="btn btn-default" style="float: left; position: relative;" type="button" value="$_("Back")" onclick="history.back()" />
+    <input class="btn btn-primary" style="float: right; position: relative;" type="submit" value="$_("Retry")" onclick="location.reload()"/>
 
-   <input style="float: left; position: relative;" type="button" value="$_("Back")" onclick="history.back()" />
-   <input style="float: right; position: relative;" type="submit" value="$_("Retry")" onclick="location.reload()"/>
-
-  </fieldset>
- </div>
+    </fieldset>
+</div>
 
 #end filter
 #end block main_content

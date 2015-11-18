@@ -55,9 +55,20 @@ class InvalidViewError(error.PrewikkaUserError):
 
 
 class ParameterDesc(object):
-    def __init__(self, name, type, mandatory=False, default=None, save=False):
+    """ Describe a HTTP parameter """
+
+    def __init__(self, name, type, mandatory=False, default=None, save=False, general=False):
+        """ Args :
+        name : Name of the parameter
+        type : Type of the parameter (int, str, list, ...)
+        mandatory : True if the parameter is mandatory
+        default : Specify a default value
+        save : True if the parameter is store in BDD to when set
+        general : True if the parameter is available for all the view """
+
         self.name = name
         self.save = save
+        self.general = general
         self.default = default
         self.mandatory = mandatory
 
@@ -67,15 +78,20 @@ class ParameterDesc(object):
             self.type = type
 
     def has_default(self):
+        """ Return True if this parameter has a default value """
         return self.default is not None
 
     def _mklist(self, value):
+        """ Return the value as a list """
+
         if not isinstance(value, list):
             return [ value ]
 
         return value
 
     def parse(self, value):
+        """ Return the value according to the parameter's type """
+
         try:
             if isinstance(self.type, list):
                 value = map(self.type[0], self._mklist(value))
@@ -113,11 +129,11 @@ class Parameters(dict):
     def mandatory(self, name, type):
         self._parameters[name] = ParameterDesc(name, type, mandatory=True, save=True)
 
-    def optional(self, name, type, default=None, save=False):
+    def optional(self, name, type, default=None, save=False, general=False):
         if default is not None:
             self._default[name] = self._hard_default[name] = default
 
-        self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save)
+        self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save, general=general)
 
     def normalize(self, view, user):
         do_load = True
@@ -135,8 +151,11 @@ class Parameters(dict):
                 do_load = False
 
             value = param.parse(value)
-            if param.save and value != param.default and do_save:
-                user.set_property(name, value, view=view)
+            if param.save and do_save:
+                if param.general:
+                    user.set_property(name, value)
+                else:
+                    user.set_property(name, value, view=view)
 
             self[name] = value
 
@@ -157,13 +176,18 @@ class Parameters(dict):
             if not param.save:
                 continue
 
-            if do_save:
-                user.del_property(name, view=view)
+            if param.general:
+                save_view = None
             else:
-                if not name in user.configuration.get(view, {}):
+                save_view = view
+
+            if do_save:
+                user.del_property(name, view=save_view)
+            else:
+                if not name in user.configuration.get(save_view, {}):
                     continue
 
-                value = param.parse(user.get_property(name, view=view))
+                value = param.parse(user.get_property(name, view=save_view))
 
                 self._default[name] = value
                 if do_load:

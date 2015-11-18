@@ -27,7 +27,7 @@ from prewikka import utils, env
 
 class MainMenuParameters(view.Parameters):
     allow_extra_parameters = False
-    _INTERNAL_PARAMETERS = [ "timeline_value", "timeline_unit", "timeline_end", "timeline_start", "order_by", "timezone", "auto_apply_value", "auto_apply_enable"]
+    _INTERNAL_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "order_by", "timezone", "auto_apply_value", "auto_apply_enable"]
 
     def __init__(self, *args, **kwargs):
         env.hookmgr.declare_once("HOOK_MAINMENU_PARAMETERS_REGISTER", multi=True)
@@ -41,14 +41,14 @@ class MainMenuParameters(view.Parameters):
     def register(self):
         view.Parameters.register(self)
 
-        self.optional("timeline_value", int, default=1, save=True)
-        self.optional("timeline_unit", str, default="hour", save=True)
-        self.optional("timeline_end", long)
-        self.optional("timeline_start", long)
-        self.optional("orderby", str, "time_desc", save=True)
-        self.optional("timezone", str, "frontend_localtime", save=True)
-        self.optional("auto_apply_value", str, default="1:00", save=True)
-        self.optional("auto_apply_enable", str, default="false", save=True)
+        self.optional("timeline_value", int, default=1, save=True, general=True)
+        self.optional("timeline_unit", str, default="hour", save=True, general=True)
+        self.optional("timeline_end", long, save=True, general=True)
+        self.optional("timeline_start", long, save=True, general=True)
+        self.optional("orderby", str, "time_desc")
+        self.optional("timezone", str, "frontend_localtime", save=True, general=True)
+        self.optional("auto_apply_value", int, default=0, save=True, general=True)
+        self.optional("auto_apply_enable", str, default="false", save=True, general=True)
 
         for i in env.hookmgr.trigger("HOOK_MAINMENU_PARAMETERS_REGISTER", self):
             self._INTERNAL_PARAMETERS = self._INTERNAL_PARAMETERS + i
@@ -141,8 +141,8 @@ class MainMenu:
         if not start and not end:
             return
 
-        self.dataset["timeline.start"] = localization.format_datetime(start, format="medium", tzinfo=self._tzobj)
-        self.dataset["timeline.end"] = localization.format_datetime(end, format="medium", tzinfo=self._tzobj)
+        self.dataset["timeline.start"] = time.mktime(start.timetuple())
+        self.dataset["timeline.end"] = time.mktime(end.timetuple())
         self.dataset["timeline.current"] = utils.create_link(self.main.view_path, self.parameters - ["timeline_end"])
 
         timeunit = self.parameters["timeline_unit"]
@@ -221,7 +221,7 @@ class MainMenu:
         delta = relativedelta(**{self._timeunit + "s" if self._timeunit != "unlimited" else "years": self._timevalue})
 
         if self.start and not self.end:
-            self.end = self.start + delta
+            self.end = datetime.datetime.now(utils.timeutil.tzlocal())
 
         elif self.end and not self.start:
             self.start = self.end - delta
@@ -280,18 +280,48 @@ class MainMenu:
         self._setup_timezone()
         self._setup_timeline_range()
 
-        for t in "time_desc", "time_asc", "count_desc", "count_asc":
-            self.dataset["timeline.%s_selected" % t] = ""
-
-        self.dataset["timeline.%s_selected" % parameters["orderby"]] = "selected='selected'"
-
-        for unit in "min", "hour", "day", "month", "year", "unlimited":
-            self.dataset["timeline.%s_selected" % unit] = ""
+        self.dataset["timeline.order_by"] = parameters["orderby"]
 
         self.dataset["timeline.value"] = parameters["timeline_value"]
-        self.dataset["timeline.%s_selected" % parameters["timeline_unit"]] = "selected='selected'"
+        self.dataset["timeline.unit"] = parameters["timeline_unit"]
+
+        self.dataset["timeline.quick"] = [
+            (_("Today"), 1, "day"),
+            (_("This month"), 1, "month"),
+            (ngettext("%d hour", "%d hours", 1) % 1, 1, "hour"),
+            (ngettext("%d hour", "%d hours", 2) % 2, 2, "hour"),
+            (ngettext("%d day", "%d days", 1) % 1, 24, "hour"),
+            (ngettext("%d day", "%d days", 2) % 2, 24*2, "hour"),
+            (ngettext("%d week", "%d weeks", 1) % 1, 24*7, "hour"),
+            (ngettext("%d month", "%d months", 1) % 1, 24*31, "hour"),
+            (ngettext("%d month", "%d months", 3) % 3, 3*24*31, "hour"),
+            (ngettext("%d year", "%d years", 1) % 1, 365*24, "hour")]
+
+        self.dataset["timeline.quick_selected"] = _("Custom")
+        self.dataset["timeline.quick_custom"] = True
+
+        if "timeline_start" not in self.parameters and\
+           "timeline_end" not in self.parameters:
+            for label, value, unit in self.dataset["timeline.quick"]:
+                if value == self.parameters["timeline_value"] and\
+                   unit == self.parameters["timeline_unit"]:
+                    self.dataset["timeline.quick_selected"] = label
+                    self.dataset["timeline.quick_custom"] = False
+
+        self.dataset["timeline.refresh"] = [
+            (ngettext("%d second", "%d seconds", 30) % 30, 30),
+            (ngettext("%d minute", "%d minutes", 1) % 1, 60),
+            (ngettext("%d minute", "%d minutes", 5) % 5, 60*5),
+            (ngettext("%d minute", "%d minutes", 10) % 10, 60*10)]
+
+        self.dataset["timeline.refresh_selected"] = _("Inactive")
+        for label, value in self.dataset["timeline.refresh"]:
+            if value == self.parameters["auto_apply_value"]:
+                self.dataset["timeline.refresh_selected"] = label
 
         self._set_timeline(self.start, self.end)
+
+        self.dataset["timeline.time_format"] = localization.get_calendar_format()
 
         self.dataset["auto_apply_value"] = self.parameters["auto_apply_value"]
         self.dataset["auto_apply_enable"] = self.parameters["auto_apply_enable"]

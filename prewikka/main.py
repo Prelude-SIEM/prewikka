@@ -28,7 +28,8 @@ except ImportError:
 
 
 from prewikka import view, config, log, database, idmefdatabase, version, \
-     auth, error, utils, localization, resolve, theme, pluginmanager, renderer, env
+                     auth, error, utils, localization, resolve, theme, \
+                     pluginmanager, renderer, env
 from prewikka.myconfigparser import ConfigParserSection
 
 from prewikka.templates import ClassicLayout
@@ -36,7 +37,7 @@ from prewikka.templates import ClassicLayout
 
 class Logout(view._View):
     view_parameters = view.Parameters
-    view_permissions = [ ]
+    view_permissions = []
 
     def render(self):
         env.session.logout(self.request)
@@ -54,17 +55,35 @@ class BaseView(view._View):
         # The database attribute might be None in case of initialisation error
         # FIXME: move me to a plugin !
         try:
-                theme_name = user.get_property("theme", default=env.config.default_theme)
+            theme_name = user.get_property("theme", default=env.config.default_theme)
         except:
-                theme_name = env.config.default_theme
+            theme_name = env.config.default_theme
 
-        dataset["document.title"] = interface.getOptionValue("browser_title", "Prelude SIEM")
-        dataset["document.css_files"] = [ "prewikka/css/jquery-ui.min.css" , "prewikka/css/demo_table_jui.css", "prewikka/css/jquery.jstree.css", "prewikka/css/themes/%s.css" % theme_name ]
-        dataset["document.js_files"] = [ "prewikka/js/jquery.js", "prewikka/js/functions.js", "prewikka/js/ajax.js",
-                                         "prewikka/js/underscore-min.js",
-                                         "prewikka/js/jquery-ui.min.js", "prewikka/js/jquery.jstree.js" ]
 
-        dataset["prewikka.software"] = interface.getOptionValue("software", "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />")
+        dataset["document.title"] = interface.getOptionValue("browser_title",
+                                                             "Prelude SIEM")
+
+        dataset["document.css_files"] = ["prewikka/css/jquery-ui.min.css",
+                                         "prewikka/css/bootstrap.min.css",
+                                         "prewikka/css/demo_table_jui.css",
+                                         "prewikka/css/jquery.jstree.css",
+                                         "prewikka/css/jquery-ui-timepicker-addon.min.css",
+                                         "prewikka/css/themes/%s.css" % theme_name]
+
+        dataset["document.js_files"] = ["prewikka/js/jquery.js",
+                                        "prewikka/js/jquery-ui.min.js",
+                                        "prewikka/js/bootstrap.min.js",
+                                        "prewikka/js/functions.js",
+                                        "prewikka/js/ajax.js",
+                                        "prewikka/js/underscore-min.js",
+                                        "prewikka/js/jquery-ui-timepicker-addon.min.js",
+                                        "prewikka/js/jquery.jstree.js"]
+
+        dataset["prewikka.software"] = interface.getOptionValue(\
+                "software",
+                "<img src='prewikka/images/prelude-logo.png'\
+                      alt='Prelude' />")
+
         dataset["prewikka.place"] = interface.getOptionValue("place", "")
         dataset["prewikka.date"] = localization.format_date()
         if user:
@@ -76,19 +95,55 @@ class BaseView(view._View):
         dataset["prewikka.logout_link"] = (user and env.session.can_logout()) and utils.create_link("logout") or None
 
         try:
-                paths = request.getViewElements()
-                active_section, active_tab = paths[0], paths[1]
+            paths = request.getViewElements()
+            active_section, active_tab = paths[0], paths[1]
         except:
-                active_section, active_tab = "", ""
+            active_section, active_tab = "", ""
 
         dataset["interface.active_tab"] = active_tab
         dataset["interface.active_section"] = active_section
-        dataset["interface.sections"] = env.viewmanager.getSections(user) if env.viewmanager else {}
+        sections = env.viewmanager.getSections(user) if env.viewmanager else {}
+        dataset["interface.sections"] = sections
         dataset["toplayout_extra_content"] = ""
-        all(env.hookmgr.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT", request, user, dataset))
+
+        all(env.hookmgr.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT",
+                                request, user, dataset))
+        if user:
+            dataset["interface.navbar"] = self._generate_navbar(sections,
+                                                                active_section)
+        else:
+            dataset["interface.navbar"] = []
+
+    @staticmethod
+    def _generate_navbar(sections, active_section):
+        """ Generate a dictionary representing the navigation bar to generate.
+            [{name: delimiter,
+              active: True,
+              sections: [{name: section, link: link}] }, ]"""
+
+        navbar = []
+        for name, tabs in sections.items():
+            if not tabs:
+                navbar.append({'name':name,
+                               'active': False,
+                               'sections': []})
+            else:
+                link = tabs.values()[0].values()[0].view_path
+                if not navbar:
+                    navbar.append({'name': _("Other"),
+                                   'active': False, 'sections': []})
+                if name == active_section:
+                    navbar[-1]['active'] = True
+
+                navbar[-1]['sections'].append({'name': name, 'link': link})
+
+        navbar[-1]['extend'] = True  # If This delimiter can have
+                                                # additional menu
 
 
-_core_cache = { }
+        return navbar
+
+_core_cache = {}
 _core_cache_lock = Lock()
 
 
@@ -251,6 +306,7 @@ class Core:
         dataset["document.charset"] = localization.getCurrentCharset()
         dataset["toplayout_extra_content"] = ""
         dataset["prewikka.user"] = user
+        dataset["prewikka.about"] = utils.create_link("About")
 
     def handleError(self, request, err, user):
         dataset, template_name = None, None

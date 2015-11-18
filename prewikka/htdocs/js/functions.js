@@ -138,12 +138,22 @@ function prewikka_dialog(data)
      * Prewikka logging page.
      */
     if ( data.code == 401 ) {
-        $("#prewikka-dialog").dialog('option', 'buttons', {
-                'Ok': function() {
+        $("#prewikka-dialog").dialog('option', 'buttons', [{
+                text: 'Ok',
+                'class': 'btn btn-default',
+                click: function() {
                         $(this).dialog('close');
                         location.reload();
                 }
-        });
+        }]);
+    } else {
+        $("#prewikka-dialog").dialog('option', 'buttons', [{
+                text: 'Ok',
+                'class': 'btn btn-default',
+                click: function() {
+                        $(this).dialog('close');
+                }
+        }]);
     }
 
     $("#prewikka-dialog").dialog("open");

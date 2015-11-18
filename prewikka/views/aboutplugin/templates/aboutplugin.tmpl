@@ -60,8 +60,10 @@
         closeOnEscape: false,
         dialogClass: "update-ui-dialog",
 
-        buttons: {
-            Ok: function() {
+        buttons: [{
+            'class': 'btn btn-default',
+            text: '$_("Close")',
+            click: function() {
                  \$(this).dialog("close");
 
                  /*
@@ -70,7 +72,7 @@
                  location.replace(prewikka_location().href);
                  return false;
             }
-        }
+        }]
     });
 
     \$(".activate-button").click(function() {
@@ -145,12 +147,12 @@
 
 <div id="update-dialog" title="Applying Updates">
   <div id="progressbar">
-   <div class="progress-label">Applying Updates...</div>
+    <div class="progress-label">$_("Applying Updates")...</div>
   </div>
 
   <fieldset>
-   <legend>Update log</legend>
-   <textarea class="update-log" readonly=""></textarea>
+    <h4>$_("Update log")</h4>
+    <textarea class="update-log" readonly=""></textarea>
   </fieldset>
 </div>
 
@@ -159,81 +161,88 @@
 
 <div id="fieldset_page">
 #if $len($maintenance) > 0:
- <fieldset class="fieldset_heading">
-  <legend style="color:red;">$_("Plugin Maintenance")</legend>
-  <p>
-   <center><b style="color:red;">$_("The following plugins need to be updated before they can be loaded into the system")</b></center>
-  </p>
+  <div class="panel panel-danger">
+    <div class="panel-heading">
+      <h3 class="panel-title">$_("Plugin Maintenance")</h3>
+    </div>
+    <div class="panel-body">
+      <p>
+        <center><b style="color:red;">$_("The following plugins need to be updated before they can be loaded into the system")</b></center>
+      </p>
 
-  #for $name, $list in $sorted($maintenance.items())
-  <fieldset>
-   <legend>$_($name)</legend>
-   <table>
-    <tr><th style="width:20%">$_("Name")</th><th>$_("Description")</th><th style="width:10%">$_("Version")</th><th style="width:15%">$_("Current Database Version")</th><th class="right" style="width:15%">$_("Required Database Update")</th></tr>
+      #for $name, $list in $sorted($maintenance.items())
+      <fieldset class="fieldset_heading">
+        <legend>$_($name)</legend>
+        <table>
+          <tr><th style="width:20%">$_("Name")</th><th>$_("Description")</th><th style="width:10%">$_("Version")</th><th style="width:15%">$_("Current Database Version")</th><th class="right" style="width:15%">$_("Required Database Update")</th></tr>
 
-    #set $cnt = 0
-    #for $mod, $fv, $tv in $sorted($list, $key=lambda x: $x[0].__module__)
-     #set $plugin_name = $mod.plugin_name or $mod.__module__
-    <tr class="$row_classes[$cnt % 2]">
-     <td>$plugin_name</td><td>$_($mod.plugin_description)</td><td>$mod.plugin_version</td>
-     <td>
-      #if $fv
-       $fv
-      #else
-       -
-      #end if
-     </td>
-     <td class="right">$tv</td>
-    </tr>
-     #set $cnt += 1
+        #set $cnt = 0
+        #for $mod, $fv, $tv in $sorted($list, $key=lambda x: $x[0].__module__)
+          #set $plugin_name = $mod.plugin_name or $mod.__module__
+          <tr class="$row_classes[$cnt % 2]">
+            <td>$plugin_name</td><td>$_($mod.plugin_description)</td><td>$mod.plugin_version</td>
+            <td>
+          #if $fv
+              $fv
+          #else
+              -
+          #end if
+            </td>
+            <td class="right">$tv</td>
+          </tr>
+          #set $cnt += 1
+        #end for
+        </table>
+      </fieldset>
     #end for
-   </table>
-  </fieldset>
-  #end for
-
   #if $maintenance_total == 0
   #set $disabled = 'disabled="disabled"'
   #else
   #set $disabled = ""
   #end if
-  <button class="update-button button" $disabled>$_("Install Update")</button>
- </fieldset>
+      <div class="pull-right">
+        <button class="update-button btn btn-danger" $disabled>$_("Install Update")</button>
+      </div>
+    </div>
+  </div>
 #end if
+  <div class="panel panel-primary">
+    <div class="panel-heading">
+      <h3 class="panel-title">$_("Installed Plugins")</h3>
+    </div>
+    <div class="panel-body">
+      #for $name, $list in $sorted($installed.items())
+      <fieldset class="fieldset_heading">
+        <legend>$_($name)</legend>
+        <table>
+          <tr><th style="width:20%">$_("Name")</th><th>$_("Description")</th><th style="width:10%">$_("Version")</th><th style="width:10%">$_("Database Version")</th><th class="right" style="width:5%">$_("Active")</th></tr>
 
- <fieldset class="fieldset_heading">
-  <legend>$_("Installed Plugins")</legend>
-
-   #for $name, $list in $sorted($installed.items())
-   <fieldset>
-    <legend>$_($name)</legend>
-    <table>
-     <tr><th style="width:20%">$_("Name")</th><th>$_("Description")</th><th style="width:10%">$_("Version")</th><th style="width:10%">$_("Database Version")</th><th class="right" style="width:5%">$_("Active")</th></tr>
-
-     #set $cnt = 0
-     #for $mod, $enabled in $sorted($list, key=lambda x: $x[0].__module__)
-      #if $enabled
-      #set $checked = "checked=\"checked\""
-      #else
-      #set $checked = ""
-      #end if
-      #set $plugin_name = $mod.plugin_name or $mod.__module__
-
-     <tr class="$row_classes[$cnt % 2]">
-      <td>$plugin_name</td><td>$_($mod.plugin_description)</td><td>$mod.plugin_version</td>
-      <td>#if $mod.plugin_database_version
-           $mod.plugin_database_version
+        #set $cnt = 0
+        #for $mod, $enabled in $sorted($list, key=lambda x: $x[0].__module__)
+          #if $enabled
+            #set $checked = "checked=\"checked\""
           #else
-           -
+            #set $checked = ""
           #end if
-      </td>
-      <td class="right"><input type="checkbox" name="enable_plugin" value="$mod.__module__" $checked /></td></tr>
-      #set $cnt += 1
-     #end for
-    </table>
+          #set $plugin_name = $mod.plugin_name or $mod.__module__
 
-   </fieldset>
-   #end for
-
-  <button class="activate-button button">$_("Update")</button>
- </fieldset>
+          <tr class="$row_classes[$cnt % 2]">
+            <td>$plugin_name</td><td>$_($mod.plugin_description)</td><td>$mod.plugin_version</td>
+            <td>#if $mod.plugin_database_version
+             $mod.plugin_database_version
+                #else
+             -
+                #end if
+            </td>
+            <td class="right"><input type="checkbox" name="enable_plugin" value="$mod.__module__" $checked /></td></tr>
+          #set $cnt += 1
+        #end for
+        </table>
+      </fieldset>
+      #end for
+      <div class="pull-right">
+        <button class="btn btn-primary">$_("Update")</button>
+      </div>
+    </div>
+  </div>
 </div>

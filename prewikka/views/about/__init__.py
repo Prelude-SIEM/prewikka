@@ -12,8 +12,5 @@ class About(view.View):
     plugin_description = N_("Prewikka About page")
     plugin_htdocs = (("about", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
-    view_name = N_("About")
     view_template = templates.About
     view_parameters = view.Parameters
-    view_section = N_("Settings")
-    view_order = 6

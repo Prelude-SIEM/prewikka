@@ -83,7 +83,7 @@
 
 <div id="fieldset_page">
 
-<input type="submit" class="global_toggle" value="$_("Show/Hide all")" />
+<input class="btn btn-default global_toggle" type="submit" value="$_("Show/Hide all")" />
 
 #set $listing = $locations.keys()
 $listing.sort()
@@ -178,7 +178,7 @@ $listing.sort()
     </table>
 
     <div style="display: $display">
-    <table class="analyzers">
+    <table class="table table-striped table-bordered table-rounded table-condensed">
      <thead>
       <tr class="tr_header $row_classes[$cnt%2]">
        <th style="width: 5%">$_("Delete")</th>
@@ -227,10 +227,16 @@ $listing.sort()
 #end for
 
 #if len($locations) > 0
-  <div style="text-align: right; vertical-align: bottom;">
-    <input class="checkbox" type="checkbox" name="alerts" /><b>$_("Alerts")</b>
-    <input class="checkbox" type="checkbox" name="heartbeats" /><b>$_("Heartbeats")</b>
-    &nbsp;<input type="submit" value="$_("Delete")" />
+  <div class="pull-right form-inline">
+    <div class="form-group">
+      <label for="agent_delete_alerts">$_("Alerts")</label>
+      <input id="agent_delete_alerts" class="checkbox" type="checkbox" name="alerts" />
+    </div>
+    <div class="form-group">
+      <label for="agent_delete_heartbeats">$_("Heartbeats")</label>
+      <input id="agent_delete_heartbeats" class="checkbox" type="checkbox" name="heartbeats" />
+    </div>
+    &nbsp;<input class="btn btn-danger" type="submit" value="$_("Delete")" />
   </div>
 #end if
 

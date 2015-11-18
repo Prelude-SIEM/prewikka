@@ -7,23 +7,91 @@
 <script>
     \$(document).ready(function() {
         \$("div.traceback").accordion({collapsible: true, active: false, heightStyle: "content"});
+        \$('a[data-confirm]').click(function() {
+            var href = \$(this).attr('href');
+
+            \$('#dataConfirmModal').find('.modal-body').text(\$(this).attr('data-confirm'));
+            \$('#dataConfirmOK').attr('href', href);
+            \$('#dataConfirmModal').modal({show: true});
+            return false;
+        });
     });
 </script>
 
+#filter CleanOutput
 <body class="$body_class">
+    <span id="prewikka-title" class="hidden">$document.title</span>
     <div id="prewikka-dialog">
         <div class="content"></div>
-        <br/><div class="traceback" style="display:none;">
+        <div class="traceback" style="display:none;">
             <h3>$_("Detail")</h3>
             <div style="padding: 5px"><textarea style="width: calc(100% - 10px);" class="traceback" rows="10" readonly="readonly"></textarea></div>
         </div>
     </div>
-    <div id="top_view">
-        <div id="top_view_header">
-            <div id="top_view_header_software">$prewikka.software</div>
-            <div id="top_view_header_place">$prewikka.place</div>
-            $toplayout_extra_content
+#end filter
+    <div id="dataConfirmModal" class="modal fade" role="dialog" aria-labelledby="dataConfirmLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 class="modal-title" id="dataConfirmLabel">$_('Please Confirm')</h3>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">$_('Cancel')</button>
+                    <a class="btn btn-primary" aria-hidden="true" data-dismiss="modal" id="dataConfirmOK">$_('OK')</a>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <div id="top_view">
+        <nav class="navbar navbar-fixed-top navbar-default" id="top_view_navbar">
+            <div class="navbar-header">
+                <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main_navbar_collapse" aria-expanded="false">
+                    <span class="sr-only">$_("Toggle navigation")</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <div class="hidden-sm">
+                    <div class="navbar-brand">$prewikka.software</div>
+                </div>
+            </div>
+
+#filter CleanOutput
+            <div class="collapse navbar-collapse" id="main_navbar_collapse">
+                <ul class="nav navbar-nav">
+                #for $delimiter in $interface.navbar
+                    #if $delimiter['active']
+                        #set $class_ = 'active'
+                    #else
+                        #set $class_ = ''
+                    #end if
+                    <li class="dropdown $class_">
+                        <a class="dropdown-toggle" data-toggle="dropdown">$_($delimiter['name'])<span class="caret"></span></a>
+                        <ul class="dropdown-menu" role="menu">
+                        #for $section in $delimiter['sections']
+                            <li><a href="$section['link']">$_($section['name'])</a></li>
+                        #end for
+                        #if $delimiter.get('extend')
+                            <li role="separator" class="divider"></li>
+                            <li><a class="widget-link" title="$_("About")" href="$prewikka.about">$_("About")</a></li>
+                            #if $prewikka.logout_link
+                            <li><a title="$_("Logout")" href="$prewikka.logout_link" data-confirm="$_("Are you sure you want to Logout ?")">$_("Logout")</a></li>
+                            #end if
+                        #end if
+                        </ul>
+                    </li>
+                #end for
+#end filter
+                </ul>
+                <ul class="nav navbar-nav navbar-right" id="nav_top_view_header">
+                    $toplayout_extra_content
+                </ul>
+            </div>
+        </nav>
         $toplayout_content
     </div>
 </body>

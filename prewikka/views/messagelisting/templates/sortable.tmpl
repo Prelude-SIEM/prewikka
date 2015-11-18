@@ -1,0 +1,22 @@
+#def sortable(link, field, current_order=None)
+    #if $current_order and $current_order == $field + "_asc"
+        #set field_order = $field + "_desc"
+    #else
+        #set field_order = $field + "_asc"
+    #end if
+
+<script>
+\$(".sortable_$field").on("click", function() {
+    \$(".hidden_order_by_input").remove();
+    \$("#main form").prepend('<input type="hidden" class="hidden_order_by_input" name="orderby" value="$field_order">');
+    \$("#main form").submit();
+});
+</script>
+
+<a class="sortable_$field">$link</a>
+    #if $current_order == $field + "_desc"
+<span class="caret"></span>
+    #elif $current_order == $field + "_asc"
+<span class="dropup"><span class="caret"></span></span>
+    #end if
+#end def

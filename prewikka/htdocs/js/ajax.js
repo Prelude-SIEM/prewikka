@@ -20,6 +20,8 @@ $(document).ready(function(){
        else
            prewikka_dialog($.parseJSON(xhr.responseText));
   });
+
+  $(window).on('resize', __autocollapse);
 });
 
 
@@ -71,7 +73,29 @@ function __ie_fixes(data)
     return data;
 }
 
+function __autocollapse() {
+    var mainmenu = $('#main_menu_navbar');
+    var topmenu = $("#topmenu .topmenu_nav");
+    var window_width = $(window).width();
 
+    mainmenu.removeClass('collapsed'); // set standard view
+    $("#main").css("margin-top", "");
+    topmenu.css("height", "")
+           .css("width", window_width - $("#main_menu_navbar").innerWidth());
+
+    if ( Math.max(mainmenu.innerHeight(), topmenu.innerHeight()) > 60 ) { // check if the topmenu or mainmenu is split across two lines
+        mainmenu.addClass('collapsed');
+
+        topmenu.css("width", window_width - $("#main_menu_navbar").innerWidth());
+
+        var height = Math.max(mainmenu.innerHeight(), topmenu.innerHeight());
+
+        if ( height > 60 ) { // check if we've still got 2 lines or more
+            $("#main").css("margin-top", height - 40);
+            topmenu.css("height", height);
+        }
+    }
+ }
 
 function prewikka_drawTab(data)
 {
@@ -102,21 +126,27 @@ function prewikka_drawTab(data)
     $("#main").off(); /* clear any events bound to this content by the current view */
     $("#main").html(content);
 
+    __autocollapse();
+
     $("#topmenu #help-button").hide();
-    $("#timeline #view-settings").hide();
+    $("#timeline #view-settings #main_menu_form").hide();
 
-    $("#timeline_toggle").click(function() {
-        $(".prewikka-view-config:visible").hide();
-
-        $("#timeline").toggle();
-    });
-
+    $("#prewikka-view-config-content").html("");
     var vc = $("#main .prewikka-view-config");
     if ( vc.length ) {
-        $("#view-settings-button").button()
-            .click(function() { vc.toggle("drop", 200); });
+        $("#_main").css("top", "125px");
+        $("#prewikka-view-config-nav").show();
+        $("#prewikka-view-config-toggle").show();
+        vc.appendTo("#prewikka-view-config-content");
 
-        $("#timeline #view-settings").show();
+        $("#prewikka-view-config-form").on("submit", function() {
+            $("#main form").submit();
+            return false;
+        });
+    } else {
+        $("#prewikka-view-config-nav").hide();
+        $("#prewikka-view-config-toggle").hide();
+        $("#_main").css("top", "100px");
     }
 
     var vh = $("#main .prewikka-view-help");
@@ -129,9 +159,17 @@ function prewikka_drawTab(data)
             });
         });
     }
+
+    $(function () {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
 }
 
+String.prototype.capitalize = function() {
+        return this.charAt(0).toUpperCase() + this.slice(1);
+};
 
+/* Update the tab's menu according to the url */
 function _url2menu(url)
 {
         var pathname = unescape(url);
@@ -143,13 +181,18 @@ function _url2menu(url)
 
         var tab = null;
         $("#topmenu .topmenu_item").find("a").each(function() {
-                if ( $(this).attr("href").split("?")[0] == wanted ) {
+                if ( $(this).attr("href").split("?")[0] === wanted ) {
                     tab = $(this);
                     return false;
                 }
         });
 
         if ( tab ) {
+                /* Update the document's title according to the names of the section and tab */
+                if ( pathtbl[0] != undefined && pathtbl[1] != undefined ) {
+                        document.title = $("#prewikka-title").text() + " - " + pathtbl[0].capitalize() + " (" + pathtbl[1].capitalize() + ")";
+                }
+
                 /*
                  * Activate div for the selected section
                  */
@@ -158,14 +201,14 @@ function _url2menu(url)
                 $("#menu .menu_item_" + pathtbl[0]).toggleClass("menu_item_inactive", false);
                 $("#menu .menu_item_" + pathtbl[0]).toggleClass("menu_item_active", true);
 
-                $("#topmenu div.topmenu_section").hide();
+                $("#topmenu ul.topmenu_section").hide();
                 $("#topmenu_" + pathtbl[0]).show();
 
                 /*
                  * show the tab
                  */
-                $("#topmenu .topmenu_item_active").toggleClass("topmenu_item_active", false);
-                $(tab).parents("div").eq(0).toggleClass("topmenu_item_active", true);
+                $("#topmenu .active").toggleClass("active", false);
+                $(tab).parents("li").eq(0).toggleClass("active", true);
         }
 }
 
@@ -239,7 +282,7 @@ function prewikka_widget(settings)
 
                         $(content).find(":input.widget-control").each(function(idx, data) {
                                 $(this.form).uniqueId();
-                                var btn = { class: $(this).attr("class"),
+                                var btn = { 'class': $(this).attr("class"),
                                             text: $(this).val(),
                                             type: $(this).attr("type"),
                                             form: $(this.form).attr("id"),
@@ -249,7 +292,7 @@ function prewikka_widget(settings)
                         }).remove();
 
                         if ( btbl.length == 0 )
-                                btbl.push({ text: "Close", click: function() { $(this).dialog('destroy').remove() } });
+                                btbl.push({ text: "Close", 'class': "btn btn-default", click: function() { $(this).dialog('destroy').remove() } });
 
                         conf["buttons"] = btbl;
                 }

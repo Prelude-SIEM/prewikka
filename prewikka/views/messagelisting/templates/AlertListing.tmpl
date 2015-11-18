@@ -1,4 +1,6 @@
 #from prewikka import usergroup, utils, env
+#from sortable import sortable
+
 #extends MessageListing
 
 #block messagelisting_scripts
@@ -212,7 +214,7 @@ if ( window._messagelisting_title_array == undefined ) {
 #block message_fields_header
 <thead>
  <tr style="height: 20px;">
-  <td style="text-align: right">#</td>
+  <td style="text-align: right; min-width: 3.0em;">$sortable().sortable("#", "count", $order_by)</td>
   <th class="filter_popup">
    <a class="filter_popup_link">$_("Classification")</a>
     #if $classification_filtered
@@ -294,7 +296,7 @@ if ( window._messagelisting_title_array == undefined ) {
    </div>
   </th>
 
-  <td>$_("Date")</td>
+  <td>$sortable().sortable($_("Date"), "time", $order_by)</td>
 
   #for $column in $extra_column
   <td>$column</td>
@@ -490,14 +492,17 @@ $text
 
 
 #block message_extra_footer
-  <td>
     #if $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
-    <div style="float: right;">
-      <input type="submit" name="listing_apply" value="$_("Apply")" />
-      <select style="display:inline;" name="action" id="action">
-        <option value="delete_message">$_('Delete')</option>
-      </select>
+    <div class="pull-right">
+      <div class="input-group">
+        <select class="form-control" name="action" id="action">
+          <option value="delete_message">$_('Delete')</option>
+        </select>
+        <span class="input-group-btn">
+          <input type="submit" class="btn btn-primary"name="listing_apply" value="$_("Apply")" />
+        </span>
+      </div>
+    </div>
     #end if
     </div>
-  </td>
 #end block

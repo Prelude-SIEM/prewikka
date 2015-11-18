@@ -203,3 +203,15 @@ def get_quarter_names(*args, **kwargs):
 
 def get_era_names(*args, **kwargs):
     return babel.dates.get_era_names(*args, locale=translation.getLocale(), **kwargs)
+
+def get_calendar_format():
+    """ Return a date format for use by jquery's datetime picker """
+
+    calendar_format = babel.dates.get_date_format(
+        'short',
+        translation.getLocale()).pattern
+
+    # babel uses 'MM' for month, and jquery uses 'mm'
+    # 4-digits year: "yyyy" in Babel, "yy" in jQuery.
+    # 2-digits year: "yy" in Babel, "y" in jQuery.
+    return calendar_format.replace("yy", "y").replace("MM", "mm")

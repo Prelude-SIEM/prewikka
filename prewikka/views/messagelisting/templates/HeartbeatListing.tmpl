@@ -100,14 +100,16 @@
 #end block message_fields
 
 #block message_extra_footer
-  <td>
     #if $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
-    <div style="float: right;">
-      <input type="submit" name="listing_apply" value="$_("Apply")" />
-      <select style="display:inline;" name="action" id="action">
-        <option value="delete_message">$_('Delete')</option>
-      </select>
+    <div class="pull-right">
+      <div class="input-group">
+        <select class="form-control" name="action" id="action">
+          <option value="delete_message">$_('Delete')</option>
+        </select>
+        <span class="input-group-btn">
+          <input type="submit" class="btn btn-primary"name="listing_apply" value="$_("Apply")" />
+        </span>
+      </div>
     </div>
     #end if
-  </td>
 #end block

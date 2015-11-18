@@ -153,6 +153,8 @@ class MessageListing(view.View):
     def render(self):
         view.View.render(self)
 
+        self.dataset["order_by"] = self.parameters["orderby"]
+
         # We need to remove x/y from parameters, so that they aren't used for link.
         self.dataset["hidden_parameters"] = [ ]
 
@@ -164,8 +166,7 @@ class MessageListing(view.View):
 
 
     def _setHiddenParameters(self):
-        if self.parameters.has_key("timeline_end"):
-            self.dataset["hidden_parameters"].append(("timeline_end", self.parameters["timeline_end"]))
+        pass
 
     def _setNavPrev(self, offset):
         if offset:

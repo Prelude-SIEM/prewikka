@@ -70,7 +70,7 @@ function check_same_origin(url) {
         \$(document).on("submit", "#main form", function() {
                 \$(this).find("input[name=_download]").remove();
 
-                var data = \$(this).serialize();
+                var data = \$(this).add("#prewikka-view-config-form").serialize();
 
                 if ( \$(this).data("clicked") ) {
                         data += "&" + \$(this).data("clicked");
@@ -105,123 +105,50 @@ function check_same_origin(url) {
 </script>
 
 <div id="topmenu">
- #for $section, $tabs in $interface.sections.items()
-  #if not $tabs
-    #continue
-  #end if
+    <div class="topmenu_nav">
+    #for $section in $interface.sections.keys():
+        #set $style = ""
 
-  #set $style = ""
-  #if $section != $interface.active_section
-  #set $style="display:none;"
-  #end if
-
-  <div style="padding: 0px; margin: 0px; $style" class="topmenu_section" id="topmenu_$nameToPath($section)">
-  #for $name, $views in $tabs.items()
-    #set $firstview = $views.values()[0]
-    #if $prewikka.user and not $prewikka.user.has($firstview.view_permissions):
-      #continue
-    #end if
-
-    #if $name == $interface.active_tab
-      #set $class_ = 'topmenu_item_active'
-    #else
-      #set $class_ = ''
-    #end if
-
-    <div class="topmenu_item $class_"><p><a href="$firstview.view_path" class="topmenu_links">$_($name)</a></p></div>
-  #end for
-  </div>
- #end for
-
-  #end filter
-
-  <div class="topmenu_item_special">
-  <button type="button" id="help-button" title="$_("Help")"></button>
-  <button type="button" id="maximize-button" title="$_("Maximize")"></button>
-  #if $prewikka.logout_link
-  <button type="button" id="logout-button" title="$_("Logout")" onclick="location.href='${document.base_url}$prewikka.logout_link'"></button>
-  #end if
-  </div>
-
-  <div class="topmenu_item_user">
-    #set $lnk = $document.base_url + "usersettingsdisplay"
-    #if $varExists("prewikka.user.name")
-     #set $title = $_('%s account') % $prewikka.user.name
-     <p><b><a class="widget-link" title="$title" href="$lnk">$prewikka.user_display</a></b></p>
-    #end if
-  </div>
-  #filter CleanOutput
-
-</div>
-#end filter
-
-#filter Filter
-
-<script type="text/javascript">
-\$(document).ready(function() {
-  \$("#maximize-button").click(function() {
-	\$("#top_view").toggleClass("maximized");
-  });
-
-  \$("span.menu_item_delimiter").on("click", function() {
-    \$(this).nextUntil("span").slideToggle();
-    \$(this).siblings("span.menu_item_delimiter").nextUntil("span").slideUp();
-  });
-
-  \$("a.menu_item_active").prevAll("span.menu_item_delimiter").first().click();
-
-});
-
-</script>
-
-#end filter
-
-#filter CleanOutput
-<div id="menu">
-  #set $style = ''
-  #for $name, $tabs in $interface.sections.items()
-    #if $name == $interface.active_section
-      #set $class_ = 'menu_item_active'
-    #else
-      #set $class_ = 'menu_item_inactive'
-    #end if
-
-    #set $link = ""
-    #for $tab, $views in $tabs.items()
-        #set $firstview = $views.values()[0]
-        #if $prewikka.user and not $prewikka.user.has($firstview.view_permissions):
-            #continue
+        #if $nameToPath($section) != $interface.active_section
+            #set $style="display:none;"
         #end if
 
-        #set $link = $firstview.view_path
-        #break
+        <ul style="$style" class="nav nav-tabs topmenu_section" id="topmenu_$nameToPath($section)">
+        #for $name, $views in $interface.sections.get($section).items()
+            #set $firstview = $views.values()[0]
+
+            #if $prewikka.user and not $prewikka.user.has($firstview.view_permissions):
+                #continue
+            #end if
+
+            #if $nameToPath($name) == $interface.active_tab
+                #set $class_ = 'active'
+            #else
+                #set $class_ = ''
+            #end if
+
+            <li role="presentation" class="$class_ topmenu_item"><a href="$firstview.view_path" class="topmenu_links">$_($name)</a></li>
+        #end for
+        </ul>
     #end for
-
-    #if not $tabs
-      ## Display a delimiter if the section has no tabs
-      <span class="menu_item_delimiter">$_($name)</span>
-      #set $style = 'display:none;'
-    #else if $link
-      ## Display a clickable section if an accessible tab was found
-      <a class="menu_item menu_item_$nameToPath(name) $class_" href="$link" style="$style">$_($name)</a>
-    ##else
-      ## Do not display the section, the user miss the necessary permissions
-    #end if
-  #end for
-
 #end filter
 
-<span>
-## Empty span for section (un)folding
-</span>
+    </div>
 
+    <div id="prewikka-view-config-nav" class="pull-right">
+        <a type="button" data-toggle="collapse" class="pull-right" data-target="#prewikka-view-config-content"><span style="font-size: 20px;">&#9881;</span></a>
+        <form id="prewikka-view-config-form">
+            <div class="collapse" id="prewikka-view-config-content"></div>
+        </form>
+    </div>
 </div>
+
 <div id="_main_viewport"></div>
 <div id="_main">
- <div id="ajax-spinner" class="ajax-spinner" style="display:none;">
-  <img id="img-spinner" src="prewikka/images/ajax-loader.gif" alt="Loading"/>
- </div>
- <div id="main" class="content" />
+    <div id="ajax-spinner" class="ajax-spinner" style="display:none;">
+        <img id="img-spinner" src="prewikka/images/ajax-loader.gif" alt="Loading"/>
+    </div>
+    <div id="main" class="content" />
 </div>
 
 #end block toplayout_content
