@@ -456,8 +456,8 @@
             text: {
                 element : function(settings, original) {
                     var input = $('<input />');
-                    if (settings.width  != 'none') { input.width(settings.width);  }
-                    if (settings.height != 'none') { input.height(settings.height); }
+                    if (settings.width  != 'none') { input.css("width", settings.width);  }
+                    if (settings.height != 'none') { input.css("height", settings.height); }
                     /* https://bugzilla.mozilla.org/show_bug.cgi?id=236791 */
                     //input[0].setAttribute('autocomplete','off');
                     input.attr('autocomplete','off');
