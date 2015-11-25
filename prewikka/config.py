@@ -45,7 +45,8 @@ class Config(object):
             if not os.path.isabs(fpattern):
                 fpattern = os.path.join(siteconfig.conf_dir, fpattern)
 
-            for fname in glob.glob(fpattern):
+            # Files are loaded in alphabetical order
+            for fname in sorted(glob.glob(fpattern)):
                 self._load_config(fname)
 
     def _load_config(self, filename):
