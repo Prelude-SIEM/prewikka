@@ -69,7 +69,7 @@ def _gen_option_list(iterator, selected):
 
     return out
 
-def get_html_select(selected_path, default_paths=None):
+def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max_paths=0):
     _default_paths = default_paths or {
         "Source IP": "alert.source(0).node.address(0).address",
         "Source Port": "alert.source.service.port",
@@ -79,25 +79,41 @@ def get_html_select(selected_path, default_paths=None):
         "Analyzer": "alert.analyzer(-1).name"
     }
 
-    _html_default_value = _gen_option_list(_default_paths.items(), selected_path)
-    _html_all_value = _gen_option_list(((i, i) for i in _get_path_list() if i not in _default_paths.values()), selected_path)
+    if selected_paths is None:
+        selected_paths = []
 
-    return """
+    _html_default_value = _gen_option_list(_default_paths.items(), selected_paths)
+
+    html = """
 <link rel="stylesheet" type="text/css" href="prewikka/css/chosen.min.css">
+<link rel="stylesheet" type="text/css" href="prewikka/css/bootstrap-chosen.css">"""
 
-<select class="data-paths chosen-sortable" multiple name="selected_path" data-placeholder="%s">
+    html += """<select class="data-paths chosen-sortable form-control" %s name="selected_path" data-placeholder="%s">""" % (
+        "multiple" if max_paths != 1 else "",
+        escape_html_string(_("Select paths..."))
+    )
+
+    html += """
     <optgroup label="%s">
     %s
     </optgroup>
+""" % (escape_html_string(_("Default paths")), _html_default_value)
+
+    if all_paths:
+        _html_all_value = _gen_option_list(((i, i) for i in _get_path_list() if i not in _default_paths.values()), selected_paths)
+        html += """
     <optgroup label="%s">
     %s
-    </optgroup>
+    </optgroup>""" % (escape_html_string(_("All paths")), _html_all_value)
+
+    html += """
 </select>
 
 <script type="text/javascript">
     $LAB.script("prewikka/js/chosen.jquery.min.js").wait()
         .script("prewikka/js/jquery-chosen-sortable.js").wait(function() {
             $(".data-paths").chosen({
+                max_selected_options: %d,
                 width: "100%%",
                 search_contains: true
              }).chosenSortable();
@@ -105,7 +121,7 @@ def get_html_select(selected_path, default_paths=None):
             var select = $(".data-paths");
             var container = select.siblings('.chosen-container');
             var list = container.find('.chosen-choices');
-            var sorted_elements = "%s".split(',').reverse();
+            var sorted_elements = %s;
 
             for (var i = 0; i < sorted_elements.length; ++i) {
                 var value = sorted_elements[i];
@@ -120,11 +136,6 @@ def get_html_select(selected_path, default_paths=None):
             }
          });
 </script>
-""" % (
-    escape_html_string(_("Select paths...")),
-    escape_html_string(_("Default paths")),
-    _html_default_value,
-    escape_html_string(_("All paths")),
-    _html_all_value,
-    ','.join(selected_path)
-)
+""" % (max_paths, list(reversed(selected_paths)))
+
+    return html
