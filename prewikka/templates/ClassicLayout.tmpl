@@ -70,7 +70,7 @@ function check_same_origin(url) {
         \$(document).on("submit", "#main form", function() {
                 \$(this).find("input[name=_download]").remove();
 
-                var data = \$(this).add("#prewikka-view-config-form").serialize();
+                var data = \$(this).serialize();
 
                 if ( \$(this).data("clicked") ) {
                         data += "&" + \$(this).data("clicked");
@@ -132,21 +132,14 @@ function check_same_origin(url) {
         </ul>
     #end for
 #end filter
-
     </div>
-
-    <div id="prewikka-view-config-nav" class="pull-right">
-        <a type="button" data-toggle="collapse" class="pull-right" data-target="#prewikka-view-config-content"><span style="font-size: 20px;">&#9881;</span></a>
-        <form id="prewikka-view-config-form">
-            <div class="collapse" id="prewikka-view-config-content"></div>
-        </form>
-    </div>
+    <a type="button" id="config-button" data-toggle="collapse" class="pull-right" data-target=".prewikka-view-config"><span style="font-size: 20px;">&#9881;</span></a>
 </div>
 
 <div id="_main_viewport"></div>
 <div id="_main">
     <div id="ajax-spinner" class="ajax-spinner" style="display:none;">
-        <img id="img-spinner" src="prewikka/images/ajax-loader.gif" alt="Loading"/>
+        <img id="img-spinner" src="prewikka/images/ajax-loader.gif" alt="$_('Loading')"/>
     </div>
     <div id="main" class="content" />
 </div>

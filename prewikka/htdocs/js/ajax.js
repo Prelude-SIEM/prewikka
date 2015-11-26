@@ -131,23 +131,7 @@ function prewikka_drawTab(data)
     $("#topmenu #help-button").hide();
     $("#timeline #view-settings #main_menu_form").hide();
 
-    $("#prewikka-view-config-content").html("");
-    var vc = $("#main .prewikka-view-config");
-    if ( vc.length ) {
-        $("#_main").css("top", "125px");
-        $("#prewikka-view-config-nav").show();
-        $("#prewikka-view-config-toggle").show();
-        vc.appendTo("#prewikka-view-config-content");
-
-        $("#prewikka-view-config-form").on("submit", function() {
-            $("#main form").submit();
-            return false;
-        });
-    } else {
-        $("#prewikka-view-config-nav").hide();
-        $("#prewikka-view-config-toggle").hide();
-        $("#_main").css("top", "100px");
-    }
+    $("#config-button").toggle($("#main .prewikka-view-config").length > 0);
 
     var vh = $("#main .prewikka-view-help");
     if ( vh.length )  {
