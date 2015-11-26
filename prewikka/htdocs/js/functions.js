@@ -123,7 +123,7 @@ $(document).ready(function(){
 function prewikka_dialog(data)
 {
     $("#prewikka-dialog").dialog("option", "title", data.name || "Prewikka Dialog");
-    $("#prewikka-dialog .content").html(data.message);
+    $("#prewikka-dialog .content").text(data.message);
 
     if ( data.traceback ) {
         $("#prewikka-dialog div.traceback").show();
