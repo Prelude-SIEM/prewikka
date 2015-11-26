@@ -62,29 +62,33 @@
 
 #filter CleanOutput
             <div class="collapse navbar-collapse" id="main_navbar_collapse">
+            #if $prewikka.user_display
                 <ul class="nav navbar-nav">
-                #for $delimiter in $interface.navbar
-                    #if $delimiter['active']
-                        #set $class_ = 'active'
-                    #else
-                        #set $class_ = ''
-                    #end if
-                    <li class="dropdown $class_">
-                        <a class="dropdown-toggle" data-toggle="dropdown">$_($delimiter['name'])<span class="caret"></span></a>
+                #for $index, ($section, $tabs) in $enumerate($interface.sections.items()):
+                    #if not $tabs
+                        #if $index != 0
+                        </ul>
+                    </li>
+                        #end if
+                        #if $index != len($interface.sections) - 1
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown">$_($section)<span class="caret"></span></a>
                         <ul class="dropdown-menu" role="menu">
-                        #for $section in $delimiter['sections']
-                            <li><a href="$section['link']">$_($section['name'])</a></li>
-                        #end for
-                        #if $delimiter.get('extend')
+                        #end if
+                    #else
+                            <li><a href="${tabs.values()[0].values()[0].view_path}">$_($section)</a></li>
+                        #if $index == len($interface.sections) - 1
                             <li role="separator" class="divider"></li>
                             <li><a class="widget-link" title="$_("About")" href="$prewikka.about">$_("About")</a></li>
                             #if $prewikka.logout_link
                             <li><a title="$_("Logout")" href="$prewikka.logout_link" data-confirm="$_("Are you sure you want to Logout ?")">$_("Logout")</a></li>
                             #end if
-                        #end if
                         </ul>
                     </li>
+                        #end if
+                    #end if
                 #end for
+            #end if
 #end filter
                 </ul>
                 <ul class="nav navbar-nav navbar-right" id="nav_top_view_header">

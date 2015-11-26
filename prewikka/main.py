@@ -60,8 +60,7 @@ class BaseView(view._View):
             theme_name = env.config.default_theme
 
 
-        dataset["document.title"] = interface.getOptionValue("browser_title",
-                                                             "Prelude SIEM")
+        dataset["document.title"] = interface.getOptionValue("browser_title", "Prelude SIEM")
 
         dataset["document.css_files"] = ["prewikka/css/jquery-ui.min.css",
                                          "prewikka/css/bootstrap.min.css",
@@ -79,10 +78,9 @@ class BaseView(view._View):
                                         "prewikka/js/jquery-ui-timepicker-addon.min.js",
                                         "prewikka/js/jquery.jstree.js"]
 
-        dataset["prewikka.software"] = interface.getOptionValue(\
-                "software",
-                "<img src='prewikka/images/prelude-logo.png'\
-                      alt='Prelude' />")
+        dataset["prewikka.software"] = interface.getOptionValue(
+            "software",
+            "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />")
 
         dataset["prewikka.place"] = interface.getOptionValue("place", "")
         dataset["prewikka.date"] = localization.format_date()
@@ -102,47 +100,11 @@ class BaseView(view._View):
 
         dataset["interface.active_tab"] = active_tab
         dataset["interface.active_section"] = active_section
-        sections = env.viewmanager.getSections(user) if env.viewmanager else {}
-        dataset["interface.sections"] = sections
+        dataset["interface.sections"] = env.viewmanager.getSections(user) if env.viewmanager else {}
         dataset["toplayout_extra_content"] = ""
 
         all(env.hookmgr.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT",
                                 request, user, dataset))
-        if user:
-            dataset["interface.navbar"] = self._generate_navbar(sections,
-                                                                active_section)
-        else:
-            dataset["interface.navbar"] = []
-
-    @staticmethod
-    def _generate_navbar(sections, active_section):
-        """ Generate a dictionary representing the navigation bar to generate.
-            [{name: delimiter,
-              active: True,
-              sections: [{name: section, link: link}] }, ]"""
-
-        navbar = []
-        for name, tabs in sections.items():
-            if not tabs:
-                navbar.append({'name':name,
-                               'active': False,
-                               'sections': []})
-            else:
-                link = tabs.values()[0].values()[0].view_path
-                if not navbar:
-                    navbar.append({'name': _("Other"),
-                                   'active': False, 'sections': []})
-                if name == active_section:
-                    navbar[-1]['active'] = True
-
-                navbar[-1]['sections'].append({'name': name, 'link': link})
-
-        navbar[-1]['extend'] = True  # If This delimiter can have
-                                                # additional menu
-
-
-        return navbar
-
 _core_cache = {}
 _core_cache_lock = Lock()
 
