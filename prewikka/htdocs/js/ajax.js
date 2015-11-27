@@ -217,14 +217,15 @@ function prewikka_widget(settings)
 
         var dlg = $('<div class="widget-dialog" />');
 
-        var conf = _mergedict({ width: $("#_main").width() / 2,
+        var conf = _mergedict({ width: $("#_main").width() * 0.9,
                                 height: "auto",
                                 autoOpen: false,
                                 maxWidth: $("#_main").width(),
                                 maxHeight: prewikka_dialog_getMaxHeight(),
                                 draggable: true,
+                                modal: true,
                                 buttons: undefined,
-                                position: { my: "center", at: "center", "of": "#_main_viewport", within: "#_main_viewport" },
+                                position: { my: "center", at: "center", "of": window },
                                 collision: "fit",
                                 appendTo: "#_main",
                                 close: function() {
@@ -257,14 +258,13 @@ function prewikka_widget(settings)
 
                 /*
                  * Create the dialog before appending the content, so that the content might depend on the dialog
-                 * Open the dialog only after the content has been loaded, to prevent positionning issue
+                 * Open the dialog before loading the content, as some libraries need elements to be displayed
+                 * Force a dialog re-positioning due to the content change
                  */
                 $(dlg).dialog(conf);
-                $(dlg).append(content);
                 $(dlg).dialog("open");
-
-                if ( conf["draggable"] )
-                        dlg.parents(".ui-dialog").draggable({containment: "#_main"});
+                $(dlg).append(content);
+                $(dlg).dialog("option", "position", conf.position);
         });
 }
 
