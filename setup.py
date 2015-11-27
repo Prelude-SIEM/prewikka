@@ -252,6 +252,12 @@ setup(name="prewikka",
                 'prewikka.renderer.type': [
                 ],
 
+                'prewikka.dataprovider.backend': [
+                ],
+
+                'prewikka.dataprovider.type': [
+                ],
+
                 'prewikka.plugins': [
                 ],
 

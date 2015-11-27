@@ -29,7 +29,7 @@ except ImportError:
 
 from prewikka import view, config, log, database, idmefdatabase, version, \
                      auth, error, utils, localization, resolve, theme, \
-                     pluginmanager, renderer, env
+                     pluginmanager, renderer, env, dataprovider
 from prewikka.myconfigparser import ConfigParserSection
 
 from prewikka.templates import ClassicLayout
@@ -258,6 +258,7 @@ class Core:
                 env.viewmanager.addView(Logout())
 
         env.renderer = renderer.RendererPluginManager()
+        env.dataprovider = dataprovider.DataProviderManager()
 
         self._last_plugin_activation_change = last_change or env.db.get_last_plugin_activation_change()
 
