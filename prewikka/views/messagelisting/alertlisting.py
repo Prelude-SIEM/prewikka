@@ -1257,7 +1257,7 @@ class AlertListing(MessageListing):
 
 
 class CorrelationAlertListing(AlertListing, view.View):
-    view_name = N_("CorrelationAlerts")
+    view_name = N_("Threats")
     view_parameters = CorrelationAlertListingParameters
     alert_type_default = [ "alert.correlation_alert.name" ]
     view_order = 1
