@@ -253,7 +253,7 @@ class Core:
         if env.session.can_logout():
                 env.viewmanager.addView(Logout())
 
-        env.renderer = renderer.RendererPluginManager("prewikka.renderer")
+        env.renderer = renderer.RendererPluginManager()
 
         self._last_plugin_activation_change = last_change or env.db.get_last_plugin_activation_change()
 

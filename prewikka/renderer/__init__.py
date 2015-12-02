@@ -96,7 +96,7 @@ class RendererBackend(pluginmanager.PluginBase):
 class RendererPluginManager(pluginmanager.PluginManager):
     _default_backends = {}
 
-    def __init__(self, entrypoint):
+    def __init__(self):
         self._backends = pluginmanager.PluginManager("prewikka.renderer.backend")
         pluginmanager.PluginManager.__init__(self, "prewikka.renderer.type")
 
