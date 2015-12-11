@@ -167,7 +167,7 @@
     </div>
     <div class="panel-body">
       <p>
-        <center><b style="color:red;">$_("The following plugins need to be updated before they can be loaded into the system")</b></center>
+        <center><b style="color:red;">$_("The following apps need to be updated before they can be loaded into the system")</b></center>
       </p>
 
       #for $name, $list in $sorted($maintenance.items())
@@ -208,7 +208,7 @@
 #end if
   <div class="panel panel-primary">
     <div class="panel-heading">
-      <h3 class="panel-title">$_("Installed Plugins")</h3>
+      <h3 class="panel-title">$_("Installed Apps")</h3>
     </div>
     <div class="panel-body">
       #for $name, $list in $sorted($installed.items())

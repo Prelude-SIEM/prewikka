@@ -32,7 +32,7 @@ class AboutPlugin(view.View):
     plugin_copyright = version.__copyright__
     plugin_description = N_("Plugin installation and activation management page")
 
-    view_name = N_("Plugins")
+    view_name = N_("Apps")
     view_template = templates.aboutplugin
     view_section = N_("Settings")
     view_permissions = [ usergroup.PERM_USER_MANAGEMENT ]
@@ -44,12 +44,12 @@ class AboutPlugin(view.View):
             self.optional("enable_plugin", [str])
 
     view_parameters = AboutPluginParameters
-    _all_plugins = ((_("View plugins"), "prewikka.views"),
-                    (_("API plugins"), "prewikka.plugins"),
-                    (_("Authentication plugins"), "prewikka.auth"),
-                    (_("Session plugins"), "prewikka.session"),
-                    (_("Renderer plugins"), "prewikka.renderer.backend"),
-                    (_("Renderer type"), "prewikka.renderer.type"))
+    _all_plugins = ((_("Apps: View"), "prewikka.views"),
+                    (_("Apps: API"), "prewikka.plugins"),
+                    (_("Apps: Authentication"), "prewikka.auth"),
+                    (_("Apps: Identification"), "prewikka.session"),
+                    (_("Apps: Renderer backend"), "prewikka.renderer.backend"),
+                    (_("Apps: Renderer type"), "prewikka.renderer.type"))
 
     def _apply_update(self, data):
         self.dataset = None
