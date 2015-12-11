@@ -1,7 +1,7 @@
 #filter CleanOutput
 <label for="menu_filter_select" class="label-xs">$_("Filter:")</label>
-<select id="menu_filter_select" name="filter" class="form-control input-sm">
-    <option value="">$_("Select your filter")</option>
+<select id="menu_filter_select" name="filter" class="form-control input-sm" data-toggle="tooltip" title="$_("Alert filter")" data-trigger="hover" data-container="body">
+    <option value="">$_("No filter")</option>
     #for $fltr in $filters
         #if $fltr == $current_filter
             #set $selected = "selected=\"selected\""

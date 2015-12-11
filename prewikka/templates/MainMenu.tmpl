@@ -34,11 +34,13 @@
           </div>
 
           <div class="form-group">
-               <div class="btn-group">
+               <div class="btn-group" id="dropdown-refresh">
                     <label class="label-xs">$_("Refresh:")</label><br>
-                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div data-toggle="tooltip" title="$_("Update frequency of the current page")" data-trigger="hover" data-container="body">
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#dropdown-refresh">
                          <span class="reload-icon">&#8634; </span><span id="refresh-value">$timeline.refresh_selected</span> <span class="caret"></span>
                     </button>
+                    </div>
 
                     <ul class="dropdown-menu" id="refresh-select">
                     #for label, value in $timeline.refresh
@@ -51,11 +53,13 @@
           </div>
 
           <div class="form-group">
-               <div class="btn-group">
+               <div class="btn-group" id="dropdown-period">
                     <label class="label-xs">$_("Period:")</label><br>
-                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    <div data-toggle="tooltip" title="$_("Period to visualize")" data-trigger="hover" data-container="body">
+                    <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#dropdown-period">
                          <span id="timeline_quick_selected">$timeline.quick_selected</span> <span class="caret">
                     </button>
+                    </div>
 
                     <ul class="dropdown-menu" id="timeline_quick_select">
                          <li><a data-value="" data-unit="" id="timeline_quick_select_custom">$_("Custom")</a></li>
@@ -69,12 +73,12 @@
 
           <div class="form-group form-group-date">
                <label for="timeline_start" class="label-xs">$_("Start:")</label>
-               <input class="btn btn-default input-sm btn-sm" type="text" id="timeline_start" name="" placeholder="$_("start")" value="">
+               <input class="btn btn-default input-sm btn-sm" type="text" id="timeline_start" name="" placeholder="$_("start")" value="" data-toggle="tooltip" title="$_("Date of the oldest alert to visualize")" data-trigger="hover" data-container="body">
           </div>
 
           <div class="form-group form-group-date">
                <label for="timeline_end" class="label-xs">$_("End:")</label>
-               <input class="btn btn-default input-sm btn-sm" type="text" id="timeline_end" placeholder="$_("end")" value="">
+               <input class="btn btn-default input-sm btn-sm" type="text" id="timeline_end" placeholder="$_("end")" value="" data-toggle="tooltip" title="$_("Date of the most recent alert to visualize")" data-trigger="hover" data-container="body">
           </div>
 
           <button class="btn btn-primary btn-sm btn-submit disabled" id="main_menu_form_submit" type="submit">$_("Go!")</button>
