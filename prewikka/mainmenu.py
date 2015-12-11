@@ -41,7 +41,7 @@ class MainMenuParameters(view.Parameters):
     def register(self):
         view.Parameters.register(self)
 
-        self.optional("timeline_value", int, default=1, save=True, general=True)
+        self.optional("timeline_value", int, default=24*31, save=True, general=True)
         self.optional("timeline_unit", str, default="hour", save=True, general=True)
         self.optional("timeline_end", long, save=True, general=True)
         self.optional("timeline_start", long, save=True, general=True)
