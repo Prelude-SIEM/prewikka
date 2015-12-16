@@ -120,3 +120,14 @@ function resizeGrids() {
 function getCellValue(cellvalue, options, cell) {
     return $(cell).text() || $(cell).find(":input").val();
 }
+
+function setConfirmDialogPosition(grid, form) {
+    var rowid = grid.jqGrid('getGridParam', 'selrow');
+    // Do not use jQuery selector because rowid may contain dots
+    var row = document.getElementById(rowid);
+    form.closest('div.ui-jqdialog').position({
+        my: "right",
+        at: "right",
+        of: $(row)
+    });
+}
