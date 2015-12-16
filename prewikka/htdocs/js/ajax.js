@@ -21,7 +21,7 @@ $(document).ready(function(){
            prewikka_dialog($.parseJSON(xhr.responseText));
   });
 
-  $(window).on('resize', __autocollapse);
+  $(window).on('resize', prewikka_resizeTopMenu);
 });
 
 
@@ -73,30 +73,6 @@ function __ie_fixes(data)
     return data;
 }
 
-function __autocollapse() {
-    var mainmenu = $('#main_menu_navbar');
-    var topmenu = $("#topmenu .topmenu_nav");
-    var window_width = $(window).width();
-
-    mainmenu.removeClass('collapsed'); // set standard view
-    $("#main").css("margin-top", "");
-    topmenu.css("height", "")
-           .css("width", window_width - $("#main_menu_navbar").innerWidth());
-
-    if ( Math.max(mainmenu.innerHeight(), topmenu.innerHeight()) > 60 ) { // check if the topmenu or mainmenu is split across two lines
-        mainmenu.addClass('collapsed');
-
-        topmenu.css("width", window_width - $("#main_menu_navbar").innerWidth());
-
-        var height = Math.max(mainmenu.innerHeight(), topmenu.innerHeight());
-
-        if ( height > 60 ) { // check if we've still got 2 lines or more
-            $("#main").css("margin-top", height - 40);
-            topmenu.css("height", height);
-        }
-    }
- }
-
 function prewikka_drawTab(data)
 {
     var form;
@@ -126,7 +102,7 @@ function prewikka_drawTab(data)
     $("#main").off(); /* clear any events bound to this content by the current view */
     $("#main").html(content);
 
-    __autocollapse();
+    prewikka_resizeTopMenu();
 
     $("#topmenu #help-button").hide();
     $("#timeline #view-settings #main_menu_form").hide();
@@ -148,10 +124,6 @@ function prewikka_drawTab(data)
         $('[data-toggle="tooltip"]').tooltip();
     });
 }
-
-String.prototype.capitalize = function() {
-        return this.charAt(0).toUpperCase() + this.slice(1);
-};
 
 /* Update the tab's menu according to the url */
 function _url2menu(url)

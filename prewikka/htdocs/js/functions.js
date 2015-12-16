@@ -1,3 +1,8 @@
+String.prototype.capitalize = function() {
+    return this.charAt(0).toUpperCase() + this.slice(1);
+};
+
+
 $(document).ready(function(){
   var $cache = null;
   var $cachef = null;
@@ -119,6 +124,29 @@ $(document).ready(function(){
   });
 });
 
+function prewikka_resizeTopMenu() {
+    var mainmenu = $('#main_menu_navbar');
+    var topmenu = $("#topmenu .topmenu_nav");
+    var main = $("#main");
+    var window_width = $(window).width();
+
+    mainmenu.removeClass('collapsed'); // set standard view
+    main.css("margin-top", "");
+    topmenu.css("height", "").css("width", window_width - mainmenu.innerWidth());
+
+    if ( Math.max(mainmenu.innerHeight(), topmenu.innerHeight()) > 60 ) { // check if the topmenu or mainmenu is split across two lines
+        mainmenu.addClass('collapsed');
+
+        topmenu.css("width", window_width - mainmenu.innerWidth());
+
+        var height = Math.max(mainmenu.innerHeight(), topmenu.innerHeight());
+
+        if ( height > 60 ) { // check if we've still got 2 lines or more
+            main.css("margin-top", height - 40);
+            topmenu.css("height", height);
+        }
+    }
+}
 
 function prewikka_dialog(data)
 {
@@ -132,29 +160,20 @@ function prewikka_dialog(data)
         $("#prewikka-dialog div.traceback").hide();
     }
 
-    /*
-     * If the session expired, we proceed to reload the whole page when
-     * the user validate the dialog. This will redirect the user to the
-     * Prewikka logging page.
-     */
-    if ( data.code == 401 ) {
-        $("#prewikka-dialog").dialog('option', 'buttons', [{
-                text: 'Ok',
-                'class': 'btn btn-default',
-                click: function() {
-                        $(this).dialog('close');
-                        location.reload();
-                }
-        }]);
-    } else {
-        $("#prewikka-dialog").dialog('option', 'buttons', [{
-                text: 'Ok',
-                'class': 'btn btn-default',
-                click: function() {
-                        $(this).dialog('close');
-                }
-        }]);
-    }
+    $("#prewikka-dialog").dialog('option', 'buttons', [{
+        text: 'Ok',
+        'class': 'btn btn-default',
+        click: function() {
+            $(this).dialog('close');
+            /*
+             * If the session expired, we proceed to reloading the whole page
+             * when the user validates the dialog. This will redirect the user
+             * to the Prewikka login page.
+             */
+            if ( data.code === 401 )
+                location.reload();
+        }
+    }]);
 
     $("#prewikka-dialog").dialog("open");
 }
