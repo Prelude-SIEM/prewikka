@@ -57,8 +57,8 @@
 <td>
   <a class="popup_menu_toggle">$message.agent.value</a>
   <span class="popup_menu">
-   - <a href="$message.summary" title="$_('Heartbeat details')" class="widget-link">$_("See heartbeat details")</a><br />
-   - <a href="$message.agent.inline_filter">$_("Filter on agent")</a>
+   <a href="$message.summary" title="$_('Heartbeat details')" class="widget-link">$_("See heartbeat details")</a>
+   <a href="$message.agent.inline_filter">$_("Filter on agent")</a>
   </span>
 </td>
 
@@ -67,15 +67,15 @@
     #for $address in $message["node.address(*).address"]
     <a class="popup_menu_toggle">$address.value</a>
     <span class="popup_menu">
-      - <a href="$address.inline_filter">$_("Filter on address")</a><br />
+      <a href="$address.inline_filter">$_("Filter on address")</a>
       #if $env.enable_details
-      - <a target="$env.external_link_target" href="$env.host_details_url?host=$address.value">Address information</a><br />
+      <a target="$env.external_link_target" href="$env.host_details_url?host=$address.value">Address information</a>
       #end if
       #for $name, $link, $widget in $address.host_links
       #if $widget
-       - <a href="$link" class="widget-link" title="$name">$name</a><br />
+       <a href="$link" class="widget-link" title="$name">$name</a>
       #else
-       - <a href="$link" target="_$name">$name</a><br />
+       <a href="$link" target="_$name">$name</a>
       #end if
       #end for
     </span>

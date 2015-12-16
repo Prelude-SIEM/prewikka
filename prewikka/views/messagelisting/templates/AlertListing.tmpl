@@ -330,13 +330,13 @@ if ( window._messagelisting_title_array == undefined ) {
 #def classificationWrite(info, text)
 <a class="impact_severity_$info.severity.value popup_menu_toggle">$text</a><span class="popup_menu">
 #if $info.count == 1
-- <a class="widget-link" title="$_('Alert details')" href="$info.display">$_("See alert details")</a><br />
+<a class="widget-link" title="$_('Alert details')" href="$info.display">$_("See alert details")</a>
 #end if
 #if not $info.classification.already_filtered
-- <a href="$info.classification.inline_filter">$_("Filter on this classification")</a><br />
+<a href="$info.classification.inline_filter">$_("Filter on this classification")</a>
 #end if
 #for name, url in $info.classification_url
-- <a href="$url">$name</a><br />
+<a href="$url">$name</a>
 #end for
 </span>#slurp
 #end def
@@ -345,7 +345,7 @@ if ( window._messagelisting_title_array == undefined ) {
 #if $time_url
 <a class="popup_menu_toggle">$text</a><span class="popup_menu">
 #for name, url in $time_url
-- <a href="$url">$name</a><br />
+<a href="$url">$name</a>
 #end for
 </span>#slurp
 #else
@@ -362,9 +362,9 @@ $text
 #if $direction.service.value != None#$hstr
        <a class="popup_menu_toggle">$direction.service.value</a>
        <span class="popup_menu">
-        #filter Filter - $writeInlineFilter($direction.service, $_("Filter on this port/protocol"))<br/> #end filter
+        #filter Filter $writeInlineFilter($direction.service, $_("Filter on this port/protocol"))#end filter
         #if $direction.port.value and $env.enable_details
-        - <a target="$env.external_link_target" href="$env.port_details_url?port=$str($direction.port.value)&amp;protocol=$protocol">$_("Port/protocol information")</a>
+        <a target="$env.external_link_target" href="$env.port_details_url?port=$str($direction.port.value)&amp;protocol=$protocol">$_("Port/protocol information")</a>
         #end if
        </span>#slurp
 #end if
@@ -439,18 +439,17 @@ $text
       #for $address in $direction.addresses
 
        <a class="popup_menu_toggle">$address.hostname</a><span class="popup_menu">
-         - #filter Filter $writeInlineFilter($address, $str($_("Filter on this %s") % ($name))) #end filter
-         <br />
+         #filter Filter $writeInlineFilter($address, $str($_("Filter on this %s") % ($name))) #end filter
 
        #if $address.value and (not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net"))
          #if $env.enable_details
-         - <a target="$env.external_link_target" href="$env.host_details_url?host=$address.value">$str($_("%s information") % ($name)).capitalize()</a><br />
+         <a target="$env.external_link_target" href="$env.host_details_url?host=$address.value">$str($_("%s information") % ($name)).capitalize()</a>
          #end if
          #for $linkname, $link, $widget in $address.host_links
           #if $widget
-          - <a href="$link" class="widget-link" title="$linkname">$linkname</a><br />
+          <a href="$link" class="widget-link" title="$linkname">$linkname</a>
           #else
-          - <a href="$link" target="_$linkname">$linkname</a><br />
+          <a href="$link" target="_$linkname">$linkname</a>
           #end if
          #end for
        #end if
