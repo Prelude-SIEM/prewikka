@@ -67,6 +67,7 @@ class BaseView(view._View):
                                          "prewikka/css/demo_table_jui.css",
                                          "prewikka/css/jquery.jstree.css",
                                          "prewikka/css/jquery-ui-timepicker-addon.min.css",
+                                         "prewikka/css/font-awesome.min.css",
                                          "prewikka/css/themes/%s.css" % theme_name]
 
         dataset["document.js_files"] = ["prewikka/js/jquery.js",
