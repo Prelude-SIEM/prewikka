@@ -44,7 +44,7 @@ def idmef_criteria_to_urlparams(paths, values, operators=None, index=0):
         # FIXME: The column type is alertlisting specific, in the long run, we need
         # to suppress this, and standardize all IDMEF parameters handling accross view
         ctype = prelude.IDMEFPath(path).getName(1)
-        if ctype == "assessment" or ctype == "correlation_alert":
+        if ctype in ("assessment", "correlation_alert", "overflow_alert", "tool_alert", "additional_data"):
             ctype = "classification"
 
         if ctype not in ("classification", "source", "target", "analyzer"):
