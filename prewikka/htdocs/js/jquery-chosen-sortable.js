@@ -12,14 +12,24 @@
 (function($) {
     $.fn.chosenOrder = function() {
         var $this = this.filter('.chosen-sortable[multiple]').first(),
-            $chosen = $this.siblings('.chosen-container');
+            $chosen = $this.siblings('.chosen-container'),
+            unselected = [],
+            sorted;
 
-        return $($chosen.find('.chosen-choices li[class!="search-field"]').map( function() {
+        $this.find('option').each(function() {
+            !this.selected && unselected.push(this);
+        });
+
+        sorted = $($chosen.find('.chosen-choices li[class!="search-field"]').map(function() {
             if (!this) {
                 return undefined;
             }
-            return $this.find('option:contains(' + $(this).text() + ')')[0];
+            var text = $.trim($(this).text());
+            return $this.find('option').filter(function() { return $(this).html() == text; })[0];
         }));
+
+        sorted.push.apply(sorted, unselected);
+        return sorted;
     };
 
     /*
@@ -52,6 +62,7 @@
                 var $options = $select.chosenOrder();
                 $select.children().remove();
                 $select.append($options);
+                $select.trigger("chosen:updated");
             });
         });
     };
