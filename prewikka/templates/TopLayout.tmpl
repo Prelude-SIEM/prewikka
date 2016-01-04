@@ -1,4 +1,5 @@
 #extends prewikka.templates.HTMLDocument
+#from prewikka import env
 
 #def body_class()
 #end def
@@ -69,11 +70,24 @@
                         #end if
                         #if $index != len($interface.sections) - 1
                     <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown">$_($section)<span class="caret"></span></a>
+                        <a class="dropdown-toggle" data-toggle="dropdown">
+                            #if $env.config.section_order.get($section)
+                                <i class="fa fa-$env.config.section_order[$section].value"></i>
+                            #end if
+                            $_($section)
+                            <span class="caret"></span>
+                        </a>
                         <ul class="dropdown-menu" role="menu">
                         #end if
                     #else
-                            <li><a href="${tabs.values()[0].values()[0].view_path}">$_($section)</a></li>
+                            <li>
+                                <a href="${tabs.values()[0].values()[0].view_path}">
+                                #if $env.config.section_order.get($section)
+                                    <i class="fa fa-$env.config.section_order[$section].value"></i>
+                                #end if
+                                $_($section)
+                                </a>
+                            </li>
                         #if $index == len($interface.sections) - 1
                             <li role="separator" class="divider"></li>
                             <li><a class="widget-link" title="$_("About")" href="$prewikka.about">$_("About")</a></li>
