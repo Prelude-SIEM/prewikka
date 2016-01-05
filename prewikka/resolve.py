@@ -121,6 +121,9 @@ class AddressResolve:
     def __init__(self, addr, format=None):
         global resolver
 
+        if not isinstance(addr, str):
+            raise TypeError('AddressResolve expects a valid IP address to resolve')
+
         self._addr = addr
         self._name = None
         self._formater = format
@@ -129,7 +132,7 @@ class AddressResolve:
             resolver.resolve(addr, self._resolve_cb)
 
     def __len__(self):
-        return len(self)
+        return len(str(self))
 
     def resolveSucceed(self):
         if self._name:
