@@ -250,3 +250,17 @@ function prewikka_getRenderSize(container, options)
 
         return size;
 }
+
+
+function prewikka_grid(table, settings) {
+    var conf = _mergedict({
+        datatype: "local",
+        cmTemplate: {title: false},
+        autoencode: true,
+        autowidth: true,
+        forceFit: true,
+        shrinkToFit: true,
+    }, settings);
+
+    return $(table).jqGrid(conf);
+}

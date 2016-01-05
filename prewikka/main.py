@@ -59,15 +59,15 @@ class BaseView(view._View):
         except:
             theme_name = env.config.default_theme
 
-
         dataset["document.title"] = interface.getOptionValue("browser_title", "Prelude SIEM")
 
         dataset["document.css_files"] = ["prewikka/css/jquery-ui.min.css",
                                          "prewikka/css/bootstrap.min.css",
-                                         "prewikka/css/demo_table_jui.css",
                                          "prewikka/css/jquery.jstree.css",
                                          "prewikka/css/jquery-ui-timepicker-addon.min.css",
                                          "prewikka/css/font-awesome.min.css",
+                                         "prewikka/css/ui.jqgrid.min.css",
+                                         "prewikka/css/ui.multiselect.css",
                                          "prewikka/css/themes/%s.css" % theme_name]
 
         dataset["document.js_files"] = ["prewikka/js/jquery.js",
@@ -77,6 +77,9 @@ class BaseView(view._View):
                                         "prewikka/js/ajax.js",
                                         "prewikka/js/underscore-min.js",
                                         "prewikka/js/jquery-ui-timepicker-addon.min.js",
+                                        "prewikka/js/ui.multiselect.js",
+                                        "prewikka/js/jquery.jqgrid.min.js",
+                                        "prewikka/js/commonlisting.js",
                                         "prewikka/js/jquery.jstree.js"]
 
         dataset["prewikka.software"] = interface.getOptionValue(
