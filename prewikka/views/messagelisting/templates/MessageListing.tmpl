@@ -7,7 +7,8 @@ $messagelisting_scripts
 <link rel="stylesheet" type="text/css" href="messagelisting/css/messagelisting.css">
 
 <script type="text/javascript">
-<!--
+\$LAB.script("messagelisting/js/messagelisting.js").wait();
+
 \$(document).ready(function() {
   \$(document).on("click", "#main form input[name=pdfgen], #main form input[name=csvgen]", function(event) {
         \$("#main form").data("enable-download", true);
@@ -23,11 +24,11 @@ $messagelisting_scripts
    }
 
   \$(".filter_popup_link").click(function(){
-        \$(this).nextAll("div").popupUnique(function(data){data.show()}, function(data){data.hide()})
+        \$(this).nextAll("div").toggle();
         return false;
   });
 });
-//--></script>
+</script>
 
 #def message_listing_header
 #end def
