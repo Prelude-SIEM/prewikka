@@ -561,6 +561,32 @@ div.progress_bar_text {
     text-shadow: 1px 1px 0 #fff;
 }
 
+.label-checkbox {
+  cursor: pointer;
+}
+
+.checkbox-label {
+  display: none;
+  &:checked + .label-checkbox > span {
+    background-color: #5CB85C;
+    &:after {
+      content: "\2714";
+    }
+  }
+  + .label-checkbox > span {
+    margin-left: 5px;
+    margin-bottom: 2px;
+    background-color: #D9534F;
+    &:empty {
+      display:inherit;
+    }
+    &:after {
+      content: "\2717";
+    }
+  }
+
+}
+
 /*
  * Prewikka renderer
  */

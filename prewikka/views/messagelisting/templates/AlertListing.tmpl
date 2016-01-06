@@ -76,7 +76,7 @@ if ( window._messagelisting_title_array == undefined ) {
 
 
                 \$("input.reset_filter").click(function() {
-                        var type = \$(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().prop("id");
+                        var type = \$(this).closest(".filter_popup").find("div").prop("id");
 
                         saved_state[type] = messagelisting.get_next_state(saved_forms, type, saved_state[type]);
 
@@ -203,8 +203,8 @@ if ( window._messagelisting_title_array == undefined ) {
      <tr class="inline_filter nodash">
       <td colspan="3">&nbsp;</td>
       <td>
-       <input type="submit" value="$_("Apply")" />
-       <input type="button" class="reset_filter" value="Reset" />
+       <input type="button" class="reset_filter btn btn-default" value="$_("Reset")" />
+       <input type="submit" class="btn btn-primary" value="$_("Apply")" />
       </td>
      </tr>
     </table>
@@ -229,7 +229,7 @@ if ( window._messagelisting_title_array == undefined ) {
         <th>$_("Type:")</th>
         <td>&nbsp;</td>
         #if $correlation_alert_view
-         #set $disabled="disabled=\"disabled\""
+         #set $disabled="disabled"
         #else
          #set $disabled=""
         #end if
@@ -242,14 +242,20 @@ if ( window._messagelisting_title_array == undefined ) {
           #set $checked = ""
          #end if
 
-        <td>$_($name)<input class="checkbox" $disabled type="checkbox" name="alert.type" value="$path" $checked /></td>
+        <td>
+          <input id="checkbox-type-$name" class="checkbox-label" type="checkbox" name="alert.type" value="$path" $disabled $checked />
+          <label for="checkbox-type-$name" class="btn btn-default btn-xs label-checkbox">$_($name)<span class="badge"></span></label>
+        </td>
         #end for
        </tr>
 
        <tr>
         <th>$_("Severity:")</th>
         #for $item in $N_("info"), $N_("low"), $N_("medium"), $N_("high"), $N_("n/a")
-        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.severity" value="$item" /></td>
+        <td>
+          <input id="checkbox-severity-$item" class="checkbox-label" type="checkbox" name="alert.assessment.impact.severity" value="$item"/>
+          <label for="checkbox-severity-$item" class="btn btn-default btn-xs label-checkbox">$_($item)<span class="badge"></span></label>
+        </td>
         #end for
        </tr>
 
@@ -258,7 +264,10 @@ if ( window._messagelisting_title_array == undefined ) {
         <td colspan="2">&nbsp;</td>
 
         #for item in $N_("succeeded"), $N_("failed"), $N_("n/a")
-        <td>$_($item)<input class="checkbox" type="checkbox" name="alert.assessment.impact.completion" value="$item" /></td>
+        <td>
+          <input id="checkbox-completion-$item" class="checkbox-label" type="checkbox" name="alert.assessment.impact.completion" value="$item"/>
+          <label for="checkbox-completion-$item" class="btn btn-default btn-xs label-checkbox">$_($item)<span class="badge"></span></label>
+        </td>
         #end for
        </tr>
       </table>
