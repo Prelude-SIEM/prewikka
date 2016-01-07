@@ -141,7 +141,7 @@ class PluginManager:
         self.__instances = []
         self.__dinstances = {}
 
-        plist = {}
+        plist = []
         ignore = []
 
         for i in pkg_resources.iter_entry_points(entrypoint):
@@ -155,10 +155,10 @@ class PluginManager:
                 logger.exception("%s: %s", i.module_name, e)
                 continue
 
-            plist[i.module_name] = i.name, plugin_class
+            plist.append((i.module_name, i.name, plugin_class))
             ignore.extend(plugin_class.plugin_deprecate)
 
-        for mname, (name, plugin_class) in plist.items():
+        for mname, name, plugin_class in plist:
             if mname in ignore:
                 continue
 
