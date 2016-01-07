@@ -1,6 +1,6 @@
 function CommonListing(elem, text, columns, data, editLink, deleteLink) {
 
-    elem.addClass("commonlisting");
+    $(elem).addClass("commonlisting");
 
     columns['model'][0].formatter = function(cellValue, options) {
         var link = $('<a>').prop("class", "widget-link")
