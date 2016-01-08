@@ -170,6 +170,8 @@ function _url2menu(url)
 
 function prewikka_loadTab(settings)
 {
+        $("#top_view_navbar .dropdown").removeClass("open");
+
         var type = settings['type'] || "";
 
         if ( settings['dataType'] == undefined )
