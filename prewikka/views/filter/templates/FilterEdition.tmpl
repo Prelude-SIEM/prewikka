@@ -131,7 +131,7 @@ function newFilterElement(name, idmef_object, idmef_operator, object_value) {
 
   <div class="input-group">
     <select class="filter_only form-control" name="filter_name">
-      <option value="">&nbsp;</option>
+      <option value="">$_("Select a filter")</option>
     #for $f in $filters
       #if $f == $fltr.name
         #set $selected = "selected=\"selected\""
