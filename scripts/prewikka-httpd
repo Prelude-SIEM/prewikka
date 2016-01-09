@@ -22,6 +22,7 @@
 import sys
 import shutil
 import getopt
+import multiprocessing
 import urllib, urlparse
 import SocketServer, BaseHTTPServer
 
@@ -30,13 +31,13 @@ from prewikka import main, siteconfig, localization
 
 
 class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
-    def __init__(self, core, *args, **kwargs):
-        self.core = core
+    def __init__(self, *args, **kwargs):
         apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
 
 
 
 class PrewikkaRequestHandler(request.Request, BaseHTTPServer.BaseHTTPRequestHandler):
+
     def init(self, method):
         request.Request.init(self, self.server.core)
 
@@ -138,12 +139,20 @@ def usage():
     print
     sys.exit(1)
 
+def serve_forever(server):
+    server.core = main.get_core_from_config(config)
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == "__main__":
     config = None
     addr, port = "0.0.0.0", 8000
+    num_process = multiprocessing.cpu_count()
 
-    opts, args = getopt.getopt(sys.argv[1:], "hc:a:p:", ["help", "config=", "address=", "port="])
+    opts, args = getopt.getopt(sys.argv[1:], "hc:a:p:m:", ["help", "config=", "address=", "port=", "multiprocess="])
     for opt, arg in opts:
         if opt in ("-h", "--help"):
             usage()
@@ -157,7 +166,11 @@ if __name__ == "__main__":
         elif opt in ("-c", "--config"):
             config = arg
 
-    core = main.get_core_from_config(config)
+        elif opt in ("-m", "--multiprocess"):
+            num_process = int(arg)
 
-    server = PrewikkaServer(core, (addr, port), PrewikkaRequestHandler)
-    server.serve_forever()
+    server = PrewikkaServer((addr, port), PrewikkaRequestHandler)
+    for i in range(num_process - 1):
+        multiprocessing.Process(target=serve_forever, args=(server,)).start()
+
+    serve_forever(server)
