@@ -77,6 +77,7 @@ class Config(object):
 
     def _set_generic(self, section_name, section_object):
         if hasattr(self, section_name) and not self._section_has_list(section_object):
-            getattr(self, section_name).update(section_object)
-        else:
-            setattr(self, section_name, section_object)
+            for key, value in getattr(self, section_name).iteritems():
+                section_object.setdefault(key, value)
+
+        setattr(self, section_name, section_object)
