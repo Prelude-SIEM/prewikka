@@ -22,7 +22,7 @@ from prewikka import pluginmanager, env, error
 
 RED_STD = "E78D90"
 ORANGE_STD = "F5B365"
-YELLOW_STD = "F9ED59"
+YELLOW_STD = "D4C608"
 GREEN_STD = "B1E55D"
 BLUE_STD = "93B9DD"
 
@@ -33,7 +33,7 @@ SEVERITY_COLOR_MAP = {
         "info": (_("Informational"), BLUE_STD)
 }
 
-COLOR_MAP = "93B9DD", "B1E55D", "F9ED59", "F5B365", "E78D90", "C6A0CF", "5256D3", \
+COLOR_MAP = "93B9DD", "B1E55D", "D4C608", "F5B365", "E78D90", "C6A0CF", "5256D3", \
             "A7DE65", "F2A97B", "F6818A", "B087C6", "66DC92"
 
 

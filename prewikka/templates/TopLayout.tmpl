@@ -47,7 +47,7 @@
     </div>
 
     <div id="top_view">
-        <nav class="navbar navbar-fixed-top navbar-default" id="top_view_navbar">
+        <nav class="navbar navbar-fixed-top navbar-primary" id="top_view_navbar">
             <div class="navbar-header">
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main_navbar_collapse" aria-expanded="false">
                     <span class="sr-only">$_("Toggle navigation")</span>
@@ -55,15 +55,12 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <div class="hidden-sm">
-                    <div class="navbar-brand">$prewikka.software</div>
-                </div>
-            </div>
+           </div>
 
 #filter CleanOutput
             <div class="collapse navbar-collapse" id="main_navbar_collapse">
             #if $prewikka.user_display
-                <ul class="nav navbar-nav">
+                <ul id="top_view_navbar_menu" class="nav navbar-nav navbar-primary">
                 #for $index, ($section, $tabs) in $enumerate($interface.sections.items()):
                     #if not $tabs
                         #if $index != 0
@@ -92,6 +89,9 @@
 #end filter
                 </ul>
                 <ul class="nav navbar-nav navbar-right" id="nav_top_view_header">
+                    <li class="hidden-sm hidden-md">
+                        <div class="navbar-brand">$prewikka.software</div>
+                    </li>
                     $toplayout_extra_content
                 </ul>
             </div>

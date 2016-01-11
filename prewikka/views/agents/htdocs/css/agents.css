@@ -66,3 +66,9 @@ table.analyzers {
 .show_all {
     cursor: pointer;
 }
+.global_toggle {
+    position: absolute;
+    right: 10px;
+    top: -42px;
+    z-index: 5;
+}

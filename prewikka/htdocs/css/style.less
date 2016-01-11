@@ -123,19 +123,37 @@ p {
 #topmenu {
     z-index: 3;
     position: fixed;
-    top: 50px;
+    top: 46px;
     background: @active-background;
     width: 100%;
-    padding-top: 9px;
     .topmenu_nav {
+        .topmenu_nav_container {
+          background-color: @primary-background-color;
+          opacity: 0.15;
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 50px;
+          width: 100%;
+        }
+        a {
+          color: #686868;
+        }
+        padding-top: 9px;
         font-weight: bold;
         .nav-tabs {
-        border-bottom: 1px solid @primary-background-color;
+            border: none;
         }
     }
 }
 
-
+#config-button {
+  position: fixed;
+  right: 5px;
+  top: 56px;
+  font-size: 20pt;
+  z-index: 5;
+}
 
 /*
  * menu
@@ -143,15 +161,14 @@ p {
 
 #main_menu_ng {
     position: fixed;
-    top: 45px;
+    top: 41px;
     z-index: 4;
     max-width: 50%;
     right: 0;
     #main_menu_navbar {
         margin-bottom: 0px;
-        padding: 2px 15px;
+        padding: 2px 35px 3px;
         color: @active-text;
-        background-color: @active-background;
     }
 
     .collapsed {
@@ -169,8 +186,14 @@ p {
     }
     .form-group-date {
         max-width: 140px;
+        .disabled {
+          cursor: pointer;
+        }
     }
     .btn-submit {
+        &.disabled {
+          cursor: initial;
+        }
         margin-top: 19px;
     }
     .form-control {
@@ -241,16 +264,59 @@ p {
  */
 
 #top_view {
+    &.detach {
+        #top_view_navbar {
+            position: static;
+        }
+        #topmenu {
+            position: static;
+        }
+        #main_menu_ng {
+            position: absolute;
+            top: -80px;
+        }
+    }
+    &.fullscreen {
+        #top_view_navbar {
+            display: none;
+        }
+        #topmenu {
+            display: none;
+        }
+        #main_menu_ng {
+            display: none;
+        }
+        #_main {
+            top: 0;
+        }
+        #_main_viewport {
+            top: 0;
+        }
+    }
+
     #top_view_navbar {
         z-index: 30;
-        .navbar-brand img { max-height: 30px }
-        border-bottom: 4px solid @inactive-top-background;
-
+        margin-bottom: 0;
+        .navbar-brand {
+          padding: 7px;
+          img {
+            max-height: 40px;
+          }
+        }
+        #top_view_navbar_menu {
+          position: relative;
+          z-index: 1;
+        }
         #nav_top_view_header {
-            margin-right: 5px;
+            right: 20px;
+            position: absolute;
+            z-index: 0;
             .btn {
                 padding: 6px 6px;
             }
+        }
+        .navbar-nav > li > a {
+            font-size: 13pt;
         }
     }
 }
@@ -258,14 +324,14 @@ p {
 #_main_viewport {
     position: fixed;
     z-index: -1;
-    top: 125px;
+    top: 100px;
     bottom: 0px;
     width: 100%;
 }
 
 #_main {
     font-size: 100%;
-    top: 125px;
+    top: 100px;
     bottom: 0px;
     width: 100%;
     position: absolute;
@@ -429,6 +495,7 @@ p {
     legend {
         font-size: 10pt;
         font-weight: bold;
+        margin-bottom: 0;
     }
 }
 
@@ -626,7 +693,37 @@ body .tooltip {
 }
 
 
+.navbar-primary {
+  background-color: @primary-background-color;
+  border-color: darken(@primary-background-color, 5%);
+  .navbar-nav {
+    > li > a {
+      color: @primary-color;
+      &:hover,
+      &:focus {
+        color: darken(@primary-color, 10%);
+        background-color: @primary-background-color;
+      }
+    }
+    > .active > a {
+      &,
+      &:hover,
+      &:focus {
+        color: @primary-color;
+        background-color: darken(@primary-background-color, 5%);
+      }
+    }
+  }
+  .nav .open > a, .nav .open > a:focus, .nav .open > a:hover {
+    background-color: darken(@primary-background-color, 5%)
+  }
+}
+
 /* Panels */
+
+.panel-default {
+    border-color: #B0B0B0
+}
 
 .panel-primary{
     border-color: @primary-background-color;
@@ -704,6 +801,6 @@ body .tooltip {
   }
 }
 
-.btn-primary {
+.btn-custom {
     .button-variant(@primary-color, @primary-background-color, darken(@primary-background-color, 5%));
 }

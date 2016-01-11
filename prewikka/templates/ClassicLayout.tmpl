@@ -105,7 +105,9 @@ function check_same_origin(url) {
 </script>
 
 <div id="topmenu">
-    <div class="topmenu_nav">
+  <div class="topmenu_nav">
+    <div class="topmenu_nav_container"></div>
+    <div class="topmenu_content">
     #for $section in $interface.sections.keys():
         #set $style = ""
 
@@ -131,10 +133,11 @@ function check_same_origin(url) {
         #end for
         </ul>
     #end for
-#end filter
     </div>
-    <a type="button" id="config-button" data-toggle="collapse" class="pull-right" data-target=".prewikka-view-config"><span style="font-size: 20px;">&#9881;</span></a>
+  </div>
 </div>
+<a type="button" id="config-button" data-toggle="collapse" data-target=".prewikka-view-config"><i class="fa fa-cogs"></i></a>
+#end filter
 
 <div id="_main_viewport"></div>
 <div id="_main">
