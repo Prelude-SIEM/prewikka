@@ -546,12 +546,12 @@ class MessageSummary(Table, view.View):
             links = []
             for url, text in env.hookmgr.trigger("HOOK_ALERTSUMMARY_MEANING_LINK", alert, meaning, value):
                 if url:
-                    links.append("- <a target='%s' href='%s'>%s</a>" % \
+                    links.append("<a target='%s' href='%s'>%s</a>" % \
                                  (env.external_link_target, url, text))
 
             if links:
                 meaning = "<a class='popup_menu_toggle'>%s</a><span class='popup_menu'>%s</span>" % \
-                          (meaning, "<br/>".join(links))
+                          (meaning, "".join(links))
 
             if not ignored.has_key(meaning):
                 self.newTableCol(index, meaning or "Data content")

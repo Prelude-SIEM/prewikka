@@ -138,15 +138,15 @@ $listing.sort()
          #for $addr in $node.node_addresses
           <a class="popup_menu_toggle">$addr.value</a>
           <span class="popup_menu">
-           - <a href="$addr.inline_filter">$_("Filter on address")</a><br />
+           <a href="$addr.inline_filter">$_("Filter on address")</a>
            #if $env.enable_details
-           - <a target="$env.external_link_target" href="$env.host_details_url?host=$addr.value">$_("Address information")</a><br />
+           <a target="$env.external_link_target" href="$env.host_details_url?host=$addr.value">$_("Address information")</a>
            #end if
            #for $name, $link, $widget in $addr.host_links
             #if $widget
-            - <a href="$link" class="widget-link" title="$name">$name</a><br />
+            <a href="$link" class="widget-link" title="$name">$name</a>
             #else
-            - <a href="$link" target="_$name">$name</a><br />
+            <a href="$link" target="_$name">$name</a>
             #end if
            #end for
           </span>
@@ -199,15 +199,15 @@ $listing.sort()
        <td>
         <a class="popup_menu_toggle">$analyzer.name</a>
         <span class="popup_menu">
-         - <a href="$analyzer.alert_listing">$_("Alert listing")</a><br />
-         - <a href="$analyzer.heartbeat_listing">$_("Heartbeat listing")</a><br />
-         - <a href="$analyzer.heartbeat_analyze">$_("Heartbeat analysis")</a><br />
+         <a href="$analyzer.alert_listing">$_("Alert listing")</a>
+         <a href="$analyzer.heartbeat_listing">$_("Heartbeat listing")</a>
+         <a href="$analyzer.heartbeat_analyze">$_("Heartbeat analysis")</a>
         </span>
        </td>
        <td>
         <a class="popup_menu_toggle">$analyzer.model</a>
         <span class="popup_menu">
-         - <a href="$analyzer.model_inline_filter">$_("Filter on model")</a>
+         <a href="$analyzer.model_inline_filter">$_("Filter on model")</a>
         </span>
        </td>
        <td>$analyzer.version</td>
