@@ -21,7 +21,7 @@ import time, abc
 import re, operator, pkg_resources, pkgutil, glob, os.path, sys
 
 import preludedb
-from prewikka import log, error, utils, version, env
+from prewikka import log, error, utils, version, env, compat
 
 
 class DatabaseSchemaError(error.PrewikkaUserError):
@@ -359,7 +359,7 @@ class Database(preludedb.SQL):
         return self._dbtype
 
     def escape(self, data):
-        if not isinstance(data, str):
+        if not isinstance(data, compat.STRING_TYPES):
             return data if data is not None else "NULL"
 
         return preludedb.SQL.escape(self, data)
