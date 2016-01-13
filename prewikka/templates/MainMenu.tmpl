@@ -11,8 +11,10 @@
      \$('#timeline_end').datetimepicker("setDate", (new Date(parseFloat("$timeline.end")*1000)));
      \$('#timeline_start').datetimepicker("setDate", (new Date(parseFloat("$timeline.start")*1000)));
 
-     #if not $timeline.quick_custom
-     disable_date();
+     #if $timeline.quick_custom
+     trigger_custom_date(true);
+     #else
+     trigger_custom_date(false);
      #end if
 });
 </script>
@@ -38,7 +40,7 @@
                     <label class="label-xs">$_("Refresh:")</label><br>
                     <div data-toggle="tooltip" title="$_("Update frequency of the current page")" data-trigger="hover" data-container="#main">
                     <button type="button" class="btn btn-default btn-sm dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#dropdown-refresh">
-                         <span class="reload-icon">&#8634; </span><span id="refresh-value">$timeline.refresh_selected</span> <span class="caret"></span>
+                         <span class="reload-icon">&#8634;</span><span id="refresh-value">$timeline.refresh_selected</span><span class="caret"></span>
                     </button>
                     </div>
 

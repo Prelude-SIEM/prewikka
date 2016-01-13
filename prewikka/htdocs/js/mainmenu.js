@@ -1,42 +1,34 @@
-function disable_date () {
-    $("#hidden_timeline_start").val("");
-    $("#hidden_timeline_end").val("");
-    $("#main_menu_ng .form-group-date input").addClass("disabled");
-}
+function trigger_custom_date(enabled)
+{
+    $("#hidden_timeline_start").prop("disabled", !enabled);
+    $("#hidden_timeline_end").prop("disabled", !enabled);
+    $("#hidden_timeline_value").prop("disabled", enabled);
+    $("#hidden_timeline_unit").prop("disabled", enabled);
 
-function MainMenuInit (date_format) {
-    function enable_date () {
-        $("#hidden_timeline_value").val("");
-        $("#hidden_timeline_unit").val("");
-        $("#main_menu_ng .form-group-date input").removeClass("disabled");
-        $("#timeline_quick_selected").html($("#timeline_quick_select_custom").html());
+    $("#main_menu_ng .form-group-date input").toggleClass("disabled", !enabled);
+
+    if ( enabled ) {
+        $("#main_menu_form_submit").removeClass("disabled");
+        $("#timeline_quick_selected").html($("#timeline_quick_select_custom").text());
         update_date();
     }
+}
 
-    function update_date() {
-        var start = $("#timeline_start").datetimepicker("getDate");
 
-        if ( start ) {
-            $("#hidden_timeline_start").val(start.getTime()/1000);
-        } else {
-            $("#hidden_timeline_start").val("");
-        }
 
-        var end = $("#timeline_end").datetimepicker("getDate");
+function update_date() {
+    var start = $("#timeline_start").datetimepicker("getDate");
+    $("#hidden_timeline_start").val(start ? start.getTime() / 1000 : "");
 
-        if ( end ) {
-            $("#hidden_timeline_end").val(end.getTime()/1000);
-        } else {
-            $("#hidden_timeline_end").val("");
-        }
-    }
+    var end = $("#timeline_end").datetimepicker("getDate");
+    $("#hidden_timeline_end").val(end ? end.getTime() / 1000 : "");
+}
 
+
+function MainMenuInit (date_format) {
     $('#timeline_start').add('#timeline_end').datetimepicker({
         "dateFormat": date_format,
-        "onSelect": function() {
-            $("#main_menu_form_submit").removeClass("disabled");
-            enable_date();
-        }
+        "onSelect": function() { trigger_custom_date(true); }
     })
     .change(function() {
         update_date();
@@ -47,20 +39,19 @@ function MainMenuInit (date_format) {
     });
 
     $("#refresh-select a").on("click", function() {
-        $("#refresh-value").html($(this).html());
+        $("#refresh-value").text($(this).text());
         $("#main_menu_form_submit").removeClass("disabled");
     });
 
     $("#timeline_quick_select a").on("click", function() {
-        $("#main_menu_form_submit").removeClass("disabled");
         $("#hidden_timeline_value").val($(this).data("value"));
         $("#hidden_timeline_unit").val($(this).data("unit"));
-        $("#timeline_quick_selected").html($(this).html());
+        $("#timeline_quick_selected").text($(this).text());
 
         if ( $(this).data("value") === "" ){
-            enable_date();
+            trigger_custom_date(true);
         } else {
-            disable_date();
+            trigger_custom_date(false);
             $("#main form").submit();
         }
      });
