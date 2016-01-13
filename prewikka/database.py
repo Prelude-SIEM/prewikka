@@ -412,6 +412,7 @@ class Database(preludedb.SQL):
     def get_property(self, user, key, view=None, default=None):
         return self.get_property_fail(user, key, view, default)
 
+    @use_transaction
     def set_property(self, user, key, value, view=None):
         self.del_property(user, key, view)
 
