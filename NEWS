@@ -1,3 +1,168 @@
+* 2016-03-01, prewikka-1.3.0beta1:
+
+Author: Sélim Menouar
+
+- Look-and-feel:
+
+    - Add tooltip for host and classification
+    - Reponsive element for extra small device (<= 768px)
+    - Ask for confirmation when performing a dangerous action
+    - Always open a popup menu when filtering on alert listing
+    - Change the ajax spinner
+    - Automatically close the filter menu when we click outside
+
+- MainMenu fixes
+
+- Change the permissions' mechanism
+
+- Deprecate "place" option in the configuration file
+
+Author: Camille Gardet
+
+- Pretty output for prewikka-httpd help
+
+- Document the multiprocess option in prewikka-httpd
+
+- Add missing MIME types
+
+- Add index to IDMEF paths of Source/Target port
+
+Author: François Poirotte
+
+- Fix a plugin update failure
+
+- Fix several issues in AddressResolve
+
+- Default view after a successful login
+
+Author: Antoine Luong
+
+- Support for prewikka-updatedb entry point
+
+- Various theme-related tweaks
+
+- Better handling of sections in the menubar
+
+- Bugfixes
+
+    - Filters were not applied when deleting alerts
+    - Prevent empty message when the session cookie expires
+    - Catch errors when database scripts are missing
+    - Fix normalization problems in Agents and Heartbeats views
+    - Avoid MessageSummary NoneType exception
+    - Take timezone into account in message summary
+
+Author: Thomas Andrejak
+
+- Add method in renderer to check if a backend is loaded
+
+Author: Abdel Elmili
+
+- API to query different data sources
+
+Author: Yoann Vandoorselaere
+
+- Fix duplicated parameters exception
+
+- Disable multithreading support since it is known to cause deadlock
+
+
+
+* 2016-01-13, prewikka-1.3.0alpha1:
+
+Author: Sélim Menouar
+
+- Major look-and-feel overhaul
+
+    - Bootstrap migration
+
+    - MainMenu reworking
+
+        - Add jquery-ui-datetimepicker for calendars
+        - Temporarily remove timezone selection
+        - No more "Save" button, the settings are always saved
+        - Add an option for parameters which need to be shared between views
+
+    - Add FontAwesome icons in navbar
+
+    - Change prewikka's logo
+
+    - Change the popup_menu
+
+    - Update filter menu in alert listing
+
+- Allow multiple plugins in the same file
+
+- Add a default mimetype to the WSGI script
+
+- Preserve configuration section ordering on merge
+
+Author: Antoine Luong
+
+- Prewikka dialog adjustments
+
+- Standardize grid library usage with free-jqGrid
+
+- Remove the ToolAlertListing view
+
+- Display hearbeat details in a widget
+
+- Bugfixes
+
+    - Fix issue with jEditable input fields' dimensions
+
+    - Fix possible injection in error dialog
+
+    - Fix inconsistency in the handling of substring operators
+
+    - Operator tooltips were not displayed in AlertListing filters
+
+    - Do not create a topmenu tab for section delimiters
+
+Author: Yoann Vandoorselaere
+
+- prewikka-httpd server now supports multiprocessing
+
+- Add missing path type for criteria to url mapping
+
+- Multiple time navigation fixes
+
+- Fix exception when using sensor localtime mode
+
+Author: Camille Gardet
+
+- Bugfixes
+
+    - Fix order in jquery-chosen-sortable.js
+
+    - Fix renderer-elem height
+
+    - Fix view extra settings
+
+        Remove excessive containers, causing data duplication
+        Add a z-index to prewikka-view-config to display it above
+        graphics present in the page.
+
+- Add parameters to chosen encapsulation
+
+    The new parameters are used to tweak the rendering of the <select>:
+    - max_paths=int, to choose how many parameters are permitted
+    - all_paths=bool, whether to display all the IDMEF paths in the <select> or not
+
+- Update underscore.js to 1.8.3
+
+- Keep the order of "Data paths" in the view settings
+
+Author: Abdel Elmili
+
+- Remove unused parameter in RendererPluginManager
+
+Author: Louis-David Gabet
+
+- Load conf files in alphabetical order
+
+
+
 * 2015-08-06, prewikka-1.2.6:
 
 Author: Yoann Vandoorselaere
