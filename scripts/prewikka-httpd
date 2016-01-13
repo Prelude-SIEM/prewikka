@@ -24,13 +24,13 @@ import shutil
 import getopt
 import multiprocessing
 import urllib, urlparse
-import SocketServer, BaseHTTPServer
+import BaseHTTPServer
 
 from prewikka.web import request
 from prewikka import main, siteconfig, localization
 
 
-class PrewikkaServer(SocketServer.ThreadingMixIn, BaseHTTPServer.HTTPServer):
+class PrewikkaServer(BaseHTTPServer.HTTPServer):
     def __init__(self, *args, **kwargs):
         apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
 
