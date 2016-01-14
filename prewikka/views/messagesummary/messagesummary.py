@@ -446,7 +446,7 @@ class MessageSummary(Table, view.View):
         if node["name"]:
             self.newTableEntry(_("Node name"), node["name"])
 
-        elif node_name.resolveSucceed():
+        elif node_name is not None and node_name.resolveSucceed():
             self.newTableEntry(_("Node name (resolved)"), node_name)
 
         self.newTableEntry(_("Node address"), addr_list)
