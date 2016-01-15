@@ -257,6 +257,48 @@ p {
 /*
  * main screen
  */
+@media (max-width: 768px) {
+  #top_view {
+    #top_view_navbar {
+      position: static;
+      #nav_top_view_header.nav {
+        position: static;
+      }
+      .navbar-toggle {
+        padding-bottom: 3px;
+      }
+      .dropdown-menu {
+        background-color: #fff;
+      }
+    }
+    #topmenu {
+      position: static;
+      .topmenu_nav_container {
+        display: none;
+      }
+    }
+    #_main {
+      position: static;
+      .prewikka-view-config {
+        position: static;
+      }
+    }
+    #main_menu_ng {
+      position: absolute;
+      top: 55px;
+      z-index: -1;
+      max-width: 100%;
+      .form-group {
+        display: inline-block;
+        margin-bottom: 0px;
+        vertical-align: middle;
+      }
+    }
+    #config-button {
+      position: absolute;
+    }
+  }
+}
 
 #top_view {
     &.detach {

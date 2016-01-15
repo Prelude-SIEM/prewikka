@@ -133,19 +133,28 @@ function prewikka_resizeTopMenu() {
 
     mainmenu.removeClass('collapsed'); // set standard view
     main.css("margin-top", "");
-    topmenu.css("height", "").css("width", window_width - mainmenu.innerWidth());
+    mainmenu.css("margin-top", "");
+    topmenu.css("height", "").css("width", "");
 
-    if ( Math.max(mainmenu.innerHeight(), topmenu.innerHeight()) > 60 ) { // check if the topmenu or mainmenu is split across two lines
-        mainmenu.addClass('collapsed');
-
+    if ( window_width > 768 ) {
         topmenu.css("width", window_width - mainmenu.innerWidth());
 
-        var height = Math.max(mainmenu.innerHeight(), topmenu.innerHeight());
+        if ( Math.max(mainmenu.innerHeight(), topmenu.innerHeight()) > 60 ) { // check if the topmenu or mainmenu is split across two lines
+            mainmenu.addClass('collapsed');
 
-        if ( height > 60 ) { // check if we've still got 2 lines or more
-            main.css("margin-top", height - 40);
-            topmenu.css("height", height);
+            topmenu.css("width", window_width - mainmenu.innerWidth());
+
+            var height = Math.max(mainmenu.innerHeight(), topmenu.innerHeight());
+
+            if ( height > 60 ) { // check if we've still got 2 lines or more
+                main.css("margin-top", height - 40);
+                topmenu.css("height", height);
+            }
         }
+    }
+    else {
+        mainmenu.css("margin-top", topmenu.innerHeight());
+        main.css("margin-top", mainmenu.innerHeight());
     }
 }
 
