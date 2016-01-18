@@ -391,7 +391,7 @@ class MessageSummary(Table, view.View):
 
         s = localization.format_datetime(local, format="medium")
         if t.tzinfo.utcoffset(t) != local.tzinfo.utcoffset(local):
-            s = " ".join((s, _("(agent local time: %s)") % localization.format_datetime(t, format="medium")))
+            s = " ".join((s, _("(agent local time: %s)") % localization.format_datetime(t, tzinfo=t.tzinfo, format="medium")))
 
         return s
 
