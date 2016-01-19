@@ -103,6 +103,7 @@ $(document).ready(function(){
 
   $("#prewikka-dialog").dialog({
       modal: true,
+      appendTo: "#_main",
       autoOpen: false,
       draggable: false,
       width: 400,
