@@ -327,7 +327,8 @@ class Core:
                 return
 
             if not request.path or request.path == "/":
-                raise error.RedirectionError("%salerts/alerts" % request.getBaseURL(), 302)
+                default_view = env.config.general.getOptionValue("default_view", "alerts/alerts")
+                raise error.RedirectionError("%s%s" % (request.getBaseURL(), default_view), 302)
 
             view_object = env.viewmanager.loadView(request, user)
             if view_object.dataset is not None:
