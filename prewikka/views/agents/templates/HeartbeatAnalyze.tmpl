@@ -1,8 +1,8 @@
 <link rel="stylesheet" type="text/css" href="agents/css/agents.css">
 
-<table class="heartbeat_analyze">
+<table class="table table-striped table-bordered table-condensed">
   <thead>
-    <tr class="heartbeat_analyze_header">
+    <tr>
       <td>$_("Name")</td>
       <td>$_("Model")</td>
       <td>$_("OS")</td>
@@ -15,10 +15,7 @@
   </thead>
   <tbody>
 
-  #set $row_classes = ("table_row_even", "table_row_odd")
-  #set $cnt = 0 
-  
-  <tr class="$row_classes[$cnt%2]">
+  <tr>
     <td>$analyzer.name</td>
     <td>$analyzer.model $analyzer.version</td>
     <td>$analyzer.ostype $analyzer.osversion</td>
@@ -38,21 +35,20 @@
       <b>$analyzer.status_meaning</b>
     </td>
   </tr>
-  #set $cnt += 1
  </tbody>
 </table>
   
-<table class="heartbeat_analyze">
+<table class="table table-striped table-bordered table-condensed">
   <thead>
-    <tr class="heartbeat_analyze_header"><td class="">$_("Events")</td></tr>
+    <tr><td>$_("Events")</td></tr>
   </thead>
 
   <tbody>
-    #set $row_classes = ("table_row_even", "table_row_odd")
-    #set $cnt = 0
     #for $event in $analyzer.events
-      <tr class="$row_classes[$cnt%2]"><td class="heartbeat_analyzer_event_$event.type">$event.time</td><td class="heartbeat_analyzer_event_$event.type">$event.value</td></tr>
-      #set $cnt += 1
+      <tr>
+        <td class="heartbeat_analyzer_event_$event.type">$event.time</td>
+        <td class="heartbeat_analyzer_event_$event.type">$event.value</td>
+      </tr>
     #end for
   </tbody>
 </table>

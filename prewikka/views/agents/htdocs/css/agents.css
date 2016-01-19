@@ -1,8 +1,3 @@
-.hearbeat_analyze {
-    font-size: 120%;
-    width: 100%;
-}
-
 .heartbeat_analyzer_event_start,
 .heartbeat_analyzer_event_normal_stop,
 .heartbeat_analyzer_event_no_anomaly {
