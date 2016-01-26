@@ -232,16 +232,6 @@ class AlertListingParameters(MessageListingParameters):
         return MessageListingParameters.isSaved(self, param)
 
 
-class SensorAlertListingParameters(AlertListingParameters):
-    def register(self):
-        AlertListingParameters.register(self)
-        self.mandatory("analyzerid", str)
-
-    def normalize(self, *args, **kwargs):
-        AlertListingParameters.normalize(self, *args, **kwargs)
-        self["analyzer"].insert(0, ("alert.analyzer.analyzerid", "=", self["analyzerid"]))
-
-
 class CorrelationAlertListingParameters(AlertListingParameters):
     def register(self):
         AlertListingParameters.register(self)
@@ -1273,21 +1263,3 @@ class CorrelationAlertListing(AlertListing, view.View):
     view_parameters = CorrelationAlertListingParameters
     alert_type_default = [ "alert.correlation_alert.name" ]
     view_order = 1
-
-
-class SensorAlertListing(AlertListing, view.View):
-    view_parameters = SensorAlertListingParameters
-    view_permissions = [ usergroup.PERM_IDMEF_VIEW ]
-    view_template = templates.SensorAlertListing
-    view_parent = AlertListing
-
-    listed_alert = ListedAlert
-    listed_aggregated_alert = ListedAggregatedAlert
-
-    def _setHiddenParameters(self):
-        AlertListing._setHiddenParameters(self)
-        self.dataset["hidden_parameters"].append(("analyzerid", self.parameters["analyzerid"]))
-
-    def render(self):
-        AlertListing.render(self)
-        self.dataset["analyzer_infos"], _ = env.idmef_db.getAnalyzer(self.parameters["analyzerid"], htmlsafe=True)

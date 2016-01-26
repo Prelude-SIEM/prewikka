@@ -1,5 +1,5 @@
-from alertlisting import AlertListing, SensorAlertListing, CorrelationAlertListing
-from heartbeatlisting import HeartbeatListing, SensorHeartbeatListing
+from alertlisting import AlertListing, CorrelationAlertListing
+from heartbeatlisting import HeartbeatListing
 from prewikka import pluginmanager, version
 
 class MessageListing(pluginmanager.PluginPreload):
@@ -10,6 +10,4 @@ class MessageListing(pluginmanager.PluginPreload):
     plugin_copyright = version.__copyright__
     plugin_description = N_("Alert and Heartbeat listing page")
 
-    plugin_classes = [ AlertListing, SensorAlertListing,
-                       CorrelationAlertListing,
-                       HeartbeatListing, SensorHeartbeatListing ]
+    plugin_classes = [AlertListing, CorrelationAlertListing, HeartbeatListing]

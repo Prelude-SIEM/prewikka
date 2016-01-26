@@ -25,18 +25,11 @@ from messagelisting import MessageListing, MessageListingParameters, ListedMessa
 class HeartbeatListingParameters(MessageListingParameters):
     def register(self):
         MessageListingParameters.register(self)
+        self.optional("heartbeat.analyzer(-1).analyzerid", str)
         self.optional("heartbeat.analyzer(-1).name", str)
         self.optional("heartbeat.analyzer(-1).node.address.address", str)
         self.optional("heartbeat.analyzer(-1).node.name", str)
         self.optional("heartbeat.analyzer(-1).model", str)
-
-
-
-class SensorHeartbeatListingParameters(HeartbeatListingParameters):
-    def register(self):
-        HeartbeatListingParameters.register(self)
-        self.mandatory("analyzerid", str)
-
 
 
 class ListedHeartbeat(ListedMessage):
@@ -89,7 +82,8 @@ class HeartbeatListing(MessageListing):
 
     def _applyInlineFilters(self, criteria):
         filter_found = False
-        for column, path in (("name", "heartbeat.analyzer(-1).name"),
+        for column, path in (("analyzerid", "heartbeat.analyzer(-1).analyzerid"),
+                             ("name", "heartbeat.analyzer(-1).name"),
                              ("model", "heartbeat.analyzer(-1).model"),
                              ("address", "heartbeat.analyzer(-1).node.address.address"),
                              ("node.name", "heartbeat.analyzer(-1).node.name")):
@@ -128,24 +122,3 @@ class HeartbeatListing(MessageListing):
         self.dataset["total"] = count
 
         self._setNavNext(self.parameters["offset"], count)
-
-
-
-class SensorHeartbeatListing(HeartbeatListing, view.View):
-    view_parameters = SensorHeartbeatListingParameters
-    view_permissions = [ usergroup.PERM_IDMEF_VIEW ]
-    view_template = templates.SensorHeartbeatListing
-    view_parent = HeartbeatListing
-
-    listed_heartbeat = ListedHeartbeat
-
-    def _adjustCriteria(self, criteria):
-        criteria.append("heartbeat.analyzer.analyzerid == '%s'" % self.parameters["analyzerid"])
-
-    def _setHiddenParameters(self):
-        HeartbeatListing._setHiddenParameters(self)
-        self.dataset["hidden_parameters"].append(("analyzerid", self.parameters["analyzerid"]))
-
-    def render(self):
-        HeartbeatListing.render(self)
-        self.dataset["analyzer"], _ = env.idmef_db.getAnalyzer(self.parameters["analyzerid"])

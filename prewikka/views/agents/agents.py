@@ -20,21 +20,20 @@
 import pkg_resources
 import time
 
-from prewikka import view, usergroup, utils, localization, env
+from prewikka import view, usergroup, utils, localization, env, mainmenu
 from . import templates
 
 
-class SensorListingParameters(view.Parameters):
+class SensorListingParameters(mainmenu.MainMenuParameters):
     def register(self):
+        mainmenu.MainMenuParameters.register(self)
         self.optional("filter_path", str)
         self.optional("filter_value", str)
-
 
 
 class HeartbeatAnalyzeParameters(view.Parameters):
     def register(self):
         self.mandatory("analyzerid", str)
-
 
 
 class SensorMessagesDelete(SensorListingParameters):
@@ -43,20 +42,6 @@ class SensorMessagesDelete(SensorListingParameters):
         self.optional("analyzerid", list, default=[])
         self.optional("alerts", str, default=None)
         self.optional("heartbeats", str, default=None)
-
-
-
-def get_analyzer_status_from_latest_heartbeat(heartbeat, error_margin):
-    if heartbeat.get("additional_data('Analyzer status')") == "exiting":
-        return "offline", _("Offline")
-
-    if heartbeat.get("heartbeat_interval") is None:
-        return "unknown", _("Unknown")
-
-    if time.time() - int(heartbeat.get("create_time")) > int(heartbeat.get("heartbeat_interval")) + error_margin:
-        return "missing", _("Missing")
-
-    return "online", _("Online")
 
 
 class SensorListing(view.View):
@@ -87,9 +72,13 @@ class SensorListing(view.View):
         for (analyzerid,) in env.idmef_db.getValues(["heartbeat.analyzer(-1).analyzerid/group_by"], criteria):
             analyzer, heartbeat = env.idmef_db.getAnalyzer(analyzerid)
 
-            parameters = { "analyzerid": analyzer["analyzerid"] }
-            analyzer.alert_listing = utils.create_link(view.getViewPath("SensorAlertListing"), parameters)
-            analyzer.heartbeat_listing = utils.create_link(view.getViewPath("SensorHeartbeatListing"), parameters)
+            parameters = {"heartbeat.analyzer(-1).analyzerid": analyzer["analyzerid"]}
+            analyzer.heartbeat_listing = utils.create_link(view.getViewPath("HeartbeatListing"), parameters)
+            parameters = {"analyzer_object_0": "alert.analyzer.analyzerid",
+                          "analyzer_operator_0": "=",
+                          "analyzer_value_0": analyzer["analyzerid"]}
+            analyzer.alert_listing = utils.create_link(view.getViewPath("AlertListing"), parameters)
+            parameters = {"analyzerid": analyzer["analyzerid"]}
             analyzer.heartbeat_analyze = utils.create_link(self.view_path + "/HeartbeatAnalyze", parameters)
 
             node_key = ""
@@ -118,7 +107,7 @@ class SensorListing(view.View):
                                                                                "filter_value": analyzer["model"] })
 
             analyzer.status, analyzer.status_meaning = \
-                                get_analyzer_status_from_latest_heartbeat(heartbeat, self._heartbeat_error_margin)
+                utils.get_analyzer_status_from_latest_heartbeat(heartbeat, self._heartbeat_error_margin)
 
             delta = float(heartbeat.get("create_time")) - time.time()
             analyzer.last_heartbeat_time = localization.format_timedelta(delta, add_direction=True)
@@ -172,7 +161,6 @@ class SensorMessagesDelete(SensorListing):
         SensorListing.render(self)
 
 
-
 class HeartbeatAnalyze(SensorListing):
     view_parameters = HeartbeatAnalyzeParameters
     view_permissions = [ usergroup.PERM_IDMEF_VIEW ]
@@ -213,7 +201,7 @@ class HeartbeatAnalyze(SensorListing):
             if latest:
                 latest = False
                 analyzer.status, analyzer.status_meaning = \
-                                    get_analyzer_status_from_latest_heartbeat(cur, self._heartbeat_error_margin)
+                    utils.get_analyzer_status_from_latest_heartbeat(cur, self._heartbeat_error_margin)
                 if analyzer.status == "missing":
                     delta = time.time() - float(cur_time)
                     analyzer.events.append({ "time": cur_time_str, "value": _("Sensor is down since %s") % localization.format_timedelta(delta), "type": "down"})
