@@ -20,8 +20,7 @@
 import pkg_resources, os, json
 
 from . import templates
-from prewikka import view, database, usergroup, version, env
-
+from prewikka import view, database, usergroup, version, env, error
 
 
 class AboutPlugin(view.View):
@@ -81,7 +80,10 @@ class AboutPlugin(view.View):
         upinfo = uperror = None
 
         dbup = database.DatabaseUpdateHelper(mod.__module__, mod.plugin_database_version, mod.plugin_database_branch)
-        upinfo = dbup.list()
+        try:
+            upinfo = dbup.list()
+        except error.PrewikkaUserError as e:
+            uperror = e
 
         if uperror:
             data.maintenance.setdefault(catname, []).append((mod, dbup.get_schema_version(), uperror))

@@ -304,7 +304,11 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
         ret = self._list(from_version=from_version, to_version=self._reqversion, branch=self._reqbranch, type="update")
         if not(ret) or ret[-1].version != self._reqversion:
-            raise error.PrewikkaUserError(_("Database migration error"), _("No linear migration script found for module %(module)s %(version1)s -> %(version2)s") % (self._module_name, ret[-1].get_version_string(), self._get_version_string(self._reqbranch, self._reqversion)))
+            raise error.PrewikkaUserError(_("Database migration error"), _("No linear migration script found for module %(module)s %(version1)s -> %(version2)s") % {
+                'module': self._module_name,
+                'version1': self._get_version_string(self._from_branch, self._from_version),
+                'version2': self._get_version_string(self._reqbranch, self._reqversion)
+            })
 
         return prev + ret
 
