@@ -13,22 +13,24 @@
     color: red;
 }
 
-.heartbeat_analyze_sensor_status_offline {
-    background-color: lightGray;
+.heartbeat_analyze {
+    color: #333;
     text-align: center;
 }
 
-.heartbeat_analyze_sensor_status_missing {
-    text-align: center;
+.sensor_status_offline {
+    background-color: lightGray;
+}
+
+.sensor_status_missing {
     background-color: lightCoral;
 }
 
-.heartbeat_analyze_sensor_status_unknown {
+.sensor_status_unknown {
     background-color: lightSalmon;
 }
 
-.heartbeat_analyze_sensor_status_online {
-    text-align: center;
+.sensor_status_online {
     background-color: lightGreen;
 }
 

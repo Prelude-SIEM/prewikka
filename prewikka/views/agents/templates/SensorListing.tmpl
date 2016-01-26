@@ -91,7 +91,7 @@ $listing.sort()
 #for $entry in $listing:
  <fieldset class="fieldset_heading">
   #set $dominant = $getDominantStatus($locations[$entry])
-  #set $dclass = "heartbeat_analyze_sensor_status_" + $dominant
+  #set $dclass = "heartbeat_analyze sensor_status_" + $dominant
 
   #if $dominant != "online"
    #set $display = "block"
@@ -110,7 +110,7 @@ $listing.sort()
                     ("unknown", $ngettext("%d Unknown", "%d Unknowns", $locations[$entry]["unknown"])),
                     ("missing", $ngettext("%d Missing", "%d Missings", $locations[$entry]["missing"])))
         #if $locations[$entry][$i[0]] > 0
-      <span class="heartbeat_analyze_sensor_status_$i[0]">$str($i[1] % $locations[$entry][$i[0]])</span>
+      <span class="heartbeat_analyze sensor_status_$i[0]">$str($i[1] % $locations[$entry][$i[0]])</span>
         #end if
        #end for
       </div>
@@ -118,11 +118,8 @@ $listing.sort()
    #set $nlisting = $sorted($locations[$entry]["nodes"].values(), key=operator.itemgetter("missing", "node.name"))
 
    #for $node in $nlisting
-    #set $cnt = 0
-    #set $row_classes = ("table_row_even", "table_row_odd")
-    #set $row_class = $row_classes[$cnt%2]
     #set $dominant = $getDominantStatus($node)
-    #set $dclass = "heartbeat_analyze_sensor_status_" + dominant
+    #set $dclass = "heartbeat_analyze sensor_status_" + dominant
 
     #if $dominant != "online"
      #set $display = "block"
@@ -164,7 +161,7 @@ $listing.sort()
            </td>
            #for $i in ("online", "offline", "unknown", "missing")
             #if $node[$i] > 0
-           <td class="$i heartbeat_analyze_sensor_status_$i" style="cursor: pointer;">
+           <td class="$i heartbeat_analyze sensor_status_$i" style="cursor: pointer;">
             <a href="#">$node[$i]</a>
            </td>
             #end if
@@ -180,7 +177,7 @@ $listing.sort()
     <div style="display: $display">
     <table class="table table-striped table-bordered table-rounded table-condensed">
      <thead>
-      <tr class="tr_header $row_classes[$cnt%2]">
+      <tr class="tr_header">
        <th style="width: 5%">$_("Delete")</th>
        <th style="width: 20%">$_("Name")</th>
        <th style="width: 20%">$_("Model")</th>
@@ -192,8 +189,7 @@ $listing.sort()
      </thead>
      <tbody>
      #for $analyzer in $node.analyzers
-      #set $cnt += 1
-      <tr class="tr_$analyzer.status $row_classes[$cnt%2]">
+      <tr class="tr_$analyzer.status">
        <td style="padding-top: 0px; padding-bottom: 0px;"><input class="checkbox" type="checkbox" name="analyzerid" value="$analyzer["analyzerid"]" /></td>
 
        <td>
@@ -213,7 +209,7 @@ $listing.sort()
        <td>$analyzer.version</td>
        <td>$analyzer.class</td>
        <td>$analyzer.last_heartbeat_time</td>
-       <td style="text-align: center;" class="heartbeat_analyze_sensor_status_$analyzer.status">$analyzer.status_meaning</td>
+       <td style="text-align: center;" class="heartbeat_analyze sensor_status_$analyzer.status">$analyzer.status_meaning</td>
       </tr>
      #end for
      </tbody>
