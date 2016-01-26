@@ -1243,8 +1243,6 @@ class AlertListing(MessageListing):
 
         self._setNavPrev(self.parameters["offset"])
 
-        self._setHiddenParameters()
-
         self.dataset["messages"] = [ ]
         total = self._setMessages(criteria)
         self._setDatasetConstants()

@@ -114,7 +114,6 @@ class HeartbeatListing(MessageListing):
         self._setNavPrev(self.parameters["offset"])
 
         count = self._setMessages(criteria)
-        self._setHiddenParameters()
 
         self.dataset["nav.from"] = self.parameters["offset"] + 1
         self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])

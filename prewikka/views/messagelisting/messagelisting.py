@@ -152,21 +152,7 @@ class MessageListing(view.View):
 
     def render(self):
         view.View.render(self)
-
         self.dataset["order_by"] = self.parameters["orderby"]
-
-        # We need to remove x/y from parameters, so that they aren't used for link.
-        self.dataset["hidden_parameters"] = [ ]
-
-        for i in ("x", "y"):
-            if self.parameters.has_key(i):
-                self.dataset["hidden_parameters"].append( (i, self.parameters.pop(i)) )
-            else:
-                self.dataset["hidden_parameters"].append( (i, "") )
-
-
-    def _setHiddenParameters(self):
-        pass
 
     def _setNavPrev(self, offset):
         if offset:
