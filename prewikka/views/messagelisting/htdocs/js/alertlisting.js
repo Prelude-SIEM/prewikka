@@ -244,7 +244,7 @@ function MessageListing() {
 
    $(this).parents(".inline_filter").after(tr);
    $(select).trigger("change");
-   $(tr).children("td.td_container_remove").html("<a class=\"remove_entry\">-</a>");
+   $(tr).children("td.td_container_remove").html("<a class=\"remove_entry fa fa-minus\"></a>");
  });
 
   $(document).on("change", ".popup_select_field", function() {
@@ -259,26 +259,27 @@ function MessageListing() {
                 var old_select = $(td).siblings(".td_container_operator").children();
                 var old_value = $(old_select).children(":selected").prop("value");
 
-                select = _messagelisting.createSelectFromArray(_messagelisting_operator_array[str], "popup_operator_select", $(old_select).prop("name"), old_value);
+                select = _messagelisting.createSelectFromArray(_messagelisting_operator_array[str], "popup_operator_select form-control input-sm", $(old_select).prop("name"), old_value);
                 $(old_select).replaceWith(select);
           }
 
           if ( _messagelisting_value_array[str] && advanced_mode ) {
-                  select = _messagelisting.createSelectFromArray(_messagelisting_value_array[str], "popup_input_field", $(input).prop("name"), $(input).prop("value"));
+                  select = _messagelisting.createSelectFromArray(_messagelisting_value_array[str], "popup_input_field form-control input-sm", $(input).prop("name"), $(input).prop("value"));
                   $(input).replaceWith(select);
           }
 
           else {
-                var n = document.createElement("input");
-                n.setAttribute("type", "text");
-                n.setAttribute("name", $(input).prop("name"));
-                n.setAttribute("class", "popup_input_field");
+                var n = $("<input>", {
+                    type: "text",
+                    name: $(input).prop("name"),
+                    class: "popup_input_field form-control input-sm"
+                });
 
                 if ( $(input).prop("type") != "select-one" )
-                        n.setAttribute("value", $(input).prop("value"));
+                        n.attr("value", $(input).prop("value"));
 
                 if ( old_value == '!' )
-                        n.setAttribute("disabled", "disabled");
+                        n.attr("disabled", "disabled");
 
                 $(input).replaceWith(n);
           }

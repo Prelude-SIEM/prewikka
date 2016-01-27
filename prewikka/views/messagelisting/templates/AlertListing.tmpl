@@ -136,7 +136,7 @@ if ( window._messagelisting_title_array == undefined ) {
         <th>$_('Filter on') [<a class="expert_mode">$_("advanced")</a>]:</th>
         <td class="td_container_path">
          <input type="hidden" name="${obname}_object_0" value="__all__" />
-         <select style="display:none;" disabled="disabled" class="popup_select_field" name="${obname}_object_0">
+         <select style="display:none;" disabled="disabled" class="popup_select_field form-control input-sm" name="${obname}_object_0">
             #for $i in $all_filters[$obname]
              $define_inline_filter_options($i, $preselect, 0);
             #end for
@@ -144,15 +144,15 @@ if ( window._messagelisting_title_array == undefined ) {
         </td>
 
         <td class="td_container_operator">
-         <select style="display:none;" class="popup_operator_select" name="${obname}_operator_0" />
+         <select style="display:none;" class="popup_operator_select form-control input-sm" name="${obname}_operator_0" />
         </td>
 
         <td class="td_container_value">
-         <input class="popup_input_field" type="text" name="${obname}_value_0" />
+         <input class="popup_input_field form-control input-sm" type="text" name="${obname}_value_0" />
         </td>
 
-        <td class="td_container_remove">&nbsp;</td>
-        <td class="td_container_add"><a class="append_entry">+</a></td>
+        <td class="td_container_remove"><a class="fa fa-minus" style="visibility: hidden"></a></td>
+        <td class="td_container_add"><a class="append_entry fa fa-plus"></a></td>
        </tr>
       </table>
 #end def
@@ -174,15 +174,15 @@ if ( window._messagelisting_title_array == undefined ) {
        <tr class="inline_filter">
         <th>$_('Group entry by:')</th>
         <td class="td_container_path">
-         <select class="popup_input_field" name="aggregated_${obname}">
+         <select class="popup_input_field form-control input-sm" name="aggregated_${obname}">
           <option value="none"></option>
           #for $i in $all_filters[$obname]
            $define_inline_aggreg_options($i, 0)
           #end for
          </select>
         </td>
-        <td class="td_container_remove">&nbsp;</td>
-        <td class="td_container_add"><a class="append_entry">+</a></td>
+        <td class="td_container_remove"><a class="fa fa-minus" style="visibility: hidden"></a></td>
+        <td class="td_container_add"><a class="append_entry fa fa-plus"></a></td>
        </tr>
       </table>
 #end def

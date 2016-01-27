@@ -42,16 +42,17 @@
     border-bottom: 1px dashed @border;
 }
 
-.inline_filter_content td input[type="text"] {
-    height: 20px;
-}
-
 .inline_filter_content th {
     font-size: 9pt;
     color: #950;
     font-weight: normal;
     text-align: left;
     border-bottom: 1px dashed @border;
+}
+
+.inline_filter .form-control {
+    width: auto;
+    display: inline;
 }
 
 #classification table, #source table, #target table, #analyzer table {
