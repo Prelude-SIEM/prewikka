@@ -127,11 +127,6 @@ class MainMenu:
         self.main = main_view
         self.dataset = template.PrewikkaTemplate(MainMenuTemplate.MainMenu)
 
-    def _set_timeline_link(self, type, start, end):
-        parameters = self.parameters - [ "offset" ] + { "timeline_start": int(time.mktime(start.timetuple())),
-                                                        "timeline_end": int(time.mktime(end.timetuple())) }
-        self.dataset["timeline.%s" % type] = utils.create_link(self.main.view_path, parameters)
-
     def _set_timeline(self, start, end):
         for unit in "minute", "hour", "day", "month", "year", "unlimited":
              self.dataset["timeline.%s_selected" % unit] = ""
@@ -143,13 +138,6 @@ class MainMenu:
 
         self.dataset["timeline.start"] = time.mktime(start.timetuple())
         self.dataset["timeline.end"] = time.mktime(end.timetuple())
-        self.dataset["timeline.current"] = utils.create_link(self.main.view_path, self.parameters - ["timeline_end"])
-
-        timeunit = self.parameters["timeline_unit"]
-        if timeunit != "unlimited":
-            delta = relativedelta(**{timeunit + "s": self.parameters["timeline_value"]})
-            self._set_timeline_link("next", end, end + delta)
-            self._set_timeline_link("prev", start - delta, start)
 
     def _get_unit(self):
         delta = self.end - self.start
