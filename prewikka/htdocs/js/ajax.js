@@ -189,9 +189,11 @@ function prewikka_loadTab(settings)
                 window._prewikka_current_xhr = xhr;
         };
 
-        settings['complete'] = function(xhr) {
+
+        settings['complete'] = $.makeArray(settings['complete']);
+        settings['complete'].push(function(xhr) {
                 window._prewikka_current_xhr = null;
-        };
+        });
 
         return $.ajax(settings).success(function(data) {
                 if ( settings['history'] && type.toUpperCase() != "POST" ) {
@@ -201,8 +203,10 @@ function prewikka_loadTab(settings)
                                 url += "?" + settings['data'];
 
                         history.pushState(url, '', url);
-                }
 
+                        if ( settings['success'] )
+                                settings['success']();
+                }
                 prewikka_drawTab(data);
         });
 }
