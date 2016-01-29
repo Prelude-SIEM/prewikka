@@ -43,6 +43,23 @@
 
                 <![endif]-->
 
+                <!--[if lte IE 9]>
+                <script type="text/javascript">
+                    setInterval(function() {
+                        var loader = \$('.loader');
+                        \$({deg: 0}).animate({deg: 360}, {
+                            duration: 1500,
+                            easing: 'linear',
+                            step: function(now) {
+                                loader.css({
+                                    transform: 'rotate(' + now + 'deg)'
+                                });
+                            }
+                        });
+                    }, 1500)
+                </script>
+                <![endif]-->
+
                 #def head_extra_content
                 #end def
                 $head_extra_content

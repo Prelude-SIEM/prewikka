@@ -68,6 +68,7 @@ class BaseView(view._View):
                                          "prewikka/css/font-awesome.min.css",
                                          "prewikka/css/ui.jqgrid.min.css",
                                          "prewikka/css/ui.multiselect.css",
+                                         "prewikka/css/loader.css",
                                          "prewikka/css/themes/%s.css" % theme_name]
 
         dataset["document.js_files"] = ["prewikka/js/jquery.js",
