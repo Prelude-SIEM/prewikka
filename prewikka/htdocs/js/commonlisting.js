@@ -62,21 +62,11 @@ function CommonListing(elem, text, columns, data, editLink, deleteLink) {
     });
     $(".button-delete").on("click", function() {
         var rows = grid.getGridParam("selarrrow");
-        if ( rows.length == 0 ) return;
-        grid.delGridRow(rows, {
-            onclickSubmit: function() {
-                $.ajax({
-                    url: prewikka_location().href + "/" + deleteLink,
-                    data: {action: "delete", id: rows}
-                });
-            },
-            afterShowForm: function(form) {
-                // Center delete confirmation dialog
-                form.closest('div.ui-jqdialog').position({
-                    my: "center",
-                    of: $("div#main")
-                });
-            }
+        if ( ( rows.length == 0 ) || ( $(this).data("confirm") ) ) return;
+        $.ajax({
+            url: prewikka_location().href + "/" + deleteLink,
+            data: {action: "delete", id: rows},
+            success: function() { grid.delRowData(rows); }
         });
     });
 

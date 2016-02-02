@@ -40,6 +40,9 @@ function check_same_origin(url) {
         });
 
         \$(document).on("click", "a, area", function(event) {
+                if ( \$(this).data("confirm") )
+                        return false;
+
                 var url = \$(this).attr('href');
 
                 if ( ! url || url.indexOf("#") != -1 )
