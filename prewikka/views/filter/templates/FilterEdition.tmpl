@@ -239,6 +239,10 @@ function newFilterElement(name, idmef_object, idmef_operator, object_value) {
 
 <button class="pull-right btn btn-primary" type="submit" name="mode" value="$_("Save")"><i class="fa fa-save"></i> $_("Save")</button>
 </fieldset>
+
+#if $fltr.name
+  <input type="hidden" name="load" value="$fltr.name">
+#end if
 </form>
 
 </div>

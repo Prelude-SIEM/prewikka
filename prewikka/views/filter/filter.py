@@ -149,6 +149,7 @@ class AlertFilterEditionParameters(view.Parameters):
         self.optional("filter_name", str)
         self.optional("filter_comment", str, default="")
         self.optional("filter_formula", str, default="")
+        self.optional("load", str)
 
     def normalize(self, *args, **kwargs):
         view.Parameters.normalize(self, *args, **kwargs)
@@ -336,6 +337,9 @@ class AlertFilterEdition(view.View):
 
         if self.parameters["filter_formula"] == _(self.example_formula):
             raise error.PrewikkaUserError(_("Could not save Filter"), _("No valid filter formula provided"))
+
+        if self.parameters.get("load") != fname and self._db.get_filter(self.user, fname):
+            raise error.PrewikkaUserError(_("Could not save Filter"), _("The filter name is already used by another filter"))
 
         fltr = Filter(fname,
                       self.parameters["filter_type"],
