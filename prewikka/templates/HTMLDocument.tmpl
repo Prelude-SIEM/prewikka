@@ -68,8 +68,10 @@
                 <script src="prewikka/js/flash_detect_min.js" type="text/javascript"></script>
                 <script type="text/javascript">
                         document.cookie = "has_flash=" + ((FlashDetect.installed == true) ? 1 : 0);
+                        window.prewikka_config = { base_url: "$document.base_url" };
+
                         \$.ajaxSetup({ url: "?" });
-                        \$LAB.setGlobalDefaults({ BasePath: "$document.base_url" });
+                        \$LAB.setGlobalDefaults({ BasePath: prewikka_config.base_url });
                 </script>
         </head>
         $body
