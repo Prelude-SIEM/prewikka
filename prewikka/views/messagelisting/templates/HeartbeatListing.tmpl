@@ -42,7 +42,7 @@
 
 <td>$_("Date")</td>
 
-#if $messages and $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
+#if $messages and $prewikka.user.has("IDMEF_ALTER")
 <td><input class="checkbox" type="checkbox" id="allbox" /></td>
 #end if
 
@@ -100,7 +100,7 @@
 #end block message_fields
 
 #block message_extra_footer
-    #if $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
+    #if $prewikka.user.has("IDMEF_ALTER")
     <div class="pull-right">
       <div class="input-group">
         <select class="form-control" name="action" id="action">

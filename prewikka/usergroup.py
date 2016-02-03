@@ -17,37 +17,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import abc, hashlib
+import abc
+import hashlib
+import compat
 from prewikka import error, log, localization, env
 
 ADMIN_LOGIN = "admin"
-
-PERM_IDMEF_VIEW = "IDMEF_VIEW"
-PERM_IDMEF_ALTER = "IDMEF_ALTER"
-PERM_TICKET_CREATE = "TICKET_CREATE"
-PERM_TICKET_ALTER = "TICKET_ALTER"
-PERM_TICKET_VIEW = "TICKET_VIEW"
-PERM_ADMIN_CONSOLE = "ADMIN_CONSOLE"
-PERM_USER_MANAGEMENT = "USER_MANAGEMENT"
-PERM_GROUP_MANAGEMENT = "GROUP_MANAGEMENT"
-PERM_COMMAND = "COMMAND"
-PERM_INTRUSIVE_COMMAND = "INTRUSIVE_COMMAND"
-PERM_ASSET_CREATE = "ASSET_GROUP_CREATE"
-PERM_ASSET_ALTER = "ASSET_GROUP_ALTER"
-
-ALL_PERMISSIONS = [ PERM_IDMEF_VIEW,
-                    PERM_IDMEF_ALTER,
-                    PERM_TICKET_CREATE,
-                    PERM_TICKET_ALTER,
-                    PERM_TICKET_VIEW,
-                    PERM_ADMIN_CONSOLE,
-                    PERM_USER_MANAGEMENT,
-                    PERM_GROUP_MANAGEMENT,
-                    PERM_COMMAND,
-                    PERM_INTRUSIVE_COMMAND,
-                    PERM_ASSET_CREATE,
-                    PERM_ASSET_ALTER ]
-
 
 class PermissionDeniedError(error.PrewikkaUserError):
     def __init__(self, action_name):
@@ -57,6 +32,17 @@ class PermissionDeniedError(error.PrewikkaUserError):
 
 _NAMEID_TBL = {}
 
+class Permissions(set):
+    """ List of all the permissions available """
+
+    def declare(self, permission):
+        """Add the permission to the set if it is not already declared"""
+        if isinstance(permission, compat.STRING_TYPES):
+            self.add(permission)
+        else:
+            self.union(permission)
+
+ALL_PERMISSIONS = Permissions()
 
 class NameID(object):
     __metaclass__ = abc.ABCMeta

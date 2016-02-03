@@ -665,7 +665,7 @@ class ListedAggregatedAlert(ListedAlert):
 class AlertListing(MessageListing):
     view_name = N_("Alerts")
     view_parameters = AlertListingParameters
-    view_permissions = [ usergroup.PERM_IDMEF_VIEW ]
+    view_permissions = [ "IDMEF_VIEW" ]
     view_template = templates.AlertListing
     view_extensions = (("menu", mainmenu.MainMenuAlert),)
     view_section = N_("Alerts")

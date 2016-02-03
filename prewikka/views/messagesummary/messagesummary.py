@@ -358,7 +358,7 @@ class MessageParameters(view.Parameters):
 
 class MessageSummary(Table, view.View):
     view_parameters = MessageParameters
-    view_permissions = [ usergroup.PERM_IDMEF_VIEW ]
+    view_permissions = [ "IDMEF_VIEW" ]
     view_template = templates.MessageSummary
     plugin_htdocs = (("messagesummary", pkg_resources.resource_filename(__name__, 'htdocs')),)
 

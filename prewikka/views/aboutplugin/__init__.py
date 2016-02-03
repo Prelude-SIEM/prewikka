@@ -34,7 +34,7 @@ class AboutPlugin(view.View):
     view_name = N_("Apps")
     view_template = templates.aboutplugin
     view_section = N_("Settings")
-    view_permissions = [ usergroup.PERM_USER_MANAGEMENT ]
+    view_permissions = [ "USER_MANAGEMENT" ]
     view_order = 6
 
     class AboutPluginParameters(view.Parameters):

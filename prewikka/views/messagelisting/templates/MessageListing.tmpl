@@ -63,7 +63,7 @@ $message_listing_header
       #set global $message = $message
         <tr class="$row_classes[$cnt % 2]">
           $message_fields
-          #if $prewikka.user.has(usergroup.PERM_IDMEF_ALTER)
+          #if $prewikka.user.has("IDMEF_ALTER")
           <td>
             <input class="checkbox" type="checkbox" name="selection" value="$message.selection"/>
           </td>

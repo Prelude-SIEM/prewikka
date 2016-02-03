@@ -150,7 +150,7 @@ class Session(pluginmanager.PluginBase):
         user = self.authenticate(request, info)
         self.__create_session(request, user)
 
-        is_admin = set(user.permissions) == set(usergroup.ALL_PERMISSIONS)
+        is_admin = set(user.permissions) == usergroup.ALL_PERMISSIONS
         env.log.info("User login with profile '%s'" % ("admin" if is_admin else "default"), request, user)
 
         return user

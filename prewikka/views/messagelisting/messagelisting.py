@@ -193,7 +193,7 @@ class MessageListing(view.View):
         if len(self.parameters["selection"]) == 0:
             return
 
-        if not self.user.has(usergroup.PERM_IDMEF_ALTER):
+        if not self.user.has("IDMEF_ALTER"):
             raise usergroup.PermissionDeniedError(self.current_view)
 
         idents = [ ]

@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import pkg_resources, sys, os, traceback
-from prewikka import log, utils, error, database, env
+from prewikka import log, utils, error, database, env, usergroup
 from prewikka.localization import translation
 
 logger = log.getLogger(__name__)
@@ -123,6 +123,12 @@ class PluginManager:
 
         if plugin_class.plugin_locale:
             translation.addDomain(*plugin_class.plugin_locale)
+
+        for permission in getattr(plugin_class, "view_permissions", []):
+            usergroup.ALL_PERMISSIONS.declare(permission)
+
+        for permission in getattr(plugin_class, "additional_permissions", []):
+            usergroup.ALL_PERMISSIONS.declare(permission)
 
         dh = database.DatabaseUpdateHelper(plugin_class.__module__, plugin_class.plugin_database_version, plugin_class.plugin_database_branch)
         if autoupdate or plugin_class.plugin_database_autoupdate:

@@ -176,7 +176,7 @@ class AlertFilterEdition(view.View):
     view_template = templates.FilterEdition
     view_section = N_("Settings")
     view_order = 1
-    view_permissions = [ usergroup.PERM_IDMEF_VIEW ]
+    view_permissions = [ "IDMEF_VIEW" ]
     example_formula = N_("Example: (A AND B) OR (C AND D)")
 
     def _user_delete_hook(self, user):
