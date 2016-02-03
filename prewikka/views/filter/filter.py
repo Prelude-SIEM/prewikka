@@ -241,9 +241,23 @@ class AlertFilterEdition(view.View):
         self.dataset["alert_objects"] = self._flatten(prelude.IDMEFClass("alert"))
         self.dataset["generic_objects"] = self._flatten(prelude.IDMEFClass("heartbeat"))
 
-        self.dataset["operators"] = ["=", "=*", "!=", "!=*", "~", "~*",
-                                     "!~", "!~*", "<", "<=", ">", ">=",
-                                     "<>", "<>*", "!<>", "!<>*"]
+        self.dataset["operators"] = [
+            ("=", _("Equal")),
+            ("=*", _("Equal (case-insensitive)")),
+            ("!=", _("Not equal")),
+            ("!=*", _("Not equal (case-insensitive)")),
+            ("~", _("Regular expression")),
+            ("~*", _("Regular expression (case-insensitive)")),
+            ("!~", _("Not regular expression")),
+            ("!~*", _("Not regular expression (case-insensitive)")),
+            ("<", _("Lesser than")),
+            ("<=", _("Lesser or equal")),
+            (">", _("Greater than")),
+            (">=", _("Greater or equal")),
+            ("<>", _("Substring")),
+            ("<>*", _("Substring (case-insensitive)")),
+            ("!<>", _("Not substring")),
+            ("!<>*", _("Not substring (case-insensitive)"))]
 
         self.dataset["elements"] = [self._element("A")]
         self.dataset["fltr.name"] = ""

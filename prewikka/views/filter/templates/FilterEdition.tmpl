@@ -98,8 +98,8 @@ function newFilterElement(name, idmef_object, idmef_operator, object_value) {
       <div class="col-sm-8">
         <div class="col-xs-3">
           <select class="form-control" id="operator_example" name="operator_example">
-          #for operator in $operators
-            <option value="$operator">$operator</option>
+          #for operator, description in $operators
+            <option value="$operator" title="$description">$operator</option>
           #end for
           </select>
         </div>
