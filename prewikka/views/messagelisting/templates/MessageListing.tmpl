@@ -27,6 +27,34 @@ $messagelisting_scripts
         \$(this).nextAll("div").toggle();
         return false;
   });
+
+    \$(".ajax-tooltip").tooltip({
+        html: true,
+        container: '#main',
+        trigger: 'hover',
+        delay: { "show": 200, "hide": 0 },
+        title: function() {
+            var title = \$(this).data("save-title");
+            if ( ! title && \$(this).data("title") ) {
+                \$.ajax({
+                    async: false,
+                    type: "GET",
+                    url: \$(this).data("title"),
+                    success: function(data) {
+                        title = JSON.parse(data).content;
+                        if ( title instanceof Array ) {
+                            title = title.map(function(v, i) {
+                                return \$("<div>").text(v).html();
+                            }).join("<br>");
+                        }
+
+                    }
+                });
+                \$(this).data("save-title", title);
+            }
+            return title;
+        }
+    });
 });
 </script>
 

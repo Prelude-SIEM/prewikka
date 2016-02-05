@@ -351,7 +351,8 @@ if ( window._messagelisting_title_array == undefined ) {
 #end def
 
 #def classificationWrite(info, text)
-<a class="impact_severity_$info.severity.value popup_menu_toggle">$text</a><span class="popup_menu">
+#filter CleanOutput
+<a class="impact_severity_$info.severity.value popup_menu_toggle" title="$info.description" data-toggle="tooltip" data-placement="top" data-container="#main">$text</a><span class="popup_menu">
 #if $info.count == 1
 <a class="widget-link" title="$_('Alert details')" href="$info.display">$_("See alert details")</a>
 #end if
@@ -364,6 +365,7 @@ if ( window._messagelisting_title_array == undefined ) {
 <a href="$url">$name</a>
 #end for
 </span>#slurp
+#end filter
 #end def
 
 #def timeWrite(time_url, text)
@@ -463,7 +465,7 @@ $text
 
       #for $address in $direction.addresses
 
-       <a class="popup_menu_toggle">$address.hostname</a><span class="popup_menu">
+       <a class="popup_menu_toggle ajax-tooltip" data-title="$address.url_infos">$address.hostname</a><span class="popup_menu">
          #filter Filter $writeInlineFilter($address, $str($_("Filter on this %s") % ($name))) #end filter
 
        #if $address.value and (not $address.category or $address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net"))

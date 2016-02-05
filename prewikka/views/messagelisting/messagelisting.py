@@ -119,6 +119,11 @@ class ListedMessage(dict):
         field["host_links"] = [ ]
         field["category"] = category
 
+        if env.hookmgr.hasListener("HOOK_HOST_TOOLTIP"):
+            field["url_infos"] = utils.create_link("hostinfoajax", {"host": value})
+        else:
+            field["url_infos"] = None
+
         if value and dns is True:
             field["hostname"] = resolve.AddressResolve(value)
         else:
@@ -143,6 +148,23 @@ class ListedMessage(dict):
     def createMessageLink(self, ident, view):
         return utils.create_link("/".join((self.view_path, view)), { "ident": ident })
 
+class HostInfoAjax(view.View):
+    class HostInfoAjaxParameters(view.Parameters):
+        def register(self):
+            self.mandatory("host", str)
+
+    view_parameters = HostInfoAjaxParameters
+
+    def __init__(self):
+        view.View.__init__(self)
+        env.hookmgr.declare_once("HOOK_HOST_TOOLTIP")
+
+    def render(self):
+        infos = []
+        for info in env.hookmgr.trigger("HOOK_HOST_TOOLTIP", self.parameters["host"]):
+            infos.extend(info)
+
+        return infos
 
 class MessageListing(view.View):
     plugin_htdocs = (("messagelisting", pkg_resources.resource_filename(__name__, 'htdocs')),)

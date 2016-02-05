@@ -518,6 +518,7 @@ class ListedAlert(ListedMessage):
         dataset["display"] = self.createMessageLink(ident, "AlertSummary")
         dataset["severity"] = { "value": message["alert.assessment.impact.severity"] }
         dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"])
+        dataset["description"] = message["alert.assessment.impact.description"]
 
     def _setMessageTimeURL(self, t, host):
         ret = []
@@ -650,6 +651,7 @@ class ListedAggregatedAlert(ListedAlert):
             "classification_references": "",
             "classification_url": "",
             "count": count,
+            "description": "",
             "classification": self.createInlineFilteredField("alert.classification.text", classification, direction="classification"),
             "severity": { "value": severity },
             "completion": self.createInlineFilteredField("alert.assessment.impact.completion", completion)
