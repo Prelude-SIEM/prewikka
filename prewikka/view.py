@@ -394,23 +394,11 @@ class View(_View, pluginmanager.PluginBase):
 
 
 class ViewManager:
-    def getSections(self, user=None):
-        def _merge(d1, d2):
-                for section, tabs in d2.items():
-                        d1[section] = copy(d1.get(section, {}))
-                        for tab, views in tabs.items():
-                                d1[section][tab] = views
-
-        d = copy(self._sections)
-        [_merge(d, i) for i in env.hookmgr.trigger("HOOK_MENU_LOAD", user) if i]
-
-        return d
-
     def getViewPath(self, view_id, default=_sentinel):
         return getViewPath(view_id, default)
 
     def getViewID(self, request):
-        sections = self._sections_path
+        sections = env.menumanager.get_sections_path()
         paths = request.getViewElements()
 
         view_id = None
@@ -461,19 +449,12 @@ class ViewManager:
 
     def addView(self, view):
         if view.view_name:
-            self._addSectionInfo(view)
+            env.menumanager.add_section_info(view)
 
         self._views[view.view_id] = view
 
         env.hookmgr.declare("HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper())
         env.hookmgr.declare("HOOK_%s_PARAMETERS_NORMALIZE" % view.view_id.upper())
-
-    def _addSectionInfo(self, view):
-        self._sections.setdefault(view.view_section, utils.OrderedDict()) \
-                      .setdefault(view.view_name, utils.OrderedDict())[view.view_id] = view
-
-        self._sections_path.setdefault(utils.nameToPath(view.view_section), {}) \
-                           .setdefault(utils.nameToPath(view.view_name), utils.OrderedDict())[utils.nameToPath(view.view_id)] = view.view_path
 
     def loadViews(self):
         for view_class in sorted(pluginmanager.PluginManager("prewikka.views"), key=operator.attrgetter("view_order")):
@@ -491,8 +472,4 @@ class ViewManager:
     def __init__(self):
         self._views = {}
 
-        self._sections = utils.OrderedDict((k, utils.OrderedDict()) for k in env.config.section_order.keys())
-        self._sections_path = {}
-
         env.hookmgr.declare("HOOK_VIEW_LOAD", multi=True)
-        env.hookmgr.declare("HOOK_MENU_LOAD", multi=True)

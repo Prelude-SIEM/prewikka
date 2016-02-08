@@ -1,5 +1,4 @@
 #extends prewikka.templates.HTMLDocument
-#from prewikka import env
 
 #def body_class()
 #end def
@@ -70,46 +69,46 @@
             <div class="collapse navbar-collapse" id="main_navbar_collapse">
             #if $prewikka.user_display
                 <ul id="top_view_navbar_menu" class="nav navbar-nav navbar-primary">
-                #for $index, ($section, $tabs) in $enumerate($interface.sections.items()):
-                    #if not $tabs
-                        #if $index != 0
-                        </ul>
-                    </li>
-                        #end if
-                        #if $index != len($interface.sections) - 1
+                #for $name, $menu_item in $interface.menu.items()
                     <li class="dropdown">
                         <a class="dropdown-toggle" data-toggle="dropdown">
-                            #if $env.config.section_order.get($section)
-                                <i class="fa fa-$env.config.section_order[$section].value"></i>
+                            #if $menu_item.icon
+                                <i class="fa fa-$menu_item.icon"></i>
                             #end if
-                            $_($section)
+                            $_($name)
                             <span class="caret"></span>
                         </a>
                         <ul class="dropdown-menu" role="menu">
-                        #end if
-                    #else
-                            <li>
-                                <a href="${tabs.values()[0].values()[0].view_path}">
-                                #if $env.config.section_order.get($section)
-                                    <i class="fa fa-$env.config.section_order[$section].value"></i>
+                        #for $section in $menu_item.entries
+                            #if $section.link
+                            <li><a href="$section.link">
+                                #if $section.icon
+                                <i class="fa fa-$section.icon"></i>
                                 #end if
-                                $_($section)
-                                </a>
-                            </li>
-                        #if $index == len($interface.sections) - 1
+                                $_($section.name)
+                            </a></li>
+                            #else
+                            <li class="disabled" title="$_('This app has been disabled or failed to load.')"><a>
+                                #if $section.icon
+                                <i class="fa fa-$section.icon"></i>
+                                #end if
+                                $_($section.name)
+                            </a></li>
+                            #end if
+                        #end for
+                        #if $menu_item.default
                             <li role="separator" class="divider"></li>
                             <li><a class="widget-link" title="$_("About")" href="$prewikka.about">$_("About")</a></li>
                             #if $prewikka.logout_link
                             <li><a title="$_("Logout")" href="$prewikka.logout_link" data-confirm="$_("Are you sure you want to Logout ?")">$_("Logout")</a></li>
                             #end if
+                        #end if
                         </ul>
                     </li>
-                        #end if
-                    #end if
                 #end for
+                </ul>
             #end if
 #end filter
-                </ul>
                 <ul class="nav navbar-nav navbar-right" id="nav_top_view_header">
                     <li class="visible-lg-inline">
                         <div class="navbar-brand">$prewikka.software</div>

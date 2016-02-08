@@ -136,6 +136,11 @@ class PluginManager:
         else:
             dh.check()
 
+    @staticmethod
+    def _handle_section(plugin_class):
+        if hasattr(plugin_class, "view_section") and plugin_class.view_section:
+            env.menumanager.add_section(plugin_class.view_section)
+
     def _addPlugin(self, plugin_class, autoupdate, name=None):
         self._handle_attributes(plugin_class, autoupdate)
 
@@ -170,9 +175,11 @@ class PluginManager:
 
             try:
                 if issubclass(plugin_class, PluginPreload):
+                    [self._handle_section(x) for x in plugin_class.plugin_classes]
                     self._handle_attributes(plugin_class, autoupdate)
-                    [self._addPlugin(x, autoupdate) for x in plugin_class().plugin_classes]
+                    [self._addPlugin(x, autoupdate) for x in plugin_class.plugin_classes]
                 else:
+                    self._handle_section(plugin_class)
                     self._addPlugin(plugin_class, autoupdate, name=name)
 
             except error.PrewikkaUserError as e:

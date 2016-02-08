@@ -32,7 +32,7 @@ except ImportError:
 
 from prewikka import view, config, log, database, idmefdatabase, version, \
                      auth, error, utils, localization, resolve, theme, \
-                     pluginmanager, renderer, env, dataprovider
+                     pluginmanager, renderer, env, dataprovider, menu
 from prewikka.myconfigparser import ConfigParserSection
 
 from prewikka.templates import ClassicLayout
@@ -119,7 +119,8 @@ class BaseView(view._View):
 
         dataset["interface.active_tab"] = active_tab
         dataset["interface.active_section"] = active_section
-        dataset["interface.sections"] = env.viewmanager.getSections(user) if env.viewmanager else {}
+        dataset["interface.sections"] = env.menumanager.get_sections(user) if env.menumanager else {}
+        dataset["interface.menu"] = env.menumanager.get_menus(user) if env.menumanager else {}
         dataset["toplayout_extra_content"] = ""
 
         all(env.hookmgr.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT",
@@ -185,6 +186,7 @@ class Core:
         resolve.init()
 
         env.viewmanager = None
+        env.menumanager = None
         env.htdocs_mapping.update((("prewikka", pkg_resources.resource_filename(__name__, 'htdocs')),))
 
         try:
@@ -233,6 +235,7 @@ class Core:
         obj.init(config)
 
     def _loadPlugins(self, last_change=None):
+        env.menumanager = menu.MenuManager()
         env.viewmanager = view.ViewManager()
 
         env.plugins = {}
