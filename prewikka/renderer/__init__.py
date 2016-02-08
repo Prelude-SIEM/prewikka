@@ -25,6 +25,7 @@ ORANGE_STD = "F5B365"
 YELLOW_STD = "D4C608"
 GREEN_STD = "B1E55D"
 BLUE_STD = "93B9DD"
+GRAY_STD = "5C5C5C"
 
 SEVERITY_COLOR_MAP = {
         "high": (_("High"), RED_STD),
@@ -63,7 +64,7 @@ class RendererItem(object):
 
 
 class RendererUtils(object):
-    _nexist_color = (_("N/a"), "000000")
+    _nexist_color = (_("N/a"), GRAY_STD)
 
     def __init__(self, options):
         self._color_map_idx = 0
