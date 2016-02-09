@@ -131,12 +131,23 @@ class SQLScript(object):
     def run(self):
         pass
 
+    def __metadata_upsert(self):
+        # Update or insert metadata for the module as necessary,
+        # depending on whether the plugin already existed without a schema
+        # or not.
+        module = self.db.escape(self._module_name)
+        if self.db.query('SELECT 1 FROM Prewikka_Module_Registry WHERE module = %s' % module):
+            self.db.query('UPDATE Prewikka_Module_Registry SET branch = %s, version = %s WHERE module = %s' %
+                  (self.db.escape(self.branch), self.db.escape(self.version), module))
+        else:
+            self.db.query('INSERT INTO Prewikka_Module_Registry(module, branch, version, enabled) VALUES(%s, %s, %s, 1)' %
+                  (module, self.db.escape(self.branch), self.db.escape(self.version)))
+
     def __apply(self):
         self.run()
 
         if self.type == "install":
-            self.db.query('INSERT INTO Prewikka_Module_Registry(module, branch, version, enabled) VALUES(%s, %s, %s, 1)' %
-                  (self.db.escape(self._module_name), self.db.escape(self.branch), self.db.escape(self.version)))
+            self.__metadata_upsert()
 
         elif self.type == "update":
             self.db.query("UPDATE Prewikka_Module_Registry SET version=%s WHERE module=%s%s" % (self.db.escape(self.version), self.db.escape(self._module_name), self.db._chknull("branch", self.branch)))
