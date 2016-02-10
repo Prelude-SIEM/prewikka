@@ -59,7 +59,7 @@ class BaseView(view._View):
         except:
             theme_name = env.config.default_theme
 
-        dataset["document.title"] = interface.getOptionValue("browser_title", "Prelude SIEM")
+        dataset["document.title"] = interface.getOptionValue("browser_title", "Prelude OSS")
 
         dataset["document.css_files"] = ["prewikka/css/jquery-ui.min.css",
                                          "prewikka/css/bootstrap.min.css",
@@ -87,7 +87,6 @@ class BaseView(view._View):
             "software",
             "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />")
 
-        dataset["prewikka.place"] = interface.getOptionValue("place", "")
         dataset["prewikka.date"] = localization.format_date()
         if user:
             if interface.getOptionValue("user_display") == "name":
