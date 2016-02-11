@@ -85,8 +85,6 @@ function CommonListing(elem, text, columns, data, editLink, deleteLink) {
 }
 
 
-$(document).on("dialogopen", resizeGrids);
-
 $(window).on("resize", function() {
     resizeGrid();
     resizeGrids();
@@ -104,8 +102,9 @@ function resizeGrid() {
 
     var delta = titleHeight + headerHeight + pagerHeight + footerHeight + 3 * margin;
 
-    var newHeight = window.innerHeight - parseInt($("div#_main").css("top")) - delta;
-    var newWidth = window.innerWidth - parseInt($("div#_main").css("left")) - 2 * margin;
+    var position = $("div#_main").position();
+    var newHeight = window.innerHeight - position.top - delta;
+    var newWidth = window.innerWidth - position.left - 2 * margin;
     $(grid).jqGrid("setGridHeight", newHeight, true);
     $(grid).jqGrid("setGridWidth", newWidth, true);
 }
