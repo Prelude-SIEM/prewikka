@@ -21,7 +21,21 @@ function CommonListing(elem, text, options) {
         pager: true,
         hidegrid: false,
         viewrecords: true,
-        globalSearch: false
+        globalSearch: false,
+        onSelectRow: function() {
+            var rows = $(this).jqGrid('getGridParam', 'selarrrow');
+            if ( rows.length == 0 ) {
+                disableButtons(".needone", "Please select at least one entry");
+                disableButtons(".justone", "Please select exactly one entry");
+            }
+            else if ( rows.length > 1 ) {
+                enableButtons(".needone");
+                disableButtons(".justone", "Please select exactly one entry");
+            }
+            else {
+                enableButtons(".needone, .justone");
+            }
+        }
     }, options);
 
     var grid = prewikka_grid(elem, options)
@@ -145,4 +159,12 @@ function setConfirmDialogPosition(grid, form) {
         at: "right",
         of: $(row)
     });
+}
+
+function disableButtons(elem, title) {
+    $(elem).prop("disabled", true).prop("title", title);
+}
+
+function enableButtons(elem, title) {
+    $(elem).prop("disabled", false).prop("title", "");
 }
