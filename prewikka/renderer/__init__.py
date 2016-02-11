@@ -114,6 +114,15 @@ class RendererPluginManager(pluginmanager.PluginManager):
             if not i.renderer_type in self._default_backends:
                 self._default_backends[i.renderer_type] = i.renderer_backend
 
+    def has_backend(self, wanted_backend, wanted_type=None):
+        if wanted_backend not in self._renderer:
+            return False
+
+        if wanted_type is None:
+            return True
+
+        return set(wanted_type).issubset(self._renderer[wanted_backend])
+
     def get_backends(self, wanted_type):
         for backend, typedict in self._renderer.items():
             if wanted_type in typedict:
