@@ -241,7 +241,7 @@ exec(open('prewikka/version.py').read())
 
 setup(name="prewikka",
       version=__version__,
-      maintainer = "Equipe Prelude",
+      maintainer = "Prelude Team",
       maintainer_email = "support.prelude@c-s.fr",
       url = "http://www.prelude-siem.com",
       packages = find_packages(),
