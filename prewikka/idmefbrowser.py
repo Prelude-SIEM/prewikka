@@ -72,9 +72,9 @@ def _gen_option_list(iterator, selected):
 def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max_paths=0):
     _default_paths = default_paths or {
         "Source IP": "alert.source(0).node.address(0).address",
-        "Source Port": "alert.source.service.port",
+        "Source Port": "alert.source(0).service.port",
         "Target IP": "alert.target(0).node.address(0).address",
-        "Target Port": "alert.target.service.port",
+        "Target Port": "alert.target(0).service.port",
         "Classification": "alert.classification.text",
         "Analyzer": "alert.analyzer(-1).name"
     }
