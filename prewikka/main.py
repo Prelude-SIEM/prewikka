@@ -19,6 +19,7 @@
 
 import pkg_resources
 from prewikka import siteconfig, template
+import os
 import prelude
 import preludedb
 import json
@@ -98,9 +99,14 @@ class BaseView(view._View):
                                         "prewikka/js/commonlisting.js",
                                         "prewikka/js/jquery.jstree.js"]
 
+        dataset["prewikka.favicon"] = interface.getOptionValue(
+            "favicon",
+            "prewikka/images/favicon.ico"
+        )
         dataset["prewikka.software"] = interface.getOptionValue(
             "software",
-            "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />")
+            "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />"
+        )
 
         dataset["prewikka.date"] = localization.format_date()
         if user:
@@ -188,6 +194,13 @@ class Core:
         env.viewmanager = None
         env.menumanager = None
         env.htdocs_mapping.update((("prewikka", pkg_resources.resource_filename(__name__, 'htdocs')),))
+
+        custom_theme = env.config.interface.getOptionValue("custom_theme", None)
+        if custom_theme:
+            if os.path.isdir("%s%s" % (os.path.sep, custom_theme)):
+                env.htdocs_mapping.update((("custom", custom_theme),))
+            else:
+                env.htdocs_mapping.update((("custom", pkg_resources.resource_filename(custom_theme, 'htdocs')),))
 
         try:
             self._prewikka_initialized = False
