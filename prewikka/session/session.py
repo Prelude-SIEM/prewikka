@@ -96,7 +96,15 @@ class Session(pluginmanager.PluginBase):
     def __check_session(self, request):
         sessionid = request.input_cookie.get("sessionid")
         if not sessionid:
-             raise SessionInvalid(message="", template=self.template, log_priority=log.INFO)
+            # No session cookie sent by the browser
+            if request.is_xhr:
+                # In case of an AJAX request, we consider that
+                # the session cookie expired and was not sent.
+                raise SessionExpired(login=None, template=self.template)
+            else:
+                # Otherwise, we consider that the session cookie did not exist,
+                # and we don't display any message on the login page.
+                raise SessionInvalid(message="", template=self.template, log_priority=log.INFO)
 
         sessionid = sessionid.value
 
