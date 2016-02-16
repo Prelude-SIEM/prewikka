@@ -109,13 +109,16 @@ def escape_html_string(s):
     return s
 
 
-def _criteria_value_find(value, clist=[]):
+def find_unescaped_characters(value, characters=None):
+    """Search for unescaped characters among *characters* in string *value*."""
     escaped = False
+    if not characters:
+        return False
 
     for char in value:
         if escaped:
             escaped = False
-        elif char in clist:
+        elif char in characters:
             return True
         elif char == '\\':
             escaped = True
@@ -129,7 +132,7 @@ def filter_value_adjust(operator, value):
 
     value = value.strip()
 
-    has_wildcard = _criteria_value_find(value, ["*"])
+    has_wildcard = find_unescaped_characters(value, ["*"])
     if has_wildcard:
         return value
 
