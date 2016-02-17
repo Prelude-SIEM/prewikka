@@ -20,7 +20,7 @@
 import pkg_resources, os, json
 
 from . import templates
-from prewikka import view, database, usergroup, version, env, error
+from prewikka import view, database, version, env, error
 
 
 class AboutPlugin(view.View):
@@ -30,6 +30,7 @@ class AboutPlugin(view.View):
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
     plugin_description = N_("Plugin installation and activation management page")
+    plugin_mandatory = True
 
     view_name = N_("Apps")
     view_template = templates.aboutplugin
@@ -96,7 +97,8 @@ class AboutPlugin(view.View):
 
         else:
             if "enable_plugin" in self.parameters:
-                self._dbup(mod, mod.__module__ in self.parameters["enable_plugin"])
+                enabled = mod.plugin_mandatory or mod.__module__ in self.parameters["enable_plugin"]
+                self._dbup(mod, enabled)
 
             data.installed.setdefault(catname, []).append((mod, env.db.is_plugin_active(mod.__module__)))
 

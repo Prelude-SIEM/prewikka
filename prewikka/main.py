@@ -250,6 +250,13 @@ class Core:
                 env.url[urltype][option.name] = option.value
 
     def _load_auth_or_session(self, typename, plugins, name, config=None):
+        if name not in plugins:
+            raise error.PrewikkaUserError(
+                "Initialization error",
+                "Cannot use %(type)s mode '%(name)s', please contact your local administrator." %
+                {'type': typename, 'name': name}
+            )
+
         if config:
             config = config.getSection(name)
         else:

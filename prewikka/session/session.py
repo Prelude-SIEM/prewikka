@@ -81,6 +81,7 @@ class SessionDatabase(database.DatabaseHelper):
 class Session(pluginmanager.PluginBase):
     template = None
     autologin = False
+    plugin_mandatory = True
 
     def __init__(self, config):
         pluginmanager.PluginBase.__init__(self)

@@ -128,6 +128,7 @@ class _AuthGroup(object):
 
 class Auth(pluginmanager.PluginBase, _AuthUser, _AuthGroup):
     __metaclass__ = abc.ABCMeta
+    plugin_mandatory = True
 
     def __init__(self, config):
         pluginmanager.PluginBase.__init__(self)

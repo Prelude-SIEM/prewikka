@@ -110,6 +110,8 @@ class PluginBase(object):
     plugin_locale = None
 
     plugin_deprecate = []
+    plugin_mandatory = False
+
 
 class PluginPreload(PluginBase):
     plugin_classes = []
