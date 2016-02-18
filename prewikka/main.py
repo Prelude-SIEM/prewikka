@@ -19,7 +19,10 @@
 
 import pkg_resources
 from prewikka import siteconfig, template
-import prelude, preludedb, json
+import prelude
+import preludedb
+import json
+import mimetypes
 
 try:
     from threading import Lock, local
@@ -33,6 +36,18 @@ from prewikka import view, config, log, database, idmefdatabase, version, \
 from prewikka.myconfigparser import ConfigParserSection
 
 from prewikka.templates import ClassicLayout
+
+
+_ADDITIONAL_MIME_TYPES = [("application/vnd.oasis.opendocument.formula-template", ".otf"),
+                          ("application/vnd.ms-fontobject", ".eot"),
+                          ("image/vnd.microsoft.icon", ".ico"),
+                          ("application/font-woff", ".woff"),
+                          ("application/font-sfnt", ".ttf"),
+                          ("application/json", ".map"),
+                          ("font/woff2", ".woff2")]
+
+for mtype, extension in _ADDITIONAL_MIME_TYPES:
+    mimetypes.add_type(mtype, extension)
 
 
 class Logout(view._View):
