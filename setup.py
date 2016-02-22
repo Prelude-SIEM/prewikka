@@ -280,6 +280,12 @@ setup(name="prewikka",
                         'UserManagement = prewikka.views.usermanagement:UserManagement',
                         'Warning = prewikka.views.warning:Warning',
                 ],
+
+                'prewikka.updatedb': [
+                        'prewikka = prewikka.sql',
+                        'prewikka.views.filter.filter = prewikka.views.filter.sql'
+                ]
+
       },
 
       package_data= { '': ["htdocs/images/*.*",

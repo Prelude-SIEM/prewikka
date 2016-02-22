@@ -216,6 +216,12 @@ class DatabaseUpdateHelper(DatabaseHelper):
         self._from_branch = branch
         self._from_version = version
 
+    def _get_update_directories(self):
+        for i in pkg_resources.iter_entry_points("prewikka.updatedb", self._module_name):
+            try:
+                yield i.load().__path__[0]
+            except Exception as e:
+                log.getLogger().exception("[%s]: error loading SQL updates: %s", self._module_name, e)
 
     def _get_schema_list(self, **kwargs):
         from_version = to_version = None
@@ -226,8 +232,9 @@ class DatabaseUpdateHelper(DatabaseHelper):
         if "to_version" in kwargs:
             to_version = pkg_resources.parse_version(kwargs.pop("to_version"))
 
-        dirname = pkg_resources.resource_filename(self._module_name, "sql")
-        for importer, package_name, _ in pkgutil.iter_modules([dirname]):
+        dirnames = self._get_update_directories()
+
+        for importer, package_name, _ in pkgutil.iter_modules(dirnames):
             try:
                 mod = importer.find_module(package_name).load_module(package_name).SQLUpdate(self)
             except Exception as e:
