@@ -136,6 +136,7 @@ def usage():
     print "-c --config [config]\tConfiguration file to use (default: %s/prewikka.conf)" % siteconfig.conf_dir
     print "-p --port [port]\tPort number to use (default: 8000)"
     print "-a --address [address]\tIP to bind to (default: 0.0.0.0)"
+    print "-m --multiprocess [number]\tNumber of processes to use. Default value matches the number of available CPUs (i.e. %d)" % multiprocessing.cpu_count()
     print
     sys.exit(1)
 
