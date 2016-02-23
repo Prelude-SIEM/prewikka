@@ -189,7 +189,7 @@ class MessageListing(view.View):
 
         return len(results)
 
-    def _updateMessages(self, action, crit_and_ident=False):
+    def _updateMessages(self, action, criteria, crit_and_ident=False):
         if len(self.parameters["selection"]) == 0:
             return
 
@@ -202,11 +202,12 @@ class MessageListing(view.View):
             if item.isdigit():
                 idents += [ long(item) ]
             else:
-                criteria = urllib.unquote_plus(item)
+                crit = " && ".join(criteria + [urllib.unquote_plus(item)])
+
                 if not crit_and_ident:
-                        idents += self._getMessageIdents(criteria)
+                        idents += self._getMessageIdents(crit)
                 else:
-                        criterial.append(criteria)
+                        criterial.append(crit)
 
         action((idents, criterial) if crit_and_ident else idents, is_ident=crit_and_ident)
         del self.parameters["selection"]

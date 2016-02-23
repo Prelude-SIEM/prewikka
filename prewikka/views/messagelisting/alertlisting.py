@@ -1226,9 +1226,6 @@ class AlertListing(MessageListing):
 
     def render(self):
         MessageListing.render(self)
-        if "listing_apply" in self.parameters:
-            if self.parameters["action"] == "delete_message":
-                self._updateMessages(self._deleteMessage)
 
         self._setTimelineChart()
 
@@ -1240,6 +1237,10 @@ class AlertListing(MessageListing):
 
         self._applyFilters(criteria)
         self._adjustCriteria(criteria)
+
+        if "listing_apply" in self.parameters:
+            if self.parameters["action"] == "delete_message":
+                self._updateMessages(self._deleteMessage, criteria)
 
         self._setNavPrev(self.parameters["offset"])
 

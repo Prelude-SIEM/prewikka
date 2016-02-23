@@ -100,7 +100,6 @@ class HeartbeatListing(MessageListing):
     def render(self):
         MessageListing.render(self)
 
-        self._updateMessages(self._deleteMessage)
         criteria = [ ]
         start = end = None
 
@@ -110,6 +109,8 @@ class HeartbeatListing(MessageListing):
 
         self._applyInlineFilters(criteria)
         self._adjustCriteria(criteria)
+
+        self._updateMessages(self._deleteMessage, criteria)
 
         self._setNavPrev(self.parameters["offset"])
 
