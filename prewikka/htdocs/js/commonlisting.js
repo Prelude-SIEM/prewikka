@@ -1,19 +1,16 @@
-function CommonListing(elem, text, columns, data, editLink, deleteLink) {
+function CommonListing(elem, text, options) {
 
     $(elem).addClass("commonlisting");
 
-    columns['model'][0].formatter = function(cellValue, options) {
+    options['colModel'][0].formatter = function(cellValue, opts, rowObj) {
         var link = $('<a>').prop("class", "widget-link")
-                           .prop("title", text['edit'] + ': ' + options.rowId)
-                           .prop("href", editLink + '?id=' + options.rowId)
+                           .prop("title", rowObj.title)
+                           .prop("href", rowObj.link)
                            .text(cellValue);
         return link.wrap("<div>").parent().html();
     };
 
-    var grid = prewikka_grid(elem, {
-        colNames: columns['names'],
-        colModel: columns['model'],
-        data: data,
+    options = _mergedict({
         gridview: true,
         multiselect: true,
         multiSort: true,
@@ -23,13 +20,16 @@ function CommonListing(elem, text, columns, data, editLink, deleteLink) {
         rowList: ['-1:all', 10, 20, 30],
         pager: true,
         hidegrid: false,
-        viewrecords: true
-    })
+        viewrecords: true,
+        globalSearch: false
+    }, options);
+
+    var grid = prewikka_grid(elem, options)
     .jqGrid('navGrid', {
         add: false,
         edit: false,
         del: false,
-        search: true,
+        search: !options.globalSearch,
         refresh: false
     })
     .jqGrid('navButtonAdd', {
@@ -41,9 +41,35 @@ function CommonListing(elem, text, columns, data, editLink, deleteLink) {
         }
     });
 
+    if ( options.globalSearch ) {
+        $(".ui-jqgrid-titlebar").css("overflow", "auto")
+        .append($("<label>", {for: "globalSearch", class: "pull-right"}).text(text["search"])
+        .append($("<input>", {id: "globalSearch", type: "text"})));
+
+        $("#globalSearch").on("keypress", function(e) {
+            if ( e.which === $.ui.keyCode.ENTER ) {
+                var query = $(this).val();
+                var postData = grid.jqGrid("getGridParam", "postData");
+                if ( options.datatype == "json" ) {
+                    postData.query = query;
+                }
+                else {
+                    var rules = $.map(grid.jqGrid("getGridParam", "colModel"), function(column) {
+                        if ( column.search !== false )
+                            return {field: column.name, op: "cn", data: query};
+                    });
+                    postData.filters = {groupOp: "OR", rules: rules};
+                }
+                grid.jqGrid("setGridParam", {search: true});
+                grid.trigger("reloadGrid", [{page: 1, current: true}]);
+                return false;
+            }
+        });
+    }
+
     $(".button-add").on("click", function() {
         prewikka_widget({
-            url: prewikka_location().href + "/" + editLink,
+            url: prewikka_location().href + "/" + options.editLink,
             dialog: {
                 title: text['new']
             }
@@ -53,7 +79,7 @@ function CommonListing(elem, text, columns, data, editLink, deleteLink) {
         var row = grid.getGridParam("selrow");
         if ( ! row ) return;
         prewikka_widget({
-            url: prewikka_location().href + "/" + editLink,
+            url: prewikka_location().href + "/" + options.editLink,
             data: {id: row, duplicate: "true"},
             dialog: {
                 title: text['new']
@@ -64,7 +90,7 @@ function CommonListing(elem, text, columns, data, editLink, deleteLink) {
         var rows = grid.getGridParam("selarrrow");
         if ( ( rows.length == 0 ) || ( $(this).data("confirm") ) ) return;
         $.ajax({
-            url: prewikka_location().href + "/" + deleteLink,
+            url: prewikka_location().href + "/" + options.deleteLink,
             data: {action: "delete", id: rows},
             success: function() { grid.delRowData(rows); }
         });
