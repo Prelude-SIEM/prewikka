@@ -54,7 +54,7 @@ class _AuthUser(object):
         env.db.del_properties(user)
 
     @abc.abstractmethod
-    def getUserList(self):
+    def getUserList(self, search=None):
         return []
 
     @abc.abstractmethod
@@ -86,7 +86,7 @@ class _AuthGroup(object):
     def canManageGroupMembers(self):
         return "setGroupMembers" in self.__class__.__dict__
 
-    def getGroupList(self):
+    def getGroupList(self, search=None):
         return []
 
     def createGroup(self, group):
