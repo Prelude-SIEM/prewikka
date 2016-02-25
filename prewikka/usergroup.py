@@ -40,7 +40,7 @@ class Permissions(set):
         if isinstance(permission, compat.STRING_TYPES):
             self.add(permission)
         else:
-            self.union(permission)
+            self.update(permission)
 
 ALL_PERMISSIONS = Permissions()
 
