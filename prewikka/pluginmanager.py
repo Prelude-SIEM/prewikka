@@ -175,9 +175,10 @@ class PluginManager:
 
             try:
                 if issubclass(plugin_class, PluginPreload):
+                    # Get sections from all views before testing plugin database version
                     [self._handle_section(x) for x in plugin_class.plugin_classes]
                     self._handle_attributes(plugin_class, autoupdate)
-                    [self._addPlugin(x, autoupdate) for x in plugin_class.plugin_classes]
+                    [self._addPlugin(x, autoupdate) for x in plugin_class().plugin_classes]
                 else:
                     self._handle_section(plugin_class)
                     self._addPlugin(plugin_class, autoupdate, name=name)
