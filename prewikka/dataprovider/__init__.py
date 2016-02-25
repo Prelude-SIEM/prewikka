@@ -188,3 +188,7 @@ class DataProviderManager(pluginmanager.PluginManager):
         results = self._backends[type].get_values(paths, criteria, distinct, limit, offset)
 
         return results
+
+    def has_type(self, wanted_type):
+        return wanted_type in self._backends
+

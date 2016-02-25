@@ -236,6 +236,7 @@ class Core:
 
     def _loadPlugins(self, last_change=None):
         env.menumanager = menu.MenuManager()
+        env.dataprovider = dataprovider.DataProviderManager()
         env.viewmanager = view.ViewManager()
 
         env.plugins = {}
@@ -276,7 +277,6 @@ class Core:
                 env.viewmanager.addView(Logout())
 
         env.renderer = renderer.RendererPluginManager()
-        env.dataprovider = dataprovider.DataProviderManager()
 
         self._last_plugin_activation_change = last_change or env.db.get_last_plugin_activation_change()
 
