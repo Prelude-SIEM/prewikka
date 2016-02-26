@@ -87,11 +87,11 @@ class MenuManager(object):
             if section in self._all_sections:
                 # Sections that are declared in section_order but not loaded
                 # should appear in the menu, but with an empty link
-                link = self._get_first_view_path(loaded_sections.get(section))
+                views = self._get_display_views(loaded_sections.get(section))
 
                 # Put the section in the previous menu (or in the default one if there is none)
                 current_menu = menus.values()[-1] if menus else default_menu
-                current_menu["entries"].append({'name': section, 'link': link, 'icon': icon.value})
+                current_menu["entries"].append({'name': section, 'views': views, 'icon': icon.value})
 
             else:
                 # Create a new menu if the section_order entry does not match a section
@@ -101,8 +101,8 @@ class MenuManager(object):
         for section in loaded_sections:
             # Put the sections not declared in section_order in the default menu
             if section not in env.config.section_order:
-                link = self._get_first_view_path(loaded_sections.get(section))
-                default_menu["entries"].append({'name': section, 'link': link, 'icon': None})
+                views = self._get_display_views(loaded_sections.get(section))
+                default_menu["entries"].append({'name': section, 'views': views, 'icon': None})
 
         if self._DEFAULT_MENU in menus:
             menus[self._DEFAULT_MENU]["entries"] += default_menu["entries"]
@@ -111,8 +111,21 @@ class MenuManager(object):
 
         return menus
 
-    @staticmethod
-    def _get_first_view_path(section):
+    @classmethod
+    def _get_display_views(cls, section):
         if not section:
             return None
-        return section.values()[0].values()[0].view_path
+
+        views = [view.values()[0] for view in section.values() if view.values()[0].view_subsection]
+
+        if not views:
+            return [cls._get_first_view(section)]
+        return views
+
+    @staticmethod
+    def _get_first_view(section):
+        if not section:
+            return None
+
+        # Take the parent of the first view
+        return section.values()[0].values()[0]

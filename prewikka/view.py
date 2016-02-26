@@ -320,6 +320,7 @@ class _View(object):
     view_id = None
     view_name = None
     view_parameters = None
+    view_subsection = False
     view_permissions = [ ]
     view_template = None
     view_section = None

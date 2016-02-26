@@ -25,6 +25,11 @@
             \$('#dataConfirmModal').modal({show: true});
             return false;
         });
+
+        \$('ul.dropdown-menu [data-toggle=dropdown]').on('click', function(event) {
+            \$(this).closest(".dropdown-submenu").toggleClass("open");
+            return false;
+        });
     });
 </script>
 
@@ -80,13 +85,31 @@
                         </a>
                         <ul class="dropdown-menu" role="menu">
                         #for $section in $menu_item.entries
-                            #if $section.link
-                            <li><a href="$section.link">
+                            #if $section.views
+                                #if len($section.views) == 1
+                            <li>
+                                <a href="$section.views[0].view_path">
                                 #if $section.icon
-                                <i class="fa fa-$section.icon"></i>
+                                    <i class="fa fa-$section.icon"></i>
                                 #end if
-                                $_($section.name)
-                            </a></li>
+                                    $_($section.name)
+                                </a>
+                            </li>
+                                #else
+                            <li class="dropdown dropdown-submenu">
+                                <a class="dropdown-toggle" data-toggle="dropdown">
+                                #if $section.icon
+                                    <i class="fa fa-$section.icon"></i>
+                                #end if
+                                    $_($section.name)
+                                </a>
+                                <ul class="dropdown-menu">
+                                #for view in $section.views
+                                    <li><a href="$view.view_path">$_($view.view_name)</a></li>
+                                #end for
+                                </ul>
+                            </li>
+                                #end if
                             #else
                             <li class="disabled" title="$_('This app has been disabled or failed to load.')"><a>
                                 #if $section.icon
