@@ -99,6 +99,11 @@ class BaseView(view._View):
                                         "prewikka/js/commonlisting.js",
                                         "prewikka/js/jquery.jstree.js"]
 
+        for type_ in ("css", "js"):
+            for i in env.hookmgr.trigger("HOOK_LOAD_HEAD_CONTENT_%s" % type_.upper()):
+                l = dataset["document.%s_files" % type_]
+                l += (href for href in i if href not in l)
+
         dataset["prewikka.favicon"] = interface.getOptionValue(
             "favicon",
             "prewikka/images/favicon.ico"
@@ -173,6 +178,8 @@ class Core:
         env.hookmgr.declare("HOOK_TOPLAYOUT_EXTRA_CONTENT")
         env.hookmgr.declare("HOOK_PROCESS_REQUEST")
         env.hookmgr.declare("HOOK_LINK")
+        env.hookmgr.declare("HOOK_LOAD_HEAD_CONTENT_CSS", list)
+        env.hookmgr.declare("HOOK_LOAD_HEAD_CONTENT_JS", list)
 
         env.dns_max_delay = float(env.config.general.getOptionValue("dns_max_delay", 0))
 
