@@ -55,7 +55,7 @@ class PluginHookManager:
         self._hooks = { }
 
     def hasListener(self, hook):
-        return hook in self._hooks
+        return bool(self._hooks.get(hook))
 
     def unregister(self, hook=None, method=None):
         if hook and method:
