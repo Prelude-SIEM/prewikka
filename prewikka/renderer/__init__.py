@@ -128,6 +128,10 @@ class RendererPluginManager(pluginmanager.PluginManager):
             if wanted_type in typedict:
                 yield backend
 
+    def get_backends_instances(self, wanted_type):
+        for backend in self.get_backends(wanted_type):
+            yield self._renderer[backend][wanted_type]
+
     def get_default_backend(self, wanted_type):
         return self._default_backends.get(wanted_type)
 
