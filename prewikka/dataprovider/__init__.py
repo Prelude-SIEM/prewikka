@@ -173,7 +173,23 @@ class DataProviderManager(pluginmanager.PluginManager):
                 raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
             self._type_handlers[k] = normalizer
 
-    def query(self, type, paths, criteria=None, distinct=0, limit=-1, offset=-1):
+    def _guess_data_type(self, paths, criteria=None):
+        res = set()
+        for path in paths:
+            tmp = path.partition('.')
+            if tmp[1]:
+                res.add(tmp[0].rpartition('(')[2])
+
+        # FIXME Try to guess the backend using criteria first
+        if len(res) != 1:
+            raise DataProviderError("Unable to guess data type: incompatible paths")
+
+        return list(res)[0]
+
+    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None):
+        if not type:
+            type = self._guess_data_type(paths, criteria)
+
         if type not in self._type_handlers or type not in self._backends:
             raise NoBackendError("No backend available for '%s' datatype" % type)
 
