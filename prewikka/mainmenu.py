@@ -237,20 +237,23 @@ class MainMenu:
             else:
                 self.dataset["timeline.%s_selected" % timezone] = ""
 
-    def get_criteria(self, ctype="alert"):
+    def get_criteria_format(self, disable_filter=False):
         criteria = []
 
-        for c in env.hookmgr.trigger("HOOK_MAINMENU_GET_CRITERIA", self, ctype):
-            if c:
-                criteria.append(c)
-
+        if not disable_filter:
+            for c in env.hookmgr.trigger("HOOK_MAINMENU_GET_CRITERIA", self, "%(backend)s"):
+                if c:
+                    criteria.append(c)
         if self.start:
-                criteria.append("%s.create_time >= '%s'" % (ctype, str(self.start)))
+                criteria.append("%%(backend)s.%%(time_field)s >= '%s'" % str(self.start))
 
         if self.end:
-                criteria.append("%s.create_time <= '%s'" % (ctype, str(self.end)))
+                criteria.append("%%(backend)s.%%(time_field)s <= '%s'" % str(self.end))
 
         return " && ".join(criteria)
+
+    def get_criteria(self, ctype="alert"):
+        return self.get_criteria_format() % {'backend' : ctype, 'time_field' : 'create_time'}
 
     def get_step(self, stepno=None):
         if stepno:

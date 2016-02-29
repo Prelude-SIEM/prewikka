@@ -123,7 +123,7 @@ class DataProviderNormalizer(object):
         """
         pass
 
-    def parse_criteria(self, criteria):
+    def parse_criteria(self, criteria, type):
         """
         Parse criteria and turn them into a structure
         that can be used by the backend.
@@ -131,6 +131,8 @@ class DataProviderNormalizer(object):
         @param criteria: List of criteria in natural syntax
             (eg. ["foo.bar == 42 || foo.id = 23"])
         @type criteria: list
+        @param type: type of backend
+        @type type: string
         @return: The criteria as a structure that can easily
             be used by the backend.
         """
@@ -199,7 +201,7 @@ class DataProviderManager(pluginmanager.PluginManager):
         normalizer = self._type_handlers[type]
         if normalizer:
             paths = normalizer.parse_paths(paths)
-            criteria = normalizer.parse_criteria(criteria)
+            criteria = normalizer.parse_criteria(criteria, type)
 
         results = self._backends[type].get_values(paths, criteria, distinct, limit, offset)
 

@@ -24,7 +24,7 @@ from . import templates
 
 
 class Filter:
-    _typetbl = { "generic": "alert", "alert": "alert", "heartbeat": "heartbeat" }
+    _typetbl = { "generic": "alert", "alert": "alert", "heartbeat": "heartbeat", "%(backend)s" : "%(backend)s" }
 
     def __init__(self, name, ftype, comment, elements, formula):
         self.name = name
@@ -65,7 +65,7 @@ class Filter:
 
 
     def get_criteria_cast(self, wanted_type):
-        if self.type != "generic" and self.type != wanted_type:
+        if self.type != "generic" and self.type != wanted_type and wanted_type != "%(backend)s":
             return None
 
         old_type = self.type
