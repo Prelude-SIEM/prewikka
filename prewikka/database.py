@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time, abc
+import time, abc, fcntl
 import re, operator, pkg_resources, pkgutil, glob, os.path, sys
 
 import preludedb
@@ -27,6 +27,23 @@ from prewikka import log, error, utils, version, env, compat
 class DatabaseSchemaError(error.PrewikkaUserError):
     def __init__(self, err):
         error.PrewikkaUserError.__init__(self, _("Database schema error"), err)
+
+
+__flock_fd = open(__file__, 'r')
+
+
+def use_flock(func):
+    def inner(self, *args, **kwargs):
+        fcntl.flock(__flock_fd, fcntl.LOCK_EX)
+
+        try:
+            ret = func(self, *args, **kwargs)
+        finally:
+            fcntl.flock(__flock_fd, fcntl.LOCK_UN)
+
+        return ret
+
+    return inner
 
 
 def use_transaction(func):
@@ -202,15 +219,22 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
         return branch, version, not(bool(int(enabled)))
 
+    def _init_version_attr(self):
+        if not self._initialized:
+            self._from_branch, self._from_version, self._need_enable = self._get_database_version()
+            self._initialized = True
+
     def __init__(self, module_name, reqversion, reqbranch=None):
         DatabaseHelper.__init__(self) #for use_transaction
 
         self._reqbranch = reqbranch
         self._reqversion = reqversion
         self._module_name = module_name
-        self._from_branch, self._from_version, self._need_enable = self._get_database_version()
+        self._initialized = False
 
     def check(self):
+        self._init_version_attr()
+
         if not self._from_version and self._reqversion:
             raise DatabaseSchemaError(_("database installation required"))
 
@@ -306,6 +330,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
         if not self._reqversion:
             return []
 
+        self._init_version_attr()
         from_version, prev = self._from_version, []
 
         if not from_version:
@@ -330,12 +355,14 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
         return prev + ret
 
+    @use_flock
     @use_transaction
     def apply(self):
         [ update.apply(transaction=False) for update in self.list() ]
         self.check()
 
     def get_schema_version(self):
+        self._init_version_attr()
         return self._from_version
 
 
