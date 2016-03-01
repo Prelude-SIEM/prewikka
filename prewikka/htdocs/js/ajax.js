@@ -247,7 +247,7 @@ function prewikka_widget(settings)
                         $(content).find(":input.widget-control").each(function(idx, data) {
                                 $(this.form).uniqueId();
                                 var btn = { 'class': $(this).attr("class"),
-                                            text: $(this).val(),
+                                            html: $(this).html() ? $(this).html() : $(this).val(),
                                             type: $(this).attr("type"),
                                             form: $(this.form).attr("id"),
                                             click: $.noop

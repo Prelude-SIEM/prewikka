@@ -108,8 +108,8 @@ function newFilterElement(name, idmef_object, idmef_operator, object_value) {
           <div class="input-group">
             <input type="text" class="form-control" id="value_example" name="value_example" placeholder="$_("value")">
             <span class="input-group-btn">
-              <div class="btn btn-danger del_entry" type="button" id="button_example">$_("Remove")</div>
-              <div class="btn btn-default add_entry">$_("Add")</div>
+              <div class="btn btn-default add_entry"><i class="fa fa-plus"></i></div>
+              <div class="btn btn-default del_entry" id="button_example"><i class="fa fa-minus"></i></div>
             </span>
           </div>
         </div>
@@ -142,8 +142,8 @@ function newFilterElement(name, idmef_object, idmef_operator, object_value) {
     #end for
     </select>
     <span class="input-group-btn">
-      <input class="btn btn-default" type="submit" name="mode" value="$_("Load")"/>
-      <input class="btn btn-danger" type="submit" name="mode" value="$_("Delete")" data-confirm="$_("Delete this filter?")"/>
+      <button class="btn btn-default" type="submit" name="mode" value="$_("Load")"><i class="fa fa-cloud-download"></i> $_("Load")</button>
+      <button class="btn btn-danger" type="submit" name="mode" value="$_("Delete")" data-confirm="$_("Delete this filter?")"><i class="fa fa-trash"> $_("Delete")</i></button>
     </span>
   </div>
 </fieldset>
@@ -237,7 +237,7 @@ function newFilterElement(name, idmef_object, idmef_operator, object_value) {
   </div>
 </div>
 
-<input class="pull-right btn btn-primary" type="submit" name="mode" value="$_("Save")"/>
+<button class="pull-right btn btn-primary" type="submit" name="mode" value="$_("Save")"><i class="fa fa-save"></i> $_("Save")</button>
 </fieldset>
 </form>
 

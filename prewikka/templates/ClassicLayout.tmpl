@@ -108,7 +108,7 @@ function check_same_origin(url) {
                 return false;
         });
 
-        \$(document).on("click", "#main form input[type=submit]", function() {
+        \$(document).on("click", "#main form :input[type=submit]", function() {
                 var name = \$(this).attr("name");
                 var value = \$(this).attr("value");
 

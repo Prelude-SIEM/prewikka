@@ -10,7 +10,7 @@ $messagelisting_scripts
 \$LAB.script("messagelisting/js/messagelisting.js").wait();
 
 \$(document).ready(function() {
-  \$(document).on("click", "#main form input[name=pdfgen], #main form input[name=csvgen]", function(event) {
+  \$(document).on("click", "#main form :input[name=pdfgen], #main form :input[name=csvgen]", function(event) {
         \$("#main form").data("enable-download", true);
   });
 
