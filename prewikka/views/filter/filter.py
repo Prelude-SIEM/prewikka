@@ -77,6 +77,11 @@ class Filter:
 
 
 class FilterDatabase(database.DatabaseHelper):
+    def __init__(self):
+        database.DatabaseHelper.__init__(self)
+        env.hookmgr.declare_once("HOOK_FILTER_LISTING")
+        env.hookmgr.declare_once("HOOK_FILTER_CRITERIA_LOAD")
+
     def get_filter_list(self, user, ftype=None, name=None):
 
         type_str=""
@@ -228,8 +233,6 @@ class AlertFilterEdition(view.View):
         self._db = FilterDatabase()
 
         env.hookmgr.declare("HOOK_FILTER_DELETE")
-        env.hookmgr.declare("HOOK_FILTER_LISTING")
-        env.hookmgr.declare_once("HOOK_FILTER_CRITERIA_LOAD")
 
         env.hookmgr.register("HOOK_MAINMENU_PARAMETERS_REGISTER", self._filter_parameters_register_hook)
         env.hookmgr.register("HOOK_IDMEFDATABASE_CRITERIA_PREPARE", self._filter_get_criteria_hook)
