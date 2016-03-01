@@ -1,4 +1,4 @@
-# Copyright (C) 2008-2015 CS-SI. All Rights Reserved.
+# Copyright (C) 2008-2016 CS-SI. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoannv@gmail.com>
 #
 # This file is part of the Prewikka program.

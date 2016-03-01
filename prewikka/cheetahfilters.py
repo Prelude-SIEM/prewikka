@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2015 CS-SI. All Rights Reserved.
+# Copyright (C) 2004-2016 CS-SI. All Rights Reserved.
 # Author: Rob Holland <tigger@gentoo.org>
 
 import Cheetah

@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2015 CS-SI. All Rights Reserved.
+# Copyright (C) 2004-2016 CS-SI. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 
 import pkg_resources
