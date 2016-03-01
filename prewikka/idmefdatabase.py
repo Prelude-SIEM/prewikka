@@ -114,11 +114,7 @@ class IDMEFDatabase(preludedb.DB):
             else:
                 criteria = " && ".join([ "(%s)" % c for c in criteria ])
 
-        if selection[0].find("alert") != -1:
-            ctype = "alert"
-        else:
-            ctype = "heartbeat"
-
+        ctype = self._guess_data_type(selection)
         criteria = self._prepare_criteria(criteria, ctype)
         return preludedb.DB.getValues(self, selection, criteria=criteria, distinct=bool(distinct), limit=limit, offset=offset)
 
@@ -143,10 +139,17 @@ class IDMEFDatabase(preludedb.DB):
             else:
                 criteria = " || ".join([ "(%s)" % c for c in criteria ])
 
-        if order and order[0].find("heartbeat") != -1:
-            ctype = "heartbeat"
-        else:
-            ctype = "alert"
-
+        ctype = self._guess_data_type(order)
         criteria = self._prepare_criteria(criteria, ctype)
         preludedb.DB.update(self, fields, values, criteria, order, limit, offset)
+
+    def _guess_data_type(self, paths):
+        """Guess IDMEF type (alert or heartbeat) from provided paths"""
+        #FIXME: merge with the function in dataprovider?
+        for path in paths:
+            if "heartbeat" in path:
+                return "heartbeat"
+            elif "alert" in path:
+                return "alert"
+
+        return "alert"
