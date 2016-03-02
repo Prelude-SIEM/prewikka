@@ -216,7 +216,7 @@ class MessageListing(view.View):
             return
 
         if not self.user.has("IDMEF_ALTER"):
-            raise usergroup.PermissionDeniedError(self.current_view)
+            raise usergroup.PermissionDeniedError(["IDMEF_ALTER"], self.current_view)
 
         idents = [ ]
         criterial = []

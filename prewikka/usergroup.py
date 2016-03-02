@@ -25,12 +25,33 @@ from prewikka import error, log, localization, env
 ADMIN_LOGIN = "admin"
 
 class PermissionDeniedError(error.PrewikkaUserError):
-    def __init__(self, action_name):
-        error.PrewikkaUserError.__init__(self, _("Permission Denied"),
-                                         _("Access to view '%s' forbidden") % action_name, log_priority=log.WARNING)
+    def __init__(self, permissions, view=None):
+        if isinstance(permissions, compat.STRING_TYPES):
+            permissions = set(permissions)
 
+        if view:
+            msg = _("Access to view '%(view)s' forbidden. Required permissions: %(permissions)s") % {
+                "view": view,
+                "permissions": ", ".join(permissions)
+            }
+        else:
+            msg = _("Required permissions: %s") % ", ".join(permissions)
+
+        error.PrewikkaUserError.__init__(self, _("Permission Denied"), msg, log_priority=log.WARNING)
 
 _NAMEID_TBL = {}
+
+def permissions_required(permissions):
+    ALL_PERMISSIONS.declare(permissions)
+
+    def has_permissions(func):
+        def wrapper(*args, **kwargs):
+            user = getattr(env.threadlocal, "user", None)
+            if user and not user.has(permissions):
+                raise PermissionDeniedError(permissions)
+            return func(*args, **kwargs)
+        return wrapper
+    return has_permissions
 
 class Permissions(set):
     """ List of all the permissions available """

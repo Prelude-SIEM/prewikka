@@ -434,7 +434,7 @@ class ViewManager:
 
         env.log.info("Loading view %s" % view.view_id, request, userl)
         if userl and view.view_permissions and not userl.has(view.view_permissions):
-            raise usergroup.PermissionDeniedError(view.view_id)
+            raise usergroup.PermissionDeniedError(view.view_permissions, view.view_id)
 
         parameters = {}
         if view.view_parameters:
