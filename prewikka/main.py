@@ -158,10 +158,10 @@ class Core:
     def _checkVersion(self):
         error_type = _("Version Requirement error")
         if not prelude.checkVersion(siteconfig.libprelude_required_version):
-            raise error.PrewikkaUserError(error_type, _("Prewikka %(vPre)s requires libprelude %(vLib)s or higher") % {'vPre':version.__version__, 'vLib':siteconfig.libprelude_required_version})
+            raise error.PrewikkaUserError(error_type, _("Prelude %(vPre)s requires libprelude %(vLib)s or higher") % {'vPre':version.__version__, 'vLib':siteconfig.libprelude_required_version})
 
         elif not preludedb.checkVersion(siteconfig.libpreludedb_required_version):
-            raise error.PrewikkaUserError(error_type, _("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher") % {'vPre':version.__version__, 'vLib':siteconfig.libpreludedb_required_version})
+            raise error.PrewikkaUserError(error_type, _("Prelude %(vPre)s requires libpreludedb %(vLib)s or higher") % {'vPre':version.__version__, 'vLib':siteconfig.libpreludedb_required_version})
 
     def __init__(self, filename=None):
         env.auth = None # In case of database error
@@ -317,7 +317,7 @@ class Core:
         dataset, template_name = None, None
 
         if not isinstance(err, error.PrewikkaUserError):
-            err = error.PrewikkaUserError(_("Prewikka internal error"), err, display_traceback=True)
+            err = error.PrewikkaUserError(_("Prelude internal error"), err, display_traceback=True)
 
         login = user.name if user else err.log_user
         if str(err):

@@ -160,7 +160,7 @@ function prewikka_resizeTopMenu() {
 
 function prewikka_dialog(data)
 {
-    $("#prewikka-dialog").dialog("option", "title", data.name || "Prewikka Dialog");
+    $("#prewikka-dialog").dialog("option", "title", data.name || "Prelude Dialog");
     $("#prewikka-dialog .content").text(data.message);
 
     if ( data.traceback ) {

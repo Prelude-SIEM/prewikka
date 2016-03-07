@@ -114,7 +114,7 @@ function prewikka_drawTab(data)
         $("#topmenu #help-button").show();
         $("#topmenu #help-button").click(function() {
             prewikka_dialog({
-                name: "Prewikka Help",
+                name: "Prelude Help",
                 message: $("#main .prewikka-view-help").html()
             });
         });
