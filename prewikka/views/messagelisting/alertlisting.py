@@ -534,11 +534,11 @@ class ListedAlert(ListedMessage):
         return ret
 
     def _setMessageTime(self, message):
-        self["time"] = self.createTimeField(message["alert.create_time"], self.timezone)
+        self["time"] = self.createTimeField(message["alert.create_time"])
         self["time"]["time_url"] = self._setMessageTimeURL(message["alert.analyzer_time"], message["alert.analyzer(-1).node.name"])
         if (message["alert.analyzer_time"] is not None and
             abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
-            self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"], self.timezone)
+            self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"])
         else:
             self["analyzer_time"] = { "value": None }
 
@@ -640,8 +640,8 @@ class ListedAggregatedAlert(ListedAlert):
         self["target"] = [ ]
 
     def setTime(self, time_min, time_max):
-        self["time_min"] = self.createTimeField(time_min, self.parameters["timezone"])
-        self["time_max"] = self.createTimeField(time_max, self.parameters["timezone"])
+        self["time_min"] = self.createTimeField(time_min)
+        self["time_max"] = self.createTimeField(time_max)
 
     def setCriteriaForSelection(self, select_criteria):
         self["selection"] = urllib.quote_plus(" && ".join(select_criteria))
@@ -995,9 +995,7 @@ class AlertListing(MessageListing):
         elif self.parameters["orderby"] == "count_asc":
             selection += [ "count(alert.create_time)/order_asc", "max(alert.create_time)" ]
 
-        use_sensor_localtime = self.parameters["timezone"] == "sensor_localtime"
-        if not use_sensor_localtime:
-            selection += [ "min(alert.create_time)" ]
+        selection += [ "min(alert.create_time)" ]
 
         results = env.idmef_db.getValues(selection, criteria)
         total_results = len(results)
@@ -1062,12 +1060,8 @@ class AlertListing(MessageListing):
                 criteria2.append(criterion)
                 select_criteria.append(criterion)
 
-            if use_sensor_localtime:
-                time_min = env.idmef_db.getValues(["alert.create_time/order_asc"], criteria2, limit=1)[0][0]
-                time_max = env.idmef_db.getValues(["alert.create_time/order_desc"], criteria2, limit=1)[0][0]
-            else:
-                time_max = values[start + 1]
-                time_min = values[start + 2]
+            time_max = values[start + 1]
+            time_min = values[start + 2]
 
             parameters = self._createAggregationParameters(aggregated_classification_values,
                                                            aggregated_source_values, aggregated_target_values, aggregated_analyzer_values)

@@ -46,7 +46,6 @@ class MainMenuParameters(view.Parameters):
         self.optional("timeline_end", long, save=True, general=True)
         self.optional("timeline_start", long, save=True, general=True)
         self.optional("orderby", str, "time_desc")
-        self.optional("timezone", str, "frontend_localtime", save=True, general=True)
         self.optional("auto_apply_value", int, default=0, save=True, general=True)
         self.optional("auto_apply_enable", str, default="false", save=True, general=True)
 
@@ -55,9 +54,6 @@ class MainMenuParameters(view.Parameters):
 
     def normalize(self, view_name, user):
         do_load = view.Parameters.normalize(self, view_name, user)
-
-        if not self["timezone"] in ("frontend_localtime", "sensor_localtime", "utc"):
-            raise view.InvalidValueError("timezone", self["timezone"])
 
         if self["orderby"] not in ("time_desc", "time_asc", "count_desc", "count_asc"):
             raise view.InvalidParameterValueError("orderby", self["orderby"])
@@ -197,10 +193,10 @@ class MainMenu:
     def _setup_timeline_range(self):
         self.start = self.end = None
         if "timeline_start" in self.parameters:
-            self.start = datetime.datetime.fromtimestamp(self.parameters["timeline_start"], utils.timeutil.tzlocal()).astimezone(self._tzobj)
+            self.start = datetime.datetime.fromtimestamp(self.parameters["timeline_start"], env.threadlocal.user.timezone)
 
         if "timeline_end" in self.parameters:
-            self.end = datetime.datetime.fromtimestamp(self.parameters["timeline_end"], utils.timeutil.tzlocal()).astimezone(self._tzobj)
+            self.end = datetime.datetime.fromtimestamp(self.parameters["timeline_end"], env.threadlocal.user.timezone)
 
         self._timeunit, self._timevalue = self.parameters["timeline_unit"], self.parameters["timeline_value"]
         if self._timeunit == "unlimited":
@@ -209,33 +205,22 @@ class MainMenu:
         delta = relativedelta(**{self._timeunit + "s" if self._timeunit != "unlimited" else "years": self._timevalue})
 
         if self.start and not self.end:
-            self.end = datetime.datetime.now(utils.timeutil.tzlocal())
+            self.end = datetime.datetime.now(env.threadlocal.user.timezone)
 
         elif self.end and not self.start:
             self.start = self.end - delta
 
         elif self.start is None and self.end is None:
-            self.start = self.end = datetime.datetime.now(self._tzobj)
+            self.start = self.end = datetime.datetime.now(env.threadlocal.user.timezone)
             if self._timeunit in ("hour", "minute", "second"): #relative
                 self.start = self.end - delta
 
             else: # absolute
                 self.end = self._round_datetime(self.end, self._timeunit)
                 if self.parameters["timeline_unit"] == "unlimited":
-                    self.start = datetime.datetime(1970, 1, 1, tzinfo=utils.timeutil.tzutc()).astimezone(self._tzobj)
+                    self.start = datetime.fromtimestamp(0).replace(tzinfo=env.threadlocal.user.timezone)
                 else:
                     self.start = self.end - delta
-
-    def _setup_timezone(self):
-        for timezone, tzobj, tzname in (("utc", utils.timeutil.tzutc, "UTC"),
-                                        ("sensor_localtime", utils.timeutil.tzlocal, _("localtime")),
-                                        ("frontend_localtime", utils.timeutil.tzlocal, _("localtime"))):
-            if timezone == self.parameters["timezone"]:
-                self._tzobj = tzobj()
-                self.dataset["timeline.range_timezone"] = tzname
-                self.dataset["timeline.%s_selected" % timezone] = "selected='selected'"
-            else:
-                self.dataset["timeline.%s_selected" % timezone] = ""
 
     def get_criteria_format(self, disable_filter=False):
         criteria = []
@@ -268,7 +253,6 @@ class MainMenu:
 
     def render(self, parameters):
         self.parameters = parameters
-        self._setup_timezone()
         self._setup_timeline_range()
 
         self.dataset["timeline.order_by"] = parameters["orderby"]

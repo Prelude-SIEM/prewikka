@@ -18,13 +18,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import pkg_resources, locale, gettext, __builtin__, datetime
+import prelude
+import pkg_resources, locale, gettext, __builtin__, datetime, pytz
 from prewikka import utils, env, log
 
 from threading import local, Lock
 
 # Babel functions
-import babel.dates, babel.numbers
+import babel.dates, babel.numbers, babel.core
 
 try:
     from babel.dates import format_timedelta as _format_timedelta
@@ -160,25 +161,25 @@ def format_date(date=None, tzinfo=None, **kwargs):
 
     # Babel format_date() miss tzinfo convertion
     if date:
-        date = date.astimezone(tzinfo or utils.timeutil.tzlocal())
+        date = date.astimezone(tzinfo or env.threadlocal.user.timezone)
 
     return babel.dates.format_date(date, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
 
-def format_time(time=None, tzinfo=None, **kwargs):
-    if isinstance(time, (float, int)):
-        time = datetime.datetime.utcfromtimestamp(time).replace(tzinfo=utils.timeutil.tzutc())
+def format_time(dt=None, tzinfo=None, **kwargs):
+    if isinstance(dt, (float, int, prelude.IDMEFTime)):
+        dt = datetime.datetime.fromtimestamp(dt, utils.timeutil.tzutc())
 
     if not tzinfo:
-        tzinfo = utils.timeutil.tzlocal()
+        tzinfo = env.threadlocal.user.timezone
 
-    return babel.dates.format_time(time, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
+    return babel.dates.format_time(dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
 
 def format_datetime(dt=None, tzinfo=None, **kwargs):
-    if isinstance(dt, (float, int)):
-        dt = datetime.datetime.utcfromtimestamp(dt).replace(tzinfo=utils.timeutil.tzutc())
+    if isinstance(dt, (float, int, prelude.IDMEFTime)):
+        dt = datetime.datetime.fromtimestamp(dt, utils.timeutil.tzutc())
 
     if not tzinfo:
-        tzinfo = utils.timeutil.tzlocal()
+        tzinfo = env.threadlocal.user.timezone
 
     return babel.dates.format_datetime(datetime=dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
 
@@ -215,3 +216,12 @@ def get_calendar_format():
     # 4-digits year: "yyyy" in Babel, "yy" in jQuery.
     # 2-digits year: "yy" in Babel, "y" in jQuery.
     return calendar_format.replace("yy", "y").replace("MM", "mm")
+
+def get_timezones():
+    return sorted(zone for zone in babel.core.get_global('zone_territories').keys() + ["UTC"] if not zone.startswith('Etc/'))
+
+def get_system_timezone():
+    try:
+        return babel.dates.LOCALTZ.zone
+    except:
+        return pytz.timezone("UTC")

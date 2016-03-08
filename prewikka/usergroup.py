@@ -20,6 +20,7 @@
 import abc
 import hashlib
 import compat
+import utils
 from prewikka import error, log, localization, env
 
 ADMIN_LOGIN = "admin"
@@ -126,7 +127,7 @@ class User(NameID):
 
     def __init__(self, login=None, userid=None):
         NameID.__init__(self, login, userid)
-        self._configuration = self._permissions = None
+        self._configuration = self._permissions = self._timezone = None
 
     def _id2name(self, id):
         return env.auth.hasUser(self)
@@ -149,6 +150,13 @@ class User(NameID):
             self._configuration = env.db.get_properties(self)
 
         return self._configuration
+
+    @property
+    def timezone(self):
+        if not self._timezone:
+            self._timezone = utils.timeutil.timezone(self.get_property("timezone", default=env.config.default_timezone))
+
+        return self._timezone
 
     def set_locale(self):
         lang = self.get_property("language", default=env.config.default_locale)

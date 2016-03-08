@@ -382,16 +382,16 @@ class MessageSummary(Table, view.View):
 
         return '<a target="%s" href="%s">%s</a>' % (env.external_link_target, url, name)
 
-    def getTime(self, t):
-        if not t:
+    def getTime(self, dt):
+        if not dt:
             return None
 
-        t = datetime.fromtimestamp(t, utils.timeutil.tzoffset(None, t.getGmtOffset()))
-        local = t.astimezone(utils.timeutil.tzlocal())
+        agent_time = datetime.fromtimestamp(dt, utils.timeutil.tzoffset(None, dt.getGmtOffset()))
+        user_time = datetime.fromtimestamp(dt, self.user.timezone)
 
-        s = localization.format_datetime(local, format="medium")
-        if t.tzinfo.utcoffset(t) != local.tzinfo.utcoffset(local):
-            s = " ".join((s, _("(agent local time: %s)") % localization.format_datetime(t, tzinfo=t.tzinfo, format="medium")))
+        s = localization.format_datetime(user_time, format="medium")
+        if agent_time.tzinfo.utcoffset(agent_time) != user_time.tzinfo.utcoffset(user_time):
+            s = " ".join((s, _("(agent local time: %s)") % localization.format_datetime(agent_time, tzinfo=agent_time.tzinfo, format="medium")))
 
         return s
 

@@ -19,6 +19,7 @@ class UserSettingsModifyParameters(view.Parameters):
         self.optional("name", str)
         self.optional("email", str)
         self.optional("language", str)
+        self.optional("timezone", str)
         self.optional("theme", str)
 
 
@@ -42,6 +43,8 @@ class UserSettingsDisplay(view.View):
         self.dataset["object"] = self._object
         self.dataset["fullname"] = env.db.get_property(self._object, "fullname")
         self.dataset["email"] = env.db.get_property(self._object, "email")
+        self.dataset["available_timezones"] = localization.get_timezones()
+        self.dataset["timezone"] = env.db.get_property(self._object, "timezone", default=env.config.default_timezone)
         self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
         self.dataset["language"] = env.db.get_property(self._object, "language", default=env.config.default_locale)
         self.dataset["available_themes"] = theme.getThemes()
@@ -69,6 +72,12 @@ class UserSettingsModify(view.View):
         env.db.set_property(user, "language", lang)
         if user == self.user:
             self.user.set_locale()
+
+        timezone = self.parameters["timezone"]
+        if not timezone in localization.get_timezones():
+            raise error.PrewikkaUserError(_("Invalid Timezone"), _("Specified timezone does not exist"), log_priority=log.WARNING)
+
+        env.db.set_property(user, "timezone", timezone)
 
         # Make sure nothing is returned (reset the default dataset)
         self.dataset = None

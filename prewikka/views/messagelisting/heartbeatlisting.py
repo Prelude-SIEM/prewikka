@@ -49,8 +49,8 @@ class ListedHeartbeat(ListedMessage):
         for address in message["heartbeat.analyzer(-1).node.address"]:
             hfield = self.createHostField("heartbeat.analyzer(-1).node.address.address", address["address"], address["category"])
             self["node.address(*).address"].append(hfield)
-            
-        self["time"] = self.createTimeField(message["heartbeat.create_time"], self.parameters["timezone"])
+
+        self["time"] = self.createTimeField(message["heartbeat.create_time"])
 
 
 

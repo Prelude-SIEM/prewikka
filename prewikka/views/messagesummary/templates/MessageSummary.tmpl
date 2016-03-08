@@ -6,7 +6,6 @@
 
 #from datetime import datetime
 #from prewikka.localization import format_datetime
-#from prewikka.utils.timeutil import tzlocal
 
 #set global $section_cnt = 0
 #set global $row_classes = ("table_row_even", "table_row_odd")
@@ -68,7 +67,7 @@
                                  <th style="text-align: left; width:150px;">$entry.name</th>
                                 #end if
 				#if isinstance($entry.value, $datetime)
-				  #set $entry["value"] = $format_datetime($entry.value, tzinfo=$tzlocal())
+				  #set $entry["value"] = $format_datetime($entry.value)
 				#end if
 				 <td class="$entry_value_classes[$entry.emphase]">$entry.value</td>
 				</tr>

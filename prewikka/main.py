@@ -169,6 +169,7 @@ class Core:
 
         env.config.default_theme = env.config.general.getOptionValue("default_theme", "cs")
         env.config.default_locale = env.config.general.getOptionValue("default_locale", "en_GB")
+        env.config.default_timezone = env.config.general.getOptionValue("default_timezone", localization.get_system_timezone())
         env.config.default_encoding = env.config.general.getOptionValue("encoding", "UTF-8")
 
         env.log = log.Log(env.config)

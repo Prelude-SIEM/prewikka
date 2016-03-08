@@ -46,7 +46,6 @@ class MessageListingParameters(mainmenu.MainMenuParameters):
 class ListedMessage(dict):
     def __init__(self, view_path, parameters):
         self.parameters = parameters
-        self.timezone = parameters["timezone"]
         self.view_path = view_path
 
     def _isAlreadyFiltered(self, column, path, criterion, value):
@@ -95,24 +94,11 @@ class ListedMessage(dict):
         link = utils.create_link(self.view_path, self.parameters + extra - [ "offset" ])
         return { "value": utils.escape_html_string(real_value), "inline_filter": link, "already_filtered": alreadyf }
 
-    def createTimeField(self, timeobj, timezone=None):
+    def createTimeField(self, timeobj):
         if not timeobj:
             return { "value": "n/a" }
 
-        timeval = float(timeobj)
-
-        tzobj = { "utc": utils.timeutil.tzutc,
-                  "sensor_localtime": lambda: utils.timeutil.tzoffset("UTC", timeobj.getGmtOffset()),
-                  "frontend_localtime": utils.timeutil.tzlocal
-        }[timezone]()
-
-        time_value = localization.format_time(timeval, format="short", tzinfo=tzobj)
-
-        value = localization.format_datetime(timeval, format="short", tzinfo=tzobj)
-        if isinstance(tzobj, utils.timeutil.tzoffset):
-            value += " (" + localization.format_time(timeval, format="z", tzinfo=tzobj) + ")"
-
-        return { "value": value or "n/a" }
+        return { "value": localization.format_time(timeobj, format="short") }
 
     def createHostField(self, object, value, category=None, direction=None, dns=True):
         field = self.createInlineFilteredField(object, value, direction)
