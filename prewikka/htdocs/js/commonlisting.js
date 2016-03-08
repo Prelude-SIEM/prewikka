@@ -106,7 +106,11 @@ function CommonListing(elem, text, options) {
         $.ajax({
             url: prewikka_location().href + "/" + options.deleteLink,
             data: {action: "delete", id: rows},
-            success: function() { grid.delRowData(rows); }
+            success: function() {
+                // Iterate upwards because 'rows' gets modified
+                for ( var i = rows.length - 1; i >= 0; i-- )
+                    grid.delRowData(rows[i]);
+            }
         });
     });
 
