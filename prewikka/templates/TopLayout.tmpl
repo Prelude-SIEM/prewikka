@@ -21,7 +21,7 @@
 
             \$('#dataConfirmModal').find('.modal-body').text(confirm);
             // Remove the handler in case it was already set. And set the correct handler
-            \$('#dataConfirmOK').off("click", confirm_handler).on("click", confirm_handler);
+            \$('#dataConfirmOK').off("click").on("click", confirm_handler);
             \$('#dataConfirmModal').modal({show: true});
             return false;
         });
