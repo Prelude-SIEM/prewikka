@@ -126,6 +126,23 @@ def find_unescaped_characters(value, characters=None):
     return False
 
 
+def split_unescaped_characters(value, characters):
+    """Split the string *value* using unescaped *characters* as delimiters."""
+    escaped = False
+    start = 0
+
+    for index, char in enumerate(value):
+        if escaped:
+            escaped = False
+        elif char in characters:
+            yield value[start:index]
+            start = index + 1
+        elif char == '\\':
+            escaped = True
+
+    yield value[start:]
+
+
 def filter_value_adjust(operator, value):
     if operator not in ("<>*", "<>"):
         return value
