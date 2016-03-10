@@ -267,6 +267,9 @@ class Core:
             except error.PrewikkaUserError as err:
                 env.log.warning("%s: plugin loading failed: %s" % (i.__name__, err))
 
+        # Load views before auth/session to find all permissions
+        env.viewmanager.loadViews()
+
         _AUTH_PLUGINS = pluginmanager.PluginManager("prewikka.auth", autoupdate=True)
         _SESSION_PLUGINS = pluginmanager.PluginManager("prewikka.session", autoupdate=True)
         cfg = env.config
@@ -290,8 +293,6 @@ class Core:
             # Nothing defined, we use the anonymous module
             self._load_auth_or_session("session", _SESSION_PLUGINS, "anonymous")
             env.auth = env.session
-
-        env.viewmanager.loadViews()
 
         env.viewmanager.addView(BaseView())
         if env.session.can_logout():
