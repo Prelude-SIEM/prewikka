@@ -355,11 +355,18 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
         return prev + ret
 
-    @use_flock
     @use_transaction
-    def apply(self):
+    def _apply(self):
         [ update.apply(transaction=False) for update in self.list() ]
         self.check()
+
+    @use_flock
+    def apply(self):
+        # We call _init_version_attr() outside the transaction because it fails
+        # when the tables do not exist (eg. during database initialization)
+        # and we don't want the whole transaction to be rolled back.
+        self._init_version_attr()
+        self._apply()
 
     def get_schema_version(self):
         self._init_version_attr()
