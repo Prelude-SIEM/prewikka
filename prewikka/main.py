@@ -366,6 +366,10 @@ class Core:
 
             if not request.path or request.path == "/":
                 default_view = env.config.general.getOptionValue("default_view", "alerts/alerts")
+                if not env.viewmanager.getViewIDFromPaths(default_view.split('/')):
+                    # The configured view does not exist. Fall back to "settings/my_account"
+                    # which does not require any specific permission.
+                    default_view = "settings/my_account"
                 raise error.RedirectionError("%s%s" % (request.getBaseURL(), default_view), 302)
 
             view_object = env.viewmanager.loadView(request, user)

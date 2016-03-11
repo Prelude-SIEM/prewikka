@@ -399,9 +399,11 @@ class ViewManager:
         return getViewPath(view_id, default)
 
     def getViewID(self, request):
-        sections = env.menumanager.get_sections_path()
         paths = request.getViewElements()
+        return self.getViewIDFromPaths(paths)
 
+    def getViewIDFromPaths(self, paths):
+        sections = env.menumanager.get_sections_path()
         view_id = None
         try:
                 views = sections.get(paths[0], {}).get(paths[1])
