@@ -208,6 +208,7 @@ function prewikka_loadTab(settings)
                                 settings['success']();
                 }
                 prewikka_drawTab(data);
+                window.scrollTo(0, 0);
         });
 }
 
