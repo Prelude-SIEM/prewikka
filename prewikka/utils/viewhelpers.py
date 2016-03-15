@@ -30,5 +30,6 @@ class GridAjaxParameters(view.Parameters):
         self.optional("sort_order", str)  # sort order (asc or desc)
 
     def get_response(self, total_results):
-        nb_pages = total_results // self["rows"]  # ceil division
+        # Ceil division (use // instead of / for Python3 compatibility):
+        nb_pages = (total_results - 1) // self["rows"] + 1
         return {"total": nb_pages, "page": self["page"], "rows": [], "records": total_results}
