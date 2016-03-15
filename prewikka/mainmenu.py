@@ -211,7 +211,7 @@ class MainMenu:
             self.start = self.end - delta
 
         elif self.start is None and self.end is None:
-            self.start = self.end = datetime.datetime.now(env.threadlocal.user.timezone)
+            self.start = self.end = datetime.datetime.now(env.threadlocal.user.timezone).replace(second=0, microsecond=0)
             if self._timeunit in ("hour", "minute", "second"): #relative
                 self.start = self.end - delta
 
@@ -226,10 +226,12 @@ class MainMenu:
         criteria = []
 
         if self.start:
-            criteria.append("%%(backend)s.%%(time_field)s >= '%s'" % (str(self.start.astimezone(utils.timeutil.timezone("UTC")))))
+            start = self.start.astimezone(utils.timeutil.timezone("UTC"))
+            criteria.append("%%(backend)s.%%(time_field)s >= '%s'" % start)
 
         if self.end:
-            criteria.append("%%(backend)s.%%(time_field)s <= '%s'" % (str(self.end.astimezone(utils.timeutil.timezone("UTC")))))
+            end = self.end.astimezone(utils.timeutil.timezone("UTC")) + datetime.timedelta(minutes=1)
+            criteria.append("%%(backend)s.%%(time_field)s < '%s'" % end)
 
         return " && ".join(criteria)
 
