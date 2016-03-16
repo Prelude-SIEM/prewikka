@@ -27,7 +27,7 @@
 
     \$("input[type=checkbox]").shiftcheckbox();
 
-    function update_log(data, is_error) {
+    function update_log(data, is_error, nb_plugin, nb_error) {
             if ( ! data )
                 data = "";
 
@@ -37,6 +37,10 @@
 
             \$(".update-log").text(curval + data);
             \$(".update-log").scrollTop(\$(".update-log")[0].scrollHeight);
+            if (nb_plugin) {
+                \$("#update_success").text(nb_plugin - nb_error);
+                \$("#update_error").text(nb_error);
+            }
     }
 
     progressbar.progressbar({
@@ -88,6 +92,7 @@
         \$("#update-button").prop("disabled", true);
         \$(".update-ui-dialog button").button("disable");
 
+        var nb_plugin = nb_error = 0;
         prewikka_EventSource({
             url: prewikka_location().pathname + "?apply_update=true",
 
@@ -98,7 +103,7 @@
 
             message: function(data) {
                 if ( data["error"] ) {
-                    update_log(data["error"], true);
+                    update_log(data["error"], true, nb_plugin, ++nb_error);
                     progressLabel.text('$_("Update failed")');
                     \$(".update-ui-dialog button").button("enable");
                     return;
@@ -107,7 +112,7 @@
                 var curval = progressbar.progressbar("value") || 0;
                 progressbar.progressbar("value", curval + slice);
 
-                update_log(data["label"]);
+                update_log(data["label"], false, ++nb_plugin, nb_error);
             }
         });
 
@@ -153,6 +158,8 @@
   <fieldset>
     <h4>$_("Update log")</h4>
     <textarea class="update-log" readonly=""></textarea>
+    #set update_state = $_("Updates: {0} successful, {1} failed").format('<span id="update_success">0</span>', '<span id="update_error">0</span>')
+    <p>$update_state</p>
   </fieldset>
 </div>
 
