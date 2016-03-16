@@ -32,7 +32,6 @@ class MainMenuParameters(view.Parameters):
     def __init__(self, *args, **kwargs):
         env.hookmgr.declare_once("HOOK_MAINMENU_PARAMETERS_REGISTER", multi=True)
         env.hookmgr.declare_once("HOOK_MAINMENU_PARAMETERS_NORMALIZE", multi=True)
-        env.hookmgr.declare_once("HOOK_MAINMENU_GET_CRITERIA", multi=True)
         env.hookmgr.declare_once("HOOK_MAINMENU_EXTRA_CONTENT", multi=True)
 
         # This will trigger register which in turn call a hook, do last
@@ -122,6 +121,7 @@ class MainMenu:
     def __init__(self, main_view):
         self.main = main_view
         self.dataset = template.PrewikkaTemplate(MainMenuTemplate.MainMenu)
+        env.threadlocal.menu = self
 
     def _set_timeline(self, start, end):
         for unit in "minute", "hour", "day", "month", "year", "unlimited":
@@ -222,23 +222,16 @@ class MainMenu:
                 else:
                     self.start = self.end - delta
 
-    def get_criteria_format(self, disable_filter=False):
+    def get_criteria(self):
         criteria = []
 
-        if not disable_filter:
-            for c in env.hookmgr.trigger("HOOK_MAINMENU_GET_CRITERIA", self, "%(backend)s"):
-                if c:
-                    criteria.append(c)
         if self.start:
-                criteria.append("%%(backend)s.%%(time_field)s >= '%s'" % str(self.start))
+            criteria.append("%%(backend)s.%%(time_field)s >= '%s'" % (str(self.start)))
 
         if self.end:
-                criteria.append("%%(backend)s.%%(time_field)s <= '%s'" % str(self.end))
+            criteria.append("%%(backend)s.%%(time_field)s <= '%s'" % (str(self.end)))
 
         return " && ".join(criteria)
-
-    def get_criteria(self, ctype="alert"):
-        return self.get_criteria_format() % {'backend' : ctype, 'time_field' : 'create_time'}
 
     def get_step(self, stepno=None):
         if stepno:

@@ -24,7 +24,7 @@ from . import templates
 
 
 class Filter:
-    _typetbl = { "generic": "alert", "alert": "alert", "heartbeat": "heartbeat", "%(backend)s" : "%(backend)s" }
+    _typetbl = { "generic": "alert", "alert": "alert", "heartbeat": "heartbeat" }
 
     def __init__(self, name, ftype, comment, elements, formula):
         self.name = name
@@ -65,7 +65,7 @@ class Filter:
 
 
     def get_criteria_cast(self, wanted_type):
-        if self.type != "generic" and self.type != wanted_type and wanted_type != "%(backend)s":
+        if self.type != "generic" and self.type != wanted_type:
             return None
 
         old_type = self.type
@@ -193,13 +193,24 @@ class AlertFilterEdition(view.View):
         view.optional("filter", str, save=True)
         return ["filter"]
 
-    def _filter_get_criteria_hook(self, menuview, ctype):
-        if not "filter" in menuview.parameters:
-            return None
+    def _filter_get_criteria_hook(self, criteria, ctype):
+        menu = getattr(env.threadlocal, "menu", None)
+        if not menu:
+            return
 
-        filter = self._db.get_filter(menuview.user, menuview.parameters["filter"])
-        if filter:
-            return filter.get_criteria_cast(ctype)
+        fname = menu.parameters.get("filter")
+        if not fname:
+            return
+
+        f = self._db.get_filter(env.threadlocal.user, fname)
+        if not f:
+            return
+
+        f = f.get_criteria_cast(ctype)
+        if f:
+            criteria.append(f)
+
+        return f
 
     def _filter_html_menu_hook(self, view, ctype):
         tmpl = template.PrewikkaTemplate(templates.menu)
@@ -221,7 +232,7 @@ class AlertFilterEdition(view.View):
         env.hookmgr.declare_once("HOOK_FILTER_CRITERIA_LOAD")
 
         env.hookmgr.register("HOOK_MAINMENU_PARAMETERS_REGISTER", self._filter_parameters_register_hook)
-        env.hookmgr.register("HOOK_MAINMENU_GET_CRITERIA", self._filter_get_criteria_hook)
+        env.hookmgr.register("HOOK_IDMEFDATABASE_CRITERIA_PREPARE", self._filter_get_criteria_hook)
         env.hookmgr.register("HOOK_MAINMENU_EXTRA_CONTENT", self._filter_html_menu_hook)
         env.hookmgr.register("HOOK_USER_DELETE", self._user_delete_hook)
 

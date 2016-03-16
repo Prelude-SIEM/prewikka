@@ -65,7 +65,8 @@ class IDMEFDatabase(preludedb.DB):
 
         all(env.hookmgr.trigger("HOOK_IDMEFDATABASE_CRITERIA_PREPARE", criteria, criteria_type))
 
-        criteria = " && ".join(criteria)
+        criteria = " && ".join(criteria) % {"backend": criteria_type, "time_field": "create_time"}
+
         if len(criteria) > 0:
             return prelude.IDMEFCriteria(criteria)
 

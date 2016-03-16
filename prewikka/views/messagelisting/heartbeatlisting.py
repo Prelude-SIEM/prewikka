@@ -103,7 +103,7 @@ class HeartbeatListing(MessageListing):
         criteria = [ ]
         start = end = None
 
-        time_criteria = self.menu.get_criteria("heartbeat")
+        time_criteria = self.menu.get_criteria()
         if time_criteria:
             criteria.append(time_criteria)
 
