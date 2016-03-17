@@ -224,4 +224,4 @@ def get_system_timezone():
     try:
         return babel.dates.LOCALTZ.zone
     except:
-        return pytz.timezone("UTC")
+        return "UTC"
