@@ -1,5 +1,5 @@
 $(document).ready(function() {
-  $(document).on("click", function() {
+  $(document).on("click", "#top_view", function() {
     $(".filter_popup_link + div").hide();
   });
 

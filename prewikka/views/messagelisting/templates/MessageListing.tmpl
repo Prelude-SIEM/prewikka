@@ -24,7 +24,9 @@ $messagelisting_scripts
    }
 
   \$(".filter_popup_link").click(function(){
-        \$(this).nextAll("div").toggle();
+        var div =  \$(this).nextAll("div");
+        \$('.filter_popup_link + div').not(div).hide();
+        div.toggle();
         return false;
   });
 
