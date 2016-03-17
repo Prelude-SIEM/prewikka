@@ -9,8 +9,16 @@ class DataProviderNormalizerGeneric(DataProviderNormalizer):
 
         self._time_field = time_field
 
-    def parse_paths(self, paths):
-        return paths
+    def parse_paths(self, paths, type):
+        parsed_paths = []
+
+        for path in paths:
+            try:
+                parsed_paths.append(path % { 'backend' : type, 'time_field' : self._time_field })
+            except:
+                parsed_paths.append(path)
+
+        return parsed_paths
 
     def parse_criteria(self, criteria, type):
         parsed_criteria = []

@@ -110,7 +110,7 @@ class DataProviderBackend(pluginmanager.PluginBase):
 
 
 class DataProviderNormalizer(object):
-    def parse_paths(self, paths):
+    def parse_paths(self, paths, type):
         """
         Parse paths and turn them into a structure
         that can be used by the backend.
@@ -118,6 +118,8 @@ class DataProviderNormalizer(object):
         @param paths: List of paths in natural syntax
             (eg. ["foo.bar", "count(foo.id)"])
         @type paths: list
+        @param type: type of backend
+        @type type: string
         @return: The paths as a structure that can easily
             be used by the backend.
         """
@@ -179,8 +181,12 @@ class DataProviderManager(pluginmanager.PluginManager):
         res = set()
         for path in paths:
             tmp = path.partition('.')
-            if tmp[1]:
-                res.add(tmp[0].rpartition('(')[2])
+            if not tmp[1]:
+                continue
+            tmp = tmp[0].rpartition('(')[2]
+            # Exclude generic paths, eg. "%(backend)s.%(time_field)s".
+            if tmp != 'backend)s':
+                res.add(tmp)
 
         # FIXME Try to guess the backend using criteria first
         if len(res) != 1:
@@ -200,7 +206,7 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         normalizer = self._type_handlers[type]
         if normalizer:
-            paths = normalizer.parse_paths(paths)
+            paths = normalizer.parse_paths(paths, type)
             criteria = normalizer.parse_criteria(criteria, type)
 
         results = self._backends[type].get_values(paths, criteria, distinct, limit, offset)
