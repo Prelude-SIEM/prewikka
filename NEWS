@@ -1,3 +1,61 @@
+* 2016-03-18, prewikka-1.3.0beta2:
+
+Author: Yoann Vandoorselaere
+
+- get_criteria() now only return generic criteria (dataprovider compatibility)
+
+- Improve timezone support
+
+    - The sensor_localtime option has been removed since it is not efficient,
+      and have a number of problem.
+    - User can now select the timezone to be used in his profile.
+    - The default is now to format timezone in the user selected timezone, not
+      the frontend timezone.
+
+- in-transaction initialisation for version attribute
+
+- Remove deprecated
+
+Author: Louis-David Gabet
+
+- Fix wrong filter in alert listing
+
+- Show details during plugin updates
+
+- Fix filter's popup behavior
+
+- Increase font size
+
+- Change 'Prewikka' labels to 'Prelude'
+
+Author: Francois Poirotte
+
+- Support generic paths in selection
+
+- Fallback for the default view
+
+Author: Sélim Menouar
+
+- Handle permissions in dataprovider
+
+- Correctly delete events on confirm button
+
+- Add a footer-buttons css class
+
+- Change buttons' colors and icons
+
+Author: Antoine Luong
+
+- Fix wrong computation of number of pages in grid
+
+- Scroll to top when loading a page via AJAX
+
+- Correctly delete rows from jqGrid
+
+- Load views before auth/session modules
+
+
+
 * 2016-03-01, prewikka-1.3.0beta1:
 
 Author: Sélim Menouar
