@@ -226,10 +226,10 @@ class MainMenu:
         criteria = []
 
         if self.start:
-            criteria.append("%%(backend)s.%%(time_field)s >= '%s'" % (str(self.start)))
+            criteria.append("%%(backend)s.%%(time_field)s >= '%s'" % (str(self.start.astimezone(utils.timeutil.timezone("UTC")))))
 
         if self.end:
-            criteria.append("%%(backend)s.%%(time_field)s <= '%s'" % (str(self.end)))
+            criteria.append("%%(backend)s.%%(time_field)s <= '%s'" % (str(self.end.astimezone(utils.timeutil.timezone("UTC")))))
 
         return " && ".join(criteria)
 
