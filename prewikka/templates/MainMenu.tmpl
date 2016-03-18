@@ -8,8 +8,8 @@
 
      MainMenuInit("$timeline.time_format");
 
-     \$('#timeline_end').datetimepicker("setDate", (new Date(parseFloat("$timeline.end")*1000)));
-     \$('#timeline_start').datetimepicker("setDate", (new Date(parseFloat("$timeline.start")*1000)));
+     \$('#timeline_end').datetimepicker("setDate", (new Date($timeline.end * 1000)));
+     \$('#timeline_start').datetimepicker("setDate", (new Date($timeline.start *1000)));
 
      #if $timeline.quick_custom
      trigger_custom_date(true);
@@ -20,8 +20,8 @@
 </script>
 
 <div id="main_menu_ng">
-     <input type="hidden" name="timeline_end" id="hidden_timeline_end" value="$int($timeline.end)">
-     <input type="hidden" name="timeline_start" id="hidden_timeline_start" value="$int($timeline.start)">
+     <input type="hidden" name="timeline_end" id="hidden_timeline_end" value="$timeline.end">
+     <input type="hidden" name="timeline_start" id="hidden_timeline_start" value="$timeline.start">
      <input type="hidden" name="timeline_value" id="hidden_timeline_value" value="$timeline.value">
      <input type="hidden" name="timeline_unit" id="hidden_timeline_unit" value="$timeline.unit">
      <input type="hidden" name="auto_apply_enable" id="hidden_auto_apply_enable" value="$auto_apply_enable">

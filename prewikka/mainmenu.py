@@ -132,8 +132,8 @@ class MainMenu:
         if not start and not end:
             return
 
-        self.dataset["timeline.start"] = time.mktime(start.timetuple())
-        self.dataset["timeline.end"] = time.mktime(end.timetuple())
+        self.dataset["timeline.start"] = start.strftime('%s')
+        self.dataset["timeline.end"] = end.strftime('%s')
 
     def _get_unit(self):
         delta = self.end - self.start
@@ -193,10 +193,10 @@ class MainMenu:
     def _setup_timeline_range(self):
         self.start = self.end = None
         if "timeline_start" in self.parameters:
-            self.start = datetime.datetime.fromtimestamp(self.parameters["timeline_start"], env.threadlocal.user.timezone)
+            self.start = env.threadlocal.user.timezone.localize(datetime.datetime.fromtimestamp(self.parameters["timeline_start"]))
 
         if "timeline_end" in self.parameters:
-            self.end = datetime.datetime.fromtimestamp(self.parameters["timeline_end"], env.threadlocal.user.timezone)
+            self.end = env.threadlocal.user.timezone.localize(datetime.datetime.fromtimestamp(self.parameters["timeline_end"]))
 
         self._timeunit, self._timevalue = self.parameters["timeline_unit"], self.parameters["timeline_value"]
         if self._timeunit == "unlimited":
