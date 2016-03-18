@@ -45,6 +45,8 @@ class AboutPlugin(view.View):
     view_parameters = AboutPluginParameters
     _all_plugins = ((_("Apps: View"), "prewikka.views"),
                     (_("Apps: API"), "prewikka.plugins"),
+                    (_("Apps: Dataprovider backend"), "prewikka.dataprovider.backend"),
+                    (_("Apps: Dataprovider type"), "prewikka.dataprovider.type"),
                     (_("Apps: Authentication"), "prewikka.auth"),
                     (_("Apps: Identification"), "prewikka.session"),
                     (_("Apps: Renderer backend"), "prewikka.renderer.backend"),
