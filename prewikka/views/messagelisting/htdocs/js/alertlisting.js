@@ -75,9 +75,9 @@ function _MessageListing() {
 
                         $(allval).each(function(idx, value) {
                                 if ( $.inArray(value, checked_val) >= 0 )
-                                        $("input[value='" + value + "']").prop("checked", true);
+                                        $("input[value='" + value + "'][name='" + path + "']").prop("checked", true);
                                 else
-                                        $("input[value='" + value + "']").prop("checked", false);
+                                        $("input[value='" + value + "'][name='" + path + "']").prop("checked", false);
                         });
                 });
         };
