@@ -98,7 +98,7 @@ class ListedMessage(dict):
         if not timeobj:
             return { "value": "n/a" }
 
-        return { "value": localization.format_time(timeobj, format="short") }
+        return { "value": localization.format_datetime(timeobj, format="short") }
 
     def createHostField(self, object, value, category=None, direction=None, dns=True):
         field = self.createInlineFilteredField(object, value, direction)
