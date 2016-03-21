@@ -183,7 +183,6 @@ class AlertFilterEdition(view.View):
     view_section = N_("Settings")
     view_order = 1
     view_permissions = [ "IDMEF_VIEW" ]
-    example_formula = N_("Example: (A AND B) OR (C AND D)")
 
     def _user_delete_hook(self, user):
         for i in self._db.get_filter_list(user):
@@ -278,7 +277,7 @@ class AlertFilterEdition(view.View):
         self.dataset["fltr.name"] = ""
         self.dataset["fltr.type"] = ""
         self.dataset["fltr.comment"] = ""
-        self.dataset["fltr.formula"] = _(self.example_formula)
+        self.dataset["fltr.formula"] = ""
 
     def _reload(self):
         self.dataset["elements"] = []
@@ -335,7 +334,7 @@ class AlertFilterEdition(view.View):
         if not fname:
             raise error.PrewikkaUserError(_("Could not save Filter"), _("No name for this filter was provided"))
 
-        if self.parameters["filter_formula"] == _(self.example_formula):
+        if not self.parameters["filter_formula"]:
             raise error.PrewikkaUserError(_("Could not save Filter"), _("No valid filter formula provided"))
 
         if self.parameters.get("load") != fname and self._db.get_filter(self.user, fname):
