@@ -123,6 +123,31 @@ $(document).ready(function(){
           }
       }
   });
+
+  $("div.traceback").accordion({collapsible: true, active: false, heightStyle: "content"});
+
+  $(document).on('click', '[data-confirm]', function() {
+      var input = $(this);
+      var confirm = input.data("confirm");
+
+      function confirm_handler() {
+          input.removeData("confirm").removeAttr('data-confirm').click();
+          input.attr("data-confirm", confirm).data("confirm", confirm);
+          $('#dataConfirmModal').modal('hide');
+          return false;
+      }
+
+      $('#dataConfirmModal').find('.modal-body').text(confirm);
+      // Remove the handler in case it was already set. And set the correct handler
+      $('#dataConfirmOK').off("click").on("click", confirm_handler);
+      $('#dataConfirmModal').modal({show: true});
+      return false;
+  });
+
+  $('ul.dropdown-menu [data-toggle=dropdown]').on('click', function() {
+      $(this).closest(".dropdown-submenu").toggleClass("open");
+      return false;
+  });
 });
 
 function prewikka_resizeTopMenu() {
