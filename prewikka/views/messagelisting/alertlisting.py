@@ -38,12 +38,12 @@ COLUMN_LIST = [ "classification", "source", "target", "analyzer" ]
 
 CLASSIFICATION_GENERIC_SEARCH_FIELDS = [ "alert.classification.text", "alert.classification.reference.name", "alert.classification.reference.origin", "alert.assessment.impact.completion" ]
 
-SOURCE_GENERIC_SEARCH_FIELDS = [ "alert.source.node.address.address", "alert.source.user.user_id.name",
+SOURCE_GENERIC_SEARCH_FIELDS = [ "alert.source.node.address.address", "alert.source.user.user_id.name", "alert.source.node.name",
                                  "alert.source.user.user_id.number", "alert.source.process.name", "alert.source.process.pid",
                                  "alert.source.service.protocol", "alert.source.service.iana_protocol_name", "alert.source.service.iana_protocol_number",
                                  "alert.source.service.port" ]
 
-TARGET_GENERIC_SEARCH_FIELDS = [ "alert.target.node.address.address", "alert.target.user.user_id.name",
+TARGET_GENERIC_SEARCH_FIELDS = [ "alert.target.node.address.address", "alert.target.user.user_id.name", "alert.target.node.name",
                                  "alert.target.user.user_id.number", "alert.target.process.name", "alert.target.process.pid",
                                  "alert.target.service.protocol", "alert.target.service.iana_protocol_name", "alert.target.service.iana_protocol_number",
                                  "alert.target.service.port" ]
