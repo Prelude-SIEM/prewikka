@@ -185,14 +185,18 @@ class Core:
         env.dns_max_delay = float(env.config.general.getOptionValue("dns_max_delay", 0))
 
         val = env.config.general.getOptionValue("external_link_new_window", "true")
-        if val.lower() in ["true", "yes"]:
+        if val is None or val.lower() in ["true", "yes"]:
             env.external_link_target = "_blank"
         else:
             env.external_link_target = "_self"
 
         # Get prewikka.conf option "enable_flags" and store it into environment
-        env.enable_flags = env.config.general.getOptionValue("enable_flags", "true").lower() in ["true", "yes"]
-        env.enable_details = env.config.general.getOptionValue("enable_details", "false").lower() in ["true", "yes"]
+        flags = env.config.general.getOptionValue("enable_flags", "true")
+        env.enable_flags = flags is None or flags.lower() in ["true", "yes"]
+
+        details = env.config.general.getOptionValue("enable_details", "false")
+        env.enable_details = details is None or details.lower() in ["true", "yes"]
+
         env.host_details_url = env.config.general.getOptionValue("host_details_url", "https://www.prelude-siem.com/host_details.php")
         env.port_details_url = env.config.general.getOptionValue("port_details_url", "https://www.prelude-siem.com/port_details.php")
         env.reference_details_url = env.config.general.getOptionValue("reference_details_url", "https://www.prelude-siem.com/reference_details.php")
