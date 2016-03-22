@@ -987,15 +987,13 @@ class AlertListing(MessageListing):
         selection = [ "%s/group_by" % path for path in ag_list ]
 
         if self.parameters["orderby"] == "time_asc":
-            selection += [ "count(alert.create_time)", "max(alert.create_time)/order_asc" ]
+            selection += [ "count(alert.create_time)", "max(alert.create_time)", "min(alert.create_time)/order_asc" ]
         elif self.parameters["orderby"] == "time_desc":
-            selection += [ "count(alert.create_time)", "max(alert.create_time)/order_desc" ]
+            selection += [ "count(alert.create_time)", "max(alert.create_time)/order_desc", "min(alert.create_time)" ]
         elif self.parameters["orderby"] == "count_desc":
-            selection += [ "count(alert.create_time)/order_desc", "max(alert.create_time)" ]
+            selection += [ "count(alert.create_time)/order_desc", "max(alert.create_time)", "min(alert.create_time)" ]
         elif self.parameters["orderby"] == "count_asc":
-            selection += [ "count(alert.create_time)/order_asc", "max(alert.create_time)" ]
-
-        selection += [ "min(alert.create_time)" ]
+            selection += [ "count(alert.create_time)/order_asc", "max(alert.create_time)", "min(alert.create_time)" ]
 
         results = env.idmef_db.getValues(selection, criteria)
         total_results = len(results)

@@ -511,6 +511,9 @@ $text
   #if $message.aggregated
     #if $message.time_min.value == $message.time_max.value
       $message.time_min.value
+    #elif $order_by == "time_asc"
+      $message.time_min.value<br />
+      $message.time_max.value
     #else
       $message.time_max.value<br />
       $message.time_min.value
