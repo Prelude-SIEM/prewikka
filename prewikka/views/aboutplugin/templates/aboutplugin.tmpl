@@ -79,12 +79,19 @@
         }]
     });
 
-    \$(".activate-button").click(function() {
-            \$.ajax({url: prewikka_location().href, data: \$("input[type=checkbox]").serialize(), dataType: "json"}).done(function(data) {
-                location.reload();
-                return false;
-            });
-            return false;
+    \$(".activate-button").click(function(e) {
+        if ( ! \$(this).attr("data-confirm") ) {
+              \$.ajax({url: prewikka_location().href,
+                     type: "POST",
+                     data: \$("input[type=checkbox]").serialize(),
+                     dataType: "json"})
+              .done(function(data) {
+                  location.reload();
+                  return false;
+              });
+
+              return false;
+        }
     });
 
     \$(".update-button").click(function() {
@@ -248,7 +255,7 @@
       </fieldset>
       #end for
       <div class="pull-right">
-        <button class="btn btn-warning" data-confirm="$_("Update the selected apps?")"><i class="fa fa-refresh"></i> $_("Update")</button>
+        <button class="btn btn-warning activate-button" data-confirm="$_("Update the selected apps?")"><i class="fa fa-refresh"></i> $_("Update")</button>
       </div>
     </div>
   </div>
