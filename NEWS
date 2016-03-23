@@ -1,3 +1,13 @@
+* 2016-03-25, prewikka-1.3.0rc1:
+
+Author: Sélim Menouar
+
+- Move the hook declaration to FilterDatabase
+
+- TopLayout cleanup
+
+
+
 * 2016-03-18, prewikka-1.3.0beta2:
 
 Author: Yoann Vandoorselaere
