@@ -23,16 +23,21 @@ function update_date() {
 
     var end = $("#timeline_end").datetimepicker("getDate");
     $("#hidden_timeline_end").val(end ? end.getTime() / 1000 : "");
+
+    if ( start > end ) {
+        $(".input-timeline-datetime").closest(".form-group").addClass('has-error');
+        $("#main_menu_form_submit").prop('disabled', true).addClass('error-date');
+    } else {
+        $(".input-timeline-datetime").closest(".form-group").removeClass('has-error');
+        $("#main_menu_form_submit").prop('disabled', false).removeClass('error-date');
+    }
 }
 
-
 function MainMenuInit (date_format) {
-    $('#timeline_start').add('#timeline_end').datetimepicker({
+    $(".input-timeline-datetime").datetimepicker({
         "dateFormat": date_format,
-        "onSelect": function() { trigger_custom_date(true); }
-    })
-    .change(function() {
-        update_date();
+        "onSelect": function() { trigger_custom_date(true); },
+        "onClose": function() { trigger_custom_date(true); },
     });
 
     $("#main_menu_extra :input").on("change", function() {
