@@ -454,6 +454,8 @@ class ViewManager:
         if view.view_name:
             env.menumanager.add_section_info(view)
 
+        env.menumanager.add_section(view.view_section)
+
         self._views[view.view_id] = view
 
         env.hookmgr.declare("HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper())
