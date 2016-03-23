@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-03-18 19:42+0100\n"
+"POT-Creation-Date: 2016-03-28 01:29+0200\n"
 "PO-Revision-Date: 2013-11-25 17:46+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
@@ -127,85 +127,85 @@ msgstr "Prewikka %(vPre)s requiert libprelude %(vLib)s ou supérieure"
 msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
 msgstr "Prewikka %(vPre)s requiert libpreludedb %(vLib)s ou supérieure"
 
-#: prewikka/main.py:233
+#: prewikka/main.py:237
 msgid "Database error"
 msgstr "Erreur de base de données"
 
-#: prewikka/main.py:235
+#: prewikka/main.py:239
 msgid "Initialization error"
 msgstr "Erreur d'initialisation"
 
-#: prewikka/main.py:283
+#: prewikka/main.py:287
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
 msgstr "La session '%s' n'accepte pas de module d'authentification"
 
-#: prewikka/main.py:322
+#: prewikka/main.py:326
 msgid "Prelude internal error"
 msgstr "Erreur interne Prelude"
 
-#: prewikka/mainmenu.py:259
+#: prewikka/mainmenu.py:130
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: prewikka/mainmenu.py:260
+#: prewikka/mainmenu.py:131
 msgid "This month"
 msgstr "Ce mois"
 
-#: prewikka/mainmenu.py:261 prewikka/mainmenu.py:262
+#: prewikka/mainmenu.py:132 prewikka/mainmenu.py:133
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d heure"
 msgstr[1] "%d heures"
 
-#: prewikka/mainmenu.py:263 prewikka/mainmenu.py:264
+#: prewikka/mainmenu.py:134 prewikka/mainmenu.py:135
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d jour"
 msgstr[1] "%d jours"
 
-#: prewikka/mainmenu.py:265
+#: prewikka/mainmenu.py:136
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d semaine"
 msgstr[1] "%d semaines"
 
-#: prewikka/mainmenu.py:266 prewikka/mainmenu.py:267
+#: prewikka/mainmenu.py:137 prewikka/mainmenu.py:138
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mois"
 msgstr[1] "%d mois"
 
-#: prewikka/mainmenu.py:268
+#: prewikka/mainmenu.py:139
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d an"
 msgstr[1] "%d ans"
 
-#: prewikka/mainmenu.py:270 prewikka/templates/MainMenu.py:222
-msgid "Custom"
-msgstr "Personnalisé"
-
-#: prewikka/mainmenu.py:282
+#: prewikka/mainmenu.py:142
 #, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d seconde"
 msgstr[1] "%d secondes"
 
-#: prewikka/mainmenu.py:283 prewikka/mainmenu.py:284 prewikka/mainmenu.py:285
+#: prewikka/mainmenu.py:143 prewikka/mainmenu.py:144 prewikka/mainmenu.py:145
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minute"
 msgstr[1] "%d minutes"
 
-#: prewikka/mainmenu.py:287 prewikka/templates/MainMenu.py:189
+#: prewikka/mainmenu.py:278 prewikka/templates/MainMenu.py:226
+msgid "Custom"
+msgstr "Personnalisé"
+
+#: prewikka/mainmenu.py:280 prewikka/templates/MainMenu.py:193
 msgid "Inactive"
 msgstr "Inactif"
 
@@ -263,7 +263,7 @@ msgstr "Session expirée"
 msgid "Logged out"
 msgstr "Session terminée"
 
-#: prewikka/templates/ClassicLayout.py:303
+#: prewikka/templates/ClassicLayout.py:275
 msgid "Loading"
 msgstr "Chargement"
 
@@ -275,80 +275,80 @@ msgstr "Retour"
 msgid "Retry"
 msgstr "Réessayer"
 
-#: prewikka/templates/MainMenu.py:157
+#: prewikka/templates/MainMenu.py:161
 msgid "Refresh:"
 msgstr "Rafraîchir :"
 
-#: prewikka/templates/MainMenu.py:163
+#: prewikka/templates/MainMenu.py:167
 msgid "Update frequency of the current page"
 msgstr "Mettre à jour la fréquence de rafraîchissement de la page"
 
-#: prewikka/templates/MainMenu.py:201
+#: prewikka/templates/MainMenu.py:205
 msgid "Period:"
 msgstr "Période :"
 
-#: prewikka/templates/MainMenu.py:207
+#: prewikka/templates/MainMenu.py:211
 msgid "Period to visualize"
 msgstr "Période à visualiser"
 
-#: prewikka/templates/MainMenu.py:247
+#: prewikka/templates/MainMenu.py:254
 msgid "Start:"
 msgstr "Début :"
 
-#: prewikka/templates/MainMenu.py:253
+#: prewikka/templates/MainMenu.py:260
 msgid "start"
 msgstr "début"
 
-#: prewikka/templates/MainMenu.py:258
+#: prewikka/templates/MainMenu.py:265
 msgid "Date of the oldest alert to visualize"
 msgstr "Date de la plus ancienne alerte à visualiser"
 
-#: prewikka/templates/MainMenu.py:267
+#: prewikka/templates/MainMenu.py:274
 msgid "End:"
 msgstr "Fin :"
 
-#: prewikka/templates/MainMenu.py:273
+#: prewikka/templates/MainMenu.py:280
 msgid "end"
 msgstr "fin"
 
-#: prewikka/templates/MainMenu.py:278
+#: prewikka/templates/MainMenu.py:285
 msgid "Date of the most recent alert to visualize"
 msgstr "Date de la plus récente alerte à visualiser"
 
-#: prewikka/templates/MainMenu.py:286
+#: prewikka/templates/MainMenu.py:293
 msgid "Go!"
 msgstr "Go !"
 
-#: prewikka/templates/TopLayout.py:160
+#: prewikka/templates/TopLayout.py:101
 msgid "Detail"
 msgstr "Détail"
 
-#: prewikka/templates/TopLayout.py:176
+#: prewikka/templates/TopLayout.py:117
 msgid "Please Confirm"
 msgstr "Veuillez confirmer"
 
-#: prewikka/templates/TopLayout.py:186
+#: prewikka/templates/TopLayout.py:127
 #: prewikka/views/usermanagement/templates/UserSettings.py:260
 msgid "Cancel"
 msgstr "Annuler"
 
-#: prewikka/templates/TopLayout.py:192
+#: prewikka/templates/TopLayout.py:133
 msgid "OK"
 msgstr "OK"
 
-#: prewikka/templates/TopLayout.py:306
+#: prewikka/templates/TopLayout.py:247
 msgid "This app has been disabled or failed to load."
 msgstr "Cette app a été désactivée ou est impossible à charger"
 
-#: prewikka/templates/TopLayout.py:329 prewikka/templates/TopLayout.py:337
+#: prewikka/templates/TopLayout.py:270 prewikka/templates/TopLayout.py:278
 msgid "About"
 msgstr "À propos"
 
-#: prewikka/templates/TopLayout.py:345 prewikka/templates/TopLayout.py:358
+#: prewikka/templates/TopLayout.py:286 prewikka/templates/TopLayout.py:299
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: prewikka/templates/TopLayout.py:353
+#: prewikka/templates/TopLayout.py:294
 msgid "Are you sure you want to Logout ?"
 msgstr "Êtes-vous sûr de vouloir vous déconnecter ?"
 
@@ -357,7 +357,7 @@ msgstr "Êtes-vous sûr de vouloir vous déconnecter ?"
 msgid ""
 "Access to view '%(view)s' forbidden. Required permissions: %(permissions)s"
 msgstr ""
-"Accès à la vue '%(view)s interdit. Permissions requises : %(permissions)s'"
+"Accès à la vue '%(view)s' interdit. Permissions requises : %(permissions)s"
 
 #: prewikka/usergroup.py:39
 #, python-format
@@ -505,7 +505,7 @@ msgid "Apps"
 msgstr "Apps"
 
 #: prewikka/views/aboutplugin/__init__.py:36
-#: prewikka/views/filter/filter.py:177
+#: prewikka/views/filter/filter.py:183
 #: prewikka/views/usermanagement/usermanagement.py:27
 msgid "Settings"
 msgstr "Paramètres"
@@ -559,27 +559,27 @@ msgstr "Mise à jour terminée"
 msgid "Close"
 msgstr "Fermer"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:200
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:207
 msgid "Update failed"
 msgstr "Mise à jour échouée"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:253
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:260
 msgid "Applying Updates"
 msgstr "Applications des mises à jour"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:262
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:269
 msgid "Update log"
 msgstr "Journal des mises à jour"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:269
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:276
 msgid "Updates: {0} successful, {1} failed"
 msgstr "Mises à jour : {0} réussites, {1} échecs"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:289
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:296
 msgid "Plugin Maintenance"
 msgstr "Maintenance des modules"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:298
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:305
 msgid ""
 "The following apps need to be updated before they can be loaded into the "
 "system"
@@ -587,11 +587,10 @@ msgstr ""
 "Les apps suivantes doivent être mises à jour avant d'être chargées dans le "
 "système"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:316
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:423
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:323
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:430
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:97
 #: prewikka/views/agents/templates/SensorListing.py:432
-#: prewikka/views/messagelisting/templates/utils.py:88
 #: prewikka/views/messagesummary/messagesummary.py:306
 #: prewikka/views/messagesummary/messagesummary.py:459
 #: prewikka/views/messagesummary/messagesummary.py:696
@@ -604,50 +603,50 @@ msgstr ""
 msgid "Name"
 msgstr "Nom"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:321
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:428
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:328
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:435
 #: prewikka/views/messagesummary/messagesummary.py:764
 #: prewikka/views/messagesummary/messagesummary.py:770
 msgid "Description"
 msgstr "Description"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:326
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:433
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:333
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:440
 #: prewikka/views/agents/templates/SensorListing.py:444
 #: prewikka/views/messagesummary/messagesummary.py:461
 #: prewikka/views/messagesummary/messagesummary.py:566
 msgid "Version"
 msgstr "Version"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:331
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:338
 msgid "Current Database Version"
 msgstr "Version actuelle de base de données"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:336
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:343
 msgid "Required Database Update"
 msgstr "Mise à jour de base de données nécessaire"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:393
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:400
 msgid "Install Update"
 msgstr "Installer mise à jour"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:405
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:412
 msgid "Installed Apps"
 msgstr "Apps installées"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:438
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:445
 msgid "Database Version"
 msgstr "Version de base de données"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:443
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:450
 msgid "Active"
 msgstr "Actif"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:500
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:507
 msgid "Update the selected apps?"
 msgstr "Mettre à jour les apps sélectionnées ?"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.py:505
+#: prewikka/views/aboutplugin/templates/aboutplugin.py:512
 msgid "Update"
 msgstr "Mettre à jour"
 
@@ -710,26 +709,22 @@ msgid "Model"
 msgstr "Modèle"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:109
-#: prewikka/views/messagelisting/templates/utils.py:100
 msgid "OS"
 msgstr ""
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:115
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:153
-#: prewikka/views/messagelisting/templates/utils.py:106
 #: prewikka/views/messagesummary/messagesummary.py:447
 msgid "Node name"
 msgstr "Nom du nœud"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:121
-#: prewikka/views/messagelisting/templates/utils.py:112
 #: prewikka/views/messagesummary/messagesummary.py:425
 msgid "Node location"
 msgstr "Emplacement du nœud"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:127
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:140
-#: prewikka/views/messagelisting/templates/utils.py:118
 #: prewikka/views/messagesummary/messagesummary.py:452
 msgid "Node address"
 msgstr "Adresse du nœud"
@@ -809,10 +804,10 @@ msgstr "Total :"
 #: prewikka/views/agents/templates/SensorListing.py:426
 #: prewikka/views/agents/templates/SensorListing.py:586
 #: prewikka/views/agents/templates/SensorListing.py:596
-#: prewikka/views/filter/filter.py:357
-#: prewikka/views/filter/templates/FilterEdition.py:339
-#: prewikka/views/filter/templates/FilterEdition.py:349
-#: prewikka/views/messagelisting/templates/AlertListing.py:1678
+#: prewikka/views/filter/filter.py:363
+#: prewikka/views/filter/templates/FilterEdition.py:351
+#: prewikka/views/filter/templates/FilterEdition.py:361
+#: prewikka/views/messagelisting/templates/AlertListing.py:1654
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:375
 msgid "Delete"
 msgstr "Effacer"
@@ -866,179 +861,195 @@ msgstr "Élément de filtre invalide"
 msgid "Invalid filter element '%s' referenced from filter formula"
 msgstr "L'élément de filtre '%s'  référencé depuis la formule est invalide"
 
-#: prewikka/views/filter/filter.py:170
+#: prewikka/views/filter/filter.py:176
 msgid "Filters management page"
 msgstr "Page de gestion des filtres"
 
-#: prewikka/views/filter/filter.py:174
+#: prewikka/views/filter/filter.py:180
 msgid "Filters"
 msgstr "Filtres"
 
-#: prewikka/views/filter/filter.py:180
-msgid "Example: (A AND B) OR (C AND D)"
-msgstr "Exemple : (A AND B) OR (C AND D)"
-
-#: prewikka/views/filter/filter.py:256
+#: prewikka/views/filter/filter.py:259
 #: prewikka/views/messagelisting/templates/AlertListing.py:121
 msgid "Equal"
 msgstr "Égal"
 
-#: prewikka/views/filter/filter.py:257
+#: prewikka/views/filter/filter.py:260
 msgid "Equal (case-insensitive)"
 msgstr "Égal (insensible à la casse)"
 
-#: prewikka/views/filter/filter.py:258
+#: prewikka/views/filter/filter.py:261
 #: prewikka/views/messagelisting/templates/AlertListing.py:127
 msgid "Not equal"
 msgstr "Différent"
 
-#: prewikka/views/filter/filter.py:259
+#: prewikka/views/filter/filter.py:262
 msgid "Not equal (case-insensitive)"
 msgstr "Non égal (insensible à la casse)"
 
-#: prewikka/views/filter/filter.py:260
+#: prewikka/views/filter/filter.py:263
 #: prewikka/views/messagelisting/templates/AlertListing.py:169
 msgid "Regular expression"
 msgstr "Expression régulière"
 
-#: prewikka/views/filter/filter.py:261
+#: prewikka/views/filter/filter.py:264
 #: prewikka/views/messagelisting/templates/AlertListing.py:175
 msgid "Regular expression (case-insensitive)"
 msgstr "Expression régulière (insensible à la casse)"
 
-#: prewikka/views/filter/filter.py:262
+#: prewikka/views/filter/filter.py:265
 msgid "Not regular expression"
 msgstr "Non expression régulière"
 
-#: prewikka/views/filter/filter.py:263
+#: prewikka/views/filter/filter.py:266
 msgid "Not regular expression (case-insensitive)"
 msgstr "Non expression régulière (insensible à la casse)"
 
-#: prewikka/views/filter/filter.py:264
+#: prewikka/views/filter/filter.py:267
 #: prewikka/views/messagelisting/templates/AlertListing.py:133
 msgid "Lesser than"
 msgstr "Plus petit que"
 
-#: prewikka/views/filter/filter.py:265
+#: prewikka/views/filter/filter.py:268
 #: prewikka/views/messagelisting/templates/AlertListing.py:145
 msgid "Lesser or equal"
 msgstr "Plus petit ou égal"
 
-#: prewikka/views/filter/filter.py:266
+#: prewikka/views/filter/filter.py:269
 #: prewikka/views/messagelisting/templates/AlertListing.py:139
 msgid "Greater than"
 msgstr "Plus grand que"
 
-#: prewikka/views/filter/filter.py:267
+#: prewikka/views/filter/filter.py:270
 #: prewikka/views/messagelisting/templates/AlertListing.py:151
 msgid "Greater or equal"
 msgstr "Plus grand ou égal"
 
-#: prewikka/views/filter/filter.py:268
+#: prewikka/views/filter/filter.py:271
 #: prewikka/views/messagelisting/templates/AlertListing.py:157
 msgid "Substring"
 msgstr "Sous-chaîne"
 
-#: prewikka/views/filter/filter.py:269
+#: prewikka/views/filter/filter.py:272
 #: prewikka/views/messagelisting/templates/AlertListing.py:163
 msgid "Substring (case-insensitive)"
 msgstr "Sous-chaîne (insensible à la casse)"
 
-#: prewikka/views/filter/filter.py:270
+#: prewikka/views/filter/filter.py:273
 msgid "Not substring"
 msgstr "Non sous-chaîne"
 
-#: prewikka/views/filter/filter.py:271
+#: prewikka/views/filter/filter.py:274
 msgid "Not substring (case-insensitive)"
 msgstr "Non sous-chaîne (insensible à la casse)"
 
-#: prewikka/views/filter/filter.py:328 prewikka/views/filter/filter.py:332
-#: prewikka/views/filter/filter.py:335
+#: prewikka/views/filter/filter.py:331 prewikka/views/filter/filter.py:335
+#: prewikka/views/filter/filter.py:338 prewikka/views/filter/filter.py:341
 msgid "Could not save Filter"
 msgstr "Impossible de sauvegarder le filtre"
 
-#: prewikka/views/filter/filter.py:328 prewikka/views/filter/filter.py:335
+#: prewikka/views/filter/filter.py:331 prewikka/views/filter/filter.py:338
 msgid "No valid filter formula provided"
 msgstr "Formule fournie pour le filtre invalide"
 
-#: prewikka/views/filter/filter.py:332
+#: prewikka/views/filter/filter.py:335
 msgid "No name for this filter was provided"
 msgstr "Nom du filtre non renseigné"
 
-#: prewikka/views/filter/filter.py:351
-#: prewikka/views/filter/templates/FilterEdition.py:328
-#: prewikka/views/filter/templates/FilterEdition.py:333
+#: prewikka/views/filter/filter.py:341
+msgid "The filter name is already used by another filter"
+msgstr "Le nom du filtre est déjà utilisé par un autre filtre"
+
+#: prewikka/views/filter/filter.py:357
+#: prewikka/views/filter/templates/FilterEdition.py:340
+#: prewikka/views/filter/templates/FilterEdition.py:345
 msgid "Load"
 msgstr "Charger"
 
-#: prewikka/views/filter/filter.py:354
-#: prewikka/views/filter/templates/FilterEdition.py:548
-#: prewikka/views/filter/templates/FilterEdition.py:553
+#: prewikka/views/filter/filter.py:360
+#: prewikka/views/filter/templates/FilterEdition.py:570
+#: prewikka/views/filter/templates/FilterEdition.py:575
 #: prewikka/views/usermanagement/templates/UserSettings.py:266
 msgid "Save"
 msgstr "Enregistrer"
 
-#: prewikka/views/filter/templates/FilterEdition.py:124
+#: prewikka/views/filter/templates/FilterEdition.py:100
+msgid "Select an IDMEF path"
+msgstr "Sélectionner un chemin IDMEF"
+
+#: prewikka/views/filter/templates/FilterEdition.py:112
+msgid "Operator"
+msgstr "Opérateur"
+
+#: prewikka/views/filter/templates/FilterEdition.py:136
 msgid "value"
 msgstr "valeur"
 
-#: prewikka/views/filter/templates/FilterEdition.py:246
-#: prewikka/views/filter/templates/FilterEdition.py:294
+#: prewikka/views/filter/templates/FilterEdition.py:258
+#: prewikka/views/filter/templates/FilterEdition.py:306
 #: prewikka/views/filter/templates/menu.py:97
 msgid "Available filters"
 msgstr "Filtres disponibles"
 
-#: prewikka/views/filter/templates/FilterEdition.py:303
+#: prewikka/views/filter/templates/FilterEdition.py:315
 msgid "Select a filter"
 msgstr "Sélectionner un filtre"
 
-#: prewikka/views/filter/templates/FilterEdition.py:344
+#: prewikka/views/filter/templates/FilterEdition.py:356
 msgid "Delete this filter?"
 msgstr "Supprimer ce filtre ?"
 
-#: prewikka/views/filter/templates/FilterEdition.py:367
+#: prewikka/views/filter/templates/FilterEdition.py:379
 msgid "Add / Modify"
 msgstr "Ajouter / Modifier"
 
-#: prewikka/views/filter/templates/FilterEdition.py:393
+#: prewikka/views/filter/templates/FilterEdition.py:405
 msgid "filter_intro"
 msgstr "Vous êtes en train de créer un filtre dans Prewikka."
 
-#: prewikka/views/filter/templates/FilterEdition.py:401
+#: prewikka/views/filter/templates/FilterEdition.py:413
 msgid "filter_advice"
 msgstr ""
 "Les filtres peuvent être chargés en haut à droite de l'écran, une fois "
 "l'onglet des alertes sélectionné."
 
-#: prewikka/views/filter/templates/FilterEdition.py:414
+#: prewikka/views/filter/templates/FilterEdition.py:426
 msgid "Filter Type:"
 msgstr "Type de filtre :"
 
-#: prewikka/views/filter/templates/FilterEdition.py:426
+#: prewikka/views/filter/templates/FilterEdition.py:438
 #: prewikka/views/messagelisting/templates/AlertListing.py:723
 #: prewikka/views/messagesummary/messagesummary.py:1020
 msgid "Alert"
 msgstr "Alerte"
 
-#: prewikka/views/filter/templates/FilterEdition.py:435
+#: prewikka/views/filter/templates/FilterEdition.py:447
 #: prewikka/views/messagesummary/messagesummary.py:1123
 msgid "Heartbeat"
 msgstr "Pulsation"
 
-#: prewikka/views/filter/templates/FilterEdition.py:444
+#: prewikka/views/filter/templates/FilterEdition.py:456
 msgid "Generic (Alert and Heartbeat)"
 msgstr "Générique (Alerte et Pulsation)"
 
-#: prewikka/views/filter/templates/FilterEdition.py:503
+#: prewikka/views/filter/templates/FilterEdition.py:515
 msgid "Formula:"
 msgstr "Formule :"
 
-#: prewikka/views/filter/templates/FilterEdition.py:518
+#: prewikka/views/filter/templates/FilterEdition.py:525
+msgid "Eg. (A AND B) OR (C AND D)"
+msgstr "Exemple : (A AND B) OR (C AND D)"
+
+#: prewikka/views/filter/templates/FilterEdition.py:535
 #: prewikka/views/usermanagement/templates/UserSettings.py:131
 msgid "Name:"
 msgstr "Nom :"
 
-#: prewikka/views/filter/templates/FilterEdition.py:533
+#: prewikka/views/filter/templates/FilterEdition.py:545
+msgid "Filter name"
+msgstr "Nom du filtre"
+
+#: prewikka/views/filter/templates/FilterEdition.py:555
 msgid "Comment:"
 msgstr "Commentaire :"
 
@@ -1066,7 +1077,7 @@ msgstr "Alerte de Corrélation"
 msgid "Tool Alert"
 msgstr "Alerte d'Outil"
 
-#: prewikka/views/messagelisting/alertlisting.py:1257
+#: prewikka/views/messagelisting/alertlisting.py:1256
 msgid "Threats"
 msgstr "Menaces"
 
@@ -1076,7 +1087,6 @@ msgstr "Agents"
 
 #: prewikka/views/messagelisting/messagelisting.py:116
 #: prewikka/views/messagelisting/templates/AlertListing.py:781
-#: prewikka/views/messagelisting/templates/AlertListing.py:819
 msgid "n/a"
 msgstr ""
 
@@ -1122,7 +1132,7 @@ msgid "Reset"
 msgstr "Réinitialiser"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:641
-#: prewikka/views/messagelisting/templates/AlertListing.py:1665
+#: prewikka/views/messagelisting/templates/AlertListing.py:1641
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:383
 msgid "Apply"
 msgstr "Appliquer"
@@ -1167,109 +1177,97 @@ msgstr "moyenne"
 msgid "high"
 msgstr "haute"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:807
-msgid "Completion:"
-msgstr "Accomplissement :"
-
-#: prewikka/views/messagelisting/templates/AlertListing.py:815
-msgid "succeeded"
-msgstr "succès"
-
 #: prewikka/views/messagelisting/templates/AlertListing.py:817
-msgid "failed"
-msgstr "échec"
-
-#: prewikka/views/messagelisting/templates/AlertListing.py:854
 msgid "Source"
 msgstr "Source"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:886
+#: prewikka/views/messagelisting/templates/AlertListing.py:849
 msgid "Target"
 msgstr "Cible"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:918
+#: prewikka/views/messagelisting/templates/AlertListing.py:881
 msgid "Analyzer"
 msgstr "Analyseur"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:949
+#: prewikka/views/messagelisting/templates/AlertListing.py:912
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:178
 msgid "Date"
 msgstr "Date"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1099
+#: prewikka/views/messagelisting/templates/AlertListing.py:1062
 msgid "Alert details"
 msgstr "Détails de l'alerte"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1107
+#: prewikka/views/messagelisting/templates/AlertListing.py:1070
 msgid "See alert details"
 msgstr "Voir les détails de l'alerte"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1118
-#: prewikka/views/messagelisting/templates/AlertListing.py:1126
+#: prewikka/views/messagelisting/templates/AlertListing.py:1081
+#: prewikka/views/messagelisting/templates/AlertListing.py:1089
 msgid "Filter on this classification"
 msgstr "Filtrer sur cette classification"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1237
+#: prewikka/views/messagelisting/templates/AlertListing.py:1200
 msgid "Filter on this port/protocol"
 msgstr "Filtrer sur ce port/protocole"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1258
+#: prewikka/views/messagelisting/templates/AlertListing.py:1221
 msgid "Port/protocol information"
 msgstr "Informations port/protocole"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1325
+#: prewikka/views/messagelisting/templates/AlertListing.py:1291
 #, python-format
 msgid "%(hidden)d of %(total)d alerts not shown..."
 msgstr "%(hidden)d sur %(total)d alertes invisibles..."
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1336
-#: prewikka/views/messagelisting/templates/AlertListing.py:1421
+#: prewikka/views/messagelisting/templates/AlertListing.py:1302
+#: prewikka/views/messagelisting/templates/AlertListing.py:1387
 msgid "expand"
 msgstr "développer"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1369
+#: prewikka/views/messagelisting/templates/AlertListing.py:1335
 msgid "alert"
 msgid_plural "alerts"
 msgstr[0] "alerte"
 msgstr[1] "alertes"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1398
+#: prewikka/views/messagelisting/templates/AlertListing.py:1364
 msgid "source"
 msgstr "source"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1400
+#: prewikka/views/messagelisting/templates/AlertListing.py:1366
 msgid "target"
 msgstr "cible"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1410
+#: prewikka/views/messagelisting/templates/AlertListing.py:1376
 #, python-format
 msgid "%(hidden)d of %(total)d %(name)ss not shown..."
 msgstr "%(hidden)d sur %(total)d %(name)ss invisibles..."
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1456
+#: prewikka/views/messagelisting/templates/AlertListing.py:1422
 #, python-format
 msgid "Filter on this %s"
 msgstr "Filtrer sur cette %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1477
+#: prewikka/views/messagelisting/templates/AlertListing.py:1443
 #, python-format
 msgid "%s information"
 msgstr "Information sur la %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1546
+#: prewikka/views/messagelisting/templates/AlertListing.py:1512
 msgid "Filter on this Analyzer"
 msgstr "Filtrer sur cet analyseur"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1569
+#: prewikka/views/messagelisting/templates/AlertListing.py:1535
 msgid "Filter on this Host"
 msgstr "Filtrer sur cet hôte"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1617
+#: prewikka/views/messagelisting/templates/AlertListing.py:1593
 #, python-format
 msgid "sent at %s"
 msgstr "envoyée à %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1670
+#: prewikka/views/messagelisting/templates/AlertListing.py:1646
 msgid "Delete the selected alerts?"
 msgstr "Supprimer les alertes sélectionnées ?"
 
@@ -1296,14 +1294,6 @@ msgstr "Limite"
 #: prewikka/views/messagelisting/templates/MessageListing.py:313
 msgid "total"
 msgstr "total"
-
-#: prewikka/views/messagelisting/templates/utils.py:94
-#: prewikka/views/messagesummary/messagesummary.py:613
-#: prewikka/views/messagesummary/messagesummary.py:763
-#: prewikka/views/messagesummary/messagesummary.py:796
-#: prewikka/views/messagesummary/messagesummary.py:815
-msgid "Type"
-msgstr "Type"
 
 #: prewikka/views/messagesummary/__init__.py:10
 msgid "Detailed alert and heartbeat page"
@@ -1463,6 +1453,13 @@ msgstr "Fenêtre"
 #: prewikka/views/messagesummary/messagesummary.py:600
 msgid "URP"
 msgstr ""
+
+#: prewikka/views/messagesummary/messagesummary.py:613
+#: prewikka/views/messagesummary/messagesummary.py:763
+#: prewikka/views/messagesummary/messagesummary.py:796
+#: prewikka/views/messagesummary/messagesummary.py:815
+msgid "Type"
+msgstr "Type"
 
 #: prewikka/views/messagesummary/messagesummary.py:617
 msgid "Seq #"
