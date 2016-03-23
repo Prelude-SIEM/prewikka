@@ -4,6 +4,7 @@ function trigger_custom_date(enabled)
     $("#hidden_timeline_end").prop("disabled", !enabled);
     $("#hidden_timeline_value").prop("disabled", enabled);
     $("#hidden_timeline_unit").prop("disabled", enabled);
+    $("#hidden_timeline_absolute").prop("disabled", enabled);
 
     $("#main_menu_ng .form-group-date input").toggleClass("disabled", !enabled);
 
@@ -46,6 +47,7 @@ function MainMenuInit (date_format) {
     $("#timeline_quick_select a").on("click", function() {
         $("#hidden_timeline_value").val($(this).data("value"));
         $("#hidden_timeline_unit").val($(this).data("unit"));
+        $("#hidden_timeline_absolute").val($(this).data("absolute"));
         $("#timeline_quick_selected").text($(this).text());
 
         if ( $(this).data("value") === "" ){

@@ -1,5 +1,5 @@
 <script type="text/javascript">
-\$LAB.script("prewikka/js/mainmenu.js").wait(function() {
+\$LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(function() {
      window.mainmenu.reset();
 
      #if $auto_apply_enable == "true"
@@ -8,8 +8,8 @@
 
      MainMenuInit("$timeline.time_format");
 
-     \$('#timeline_end').datetimepicker("setDate", (new Date($timeline.end * 1000)));
-     \$('#timeline_start').datetimepicker("setDate", (new Date($timeline.start *1000)));
+     \$('#timeline_end').datetimepicker("setDate", new Date(moment("$timeline.end")));
+     \$('#timeline_start').datetimepicker("setDate", new Date(moment("$timeline.start")));
 
      #if $timeline.quick_custom
      trigger_custom_date(true);
@@ -24,6 +24,7 @@
      <input type="hidden" name="timeline_start" id="hidden_timeline_start" value="$timeline.start">
      <input type="hidden" name="timeline_value" id="hidden_timeline_value" value="$timeline.value">
      <input type="hidden" name="timeline_unit" id="hidden_timeline_unit" value="$timeline.unit">
+     <input type="hidden" name="timeline_absolute" id="hidden_timeline_absolute" value="$timeline.absolute">
      <input type="hidden" name="auto_apply_enable" id="hidden_auto_apply_enable" value="$auto_apply_enable">
      <input type="hidden" name="auto_apply_value" id="hidden_auto_apply_value" value="$auto_apply_value">
      <input type="hidden" name="_save" value="1">
@@ -64,10 +65,10 @@
                     </div>
 
                     <ul class="dropdown-menu" id="timeline_quick_select">
-                         <li><a data-value="" data-unit="" id="timeline_quick_select_custom">$_("Custom")</a></li>
+                         <li><a data-value="" data-unit="" data-absolute="" id="timeline_quick_select_custom">$_("Custom")</a></li>
                          <li role="separator" class="divider"></li>
-                    #for label, value, unit in $timeline.quick
-                         <li><a data-value="$value" data-unit="$unit">$label</a></li>
+                    #for label, value, unit, absolute in $timeline.quick
+                         <li><a data-value="$value" data-unit="$unit" data-absolute="$absolute">$label</a></li>
                     #end for
                     </ul>
                </div>
