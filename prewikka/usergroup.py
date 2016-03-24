@@ -28,7 +28,7 @@ ADMIN_LOGIN = "admin"
 class PermissionDeniedError(error.PrewikkaUserError):
     def __init__(self, permissions, view=None):
         if isinstance(permissions, compat.STRING_TYPES):
-            permissions = set(permissions)
+            permissions = [permissions]
 
         if view:
             msg = _("Access to view '%(view)s' forbidden. Required permissions: %(permissions)s") % {
