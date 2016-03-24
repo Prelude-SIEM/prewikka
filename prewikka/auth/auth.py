@@ -62,6 +62,10 @@ class _AuthUser(object):
         pass
 
     @abc.abstractmethod
+    def hasUserName(self, name):
+        pass
+
+    @abc.abstractmethod
     def getUserPermissions(self, login, ignore_group=False):
         return []
 
