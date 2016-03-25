@@ -940,7 +940,7 @@ class AlertListing(MessageListing):
             'time_min': time_min,
             'time_max': time_max
         }
-        message.extra_link = env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param)
+        message.extra_link = [l for l in env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param) if l is not None]
 
         result_count = 0
         for classification, severity, completion, count, messageid in res:
@@ -1117,7 +1117,7 @@ class AlertListing(MessageListing):
         self.dataset["aggregated_classification"] = self.parameters["aggregated_classification"]
         self.dataset["aggregated_analyzer"] = self.parameters["aggregated_analyzer"]
 
-        self.dataset["extra_column"] = set(env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN"))
+        self.dataset["extra_column"] = [c for c in env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN") if c is not None]
 
         ag_s = self.parameters["aggregated_source"][:]
         ag_t = self.parameters["aggregated_target"][:]
