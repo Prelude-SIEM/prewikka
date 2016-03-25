@@ -402,6 +402,9 @@ $text
 #filter CleanOutput
 
 <td style="text-align: right; width: 20px">
+  #if $message.aggregated and $message.aggregated_classifications_hidden > 0
+    <br/>
+  #end if
   #for $info in $message.infos
     #if $message.aggregated and $info.count > 1
       <a href="$info.display">$info.count</a>
