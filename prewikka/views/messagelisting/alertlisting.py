@@ -763,8 +763,6 @@ class AlertListing(MessageListing):
 
         self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.severity",
                                       ["info", "low", "medium", "high", "n/a"])
-        self._applyOptionalEnumFilter(criteria, "classification", "alert.assessment.impact.completion",
-                                      ["failed", "succeeded", "n/a"])
 
     def _filterTupleToString(self, filtertpl):
         prev_val = filtertpl
@@ -888,7 +886,7 @@ class AlertListing(MessageListing):
 
         path_list = ["alert.classification.text", "alert.analyzer(-1).node.name",
                      "alert.analyzer(-1).name", "alert.analyzer(-1).model",
-                     "alert.assessment.impact.severity", "alert.assessment.impact.completion"]
+                     "alert.assessment.impact.severity"]
 
         for path in path_list:
 
@@ -913,7 +911,7 @@ class AlertListing(MessageListing):
             analyzer_model = path_value_hash["alert.analyzer(-1).model"]
             analyzer_node_name = path_value_hash["alert.analyzer(-1).node.name"]
             severity = path_value_hash["alert.assessment.impact.severity"]
-            completion = path_value_hash["alert.assessment.impact.completion"]
+            completion = None
 
             alertkey = (classification or "") + "-" + (severity or "") + "-" + (completion or "")
 

@@ -259,17 +259,6 @@ if ( window._messagelisting_title_array == undefined ) {
         #end for
        </tr>
 
-       <tr>
-        <th>$_("Completion:")</th>
-        <td colspan="2">&nbsp;</td>
-
-        #for item in $N_("succeeded"), $N_("failed"), $N_("n/a")
-        <td>
-          <input id="checkbox-completion-$item" class="checkbox-label" type="checkbox" name="alert.assessment.impact.completion" value="$item"/>
-          <label for="checkbox-completion-$item" class="btn btn-default btn-xs label-checkbox">$_($item)<span class="badge"></span></label>
-        </td>
-        #end for
-       </tr>
       </table>
      </td></tr>
      $filter_reset()
