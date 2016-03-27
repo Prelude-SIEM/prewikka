@@ -1218,6 +1218,9 @@ class AlertListing(MessageListing):
 
     def render(self):
         MessageListing.render(self)
+        if "aggregated_analyzer" in self.parameters:
+            self.parameters["aggregated_analyzer"] = [ i.replace("alert.analyzer(0)","alert.analyzer(-1)")
+                                                           for i in self.parameters["aggregated_analyzer"] ]
 
         self._setTimelineChart()
 
