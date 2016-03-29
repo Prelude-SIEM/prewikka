@@ -36,7 +36,7 @@ def _normalizeName(name):
 
 COLUMN_LIST = [ "classification", "source", "target", "analyzer" ]
 
-CLASSIFICATION_GENERIC_SEARCH_FIELDS = [ "alert.classification.text", "alert.classification.reference.name", "alert.classification.reference.origin", "alert.assessment.impact.completion" ]
+CLASSIFICATION_GENERIC_SEARCH_FIELDS = [ "alert.classification.text", "alert.classification.reference.name" ]
 
 SOURCE_GENERIC_SEARCH_FIELDS = [ "alert.source.node.address.address", "alert.source.user.user_id.name", "alert.source.node.name",
                                  "alert.source.user.user_id.number", "alert.source.process.name", "alert.source.process.pid",
