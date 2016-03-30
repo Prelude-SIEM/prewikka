@@ -19,7 +19,7 @@
 
 import cgi
 from prewikka.web import request
-from prewikka import main
+from prewikka import main, env
 
 defined_status = {
         200: 'OK',
@@ -58,7 +58,7 @@ class WSGIRequest(request.Request):
 
 
     def getBaseURL(self):
-        return self._environ["SCRIPT_NAME"] + "/"
+        return (env.config.reverse_path or self._environ["SCRIPT_NAME"]) + "/"
 
     def getMethod(self):
         return self._environ['REQUEST_METHOD']
