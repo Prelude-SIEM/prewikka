@@ -92,6 +92,13 @@ class AlertListingParameters(MessageListingParameters):
         if not operator in ("=", "<", ">", "<=", ">=", "~", "~*", "<>", "<>*", "!"):
             raise view.InvalidParameterValueError("operator", operator)
 
+    def _check_value(self, obj, operator, value):
+        if operator != "!":
+            try:
+                prelude.IDMEFCriteria(obj + " " + operator + " '" + value + "'")
+            except RuntimeError:
+                raise view.InvalidParameterValueError(obj, value)
+
     def _setParam(self, view_name, user, column, param, value, is_default=False):
         self._dynamic_param[column][param] = value
 
@@ -130,6 +137,8 @@ class AlertListingParameters(MessageListingParameters):
                     continue
                 value = ""
 
+            self._check_value(object, operator, value)
+
             do_append = True
             for tmp in sorted:
                 if tmp[1] == object and tmp[2] == operator and tmp[3] == value:
@@ -143,16 +152,17 @@ class AlertListingParameters(MessageListingParameters):
         return ret, sorted
 
     def _loadColumnParam(self, view_name, user, paramlist, column, do_save):
-        is_saved = False
-
         if do_save:
             paramlist = copy.copy(paramlist)
+
+        self[column] = []
+        ret, sorted = self._paramDictToList(paramlist, column)
+
+        if do_save:
             user.del_property_match("%s_object_" % (column), view=view_name)
             user.del_property_match("%s_operator_" % (column), view=view_name)
             user.del_property_match("%s_value_" % (column), view=view_name)
 
-        self[column] = []
-        ret, sorted = self._paramDictToList(paramlist, column)
         for i in sorted:
             self._setParam(view_name, user, column, "%s_object_%d" % (column, i[0]), i[1], is_default=do_save)
             self._setParam(view_name, user, column, "%s_operator_%d" % (column, i[0]), i[2], is_default=do_save)
