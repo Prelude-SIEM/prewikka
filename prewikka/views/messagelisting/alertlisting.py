@@ -300,7 +300,7 @@ class ListedAlert(ListedMessage):
         else:
             dns = True
 
-        hfield = self.createHostField("alert.%s(0).node.address(0).address" % direction, address,
+        hfield = self.createHostField("alert.%s.node.address.address" % direction, address,
                                       category=category, direction=direction, dns=dns)
         dataset["addresses"].append(hfield)
 
