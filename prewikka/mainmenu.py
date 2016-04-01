@@ -21,7 +21,7 @@ from prewikka import view, template, localization
 from prewikka.templates import MainMenu as MainMenuTemplate
 
 from dateutil.relativedelta import relativedelta
-import time, copy, datetime
+import time, copy, datetime, calendar
 from prewikka import utils, env
 
 
@@ -215,10 +215,11 @@ class MainMenu:
     def _setup_timeline_range(self):
         self.start = self.end = None
         if "timeline_start" in self.parameters:
-            self.start = env.threadlocal.user.timezone.localize(datetime.datetime.fromtimestamp(self.parameters["timeline_start"]))
+            self.start = env.threadlocal.user.timezone.localize(datetime.datetime.utcfromtimestamp(self.parameters["timeline_start"]))
+
 
         if "timeline_end" in self.parameters:
-            self.end = env.threadlocal.user.timezone.localize(datetime.datetime.fromtimestamp(self.parameters["timeline_end"]))
+            self.end = env.threadlocal.user.timezone.localize(datetime.datetime.utcfromtimestamp(self.parameters["timeline_end"]))
 
         self._timeunit, self._timevalue = self.parameters["timeline_unit"], self.parameters["timeline_value"]
         if self._timeunit == "unlimited":
@@ -244,6 +245,16 @@ class MainMenu:
                 else:
                     self.start = self.end - delta
 
+    @staticmethod
+    def mktime_param(dt, precision=None):
+        tpl = list(dt.timetuple())
+
+        if precision is not None:
+            for i in xrange(precision, len(tpl)):
+                tpl[i] = 0
+
+        return int(calendar.timegm(tpl))
+
     def get_criteria(self):
         criteria = []
 
@@ -255,6 +266,7 @@ class MainMenu:
             end = self.end
             if not self._time_absolute:
                 end = self.end + relativedelta(minutes=1)
+
             end = self.end.astimezone(utils.timeutil.timezone("UTC"))
             criteria.append("%%(backend)s.%%(time_field)s < '%s'" % end)
 

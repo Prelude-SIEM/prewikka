@@ -16,13 +16,18 @@ function trigger_custom_date(enabled)
 }
 
 
+function get_time(dt)
+{
+        return (dt.getTime() - (dt.getTimezoneOffset() * 60000)) / 1000;
+}
+
 
 function update_date() {
     var start = $("#timeline_start").datetimepicker("getDate");
-    $("#hidden_timeline_start").val(start ? start.getTime() / 1000 : "");
+    $("#hidden_timeline_start").val(start ? get_time(start) : "");
 
     var end = $("#timeline_end").datetimepicker("getDate");
-    $("#hidden_timeline_end").val(end ? end.getTime() / 1000 : "");
+    $("#hidden_timeline_end").val(end ? get_time(end) : "");
 
     if ( start > end ) {
         $(".input-timeline-datetime").closest(".form-group").addClass('has-error');
