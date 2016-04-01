@@ -27,7 +27,8 @@ from prewikka import utils, env
 
 class MainMenuParameters(view.Parameters):
     allow_extra_parameters = False
-    _INTERNAL_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "order_by", "timezone", "auto_apply_value", "auto_apply_enable"]
+    _INTERNAL_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_absolute",
+                            "order_by", "timezone", "auto_apply_value", "auto_apply_enable"]
 
     def __init__(self, *args, **kwargs):
         env.hookmgr.declare_once("HOOK_MAINMENU_PARAMETERS_REGISTER", multi=True)
