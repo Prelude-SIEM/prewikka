@@ -57,7 +57,7 @@ class ListedHeartbeat(ListedMessage):
 class HeartbeatListing(MessageListing):
     view_name = N_("Heartbeats")
     view_parameters = HeartbeatListingParameters
-    view_permissions = [ "IDMEF_VIEW" ]
+    view_permissions = [ N_("IDMEF_VIEW") ]
     view_template = templates.HeartbeatListing
     view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
     view_section = N_("Agents")

@@ -48,7 +48,7 @@ class SensorListing(view.View):
     view_name = "Agents"
     view_section = "Agents"
     view_parameters = SensorListingParameters
-    view_permissions = [ "IDMEF_VIEW" ]
+    view_permissions = [ N_("IDMEF_VIEW") ]
     view_template = templates.SensorListing
     view_order = 0
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
@@ -146,7 +146,7 @@ class SensorListing(view.View):
 
 class SensorMessagesDelete(SensorListing):
     view_parameters = SensorMessagesDelete
-    view_permissions = [ "IDMEF_VIEW", "IDMEF_ALTER" ]
+    view_permissions = [ N_("IDMEF_VIEW"), N_("IDMEF_ALTER") ]
 
     def render(self):
         for analyzerid in self.parameters["analyzerid"]:
@@ -163,7 +163,7 @@ class SensorMessagesDelete(SensorListing):
 
 class HeartbeatAnalyze(SensorListing):
     view_parameters = HeartbeatAnalyzeParameters
-    view_permissions = [ "IDMEF_VIEW" ]
+    view_permissions = [ N_("IDMEF_VIEW") ]
     view_template = templates.HeartbeatAnalyze
 
     def render(self):

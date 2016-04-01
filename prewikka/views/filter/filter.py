@@ -182,7 +182,7 @@ class AlertFilterEdition(view.View):
     view_template = templates.FilterEdition
     view_section = N_("Settings")
     view_order = 1
-    view_permissions = [ "IDMEF_VIEW" ]
+    view_permissions = [ N_("IDMEF_VIEW") ]
 
     def _user_delete_hook(self, user):
         for i in self._db.get_filter_list(user):
