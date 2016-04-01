@@ -614,6 +614,7 @@ div.prewikka-view-config {
 
 .ui-dialog {
     position: fixed;
+    box-sizing: content-box; /* Bootstrap compatibility */
 
     .container {
         width: 100%;
@@ -643,6 +644,11 @@ div.prewikka-view-config {
     .ui-dialog-titlebar {
         padding-right: 0;
     }
+
+    .ui-dialog-content {
+        box-sizing: content-box; /* Bootstrap compatibility */
+    }
+
 }
 
 .ui-dialog a {
