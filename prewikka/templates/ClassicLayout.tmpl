@@ -35,7 +35,7 @@ function check_same_origin(url) {
                 prewikka_loadTab({url: e.originalEvent.state, history:false});
         });
 
-        \$(document).on("click", "a, area", function(event) {
+        \$(document).on("click", "a:not(.ajax-bypass), area:not(.ajax-bypass)", function(event) {
                 if ( \$(this).data("confirm") )
                         return false;
 

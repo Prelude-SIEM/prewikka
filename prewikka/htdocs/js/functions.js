@@ -128,7 +128,14 @@ $(document).ready(function(){
       var confirm = input.data("confirm");
 
       function confirm_handler() {
-          input.removeData("confirm").removeAttr('data-confirm').click();
+          input.removeData("confirm").removeAttr('data-confirm');
+
+          /*
+           * Simulate a click using the DOM's native click() method
+           * as jQuery's function does not work properly on "a" tags.
+           * See http://stackoverflow.com/a/21762745 for more information.
+           */
+          input[0].click();
           input.attr("data-confirm", confirm).data("confirm", confirm);
           $('#dataConfirmModal').modal('hide');
           return false;
