@@ -93,7 +93,7 @@ class AlertListingParameters(MessageListingParameters):
             raise view.InvalidParameterValueError("operator", operator)
 
     def _check_value(self, obj, operator, value):
-        if operator != "!":
+        if operator != "!" and obj != "__all__":
             try:
                 prelude.IDMEFCriteria(obj + " " + operator + " '" + value + "'")
             except RuntimeError:
