@@ -31,9 +31,6 @@ $(document).ready(function(){
   });
 
 
-  if ( navigator.userAgent.indexOf("Konqueror") != -1 )
-        $(".popup_menu").hide();
-
 
 // IDMEF Browser
 

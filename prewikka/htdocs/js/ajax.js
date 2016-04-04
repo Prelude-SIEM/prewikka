@@ -51,7 +51,7 @@ function __ie_fixes(data)
     /*
      * Return if not IE, or IE >= 10
      */
-    if ( window.navigator.userAgent.indexOf("MSIE") <= 0 || window.atob )
+    if ( 'baseURI' in document || window.atob )
         return data;
 
     var absolute = new RegExp('^(?:[a-z]+:)?//', 'i');
