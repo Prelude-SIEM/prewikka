@@ -19,6 +19,7 @@
 
 import time, abc, fcntl
 import re, operator, pkg_resources, pkgutil, glob, os.path, sys
+from datetime import datetime
 
 import preludedb
 from prewikka import log, error, utils, version, env, compat
@@ -413,6 +414,10 @@ class Database(preludedb.SQL):
 
     def getType(self):
         return self._dbtype
+
+    @staticmethod
+    def parse_datetime(date):
+        return datetime.strptime(date, '%Y-%m-%d %H:%M:%S').replace(tzinfo=utils.timeutil.timezone("UTC"))
 
     def escape(self, data):
         if not isinstance(data, compat.STRING_TYPES):
