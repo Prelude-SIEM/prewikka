@@ -201,6 +201,7 @@ class Request:
         fs = cgi.FieldStorage(**kwargs)
 
         for key in fs.keys():
+            # FIXME : remove next part when IE9 support will be dropped
             # Support for jquery-iframe-transport
             if key == "X-Requested-With" and fs[key].value == "IFrame":
                 self.is_xhr = True
@@ -208,8 +209,11 @@ class Request:
 
             value = fs[key]
             for i, f in enumerate(value if isinstance(value, list) else [value]):
-                arguments["%s_data_%d" % (key, i)] = f.value
-                arguments["%s_name_%d" % (key, i)] = f.filename
+                if f.filename:
+                    arguments["%s_data_%d" % (key, i)] = f.value
+                    arguments["%s_name_%d" % (key, i)] = f.filename
+                else:
+                    arguments[key] = f.value
 
         self.is_multipart = True
         return arguments
