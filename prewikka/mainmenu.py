@@ -120,8 +120,6 @@ class MainMenuStep(object):
 
 
 class MainMenu:
-    _time_absolute = 0
-
     def __init__(self, main_view):
         self.main = main_view
         self.dataset = template.PrewikkaTemplate(MainMenuTemplate.MainMenu)
@@ -235,7 +233,7 @@ class MainMenu:
 
         elif self.start is None and self.end is None:
             self.start = self.end = datetime.datetime.now(env.threadlocal.user.timezone).replace(second=0, microsecond=0)
-            if not self._time_absolute: #relative
+            if not self.parameters["timeline_absolute"]: #relative
                 self.start = self.end - delta
 
             else: # absolute
@@ -264,7 +262,7 @@ class MainMenu:
 
         if self.end:
             end = self.end
-            if not self._time_absolute:
+            if not self.parameters["timeline_absolute"]:
                 end = self.end + relativedelta(minutes=1)
 
             end = self.end.astimezone(utils.timeutil.timezone("UTC"))
@@ -287,7 +285,7 @@ class MainMenu:
         self.dataset["timeline.order_by"] = parameters["orderby"]
         self.dataset["timeline.value"] = parameters["timeline_value"]
         self.dataset["timeline.unit"] = parameters["timeline_unit"]
-        self._time_absolute = self.dataset["timeline.absolute"] = parameters["timeline_absolute"]
+        self.dataset["timeline.absolute"] = parameters["timeline_absolute"]
         self.dataset["timeline.quick_selected"] = _("Custom")
         self.dataset["timeline.quick_custom"] = True
         self.dataset["timeline.refresh_selected"] = _("Inactive")
