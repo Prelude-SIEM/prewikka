@@ -312,6 +312,7 @@ class Core:
             env.auth = env.session
 
         env.viewmanager.addView(BaseView())
+        env.viewmanager.addView(utils.viewhelpers.AjaxHostURL())
         if env.session.can_logout():
                 env.viewmanager.addView(Logout())
 

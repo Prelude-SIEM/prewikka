@@ -110,6 +110,8 @@ class ListedMessage(dict):
         else:
             field["url_infos"] = None
 
+        field["url_popup"] = utils.create_link("AjaxHostURL", {"host": value})
+
         if value and dns is True:
             field["hostname"] = resolve.AddressResolve(value)
         else:
@@ -121,10 +123,6 @@ class ListedMessage(dict):
         for typ, linkname, link, widget in env.hookmgr.trigger("HOOK_LINK", value):
             if typ == "host":
                 field["host_links"].append((linkname, link, widget))
-
-        if "host" in env.url:
-            for urlname, url in env.url["host"].items():
-                field["host_links"].append((urlname.capitalize(), url.replace("$host", value), False))
 
         return field
 

@@ -17,8 +17,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from prewikka import view
+from prewikka import view, env, utils
 
+from string import Template
 
 class GridAjaxParameters(view.Parameters):
     """Handle parameters sent by jqGrid."""
@@ -33,3 +34,36 @@ class GridAjaxParameters(view.Parameters):
         # Ceil division (use // instead of / for Python3 compatibility):
         nb_pages = (total_results - 1) // self["rows"] + 1
         return {"total": nb_pages, "page": self["page"], "rows": [], "records": total_results}
+
+
+class AjaxHostURL(view.View):
+    class AjaxHostURLParameters(view.Parameters):
+        def register(self):
+            self.mandatory("host", str)
+
+    view_parameters = AjaxHostURLParameters
+
+    def __init__(self):
+        view.View.__init__(self)
+        env.hookmgr.declare("HOOK_HOST_INFO")
+
+    @staticmethod
+    def _value_generator(infos):
+        for urlname, url in env.url["host"].items():
+            try:
+                url = Template(url).substitute(infos)
+            except KeyError:
+                continue
+
+            yield urlname.capitalize(), url
+
+    def render(self):
+        infos = {"host": self.parameters["host"]}
+
+        for info in env.hookmgr.trigger("HOOK_HOST_INFO", self.parameters["host"]):
+            infos.update(info)
+
+        return ['<a href="%(url)s" target="_%(urlname)s">%(urlname)s</a>' % {
+            "urlname": utils.escape_html_string(urlname),
+            "url": utils.escape_html_string(url)}
+                for urlname, url in self._value_generator(infos)]

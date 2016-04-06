@@ -152,6 +152,28 @@ $(document).ready(function(){
       $(this).closest(".dropdown-submenu").toggleClass("open");
       return false;
   });
+
+  $(document).on('click', '.popup_menu_dynamic', function() {
+      $(this).removeClass("popup_menu_dynamic");
+
+      var popup_menu = $(this).next(".popup_menu");
+      popup_menu.append($("<span>", {
+        "class": "popup_menu_loading",
+        "text": "Loading..."
+      }));
+
+      $.ajax({
+          type: "GET",
+          url: $(this).data("popup-url"),
+          success: function(data) {
+              var items = JSON.parse(data).content;
+              popup_menu.find(".popup_menu_loading").remove();
+              popup_menu.append(items.join(""));
+          }
+      });
+  });
+
+
 });
 
 function prewikka_resizeTopMenu() {
