@@ -153,14 +153,15 @@ class RendererPluginManager(pluginmanager.PluginManager):
 
         try:
             data = self._renderer[renderer][type].render(data, **kwargs)
-            return '<div id="%s" class="renderer-elem %s">%s</div>' % (cssid, classname, data)
+            html = """<div id="%s" class="renderer-elem %s">%s</div>""" % (cssid, classname, data.get("html", ""))
+
+            return {"html": html, "script": data.get("script", "")}
         except RendererNoDataException as e:
-            return """
-                <script type="text/javascript">
+            html = """<div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>""" % (cssid, classname, str(e))
+            script = """
                  var size = prewikka_getRenderSize("#%s", %s);
 
                  $("#%s").width(size[0]).css("height", size[1] + 'px').css("line-height", size[1] + 'px');
+                """ % (cssid, json.dumps(kwargs), cssid)
 
-                </script>
-                <div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>
-                """ % (cssid, json.dumps(kwargs), cssid, cssid, classname, str(e))
+            return {"html": html, "script": script}
