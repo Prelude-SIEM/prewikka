@@ -96,38 +96,42 @@ if ( window._messagelisting_title_array == undefined ) {
 #from prewikka import idmefbrowser
 
 #def define_inline_filter_options($rootcl, $preselect, $depth)
-         <option disabled="disabled" value="">$str($depth * "&nbsp;") $rootcl.getName().capitalize()</option>
+        #if $rootcl.getValueType() == $prelude.IDMEFValue.TYPE_CLASS
+         <option disabled="disabled" value="">$str($depth * "&nbsp;")$rootcl.getName().capitalize()</option>
 
           #for $subcl in $rootcl
-           #if $subcl.getValueType() == $prelude.IDMEFValue.TYPE_CLASS
                 $define_inline_filter_options($subcl, $preselect, $depth + 1)
-                #continue
+          #end for
+
+        #else
+           #if $rootcl.getPath() in $checkbox_fields
+                #return
            #end if
 
-           #set $oplist = $idmefbrowser.getOperatorList($subcl.getValueType())
-           #set $is_enum = $subcl.getValueType() == $prelude.IDMEFValue.TYPE_ENUM
+           #set $oplist = $idmefbrowser.getOperatorList($rootcl.getValueType())
+           #set $is_enum = $rootcl.getValueType() == $prelude.IDMEFValue.TYPE_ENUM
 
            #if $is_enum or $oplist
            <script type="text/javascript">
             #if $is_enum
-            window._messagelisting_value_array["$subcl.getPath()"] = $list($subcl.getEnumValues());
+            window._messagelisting_value_array["$rootcl.getPath()"] = $list($rootcl.getEnumValues());
             #end if
             #if $oplist
-            window._messagelisting_operator_array["$subcl.getPath()"] = $oplist;
+            window._messagelisting_operator_array["$rootcl.getPath()"] = $oplist;
             #end if
            </script>
            #end if
 
-           #if $subcl.getPath() == None
-            <option disabled="disabled" value="">$str(($depth + 1) * "&nbsp;")$subcl.getName().capitalize()</option>
+           #if $rootcl.getPath() == None
+            <option disabled="disabled" value="">$str($depth * "&nbsp;")$rootcl.getName().capitalize()</option>
 
-           #elif $subcl.getPath() == $preselect
-            <option value="$subcl.getPath()" selected="selected">$str(($depth + 1) * "&nbsp;")$subcl.getName()</option>
+           #elif $rootcl.getPath() == $preselect
+            <option value="$rootcl.getPath()" selected="selected">$str($depth * "&nbsp;")$rootcl.getName()</option>
 
            #else
-            <option value="$subcl.getPath()">$str(($depth + 1) * "&nbsp;")$subcl.getName()</option>
+            <option value="$rootcl.getPath()">$str($depth * "&nbsp;")$rootcl.getName()</option>
            #end if
-        #end for
+        #end if
 #end def
 
 #def define_inline_filter($obname, $preselect)
@@ -138,7 +142,7 @@ if ( window._messagelisting_title_array == undefined ) {
          <input type="hidden" name="${obname}_object_0" value="__all__" />
          <select style="display:none;" disabled="disabled" class="popup_select_field form-control input-sm" name="${obname}_object_0">
             #for $i in $all_filters[$obname]
-             $define_inline_filter_options($i, $preselect, 0);
+             $define_inline_filter_options($i, $preselect, 0)
             #end for
            </select>
         </td>
@@ -158,15 +162,15 @@ if ( window._messagelisting_title_array == undefined ) {
 #end def
 
 #def define_inline_aggreg_options($rootcl, $depth)
+        #if $rootcl.getValueType() == $prelude.IDMEFValue.TYPE_CLASS
         <option disabled="disabled" value="">$str($depth * "&nbsp;")$rootcl.getName().capitalize()</option>
 
           #for $subcl in $rootcl
-           #if $subcl.getValueType() == $prelude.IDMEFValue.TYPE_CLASS
                 $define_inline_aggreg_options($subcl, $depth + 1)
-                #continue
-           #end if
-            <option value="$subcl.getPath(listidx='(0)')">$str(($depth + 1) * "&nbsp;")$subcl.getName()</option>
           #end for
+        #else
+            <option value="$rootcl.getPath(listidx='(0)')">$str($depth * "&nbsp;")$rootcl.getName()</option>
+        #end if
 #end def
 
 #def define_inline_aggreg($obname)

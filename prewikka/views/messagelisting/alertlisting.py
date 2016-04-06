@@ -1194,7 +1194,9 @@ class AlertListing(MessageListing):
             d[i + "_default"] =self.dataset[i + "_default"] = self.parameters.getDefault(i, usedb=False)
 
         root = prelude.IDMEFClass().get("alert")
-        self.dataset["all_filters"] = { "classification" : [root.get("classification"),
+        self.dataset["all_filters"] = { "classification" : [root.get("messageid"),
+                                                            root.get("classification"),
+                                                            root.get("assessment"),
                                                             root.get("correlation_alert"),
                                                             root.get("overflow_alert"),
                                                             root.get("tool_alert"),
@@ -1203,8 +1205,10 @@ class AlertListing(MessageListing):
                                         "target": [root.get("target")],
                                         "analyzer": [root.get("analyzer")]}
 
+        self.dataset["checkbox_fields"] = ["alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"]
+
         c_params = ["aggregated_classification"] + self.parameters.getDynamicParams("classification").keys()
-        c_params += ["alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion" ]
+        c_params += self.dataset["checkbox_fields"]
         s_params = ["aggregated_source"] + self.parameters.getDynamicParams("source").keys()
         t_params = ["aggregated_target"] + self.parameters.getDynamicParams("target").keys()
         a_params = ["aggregated_analyzer"] + self.parameters.getDynamicParams("analyzer").keys()
