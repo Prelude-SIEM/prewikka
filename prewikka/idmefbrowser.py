@@ -118,24 +118,9 @@ def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max
                 search_contains: true
              }).chosenSortable();
 
-            var select = $(".data-paths");
-            var container = select.siblings('.chosen-container');
-            var list = container.find('.chosen-choices');
-            var sorted_elements = %s;
-
-            for (var i = 0; i < sorted_elements.length; ++i) {
-                var value = sorted_elements[i];
-                var elem = select.find('option[value="' + value + '"]');
-                var index = elem[0].index;
-
-                index = index + elem.parent().index() + 1;
-                list.find('a.search-choice-close[data-option-array-index="' + index + '"]')
-                    .parent()
-                    .detach()
-                    .prependTo(list);
-            }
+            $(".data-paths").chosenSetOrder(%s);
          });
 </script>
-""" % (max_paths, list(reversed(selected_paths)))
+""" % (max_paths, list(selected_paths))
 
     return html
