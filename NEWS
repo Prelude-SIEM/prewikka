@@ -1,15 +1,44 @@
+* 2016-04-08, prewikka-1.3.0rc3:
+
+Author: Antoine Luong
+
+- Re-add missing fields in AlertListing search
+
+Author: Francois Poirotte
+
+- Skip AJAX request for the logout link
+- Get rid of browser sniffing
+
+Author: Sélim Menouar
+
+- Fix simple filter in AlertListing
+- Gray out the mainmenu's inputs when they are disabled
+
+Author: Camille Gardet
+
+- HTML and JS are now separated in Renderer
+
+Author: Louis-David Gabet
+
+- Control buttons with jqGrid
+
+
+
 * 2016-04-01, prewikka-1.3.0rc2:
+
+Author: Yoann Vandoorselaere
+
+- Navigation fixes, helper method for time argument generation
 
 Author: Antoine Luong
 
 - Fix a jQuery UI / Bootstrap compatibility problem
-
 - Prevent users from disabling certain plugins
-
 - Remove enumeration fields from AlertListing basic search
 
 Author: Francois Poirotte
 
+- Return timeline_absolute in get_parameters
 - Prevent filters from being applied twice
 
 - Add support for reverse proxies
@@ -19,6 +48,7 @@ Author: Francois Poirotte
 
 Author: Camille Gardet
 
+- Don't save invalid parameters in alert view
 - Fix columns titles in users/groups listing
 
 
