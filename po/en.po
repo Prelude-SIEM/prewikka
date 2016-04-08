@@ -305,7 +305,7 @@ msgid "end"
 msgstr ""
 
 #: prewikka/templates/MainMenu.py:285
-msgid "Date of the most recent alert to visualize"
+msgid "Date of the newest alert to visualize"
 msgstr ""
 
 #: prewikka/templates/MainMenu.py:293
