@@ -18,7 +18,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import json, copy, re, urllib, prelude, time, pkg_resources, datetime
+import json, copy, re, urllib, prelude, time, pkg_resources, datetime, itertools
 from prewikka import view, usergroup, utils, error, mainmenu, localization, env
 from . import templates
 from messagelisting import MessageListingParameters, MessageListing, ListedMessage
@@ -606,7 +606,7 @@ class ListedAlert(ListedMessage):
                 'time_min': ctime,
                 'time_max': ctime
             }
-            self["extra_link"] = env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param)
+            self["extra_link"] = itertools.ifilterfalse(lambda x: x is None, env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
 
     def setMessageDirectionGeneric(self, direction, object, value, allow_empty_value=True):
         self._initDirectionIfNeeded(direction)
@@ -948,7 +948,7 @@ class AlertListing(MessageListing):
             'time_min': time_min,
             'time_max': time_max
         }
-        message.extra_link = [l for l in env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param) if l is not None]
+        message.extra_link = itertools.ifilterfalse(lambda x: x is None, env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
 
         result_count = 0
         for classification, severity, completion, count, messageid in res:
@@ -1125,7 +1125,7 @@ class AlertListing(MessageListing):
         self.dataset["aggregated_classification"] = self.parameters["aggregated_classification"]
         self.dataset["aggregated_analyzer"] = self.parameters["aggregated_analyzer"]
 
-        self.dataset["extra_column"] = [c for c in env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN") if c is not None]
+        self.dataset["extra_column"] = itertools.ifilterfalse(lambda x: x is None, env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN"))
 
         ag_s = self.parameters["aggregated_source"][:]
         ag_t = self.parameters["aggregated_target"][:]
