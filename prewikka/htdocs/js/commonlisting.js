@@ -22,21 +22,25 @@ function CommonListing(elem, text, options) {
         hidegrid: false,
         viewrecords: true,
         globalSearch: false,
-        onSelectRow: function() {
-            var rows = $(this).jqGrid('getGridParam', 'selarrrow');
-            if ( rows.length == 0 ) {
-                disableButtons(".needone", "Please select at least one entry");
-                disableButtons(".justone", "Please select exactly one entry");
-            }
-            else if ( rows.length > 1 ) {
-                enableButtons(".needone");
-                disableButtons(".justone", "Please select exactly one entry");
-            }
-            else {
-                enableButtons(".needone, .justone");
-            }
-        }
+        gridComplete: grid_buttons_state,
+        onSelectAll: grid_buttons_state,
+        onSelectRow: grid_buttons_state
     }, options);
+
+    function grid_buttons_state() {
+        var rows = $(this).jqGrid('getGridParam', 'selarrrow');
+        if ( rows.length == 0 ) {
+            disableButtons(".needone", "Please select at least one entry");
+            disableButtons(".justone", "Please select exactly one entry");
+        }
+        else if ( rows.length > 1 ) {
+            enableButtons(".needone");
+            disableButtons(".justone", "Please select exactly one entry");
+        }
+        else {
+            enableButtons(".needone, .justone");
+        }
+    };
 
     var grid = prewikka_grid(elem, options)
     .jqGrid('navGrid', {
