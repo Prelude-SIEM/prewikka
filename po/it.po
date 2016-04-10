@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-04 02:31+0200\n"
+"POT-Creation-Date: 2016-04-10 23:03+0200\n"
 "PO-Revision-Date: \n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -18,37 +18,37 @@ msgstr ""
 msgid "Authentication failed"
 msgstr "Autenticazione fallita"
 
-#: prewikka/database.py:29
+#: prewikka/database.py:30
 #, fuzzy
 msgid "Database schema error"
 msgstr "Errore di database"
 
-#: prewikka/database.py:239
+#: prewikka/database.py:240
 msgid "database installation required"
 msgstr ""
 
-#: prewikka/database.py:242
+#: prewikka/database.py:243
 msgid "database activation required"
 msgstr ""
 
-#: prewikka/database.py:311
+#: prewikka/database.py:312
 #, fuzzy
 msgid "Database installation error"
 msgstr "Errore di database"
 
-#: prewikka/database.py:311
+#: prewikka/database.py:312
 #, python-format
 msgid ""
 "No database installation script found for module %(module)s, version %"
 "(version)s"
 msgstr ""
 
-#: prewikka/database.py:318 prewikka/database.py:350
+#: prewikka/database.py:319 prewikka/database.py:351
 #, fuzzy
 msgid "Database migration error"
 msgstr "Errore di database"
 
-#: prewikka/database.py:350
+#: prewikka/database.py:351
 #, python-format
 msgid ""
 "No linear migration script found for module %(module)s %(version1)s -> %"
@@ -147,68 +147,68 @@ msgstr ""
 msgid "Prelude internal error"
 msgstr "Errore interno Prewikka"
 
-#: prewikka/mainmenu.py:131
+#: prewikka/mainmenu.py:129
 msgid "Today"
 msgstr ""
 
-#: prewikka/mainmenu.py:132
+#: prewikka/mainmenu.py:130
 msgid "This month"
 msgstr ""
 
-#: prewikka/mainmenu.py:133 prewikka/mainmenu.py:134
+#: prewikka/mainmenu.py:131 prewikka/mainmenu.py:132
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] ""
 msgstr[1] ""
 
-#: prewikka/mainmenu.py:135 prewikka/mainmenu.py:136
+#: prewikka/mainmenu.py:133 prewikka/mainmenu.py:134
 #, fuzzy, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d Nodo"
 msgstr[1] "%d Nodi"
 
-#: prewikka/mainmenu.py:137
+#: prewikka/mainmenu.py:135
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: prewikka/mainmenu.py:138 prewikka/mainmenu.py:139
+#: prewikka/mainmenu.py:136 prewikka/mainmenu.py:137
 #, fuzzy, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d Agente"
 msgstr[1] "%d Agenti"
 
-#: prewikka/mainmenu.py:140
+#: prewikka/mainmenu.py:138
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: prewikka/mainmenu.py:143
+#: prewikka/mainmenu.py:141
 #, fuzzy, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d Nodo"
 msgstr[1] "%d Nodi"
 
-#: prewikka/mainmenu.py:144 prewikka/mainmenu.py:145 prewikka/mainmenu.py:146
+#: prewikka/mainmenu.py:142 prewikka/mainmenu.py:143 prewikka/mainmenu.py:144
 #, fuzzy, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d Online"
 msgstr[1] "%d Online"
 
-#: prewikka/mainmenu.py:291 prewikka/templates/MainMenu.py:226
+#: prewikka/mainmenu.py:289 prewikka/templates/MainMenu.py:226
 msgid "Custom"
 msgstr ""
 
-#: prewikka/mainmenu.py:293 prewikka/templates/MainMenu.py:193
+#: prewikka/mainmenu.py:291 prewikka/templates/MainMenu.py:193
 #, fuzzy
 msgid "Inactive"
 msgstr "Azioni"
@@ -829,7 +829,7 @@ msgstr "Totale :"
 #: prewikka/views/filter/filter.py:363
 #: prewikka/views/filter/templates/FilterEdition.py:351
 #: prewikka/views/filter/templates/FilterEdition.py:361
-#: prewikka/views/messagelisting/templates/AlertListing.py:1654
+#: prewikka/views/messagelisting/templates/AlertListing.py:1657
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:375
 msgid "Delete"
 msgstr "Cancellare"
@@ -1054,7 +1054,7 @@ msgid "Filter Type:"
 msgstr "Tipo di filtro :"
 
 #: prewikka/views/filter/templates/FilterEdition.py:438
-#: prewikka/views/messagelisting/templates/AlertListing.py:723
+#: prewikka/views/messagelisting/templates/AlertListing.py:726
 #: prewikka/views/messagesummary/messagesummary.py:1020
 msgid "Alert"
 msgstr "Allerta"
@@ -1118,7 +1118,7 @@ msgstr "Allerte di Correlazione"
 msgid "Tool Alert"
 msgstr "Allerte di Strumento"
 
-#: prewikka/views/messagelisting/alertlisting.py:1266
+#: prewikka/views/messagelisting/alertlisting.py:1270
 msgid "Threats"
 msgstr "Minacce"
 
@@ -1127,7 +1127,7 @@ msgid "Agents"
 msgstr "Agenti"
 
 #: prewikka/views/messagelisting/messagelisting.py:116
-#: prewikka/views/messagelisting/templates/AlertListing.py:781
+#: prewikka/views/messagelisting/templates/AlertListing.py:784
 msgid "n/a"
 msgstr ""
 
@@ -1155,174 +1155,174 @@ msgstr "impostato su %s"
 msgid "Reset to current"
 msgstr "impostato su %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:403
+#: prewikka/views/messagelisting/templates/AlertListing.py:406
 msgid "Filter on"
 msgstr "Filtrare su :"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:408
+#: prewikka/views/messagelisting/templates/AlertListing.py:411
 msgid "advanced"
 msgstr "avanzato"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:532
+#: prewikka/views/messagelisting/templates/AlertListing.py:535
 msgid "Group entry by:"
 msgstr "Raggrupare i dati da :"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:587
-#: prewikka/views/messagelisting/templates/AlertListing.py:595
+#: prewikka/views/messagelisting/templates/AlertListing.py:590
+#: prewikka/views/messagelisting/templates/AlertListing.py:598
 msgid "filtered"
 msgstr "filtrato"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:635
+#: prewikka/views/messagelisting/templates/AlertListing.py:638
 #, fuzzy
 msgid "Reset"
 msgstr "Riservato"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:641
-#: prewikka/views/messagelisting/templates/AlertListing.py:1641
+#: prewikka/views/messagelisting/templates/AlertListing.py:644
+#: prewikka/views/messagelisting/templates/AlertListing.py:1644
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:383
 msgid "Apply"
 msgstr "Applicare"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:685
+#: prewikka/views/messagelisting/templates/AlertListing.py:688
 msgid "Classification"
 msgstr "Classificazione"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:710
+#: prewikka/views/messagelisting/templates/AlertListing.py:713
 msgid "Type:"
 msgstr "Tipo :"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:725
+#: prewikka/views/messagelisting/templates/AlertListing.py:728
 msgid "CorrelationAlert"
 msgstr "Allerta di correlazione"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:727
+#: prewikka/views/messagelisting/templates/AlertListing.py:730
 msgid "OverflowAlert"
 msgstr "Allerta di overflow"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:729
+#: prewikka/views/messagelisting/templates/AlertListing.py:732
 msgid "ToolAlert"
 msgstr "Allerta di strumento"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:767
+#: prewikka/views/messagelisting/templates/AlertListing.py:770
 msgid "Severity:"
 msgstr "Gravità :"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:773
+#: prewikka/views/messagelisting/templates/AlertListing.py:776
 msgid "info"
 msgstr "info"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:775
+#: prewikka/views/messagelisting/templates/AlertListing.py:778
 msgid "low"
 msgstr "bassa"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:777
+#: prewikka/views/messagelisting/templates/AlertListing.py:780
 msgid "medium"
 msgstr "media"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:779
+#: prewikka/views/messagelisting/templates/AlertListing.py:782
 msgid "high"
 msgstr "alta"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:817
+#: prewikka/views/messagelisting/templates/AlertListing.py:820
 msgid "Source"
 msgstr "Fonte"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:849
+#: prewikka/views/messagelisting/templates/AlertListing.py:852
 msgid "Target"
 msgstr "Obiettivo"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:881
+#: prewikka/views/messagelisting/templates/AlertListing.py:884
 #, fuzzy
 msgid "Analyzer"
 msgstr "ID dell'analizzatore"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:912
+#: prewikka/views/messagelisting/templates/AlertListing.py:915
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:178
 #, fuzzy
 msgid "Date"
 msgstr "Dati"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1062
+#: prewikka/views/messagelisting/templates/AlertListing.py:1065
 #, fuzzy
 msgid "Alert details"
 msgstr "Vedere il dettaglio dell'allerta"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1070
+#: prewikka/views/messagelisting/templates/AlertListing.py:1073
 #, fuzzy
 msgid "See alert details"
 msgstr "Vedere il dettaglio dell'allerta"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1081
-#: prewikka/views/messagelisting/templates/AlertListing.py:1089
+#: prewikka/views/messagelisting/templates/AlertListing.py:1084
+#: prewikka/views/messagelisting/templates/AlertListing.py:1092
 #, fuzzy
 msgid "Filter on this classification"
 msgstr "Filtrare su %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1200
+#: prewikka/views/messagelisting/templates/AlertListing.py:1203
 #, fuzzy
 msgid "Filter on this port/protocol"
 msgstr "Filtrare su %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1221
+#: prewikka/views/messagelisting/templates/AlertListing.py:1224
 #, fuzzy
 msgid "Port/protocol information"
 msgstr "Informazioni sulla rete"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1291
+#: prewikka/views/messagelisting/templates/AlertListing.py:1294
 #, python-format
 msgid "%(hidden)d of %(total)d alerts not shown..."
 msgstr "%(hidden)d su %(total)d allerte non illustrati..."
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1302
-#: prewikka/views/messagelisting/templates/AlertListing.py:1387
+#: prewikka/views/messagelisting/templates/AlertListing.py:1305
+#: prewikka/views/messagelisting/templates/AlertListing.py:1390
 msgid "expand"
 msgstr "espandere"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1335
+#: prewikka/views/messagelisting/templates/AlertListing.py:1338
 msgid "alert"
 msgid_plural "alerts"
 msgstr[0] "allerta"
 msgstr[1] "allerte"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1364
+#: prewikka/views/messagelisting/templates/AlertListing.py:1367
 msgid "source"
 msgstr "fonte"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1366
+#: prewikka/views/messagelisting/templates/AlertListing.py:1369
 msgid "target"
 msgstr "obiettivo"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1376
+#: prewikka/views/messagelisting/templates/AlertListing.py:1379
 #, python-format
 msgid "%(hidden)d of %(total)d %(name)ss not shown..."
 msgstr "%(hidden)d su %(total)d %(name)ss non illustrati..."
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1422
+#: prewikka/views/messagelisting/templates/AlertListing.py:1425
 #, python-format
 msgid "Filter on this %s"
 msgstr "Filtrare sulla %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1443
+#: prewikka/views/messagelisting/templates/AlertListing.py:1446
 #, python-format
 msgid "%s information"
 msgstr "Informazione sulla %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1512
+#: prewikka/views/messagelisting/templates/AlertListing.py:1515
 #, fuzzy
 msgid "Filter on this Analyzer"
 msgstr "Filtrare sulla %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1535
+#: prewikka/views/messagelisting/templates/AlertListing.py:1538
 #, fuzzy
 msgid "Filter on this Host"
 msgstr "Filtrare sulla %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1593
+#: prewikka/views/messagelisting/templates/AlertListing.py:1596
 #, python-format
 msgid "sent at %s"
 msgstr "inviato a %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1646
+#: prewikka/views/messagelisting/templates/AlertListing.py:1649
 msgid "Delete the selected alerts?"
 msgstr ""
 
