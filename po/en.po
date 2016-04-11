@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-10 23:03+0200\n"
+"POT-Creation-Date: 2016-04-11 10:55+0200\n"
 "PO-Revision-Date: 2013-11-25 17:48+0100\n"
 "Language-Team: English\n"
 "MIME-Version: 1.0\n"
@@ -342,7 +342,7 @@ msgid "Logout"
 msgstr ""
 
 #: prewikka/templates/TopLayout.py:294
-msgid "Are you sure you want to Logout ?"
+msgid "Are you sure you want to log out?"
 msgstr ""
 
 #: prewikka/usergroup.py:34
@@ -433,11 +433,21 @@ msgid ""
 "intrusions as well as viral infections."
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:113
+#: prewikka/views/about/templates/About.py:110
+msgid "Prelude Team:"
+msgstr ""
+
+#: prewikka/views/about/templates/About.py:116
+msgid ""
+"Prelude OSS is an open-source project originally created by Yoann "
+"Vandoorselaere in 1998."
+msgstr ""
+
+#: prewikka/views/about/templates/About.py:123
 msgid "Vigilo is a NMS (Network Management System)"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:120
+#: prewikka/views/about/templates/About.py:130
 #, python-format
 msgid ""
 "%s is a complete monitoring and performance management solution capable of "
@@ -447,30 +457,30 @@ msgid ""
 "metrology, cartography, event correlation and reporting."
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:128
+#: prewikka/views/about/templates/About.py:138
 #, python-format
 msgid ""
 "Prelude SIEM and Vigilo NMS are being developed by the %s company, designer, "
 "integrator and operator of mission critical systems."
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:146
+#: prewikka/views/about/templates/About.py:156
 msgid "Contact"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:153
+#: prewikka/views/about/templates/About.py:163
 msgid "Phone:"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:159
+#: prewikka/views/about/templates/About.py:169
 msgid "Fax:"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:167
+#: prewikka/views/about/templates/About.py:177
 msgid "Office"
 msgstr ""
 
-#: prewikka/views/about/templates/About.py:178
+#: prewikka/views/about/templates/About.py:188
 msgid "Websites"
 msgstr ""
 
@@ -571,6 +581,7 @@ msgstr ""
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:430
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:97
 #: prewikka/views/agents/templates/SensorListing.py:432
+#: prewikka/views/messagelisting/templates/utils.py:88
 #: prewikka/views/messagesummary/messagesummary.py:306
 #: prewikka/views/messagesummary/messagesummary.py:459
 #: prewikka/views/messagesummary/messagesummary.py:696
@@ -699,22 +710,26 @@ msgid "Model"
 msgstr ""
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:109
+#: prewikka/views/messagelisting/templates/utils.py:100
 msgid "OS"
 msgstr ""
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:115
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:153
+#: prewikka/views/messagelisting/templates/utils.py:106
 #: prewikka/views/messagesummary/messagesummary.py:447
 msgid "Node name"
 msgstr ""
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:121
+#: prewikka/views/messagelisting/templates/utils.py:112
 #: prewikka/views/messagesummary/messagesummary.py:425
 msgid "Node location"
 msgstr ""
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:127
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:140
+#: prewikka/views/messagelisting/templates/utils.py:118
 #: prewikka/views/messagesummary/messagesummary.py:452
 msgid "Node address"
 msgstr ""
@@ -994,12 +1009,12 @@ msgid "Add / Modify"
 msgstr ""
 
 #: prewikka/views/filter/templates/FilterEdition.py:405
-msgid "filter_intro"
-msgstr "You are in the process of creating a new Prewikka filter."
+msgid "You are in the process of creating a new Prelude filter."
+msgstr ""
 
 #: prewikka/views/filter/templates/FilterEdition.py:413
-msgid "filter_advice"
-msgstr "Filters can be loaded on the top right, once the alerts tab selected."
+msgid "Filters can be loaded on the top right, once the alerts tab selected."
+msgstr ""
 
 #: prewikka/views/filter/templates/FilterEdition.py:426
 msgid "Filter Type:"
@@ -1283,6 +1298,14 @@ msgstr ""
 msgid "total"
 msgstr ""
 
+#: prewikka/views/messagelisting/templates/utils.py:94
+#: prewikka/views/messagesummary/messagesummary.py:613
+#: prewikka/views/messagesummary/messagesummary.py:763
+#: prewikka/views/messagesummary/messagesummary.py:796
+#: prewikka/views/messagesummary/messagesummary.py:815
+msgid "Type"
+msgstr ""
+
 #: prewikka/views/messagesummary/__init__.py:10
 msgid "Detailed alert and heartbeat page"
 msgstr ""
@@ -1440,13 +1463,6 @@ msgstr ""
 
 #: prewikka/views/messagesummary/messagesummary.py:600
 msgid "URP"
-msgstr ""
-
-#: prewikka/views/messagesummary/messagesummary.py:613
-#: prewikka/views/messagesummary/messagesummary.py:763
-#: prewikka/views/messagesummary/messagesummary.py:796
-#: prewikka/views/messagesummary/messagesummary.py:815
-msgid "Type"
 msgstr ""
 
 #: prewikka/views/messagesummary/messagesummary.py:617

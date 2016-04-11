@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-10 23:03+0200\n"
+"POT-Creation-Date: 2016-04-11 10:55+0200\n"
 "PO-Revision-Date: 2013-11-25 17:46+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
@@ -349,7 +349,7 @@ msgid "Logout"
 msgstr "Déconnexion"
 
 #: prewikka/templates/TopLayout.py:294
-msgid "Are you sure you want to Logout ?"
+msgid "Are you sure you want to log out?"
 msgstr "Êtes-vous sûr de vouloir vous déconnecter ?"
 
 #: prewikka/usergroup.py:34
@@ -447,11 +447,23 @@ msgstr ""
 "votre système et ainsi prévenir les attaques, intrusions et autres "
 "infections virales."
 
-#: prewikka/views/about/templates/About.py:113
+#: prewikka/views/about/templates/About.py:110
+msgid "Prelude Team:"
+msgstr "Équipe Prelude :"
+
+#: prewikka/views/about/templates/About.py:116
+msgid ""
+"Prelude OSS is an open-source project originally created by Yoann "
+"Vandoorselaere in 1998."
+msgstr ""
+"Prelude OSS est un projet open-source créé à l'origine par Yoann "
+"Vandoorselaere en 1998."
+
+#: prewikka/views/about/templates/About.py:123
 msgid "Vigilo is a NMS (Network Management System)"
 msgstr "Vigilo est un NMS (Network Management System)"
 
-#: prewikka/views/about/templates/About.py:120
+#: prewikka/views/about/templates/About.py:130
 #, python-format
 msgid ""
 "%s is a complete monitoring and performance management solution capable of "
@@ -467,7 +479,7 @@ msgstr ""
 "gestion des états et des alarmes, la métrologie, la cartographie, la "
 "corrélation d'événements et le reporting."
 
-#: prewikka/views/about/templates/About.py:128
+#: prewikka/views/about/templates/About.py:138
 #, python-format
 msgid ""
 "Prelude SIEM and Vigilo NMS are being developed by the %s company, designer, "
@@ -476,23 +488,23 @@ msgstr ""
 "Prelude SIEM et Vigilo NMS sont développés par la société %s, concepteur, "
 "intégrateur et opérateur de système critiques."
 
-#: prewikka/views/about/templates/About.py:146
+#: prewikka/views/about/templates/About.py:156
 msgid "Contact"
 msgstr "Contact"
 
-#: prewikka/views/about/templates/About.py:153
+#: prewikka/views/about/templates/About.py:163
 msgid "Phone:"
 msgstr "Téléphone :"
 
-#: prewikka/views/about/templates/About.py:159
+#: prewikka/views/about/templates/About.py:169
 msgid "Fax:"
 msgstr "Fax :"
 
-#: prewikka/views/about/templates/About.py:167
+#: prewikka/views/about/templates/About.py:177
 msgid "Office"
 msgstr "Bureau"
 
-#: prewikka/views/about/templates/About.py:178
+#: prewikka/views/about/templates/About.py:188
 msgid "Websites"
 msgstr "Sites web"
 
@@ -595,6 +607,7 @@ msgstr ""
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:430
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:97
 #: prewikka/views/agents/templates/SensorListing.py:432
+#: prewikka/views/messagelisting/templates/utils.py:88
 #: prewikka/views/messagesummary/messagesummary.py:306
 #: prewikka/views/messagesummary/messagesummary.py:459
 #: prewikka/views/messagesummary/messagesummary.py:696
@@ -725,22 +738,26 @@ msgid "Model"
 msgstr "Modèle"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:109
+#: prewikka/views/messagelisting/templates/utils.py:100
 msgid "OS"
 msgstr ""
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:115
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:153
+#: prewikka/views/messagelisting/templates/utils.py:106
 #: prewikka/views/messagesummary/messagesummary.py:447
 msgid "Node name"
 msgstr "Nom du nœud"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:121
+#: prewikka/views/messagelisting/templates/utils.py:112
 #: prewikka/views/messagesummary/messagesummary.py:425
 msgid "Node location"
 msgstr "Emplacement du nœud"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:127
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:140
+#: prewikka/views/messagelisting/templates/utils.py:118
 #: prewikka/views/messagesummary/messagesummary.py:452
 msgid "Node address"
 msgstr "Adresse du nœud"
@@ -1020,11 +1037,11 @@ msgid "Add / Modify"
 msgstr "Ajouter / Modifier"
 
 #: prewikka/views/filter/templates/FilterEdition.py:405
-msgid "filter_intro"
-msgstr "Vous êtes en train de créer un filtre dans Prewikka."
+msgid "You are in the process of creating a new Prelude filter."
+msgstr "Vous êtes en train de créer un filtre Prelude."
 
 #: prewikka/views/filter/templates/FilterEdition.py:413
-msgid "filter_advice"
+msgid "Filters can be loaded on the top right, once the alerts tab selected."
 msgstr ""
 "Les filtres peuvent être chargés en haut à droite de l'écran, une fois "
 "l'onglet des alertes sélectionné."
@@ -1311,6 +1328,14 @@ msgstr "Limite"
 msgid "total"
 msgstr "total"
 
+#: prewikka/views/messagelisting/templates/utils.py:94
+#: prewikka/views/messagesummary/messagesummary.py:613
+#: prewikka/views/messagesummary/messagesummary.py:763
+#: prewikka/views/messagesummary/messagesummary.py:796
+#: prewikka/views/messagesummary/messagesummary.py:815
+msgid "Type"
+msgstr "Type"
+
 #: prewikka/views/messagesummary/__init__.py:10
 msgid "Detailed alert and heartbeat page"
 msgstr "Page détaillée d'alerte et pulsation"
@@ -1470,21 +1495,9 @@ msgstr "Fenêtre"
 msgid "URP"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:613
-#: prewikka/views/messagesummary/messagesummary.py:763
-#: prewikka/views/messagesummary/messagesummary.py:796
-#: prewikka/views/messagesummary/messagesummary.py:815
-msgid "Type"
-msgstr "Type"
-
 #: prewikka/views/messagesummary/messagesummary.py:617
 msgid "Seq #"
 msgstr ""
-"Les Groupes d'Actifs peuvent être utilisés comme une valeur de filtre en bas "
-"à gauche de l'écran, une fois l'onglet des alertes sélectionné. Afin de vous "
-"fournir la meilleure flexibilité, les valeurs associées à un Groupe d'Actifs "
-"ne sont pas échappées, vous devrez donc utiliser une séquence d'échappement "
-"lorsque nécessaire."
 
 #: prewikka/views/messagesummary/messagesummary.py:618
 msgid "Mask"
