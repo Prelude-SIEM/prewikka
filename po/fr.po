@@ -1041,7 +1041,7 @@ msgid "You are in the process of creating a new Prelude filter."
 msgstr "Vous êtes en train de créer un filtre Prelude."
 
 #: prewikka/views/filter/templates/FilterEdition.py:413
-msgid "Filters can be loaded on the top right, once the alerts tab selected."
+msgid "Filters can be selected while on the alerts view, using the control menu in the top right corner."
 msgstr ""
 "Les filtres peuvent être chargés en haut à droite de l'écran, une fois "
 "l'onglet des alertes sélectionné."
