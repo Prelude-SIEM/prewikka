@@ -71,8 +71,8 @@
             <label for="inputUserTimezone" class="col-sm-2 control-label">$_("Timezone:")</label>
             <div class="col-sm-10">
                 <select id="inputUserTimezone" class="form-control" name="timezone">
-                #for $tz in $available_timezone
-                    #if $selected_tz == $tz
+                #for $tz in $available_timezones
+                    #if $tz == $timezone
                         #set $selected=" selected=\"selected\""
                     #else
                         #set $selected=""
@@ -84,8 +84,8 @@
         </div>
 
         <div class="pull-right">
-            <input class="btn btn-default widget-control usersettings cancel" type="button" value="$_('Cancel')" />
-            <input class="btn btn-primary widget-control usersettings submit" type="submit" value="$_('Save')" />
+            <input class="btn btn-default widget-control widget-only usersettings cancel" type="button" value="$_('Cancel')" />
+            <button class="btn btn-primary widget-control usersettings submit" type="submit"><i class="fa fa-save"></i> $_("Save")</button>
         </div>
     </form>
 </div>
