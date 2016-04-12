@@ -18,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import pkg_resources
-from prewikka import siteconfig, template
 import os
 import prelude
 import preludedb
@@ -33,11 +32,37 @@ except ImportError:
 
 from prewikka import view, config, log, database, idmefdatabase, version, \
                      auth, error, utils, localization, resolve, theme, \
-                     pluginmanager, renderer, env, dataprovider, menu
+                     pluginmanager, renderer, env, dataprovider, menu, \
+                     siteconfig, template, resource
 from prewikka.myconfigparser import ConfigParserSection
 
 from prewikka.templates import ClassicLayout
 
+
+_CSS_FILES = [resource.CSSLink(link) for link in (
+    "prewikka/css/jquery-ui.min.css",
+    "prewikka/css/bootstrap.min.css",
+    "prewikka/css/jquery.jstree.css",
+    "prewikka/css/jquery-ui-timepicker-addon.min.css",
+    "prewikka/css/font-awesome.min.css",
+    "prewikka/css/ui.jqgrid.min.css",
+    "prewikka/css/ui.multiselect.css",
+    "prewikka/css/loader.css")
+]
+
+_JS_FILES = [resource.JSLink(link) for link in (
+    "prewikka/js/jquery.js",
+    "prewikka/js/jquery-ui.min.js",
+    "prewikka/js/bootstrap.min.js",
+    "prewikka/js/functions.js",
+    "prewikka/js/ajax.js",
+    "prewikka/js/underscore-min.js",
+    "prewikka/js/jquery-ui-timepicker-addon.min.js",
+    "prewikka/js/ui.multiselect.js",
+    "prewikka/js/jquery.jqgrid.min.js",
+    "prewikka/js/commonlisting.js",
+    "prewikka/js/jquery.jstree.js")
+]
 
 _ADDITIONAL_MIME_TYPES = [("application/vnd.oasis.opendocument.formula-template", ".otf"),
                           ("application/vnd.ms-fontobject", ".eot"),
@@ -77,32 +102,13 @@ class BaseView(view._View):
 
         dataset["document.title"] = interface.getOptionValue("browser_title", "Prelude OSS")
 
-        dataset["document.css_files"] = ["prewikka/css/jquery-ui.min.css",
-                                         "prewikka/css/bootstrap.min.css",
-                                         "prewikka/css/jquery.jstree.css",
-                                         "prewikka/css/jquery-ui-timepicker-addon.min.css",
-                                         "prewikka/css/font-awesome.min.css",
-                                         "prewikka/css/ui.jqgrid.min.css",
-                                         "prewikka/css/ui.multiselect.css",
-                                         "prewikka/css/loader.css",
-                                         "prewikka/css/themes/%s.css" % theme_name]
+        theme_file = resource.CSSLink("prewikka/css/themes/%s.css" % theme_name)
+        head = _CSS_FILES + [theme_file] + _JS_FILES
 
-        dataset["document.js_files"] = ["prewikka/js/jquery.js",
-                                        "prewikka/js/jquery-ui.min.js",
-                                        "prewikka/js/bootstrap.min.js",
-                                        "prewikka/js/functions.js",
-                                        "prewikka/js/ajax.js",
-                                        "prewikka/js/underscore-min.js",
-                                        "prewikka/js/jquery-ui-timepicker-addon.min.js",
-                                        "prewikka/js/ui.multiselect.js",
-                                        "prewikka/js/jquery.jqgrid.min.js",
-                                        "prewikka/js/commonlisting.js",
-                                        "prewikka/js/jquery.jstree.js"]
+        for i in env.hookmgr.trigger("HOOK_LOAD_HEAD_CONTENT"):
+            head += (content for content in i if content not in head)
 
-        for type_ in ("css", "js"):
-            for i in env.hookmgr.trigger("HOOK_LOAD_HEAD_CONTENT_%s" % type_.upper()):
-                l = dataset["document.%s_files" % type_]
-                l += (href for href in i if href not in l)
+        dataset["document.head_content"] = head
 
         dataset["prewikka.favicon"] = interface.getOptionValue(
             "favicon",
@@ -180,8 +186,7 @@ class Core:
         env.hookmgr.declare("HOOK_TOPLAYOUT_EXTRA_CONTENT")
         env.hookmgr.declare("HOOK_PROCESS_REQUEST")
         env.hookmgr.declare("HOOK_LINK")
-        env.hookmgr.declare("HOOK_LOAD_HEAD_CONTENT_CSS", list)
-        env.hookmgr.declare("HOOK_LOAD_HEAD_CONTENT_JS", list)
+        env.hookmgr.declare("HOOK_LOAD_HEAD_CONTENT", list)
 
         env.dns_max_delay = float(env.config.general.getOptionValue("dns_max_delay", 0))
 
