@@ -109,10 +109,10 @@ class TimeUnit(object):
 class MainMenuStep(object):
     def __init__(self, unit, value):
         d = { "year": (relativedelta(years=value), "%Y", "year"),
-              "month": (relativedelta(months=value), "%m/%Y", "month"),
-              "day": (relativedelta(days=value), "%m/%d/%Y", "mday"),
-              "hour": (relativedelta(hours=value), "%m/%d/%Y %Hh", "hour"),
-              "minute": (relativedelta(minutes=value), "%Hh%M", "min"),
+              "month": (relativedelta(months=value), _(localization.DATE_YM_FMT), "month"),
+              "day": (relativedelta(days=value), _(localization.DATE_YMD_FMT), "mday"),
+              "hour": (relativedelta(hours=value), _(localization.DATE_YMDH_FMT), "hour"),
+              "minute": (relativedelta(minutes=value), _(localization.TIME_HM_FMT), "min"),
         }
 
         self.unit = str(unit)

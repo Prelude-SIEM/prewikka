@@ -118,6 +118,17 @@ __builtin__.N_ = _deferredGettext
 __builtin__.ngettext = translation.ngettext
 
 
+DATE_YM_FMT = N_("%m/%Y")
+DATE_YMD_FMT = N_("%m/%d/%Y")
+DATE_YMDH_FMT = N_("%m/%d/%Y %Hh")
+DATE_YMDHM_FMT = N_("%m/%d/%Y %H:%M")
+DATE_YMDHMS_FMT = N_("%m/%d/%Y %H:%M:%S")
+
+TIME_HM_FMT = N_("%H:%M")
+TIME_HMS_FMT = N_("%H:%M:%S")
+
+
+
 _LANGUAGES = {
                "Deutsch": "de_DE",
                "Español": "es_ES",
