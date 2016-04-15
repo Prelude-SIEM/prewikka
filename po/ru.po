@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-11 10:55+0200\n"
+"POT-Creation-Date: 2016-04-15 17:44+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Valentin Bogdanov <bogdanov.valentin@gmail.com>\n"
 "Language-Team: Russian\n"
@@ -107,39 +107,67 @@ msgstr ""
 msgid "All paths"
 msgstr ""
 
+#: prewikka/localization.py:121
+msgid "%m/%Y"
+msgstr "%m.%Y"
+
+#: prewikka/localization.py:122
+msgid "%m/%d/%Y"
+msgstr "%d.%m.%Y"
+
+#: prewikka/localization.py:123
+msgid "%m/%d/%Y %Hh"
+msgstr "%d.%m.%Y %H:00"
+
+#: prewikka/localization.py:124
+msgid "%m/%d/%Y %H:%M"
+msgstr "%d.%m.%Y %H:%M"
+
+#: prewikka/localization.py:125
+msgid "%m/%d/%Y %H:%M:%S"
+msgstr "%d.%m.%Y %H:%M:%S"
+
+#: prewikka/localization.py:127
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: prewikka/localization.py:128
+msgid "%H:%M:%S"
+msgstr "%H:%M:%S"
+
 #: prewikka/log.py:73
 #, python-format
 msgid "Unknown logtype specified: '%s'"
 msgstr "Указан неизвестный тип лога: '%s'"
 
-#: prewikka/main.py:159
+#: prewikka/main.py:165
 msgid "Version Requirement error"
 msgstr ""
 
-#: prewikka/main.py:161
+#: prewikka/main.py:167
 #, python-format
 msgid "Prewikka %(vPre)s requires libprelude %(vLib)s or higher"
 msgstr ""
 
-#: prewikka/main.py:164
+#: prewikka/main.py:170
 #, python-format
 msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
 msgstr ""
 
-#: prewikka/main.py:238
+#: prewikka/main.py:243
 msgid "Database error"
 msgstr ""
 
-#: prewikka/main.py:240
+#: prewikka/main.py:245
 msgid "Initialization error"
 msgstr ""
 
-#: prewikka/main.py:295
+#: prewikka/main.py:300
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
 msgstr ""
 
-#: prewikka/main.py:334
+#: prewikka/main.py:340
 msgid "Prelude internal error"
 msgstr ""
 
@@ -830,7 +858,7 @@ msgstr "Сумма:"
 #: prewikka/views/filter/filter.py:363
 #: prewikka/views/filter/templates/FilterEdition.py:351
 #: prewikka/views/filter/templates/FilterEdition.py:361
-#: prewikka/views/messagelisting/templates/AlertListing.py:1657
+#: prewikka/views/messagelisting/templates/AlertListing.py:1660
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:375
 msgid "Delete"
 msgstr "Удалить"
@@ -1042,7 +1070,9 @@ msgid "You are in the process of creating a new Prelude filter."
 msgstr ""
 
 #: prewikka/views/filter/templates/FilterEdition.py:413
-msgid "Filters can be selected while on the alerts view, using the control menu in the top right corner."
+msgid ""
+"Filters can be selected while on the alerts view, using the control menu in "
+"the top right corner."
 msgstr ""
 
 #: prewikka/views/filter/templates/FilterEdition.py:426
@@ -1120,7 +1150,7 @@ msgstr "Угрозы"
 msgid "Agents"
 msgstr "Агенты"
 
-#: prewikka/views/messagelisting/messagelisting.py:116
+#: prewikka/views/messagelisting/messagelisting.py:118
 #: prewikka/views/messagelisting/templates/AlertListing.py:784
 msgid "n/a"
 msgstr ""
@@ -1175,7 +1205,7 @@ msgid "Reset"
 msgstr "Зарезервировано"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:644
-#: prewikka/views/messagelisting/templates/AlertListing.py:1644
+#: prewikka/views/messagelisting/templates/AlertListing.py:1647
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:383
 msgid "Apply"
 msgstr "Применить"
@@ -1292,32 +1322,32 @@ msgstr "цель"
 msgid "%(hidden)d of %(total)d %(name)ss not shown..."
 msgstr ""
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1425
+#: prewikka/views/messagelisting/templates/AlertListing.py:1428
 #, fuzzy, python-format
 msgid "Filter on this %s"
 msgstr "Фильтровать по адресу"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1446
+#: prewikka/views/messagelisting/templates/AlertListing.py:1449
 #, fuzzy, python-format
 msgid "%s information"
 msgstr "Информация об адресе"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1515
+#: prewikka/views/messagelisting/templates/AlertListing.py:1518
 #, fuzzy
 msgid "Filter on this Analyzer"
 msgstr "Фильтровать по адресу"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1538
+#: prewikka/views/messagelisting/templates/AlertListing.py:1541
 #, fuzzy
 msgid "Filter on this Host"
 msgstr "Фильтровать по адресу"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1596
+#: prewikka/views/messagelisting/templates/AlertListing.py:1599
 #, fuzzy, python-format
 msgid "sent at %s"
 msgstr "Зарезервировано"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1649
+#: prewikka/views/messagelisting/templates/AlertListing.py:1652
 msgid "Delete the selected alerts?"
 msgstr ""
 

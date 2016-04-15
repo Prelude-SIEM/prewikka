@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-04-11 10:55+0200\n"
+"POT-Creation-Date: 2016-04-15 17:44+0200\n"
 "PO-Revision-Date: \n"
 "Language-Team: Italian\n"
 "MIME-Version: 1.0\n"
@@ -105,39 +105,67 @@ msgstr "Percorsi predefiniti"
 msgid "All paths"
 msgstr "Tutti i percorsi"
 
+#: prewikka/localization.py:121
+msgid "%m/%Y"
+msgstr "%m/%Y"
+
+#: prewikka/localization.py:122
+msgid "%m/%d/%Y"
+msgstr "%d/%m/%Y"
+
+#: prewikka/localization.py:123
+msgid "%m/%d/%Y %Hh"
+msgstr "%d/%m/%Y %H:00"
+
+#: prewikka/localization.py:124
+msgid "%m/%d/%Y %H:%M"
+msgstr "%d/%m/%Y %H:%M"
+
+#: prewikka/localization.py:125
+msgid "%m/%d/%Y %H:%M:%S"
+msgstr "%d/%m/%Y %H:%M:%S"
+
+#: prewikka/localization.py:127
+msgid "%H:%M"
+msgstr "%H:%M"
+
+#: prewikka/localization.py:128
+msgid "%H:%M:%S"
+msgstr "%H:%M:%S"
+
 #: prewikka/log.py:73
 #, python-format
 msgid "Unknown logtype specified: '%s'"
 msgstr "Tipo sconosciuto di log: '%s'"
 
-#: prewikka/main.py:159
+#: prewikka/main.py:165
 msgid "Version Requirement error"
 msgstr "Errore di requisito di versione"
 
-#: prewikka/main.py:161
+#: prewikka/main.py:167
 #, python-format
 msgid "Prewikka %(vPre)s requires libprelude %(vLib)s or higher"
 msgstr "Prewikka %(vPre)s richiede libprelude %(vLib)s o successiva"
 
-#: prewikka/main.py:164
+#: prewikka/main.py:170
 #, python-format
 msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
 msgstr "Prewikka %(vPre)s richiede libpreludedb %(vLib)s o successiva"
 
-#: prewikka/main.py:238
+#: prewikka/main.py:243
 msgid "Database error"
 msgstr "Errore di database"
 
-#: prewikka/main.py:240
+#: prewikka/main.py:245
 msgid "Initialization error"
 msgstr "Errore di inizializzazione"
 
-#: prewikka/main.py:295
+#: prewikka/main.py:300
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
 msgstr ""
 
-#: prewikka/main.py:334
+#: prewikka/main.py:340
 msgid "Prelude internal error"
 msgstr "Errore interno Prelude"
 
@@ -835,7 +863,7 @@ msgstr "Totale:"
 #: prewikka/views/filter/filter.py:363
 #: prewikka/views/filter/templates/FilterEdition.py:351
 #: prewikka/views/filter/templates/FilterEdition.py:361
-#: prewikka/views/messagelisting/templates/AlertListing.py:1657
+#: prewikka/views/messagelisting/templates/AlertListing.py:1660
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:375
 msgid "Delete"
 msgstr "Rimovuere"
@@ -1037,7 +1065,9 @@ msgid "You are in the process of creating a new Prelude filter."
 msgstr "È nel processo di creazione di un nuovo filtro Prelude."
 
 #: prewikka/views/filter/templates/FilterEdition.py:413
-msgid "Filters can be selected while on the alerts view, using the control menu in the top right corner."
+msgid ""
+"Filters can be selected while on the alerts view, using the control menu in "
+"the top right corner."
 msgstr ""
 "I filtri si possono caricare in alto a destra, una volta la scheda delle "
 "allerte selezionata."
@@ -1115,7 +1145,7 @@ msgstr "Minacce"
 msgid "Agents"
 msgstr "Agenti"
 
-#: prewikka/views/messagelisting/messagelisting.py:116
+#: prewikka/views/messagelisting/messagelisting.py:118
 #: prewikka/views/messagelisting/templates/AlertListing.py:784
 msgid "n/a"
 msgstr ""
@@ -1166,7 +1196,7 @@ msgid "Reset"
 msgstr "Azzerare"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:644
-#: prewikka/views/messagelisting/templates/AlertListing.py:1644
+#: prewikka/views/messagelisting/templates/AlertListing.py:1647
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:383
 msgid "Apply"
 msgstr "Applicare"
@@ -1278,31 +1308,31 @@ msgstr "obiettivo"
 msgid "%(hidden)d of %(total)d %(name)ss not shown..."
 msgstr "%(hidden)d su %(total)d %(name)ss non illustrati..."
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1425
+#: prewikka/views/messagelisting/templates/AlertListing.py:1428
 #, python-format
 msgid "Filter on this %s"
 msgstr "Filtrare sulla %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1446
+#: prewikka/views/messagelisting/templates/AlertListing.py:1449
 #, python-format
 msgid "%s information"
 msgstr "Informazione sulla %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1515
+#: prewikka/views/messagelisting/templates/AlertListing.py:1518
 msgid "Filter on this Analyzer"
 msgstr "Filtrare sull'analizzatore"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1538
+#: prewikka/views/messagelisting/templates/AlertListing.py:1541
 #, fuzzy
 msgid "Filter on this Host"
 msgstr "Filtrare sulla %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1596
+#: prewikka/views/messagelisting/templates/AlertListing.py:1599
 #, python-format
 msgid "sent at %s"
 msgstr "inviato a %s"
 
-#: prewikka/views/messagelisting/templates/AlertListing.py:1649
+#: prewikka/views/messagelisting/templates/AlertListing.py:1652
 msgid "Delete the selected alerts?"
 msgstr "Rimovuere le allerte selezionate?"
 
