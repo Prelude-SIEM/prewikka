@@ -1,7 +1,35 @@
-* 2016-04-08, prewikka-1.3.0rc3:
+* 2016-04-15, prewikka-3.0.0rc4:
+
+Author: Sélim Menouar
+
+- Hook to dynamically add link in alert's popup menu
 
 Author: Antoine Luong
 
+- Rework the loading mechanism of head content
+- Use Cheetah comments in IE conditional comments
+- Global translation work
+- Fix UserSettings template
+
+Author: Yoann Vandoorselaere
+
+- Localize custom mainmenu date format
+
+Author: Francois Poirotte
+
+- Improve the help message about filters
+
+
+
+* 2016-04-08, prewikka-1.3.0rc3:
+
+Author: Yoann Vandoorselaere
+
+- Implement the parse_datetime() method
+
+Author: Antoine Luong
+
+- Handle parameters without filename in multipart
 - Re-add missing fields in AlertListing search
 
 Author: Francois Poirotte
@@ -11,11 +39,13 @@ Author: Francois Poirotte
 
 Author: Sélim Menouar
 
+- Prevent an empty column from appearing in AlertListing
 - Fix simple filter in AlertListing
 - Gray out the mainmenu's inputs when they are disabled
 
 Author: Camille Gardet
 
+- Fix Chosen select order
 - HTML and JS are now separated in Renderer
 
 Author: Louis-David Gabet
