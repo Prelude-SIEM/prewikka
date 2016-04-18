@@ -49,7 +49,7 @@ class AjaxHostURL(view.View):
 
     @staticmethod
     def _value_generator(infos):
-        for urlname, url in env.url["host"].items():
+        for urlname, url in env.url.get("host", {}).items():
             try:
                 url = Template(url).substitute(infos)
             except KeyError:
