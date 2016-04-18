@@ -148,34 +148,36 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         pluginmanager.PluginManager.__init__(self, "prewikka.dataprovider.type")
 
-        for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend"):
-            try:
-                p = plugin()
-            except error.PrewikkaUserError as err:
-                env.log.warning("%s: plugin loading failed: %s" % (plugin.__name__, err))
-                continue
-
-            if p.type in self._backends:
-                raise error.PrewikkaUserError(_("Configuration error"),
-                                              _("Only one manager should be configured for '%s' backend") % p.type)
-            if p.type is None:
-                raise error.PrewikkaUserError(_("Invalid backend type"),
-                                              _("'%s' is not a valid backend type") % p.type)
-
-            self._backends[p.type] = p
-
         for k in self.keys():
             try:
                 p = self[k]()
-            except KeyError:
-                env.log.warning("%s: plugin loading failed: %s" %
-                    (self[k].__name__, "No handler configured for '%s' datatype" % k))
+            except error.PrewikkaUserError as err:
+                env.log.warning("%s: plugin failed to load: %s" % (self[k].__name__, err))
                 continue
 
             normalizer = getattr(p, "normalizer", None)
             if not isinstance(normalizer, (types.NoneType, DataProviderNormalizer)):
                 raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
             self._type_handlers[k] = normalizer
+
+        for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend"):
+            if plugin.type not in self._type_handlers:
+                env.log.warning("%s: plugin failed to load: %s" % (
+                    plugin.__name__,
+                    _("No handler configured for '%s' datatype" % plugin.type)))
+                continue
+
+            try:
+                p = plugin()
+            except error.PrewikkaUserError as err:
+                env.log.warning("%s: plugin failed to load: %s" % (plugin.__name__, err))
+                continue
+
+            if p.type in self._backends:
+                raise error.PrewikkaUserError(_("Configuration error"),
+                                              _("Only one manager should be configured for '%s' backend") % p.type)
+
+            self._backends[p.type] = p
 
     def _guess_data_type(self, paths, criteria=None):
         res = set()
