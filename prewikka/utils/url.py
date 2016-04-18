@@ -34,12 +34,18 @@ def create_link(path, parameters=None):
 
 
 def idmef_criteria_to_urlparams(paths, values, operators=None, index=0):
-    params = {}
+    params = []
 
     if not operators:
         operators = ['='] * len(paths)
 
     for path, value, operator in zip(paths, values, operators):
+
+        # Special case for classification checkboxes
+        if path in ("alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"):
+            # Operators other than '=' are not supported
+            params.append((path, value))
+            continue
 
         # FIXME: The column type is alertlisting specific, in the long run, we need
         # to suppress this, and standardize all IDMEF parameters handling accross view
@@ -50,9 +56,9 @@ def idmef_criteria_to_urlparams(paths, values, operators=None, index=0):
         if ctype not in ("classification", "source", "target", "analyzer"):
             raise Exception, _("The path '%s' cannot be mapped to a column") % path
 
-        params["%s_object_%d" % (ctype, index)] = path
-        params["%s_operator_%d" % (ctype, index)] = operator if value else "!"
-        params["%s_value_%d" % (ctype, index)] = value if value else ""
+        params.append(("%s_object_%d" % (ctype, index), path))
+        params.append(("%s_operator_%d" % (ctype, index), operator if value else "!"))
+        params.append(("%s_value_%d" % (ctype, index), value if value else ""))
 
         index += 1
 
