@@ -20,6 +20,8 @@
 
 import time, sys, re, struct, urllib
 
+from prewikka import compat
+
 port_dict = {}
 read_done = False
 
@@ -72,13 +74,22 @@ def protocol_number_to_name(num):
      return None
 
 def nameToPath(name):
+    if not isinstance(name, compat.STRING_TYPES):
+        name = str(name)
+
     return name.lower().replace(" ", "_")
 
 def escape_attribute(value):
+    if not isinstance(value, compat.STRING_TYPES):
+        value = str(value)
+
     # Escape '\' since it's a valid js escape.
     return value.replace("\\", "\\\\").replace("\"", "\\\"").replace("/", "\\/")
 
 def escape_criteria(criteria):
+    if not isinstance(criteria, compat.STRING_TYPES):
+        criteria = str(criteria)
+
     return criteria.replace("\\", "\\\\").replace("'", "\\'")
 
 
@@ -99,7 +110,7 @@ def boolean_property(name, parameter, value=False):
 
 
 def escape_html_string(s):
-    if not isinstance(s, (str, unicode)):
+    if not isinstance(s, compat.STRING_TYPES):
         s = str(s)
 
     s = s.replace("<", "&lt;")
