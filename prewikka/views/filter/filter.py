@@ -199,7 +199,7 @@ class AlertFilterEdition(view.View):
         return ["filter"]
 
     def _filter_get_criteria_hook(self, criteria, ctype):
-        menu = getattr(env.threadlocal, "menu", None)
+        menu = env.threadlocal.menu
         if not menu:
             return
 

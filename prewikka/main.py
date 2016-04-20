@@ -379,6 +379,7 @@ class Core:
             self._prewikka_init_if_needed()
 
             env.threadlocal.user = user = env.session.get_user(request)
+            env.threadlocal.menu = None
             user.set_locale()
 
             if not all(env.hookmgr.trigger("HOOK_PROCESS_REQUEST", request, user)):
