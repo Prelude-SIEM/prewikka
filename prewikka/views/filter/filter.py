@@ -98,12 +98,6 @@ class FilterDatabase(database.DatabaseHelper):
 
         return l
 
-    def get_alert_filter(self, user):
-        return self.get_filter_list(user, "alert")
-
-    def get_heartbeat_filter(self, user):
-        return self.get_filter_list(user, "heartbeat")
-
     @database.use_transaction
     def set_filter(self, user, filter):
         self.query("INSERT INTO Prewikka_Filter (userid, type, name, comment, formula) VALUES (%s, %s, %s, %s, %s)" %
@@ -218,14 +212,12 @@ class AlertFilterEdition(view.View):
         return f
 
     def _filter_html_menu_hook(self, view, ctype):
+        if ctype not in ("alert", "heartbeat"):
+            return
+
         tmpl = template.PrewikkaTemplate(templates.menu)
-
         tmpl["current_filter"] = view.parameters.get("filter", "")
-        if ctype == "alert":
-            tmpl["filters"] = self._db.get_alert_filter(view.user)
-        else:
-            tmpl["filters"] = self._db.get_heartbeat_filter(view.user)
-
+        tmpl["filters"] = self._db.get_filter_list(view.user, ctype)
         return tmpl.render()
 
     def __init__(self):

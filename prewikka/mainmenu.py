@@ -120,6 +120,8 @@ class MainMenuStep(object):
 
 
 class MainMenu:
+    _criteria_type = None
+
     def __init__(self, main_view):
         self.main = main_view
         self.dataset = template.PrewikkaTemplate(MainMenuTemplate.MainMenu)
