@@ -174,6 +174,20 @@ p {
         input {
             width: 100%;
         }
+        .btn-group {
+          max-width: 100%;
+          button {
+            max-width: 100%;
+            span {
+              text-overflow: ellipsis;
+              white-space: nowrap;
+              overflow: hidden;
+              max-width: 100%;
+              display: inherit;
+              max-height: 14px;
+            }
+          }
+        }
     }
     .form-group-date {
         max-width: 140px;
