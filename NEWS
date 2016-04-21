@@ -1,3 +1,29 @@
+* 2016-04-22, prewikka-3.0.0:
+
+Author: Sélim Menouar
+
+- Prevent button's text in MainMenu to overflow
+- Update buttons state on rows suppression
+- Check dataprovider type before loading dataprovider backend
+
+Author: Francois Poirotte
+
+- Traceback on timelines when start == end
+- Hide irrelevant filters
+- Fix CSS class for node header in sensors
+- Avoid tracebacks in prewikka.utils.misc
+- Fix navigation bar display on IE 9
+
+Author: Antoine Luong
+
+- Fix a parenthesis problem when applying filters
+- Preserve the grid width when adding/removing columns
+- Reinitialize env.threadlocal.menu
+- Correct behavior of severity checkboxes
+- Fix KeyError when no host URL are configured
+
+
+
 * 2016-04-15, prewikka-3.0.0rc4:
 
 Author: Sélim Menouar
