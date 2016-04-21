@@ -28,19 +28,22 @@ function CommonListing(elem, text, options) {
     }, options);
 
     function grid_buttons_state() {
-        var rows = $(this).jqGrid('getGridParam', 'selarrrow');
-        if ( rows.length == 0 ) {
+        update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
+   }
+
+    function update_buttons_state(rows_count) {
+        if ( rows_count == 0 ) {
             disableButtons(".needone", "Please select at least one entry");
             disableButtons(".justone", "Please select exactly one entry");
         }
-        else if ( rows.length > 1 ) {
+        else if ( rows_count > 1 ) {
             enableButtons(".needone");
             disableButtons(".justone", "Please select exactly one entry");
         }
         else {
             enableButtons(".needone, .justone");
         }
-    };
+    }
 
     var grid = prewikka_grid(elem, options)
     .jqGrid('navGrid', {
@@ -114,6 +117,8 @@ function CommonListing(elem, text, options) {
                 // Iterate upwards because 'rows' gets modified
                 for ( var i = rows.length - 1; i >= 0; i-- )
                     grid.delRowData(rows[i]);
+
+                update_buttons_state(0);
             }
         });
     });
