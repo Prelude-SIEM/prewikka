@@ -58,7 +58,15 @@ function CommonListing(elem, text, options) {
         caption: "",
         title: "Reorder Columns",
         onClickButton: function() {
-            $(elem).jqGrid('columnChooser');
+            $(elem).jqGrid('columnChooser', {
+                /* Necessary for the grid width not to expand
+                 * This may be a bug in free-jqGrid / columnChooser
+                 * TODO: test with a more recent version */
+                done: function(perm) {
+                    if ( perm )
+                        resizeGrid();
+                }
+            });
         }
     });
 
