@@ -190,6 +190,9 @@ class MainMenu:
         delta = self.end - self.start
         totsec = delta.seconds + (delta.days * 24 * 60 * 60)
 
+        if totsec < 60:
+            return TimeUnit("minute")
+
         gtable = { 365 * 24 * 60 * 60: "year",
                    31 * 24 * 60 * 60: "month",
                    24 * 60 * 60: "day",
@@ -251,7 +254,8 @@ class MainMenu:
 
         if precision is not None:
             for i in xrange(precision, len(tpl)):
-                tpl[i] = 0
+                # calendar.timegm() won't accept 0 as a valid year/month
+                tpl[i] = 1 if i <= 1 else 0
 
         return int(calendar.timegm(tpl))
 
