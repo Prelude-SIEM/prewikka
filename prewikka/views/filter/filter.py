@@ -61,7 +61,7 @@ class Filter:
         return " ".join((criteria, operator, value))
 
     def __str__(self):
-        return re.sub("(\w+)", self._replace, self.formula)
+        return "(%s)" % re.sub("(\w+)", self._replace, self.formula)
 
 
     def get_criteria_cast(self, wanted_type):
