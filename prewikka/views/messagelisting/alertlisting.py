@@ -789,7 +789,7 @@ class AlertListing(MessageListing):
         if prev_val == filtertpl:
             value = "'%s'" % utils.escape_criteria(utils.filter_value_adjust(operator, value))
 
-        return "%s %s %s" % (object, operator, value)
+        return "%s %s (%s)" % (object, operator, value)
 
     def _getOperatorForPath(self, path, value):
         # Check whether the path can handle substring comparison

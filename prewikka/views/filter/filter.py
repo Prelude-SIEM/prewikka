@@ -58,7 +58,7 @@ class Filter:
         if self.type:
             criteria = ".".join((self._typetbl[self.type], criteria))
 
-        return " ".join((criteria, operator, value))
+        return "%s %s (%s)" % (criteria, operator, value)
 
     def __str__(self):
         return "(%s)" % re.sub("(\w+)", self._replace, self.formula)
