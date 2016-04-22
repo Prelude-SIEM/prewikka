@@ -37,6 +37,7 @@ from prewikka import view, config, log, database, idmefdatabase, version, \
 from prewikka.myconfigparser import ConfigParserSection
 
 from prewikka.templates import ClassicLayout
+from prewikka.utils import viewhelpers
 
 
 _CSS_FILES = [resource.CSSLink(link) for link in (
@@ -312,7 +313,7 @@ class Core:
             env.auth = env.session
 
         env.viewmanager.addView(BaseView())
-        env.viewmanager.addView(utils.viewhelpers.AjaxHostURL())
+        env.viewmanager.addView(viewhelpers.AjaxHostURL())
         if env.session.can_logout():
                 env.viewmanager.addView(Logout())
 
