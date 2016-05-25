@@ -17,12 +17,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from prewikka import view, template, localization
-from prewikka.templates import MainMenu as MainMenuTemplate
-
 from dateutil.relativedelta import relativedelta
-import time, copy, datetime, calendar
-from prewikka import utils, env
+import time
+import datetime
+import calendar
+import itertools
+
+from prewikka import view, template, localization, utils, env
+from prewikka.templates import MainMenu as MainMenuTemplate
 
 
 class MainMenuParameters(view.Parameters):
@@ -314,7 +316,7 @@ class MainMenu:
         self._setup_timeline_range()
         self._set_timeline(self.start, self.end)
 
-        self.dataset["menu_extra"] = env.hookmgr.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self, self._criteria_type)
+        self.dataset["menu_extra"] = itertools.ifilter(None, env.hookmgr.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self, self._criteria_type))
 
 
 class MainMenuAlert(MainMenu):

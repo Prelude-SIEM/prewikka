@@ -45,7 +45,7 @@ function MainMenuInit (date_format) {
         "onClose": function() { trigger_custom_date(true); },
     });
 
-    $("#main_menu_extra :input").on("change", function() {
+    $(".main_menu_extra :input").on("change", function() {
         $("#main_menu_form_submit").removeClass("disabled");
     });
 
