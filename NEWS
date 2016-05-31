@@ -1,3 +1,15 @@
+* 2016-06-09, prewikka-1.2.7:
+
+Author: Antoine Luong
+
+- Fix inconsistency with an alert limit >= 1000
+
+Author: Louis-David Gabet
+
+- Fix wrong filter in alert listing
+
+
+
 * 2015-08-06, prewikka-1.2.6:
 
 Author: Yoann Vandoorselaere
