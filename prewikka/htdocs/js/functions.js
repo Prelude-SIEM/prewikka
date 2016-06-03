@@ -31,6 +31,25 @@ $(document).ready(function(){
   });
 
 
+// Repeatable entries
+
+  $(document).on("click", ".del_entry_row", function() {
+      var row = $(this).parents(".repeat-entry");
+      if ( row.siblings(".repeat-entry").length > 0 )
+          row.remove();
+      else
+          row.trigger("reset_row");
+      return false;
+  });
+
+  $(document).on("click", ".add_entry_row", function() {
+      var row = $(this).parents(".repeat-entry");
+      var newrow = row.clone();
+      row.after(newrow);
+      newrow.trigger("reset_row");
+      return false;
+  });
+
 
 // IDMEF Browser
 
