@@ -1301,7 +1301,7 @@ class AlertListing(MessageListing):
 
         self.dataset["nav.from"] = localization.format_number(self.parameters["offset"] + 1)
         self.dataset["nav.to"] = localization.format_number(self.parameters["offset"] + len(self.dataset["messages"]))
-        self.dataset["limit"] = localization.format_number(self.parameters["limit"])
+        self.dataset["limit"] = self.parameters["limit"]
         self.dataset["total"] = localization.format_number(total)
         self.dataset["correlation_alert_view"] = False
 
