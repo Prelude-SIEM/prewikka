@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import time, abc, fcntl
-import re, operator, pkg_resources, pkgutil, glob, os.path, sys
+import re, operator, pkg_resources, pkgutil
 from datetime import datetime
 
 import preludedb
@@ -153,13 +153,12 @@ class SQLScript(object):
         # Update or insert metadata for the module as necessary,
         # depending on whether the plugin already existed without a schema
         # or not.
-        module = self.db.escape(self._module_name)
-        if self.db.query('SELECT 1 FROM Prewikka_Module_Registry WHERE module = %s' % module):
-            self.db.query('UPDATE Prewikka_Module_Registry SET branch = %s, version = %s WHERE module = %s' %
-                  (self.db.escape(self.branch), self.db.escape(self.version), module))
+        if self.db.query('SELECT 1 FROM Prewikka_Module_Registry WHERE module = %s', self._module_name):
+            self.db.query('UPDATE Prewikka_Module_Registry SET branch = %s, version = %s WHERE module = %s',
+                  self.branch, self.version, self._module_name)
         else:
-            self.db.query('INSERT INTO Prewikka_Module_Registry(module, branch, version, enabled) VALUES(%s, %s, %s, 1)' %
-                  (module, self.db.escape(self.branch), self.db.escape(self.version)))
+            self.db.query('INSERT INTO Prewikka_Module_Registry(module, branch, version, enabled) VALUES(%s, %s, %s, 1)',
+                  self._module_name, self.branch, self.version)
 
     def __apply(self):
         self.run()
@@ -171,8 +170,8 @@ class SQLScript(object):
             self.db.query("UPDATE Prewikka_Module_Registry SET version=%s WHERE module=%s%s" % (self.db.escape(self.version), self.db.escape(self._module_name), self.db._chknull("branch", self.branch)))
 
         elif self.type == "branch":
-            self.db.query("UPDATE Prewikka_Module_Registry SET branch=%s, version=%s, enabled=1 WHERE module=%s" % (
-                          self.db.escape(self.branch), self.db.escape(self.version), self.db.escape(self._module_name)))
+            self.db.query("UPDATE Prewikka_Module_Registry SET branch=%s, version=%s, enabled=1 WHERE module=%s",
+                          self.branch, self.version, self._module_name)
 
         self.db._update_state(self.version, self.branch)
 
@@ -213,7 +212,7 @@ class DatabaseHelper(object):
 class DatabaseUpdateHelper(DatabaseHelper):
     def _get_database_version(self):
         try:
-                infos = self.query("SELECT branch, version, enabled FROM Prewikka_Module_Registry WHERE module = %s" % self.escape(self._module_name))
+                infos = self.query("SELECT branch, version, enabled FROM Prewikka_Module_Registry WHERE module = %s", self._module_name)
                 branch, version, enabled = infos[0]
         except Exception as e:
                 return None, None, False
@@ -393,6 +392,14 @@ class Database(preludedb.SQL):
         dh = DatabaseUpdateHelper("prewikka", self.required_version, self.required_branch)
         dh.apply()
 
+    def query(self, sql, *args, **kwargs):
+        if args:
+            sql = sql % tuple(self.escape(value) for value in args)
+        elif kwargs:
+            sql = sql % dict((key, self.escape(value)) for key, value in kwargs.items())
+
+        return preludedb.SQL.query(self, sql)
+
     def _chk(self, key, value, join="AND"):
         if value is not None and value is not self.__ALL_PROPERTIES:
             return " %s %s = %s" % (join, key, self.escape(value))
@@ -428,12 +435,12 @@ class Database(preludedb.SQL):
     @staticmethod
     def datetime(t):
         if t is None:
-            return "NULL"
+            return None
 
-        return "'" + time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t)) + "'"
+        return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
 
     def is_plugin_active(self, plugin):
-        r = self.query("SELECT enabled FROM Prewikka_Module_Registry WHERE module = %s" % (self.escape(plugin)))
+        r = self.query("SELECT enabled FROM Prewikka_Module_Registry WHERE module = %s", plugin)
         if r:
             return int(r[0][0]) == 1
 
@@ -482,7 +489,7 @@ class Database(preludedb.SQL):
             self.query("INSERT INTO Prewikka_User_Configuration (view, userid, name, value) VALUES (%s,%s,%s,%s)" % (view, userid, key, self.escape(val)))
 
     def has_property(self, user, key):
-        return bool(self.query("SELECT value FROM Prewikka_User_Configuration WHERE userid = %s AND name = %s AND value IS NOT NULL" % (self.escape(user.id), self.escape(key))))
+        return bool(self.query("SELECT value FROM Prewikka_User_Configuration WHERE userid = %s AND name = %s AND value IS NOT NULL", user.id, key))
 
     def del_property(self, user, key, view=None):
         self.query("DELETE FROM Prewikka_User_Configuration WHERE userid = %s%s%s" %  (self.escape(user.id), self._chknull("view", view), self._chk("name", key)))

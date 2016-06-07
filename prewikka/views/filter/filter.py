@@ -100,23 +100,23 @@ class FilterDatabase(database.DatabaseHelper):
 
     @database.use_transaction
     def set_filter(self, user, filter):
-        self.query("INSERT INTO Prewikka_Filter (userid, type, name, comment, formula) VALUES (%s, %s, %s, %s, %s)" %
-                   (self.escape(user.id), self.escape(filter.type), self.escape(filter.name), self.escape(filter.comment), self.escape(filter.formula)))
+        self.query("INSERT INTO Prewikka_Filter (userid, type, name, comment, formula) VALUES (%s, %s, %s, %s, %s)",
+                   user.id, filter.type, filter.name, filter.comment, filter.formula)
         id = int(self.query("SELECT MAX(id) FROM Prewikka_Filter")[0][0])
         for name, element in filter.elements.items():
-            self.query("INSERT INTO Prewikka_Filter_Criterion (id, name, path, operator, value) VALUES (%d, %s, %s, %s, %s)" %
-                       ((id, self.escape(name)) + tuple([ self.escape(e) for e in element ])))
+            self.query("INSERT INTO Prewikka_Filter_Criterion (id, name, path, operator, value) VALUES (%d, %s, %s, %s, %s)",
+                       id, name, *element)
 
     def get_filter(self, user, name):
-        rows = self.query("SELECT id, comment, formula, type FROM Prewikka_Filter WHERE userid = %s AND name = %s" %
-                          (self.escape(user.id), self.escape(name)))
+        rows = self.query("SELECT id, comment, formula, type FROM Prewikka_Filter WHERE userid = %s AND name = %s",
+                          user.id, name)
         if len(rows) == 0:
             return None
 
         id, comment, formula, ftype = rows[0]
         elements = { }
 
-        rows = self.query("SELECT name, path, operator, value FROM Prewikka_Filter_Criterion WHERE id = %d" % int(id))
+        rows = self.query("SELECT name, path, operator, value FROM Prewikka_Filter_Criterion WHERE id = %d", int(id))
         for element_name, path, operator, value in rows:
             elements[element_name] = path, operator, value
 

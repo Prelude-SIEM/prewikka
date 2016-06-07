@@ -20,7 +20,6 @@
 import time, os, struct
 
 from prewikka import database, log, utils, usergroup, pluginmanager, env
-from prewikka.auth import AuthError
 from prewikka.error import PrewikkaUserError
 
 
@@ -53,14 +52,14 @@ class SessionUserInfo(object):
 
 class SessionDatabase(database.DatabaseHelper):
     def create_session(self, sessionid, user, time):
-        self.query("INSERT INTO Prewikka_Session (sessionid, userid, login, time) VALUES(%s, %s, %s, %s)" %
-                   (self.escape(sessionid), self.escape(user.id), self.escape(user.name), self.datetime(time)))
+        self.query("INSERT INTO Prewikka_Session (sessionid, userid, login, time) VALUES(%s, %s, %s, %s)",
+                   sessionid, user.id, user.name, self.datetime(time))
 
     def update_session(self, sessionid, time):
-        self.query("UPDATE Prewikka_Session SET time=%s WHERE sessionid=%s" % (self.datetime(time), self.escape(sessionid)))
+        self.query("UPDATE Prewikka_Session SET time=%s WHERE sessionid=%s", self.datetime(time), sessionid)
 
     def get_session(self, sessionid):
-        rows = self.query("SELECT login, time FROM Prewikka_Session WHERE sessionid = %s" % self.escape(sessionid))
+        rows = self.query("SELECT login, time FROM Prewikka_Session WHERE sessionid = %s", sessionid)
         if not rows:
             raise
 
@@ -69,13 +68,13 @@ class SessionDatabase(database.DatabaseHelper):
 
     def delete_session(self, sessionid=None, user=None):
         if sessionid:
-            self.query("DELETE FROM Prewikka_Session WHERE sessionid = %s" % self.escape(sessionid))
+            self.query("DELETE FROM Prewikka_Session WHERE sessionid = %s", sessionid)
 
         elif user:
-            self.query("DELETE FROM Prewikka_Session WHERE userid = %s" % self.escape(user.id))
+            self.query("DELETE FROM Prewikka_Session WHERE userid = %s", user.id)
 
     def delete_expired_sessions(self, time):
-        self.query("DELETE FROM Prewikka_Session WHERE time < %s" % self.datetime(time))
+        self.query("DELETE FROM Prewikka_Session WHERE time < %s", self.datetime(time))
 
 
 class Session(pluginmanager.PluginBase):
