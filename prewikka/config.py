@@ -55,7 +55,7 @@ class Config(object):
 
         for section in file.getSections():
             if " " in section.name:
-                type, name = section.name.split(" ")
+                type, name = section.name.split(" ", 1)
                 self._set_generic_dict(type, name, section)
             else:
                 self._set_generic(section.name, section)
