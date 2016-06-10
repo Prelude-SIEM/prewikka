@@ -94,10 +94,19 @@ class FilterDatabase(database.DatabaseHelper):
         return l
 
     @database.use_transaction
-    def set_filter(self, user, filter):
-        self.query("INSERT INTO Prewikka_Filter (userid, type, name, comment, formula) VALUES (%s, %s, %s, %s, %s)",
-                   user.id, filter.type, filter.name, filter.comment, filter.formula)
-        id = int(self.query("SELECT MAX(id) FROM Prewikka_Filter")[0][0])
+    def upsert_filter(self, user, filter):
+        rows = self.query("SELECT id FROM Prewikka_Filter WHERE userid = %s AND name = %s", user.id, filter.name)
+
+        values = (user.id, filter.type, filter.name, filter.comment, filter.formula)
+
+        if not rows:
+            self.query("INSERT INTO Prewikka_Filter (userid, type, name, comment, formula) VALUES (%s, %s, %s, %s, %s)", *values)
+            id = int(self.query("SELECT MAX(id) FROM Prewikka_Filter")[0][0])
+        else:
+            id = int(rows[0][0])
+            self.query("DELETE FROM Prewikka_Filter_Criterion WHERE Prewikka_Filter_Criterion.id = %d" % (id, ))
+            self.query("UPDATE Prewikka_Filter SET userid=%s, type=%s, name=%s, comment=%s, formula=%s WHERE id = %d", *(values + (id,)))
+
         for name, element in filter.elements.items():
             self.query("INSERT INTO Prewikka_Filter_Criterion (id, name, path, operator, value) VALUES (%d, %s, %s, %s, %s)",
                        id, name, *element)
@@ -123,11 +132,14 @@ class FilterDatabase(database.DatabaseHelper):
             qstr = " AND name = %s" % self.escape(name)
 
         rows = self.query("SELECT id FROM Prewikka_Filter WHERE userid = %s%s" % (self.escape(user.id), qstr))
-        if len(rows) > 0:
-            lst = ", ".join([ id[0] for id in rows ])
+        idlist = [ id[0] for id in rows ]
+
+        if rows:
+            lst = ", ".join(idlist)
             self.query("DELETE FROM Prewikka_Filter_Criterion WHERE Prewikka_Filter_Criterion.id IN (%s)" % lst)
             self.query("DELETE FROM Prewikka_Filter WHERE id IN (%s)" % lst)
 
+        return idlist
 
 
 class AlertFilterEditionParameters(view.Parameters):
@@ -179,10 +191,8 @@ class AlertFilterEdition(view.View):
             self._filter_delete(user, i)
 
     def _filter_delete(self, user, name):
-        self._db.delete_filter(user, name)
-
-        for i in hookmanager.trigger("HOOK_FILTER_DELETE", user, name):
-            continue
+        idlist = self._db.delete_filter(user, name)
+        list(hookmanager.trigger("HOOK_FILTER_DELETE", user, name, idlist[0]))
 
     @hookmanager.register("HOOK_MAINMENU_PARAMETERS_REGISTER")
     def _filter_parameters_register(self, view):
@@ -330,8 +340,7 @@ class AlertFilterEdition(view.View):
                       elements,
                       self.parameters["filter_formula"])
 
-        self._db.delete_filter(env.request.user, fltr.name)
-        self._db.set_filter(env.request.user, fltr)
+        self._db.upsert_filter(env.request.user, fltr)
 
         self._set_common()
         self._reload()
