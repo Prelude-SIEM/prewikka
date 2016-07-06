@@ -179,13 +179,6 @@ class my_install_scripts (install_scripts):
         if copied:
             self.outfiles.append(ofile)
 
-        share_dir = os.path.join(self.install_data, 'share', 'prewikka')
-        if not os.path.exists(share_dir):
-            os.makedirs(share_dir)
-
-        ofile, copied = self.copy_file(os.path.join(self.build_dir, 'prewikka.wsgi'), share_dir)
-        if copied:
-            self.outfiles.append(ofile)
 
 
 class my_install(install):
@@ -223,9 +216,17 @@ class my_install(install):
         print >> config, "libpreludedb_required_version = '%s'" % LIBPRELUDEDB_REQUIRED_VERSION
         config.close()
 
+    def install_wsgi(self):
+        share_dir = os.path.join(self.install_data, 'share', 'prewikka')
+        if not os.path.exists(share_dir):
+            os.makedirs(share_dir)
+
+        ofile, copied = self.copy_file('scripts/prewikka.wsgi', share_dir)
+
     def run(self):
         os.umask(022)
         self.install_conf()
+        self.install_wsgi()
         self.create_datadir()
         self.init_siteconfig()
         install.run(self)
@@ -307,7 +308,7 @@ setup(name="prewikka",
                       'prewikka.views.messagesummary': [ "htdocs/css/*.css", "htdocs/js/*.js" ],
       },
 
-      scripts=[ "scripts/prewikka-httpd", "scripts/prewikka.wsgi" ],
+      scripts=[ "scripts/prewikka-httpd" ],
       conf_files=[ "conf/prewikka.conf" ],
       cmdclass={ 'build_py': my_build_py,
                  'install': my_install,
