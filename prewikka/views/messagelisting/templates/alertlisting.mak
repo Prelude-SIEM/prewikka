@@ -348,7 +348,13 @@ $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
 <%def name="classificationWrite(info, text)">
 <a class="impact_severity_${ info.severity.value } popup_menu_toggle" title="${ info.description }" data-toggle="tooltip" data-placement="top" data-container="#main">${ text }</a><span class="popup_menu">
 % if info.count == 1:
-<a class="widget-link" title="${ _('Alert details') }" href="${ info.display }">${ _("See alert details") }</a>
+% for linkname, link, widget in info.links:
+% if widget:
+<a href="${ link }" class="widget-link" title="${ linkname }">${ linkname }</a>
+% else:
+<a href="${ link}" target="_${ linkname }">${ linkname }</a>
+% endif
+% endfor
 % endif
 % if not info.classification.already_filtered:
 <a href="${ info.classification.inline_filter }">${ _("Filter on this classification") }</a>

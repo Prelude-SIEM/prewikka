@@ -545,8 +545,12 @@ class ListedAlert(ListedMessage):
 
     def _setClassificationInfos(self, dataset, message, ident):
         dataset["count"] = 1
-        dataset["display"] = self.createMessageIdentLink(ident, "AlertSummary")
         dataset["severity"] = AttrDict(value=message["alert.assessment.impact.severity"])
+        dataset["links"] = [(_("Alert details"), self.createMessageIdentLink(ident, "AlertSummary"), True)]
+        for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", ident):
+            if typ == "ident":
+                dataset["links"].append((linkname, link, widget))
+
         dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"])
         dataset["description"] = message["alert.assessment.impact.description"]
 
@@ -918,7 +922,10 @@ class AlertListing(MessageListing):
                     res = env.dataprovider.get(Criterion("alert.messageid", "=", messageid))[0]
                     message.setMessage(res, messageid, extra_link=False)
                 else:
-                    infos["display"] = message.createMessageIdentLink(messageid, "AlertSummary")
+                    infos["links"] = [(_("Alert details"), message.createMessageIdentLink(messageid, "AlertSummary"), True)]
+                    for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", messageid):
+                        if typ == "messageid":
+                            infos["links"].append((linkname, link, widget))
             else:
                 entry_param = {}
 
