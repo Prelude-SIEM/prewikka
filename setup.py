@@ -53,7 +53,7 @@ def listfiles(*dirs):
 
 def template_compile(input, output_dir):
     from Cheetah.CheetahWrapper import CheetahWrapper
-    CheetahWrapper().main([ sys.argv[0], "compile", "--nobackup", input ])
+    CheetahWrapper().main([ sys.argv[0], "compile", "--nobackup", "--shbang", "", input ])
 
 
 class my_build_py(build_py):
