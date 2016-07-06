@@ -27,7 +27,7 @@ read_done = False
 
 # FIXME: Need appropriate implementation
 def get_analyzer_status_from_latest_heartbeat(heartbeat, error_margin):
-    if heartbeat.get("additional_data('Analyzer status')") == "exiting":
+    if heartbeat.get("additional_data('Analyzer status').data") == ("exiting",):
         return "offline", _("Offline")
 
     if heartbeat.get("heartbeat_interval") is None:
