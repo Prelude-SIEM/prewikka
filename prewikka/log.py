@@ -18,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import logging, logging.handlers, os, stat, sys
+from prewikka import env
 
 DEBUG = logging.DEBUG
 INFO = logging.INFO
@@ -29,7 +30,7 @@ class Log:
     def __init__(self, conf):
         self._logger = None
 
-        for logtype, logvalues in getattr(conf, "log", {}).items():
+        for logtype, logvalues in getattr(conf, "log", ()):
 
             config = { }
             for key, value in logvalues.items():
@@ -98,66 +99,62 @@ class Log:
         return hdlr
 
 
-    def _getLog(self, request, login, details):
-        if not request:
-            return details
+    def _format_header(self):
+        if not env.request.web:
+            return ""
 
-        message = "[%s" % request.getClientAddr()
+        hdr = "".join(("[", env.request.web.getClientAddr()))
 
-        port = request.getClientPort()
+        port = env.request.web.getClientPort()
         if port:
-            message += ":%d" % port
+            hdr = ":".join((hdr, str(port)))
 
-        if login:
-            message += " %s@" % (login)
-        else:
-            message += " "
+        hdr = " ".join((hdr, "%s@" % (env.request.user) if env.request.user else ""))
 
         flags = ""
-        if request.is_xhr:
-           flags += "xhr"
-        elif request.is_stream:
-           flags += "sse"
+        if env.request.web.is_xhr:
+           flags = " (xhr)"
+        elif env.request.web.is_stream:
+           flags = " (sse)"
 
-        if flags:
-            flags = " (%s)" % flags
+        return "".join((hdr, env.request.web.getView(), flags, "]"))
 
-        message += "%s%s]" % (request.getView(), flags)
 
-        if details:
-            if isinstance(details, Exception):
-                message += " %d" % getattr(details, "code", 500)
+    def _get_log(self, details):
+        hdr = self._format_header()
+        hdr = [ hdr ] if hdr else []
 
-            message += " %s" % (details)
+        if isinstance(details, Exception):
+            details = " ".join([str(getattr(details, "code", 500)), str(details)])
 
-        return message
+        return " ".join(hdr + [str(details)])
 
-    def debug(self, message, request=None, user=None):
+    def debug(self, message):
         if self._logger:
-            self._logger.debug(self._getLog(request, user, message))
+            self._logger.debug(self._get_log(message))
 
-    def info(self, message, request=None, user=None):
+    def info(self, message):
         if self._logger:
-            self._logger.info(self._getLog(request, user, message))
+            self._logger.info(self._get_log(message))
 
-    def warning(self, message, request=None, user=None):
+    def warning(self, message):
         if self._logger:
-            self._logger.warning(self._getLog(request, user, message))
+            self._logger.warning(self._get_log(message))
 
-    def error(self, message, request=None, user=None):
+    def error(self, message):
         if self._logger:
-            self._logger.error(self._getLog(request, user, message))
+            self._logger.error(self._get_log(message))
 
-    def critical(self, message, request=None, user=None):
+    def critical(self, message):
         if self._logger:
-            self._logger.critical(self._getLog(request, user, message))
+            self._logger.critical(self._get_log(message))
 
-    def log(self, priority, message, request=None, user=None):
+    def log(self, priority, message):
         return { DEBUG: self.debug,
                  INFO: self.info,
                  WARNING: self.warning,
                  ERROR: self.error,
-                 CRITICAL: self.critical }[priority](message, request, user)
+                 CRITICAL: self.critical }[priority](message)
 
 def getLogger(name=__name__):
         return logging.getLogger(name)

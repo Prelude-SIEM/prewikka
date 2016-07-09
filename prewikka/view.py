@@ -196,7 +196,7 @@ class Parameters(dict):
         # In case the view was dynamically added through HOOK_VIEW_LOAD, the hook isn't available
         hook = "HOOK_%s_PARAMETERS_NORMALIZE" % view.upper()
         if env.hookmgr.hasListener(hook):
-            list(env.hookmgr.trigger(hook, self, view, user))
+            list(env.hookmgr.trigger(hook, self))
 
         self.pop("_save", None)
         return do_load
@@ -331,12 +331,10 @@ class _View(object):
 
     def render(self):
         for name, classobj in self.view_extensions:
-            obj = classobj(self)
+            obj = classobj()
             setattr(self, name, obj)
 
-            obj.user = self.user
-            obj.parameters = self.parameters
-            obj.render(self.parameters)
+            obj.render()
 
     def respond(self):
         content = self.render()
@@ -344,7 +342,7 @@ class _View(object):
         if not content and self.dataset is not None:
             content = self.dataset.render()
 
-        if self.request.is_xhr:
+        if env.request.web.is_xhr:
             data = { "content": content }
 
             if self.dataset:
@@ -432,7 +430,7 @@ class ViewManager:
         if not view:
             raise InvalidViewError(_("View '%s' does not exist") % request.getView())
 
-        env.log.info("Loading view %s" % view.view_id, request, userl)
+        env.log.info("Loading view %s" % view.view_id)
         if userl and view.view_permissions and not userl.has(view.view_permissions):
             raise usergroup.PermissionDeniedError(view.view_permissions, view.view_id)
 
@@ -443,10 +441,8 @@ class ViewManager:
             parameters.handleLists()
 
         view = copy(view)
-        view.request = request
-        view.parameters = parameters
-        view.user = userl
-        view.dataset = template.PrewikkaTemplate(view.view_template) if view.view_template else None
+        view.parameters = env.request.parameters = parameters
+        view.dataset = env.request.dataset = template.PrewikkaTemplate(view.view_template) if view.view_template else None
 
         return view
 

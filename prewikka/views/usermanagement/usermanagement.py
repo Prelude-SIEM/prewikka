@@ -35,7 +35,7 @@ class UserSettingsDisplay(view.View):
 
     def render(self):
         login = self.parameters.get("name")
-        self._object = usergroup.User(login) if login else self.user
+        self._object = usergroup.User(login) if login else env.request.user
 
         if not env.auth.hasUser(self._object):
             raise error.PrewikkaUserError(_("Invalid User"), _("Requested user '%s' does not exist") % self._object)
@@ -57,7 +57,7 @@ class UserSettingsModify(view.View):
     view_permissions = []
 
     def render(self):
-        login = self.parameters.get("name", self.user.name)
+        login = self.parameters.get("name", env.request.user.name)
 
         self._object = user = usergroup.User(login)
 
@@ -70,8 +70,8 @@ class UserSettingsModify(view.View):
             raise error.PrewikkaUserError(_("Invalid Language"), _("Specified language does not exist"), log_priority=log.WARNING)
 
         env.db.set_property(user, "language", lang)
-        if user == self.user:
-            self.user.set_locale()
+        if user == env.request.user:
+            env.request.user.set_locale()
 
         timezone = self.parameters["timezone"]
         if not timezone in localization.get_timezones():

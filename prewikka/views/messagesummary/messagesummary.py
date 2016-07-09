@@ -387,7 +387,7 @@ class MessageSummary(Table, view.View):
             return None
 
         agent_time = datetime.fromtimestamp(dt, utils.timeutil.tzoffset(None, dt.getGmtOffset()))
-        user_time = datetime.fromtimestamp(dt, self.user.timezone)
+        user_time = datetime.fromtimestamp(dt, env.request.user.timezone)
 
         s = localization.format_datetime(user_time, format="medium")
         if agent_time.tzinfo.utcoffset(agent_time) != user_time.tzinfo.utcoffset(user_time):
@@ -673,7 +673,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                     #content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": ident } + "</li>"
                 else:
                     alert = env.idmef_db.getAlert(results[0], htmlsafe=True)["alert"]
-                    link = utils.create_link("/".join(self.request.getViewElements()[:2] + [self.view_id]), {"ident": results[0]})
+                    link = utils.create_link("/".join(env.request.web.getViewElements()[:2] + [self.view_id]), {"ident": results[0]})
                     content += "<li><a href=\"%s\">%s</a></li>" % (link, alert["classification.text"])
 
             if missing > 0:

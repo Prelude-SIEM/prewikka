@@ -160,7 +160,7 @@ class Session(pluginmanager.PluginBase):
         self.__create_session(request, user)
 
         is_admin = set(user.permissions) == usergroup.ALL_PERMISSIONS
-        env.log.info("User login with profile '%s'" % ("admin" if is_admin else "default"), request, user)
+        env.log.info("User login with profile '%s'" % ("admin" if is_admin else "default"))
 
         return user
 

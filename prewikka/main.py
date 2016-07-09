@@ -82,16 +82,17 @@ class Logout(view._View):
     view_permissions = []
 
     def render(self):
-        env.session.logout(self.request)
+        env.session.logout(env.request.web)
 
 
 class BaseView(view._View):
     view_template = ClassicLayout.ClassicLayout
 
     def render(self):
-        self._render(self.dataset, self.request, self.user)
+        self._render(self.dataset)
 
-    def _render(self, dataset, request, user):
+    def _render(self, dataset):
+        user = env.request.user
         interface = env.config.interface
 
         # The database attribute might be None in case of initialisation error
@@ -130,7 +131,7 @@ class BaseView(view._View):
         dataset["prewikka.logout_link"] = (user and env.session.can_logout()) and utils.create_link("logout") or None
 
         try:
-            paths = request.getViewElements()
+            paths = env.request.web.getViewElements()
             active_section, active_tab = paths[0], paths[1]
         except:
             active_section, active_tab = "", ""
@@ -141,8 +142,9 @@ class BaseView(view._View):
         dataset["interface.menu"] = env.menumanager.get_menus(user) if env.menumanager else {}
         dataset["toplayout_extra_content"] = ""
 
-        all(env.hookmgr.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT",
-                                request, user, dataset))
+        all(env.hookmgr.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT", dataset))
+
+
 _core_cache = {}
 _core_cache_lock = Lock()
 
@@ -321,41 +323,38 @@ class Core:
 
         self._last_plugin_activation_change = last_change or env.db.get_last_plugin_activation_change()
 
-    def _setupDataSet(self, dataset, request, user):
-        login = user.name if user else None
-
-        dataset["document.base_url"] = request.getBaseURL()
-        dataset["document.fullhref"] = "/".join(request.getViewElements()) # Needed for view that aren't completly ported to ajax
-        dataset["document.href"] = "/".join(request.getViewElements()[0:2]) # Subview are hidden
-        dataset["document.request_method"] = request.getMethod()
-        dataset["document.query_string"] = request.getQueryString()
+    def _setupDataSet(self, dataset):
+        dataset["document.base_url"] = env.request.web.getBaseURL()
+        dataset["document.fullhref"] = "/".join(env.request.web.getViewElements()) # Needed for view that aren't completly ported to ajax
+        dataset["document.href"] = "/".join(env.request.web.getViewElements()[0:2]) # Subview are hidden
+        dataset["document.request_method"] = env.request.web.getMethod()
+        dataset["document.query_string"] = env.request.web.getQueryString()
         dataset["document.charset"] = localization.getCurrentCharset()
         dataset["toplayout_extra_content"] = ""
-        dataset["prewikka.user"] = user
+        dataset["prewikka.user"] = env.request.user
         dataset["prewikka.about"] = utils.create_link("About")
 
-    def handleError(self, request, err, user):
+    def handleError(self, err):
         dataset, template_name = None, None
 
         if not isinstance(err, error.PrewikkaUserError):
             err = error.PrewikkaUserError(_("Prelude internal error"), err, display_traceback=True)
 
-        login = user.name if user else err.log_user
         if str(err):
-                env.log.log(err.log_priority, err, request=request, user=login)
+            env.log.log(err.log_priority, err)
 
-        if request.is_stream or request.is_xhr:
-            request.content = json.dumps({"name": err.name, "message": err.message, "code": err.code, "traceback": err.traceback})
-            if request.is_stream:
-                request.sendStream(request.content, event="error")
-                request.content = None
+        if env.request.web.is_stream or env.request.web.is_xhr:
+            env.request.web.content = json.dumps({"name": err.name, "message": err.message, "code": err.code, "traceback": err.traceback})
+            if env.request.web.is_stream:
+                env.request.web.sendStream(env.request.web.content, event="error")
+                env.request.web.content = None
 
         else:
             # This case should only occur in case of auth error (and viewmgr might not exist at this time)
             dataset = err.setupDataset()
             v = BaseView()
-            v._render(dataset, request, user)
-            self._setupDataSet(dataset, request, user)
+            v._render(dataset)
+            self._setupDataSet(dataset)
 
         return dataset
 
@@ -371,7 +370,8 @@ class Core:
         self._loadPlugins(last_change=last)
 
     def process(self, request):
-        user = None
+        env.request.init(request)
+
         http_rcode = 200
         view_object = None
 
@@ -379,8 +379,7 @@ class Core:
         try:
             self._prewikka_init_if_needed()
 
-            env.threadlocal.user = user = env.session.get_user(request)
-            env.threadlocal.menu = None
+            env.request.user = user = env.session.get_user(request)
             user.set_locale()
 
             if not all(env.hookmgr.trigger("HOOK_PROCESS_REQUEST", request, user)):
@@ -394,9 +393,9 @@ class Core:
                     default_view = "settings/my_account"
                 raise error.RedirectionError("%s%s" % (request.getBaseURL(), default_view), 302)
 
-            view_object = env.viewmanager.loadView(request, user)
+            env.request.view = view_object = env.viewmanager.loadView(request, user)
             if view_object.dataset is not None:
-                self._setupDataSet(view_object.dataset, request, user)
+                self._setupDataSet(view_object.dataset)
 
             resolve.process(env.dns_max_delay)
             request.content = view_object.respond()
@@ -407,7 +406,7 @@ class Core:
         except Exception, err:
             http_rcode = getattr(err, "code", 500)
 
-            dataset = self.handleError(request, err, user)
+            dataset = self.handleError(err)
             if dataset:
                 request.content = dataset.render()
 

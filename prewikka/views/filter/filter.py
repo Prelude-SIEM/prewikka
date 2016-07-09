@@ -193,7 +193,7 @@ class AlertFilterEdition(view.View):
         return ["filter"]
 
     def _filter_get_criteria_hook(self, criteria, ctype):
-        menu = env.threadlocal.menu
+        menu = env.request.menu
         if not menu:
             return
 
@@ -201,7 +201,7 @@ class AlertFilterEdition(view.View):
         if not fname:
             return
 
-        f = self._db.get_filter(env.threadlocal.user, fname)
+        f = self._db.get_filter(env.request.user, fname)
         if not f:
             return
 
@@ -211,13 +211,13 @@ class AlertFilterEdition(view.View):
 
         return f
 
-    def _filter_html_menu_hook(self, view, ctype):
+    def _filter_html_menu_hook(self, ctype):
         if ctype not in ("alert", "heartbeat"):
             return
 
         tmpl = template.PrewikkaTemplate(templates.menu)
-        tmpl["current_filter"] = view.parameters.get("filter", "")
-        tmpl["filters"] = self._db.get_filter_list(view.user, ctype)
+        tmpl["current_filter"] = env.request.parameters.get("filter", "")
+        tmpl["filters"] = self._db.get_filter_list(env.request.user, ctype)
         return tmpl.render()
 
     def __init__(self):
@@ -242,7 +242,7 @@ class AlertFilterEdition(view.View):
 
     def _set_common(self):
         self.dataset["type"] = self.parameters.get("type", "filter")
-        self.dataset["filters"] = self._db.get_filter_list(self.user)
+        self.dataset["filters"] = self._db.get_filter_list(env.request.user)
 
         self.dataset["alert_objects"] = self._flatten(prelude.IDMEFClass("alert"))
         self.dataset["generic_objects"] = self._flatten(prelude.IDMEFClass("heartbeat"))
@@ -295,7 +295,7 @@ class AlertFilterEdition(view.View):
 
         fname = self.parameters.get("filter_name")
         if fname:
-            filter = self._db.get_filter(self.user, fname)
+            filter = self._db.get_filter(env.request.user, fname)
 
             self.dataset["fltr.type"] = filter.type
             self.dataset["fltr.name"] = filter.name
@@ -310,7 +310,7 @@ class AlertFilterEdition(view.View):
     def _delete(self):
         fname = self.parameters.get("filter_name")
         if fname:
-            self._filter_delete(self.user, fname)
+            self._filter_delete(env.request.user, fname)
 
         self._set_common()
 
@@ -329,7 +329,7 @@ class AlertFilterEdition(view.View):
         if not self.parameters["filter_formula"]:
             raise error.PrewikkaUserError(_("Could not save Filter"), _("No valid filter formula provided"))
 
-        if self.parameters.get("load") != fname and self._db.get_filter(self.user, fname):
+        if self.parameters.get("load") != fname and self._db.get_filter(env.request.user, fname):
             raise error.PrewikkaUserError(_("Could not save Filter"), _("The filter name is already used by another filter"))
 
         fltr = Filter(fname,
@@ -338,8 +338,8 @@ class AlertFilterEdition(view.View):
                       elements,
                       self.parameters["filter_formula"])
 
-        self._db.delete_filter(self.user, fltr.name)
-        self._db.set_filter(self.user, fltr)
+        self._db.delete_filter(env.request.user, fltr.name)
+        self._db.set_filter(env.request.user, fltr)
 
         self._set_common()
         self._reload()

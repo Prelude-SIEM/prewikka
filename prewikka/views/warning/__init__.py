@@ -34,7 +34,7 @@ class Warning(view.View):
         view.View.__init__(self)
         env.hookmgr.register("HOOK_TOPLAYOUT_EXTRA_CONTENT", self._toplayout_extra_content_hook)
 
-    def _toplayout_extra_content_hook(self, request, user, dataset):
+    def _toplayout_extra_content_hook(self, dataset):
         if not request.input_cookie.get("sessionid"):
             dset = template.PrewikkaTemplate(self.view_template)
             dataset["toplayout_extra_content"] += dset.render()

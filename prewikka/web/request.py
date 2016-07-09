@@ -71,7 +71,6 @@ class Request:
         self.output_cookie = None
 
         self.content = None
-        self.user = None
         self.force_download = False
 
     def forceDownload(self, filename, type="application/force-download", size=None):

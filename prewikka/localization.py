@@ -172,7 +172,7 @@ def format_date(date=None, tzinfo=None, **kwargs):
 
     # Babel format_date() miss tzinfo convertion
     if date:
-        date = date.astimezone(tzinfo or env.threadlocal.user.timezone)
+        date = date.astimezone(tzinfo or env.request.user.timezone)
 
     return babel.dates.format_date(date, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
 
@@ -181,7 +181,7 @@ def format_time(dt=None, tzinfo=None, **kwargs):
         dt = datetime.datetime.fromtimestamp(dt, utils.timeutil.tzutc())
 
     if not tzinfo:
-        tzinfo = env.threadlocal.user.timezone
+        tzinfo = env.request.user.timezone
 
     return babel.dates.format_time(dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
 
@@ -190,7 +190,7 @@ def format_datetime(dt=None, tzinfo=None, **kwargs):
         dt = datetime.datetime.fromtimestamp(dt, utils.timeutil.tzutc())
 
     if not tzinfo:
-        tzinfo = env.threadlocal.user.timezone
+        tzinfo = env.request.user.timezone
 
     return babel.dates.format_datetime(datetime=dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
 

@@ -55,7 +55,7 @@ class AboutPlugin(view.View):
 
     def _apply_update(self, data):
         self.dataset = None
-        self.request.sendStream(json.dumps({"total": data.maintenance_total}), event="begin", sync=True)
+        env.request.web.sendStream(json.dumps({"total": data.maintenance_total}), event="begin", sync=True)
 
         for lst in data.maintenance.values():
 
@@ -68,15 +68,15 @@ class AboutPlugin(view.View):
 
                 for upscript in l:
                     label = _("Applying %(module)s %(script)s...") % {'module': mod.__module__, 'script': str(upscript)}
-                    self.request.sendStream(json.dumps({"label": label}), sync=True)
+                    env.request.web.sendStream(json.dumps({"label": label}), sync=True)
 
                     try:
                         upscript.apply()
                     except Exception as e:
-                        self.request.sendStream(json.dumps({"error": str(e)}), sync=True)
+                        env.request.web.sendStream(json.dumps({"error": str(e)}), sync=True)
                         continue
 
-        self.request.sendStream(data=json.dumps({"label": _("All updates applied")}), event="finish", sync=True)
+        env.request.web.sendStream(data=json.dumps({"label": _("All updates applied")}), event="finish", sync=True)
 
 
     def _add_plugin_info(self, data, catname, mod):
