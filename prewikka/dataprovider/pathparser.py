@@ -11,6 +11,7 @@ class DataProviderNormalizerGeneric(DataProviderNormalizer):
 
     def parse_paths(self, paths, type):
         parsed_paths = []
+        paths_types = []
 
         for path in paths:
             try:
@@ -18,7 +19,7 @@ class DataProviderNormalizerGeneric(DataProviderNormalizer):
             except:
                 parsed_paths.append(path)
 
-        return parsed_paths
+        return parsed_paths, paths_types
 
     def parse_criteria(self, criteria, type):
         parsed_criteria = []

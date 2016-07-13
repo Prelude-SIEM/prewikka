@@ -18,8 +18,39 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import types
+from datetime import datetime
 
 from prewikka import pluginmanager, error, env
+from prewikka.utils.timeutil import parser
+
+
+def _str_to_datetime(date):
+    if date.isdigit():
+        return datetime.utcfromtimestamp(int(date))
+
+    return parser.parse(date)
+
+CONVERTERS = {
+    int: datetime.utcfromtimestamp,
+    float: datetime.utcfromtimestamp,
+    str: _str_to_datetime,
+    datetime: lambda x:x,
+    types.NoneType: lambda x:x
+}
+
+def to_datetime(date):
+    try:
+        return CONVERTERS[type(date)](date)
+    except KeyError:
+        raise error.PrewikkaUserError(N_("Conversion error"),
+                                      N_("Value '%r' cannot be converted to %s" % (date, "datetime")))
+TYPES_FUNC_MAP = {
+    "int": int,
+    "float": float,
+    "long": long,
+    "datetime": to_datetime,
+    "str": str
+}
 
 
 class DataProviderError(Exception):
@@ -30,16 +61,27 @@ class NoBackendError(DataProviderError):
     pass
 
 
-class QueryResults:
+class QueryResults(object):
     def __init__(self, duration=-1, count=None, rows=None):
         self._duration = duration
         self._rows = iter(rows)
         self._count = count
         self._cache = []
+        self.paths_types = []
 
     @property
     def duration(self):
         return self._duration
+
+    def _convert_values(self, row):
+        res = []
+        for elt, type in zip(row, self.paths_types):
+            try:
+                res.append(TYPES_FUNC_MAP[type](elt) if elt else None)
+            except (KeyError, ValueError):
+                raise error.PrewikkaUserError(N_("Conversion error"),
+                                              N_("Value '%r' cannot be converted to %s" % (elt, type)))
+        return res
 
     def __len__(self):
         if self._count is None:
@@ -53,7 +95,7 @@ class QueryResults:
             yield row
 
         while True:
-            res = next(self._rows)
+            res = self._convert_values(next(self._rows))
             self._cache.append(res)
             yield res
 
@@ -86,6 +128,7 @@ class QueryResults:
         # Return the appropriate slice or value
         if isinstance(key, slice):
             return self._cache[start : stop : key.step]
+
         return self._cache[start]
 
 
@@ -211,14 +254,14 @@ class DataProviderManager(pluginmanager.PluginManager):
             criteria = []
 
         normalizer = self._type_handlers[type]
+        paths_types = []
         if normalizer:
-            paths = normalizer.parse_paths(paths, type)
+            paths, paths_types = normalizer.parse_paths(paths, type)
             criteria = normalizer.parse_criteria(criteria, type)
 
         results = self._backends[type].get_values(paths, criteria, distinct, limit, offset)
-
+        results.paths_types = paths_types
         return results
 
     def has_type(self, wanted_type):
         return wanted_type in self._backends
-
