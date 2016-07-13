@@ -20,7 +20,7 @@
 
 import abc
 
-from prewikka import log, pluginmanager, env
+from prewikka import log, pluginmanager, env, hookmanager
 from prewikka.error import PrewikkaUserError
 
 
@@ -30,10 +30,6 @@ class AuthError(PrewikkaUserError):
 
 
 class _AuthUser(object):
-    def __init__(self):
-        env.hookmgr.declare("HOOK_USER_CREATE")
-        env.hookmgr.declare("HOOK_USER_DELETE")
-
     def canCreateUser(self):
         return "createUser" in self.__class__.__dict__
 
@@ -44,11 +40,11 @@ class _AuthUser(object):
         return "setPassword" in self.__class__.__dict__
 
     def createUser(self, user):
-        for i in env.hookmgr.trigger("HOOK_USER_CREATE", user):
+        for i in hookmanager.trigger("HOOK_USER_CREATE", user):
             continue
 
     def deleteUser(self, user):
-        for i in env.hookmgr.trigger("HOOK_USER_DELETE", user):
+        for i in hookmanager.trigger("HOOK_USER_DELETE", user):
             continue
 
         env.db.del_properties(user)
@@ -77,10 +73,6 @@ class _AuthUser(object):
 
 
 class _AuthGroup(object):
-    def __init__(self):
-        env.hookmgr.declare("HOOK_GROUP_CREATE")
-        env.hookmgr.declare("HOOK_GROUP_DELETE")
-
     def canCreateGroup(self):
         return "createGroup" in self.__class__.__dict__
 
@@ -94,11 +86,11 @@ class _AuthGroup(object):
         return []
 
     def createGroup(self, group):
-        for i in env.hookmgr.trigger("HOOK_GROUP_CREATE", group):
+        for i in hookmanager.trigger("HOOK_GROUP_CREATE", group):
             continue
 
     def deleteGroup(self, group):
-        for i in env.hookmgr.trigger("HOOK_GROUP_DELETE", group):
+        for i in hookmanager.trigger("HOOK_GROUP_DELETE", group):
             continue
 
     def setGroupPermissions(self, group, permissions):

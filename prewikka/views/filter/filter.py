@@ -19,7 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import prelude, re
-from prewikka import view, error, usergroup, template, database, utils, version, env
+from prewikka import view, error, usergroup, template, database, utils, version, env, hookmanager
 from . import templates
 
 
@@ -47,7 +47,7 @@ class Filter:
 
         prev_val = self.elements[element][2]
         elements = self.elements[element]
-        for i in env.hookmgr.trigger("HOOK_FILTER_CRITERIA_LOAD", elements):
+        for i in hookmanager.trigger("HOOK_FILTER_CRITERIA_LOAD", elements):
             if i:
                 elements = i
 
@@ -77,11 +77,6 @@ class Filter:
 
 
 class FilterDatabase(database.DatabaseHelper):
-    def __init__(self):
-        database.DatabaseHelper.__init__(self)
-        env.hookmgr.declare_once("HOOK_FILTER_LISTING")
-        env.hookmgr.declare_once("HOOK_FILTER_CRITERIA_LOAD")
-
     def get_filter_list(self, user, ftype=None, name=None):
 
         type_str=""
@@ -90,7 +85,7 @@ class FilterDatabase(database.DatabaseHelper):
 
         l = map(lambda r: r[0], self.query("SELECT name FROM Prewikka_Filter WHERE userid = %s%s%s" % (self.escape(user.id), type_str, self._chk("name", name))))
 
-        for i in env.hookmgr.trigger("HOOK_FILTER_LISTING", l):
+        for i in hookmanager.trigger("HOOK_FILTER_LISTING", l):
             if i is not None:
                 l = i
 
@@ -178,21 +173,24 @@ class AlertFilterEdition(view.View):
     view_order = 1
     view_permissions = [ N_("IDMEF_VIEW") ]
 
-    def _user_delete_hook(self, user):
+    @hookmanager.register("HOOK_USER_DELETE")
+    def _user_delete(self, user):
         for i in self._db.get_filter_list(user):
             self._filter_delete(user, i)
 
     def _filter_delete(self, user, name):
         self._db.delete_filter(user, name)
 
-        for i in env.hookmgr.trigger("HOOK_FILTER_DELETE", user, name):
+        for i in hookmanager.trigger("HOOK_FILTER_DELETE", user, name):
             continue
 
-    def _filter_parameters_register_hook(self, view):
+    @hookmanager.register("HOOK_MAINMENU_PARAMETERS_REGISTER")
+    def _filter_parameters_register(self, view):
         view.optional("filter", str, save=True)
         return ["filter"]
 
-    def _filter_get_criteria_hook(self, criteria, ctype):
+    @hookmanager.register("HOOK_IDMEFDATABASE_CRITERIA_PREPARE")
+    def _filter_get_criteria(self, criteria, ctype):
         menu = env.request.menu
         if not menu:
             return
@@ -211,7 +209,8 @@ class AlertFilterEdition(view.View):
 
         return f
 
-    def _filter_html_menu_hook(self, ctype):
+    @hookmanager.register("HOOK_MAINMENU_EXTRA_CONTENT")
+    def _filter_html_menu(self, ctype):
         if ctype not in ("alert", "heartbeat"):
             return
 
@@ -223,13 +222,6 @@ class AlertFilterEdition(view.View):
     def __init__(self):
         view.View.__init__(self)
         self._db = FilterDatabase()
-
-        env.hookmgr.declare("HOOK_FILTER_DELETE")
-
-        env.hookmgr.register("HOOK_MAINMENU_PARAMETERS_REGISTER", self._filter_parameters_register_hook)
-        env.hookmgr.register("HOOK_IDMEFDATABASE_CRITERIA_PREPARE", self._filter_get_criteria_hook)
-        env.hookmgr.register("HOOK_MAINMENU_EXTRA_CONTENT", self._filter_html_menu_hook)
-        env.hookmgr.register("HOOK_USER_DELETE", self._user_delete_hook)
 
     def _flatten(self, rootcl):
         ret = []

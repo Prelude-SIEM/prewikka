@@ -23,7 +23,7 @@ import datetime
 import calendar
 import itertools
 
-from prewikka import view, template, localization, utils, env
+from prewikka import view, template, localization, utils, env, hookmanager
 from prewikka.templates import MainMenu as MainMenuTemplate
 
 
@@ -33,10 +33,6 @@ class MainMenuParameters(view.Parameters):
                             "order_by", "timezone", "auto_apply_value", "auto_apply_enable"]
 
     def __init__(self, *args, **kwargs):
-        env.hookmgr.declare_once("HOOK_MAINMENU_PARAMETERS_REGISTER", multi=True)
-        env.hookmgr.declare_once("HOOK_MAINMENU_PARAMETERS_NORMALIZE", multi=True)
-        env.hookmgr.declare_once("HOOK_MAINMENU_EXTRA_CONTENT", multi=True)
-
         # This will trigger register which in turn call a hook, do last
         view.Parameters.__init__(self, *args, **kwargs)
 
@@ -52,7 +48,7 @@ class MainMenuParameters(view.Parameters):
         self.optional("auto_apply_value", int, default=0, save=True, general=True)
         self.optional("auto_apply_enable", str, default="false", save=True, general=True)
 
-        for i in env.hookmgr.trigger("HOOK_MAINMENU_PARAMETERS_REGISTER", self):
+        for i in hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_REGISTER", self):
             self._INTERNAL_PARAMETERS = self._INTERNAL_PARAMETERS + i
 
     def normalize(self, view_name, user):
@@ -61,7 +57,7 @@ class MainMenuParameters(view.Parameters):
         if self["orderby"] not in ("time_desc", "time_asc", "count_desc", "count_asc"):
             raise view.InvalidParameterValueError("orderby", self["orderby"])
 
-        all(env.hookmgr.trigger("HOOK_MAINMENU_PARAMETERS_NORMALIZE", self))
+        all(hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_NORMALIZE", self))
         return do_load
 
 
@@ -316,7 +312,7 @@ class MainMenu:
         self._setup_timeline_range()
         self._set_timeline(self.start, self.end)
 
-        self.dataset["menu_extra"] = itertools.ifilter(None, env.hookmgr.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type))
+        self.dataset["menu_extra"] = itertools.ifilter(None, hookmanager.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type))
 
 
 class MainMenuAlert(MainMenu):

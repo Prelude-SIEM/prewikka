@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from prewikka import view, env, utils
+from prewikka import view, env, utils, hookmanager
 
 from string import Template
 
@@ -43,10 +43,6 @@ class AjaxHostURL(view.View):
 
     view_parameters = AjaxHostURLParameters
 
-    def __init__(self):
-        view.View.__init__(self)
-        env.hookmgr.declare("HOOK_HOST_INFO")
-
     @staticmethod
     def _value_generator(infos):
         for urlname, url in env.url.get("host", {}).items():
@@ -60,7 +56,7 @@ class AjaxHostURL(view.View):
     def render(self):
         infos = {"host": self.parameters["host"]}
 
-        for info in env.hookmgr.trigger("HOOK_HOST_INFO", self.parameters["host"]):
+        for info in hookmanager.trigger("HOOK_HOST_INFO", self.parameters["host"]):
             infos.update(info)
 
         return ['<a href="%(url)s" target="_%(urlname)s">%(urlname)s</a>' % {

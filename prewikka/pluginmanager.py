@@ -18,83 +18,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import pkg_resources, sys, os, traceback
-from prewikka import log, utils, error, database, env, usergroup
+from prewikka import log, utils, error, database, env, usergroup, hookmanager
 from prewikka.localization import translation
 
 logger = log.getLogger(__name__)
 
-def _hookCall(hook, cb, wtype, *args, **kwargs):
-        if callable(cb):
-            result = cb(*args, **kwargs)
-        else:
-            result = cb
 
-        if result and wtype and not isinstance(result, wtype):
-            raise Exception("Plugin Hook '%s' expect return type of '%s' but got '%s'" % (hook, wtype, type(result)))
-
-        return result
-
-class HookIterator(object):
-    def __init__(self, hookmgr, hook, *args, **kwargs):
-        self._hook = hook
-        self._args = args
-        self._kwargs = kwargs
-        self._wtype = hookmgr._hooks_info[hook][0]
-        self._cblist = iter(hookmgr._hooks[hook])
-
-    def __iter__(self):
-        return self
-
-    def next(self):
-        return _hookCall(self._hook, next(self._cblist), self._wtype, *self._args, **self._kwargs)
-
-
-class PluginHookManager:
-    def __init__(self):
-        self._hooks_info = { }
-        self._hooks = { }
-
-    def hasListener(self, hook):
-        return bool(self._hooks.get(hook))
-
-    def unregister(self, hook=None, method=None):
-        if hook and method:
-            self._hooks[hook].remove(method)
-        else:
-            for i in self._hooks:
-                self._hooks[i] = []
-
-    def register(self, hook, method):
-        if not hook in self._hooks:
-            self._hooks[hook] = [ ]
-
-        self._hooks[hook].append(method)
-
-    #FIXME: in an ideal world, this should not exist
-    def declare_once(self, hook, type=None, multi=True):
-        if not hook in self._hooks:
-            self._hooks[hook] = [ ]
-
-        if not hook in self._hooks_info:
-            self._hooks_info[hook] = type, multi
-
-    def declare(self, hook, type=None, multi=True):
-        if hook in self._hooks_info:
-            logger.warning("Hook '%s' already declared" % (hook))
-
-        self.declare_once(hook, type, multi)
-
-    def trigger(self, hook, *args, **kwargs):
-        if self._hooks_info[hook][1]:
-                result = HookIterator(self, hook, *args, **kwargs)
-        else:
-                result = _hookCall(hook, self._hooks[hook], *args, **kwargs)
-
-        return result
-
-
-
-class PluginBase(object):
+class PluginBase(hookmanager.HookRegistrar):
     plugin_name = None
     plugin_version = None
     plugin_author = None

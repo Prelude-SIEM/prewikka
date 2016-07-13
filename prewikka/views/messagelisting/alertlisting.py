@@ -19,7 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import json, copy, re, urllib, prelude, time, pkg_resources, datetime, itertools
-from prewikka import view, usergroup, utils, error, mainmenu, localization, env
+from prewikka import view, usergroup, utils, error, mainmenu, localization, env, hookmanager
 from . import templates
 from messagelisting import MessageListingParameters, MessageListing, ListedMessage
 
@@ -606,7 +606,7 @@ class ListedAlert(ListedMessage):
                 'time_min': ctime,
                 'time_max': ctime
             }
-            self["extra_link"] = itertools.ifilterfalse(lambda x: x is None, env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
+            self["extra_link"] = itertools.ifilterfalse(lambda x: x is None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
 
     def setMessageDirectionGeneric(self, direction, object, value, allow_empty_value=True):
         self._initDirectionIfNeeded(direction)
@@ -690,14 +690,6 @@ class AlertListing(MessageListing):
 
     def __init__(self):
         MessageListing.__init__(self)
-
-        env.hookmgr.declare_once("HOOK_MESSAGELISTING_EXTRA_COLUMN")
-        env.hookmgr.declare_once("HOOK_MESSAGELISTING_EXTRA_LINK")
-
-        # This hook is usually declared/triggered from the filter plugin, but since we
-        # also trigger it here, make sure it is available by declaring it anyway.
-        env.hookmgr.declare_once("HOOK_FILTER_CRITERIA_LOAD")
-
         self._max_aggregated_classifications = int(env.config.general.getOptionValue("max_aggregated_classifications", 10))
 
     def _getMessageIdents(self, criteria, limit=-1, offset=-1, order_by="time_desc"):
@@ -777,7 +769,7 @@ class AlertListing(MessageListing):
     def _filterTupleToString(self, filtertpl):
         prev_val = filtertpl
 
-        for i in env.hookmgr.trigger("HOOK_FILTER_CRITERIA_LOAD", filtertpl):
+        for i in hookmanager.trigger("HOOK_FILTER_CRITERIA_LOAD", filtertpl):
             if i:
                 filtertpl = i
 
@@ -948,7 +940,7 @@ class AlertListing(MessageListing):
             'time_min': time_min,
             'time_max': time_max
         }
-        message.extra_link = itertools.ifilterfalse(lambda x: x is None, env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
+        message.extra_link = itertools.ifilterfalse(lambda x: x is None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
 
         result_count = 0
         for classification, severity, completion, count, messageid in res:
@@ -1125,7 +1117,7 @@ class AlertListing(MessageListing):
         self.dataset["aggregated_classification"] = self.parameters["aggregated_classification"]
         self.dataset["aggregated_analyzer"] = self.parameters["aggregated_analyzer"]
 
-        self.dataset["extra_column"] = itertools.ifilterfalse(lambda x: x is None, env.hookmgr.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN"))
+        self.dataset["extra_column"] = itertools.ifilterfalse(lambda x: x is None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN"))
 
         ag_s = self.parameters["aggregated_source"][:]
         ag_t = self.parameters["aggregated_target"][:]

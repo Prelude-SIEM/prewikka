@@ -25,7 +25,7 @@ import urllib
 import pkg_resources
 
 from datetime import datetime
-from prewikka import view, usergroup, utils, resolve, localization, env
+from prewikka import view, usergroup, utils, resolve, localization, env, hookmanager
 
 from . import templates
 
@@ -544,7 +544,7 @@ class MessageSummary(Table, view.View):
                     break
 
             links = []
-            for url, text in env.hookmgr.trigger("HOOK_ALERTSUMMARY_MEANING_LINK", alert, meaning, value):
+            for url, text in hookmanager.trigger("HOOK_ALERTSUMMARY_MEANING_LINK", alert, meaning, value):
                 if url:
                     links.append("<a target='%s' href='%s'>%s</a>" % \
                                  (env.external_link_target, url, text))
@@ -636,7 +636,6 @@ class MessageSummary(Table, view.View):
 class AlertSummary(TcpIpOptions, MessageSummary):
     def __init__(self):
         MessageSummary.__init__(self)
-        env.hookmgr.declare("HOOK_ALERTSUMMARY_MEANING_LINK")
 
     def buildAlertIdent(self, alert, parent):
         calist = { }

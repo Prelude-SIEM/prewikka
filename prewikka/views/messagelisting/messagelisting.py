@@ -19,7 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import copy, time, urllib, pkg_resources
-from prewikka import view, usergroup, utils, resolve, mainmenu, localization, env
+from prewikka import view, usergroup, utils, resolve, mainmenu, localization, env, hookmanager
 
 class MessageListingParameters(mainmenu.MainMenuParameters):
     def register(self):
@@ -105,11 +105,7 @@ class ListedMessage(dict):
         field["host_links"] = [ ]
         field["category"] = category
 
-        if env.hookmgr.hasListener("HOOK_HOST_TOOLTIP"):
-            field["url_infos"] = utils.create_link("hostinfoajax", {"host": value})
-        else:
-            field["url_infos"] = None
-
+        field["url_infos"] = utils.create_link("hostinfoajax", {"host": value}) if "HOOK_HOST_TOOLTIP" in hookmanager.hookmgr else None
         field["url_popup"] = utils.create_link("AjaxHostURL", {"host": value})
 
         if value and dns is True:
@@ -120,7 +116,7 @@ class ListedMessage(dict):
         if not value:
             return field
 
-        for typ, linkname, link, widget in env.hookmgr.trigger("HOOK_LINK", value):
+        for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", value):
             if typ == "host":
                 field["host_links"].append((linkname, link, widget))
 
@@ -139,13 +135,9 @@ class HostInfoAjax(view.View):
 
     view_parameters = HostInfoAjaxParameters
 
-    def __init__(self):
-        view.View.__init__(self)
-        env.hookmgr.declare_once("HOOK_HOST_TOOLTIP")
-
     def render(self):
         infos = []
-        for info in env.hookmgr.trigger("HOOK_HOST_TOOLTIP", self.parameters["host"]):
+        for info in hookmanager.trigger("HOOK_HOST_TOOLTIP", self.parameters["host"]):
             infos.extend(info)
 
         return infos

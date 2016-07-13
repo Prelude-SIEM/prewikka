@@ -19,7 +19,7 @@
 
 import time, os, struct
 
-from prewikka import database, log, utils, usergroup, pluginmanager, env
+from prewikka import database, log, utils, usergroup, pluginmanager, env, hookmanager
 from prewikka.error import PrewikkaUserError
 
 
@@ -88,7 +88,7 @@ class Session(pluginmanager.PluginBase):
         self._db = SessionDatabase()
         self._expiration = int(config.getOptionValue("expiration", 60)) * 60
 
-        env.hookmgr.register("HOOK_USER_DELETE", lambda user: self._db.delete_session(user=user))
+        hookmanager.register("HOOK_USER_DELETE", lambda user: self._db.delete_session(user=user))
 
     def __set_session(self, request, sessionid):
         request.addCookie("sessionid", sessionid, self._expiration * 3)

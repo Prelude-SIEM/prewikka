@@ -20,7 +20,7 @@
 import pkg_resources
 import time
 
-from prewikka import view, usergroup, utils, localization, env, mainmenu
+from prewikka import view, usergroup, utils, localization, env, mainmenu, hookmanager
 from . import templates
 
 
@@ -93,7 +93,7 @@ class SensorListing(view.View):
                                                                "filter_value": addr })
 
                 address["host_links"] = []
-                for typ, linkname, link, widget in env.hookmgr.trigger("HOOK_LINK", addr):
+                for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", addr):
                     if typ == "host":
                         address["host_links"].append((linkname, link, widget))
 

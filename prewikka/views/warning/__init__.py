@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from . import templates
-from prewikka import view, template, version, env
+from prewikka import view, template, version, env, hookmanager
 
 class Warning(view.View):
     plugin_name = "Warning"
@@ -30,11 +30,8 @@ class Warning(view.View):
 
     view_template = templates.warning
 
-    def __init__(self):
-        view.View.__init__(self)
-        env.hookmgr.register("HOOK_TOPLAYOUT_EXTRA_CONTENT", self._toplayout_extra_content_hook)
-
-    def _toplayout_extra_content_hook(self, dataset):
-        if not request.input_cookie.get("sessionid"):
+    @hookmanager.register("HOOK_TOPLAYOUT_EXTRA_CONTENT")
+    def _toplayout_extra_content(self, dataset):
+        if not env.request.web.input_cookie.get("sessionid"):
             dset = template.PrewikkaTemplate(self.view_template)
             dataset["toplayout_extra_content"] += dset.render()

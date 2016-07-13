@@ -20,7 +20,7 @@
 
 import operator, json, time
 from copy import copy
-from prewikka import pluginmanager, template, usergroup, error, log, utils, env
+from prewikka import pluginmanager, template, usergroup, error, log, utils, env, hookmanager
 
 
 logger = log.getLogger(__name__)
@@ -118,10 +118,7 @@ class Parameters(dict):
         self.optional("_save", str)
         self.optional("_download", str)
 
-        # In case the view was dynamically added through HOOK_VIEW_LOAD, the hook isn't available
-        hook = "HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper()
-        if env.hookmgr.hasListener(hook):
-            list(env.hookmgr.trigger(hook, self))
+        list(hookmanager.trigger("HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper(), self))
 
     def register(self):
         pass
@@ -194,9 +191,7 @@ class Parameters(dict):
                     self[name] = value
 
         # In case the view was dynamically added through HOOK_VIEW_LOAD, the hook isn't available
-        hook = "HOOK_%s_PARAMETERS_NORMALIZE" % view.upper()
-        if env.hookmgr.hasListener(hook):
-            list(env.hookmgr.trigger(hook, self))
+        list(hookmanager.trigger("HOOK_%s_PARAMETERS_NORMALIZE" % view.upper(), self))
 
         self.pop("_save", None)
         return do_load
@@ -425,7 +420,7 @@ class ViewManager:
         if view_id:
             view = self.getView(view_id)
         else:
-            view = next((x for x in env.hookmgr.trigger("HOOK_VIEW_LOAD", request, userl) if x), None)
+            view = next((x for x in hookmanager.trigger("HOOK_VIEW_LOAD", request, userl) if x), None)
 
         if not view:
             raise InvalidViewError(_("View '%s' does not exist") % request.getView())
@@ -454,9 +449,6 @@ class ViewManager:
 
         self._views[view.view_id] = view
 
-        env.hookmgr.declare("HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper())
-        env.hookmgr.declare("HOOK_%s_PARAMETERS_NORMALIZE" % view.view_id.upper())
-
     def loadViews(self):
         for view_class in sorted(pluginmanager.PluginManager("prewikka.views"), key=operator.attrgetter("view_order")):
                 try:
@@ -472,5 +464,3 @@ class ViewManager:
 
     def __init__(self):
         self._views = {}
-
-        env.hookmgr.declare("HOOK_VIEW_LOAD", multi=True)

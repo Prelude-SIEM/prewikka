@@ -33,7 +33,7 @@ except ImportError:
 from prewikka import view, config, log, database, idmefdatabase, version, \
                      auth, error, utils, localization, resolve, theme, \
                      pluginmanager, renderer, env, dataprovider, menu, \
-                     siteconfig, template, resource
+                     siteconfig, template, resource, hookmanager
 from prewikka.myconfigparser import ConfigParserSection
 
 from prewikka.templates import ClassicLayout
@@ -107,7 +107,7 @@ class BaseView(view._View):
         theme_file = resource.CSSLink("prewikka/css/themes/%s.css" % theme_name)
         head = _CSS_FILES + [theme_file] + _JS_FILES
 
-        for i in env.hookmgr.trigger("HOOK_LOAD_HEAD_CONTENT"):
+        for i in hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT"):
             head += (content for content in i if content not in head)
 
         dataset["document.head_content"] = head
@@ -142,7 +142,7 @@ class BaseView(view._View):
         dataset["interface.menu"] = env.menumanager.get_menus(user) if env.menumanager else {}
         dataset["toplayout_extra_content"] = ""
 
-        all(env.hookmgr.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT", dataset))
+        all(hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT", dataset))
 
 
 _core_cache = {}
@@ -184,12 +184,6 @@ class Core:
 
         env.log = log.Log(env.config)
         env.log.info("Starting Prewikka")
-
-        env.hookmgr = pluginmanager.PluginHookManager()
-        env.hookmgr.declare("HOOK_TOPLAYOUT_EXTRA_CONTENT")
-        env.hookmgr.declare("HOOK_PROCESS_REQUEST")
-        env.hookmgr.declare("HOOK_LINK")
-        env.hookmgr.declare("HOOK_LOAD_HEAD_CONTENT", list)
 
         env.dns_max_delay = float(env.config.general.getOptionValue("dns_max_delay", 0))
 
@@ -366,7 +360,7 @@ class Core:
         # Some changes happened, and every process has to reload the plugin configuration
         env.log.warning("plugins were activated: triggering reload (hook warning may follow)")
 
-        env.hookmgr.unregister()
+        hookmanager.unregister()
         self._loadPlugins(last_change=last)
 
     def process(self, request):
@@ -382,7 +376,7 @@ class Core:
             env.request.user = user = env.session.get_user(request)
             user.set_locale()
 
-            if not all(env.hookmgr.trigger("HOOK_PROCESS_REQUEST", request, user)):
+            if not all(hookmanager.trigger("HOOK_PROCESS_REQUEST", request, user)):
                 return
 
             if not request.path or request.path == "/":

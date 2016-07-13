@@ -20,7 +20,7 @@
 import time, types
 import prelude, preludedb
 
-from prewikka import env
+from prewikka import hookmanager
 from prewikka.utils import escape_html_string
 
 class Message(object):
@@ -63,7 +63,7 @@ class IDMEFDatabase(preludedb.DB):
         if type(criteria) is not list:
             criteria = [ criteria ]
 
-        all(env.hookmgr.trigger("HOOK_IDMEFDATABASE_CRITERIA_PREPARE", criteria, criteria_type))
+        all(hookmanager.trigger("HOOK_IDMEFDATABASE_CRITERIA_PREPARE", criteria, criteria_type))
 
         criteria = " && ".join(criteria) % {"backend": criteria_type, "time_field": "create_time"}
 
@@ -77,8 +77,6 @@ class IDMEFDatabase(preludedb.DB):
 
         sql = preludedb.SQL(dict((k, str(v)) for k, v in config.items()))
         preludedb.DB.__init__(self, sql)
-
-        env.hookmgr.declare("HOOK_IDMEFDATABASE_CRITERIA_PREPARE")
 
     def getAlertIdents(self, criteria=None, limit=-1, offset=-1, order_by="time_desc"):
         return preludedb.DB.getAlertIdents(self, self._prepare_criteria(criteria, "alert"), limit, offset, self._ORDER_MAP[order_by])

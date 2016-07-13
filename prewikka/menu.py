@@ -19,7 +19,7 @@
 
 from copy import copy
 
-from prewikka import env, utils
+from prewikka import env, utils, hookmanager
 
 
 class MenuManager(object):
@@ -33,7 +33,6 @@ class MenuManager(object):
         self._all_sections = set()
         self._loaded_sections = {}
         self._sections_path = {}
-        env.hookmgr.declare("HOOK_MENU_LOAD", multi=True)
 
     def get_sections(self, user=None):
         def _merge(d1, d2):
@@ -43,7 +42,7 @@ class MenuManager(object):
                     d1[section][tab] = views
 
         d = copy(self._loaded_sections)
-        [_merge(d, i) for i in env.hookmgr.trigger("HOOK_MENU_LOAD", user) if i]
+        [_merge(d, i) for i in hookmanager.trigger("HOOK_MENU_LOAD", user) if i]
 
         return d
 
