@@ -12,7 +12,20 @@ without warranty of any kind.
 Dependencies
 ============
 
-   Minimal : python-setuptools python-cheetah python-lesscpy python-argparse
+Build requires:
+
+- python >= 2.6 (not python 3.x)
+- python-lesscpy
+- python-argparse
+- python-setuptools
+- python-cheetah
+
+Run requires:
+
+- python >= 2.6 (not python 3.x)
+- python-babel
+- libprelude with python bindings
+- libpreludedb with python bindings
 
 Basic Installation
 ==================
@@ -23,3 +36,5 @@ instructions specific to this package.  Some packages provide this
 `INSTALL' file but do not implement all of the features documented
 below.  The lack of an optional feature in a given package is not
 necessarily a bug.
+
+Go to https://www.prelude-siem.org/projects/prelude/wiki/InstallingPreludePrewikka for more installation instructions.
