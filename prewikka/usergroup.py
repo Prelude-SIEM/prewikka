@@ -153,12 +153,12 @@ class User(NameID):
     @property
     def timezone(self):
         if not self._timezone:
-            self._timezone = utils.timeutil.timezone(self.get_property("timezone", default=env.config.default_timezone))
+            self._timezone = utils.timeutil.timezone(self.get_property("timezone", default=env.config.general.default_timezone))
 
         return self._timezone
 
     def set_locale(self):
-        lang = self.get_property("language", default=env.config.default_locale)
+        lang = self.get_property("language", default=env.config.general.default_locale)
         if lang:
             localization.setLocale(lang)
 

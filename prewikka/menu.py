@@ -81,8 +81,11 @@ class MenuManager(object):
         loaded_sections = self.get_sections(user)
         menus = utils.OrderedDict()
         default_menu = {'icon': self._DEFAULT_ICON, 'entries': [], 'default': True}
+        section_order_instance = env.config.general.get("section_order")
+        section_order = next((sec for sec in env.config.section_order
+                                      if sec.get_instance_name() == section_order_instance), {})
 
-        for section, icon in env.config.section_order.items():
+        for section, icon in section_order.items():
             if section in self._all_sections:
                 # Sections that are declared in section_order but not loaded
                 # should appear in the menu, but with an empty link
@@ -99,7 +102,7 @@ class MenuManager(object):
 
         for section in loaded_sections:
             # Put the sections not declared in section_order in the default menu
-            if section not in env.config.section_order:
+            if section not in section_order:
                 views = self._get_display_views(loaded_sections.get(section))
                 default_menu["entries"].append({'name': section, 'views': views, 'icon': None})
 

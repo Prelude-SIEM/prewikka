@@ -34,7 +34,6 @@ from prewikka import view, config, log, database, idmefdatabase, version, \
                      auth, error, utils, localization, resolve, theme, \
                      pluginmanager, renderer, env, dataprovider, menu, \
                      siteconfig, template, resource, hookmanager
-from prewikka.myconfigparser import ConfigParserSection
 
 from prewikka.templates import ClassicLayout
 from prewikka.utils import viewhelpers
@@ -98,11 +97,11 @@ class BaseView(view._View):
         # The database attribute might be None in case of initialisation error
         # FIXME: move me to a plugin !
         try:
-            theme_name = user.get_property("theme", default=env.config.default_theme)
+            theme_name = user.get_property("theme", default=env.config.general.default_theme)
         except:
-            theme_name = env.config.default_theme
+            theme_name = env.config.general.default_theme
 
-        dataset["document.title"] = interface.getOptionValue("browser_title", "Prelude OSS")
+        dataset["document.title"] = interface.get("browser_title", "Prelude OSS")
 
         theme_file = resource.CSSLink("prewikka/css/themes/%s.css" % theme_name)
         head = _CSS_FILES + [theme_file] + _JS_FILES
@@ -112,18 +111,18 @@ class BaseView(view._View):
 
         dataset["document.head_content"] = head
 
-        dataset["prewikka.favicon"] = interface.getOptionValue(
+        dataset["prewikka.favicon"] = interface.get(
             "favicon",
             "prewikka/images/favicon.ico"
         )
-        dataset["prewikka.software"] = interface.getOptionValue(
+        dataset["prewikka.software"] = interface.get(
             "software",
             "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />"
         )
 
         dataset["prewikka.date"] = localization.format_date()
         if user:
-            if interface.getOptionValue("user_display") == "name":
+            if interface.get("user_display") == "name":
                 dataset["prewikka.user_display"] = user.get_property("fullname", default=user.name)
             else:
                 dataset["prewikka.user_display"] = user.name
@@ -176,33 +175,29 @@ class Core:
         env.auth = None # In case of database error
         env.config = config.Config(filename)
 
-        env.config.default_theme = env.config.general.getOptionValue("default_theme", "cs")
-        env.config.default_locale = env.config.general.getOptionValue("default_locale", "en_GB")
-        env.config.default_timezone = env.config.general.getOptionValue("default_timezone", localization.get_system_timezone())
-        env.config.default_encoding = env.config.general.getOptionValue("encoding", "UTF-8")
-        env.config.reverse_path = env.config.general.getOptionValue("reverse_path", "").rstrip("/")
+        env.config.general.setdefault("default_theme", "cs")
+        env.config.general.setdefault("default_locale", "en_GB")
+        env.config.general.setdefault("encoding", "UTF-8")
+        env.config.general.setdefault("default_timezone", localization.get_system_timezone())
+        env.config.general.reverse_path = env.config.general.get("reverse_path", "").rstrip("/")
 
         env.log = log.Log(env.config)
         env.log.info("Starting Prewikka")
 
-        env.dns_max_delay = float(env.config.general.getOptionValue("dns_max_delay", 0))
+        env.dns_max_delay = float(env.config.general.get("dns_max_delay", 0))
 
-        val = env.config.general.getOptionValue("external_link_new_window", "true")
+        val = env.config.general.get("external_link_new_window", "true")
         if val is None or val.lower() in ["true", "yes"]:
             env.external_link_target = "_blank"
         else:
             env.external_link_target = "_self"
 
-        # Get prewikka.conf option "enable_flags" and store it into environment
-        flags = env.config.general.getOptionValue("enable_flags", "true")
-        env.enable_flags = flags is None or flags.lower() in ["true", "yes"]
-
-        details = env.config.general.getOptionValue("enable_details", "false")
+        details = env.config.general.get("enable_details", "false")
         env.enable_details = details is None or details.lower() in ["true", "yes"]
 
-        env.host_details_url = env.config.general.getOptionValue("host_details_url", "https://www.prelude-siem.com/host_details.php")
-        env.port_details_url = env.config.general.getOptionValue("port_details_url", "https://www.prelude-siem.com/port_details.php")
-        env.reference_details_url = env.config.general.getOptionValue("reference_details_url", "https://www.prelude-siem.com/reference_details.php")
+        env.host_details_url = env.config.general.get("host_details_url", "https://www.prelude-siem.com/host_details.php")
+        env.port_details_url = env.config.general.get("port_details_url", "https://www.prelude-siem.com/port_details.php")
+        env.reference_details_url = env.config.general.get("reference_details_url", "https://www.prelude-siem.com/reference_details.php")
 
         resolve.init()
 
@@ -210,7 +205,7 @@ class Core:
         env.menumanager = None
         env.htdocs_mapping.update((("prewikka", pkg_resources.resource_filename(__name__, 'htdocs')),))
 
-        custom_theme = env.config.interface.getOptionValue("custom_theme", None)
+        custom_theme = env.config.interface.get("custom_theme", None)
         if custom_theme:
             if os.path.isdir("%s%s" % (os.path.sep, custom_theme)):
                 env.htdocs_mapping.update((("custom", custom_theme),))
@@ -247,23 +242,18 @@ class Core:
 
     def _initURL(self):
         env.url = {}
-        for urltype in env.config.url:
-            env.url[urltype] = {}
-            for option in env.config.url[urltype].getOptions():
-                env.url[urltype][option.name] = option.value
+        for urlconf in env.config.url:
+            env.url[urlconf.get_instance_name()] = {}
+            for label, url in urlconf.items():
+                env.url[urlconf.get_instance_name()][label] = url
 
-    def _load_auth_or_session(self, typename, plugins, name, config=None):
+    def _load_auth_or_session(self, typename, plugins, name, config=config.SectionRoot()):
         if name not in plugins:
             raise error.PrewikkaUserError(
                 "Initialization error",
                 "Cannot use %(type)s mode '%(name)s', please contact your local administrator." %
                 {'type': typename, 'name': name}
             )
-
-        if config:
-            config = config.getSection(name)
-        else:
-            config = ConfigParserSection(name)
 
         obj = plugins[name](config)
         setattr(env, typename, obj)
@@ -289,19 +279,19 @@ class Core:
         cfg = env.config
 
         if cfg.session:
-            self._load_auth_or_session("session", _SESSION_PLUGINS, cfg.session.name, cfg.session)
+            self._load_auth_or_session("session", _SESSION_PLUGINS, cfg.session.get_instance_name(), cfg.session)
             if isinstance(env.session, auth.Auth):
                 # If the session module is also an auth module, no need to load an auth module
                 env.auth = env.session
                 if cfg.auth:
-                    env.log.error(_("Session '%s' does not accept any authentication module" % cfg.session.name))
+                    env.log.error(_("Session '%s' does not accept any authentication module" % cfg.session.get_instance_name()))
             else:
                 # If no authentification module defined, we use the session's default auth module
-                auth_name = cfg.auth.name if cfg.auth else env.session.get_default_auth()
+                auth_name = cfg.auth.get_instance_name() if cfg.auth else env.session.get_default_auth()
                 self._load_auth_or_session("auth", _AUTH_PLUGINS, auth_name, cfg.auth)
         elif cfg.auth:
             # No session module defined, we load the auth module first
-            self._load_auth_or_session("auth", _AUTH_PLUGINS, cfg.auth.name, cfg.auth)
+            self._load_auth_or_session("auth", _AUTH_PLUGINS, cfg.auth.get_instance_name(), cfg.auth)
             self._load_auth_or_session("session", _SESSION_PLUGINS, env.auth.getDefaultSession())
         else:
             # Nothing defined, we use the anonymous module
@@ -369,7 +359,7 @@ class Core:
         http_rcode = 200
         view_object = None
 
-        encoding = env.config.general.getOptionValue("encoding", "utf8")
+        encoding = env.config.general.get("encoding", "utf8")
         try:
             self._prewikka_init_if_needed()
 
@@ -380,7 +370,7 @@ class Core:
                 return
 
             if not request.path or request.path == "/":
-                default_view = env.config.general.getOptionValue("default_view", "alerts/alerts")
+                default_view = env.config.general.get("default_view", "alerts/alerts")
                 if not env.viewmanager.getViewIDFromPaths(default_view.split('/')):
                     # The configured view does not exist. Fall back to "settings/my_account"
                     # which does not require any specific permission.

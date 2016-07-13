@@ -58,7 +58,7 @@ class WSGIRequest(request.Request):
 
 
     def getBaseURL(self):
-        return (env.config.reverse_path or self._environ["SCRIPT_NAME"]) + "/"
+        return (env.config.general.reverse_path or self._environ["SCRIPT_NAME"]) + "/"
 
     def getMethod(self):
         return self._environ['REQUEST_METHOD']

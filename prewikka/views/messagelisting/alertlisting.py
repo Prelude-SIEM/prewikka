@@ -255,8 +255,8 @@ class ListedAlert(ListedMessage):
         apply(ListedMessage.__init__, (self, ) + args, kwargs)
         self.reset()
 
-        self._max_aggregated_source = int(env.config.general.getOptionValue("max_aggregated_source", 10))
-        self._max_aggregated_target = int(env.config.general.getOptionValue("max_aggregated_target", 10))
+        self._max_aggregated_source = int(env.config.general.get("max_aggregated_source", 10))
+        self._max_aggregated_target = int(env.config.general.get("max_aggregated_target", 10))
 
     def _getKnownValue(self, direction, key):
         return { "alert.%s.service.port" % direction: ("service", None),
@@ -690,7 +690,7 @@ class AlertListing(MessageListing):
 
     def __init__(self):
         MessageListing.__init__(self)
-        self._max_aggregated_classifications = int(env.config.general.getOptionValue("max_aggregated_classifications", 10))
+        self._max_aggregated_classifications = int(env.config.general.get("max_aggregated_classifications", 10))
 
     def _getMessageIdents(self, criteria, limit=-1, offset=-1, order_by="time_desc"):
         return env.idmef_db.getAlertIdents(criteria, limit, offset, order_by)

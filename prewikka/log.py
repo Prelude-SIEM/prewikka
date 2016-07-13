@@ -30,15 +30,15 @@ class Log:
     def __init__(self, conf):
         self._logger = None
 
-        for logtype, logvalues in getattr(conf, "log", ()):
+        for logconfig in getattr(conf, "log", ()):
 
             config = { }
-            for key, value in logvalues.items():
+            for key, value in logconfig.items():
                 config[key] = str(value)
 
             self._logger = logging.getLogger()
             self._logger.setLevel(logging.NOTSET)
-            self._logger.addHandler(self._getHandler(config, logtype))
+            self._logger.addHandler(self._getHandler(config, logconfig.get_instance_name()))
 
     def _getSyslogHandlerAddress(self):
         for f in ("/dev/log", "/var/run/log", "/var/run/syslog"):

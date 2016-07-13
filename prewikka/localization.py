@@ -64,13 +64,13 @@ class TranslationProxy(object):
         try:
            return self._data.catalog.charset()
         except:
-           return env.config.default_encoding
+           return env.config.general.encoding
 
     def getLocale(self):
         try:
             return self._data.lang
         except:
-            return env.config.default_locale
+            return env.config.general.default_locale
 
     def setLocale(self, lang):
         first = None
@@ -143,9 +143,9 @@ _LANGUAGES = {
 
 def setLocale(lang):
     if not lang:
-        lang = env.config.default_locale
+        lang = env.config.general.default_locale
 
-    translation.setLocale("%s.%s" % (lang, env.config.default_encoding))
+    translation.setLocale("%s.%s" % (lang, env.config.general.encoding))
 
 
 def getLanguages():

@@ -227,7 +227,7 @@ class Request:
         return self.getView().strip("/").split("/")
 
     def getBaseURL(self):
-        return env.config.reverse_path + "/"
+        return env.config.general.reverse_path + "/"
 
     def getQueryString(self):
         pass

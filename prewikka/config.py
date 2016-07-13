@@ -1,5 +1,5 @@
-# Copyright (C) 2004-2016 CS-SI. All Rights Reserved.
-# Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
+# Copyright (C) 2016 CS-SI. All Rights Reserved.
+# Author: Yoann Vandoorselaere <yoannv@gmail.com>
 #
 # This file is part of the Prewikka program.
 #
@@ -18,66 +18,171 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-import os, glob
-from prewikka import myconfigparser, siteconfig, utils
+import re, os, glob
+from prewikka import siteconfig, utils
 
 
-class Config(object):
+
+class ParseError(Exception):
+    def __init__(self, filename, lineno, line):
+        self._message = _("parse error in \"%(txt)s\" at %(file)s line %(line)d") % {'txt': line.rstrip(), 'file': filename, 'line': lineno}
+
+    def __str__(self):
+        return self._message
+
+
+class ConfigParserOption(str):
+    def __new__(cls, *args, **kw):
+        return str.__new__(cls, args[1])
+
+    def __init__(self, name, value):
+        self.name = name
+        self.value = value
+
+    def __repr__(self):
+        return "<ConfigParserOption %s%s%s>" % (self.name, "=" if self.value else "", self.value or "")
+
+
+class ConfigParserSection(object):
+    def __init__(self, name):
+        object.__setattr__(self, "_instance_name", name)
+        object.__setattr__(self, "_od", utils.OrderedDict())
+
+    def __repr__(self):
+        return "ConfigParserSection<%s,%s>" % (self._instance_name, self._od.items())
+
+    def __setitem__(self, key, value):
+        self._od[key] = value
+
+    def __getitem__(self, key):
+        return self._od[key]
+
+    def __setattr__(self, key, value):
+        self._od[key] = value
+
+    def __getattr__(self, key):
+        return self._od[key]
+
+    def __contains__(self, key):
+        return self._od.__contains__(key)
+
+    def __iter__(self):
+        return self._od.__iter__()
+
+    def get_instance_name(self):
+        return self._instance_name
+
+    def get(self, name, default=None):
+        return self._od.get(name, default)
+
+    def keys(self):
+        return self._od.keys()
+
+    def items(self):
+        return self._od.items()
+
+    def values(self):
+        return self._od.values()
+
+    def setdefault(self, key, default):
+        return self._od.setdefault(key, default)
+
+    @utils.deprecated
+    def getOptions(self):
+        return self._od.values()
+
+    @utils.deprecated
+    def getOption(self, name):
+        return self._od[name]
+
+    @utils.deprecated
+    def getOptionValue(self, key, value=None):
+        return self._od.get(key, value)
+
+
+class SectionRoot(list):
+    def __contains__(self, key):
+        return self and self[0].__contains__(key)
+
+    def __getitem__(self, key):
+        if isinstance(key, int):
+            return list.__getitem__(self, key)
+        else:
+            return self[0][key]
+
+    def __getattr__(self, attr):
+        return getattr(self[0] if self else ConfigParserSection(""), attr)
+
+
+class MyConfigParser:
+    """
+    A config parser class ala ConfigParser.ConfigParser (only read operations
+    are (will be) supported).
+    ConfigParser.ConfigParser did not feed all our needs:
+    - we need the '= value' part of option to be optional
+    - we need to support special characters (like ':') in option name (for urls)
+    - we need to keep the right order of options in sections (this is done via
+      the OrderedDict class that subclass dict)
+    """
+
+    EMPTY_LINE_REGEXP = re.compile("^\s*(\#.*)?$")
+    SECTION_REGEXP = re.compile("^\s*\[\s*(?P<name>[^\s]+)\s*(?P<instance>.+)?]")
+    OPTION_REGEXP = re.compile("^\s*(?P<name>[^:=]+)([:=]\s*(?P<value>.+))?$")
+
+    def __init__(self):
+        self._sections = utils.OrderedDict()
+
+    def _create_section(self, name, instance):
+        if instance:
+            instance = instance.strip()
+
+        if not name in self._sections:
+            self._sections[name] = SectionRoot()
+
+        for section in self._sections[name]:
+            if section.get_instance_name() == instance:
+                return section
+
+        self._sections[name].append(ConfigParserSection(instance))
+        return self._sections[name][-1]
+
+    def read(self, filename):
+        cursection = None
+
+        for lineno, line in enumerate(open(filename).readlines()):
+            result = self.EMPTY_LINE_REGEXP.match(line)
+            if result:
+                continue
+
+            result = self.SECTION_REGEXP.match(line)
+            if result:
+                cursection = self._create_section(*result.group("name", "instance"))
+                continue
+
+            result = self.OPTION_REGEXP.match(line)
+            if not result:
+                raise ParseError(file.name, lineno + 1, line)
+
+            name, value = result.group("name").strip(), result.group("value")
+            cursection[name] = ConfigParserOption(name, value.strip() if value else None)
+
+    def get(self, name, default):
+        return self._sections.get(name, default)
+
+    def __getattr__(self, key):
+        return self._sections.get(key, SectionRoot())
+
+
+class Config(MyConfigParser):
     def __init__(self, filename=None):
-        if not filename:
-            filename=siteconfig.conf_dir + "/prewikka.conf"
+        MyConfigParser.__init__(self)
 
-        self.general = myconfigparser.ConfigParserSection("general")
-        self.section_order = myconfigparser.ConfigParserSection("section_order")
-        self.interface = myconfigparser.ConfigParserSection("interface")
-        self.database = myconfigparser.ConfigParserSection("database")
-        self.idmef_database = myconfigparser.ConfigParserSection("idmef_database")
-        self.renderer_defaults = myconfigparser.ConfigParserSection("renderer_defaults")
-        self.include = myconfigparser.ConfigParserSection("include")
+        self.read(filename or siteconfig.conf_dir + "/prewikka.conf")
 
-        self.log = {}
-        self.auth = None
-        self.session = None
-        self.url = { }
-
-        self._load_config(filename)
-        for fpattern in self.include:
+        for fpattern in self.include.keys():
             if not os.path.isabs(fpattern):
                 fpattern = os.path.join(siteconfig.conf_dir, fpattern)
 
             # Files are loaded in alphabetical order
             for fname in sorted(glob.glob(fpattern)):
-                self._load_config(fname)
-
-    def _load_config(self, filename):
-        file = myconfigparser.MyConfigParser(filename)
-        file.load()
-
-        for section in file.getSections():
-            if " " in section.name:
-                type, name = section.name.split(" ", 1)
-                self._set_generic_dict(type, name, section)
-            else:
-                self._set_generic(section.name, section)
-
-    def _set_generic_dict(self, dtype, section_name, section_object):
-        d = getattr(self, dtype, None)
-        if not d:
-            d = myconfigparser.ConfigParserSection(section_name)
-            setattr(self, dtype, d)
-
-        d[section_name] = section_object
-
-    def _section_has_list(self, section_object):
-        l = section_object.items()
-        if not l:
-            return False
-
-        return l[0][1].value is None
-
-    def _set_generic(self, section_name, section_object):
-        if hasattr(self, section_name) and not self._section_has_list(section_object):
-            for key, value in getattr(self, section_name).iteritems():
-                section_object.setdefault(key, value)
-
-        setattr(self, section_name, section_object)
+                self.read(fname)
