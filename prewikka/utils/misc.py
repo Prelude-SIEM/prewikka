@@ -18,9 +18,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import os.path
 import time, sys, re, struct, urllib
 
-from prewikka import compat
+from prewikka import compat, env
 
 port_dict = {}
 read_done = False
@@ -190,6 +191,25 @@ def hexdump(content):
         i += 16
 
     return content
+
+
+def deprecated(func):
+    """This is a decorator which can be used to mark functions
+       as deprecated. It will result in a warning being emitted
+       when the function is used."""
+
+    def new_func(*args, **kwargs):
+        caller = sys._getframe(1)
+
+        filename = os.path.basename(caller.f_globals["__file__"])
+        if filename.endswith((".pyc", ".pyo")):
+            filename = filename[:-1]
+
+        env.log.warning("%s:%d call to deprecated function %s." % (filename, caller.f_lineno, func.__name__))
+        return func(*args, **kwargs)
+
+    return new_func
+
 
 
 if sys.hexversion >= 0x02070000:
