@@ -14,54 +14,13 @@
 }
 
 .heartbeat_analyze {
-    color: #333;
+    color: white;
     text-align: center;
-}
-
-.sensor_status_offline {
-    background-color: lightGray;
-}
-
-.sensor_status_missing {
-    background-color: lightCoral;
-}
-
-.sensor_status_unknown {
-    background-color: lightSalmon;
-}
-
-.sensor_status_online {
-    background-color: lightGreen;
 }
 
 .heartbeat_analyze_sensor_info {
     font-weight: bold;
     border-top: 10px;
-}
-
-table.locations, table.nodes, table.analyzers {
-    border-collapse: separate !important;
-}
-
-table.locations {
-    border: 2px solid @table-header;
-    border-spacing: 0;
-    border-radius: 5px 5px 0 0;
-}
-
-table.nodes {
-    margin-top: 1em;
-    border: 2px solid @table-header;
-    border-spacing: 0;
-    border-radius: 5px 5px 0 0;
-}
-
-table.analyzers {
-    border-radius: 0 0 5px 5px;
-}
-
-.show_all {
-    cursor: pointer;
 }
 
 .global_toggle {

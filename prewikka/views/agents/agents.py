@@ -17,10 +17,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import json
 import pkg_resources
 import time
 
-from prewikka import view, usergroup, utils, localization, env, mainmenu, hookmanager
+from prewikka import view, utils, localization, env, mainmenu, hookmanager
 from . import templates
 
 
@@ -29,6 +30,7 @@ class SensorListingParameters(mainmenu.MainMenuParameters):
         mainmenu.MainMenuParameters.register(self)
         self.optional("filter_path", str)
         self.optional("filter_value", str)
+        self.optional("status", list, default=[])
 
 
 class HeartbeatAnalyzeParameters(view.Parameters):
@@ -36,7 +38,7 @@ class HeartbeatAnalyzeParameters(view.Parameters):
         self.mandatory("analyzerid", str)
 
 
-class SensorMessagesDelete(SensorListingParameters):
+class SensorMessagesDeleteParameters(SensorListingParameters):
     def register(self):
         SensorListingParameters.register(self)
         self.optional("analyzerid", list, default=[])
@@ -58,94 +60,66 @@ class SensorListing(view.View):
         self._heartbeat_count = int(env.config.general.get("heartbeat_count", 30))
         self._heartbeat_error_margin = int(env.config.general.get("heartbeat_error_margin", 3))
 
-    def render(self):
-        analyzers = { }
-
+    def _get_analyzers(self):
         criteria = None
-        if self.parameters.has_key("filter_path"):
+        if "filter_path" in self.parameters:
             criteria = "%s == '%s'" % (self.parameters["filter_path"],
                                        utils.escape_criteria(self.parameters["filter_value"]))
 
-        locations = { }
-        nodes = { }
-
         for (analyzerid,) in env.idmef_db.getValues(["heartbeat.analyzer(-1).analyzerid/group_by"], criteria):
             analyzer, heartbeat = env.idmef_db.getAnalyzer(analyzerid)
+            status, status_text = utils.get_analyzer_status_from_latest_heartbeat(
+                heartbeat, self._heartbeat_error_margin
+            )
 
-            parameters = {"heartbeat.analyzer(-1).analyzerid": analyzer["analyzerid"]}
-            analyzer.heartbeat_listing = utils.create_link(view.getViewPath("HeartbeatListing"), parameters)
-            parameters = {"analyzer_object_0": "alert.analyzer.analyzerid",
-                          "analyzer_operator_0": "=",
-                          "analyzer_value_0": analyzer["analyzerid"]}
-            analyzer.alert_listing = utils.create_link(view.getViewPath("AlertListing"), parameters)
-            parameters = {"analyzerid": analyzer["analyzerid"]}
-            analyzer.heartbeat_analyze = utils.create_link(self.view_path + "/HeartbeatAnalyze", parameters)
-
-            node_key = ""
-            addresses = []
-            for addr in analyzer["node.address(*).address"]:
-                node_key += addr
-
-                address = {}
-                address["value"] = addr
-                address["inline_filter"] = utils.create_link(self.view_path,
-                                                             { "filter_path": "heartbeat.analyzer(-1).node.address(*).address",
-                                                               "filter_value": addr })
-
-                address["host_links"] = []
-                for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", addr):
-                    if typ == "host":
-                        address["host_links"].append((linkname, link, widget))
-
-                if "host" in env.url:
-                    for urlname, url in env.url["host"].items():
-                        address["host_links"].append((urlname.capitalize(), url.replace("$host", addr), False))
-
-                addresses.append(address)
-
-            analyzer.model_inline_filter = utils.create_link(self.view_path, { "filter_path": "heartbeat.analyzer(-1).model",
-                                                                               "filter_value": analyzer["model"] })
-
-            analyzer.status, analyzer.status_meaning = \
-                utils.get_analyzer_status_from_latest_heartbeat(heartbeat, self._heartbeat_error_margin)
+            if self.parameters["status"] and status not in self.parameters["status"]:
+                continue
 
             delta = float(heartbeat.get("create_time")) - time.time()
-            analyzer.last_heartbeat_time = localization.format_timedelta(delta, add_direction=True)
 
-            node_location = analyzer["node.location"] or _("Node location n/a")
-            node_name = analyzer.get("node.name") or _("Node name n/a")
+            parameters = {"heartbeat.analyzer(-1).analyzerid": analyzerid}
+            heartbeat_listing = utils.create_link(view.getViewPath("HeartbeatListing"), parameters)
+
+            parameters = {"analyzer_object_0": "alert.analyzer.analyzerid",
+                          "analyzer_operator_0": "=",
+                          "analyzer_value_0": analyzerid}
+            alert_listing = utils.create_link(view.getViewPath("AlertListing"), parameters)
+
+            parameters = {"analyzerid": analyzerid}
+            heartbeat_analyze = utils.create_link(self.view_path + "/HeartbeatAnalyze", parameters)
+
+            node_name = analyzer["node.name"] or _("Node name n/a")
             osversion = analyzer["osversion"] or _("OS version n/a")
             ostype = analyzer["ostype"] or _("OS type n/a")
 
-            node_key = node_name + osversion + ostype
+            yield {"id": analyzerid,
+                   "label": "%s - %s %s" % (node_name, ostype, osversion),
+                   "location": analyzer["node.location"] or _("Node location n/a"),
+                   "node": node_name,
+                   "name": analyzer["name"],
+                   "model": analyzer["model"],
+                   "class": analyzer["class"],
+                   "version": analyzer["version"],
+                   "latest_heartbeat": localization.format_timedelta(delta, add_direction=True),
+                   "status": status,
+                   "status_text": status_text,
+                   "links": [
+                       {"text": _("Alert listing"), "link": alert_listing},
+                       {"text": _("Heartbeat listing"), "link": heartbeat_listing},
+                       {"text": _("Heartbeat analysis"), "link": heartbeat_analyze,
+                        "class": "widget-link", "title": _("Heartbeat analysis")},
+                   ]}
 
-            if not locations.has_key(node_location):
-                locations[node_location] = { "total": 1, "missing": 0, "unknown": 0, "offline": 0, "online": 0, "nodes": { } }
-            else:
-                locations[node_location]["total"] += 1
+    def render(self):
+        analyzer_data = list(self._get_analyzers())
+        list(hookmanager.trigger("HOOK_AGENTS_EXTRA_CONTENT", analyzer_data))
 
-            if not locations[node_location]["nodes"].has_key(node_key):
-                locations[node_location]["nodes"][node_key] = { "total": 1, "missing": 0, "unknown": 0, "offline": 0, "online": 0,
-                                                                "analyzers": [ ],
-                                                                "node.name": node_name, "node.location": node_location,
-                                                                "ostype": ostype, "osversion": osversion,
-                                                                "node_addresses": addresses }
-            else:
-                locations[node_location]["nodes"][node_key]["total"] += 1
-
-            locations[node_location][analyzer.status] += 1
-            locations[node_location]["nodes"][node_key][analyzer.status] += 1
-
-            if analyzer.status in ["missing", "unknown"]:
-                locations[node_location]["nodes"][node_key]["analyzers"].insert(0, analyzer)
-            else:
-                locations[node_location]["nodes"][node_key]["analyzers"].append(analyzer)
-
-        self.dataset["locations"] = locations
+        self.dataset["data"] = utils.escape_attribute(json.dumps(analyzer_data))
+        self.dataset["extra_columns"] = list(hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN"))
 
 
 class SensorMessagesDelete(SensorListing):
-    view_parameters = SensorMessagesDelete
+    view_parameters = SensorMessagesDeleteParameters
     view_permissions = [ N_("IDMEF_VIEW"), N_("IDMEF_ALTER") ]
 
     def render(self):

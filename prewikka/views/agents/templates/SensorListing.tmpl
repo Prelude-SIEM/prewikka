@@ -1,243 +1,102 @@
-#import operator
-#from prewikka import env
-
-#def getDominantStatus($d)
-    #if $d["missing"] > 0 or $d["unknown"] > 0
-        #return "missing"
-    #end if
-
-    #return "online"
-#end def
-
 <link rel="stylesheet" type="text/css" href="agents/css/agents.css">
 
 <script type="text/javascript">
-<!--
-\$(document).ready(function() {
 
- \$(".fieldset_toggle").click(function(){
-    var \$d = \$(this).parent().next("div").next("div");
-
-    if ( \$d.is(':visible') ) {
-       \$d.hide('normal');
-    } else {
-       \$d.show('normal');
+    function statusAttr(rowId, value, rowObj) {
+        var status_classes = {"online": "success", "offline": "default", "unknown": "warning", "missing": "danger"};
+        return ' class="label-' + status_classes[rowObj.status] + '"';
     }
 
-    return false;
-  });
+    function nameFormatter(cellValue, opts, rowObj) {
+        var div = \$("<div>");
+        \$("<a>", {"class": "popup_menu_toggle"}).text(cellValue).appendTo(div);
+        var span = \$("<span>", {"class": "popup_menu"}).appendTo(div);
+        \$.each(rowObj.links, function(index, elem) {
+            \$("<a>", {
+                href: elem.link,
+                class: elem.class,
+                title: elem.title
+            }).text(elem.text).appendTo(span);
+        });
+        return div.html();
+    };
 
-  \$(".fieldset_toggle2").click(function(){
-        \$(this).prev().find(".fieldset_toggle").click();
-        return false;
-  });
+    var text = {'title': "$_('Agents')", 'search': "$_('Search:')"};
 
-  \$("td.offline, td.online, td.missing, td.unknown").click(function(){
-        var \$ctype = \$(this).prop('class').split(" ")[0];
-        var \$div = \$(this).parents("table").next("div");
-        var \$all_tr = \$("table tbody tr", \$div);
-
-        \$all_tr.filter(".tr_" + \$ctype).show();
-        \$all_tr.not(".tr_" + \$ctype).hide();
-        \$div.show('normal');
-
-        return false;
-  });
-
-  \$("td.show_all, th.show_all").click(function(){
-        var \$div = \$(this).parents("table").next("div");
-        var \$all_tr = \$("table tbody tr", \$div);
-        if ( \$div.is(':visible') && ! \$all_tr.is(':hidden') ) {
-                \$div.hide('normal');
-        } else {
-                \$all_tr.show();
-                \$div.show('normal');
+    var grid = CommonListing('table#agents', text, {
+        colNames: ["$_('Name')", "$_('Location')", "$_('Node')", "$_('Model')", "$_('Version')", "$_('Class')",
+                #for $column in $extra_columns
+                   "$column.label",
+                #end for
+                   "$_('Latest heartbeat')", "$_('Status')"],
+        colModel: [
+            {name: 'name', width: 15, formatter: nameFormatter},
+            {name: 'location', width: 15},
+            {name: 'label', width: 15},
+            {name: 'model', width: 10, sortable: false},
+            {name: 'version', width: 5, sortable: false},
+            {name: 'class', width: 10, sortable: false},
+            #for $column in $extra_columns
+            {name: '$column.name', width: 10, sortable: false},
+            #end for
+            {name: 'latest_heartbeat', width: 10, sortable: false},
+            {name: 'status_text', width: 5, sortable: false, align: 'center', classes: 'heartbeat_analyze', cellattr: statusAttr}
+        ],
+        data: \$.parseJSON("$data"),
+        globalSearch: true,
+        grouping: true,
+        groupingView: {
+            groupField: ["location", "label"],
+            groupColumnShow: [false, false],
+            groupText: ['<b>{0}</b> ({1} agents)', '<b>{0}</b> ({1} agents)'],
+            groupCollapse: false,
+            groupOrder: ['asc', 'asc'],
+            groupSummary: [false, false]
         }
+    });
 
-        return false;
-  });
-
-  \$(".global_toggle").click(function(){
-        var \$div = \$("td.show_all").parents("table").next("div");
-        var \$all_tr = \$("table tbody tr", \$div);
-        var \$d = \$(".fieldset_toggle").parent().next("div").next("div");
-        if ( \$div.is(':visible') && ! \$all_tr.is(':hidden') ) {
-                \$div.hide('normal');
-                \$d.hide('normal');
-        } else {
-                \$all_tr.show();
-                \$div.show('normal');
-                \$d.show('normal');
+    \$(".global_toggle").on("click", function() {
+        if ( \$("#agents .ui-icon-circlesmall-plus").length > 0 ) {
+            \$("#agents .ui-icon-circlesmall-plus").trigger("click");
+            \$("#agents .ui-icon-circlesmall-plus").trigger("click");
         }
+        else {
+            \$("#agents .ui-icon-circlesmall-minus").trigger("click");
+        }
+    });
 
-        return false;
-  });
-});
+    \$("form").on("submit", function() {
+        var form = this;
+        var rows = grid.getGridParam("selarrrow");
+        if ( rows.length == 0 || \$(this).data("confirm") ) return;
 
-//--></script>
+        \$.each(rows, function(index, row) {
+            \$("<input>", {"type": "hidden", "name": "analyzerid", "value": row}).appendTo(form);
+        });
+    });
+
+</script>
 
 #filter CleanOutput
 
-#if len($locations) > 0
- <form action="$document.href/SensorMessagesDelete" method="post">
-#end if
+<table id="agents"></table>
 
-<div id="fieldset_page">
+<button type="button" class="btn btn-default btn-sm global_toggle">$_("Show/Hide all")</button>
 
-<input class="btn btn-default btn-sm global_toggle" type="submit" value="$_("Show/Hide all")" />
+<form action="$document.href/SensorMessagesDelete" method="post">
 
-#set $listing = $locations.keys()
-$listing.sort()
-
-#for $entry in $listing:
- <fieldset class="fieldset_heading">
-  #set $dominant = $getDominantStatus($locations[$entry])
-  #set $dclass = "heartbeat_analyze sensor_status_" + $dominant
-
-  #if $dominant != "online"
-   #set $display = "block"
-  #else
-   #set $display = "none"
-  #end if
-
-  <legend>
-    <a href="#" class="fieldset_toggle">$entry</a>
-  </legend>
-       #set $nlen = $len($locations[$entry]["nodes"])
-       #set $alen = $locations[$entry]["total"]
-       <div>$str($ngettext("%d Node", "%d Nodes", $nlen) % $nlen), $str($ngettext("%d Agent", "%d Agents", $alen) % $alen),
-       #for $i in ( ("online",  $ngettext("%d Online", "%d Onlines", $locations[$entry]["online"])),
-                    ("offline", $ngettext("%d Offline", "%d Offlines", $locations[$entry]["offline"])),
-                    ("unknown", $ngettext("%d Unknown", "%d Unknowns", $locations[$entry]["unknown"])),
-                    ("missing", $ngettext("%d Missing", "%d Missings", $locations[$entry]["missing"])))
-        #if $locations[$entry][$i[0]] > 0
-      <span class="heartbeat_analyze sensor_status_$i[0]">$str($i[1] % $locations[$entry][$i[0]])</span>
-        #end if
-       #end for
-      </div>
-   <div class="nodash" style="display: $display">
-   #set $nlisting = $sorted($locations[$entry]["nodes"].values(), key=operator.itemgetter("missing", "node.name"))
-
-   #for $node in $nlisting
-    #set $dominant = $getDominantStatus($node)
-    #set $dclass = "heartbeat_analyze sensor_status_" + dominant
-
-    #if $dominant != "online"
-     #set $display = "block"
-    #else
-     #set $display = "none"
-    #end if
-
-    <table class="nodes">
-     <thead style="width: 100%;">
-      <tr class="$dclass">
-        <th class="show_all">$node["node.name"]</th>
-        <th>
-         #for $addr in $node.node_addresses
-          <a class="popup_menu_toggle">$addr.value</a>
-          <span class="popup_menu">
-           <a href="$addr.inline_filter">$_("Filter on address")</a>
-           #if $env.enable_details
-           <a target="$env.external_link_target" href="$env.host_details_url?host=$addr.value">$_("Address information")</a>
-           #end if
-           #for $name, $link, $widget in $addr.host_links
-            #if $widget
-            <a href="$link" class="widget-link" title="$name">$name</a>
-            #else
-            <a href="$link" target="_$name">$name</a>
-            #end if
-           #end for
-          </span>
-          <br/>
-         #end for
-        </th>
-        <th>$node.ostype</th>
-        <th>$node.osversion</th>
-        <th>
-
-         <table class="sensors">
-          <tr>
-           <td class="show_all" style="background-color: white; width: 60px; text-align: center;">
-            $_("Total:") <a href="#">$node["total"]</a>
-           </td>
-           #for $i in ("online", "offline", "unknown", "missing")
-            #if $node[$i] > 0
-           <td class="$i heartbeat_analyze sensor_status_$i" style="cursor: pointer;">
-            <a href="#">$node[$i]</a>
-           </td>
-            #end if
-           #end for
-          </tr>
-         </table>
-
-        </th>
-      </tr>
-     </thead>
-    </table>
-
-    <div style="display: $display">
-    <table class="table table-striped table-bordered table-rounded table-condensed">
-     <thead>
-      <tr class="tr_header">
-       <th style="width: 5%">$_("Delete")</th>
-       <th style="width: 20%">$_("Name")</th>
-       <th style="width: 20%">$_("Model")</th>
-       <th style="width: 5%">$_("Version")</th>
-       <th style="width: 20%">$_("Class")</th>
-       <th style="width: 20%">$_("Latest heartbeat")</th>
-       <th style="width: 10%; text-align: center;">$_("Status")</th>
-      </tr>
-     </thead>
-     <tbody>
-     #for $analyzer in $node.analyzers
-      <tr class="tr_$analyzer.status">
-       <td style="padding-top: 0px; padding-bottom: 0px;"><input class="checkbox" type="checkbox" name="analyzerid" value="$analyzer["analyzerid"]" /></td>
-
-       <td>
-        <a class="popup_menu_toggle">$analyzer.name</a>
-        <span class="popup_menu">
-         <a href="$analyzer.alert_listing">$_("Alert listing")</a>
-         <a href="$analyzer.heartbeat_listing">$_("Heartbeat listing")</a>
-         <a href="$analyzer.heartbeat_analyze">$_("Heartbeat analysis")</a>
-        </span>
-       </td>
-       <td>
-        <a class="popup_menu_toggle">$analyzer.model</a>
-        <span class="popup_menu">
-         <a href="$analyzer.model_inline_filter">$_("Filter on model")</a>
-        </span>
-       </td>
-       <td>$analyzer.version</td>
-       <td>$analyzer.class</td>
-       <td>$analyzer.last_heartbeat_time</td>
-       <td style="text-align: center;" class="heartbeat_analyze sensor_status_$analyzer.status">$analyzer.status_meaning</td>
-      </tr>
-     #end for
-     </tbody>
-    </table>
-    </div>
-   #end for
-  </div>
- </fieldset>
-
-<br />
-#end for
-
-#if len($locations) > 0
-  <div class="pull-right form-inline">
-    <div class="form-group">
-      <label for="agent_delete_alerts">$_("Alerts")</label>
+  <div class="footer-buttons form-inline">
+    <div class="checkbox">
       <input id="agent_delete_alerts" class="checkbox" type="checkbox" name="alerts" />
+      <label for="agent_delete_alerts">$_("Alerts")</label>
     </div>
-    <div class="form-group">
-      <label for="agent_delete_heartbeats">$_("Heartbeats")</label>
+    <div class="checkbox">
       <input id="agent_delete_heartbeats" class="checkbox" type="checkbox" name="heartbeats" />
+      <label for="agent_delete_heartbeats">$_("Heartbeats")</label>
     </div>
-    &nbsp;<button class="btn btn-danger" type="submit" value="$_("Delete")" data-confirm="$_("Delete the selected IDMEF messages?")"><i class="fa fa-trash"></i> $_("Delete")</button>
+    &nbsp;<button class="btn btn-danger needone" type="submit" value="$_("Delete")" data-confirm="$_("Delete the selected IDMEF messages?")"><i class="fa fa-trash"></i> $_("Delete")</button>
   </div>
-#end if
 
-</div>
 </form>
 
 #end filter

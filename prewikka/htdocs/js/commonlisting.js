@@ -2,13 +2,16 @@ function CommonListing(elem, text, options) {
 
     $(elem).addClass("commonlisting");
 
-    options['colModel'][0].formatter = function(cellValue, opts, rowObj) {
-        var link = $('<a>').prop("class", "widget-link")
-                           .prop("title", rowObj.title)
-                           .prop("href", rowObj.link)
-                           .text(cellValue);
-        return link.wrap("<div>").parent().html();
-    };
+    if ( ! options['colModel'][0].formatter ) {
+        options['colModel'][0].formatter = function(cellValue, opts, rowObj) {
+            var link = $('<a>', {
+                class: rowObj.class || "widget-link",
+                title: rowObj.title,
+                href: rowObj.link
+            }).text(cellValue);
+            return link.wrap("<div>").parent().html();
+        };
+    }
 
     options = _mergedict({
         gridview: true,
