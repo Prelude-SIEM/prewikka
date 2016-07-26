@@ -21,6 +21,7 @@
 import operator, json, time
 from copy import copy
 from prewikka import pluginmanager, template, usergroup, error, log, utils, env, hookmanager
+from prewikka.response import PrewikkaResponse
 
 
 logger = log.getLogger(__name__)
@@ -323,8 +324,15 @@ class _View(object):
     view_parent = None
     view_help = None
     view_extensions = []
+    view_layout = "BaseView"
 
     def render(self):
+        pass
+
+    def _render(self):
+        if self.dataset is not None:
+            _VIEWS["baseview"].setup_dataset(self.dataset)
+
         for name, classobj in self.view_extensions:
             obj = classobj()
             setattr(self, name, obj)
@@ -332,22 +340,21 @@ class _View(object):
             obj.render()
 
     def respond(self):
-        content = self.render()
+        self._render()
+        response = self.render()
 
-        if not content and self.dataset is not None:
-            content = self.dataset.render()
+        if response and not issubclass(response.__class__, PrewikkaResponse):
+            response = PrewikkaResponse(response)
 
-        if env.request.web.is_xhr:
-            data = { "content": content }
+        if not response:
+            response = PrewikkaResponse(self.dataset.render() if self.dataset else None)
 
-            if self.dataset:
-                for name, clname in self.view_extensions:
-                    obj = getattr(self, name)
-                    data[name] = obj.dataset.render([dict(self.dataset or {})])
+        if self.dataset:
+            for name, clname in self.view_extensions:
+                obj = getattr(self, name)
+                response.ext_content[name] = obj.dataset.render([dict(self.dataset or {})])
 
-            content = json.dumps(data)
-
-        return content
+        return response
 
     def __init__(self):
         if not self.view_id:
@@ -414,13 +421,15 @@ class ViewManager:
 
     def loadView(self, request, userl):
         view_id = self.getViewID(request)
-        if not request.is_xhr and not request.is_stream and not view_id == "logout" and not "_download" in request.arguments:
-            view_id = "BaseView"
-
         if view_id:
             view = self.getView(view_id)
         else:
             view = next((x for x in hookmanager.trigger("HOOK_VIEW_LOAD", request, userl) if x), None)
+
+        view_layout = view.view_layout if view else "BaseView"
+
+        if not request.is_xhr and not request.is_stream and view_layout and not "_download" in request.arguments:
+            view = self.getView(view_layout)
 
         if not view:
             raise InvalidViewError(_("View '%s' does not exist") % request.getView())
@@ -450,6 +459,10 @@ class ViewManager:
         self._views[view.view_id] = view
 
     def loadViews(self):
+        #Import here, because of cyclic dependency
+        from baseview import BaseView
+        self.addView(BaseView())
+
         for view_class in sorted(pluginmanager.PluginManager("prewikka.views"), key=operator.attrgetter("view_order")):
                 try:
                         vi = view_class()

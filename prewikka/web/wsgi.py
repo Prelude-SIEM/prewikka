@@ -66,14 +66,17 @@ class WSGIRequest(request.Request):
     def write(self, data):
         self._write(data)
 
-    def sendHeaders(self, code=200, status_text=None):
+    def sendHeaders(self, headers, code=200, status_text=None):
+        if not headers:
+            headers = self.output_headers
+
         if self.output_cookie:
-            self.output_headers.extend(("Set-Cookie", c.OutputString()) for c in self.output_cookie.values())
+            headers.extend(("Set-Cookie", c.OutputString()) for c in self.output_cookie.values())
 
         if not status_text:
             status_text = defined_status.get(code, "Unknown")
 
-        self._write = self._start_response("%d %s" % (code, status_text), self.output_headers)
+        self._write = self._start_response("%d %s" % (code, status_text), headers)
 
     def getHeader(self, name):
         return self._environ[name]
