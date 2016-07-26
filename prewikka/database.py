@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time, abc, fcntl
+import time, abc, fcntl, types
 import re, operator, pkg_resources, pkgutil
 from datetime import datetime
 
@@ -459,9 +459,29 @@ class Database(preludedb.SQL):
 
         return dict((i[0], ModuleInfo(i[1], i[2], int(i[3]))) for i in rows)
 
+    def _prefilter_iterate(self, l):
+        tmp = []
+        for v in l:
+            tmp.append(str(self.escape(v)))
+
+        if self.__ESCAPE_PREFILTER.get(type(v)) == self._prefilter_iterate:
+            fmt = '%s'
+        else:
+            fmt = '(%s)'
+
+        return fmt % ', '.join(tmp)
+
     @_fix_exception
     def __init__(self, config):
         env.db = self
+
+        self.__ESCAPE_PREFILTER = {
+                datetime: lambda date: self.escape(date.strftime("%Y-%m-%d %H:%M:%S")),
+                set: self._prefilter_iterate,
+                list: self._prefilter_iterate,
+                tuple: self._prefilter_iterate,
+                types.GeneratorType: self._prefilter_iterate
+        }
 
         settings = { "host": "localhost", "name": "prewikka", "user": "prewikka", "type": "mysql" }
         settings.update([(k, str(v)) for k, v in config.items()])
@@ -515,6 +535,10 @@ class Database(preludedb.SQL):
         return datetime.strptime(date, '%Y-%m-%d %H:%M:%S').replace(tzinfo=utils.timeutil.timezone("UTC"))
 
     def escape(self, data):
+        prefilter = self.__ESCAPE_PREFILTER.get(type(data))
+        if prefilter:
+            return prefilter(data)
+
         if not isinstance(data, compat.STRING_TYPES):
             return data if data is not None else "NULL"
 
