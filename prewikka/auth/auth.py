@@ -40,13 +40,10 @@ class _AuthUser(object):
         return "setPassword" in self.__class__.__dict__
 
     def createUser(self, user):
-        for i in hookmanager.trigger("HOOK_USER_CREATE", user):
-            continue
+        list(hookmanager.trigger("HOOK_USER_CREATE", user))
 
     def deleteUser(self, user):
-        for i in hookmanager.trigger("HOOK_USER_DELETE", user):
-            continue
-
+        list(hookmanager.trigger("HOOK_USER_DELETE", user))
         env.db.del_properties(user)
 
     @abc.abstractmethod
@@ -86,12 +83,10 @@ class _AuthGroup(object):
         return []
 
     def createGroup(self, group):
-        for i in hookmanager.trigger("HOOK_GROUP_CREATE", group):
-            continue
+        list(hookmanager.trigger("HOOK_GROUP_CREATE", group))
 
     def deleteGroup(self, group):
-        for i in hookmanager.trigger("HOOK_GROUP_DELETE", group):
-            continue
+        list(hookmanager.trigger("HOOK_GROUP_DELETE", group))
 
     def setGroupPermissions(self, group, permissions):
         pass
