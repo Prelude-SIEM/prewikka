@@ -690,7 +690,7 @@ class AlertListing(MessageListing):
 
     def __init__(self):
         MessageListing.__init__(self)
-        self._max_aggregated_classifications = int(env.config.general.get("max_aggregated_classifications", 10))
+        self._max_aggregated_classification = int(env.config.general.get("max_aggregated_classification", 10))
 
     def _getMessageIdents(self, criteria, limit=-1, offset=-1, order_by="time_desc"):
         return env.idmef_db.getAlertIdents(criteria, limit, offset, order_by)
@@ -944,7 +944,7 @@ class AlertListing(MessageListing):
 
         result_count = 0
         for classification, severity, completion, count, messageid in res:
-            if result_count >= self._max_aggregated_classifications:
+            if result_count >= self._max_aggregated_classification:
                 continue
 
             result_count += 1
