@@ -61,10 +61,14 @@ class QueryResults:
         # Normalize the input
         if isinstance(key, slice):
             start = key.start
-            if start < 0:
+            if not start:
+                start = 0
+            elif start < 0:
                 start = min(0, len(self) + start)
             stop = key.stop
-            if stop < 0:
+            if not stop:
+                stop = len(self)
+            elif stop < 0:
                 stop = min(0, len(self) + stop)
         else:
             start = key
