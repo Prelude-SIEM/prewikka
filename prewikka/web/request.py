@@ -20,7 +20,20 @@
 
 import sys, os, os.path, time, copy, Cookie
 import mimetypes, urllib, cgi
-from prewikka import env
+from prewikka import env, error
+from prewikka.response import PrewikkaResponse, PrewikkaDownloadResponse
+
+_ADDITIONAL_MIME_TYPES = [("application/vnd.oasis.opendocument.formula-template", ".otf"),
+                          ("application/vnd.ms-fontobject", ".eot"),
+                          ("image/vnd.microsoft.icon", ".ico"),
+                          ("application/font-woff", ".woff"),
+                          ("application/font-sfnt", ".ttf"),
+                          ("application/json", ".map"),
+                          ("font/woff2", ".woff2")]
+
+for mtype, extension in _ADDITIONAL_MIME_TYPES:
+    mimetypes.add_type(mtype, extension)
+
 
 class BufferedWriter:
         def __init__(self, wcb, buffersize=8192):
@@ -70,18 +83,6 @@ class Request:
 
         self.output_cookie = None
 
-        self.content = None
-        self.force_download = False
-
-    def forceDownload(self, filename, type="application/force-download", size=None):
-        self.force_download = True
-        self.output_headers = [ ("Content-Type", type),
-                                ("Content-Disposition", "attachment; filename=%s" % filename),
-                                ("Pragma", "public"),
-                                ("Cache-Control", "max-age=0") ]
-        if size:
-            self.output_headers.append(("Content-length", str(size)))
-
     def addCookie(self, param, value, expires, path="/"):
         if not self.output_cookie:
             self.output_cookie = Cookie.SimpleCookie()
@@ -101,11 +102,14 @@ class Request:
     def write(self, data):
         pass
 
-    def sendHeaders(self, code=200, status_text=None):
-        if self.output_cookie:
-            self.output_headers.extend(("Set-Cookie", c.OutputString()) for c in self.output_cookie.values())
+    def sendHeaders(self, headers=None, code="200", staus_text=None):
+        if not headers:
+            headers = self.output_headers
 
-        for name, value in self.output_headers:
+        if self.output_cookie:
+            headers.extend(("Set-Cookie", c.OutputString()) for c in self.output_cookie.values())
+
+        for name, value in headers:
             self.sendHeader(name, value)
 
         self.endHeaders()
@@ -118,7 +122,7 @@ class Request:
 
     def sendRedirect(self, location, redirect_code=307):
         self.output_headers = [('Location', location)]
-        self.sendResponse(code=redirect_code, status_text="%d Redirect" % redirect_code)
+        self.sendResponse(None, code=redirect_code, status_text="%d Redirect" % redirect_code)
 
     def sendStream(self, data, event=None, evid=None, retry=None, sync=False):
         if self._buffer is None:
@@ -126,8 +130,7 @@ class Request:
             self._buffer = BufferedWriter(self.write)
             self.write = self._buffer.write
 
-            self.output_headers = [("Content-Type", "text/event-stream")]
-            self.sendHeaders()
+            self.sendHeaders([("Content-Type", "text/event-stream")])
 
             if retry:
                  self._buffer.write("retry: %d\n" % retry)
@@ -143,18 +146,50 @@ class Request:
         if sync:
                 self._buffer.flush()
 
-    def sendResponse(self, code=200, status_text=None):
-        if self.is_stream:
-            # This was an event stream
-            self.sendStream("close", event="close")
-            self._buffer.flush()
-            return
+    def sendResponse(self, response, code=200, status_text=None):
+        """Send a PrewikkaResponse response."""
 
-        self.sendHeaders(code, status_text)
+        if not response:
+            response = PrewikkaResponse()
 
-        if self.content:
-            self.write(self.content)
+        if env.request.web.is_stream:
+            if isinstance(response.html, error.PrewikkaUserError):
+                env.request.web.sendStream(response.content(), event="error")
+                return
 
+            env.request.web.close_stream()
+
+        if response.code:
+            code = response.code
+
+        if response.status_text:
+            status_text = response.status_text
+
+        if response.force_download:
+            self.force_download(response.filename, response.type, response.size)
+
+        env.request.web.sendHeaders(self.output_headers, code, status_text)
+
+        html = response.content()
+        if html:
+            env.request.web.write(html)
+
+    def force_download(self, filename, type, size):
+        """Add file download headers."""
+
+        self.output_headers = [
+            ("Content-Type", type),
+            ("Content-Disposition", "attachment; filename=%s" % filename),
+            ("Pragma", "public"),
+            ("Cache-Control", "max-age=0")
+        ]
+        if size:
+            self.output_headers.append(("Content-length", str(size)))
+
+    def close_stream(self):
+        """Close the stream."""
+        self.sendStream("close", event="close")
+        self._buffer.flush()
 
     def resolveStaticPath(self, fname):
         pathmap = env.htdocs_mapping
@@ -166,7 +201,7 @@ class Request:
 
         path = os.path.abspath(os.path.join(mapping, urllib.unquote(fname[len(pathkey) + 2:])))
         if not path.startswith(mapping):
-                self.sendResponse(403, status_text="Request Forbidden")
+                self.sendResponse(None, 403, status_text="Request Forbidden")
                 return
 
         # If the path doesn't exist or is not a regular file return None so that prewikka
@@ -177,7 +212,7 @@ class Request:
         try:
                 fd = open(path, "r")
         except:
-                self.sendResponse(404, status_text="File not found")
+                self.sendResponse(None, 404, status_text="File not found")
                 return
 
         stat = os.fstat(fd.fileno())

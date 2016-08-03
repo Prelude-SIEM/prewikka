@@ -76,9 +76,9 @@ class PrewikkaRequestHandler(request.Request, BaseHTTPServer.BaseHTTPRequestHand
 
         self.server.core.process(self)
 
-    def sendHeaders(self, code=200, status_text=None):
+    def sendHeaders(self, headers=None, code=200, status_text=None):
         self.send_response(code)
-        request.Request.sendHeaders(self)
+        request.Request.sendHeaders(self, headers)
 
     def getMethod(self):
         return self._method

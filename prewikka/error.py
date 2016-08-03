@@ -17,8 +17,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import sys, traceback, StringIO
-from prewikka import template, log
+import sys
+import traceback
+import json
+
+from prewikka import template, log, env, response
 from prewikka.templates import ErrorTemplate
 
 
@@ -65,17 +68,37 @@ class PrewikkaUserError(PrewikkaError):
             if exc_tb:
                 self.traceback = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
 
-    def setupDataset(self):
-        dataset = template.PrewikkaTemplate(self.template)
-        dataset["name"] = self.name
-        dataset["message"] = self.message
-        dataset["code"] = self.code
-        dataset["traceback"] = self.traceback
+    def _html_respond(self):
+        from prewikka import baseview
 
-        return dataset
+        v = baseview.BaseView()
+        v.dataset = template.PrewikkaTemplate(self.template)
+
+        for i in ("name", "message", "code", "traceback"):
+            v.dataset[i] = getattr(self, i)
+
+        return v.respond()
+
+    def respond(self):
+        if str(self):
+            env.log.log(self.log_priority, self)
+
+        if not (env.request.web.is_stream or env.request.web.is_xhr):
+            # This case should only occur in case of auth error (and viewmgr might not exist at this time)
+            return self._html_respond()
+
+        return response.PrewikkaResponse(self, code=self.code)
 
     def __str__(self):
         return self.message
+
+    def __json__(self):
+        return {
+            "name": self.name,
+            "message": self.message,
+            "code": self.code,
+            "traceback": self.traceback
+        }
 
 
 class PrewikkaInvalidQueryError(PrewikkaUserError):

@@ -21,7 +21,6 @@ import pkg_resources
 import os
 import prelude
 import preludedb
-import json
 import mimetypes
 
 try:
@@ -31,117 +30,20 @@ except ImportError:
 
 
 from prewikka import view, config, log, database, idmefdatabase, version, \
-                     auth, error, utils, localization, resolve, theme, \
+                     auth, error, localization, resolve, \
                      pluginmanager, renderer, env, dataprovider, menu, \
-                     siteconfig, template, resource, hookmanager
+                     siteconfig, hookmanager, response
 
-from prewikka.templates import ClassicLayout
 from prewikka.utils import viewhelpers
-
-
-_CSS_FILES = [resource.CSSLink(link) for link in (
-    "prewikka/css/jquery-ui.min.css",
-    "prewikka/css/bootstrap.min.css",
-    "prewikka/css/jquery.jstree.css",
-    "prewikka/css/jquery-ui-timepicker-addon.min.css",
-    "prewikka/css/font-awesome.min.css",
-    "prewikka/css/ui.jqgrid.min.css",
-    "prewikka/css/ui.multiselect.css",
-    "prewikka/css/loader.css")
-]
-
-_JS_FILES = [resource.JSLink(link) for link in (
-    "prewikka/js/jquery.js",
-    "prewikka/js/jquery-ui.min.js",
-    "prewikka/js/bootstrap.min.js",
-    "prewikka/js/functions.js",
-    "prewikka/js/ajax.js",
-    "prewikka/js/underscore-min.js",
-    "prewikka/js/jquery-ui-timepicker-addon.min.js",
-    "prewikka/js/ui.multiselect.js",
-    "prewikka/js/jquery.jqgrid.min.js",
-    "prewikka/js/commonlisting.js",
-    "prewikka/js/jquery.jstree.js")
-]
-
-_ADDITIONAL_MIME_TYPES = [("application/vnd.oasis.opendocument.formula-template", ".otf"),
-                          ("application/vnd.ms-fontobject", ".eot"),
-                          ("image/vnd.microsoft.icon", ".ico"),
-                          ("application/font-woff", ".woff"),
-                          ("application/font-sfnt", ".ttf"),
-                          ("application/json", ".map"),
-                          ("font/woff2", ".woff2")]
-
-for mtype, extension in _ADDITIONAL_MIME_TYPES:
-    mimetypes.add_type(mtype, extension)
 
 
 class Logout(view._View):
     view_parameters = view.Parameters
     view_permissions = []
+    view_layout = None
 
     def render(self):
         env.session.logout(env.request.web)
-
-
-class BaseView(view._View):
-    view_template = ClassicLayout.ClassicLayout
-
-    def render(self):
-        self._render(self.dataset)
-
-    def _render(self, dataset):
-        user = env.request.user
-        interface = env.config.interface
-
-        # The database attribute might be None in case of initialisation error
-        # FIXME: move me to a plugin !
-        try:
-            theme_name = user.get_property("theme", default=env.config.general.default_theme)
-        except:
-            theme_name = env.config.general.default_theme
-
-        dataset["document.title"] = interface.get("browser_title", "Prelude OSS")
-
-        theme_file = resource.CSSLink("prewikka/css/themes/%s.css" % theme_name)
-        head = _CSS_FILES + [theme_file] + _JS_FILES
-
-        for i in hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT"):
-            head += (content for content in i if content not in head)
-
-        dataset["document.head_content"] = head
-
-        dataset["prewikka.favicon"] = interface.get(
-            "favicon",
-            "prewikka/images/favicon.ico"
-        )
-        dataset["prewikka.software"] = interface.get(
-            "software",
-            "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />"
-        )
-
-        dataset["prewikka.date"] = localization.format_date()
-        if user:
-            if interface.get("user_display") == "name":
-                dataset["prewikka.user_display"] = user.get_property("fullname", default=user.name)
-            else:
-                dataset["prewikka.user_display"] = user.name
-
-        dataset["prewikka.logout_link"] = (user and env.session.can_logout()) and utils.create_link("logout") or None
-
-        try:
-            paths = env.request.web.getViewElements()
-            active_section, active_tab = paths[0], paths[1]
-        except:
-            active_section, active_tab = "", ""
-
-        dataset["interface.active_tab"] = active_tab
-        dataset["interface.active_section"] = active_section
-        dataset["interface.sections"] = env.menumanager.get_sections(user) if env.menumanager else {}
-        dataset["interface.menu"] = env.menumanager.get_menus(user) if env.menumanager else {}
-        dataset["toplayout_extra_content"] = ""
-
-        all(hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT", dataset))
 
 
 _core_cache = {}
@@ -298,7 +200,6 @@ class Core:
             self._load_auth_or_session("session", _SESSION_PLUGINS, "anonymous")
             env.auth = env.session
 
-        env.viewmanager.addView(BaseView())
         env.viewmanager.addView(viewhelpers.AjaxHostURL())
         if env.session.can_logout():
                 env.viewmanager.addView(Logout())
@@ -306,41 +207,6 @@ class Core:
         env.renderer = renderer.RendererPluginManager()
 
         self._last_plugin_activation_change = last_change or env.db.get_last_plugin_activation_change()
-
-    def _setupDataSet(self, dataset):
-        dataset["document.base_url"] = env.request.web.getBaseURL()
-        dataset["document.fullhref"] = "/".join(env.request.web.getViewElements()) # Needed for view that aren't completly ported to ajax
-        dataset["document.href"] = "/".join(env.request.web.getViewElements()[0:2]) # Subview are hidden
-        dataset["document.request_method"] = env.request.web.getMethod()
-        dataset["document.query_string"] = env.request.web.getQueryString()
-        dataset["document.charset"] = localization.getCurrentCharset()
-        dataset["toplayout_extra_content"] = ""
-        dataset["prewikka.user"] = env.request.user
-        dataset["prewikka.about"] = utils.create_link("About")
-
-    def handleError(self, err):
-        dataset, template_name = None, None
-
-        if not isinstance(err, error.PrewikkaUserError):
-            err = error.PrewikkaUserError(_("Prelude internal error"), err, display_traceback=True)
-
-        if str(err):
-            env.log.log(err.log_priority, err)
-
-        if env.request.web.is_stream or env.request.web.is_xhr:
-            env.request.web.content = json.dumps({"name": err.name, "message": err.message, "code": err.code, "traceback": err.traceback})
-            if env.request.web.is_stream:
-                env.request.web.sendStream(env.request.web.content, event="error")
-                env.request.web.content = None
-
-        else:
-            # This case should only occur in case of auth error (and viewmgr might not exist at this time)
-            dataset = err.setupDataset()
-            v = BaseView()
-            v._render(dataset)
-            self._setupDataSet(dataset)
-
-        return dataset
 
     def _reload_plugin_if_needed(self):
         last = env.db.get_last_plugin_activation_change()
@@ -355,8 +221,6 @@ class Core:
 
     def process(self, request):
         env.request.init(request)
-
-        http_rcode = 200
         view_object = None
 
         encoding = env.config.general.get("encoding", "utf8")
@@ -378,23 +242,17 @@ class Core:
                 raise error.RedirectionError("%s%s" % (request.getBaseURL(), default_view), 302)
 
             env.request.view = view_object = env.viewmanager.loadView(request, user)
-            if view_object.dataset is not None:
-                self._setupDataSet(view_object.dataset)
 
             resolve.process(env.dns_max_delay)
-            request.content = view_object.respond()
+            response = view_object.respond()
 
         except error.RedirectionError as err:
             return request.sendRedirect(err.location, err.code)
 
+        except error.PrewikkaUserError as err:
+            response = err.respond()
+
         except Exception, err:
-            http_rcode = getattr(err, "code", 500)
+            response = error.PrewikkaUserError(_("Prelude internal error"), err, display_traceback=True).respond()
 
-            dataset = self.handleError(err)
-            if dataset:
-                request.content = dataset.render()
-
-        if request.content and request.force_download != True:
-            request.content = request.content.encode(encoding, "xmlcharrefreplace")
-
-        request.sendResponse(http_rcode)
+        request.sendResponse(response)
