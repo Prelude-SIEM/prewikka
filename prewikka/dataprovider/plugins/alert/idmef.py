@@ -6,20 +6,19 @@ from datetime import datetime
 from prelude import IDMEFTime
 
 from prewikka import pluginmanager, version, env, usergroup, utils
-from prewikka.dataprovider import QueryResults, DataProviderBackend
+from prewikka.dataprovider import QueryResults, DataProviderBackend, QueryResultsRow
+
+class IDMEFQueryResultsRow(QueryResultsRow):
+    def preprocess_value(self, value):
+        if isinstance(value, IDMEFTime):
+            return datetime.fromtimestamp(value, utils.timeutil.tzoffset(None, value.getGmtOffset()))
+
+        return value
 
 
 class IDMEFQueryResults(QueryResults):
-    def _convert_values(self, row):
-        res = []
-        for elt in row:
-            if isinstance(elt, IDMEFTime):
-                elt = datetime.fromtimestamp(elt, utils.timeutil.tzoffset(None, elt.getGmtOffset()))
-
-            res.append(elt)
-
-        return res
-
+    def preprocess_value(self, value):
+        return IDMEFQueryResultsRow(value, self.paths_types)
 
 class IDMEFAlertPlugin(DataProviderBackend):
     type = "alert"

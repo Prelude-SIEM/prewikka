@@ -211,6 +211,49 @@ def deprecated(func):
     return new_func
 
 
+class CachingIterator(object):
+    def __init__(self, items):
+        self._count = None
+        self._cache = []
+        self._items = iter(items)
+
+    def __len__(self):
+        if self._count is None:
+            for i in self:
+                pass
+
+            self._count = len(self._cache)
+
+        return self._count
+
+    def preprocess_value(self, value):
+        return value
+
+    def __iter__(self):
+        for i in self._cache:
+            yield i
+
+        for i in self._items:
+            value = self.preprocess_value(i)
+            self._cache.append(value)
+            yield value
+
+    def __getitem__(self, key):
+        if isinstance(key, slice) :
+            return [self[i] for i in xrange(*key.indices(len(self)))]
+
+        elif isinstance(key, int):
+            if key < 0:
+                key += len(self)
+
+        try:
+            for i in xrange((key + 1) - len(self._cache)):
+                self._cache.append(self.preprocess_value(next(self._items)))
+        except StopIteration:
+            raise IndexError
+
+        return self._cache[key]
+
 
 if sys.hexversion >= 0x02070000:
         from collections import OrderedDict

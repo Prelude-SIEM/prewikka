@@ -22,6 +22,7 @@ from datetime import datetime
 
 from prewikka import pluginmanager, error, env
 from prewikka.utils.timeutil import parser
+from prewikka.utils import CachingIterator
 
 
 def _str_to_datetime(date):
@@ -61,75 +62,33 @@ class NoBackendError(DataProviderError):
     pass
 
 
-class QueryResults(object):
+class QueryResultsRow(CachingIterator):
+    def __init__(self, items, types):
+        CachingIterator.__init__(self, items)
+        self._types = types
+
+    def preprocess_value(self, value):
+        type = self._types[len(self._cache)]
+        try:
+            return TYPES_FUNC_MAP[type](value)
+        except (KeyError, ValueError):
+            raise error.PrewikkaUserError(N_("Conversion error"),
+                                          N_("Value '%r' cannot be converted to %s" % (value, type)))
+
+
+class QueryResults(CachingIterator):
     def __init__(self, duration=-1, count=None, rows=None):
-        self._duration = duration
-        self._rows = iter(rows)
+        CachingIterator.__init__(self, rows)
         self._count = count
-        self._cache = []
+        self._duration = duration
         self.paths_types = []
 
     @property
     def duration(self):
         return self._duration
 
-    def _convert_values(self, row):
-        res = []
-        for elt, type in zip(row, self.paths_types):
-            try:
-                res.append(TYPES_FUNC_MAP[type](elt) if elt else None)
-            except (KeyError, ValueError):
-                raise error.PrewikkaUserError(N_("Conversion error"),
-                                              N_("Value '%r' cannot be converted to %s" % (elt, type)))
-        return res
-
-    def __len__(self):
-        if self._count is None:
-            for _dummy in iter(self):
-                pass # Throw the value away: we don't need it
-            self._count = len(self._cache)
-        return self._count
-
-    def __iter__(self):
-        for row in self._cache:
-            yield row
-
-        while True:
-            res = self._convert_values(next(self._rows))
-            self._cache.append(res)
-            yield res
-
-    def __getitem__(self, key):
-        # Normalize the input
-        if isinstance(key, slice):
-            start = key.start
-            if not start:
-                start = 0
-            elif start < 0:
-                start = min(0, len(self) + start)
-            stop = key.stop
-            if not stop:
-                stop = len(self)
-            elif stop < 0:
-                stop = min(0, len(self) + stop)
-        else:
-            start = key
-            if start < 0:
-                start = min(0, len(self) + start)
-            stop = start + 1
-
-        # Fetch as many rows as necessary from the backend into the cache
-        try:
-            for i in xrange(stop - len(self._cache)):
-                self._cache.append(next(self._rows))
-        except StopIteration:
-            pass
-
-        # Return the appropriate slice or value
-        if isinstance(key, slice):
-            return self._cache[start : stop : key.step]
-
-        return self._cache[start]
+    def preprocess_value(self, value):
+        return QueryResultsRow(value, self.paths_types)
 
 
 class DataProviderBackend(pluginmanager.PluginBase):
