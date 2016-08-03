@@ -20,15 +20,7 @@
 
 import json
 
-from prewikka import env, compat
-
-
-class PrewikkaJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if hasattr(obj, "__json__"):
-            return obj.__json__()
-
-        return json.JSONEncoder.default(self, obj)
+from prewikka import env, compat, utils
 
 
 class PrewikkaResponse(object):
@@ -81,7 +73,7 @@ class PrewikkaResponse(object):
             res = ""
 
         if not isinstance(res, compat.STRING_TYPES):
-            res = json.dumps(res, cls=PrewikkaJSONEncoder)
+            res = json.dumps(res, cls=utils.PrewikkaJSONEncoder)
 
         return res.encode(env.config.general.get("encoding", "utf8"), "xmlcharrefreplace")
 

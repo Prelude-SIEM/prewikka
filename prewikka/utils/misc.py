@@ -19,7 +19,11 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import os.path
-import time, sys, re, struct, urllib
+import time
+import sys
+import re
+import struct
+import json
 
 from prewikka import compat, env
 
@@ -191,6 +195,14 @@ def hexdump(content):
         i += 16
 
     return content
+
+
+class PrewikkaJSONEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if hasattr(obj, "__json__"):
+            return obj.__json__()
+
+        return json.JSONEncoder.default(self, obj)
 
 
 def deprecated(func):
