@@ -197,6 +197,22 @@ def hexdump(content):
 
     return content
 
+def json_type(field):
+    """Load a json and correctly encode it."""
+    return json_deep_encode(json.loads(field))
+
+def json_deep_encode(obj, encoding="utf-8"):
+    """Recursive encode an object."""
+    if isinstance(obj, unicode):
+        return obj.encode(encoding)
+
+    if isinstance(obj, list):
+        return [json_deep_encode(o, encoding) for o in obj]
+
+    if isinstance(obj, dict):
+        return dict((json_deep_encode(key, encoding), json_deep_encode(value, encoding)) for key, value in obj.iteritems())
+
+    return obj
 
 class PrewikkaJSONEncoder(json.JSONEncoder):
     def default(self, obj):
