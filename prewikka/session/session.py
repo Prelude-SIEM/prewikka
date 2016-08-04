@@ -145,7 +145,20 @@ class Session(pluginmanager.PluginBase):
         self._db.delete_session(sessionid=request.input_cookie["sessionid"].value)
         request.deleteCookie("sessionid")
 
+    def __get_user_by_token(self, request):
+        authorization = request.getHeader('Authorization').strip().split(' ')
+
+        token = None
+        if authorization[0].lower() == "token" and len(authorization) == 2:
+            token = authorization[1]
+        
+        user = env.auth.authenticateByToken(token)
+        return user
+
     def get_user(self, request):
+        if 'Authorization' in request.headers :
+            return self.__get_user_by_token(request)
+
         info = self.get_user_info(request)
         if not(info) or not(info.login) or self.autologin:
             try:

@@ -20,7 +20,7 @@
 
 import abc
 
-from prewikka import log, pluginmanager, env, hookmanager
+from prewikka import log, pluginmanager, env, hookmanager, usergroup
 from prewikka.error import PrewikkaUserError
 
 
@@ -130,3 +130,10 @@ class Auth(pluginmanager.PluginBase, _AuthUser, _AuthGroup):
 
     def getDefaultSession(self):
         pass
+
+    def authenticateByToken(self, token):
+        userids = env.db.get_users_by_properties({'token':token})
+        if not userids:
+            raise AuthError(env.session, log_user='TOKEN')
+
+        return usergroup.User(userid=userids[0])
