@@ -193,8 +193,10 @@ class my_install(install):
         ### if no prefix is given, configuration should go to /etc or in {prefix}/etc otherwise
         if self.prefix:
             self.conf_prefix = self.prefix + "/etc/prewikka"
+            self.data_prefix = self.prefix + "/var/lib/prewikka"
         else:
             self.conf_prefix = "/etc/prewikka"
+            self.data_prefix = "/var/lib/prewikka"
 
         install.finalize_options(self)
 
@@ -210,9 +212,13 @@ class my_install(install):
                 dest += "-dist"
             self.copy_file(file, dest)
 
+    def create_datadir(self):
+        self.mkpath((self.root or "") + self.data_prefix)
+
     def init_siteconfig(self):
         config = open("prewikka/siteconfig.py", "w")
         print >> config, "conf_dir = '%s'" % os.path.abspath((self.conf_prefix))
+        print >> config, "data_dir = '%s'" % os.path.abspath(self.data_prefix)
         print >> config, "libprelude_required_version = '%s'" % LIBPRELUDE_REQUIRED_VERSION
         print >> config, "libpreludedb_required_version = '%s'" % LIBPRELUDEDB_REQUIRED_VERSION
         config.close()
@@ -220,6 +226,7 @@ class my_install(install):
     def run(self):
         os.umask(022)
         self.install_conf()
+        self.create_datadir()
         self.init_siteconfig()
         install.run(self)
 
