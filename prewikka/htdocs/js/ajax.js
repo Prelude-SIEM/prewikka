@@ -78,6 +78,12 @@ function prewikka_drawTab(data)
     var form;
     var content = __ie_fixes($(data.content));
 
+    if ( data.notifications ) {
+        $.each(data.notifications, function(_, value) {
+              prewikka_notification(value);
+        });
+    }
+
     if ( ! data.content ) {
         if ( ! data.menu )
             return;

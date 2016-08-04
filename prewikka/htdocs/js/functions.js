@@ -192,6 +192,10 @@ $(document).ready(function(){
       });
   });
 
+  $(document).on('click', '#prewikka-notification .close', function() {
+    $("#prewikka-notification").hide();
+  });
+
 
 });
 
@@ -227,6 +231,29 @@ function prewikka_resizeTopMenu() {
         main.css("margin-top", mainmenu.innerHeight());
     }
 }
+
+
+function prewikka_notification(data)
+{
+    if ( typeof(data.classname) === 'undefined' )
+        data.classname = "success";
+
+    $("#prewikka-notification .alert").removeClass().addClass("alert alert-" + data.classname);
+
+    $("#prewikka-notification .fa").removeClass().addClass("fa fa-" + data.icon);
+    $("#prewikka-notification .title").text(data.name || "");
+    $("#prewikka-notification .content").text(data.message);
+
+    $("#prewikka-notification").css({top:0, left:0}).position({
+        my: "center top",
+        at: "center top",
+        of: $(window),
+        collision: "none"
+    });
+
+    $("#prewikka-notification").stop().fadeIn(0).show().delay(data.duration || 2000).fadeOut(1000);
+}
+
 
 function prewikka_dialog(data)
 {

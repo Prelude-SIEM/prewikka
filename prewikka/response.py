@@ -48,19 +48,19 @@ class PrewikkaResponse(object):
 
         self.ext_content[key] = value
 
-    def add_notification(self, notification, classname="success", name="Prewikka", icon=None):
+    def add_notification(self, message, classname="success", name=None, icon=None, duration=None):
         """Add notification to the return value."""
 
         self.ext_content.setdefault("notifications", []).append({
-            "notification": notification,
+            "message": message,
             "classname": classname,
             "name": name,
-            "icon": icon
+            "icon": icon,
+            "duration": duration
         })
 
     def content(self):
         """Retrieve the HTML content of the response."""
-
         if env.request.web.is_xhr and not hasattr(self.data, '__json__'):
             res = self._with_xhr_layout(self.data)
         else:
