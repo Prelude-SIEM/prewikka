@@ -20,7 +20,7 @@
 
 import json
 
-from prewikka import env, compat, utils
+from prewikka import env, compat, utils, template
 
 
 class PrewikkaResponse(object):
@@ -80,8 +80,12 @@ class PrewikkaResponse(object):
     def _with_xhr_layout(self, obj):
         """Position the obj in a dict for XHR response"""
 
+        if isinstance(obj, template.PrewikkaTemplate):
+            obj = obj.render()
+
         data = {"content": obj}
         data.update(self.ext_content)
+
         return data
 
 
