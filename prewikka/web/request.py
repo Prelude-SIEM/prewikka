@@ -102,7 +102,7 @@ class Request:
     def write(self, data):
         pass
 
-    def sendHeaders(self, headers=None, code="200", staus_text=None):
+    def sendHeaders(self, headers=None, code=200, status_text=None):
         if not headers:
             headers = self.output_headers
 

@@ -66,7 +66,7 @@ class WSGIRequest(request.Request):
     def write(self, data):
         self._write(data)
 
-    def sendHeaders(self, headers, code=200, status_text=None):
+    def sendHeaders(self, headers=None, code=200, status_text=None):
         if not headers:
             headers = self.output_headers
 
