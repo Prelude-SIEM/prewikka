@@ -24,6 +24,7 @@ import sys
 import re
 import struct
 import json
+import datetime
 
 from prewikka import compat, env
 
@@ -201,6 +202,9 @@ class PrewikkaJSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if hasattr(obj, "__json__"):
             return obj.__json__()
+
+        if isinstance(obj, datetime.datetime):
+            return str(obj)
 
         return json.JSONEncoder.default(self, obj)
 
