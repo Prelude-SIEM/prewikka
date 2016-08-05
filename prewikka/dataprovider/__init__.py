@@ -44,7 +44,7 @@ def to_datetime(date):
         return CONVERTERS[type(date)](date)
     except KeyError:
         raise error.PrewikkaUserError(N_("Conversion error"),
-                                      N_("Value '%r' cannot be converted to %s" % (date, "datetime")))
+                                      N_("Value %(value)r cannot be converted to %(type)s" % {"value": date, "type": "datetime"}))
 TYPES_FUNC_MAP = {
     "int": int,
     "float": float,
@@ -76,7 +76,7 @@ class QueryResultsRow(CachingIterator):
             return TYPES_FUNC_MAP[type](value)
         except (KeyError, ValueError):
             raise error.PrewikkaUserError(N_("Conversion error"),
-                                          N_("Value '%r' cannot be converted to %s" % (value, type)))
+                                          N_("Value %(value)r cannot be converted to %(type)s" % {"value": value, "type": type}))
 
 
 class QueryResults(CachingIterator):
