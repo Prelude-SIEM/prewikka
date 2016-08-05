@@ -59,9 +59,16 @@ class PrewikkaResponse(object):
             "duration": duration
         })
 
+    def _is_xhr_embedded_content(self, obj):
+        is_json = hasattr(self.data, '__json__')
+        if is_json and not isinstance(obj, template.PrewikkaTemplate):
+            return False
+
+        return True
+
     def content(self):
         """Retrieve the HTML content of the response."""
-        if env.request.web.is_xhr and not hasattr(self.data, '__json__'):
+        if env.request.web.is_xhr and self._is_xhr_embedded_content(self.data):
             res = self._with_xhr_layout(self.data)
         else:
             res = self.data
@@ -79,9 +86,6 @@ class PrewikkaResponse(object):
 
     def _with_xhr_layout(self, obj):
         """Position the obj in a dict for XHR response"""
-
-        if isinstance(obj, template.PrewikkaTemplate):
-            obj = obj.render()
 
         data = {"content": obj}
         data.update(self.ext_content)

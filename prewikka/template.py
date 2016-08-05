@@ -31,23 +31,26 @@ def load_template(name, dataset):
     return template
 
 
-class DataSet(dict):
+class DataSet(object):
+    def __init__(self, *args, **kwargs):
+        self._d = {}
+
     def __setitem__(self, key, value):
         keys = key.split(".", 1)
         if len(keys) == 1:
-            dict.__setitem__(self, key, value)
+            self._d[key] = value
         else:
             key1, key2 = keys
-            if not self.has_key(key1):
-                dict.__setitem__(self, key1, DataSet())
-            dict.__getitem__(self, key1)[key2] = value
+            if key1 not in self._d:
+                self._d[key1] = DataSet()
+            self._d[key1][key2] = value
 
     def __getitem__(self, key):
         try:
             keys = key.split(".", 1)
             if len(keys) == 1:
-                return dict.__getitem__(self, key)
-            return dict.__getitem__(self, keys[0])[keys[1]]
+                return self._d[key]
+            return self._d[keys[0]][keys[1]]
         except KeyError:
             return ""
 
@@ -68,12 +71,15 @@ class PrewikkaTemplate(DataSet):
 
     def render(self, searchList=None):
         if not searchList:
-                searchList = dict(self)
+                searchList = self._d
         else:
-                searchList = searchList + [dict(self)]
+                searchList = [x._d for x in searchList] + [self._d]
 
         template = self._template(filtersLib=cheetahfilters, searchList=searchList)
         return template.respond()
 
     def __str__(self):
+        return self.render()
+
+    def __json__(self):
         return self.render()

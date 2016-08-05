@@ -352,7 +352,7 @@ class _View(object):
         if self.dataset:
             for name, clname in self.view_extensions:
                 obj = getattr(self, name)
-                response.ext_content[name] = obj.dataset.render([dict(self.dataset or {})])
+                response.ext_content[name] = obj.dataset.render([self.dataset or {}])
 
         return response
 
