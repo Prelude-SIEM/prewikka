@@ -1,3 +1,42 @@
+* 2016-08-05, prewikka-3.1.0rc1:
+
+Author: Thomas Andrejak
+
+- Fix prewikka.wsgi permissions
+- New authentication : by token
+
+Author: Sélim Menouar
+
+- Add a JSON type in view parameters
+- Prewikka notification handling
+- Add a PrewikkaResponse object
+
+Author: Francois Poirotte
+
+- UPSERT for custom filters
+- Support multiple extra mainmenu entry
+- Allow spaces in sub-section names
+
+Author: Antoine Luong
+
+- Use of free-jqGrid for agent listing
+- Automatic query escaping for Prewikka database
+- Fix the condition for an agent to be considered offline
+
+Author: Abdel Elmili
+
+- QueryResults rework
+- Add return type in dataproviders
+
+Author: Yoann Vandoorselaere
+
+- Configuration handling overhaul
+- Implement a deprecated() decorator
+- Rework hookmanager API
+- Standardize user/request access
+
+
+
 * 2016-04-22, prewikka-3.0.0:
 
 Author: Sélim Menouar
