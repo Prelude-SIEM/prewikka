@@ -68,6 +68,9 @@ class QueryResultsRow(CachingIterator):
         self._types = types
 
     def preprocess_value(self, value):
+        if value is None:
+            return None
+
         type = self._types[len(self._cache)]
         try:
             return TYPES_FUNC_MAP[type](value)
