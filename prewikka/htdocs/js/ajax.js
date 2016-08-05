@@ -73,16 +73,21 @@ function __ie_fixes(data)
     return data;
 }
 
+function handle_notifications(data)
+{
+    if ( data.notifications ) {
+        $.each(data.notifications, function(_, value) {
+            prewikka_notification(value);
+        });
+    }
+}
+
 function prewikka_drawTab(data)
 {
     var form;
     var content = __ie_fixes($(data.content));
 
-    if ( data.notifications ) {
-        $.each(data.notifications, function(_, value) {
-              prewikka_notification(value);
-        });
-    }
+    handle_notifications(data);
 
     if ( ! data.content ) {
         if ( ! data.menu )
