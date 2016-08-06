@@ -480,6 +480,14 @@ class Database(preludedb.SQL):
     def get_property(self, user, key, view=None, default=None):
         return self.get_property_fail(user, key, view, default)
 
+    def get_users_by_properties(self, keys):
+        def get_data(keys):
+           for key, value in keys.items():
+               res = self.query("SELECT userid FROM Prewikka_User_Configuration WHERE name = %s AND value = %s", key, value)
+               yield set([x[0] for x in res])
+
+        return list(reduce(lambda x,y: x.intersection(y), get_data(keys)))
+
     @use_transaction
     def set_property(self, user, key, value, view=None):
         self.del_property(user, key, view)
