@@ -43,7 +43,7 @@ class AnonymousSession(auth.Auth, session.Session):
         return [ usergroup.User("anonymous") ]
 
     def hasUser(self, other):
-        return usergroup.User("anonymous") == other
+        return usergroup.User("anonymous")
 
     def authenticate(self, login, password="", no_password_check=False):
         return usergroup.User("anonymous")
