@@ -90,7 +90,7 @@ class NameID(object):
         return self._name
 
     @abc.abstractmethod
-    def _id2name(self, name):
+    def _id2name(self, id):
         pass
 
     def _name2id(self, name):
@@ -119,7 +119,7 @@ class Group(NameID):
         NameID.__init__(self, name, groupid)
 
     def _id2name(self, id):
-        return env.auth.hasGroup(self)
+        return env.auth.hasGroup(self).name
 
 
 class User(NameID):
@@ -130,7 +130,7 @@ class User(NameID):
         self._configuration = self._permissions = self._timezone = None
 
     def _id2name(self, id):
-        return env.auth.hasUser(self)
+        return env.auth.hasUser(self).name
 
     @property
     def permissions(self):
