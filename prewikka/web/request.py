@@ -153,7 +153,7 @@ class Request:
             response = PrewikkaResponse()
 
         if env.request.web.is_stream:
-            if isinstance(response.html, error.PrewikkaUserError):
+            if isinstance(response, error.PrewikkaUserError):
                 env.request.web.sendStream(response.content(), event="error")
                 return
 
