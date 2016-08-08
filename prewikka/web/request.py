@@ -152,29 +152,22 @@ class Request:
         if not response:
             response = PrewikkaResponse()
 
+        if response.force_download:
+            self._prepare_download_headers(response.filename, response.type, response.size)
+
         if env.request.web.is_stream:
             if isinstance(response, error.PrewikkaUserError):
                 env.request.web.sendStream(response.content(), event="error")
-                return
 
-            env.request.web.close_stream()
+            self._buffer.flush()
+        else:
+            env.request.web.sendHeaders(self.output_headers, response.code or code, response.status_text or status_text)
 
-        if response.code:
-            code = response.code
+            data = response.content()
+            if data:
+                env.request.web.write(data)
 
-        if response.status_text:
-            status_text = response.status_text
-
-        if response.force_download:
-            self.force_download(response.filename, response.type, response.size)
-
-        env.request.web.sendHeaders(self.output_headers, code, status_text)
-
-        html = response.content()
-        if html:
-            env.request.web.write(html)
-
-    def force_download(self, filename, type, size):
+    def _prepare_download_headers(self, filename, type, size):
         """Add file download headers."""
 
         self.output_headers = [
@@ -185,11 +178,6 @@ class Request:
         ]
         if size:
             self.output_headers.append(("Content-length", str(size)))
-
-    def close_stream(self):
-        """Close the stream."""
-        self.sendStream("close", event="close")
-        self._buffer.flush()
 
     def resolveStaticPath(self, fname):
         pathmap = env.htdocs_mapping
