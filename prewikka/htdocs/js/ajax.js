@@ -16,7 +16,7 @@ $(document).ready(function(){
            return;
 
        if ( ! xhr.responseText )
-           prewikka_dialog({message: error || "Unknown AJAX error"});
+           prewikka_dialog({message: error || "Connection error"});
        else
            prewikka_dialog($.parseJSON(xhr.responseText));
   });
