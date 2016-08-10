@@ -18,8 +18,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import json
-
+import json, time
 from prewikka import env, compat, utils, template
 
 
@@ -36,12 +35,18 @@ class PrewikkaResponse(object):
         If the type of data is a dict, it will be cast in a JSON string
     """
 
-    def __init__(self, data=None, code=None, status_text=None):
+    def __init__(self, data=None, headers={}, code=None, status_text=None):
         self.data = data
-        self.force_download = False
         self.code = code
         self.status_text = status_text
         self.ext_content = {}
+
+        self.headers = headers or utils.OrderedDict((("Content-type", "text/html"),
+                                                    ("Last-Modified", time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())),
+                                                    ("Expires", "Fri, 01 Jan 1999 00:00:00 GMT"),
+                                                    ("Cache-control", "no-store, no-cache, must-revalidate"),
+                                                    ("Cache-control", "post-check=0, pre-check=0"),
+                                                    ("Pragma", "no-cache")))
 
     def add_ext_content(self, key, value):
         """Add an extra content to the response (add in XHR request)."""
@@ -107,10 +112,12 @@ class PrewikkaDownloadResponse(PrewikkaResponse):
 
     def __init__(self, data, filename, type="application/force-download", size=None):
         PrewikkaResponse.__init__(self, data)
-        self.force_download = True
-        self.filename = filename
-        self.type = type
-        self.size = size or len(data)
+        self.headers.update((
+            ("Content-Type", type),
+            ("Content-Disposition", "attachment; filename=%s" % filename),
+            ("Pragma", "public"),
+            ("Cache-Control", "max-age=0")
+        ))
 
     def content(self):
         return self.data

@@ -69,12 +69,6 @@ class Request:
         self._core = core
 
         self.arguments = { }
-        self.output_headers = [ ("Content-type", "text/html"),
-                                ("Last-Modified", time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())),
-                                ("Expires", "Fri, 01 Jan 1999 00:00:00 GMT"),
-                                ("Cache-control", "no-store, no-cache, must-revalidate"),
-                                ("Cache-control", "post-check=0, pre-check=0"),
-                                ("Pragma", "no-cache") ]
 
         cookie = Cookie.SimpleCookie(self.getCookieString())
         self.input_cookie = { }
@@ -102,12 +96,9 @@ class Request:
     def write(self, data):
         pass
 
-    def sendHeaders(self, headers=None, code=200, status_text=None):
-        if not headers:
-            headers = self.output_headers
-
+    def sendHeaders(self, headers=[], code=200, status_text=None):
         if self.output_cookie:
-            headers.extend(("Set-Cookie", c.OutputString()) for c in self.output_cookie.values())
+            headers = headers + [("Set-Cookie", c.OutputString()) for c in self.output_cookie.values()]
 
         for name, value in headers:
             self.sendHeader(name, value)
@@ -121,8 +112,7 @@ class Request:
         self.write("\r\n")
 
     def sendRedirect(self, location, redirect_code=307):
-        self.output_headers = [('Location', location)]
-        self.sendResponse(None, code=redirect_code, status_text="%d Redirect" % redirect_code)
+        self.sendHeaders([('Location', location)], code=redirect_code, status_text="%d Redirect" % redirect_code)
 
     def sendStream(self, data, event=None, evid=None, retry=None, sync=False):
         if self._buffer is None:
@@ -152,32 +142,17 @@ class Request:
         if not response:
             response = PrewikkaResponse()
 
-        if response.force_download:
-            self._prepare_download_headers(response.filename, response.type, response.size)
-
         if env.request.web.is_stream:
-            if isinstance(response, error.PrewikkaUserError):
+            if isinstance(response.data, error.PrewikkaUserError):
                 env.request.web.sendStream(response.content(), event="error")
 
             self._buffer.flush()
         else:
-            env.request.web.sendHeaders(self.output_headers, response.code or code, response.status_text or status_text)
+            env.request.web.sendHeaders(response.headers.items(), response.code or code, response.status_text or status_text)
 
             data = response.content()
             if data:
                 env.request.web.write(data)
-
-    def _prepare_download_headers(self, filename, type, size):
-        """Add file download headers."""
-
-        self.output_headers = [
-            ("Content-Type", type),
-            ("Content-Disposition", "attachment; filename=%s" % filename),
-            ("Pragma", "public"),
-            ("Cache-Control", "max-age=0")
-        ]
-        if size:
-            self.output_headers.append(("Content-length", str(size)))
 
     def resolveStaticPath(self, fname):
         pathmap = env.htdocs_mapping
@@ -210,12 +185,10 @@ class Request:
             env.log.warning("Serving file with unknown MIME type: %s" % path)
             content_type = "application/octet-stream"
 
-        self.output_headers = [
-            ('Content-Type', content_type),
-            ('Content-Length', str(stat[6])),
-            ('Last-Modified', time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8])))]
+        self.sendHeaders([('Content-Type', content_type),
+                          ('Content-Length', str(stat[6])),
+                          ('Last-Modified', time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8])))])
 
-        self.sendHeaders()
         return copyfunc(fd)
 
     def handleMultipart(self, *args, **kwargs):
