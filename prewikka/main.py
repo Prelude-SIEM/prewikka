@@ -77,10 +77,14 @@ class Core:
     def _checkVersion(self):
         error_type = _("Version Requirement error")
         if not prelude.checkVersion(siteconfig.libprelude_required_version):
-            raise error.PrewikkaUserError(error_type, _("Prewikka %(vPre)s requires libprelude %(vLib)s or higher") % {'vPre':version.__version__, 'vLib':siteconfig.libprelude_required_version})
+            raise error.PrewikkaUserError(error_type,
+                                          N_("Prewikka %(vPre)s requires libprelude %(vLib)s or higher",
+                                             {'vPre': version.__version__, 'vLib': siteconfig.libprelude_required_version}))
 
         elif not preludedb.checkVersion(siteconfig.libpreludedb_required_version):
-            raise error.PrewikkaUserError(error_type, _("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher") % {'vPre':version.__version__, 'vLib':siteconfig.libpreludedb_required_version})
+            raise error.PrewikkaUserError(error_type,
+                                          N_("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher",
+                                             {'vPre': version.__version__, 'vLib': siteconfig.libpreludedb_required_version}))
 
     def __init__(self, filename=None):
         env.auth = None # In case of database error
@@ -161,9 +165,9 @@ class Core:
     def _load_auth_or_session(self, typename, plugins, name, config=config.SectionRoot()):
         if name not in plugins:
             raise error.PrewikkaUserError(
-                "Initialization error",
-                "Cannot use %(type)s mode '%(name)s', please contact your local administrator." %
-                {'type': typename, 'name': name}
+                _("Initialization error"),
+                N_("Cannot use %(type)s mode '%(name)s', please contact your local administrator.",
+                   {'type': typename, 'name': name})
             )
 
         obj = plugins[name](config)

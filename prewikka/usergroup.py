@@ -31,12 +31,10 @@ class PermissionDeniedError(error.PrewikkaUserError):
             permissions = [permissions]
 
         if view:
-            msg = _("Access to view '%(view)s' forbidden. Required permissions: %(permissions)s") % {
-                "view": view,
-                "permissions": ", ".join(permissions)
-            }
+            msg = N_("Access to view '%(view)s' forbidden. Required permissions: %(permissions)s",
+                     {"view": view, "permissions": ", ".join(permissions)})
         else:
-            msg = _("Required permissions: %s") % ", ".join(permissions)
+            msg = N_("Required permissions: %s", ", ".join(permissions))
 
         error.PrewikkaUserError.__init__(self, _("Permission Denied"), msg, log_priority=log.WARNING)
 

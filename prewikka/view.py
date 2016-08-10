@@ -33,25 +33,28 @@ class ParameterError(Exception):
 class InvalidParameterError(error.PrewikkaUserError):
     def __init__(self, name):
         error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
-                                               _("Parameter '%s' is not valid") % name, log_priority=log.WARNING)
+                                               N_("Parameter '%s' is not valid", name),
+                                               log_priority=log.WARNING)
 
 
 class InvalidParameterValueError(error.PrewikkaUserError):
     def __init__(self, name, value):
         error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
-                                               _("Invalid value '%(value)s' for parameter '%(name)s'") % {'value':value, 'name':name}, log_priority=log.WARNING)
+                                               N_("Invalid value '%(value)s' for parameter '%(name)s'", {'value': value, 'name': name}),
+                                               log_priority=log.WARNING)
 
 
 class MissingParameterError(error.PrewikkaUserError):
     def __init__(self, name):
         error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
-                                         _("Required parameter '%s' is missing") % name, log_priority=log.WARNING)
+                                               N_("Required parameter '%s' is missing", name),
+                                               log_priority=log.WARNING)
 
 class InvalidViewError(error.PrewikkaUserError):
     code = 404
 
-    def __init__(self, message):
-        error.PrewikkaUserError.__init__(self, _("Invalid view"), message, log_priority=log.ERROR)
+    def __init__(self, message, log_priority=None, **kwargs):
+        error.PrewikkaUserError.__init__(self, _("Invalid view"), message, log_priority=log.ERROR, **kwargs)
 
 
 
@@ -454,7 +457,7 @@ class ViewManager:
             view = self.getView(view_layout)
 
         if not view:
-            raise InvalidViewError(_("View '%s' does not exist") % request.path)
+            raise InvalidViewError(N_("View '%s' does not exist", request.path))
 
         if userl and view.view_permissions and not userl.has(view.view_permissions):
             raise usergroup.PermissionDeniedError(view.view_permissions, view.view_id)

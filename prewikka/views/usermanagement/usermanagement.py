@@ -38,7 +38,7 @@ class UserSettingsDisplay(view.View):
         self._object = usergroup.User(login) if login else env.request.user
 
         if not env.auth.hasUser(self._object):
-            raise error.PrewikkaUserError(_("Invalid User"), _("Requested user '%s' does not exist") % self._object)
+            raise error.PrewikkaUserError(_("Invalid User"), N_("Requested user '%s' does not exist", self._object))
 
         self.dataset["object"] = self._object
         self.dataset["fullname"] = env.db.get_property(self._object, "fullname")
@@ -67,7 +67,7 @@ class UserSettingsModify(view.View):
 
         lang = self.parameters["language"]
         if not lang in localization.getLanguagesIdentifiers():
-            raise error.PrewikkaUserError(_("Invalid Language"), _("Specified language does not exist"), log_priority=log.WARNING)
+            raise error.PrewikkaUserError(_("Invalid Language"), N_("Specified language does not exist"), log_priority=log.WARNING)
 
         env.db.set_property(user, "language", lang)
         if user == env.request.user:
@@ -75,7 +75,7 @@ class UserSettingsModify(view.View):
 
         timezone = self.parameters["timezone"]
         if not timezone in localization.get_timezones():
-            raise error.PrewikkaUserError(_("Invalid Timezone"), _("Specified timezone does not exist"), log_priority=log.WARNING)
+            raise error.PrewikkaUserError(_("Invalid Timezone"), N_("Specified timezone does not exist"), log_priority=log.WARNING)
 
         env.db.set_property(user, "timezone", timezone)
 

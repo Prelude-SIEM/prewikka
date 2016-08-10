@@ -143,13 +143,16 @@ class RendererPluginManager(pluginmanager.PluginManager):
             renderer = self.get_default_backend(type)
 
             if renderer is None:
-                raise error.PrewikkaUserError("Renderer error", "No backend supporting render type '%s'" % type)
+                raise error.PrewikkaUserError(_("Renderer error"), N_("No backend supporting render type '%s'", type))
 
         if renderer not in self._renderer:
-            raise error.PrewikkaUserError("Renderer error", "No backend named '%s'" % renderer)
+            raise error.PrewikkaUserError(_("Renderer error"),
+                                          N_("No backend named '%s'", renderer))
 
         if type not in self._renderer[renderer]:
-            raise error.PrewikkaUserError("Renderer error", "Backend '%s' does not support render type '%s'" % (renderer, type))
+            raise error.PrewikkaUserError(_("Renderer error"),
+                                          N_("Backend '%(backend)s' does not support render type '%(type)s'",
+                                             {'backend': renderer, 'type': type}))
 
         if not "names_and_colors" in kwargs:
             kwargs["names_and_colors"] = COLOR_MAP

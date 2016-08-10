@@ -98,7 +98,7 @@ class PrewikkaUserError(PrewikkaError):
     def __json__(self):
         return {
             "name": self.name,
-            "message": self.message,
+            "message": _(self.message),
             "code": self.code,
             "traceback": self.traceback
         }

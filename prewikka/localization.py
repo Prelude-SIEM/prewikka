@@ -110,11 +110,31 @@ class TranslationProxy(object):
 
 translation = TranslationProxy()
 
-def _deferredGettext(s):
-    return s
 
-__builtin__._ = translation.gettext
-__builtin__.N_ = _deferredGettext
+class _DeferredGettext(str):
+    def __new__(cls, text, arguments=None):
+        message = text % arguments if arguments else text
+        o = str.__new__(cls, message)
+        o._text = text
+        o._arguments = arguments
+        return o
+
+    def __str__(self):
+        return self
+
+    def translate(self):
+        s = translation.gettext(self._text)
+        return s % self._arguments if self._arguments else s
+
+
+def _translate(s):
+    if isinstance(s, _DeferredGettext):
+        return s.translate()
+    else:
+        return translation.gettext(s)
+
+__builtin__._ = _translate
+__builtin__.N_ = _DeferredGettext
 __builtin__.ngettext = translation.ngettext
 
 

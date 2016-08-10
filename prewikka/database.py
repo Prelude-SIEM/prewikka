@@ -26,8 +26,8 @@ from prewikka import log, error, utils, version, env, compat, usergroup
 
 
 class DatabaseSchemaError(error.PrewikkaUserError):
-    def __init__(self, err):
-        error.PrewikkaUserError.__init__(self, _("Database schema error"), err)
+    def __init__(self, message, **kwargs):
+        error.PrewikkaUserError.__init__(self, _("Database schema error"), message, **kwargs)
 
 
 __flock_fd = open(__file__, 'r')
@@ -236,16 +236,19 @@ class DatabaseUpdateHelper(DatabaseHelper):
         self._init_version_attr()
 
         if not self._from_version and self._reqversion:
-            raise DatabaseSchemaError(_("database installation required"))
+            raise DatabaseSchemaError(N_("database installation required"))
 
         if self._need_enable:
-            raise DatabaseSchemaError(_("database activation required"))
+            raise DatabaseSchemaError(N_("database activation required"))
 
         if self._reqbranch and self._from_branch != self._reqbranch:
-            raise DatabaseSchemaError("database schema branch %s required (found %s)" % (self._reqbranch, self._from_branch))
+            raise DatabaseSchemaError(N_("database schema branch %(required)s required (found %(current)s)",
+                                         {'required': self._reqbranch, 'current': self._from_branch}))
 
         if self._reqversion and self._from_version != self._reqversion:
-            raise DatabaseSchemaError("database schema version %s required (found %s)" % (self._get_version_string(self._reqbranch, self._reqversion), self._get_version_string(self._from_branch, self._from_version)))
+            raise DatabaseSchemaError(N_("database schema version %(required)s required (found %(current)s)",
+                                         {'required': self._get_version_string(self._reqbranch, self._reqversion),
+                                          'current': self._get_version_string(self._from_branch, self._from_version)}))
 
     def _update_state(self, version, branch):
         self._from_branch = branch
@@ -308,14 +311,22 @@ class DatabaseUpdateHelper(DatabaseHelper):
     def _get_install_schema(self):
         ret = self._list(to_version=self._reqversion, branch=self._reqbranch, type="install")
         if not ret:
-            raise error.PrewikkaUserError(_("Database installation error"), _("No database installation script found for module %(module)s, version %(version)s") % {'module': self._module_name, 'version': self._get_version_string(self._reqbranch, self._reqversion)})
+            raise error.PrewikkaUserError(_("Database installation error"),
+                                          N_("No database installation script found for module %(module)s, version %(version)s",
+                                             {'module': self._module_name, 'version': self._get_version_string(self._reqbranch, self._reqversion)}))
 
         return ret[-1]
 
     def _get_branch_update(self):
         prev = self._resolve_branch_switch(self._from_branch, self._from_version)
         if not prev:
-            raise error.PrewikkaUserError(_("Database migration error"), "No database branch migration script found for module %s, branch transition %s -> %s" % (self._module_name, self._get_version_string(self._from_branch, self._from_version), self._get_version_string(self._reqbranch, "<=" + self._reqversion)))
+            raise error.PrewikkaUserError(_("Database migration error"),
+                                          N_("No database branch migration script found for module %(module)s, branch transition %(current)s -> %(required)s",
+                                          {
+                                            'module': self._module_name,
+                                            'current': self._get_version_string(self._from_branch, self._from_version),
+                                            'required': self._get_version_string(self._reqbranch, "<=" + self._reqversion)
+                                          }))
 
         return prev
 
@@ -347,11 +358,15 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
         ret = self._list(from_version=from_version, to_version=self._reqversion, branch=self._reqbranch, type="update")
         if not(ret) or ret[-1].version != self._reqversion:
-            raise error.PrewikkaUserError(_("Database migration error"), _("No linear migration script found for module %(module)s %(version1)s -> %(version2)s") % {
-                'module': self._module_name,
-                'version1': self._get_version_string(self._from_branch, self._from_version),
-                'version2': self._get_version_string(self._reqbranch, self._reqversion)
-            })
+            raise error.PrewikkaUserError(
+                _("Database migration error"),
+                N_("No linear migration script found for module %(module)s %(version1)s -> %(version2)s",
+                {
+                    'module': self._module_name,
+                    'version1': self._get_version_string(self._from_branch, self._from_version),
+                    'version2': self._get_version_string(self._reqbranch, self._reqversion)
+                }
+            ))
 
         return prev + ret
 

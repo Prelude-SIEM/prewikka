@@ -25,7 +25,7 @@ from prewikka.error import PrewikkaUserError
 
 
 class AuthError(PrewikkaUserError):
-    def __init__(self, session, message=_("Authentication failed"), log_priority=log.ERROR, log_user=None):
+    def __init__(self, session, message=N_("Authentication failed"), log_priority=log.ERROR, log_user=None):
         PrewikkaUserError.__init__(self, None, message, log_priority=log_priority, log_user=log_user, template=session.template)
 
 

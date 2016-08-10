@@ -23,25 +23,22 @@ from prewikka import database, log, utils, usergroup, pluginmanager, env, hookma
 from prewikka.error import PrewikkaUserError
 
 
-class SessionInvalid(PrewikkaUserError):
+class _SessionError(PrewikkaUserError):
     code = 401
 
-    def __init__(self, arguments={}, message=None, login=None, log_priority=None, template=None):
+    def __init__(self, login=None, message=None, **kwargs):
         if message is None:
-            message = _("Invalid session")
+            message = _(self._default_message)
 
-        PrewikkaUserError.__init__(self, None, message, log_priority=log_priority, log_user=login, template=template)
+        PrewikkaUserError.__init__(self, None, message, log_user=login, **kwargs)
 
 
-class SessionExpired(PrewikkaUserError):
-    code = 401
+class SessionInvalid(_SessionError):
+    _default_message = N_("Invalid session")
 
-    def __init__(self, login, arguments={}, message=None, template=None):
-        if message is None:
-           message = _("Session expired")
 
-        PrewikkaUserError.__init__(self, None, message, log_priority=log.ERROR, log_user=login, template=template)
-
+class SessionExpired(_SessionError):
+    _default_message = N_("Session expired")
 
 
 class SessionUserInfo(object):

@@ -43,8 +43,9 @@ def to_datetime(date):
     try:
         return CONVERTERS[type(date)](date)
     except KeyError:
-        raise error.PrewikkaUserError(N_("Conversion error"),
-                                      N_("Value %(value)r cannot be converted to %(type)s" % {"value": date, "type": "datetime"}))
+        raise error.PrewikkaUserError(_("Conversion error"),
+                                      N_("Value %(value)r cannot be converted to %(type)s",
+                                         {"value": date, "type": "datetime"}))
 TYPES_FUNC_MAP = {
     "int": int,
     "float": float,
@@ -75,8 +76,9 @@ class QueryResultsRow(CachingIterator):
         try:
             return TYPES_FUNC_MAP[type](value)
         except (KeyError, ValueError):
-            raise error.PrewikkaUserError(N_("Conversion error"),
-                                          N_("Value %(value)r cannot be converted to %(type)s" % {"value": value, "type": type}))
+            raise error.PrewikkaUserError(_("Conversion error"),
+                                          N_("Value %(value)r cannot be converted to %(type)s",
+                                             {"value": value, "type": type}))
 
 
 class QueryResults(CachingIterator):
@@ -184,7 +186,7 @@ class DataProviderManager(pluginmanager.PluginManager):
 
             if p.type in self._backends:
                 raise error.PrewikkaUserError(_("Configuration error"),
-                                              _("Only one manager should be configured for '%s' backend") % p.type)
+                                              N_("Only one manager should be configured for '%s' backend", p.type))
 
             self._backends[p.type] = p
 
