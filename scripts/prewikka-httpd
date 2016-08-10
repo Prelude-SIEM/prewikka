@@ -25,15 +25,15 @@ from optparse import OptionParser
 import multiprocessing
 import urllib, urlparse
 import BaseHTTPServer
+import ssl
 
 from prewikka.web import request
 from prewikka import main, siteconfig, localization
 
 
-class PrewikkaServer(BaseHTTPServer.HTTPServer):
-    def __init__(self, *args, **kwargs):
-        apply(BaseHTTPServer.HTTPServer.__init__, (self,) + args, kwargs)
 
+class PrewikkaServer(BaseHTTPServer.HTTPServer):
+    pass
 
 
 class PrewikkaRequestHandler(request.Request, BaseHTTPServer.BaseHTTPRequestHandler):
@@ -142,6 +142,8 @@ if __name__ == "__main__":
 
     parser.add_option("-a", "--address", action="store", type="string", dest="addr", default="0.0.0.0", help="IP to bind to (default: %default)")
     parser.add_option("-p", "--port", action="store", type="int", dest="port", default=8000, help="port number to use (default: %default)")
+    parser.add_option("", "--key", action="store", type="string", dest="key", default=None, help="SSL private key to use (default: no SSL)")
+    parser.add_option("", "--cert", action="store", type="string", dest="cert", default=None, help="SSL certificate to use (default: no SSL)")
     parser.add_option("-c", "--config", action="store", type="string", dest="config", default="%s/prewikka.conf" % siteconfig.conf_dir, help="configuration file to use (default: %default)")
     parser.add_option("-m", "--multiprocess", action="store", type="int", dest="num_process", default=multiprocessing.cpu_count(),
                       help="number of processes to use. Default value matches the number of available CPUs (i.e. %d)" % multiprocessing.cpu_count())
@@ -149,6 +151,9 @@ if __name__ == "__main__":
     (options, args) = parser.parse_args()
 
     server = PrewikkaServer((options.addr, options.port), PrewikkaRequestHandler)
+    if options.key and options.cert:
+        server.socket = ssl.wrap_socket(server.socket, keyfile=options.key, certfile=options.cert, server_side=True)
+
     for i in range(options.num_process - 1):
         multiprocessing.Process(target=serve_forever, args=(server, options.config)).start()
 
