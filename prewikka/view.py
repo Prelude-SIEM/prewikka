@@ -149,7 +149,7 @@ class Parameters(dict):
                 do_load = False
 
             value = param.parse(value)
-            if param.save and do_save:
+            if user and param.save and do_save:
                 if param.general:
                     user.set_property(name, value)
                 else:
@@ -171,7 +171,7 @@ class Parameters(dict):
             elif param.has_default():
                 self[name] = param.default
 
-            if not param.save:
+            if not param.save or not user:
                 continue
 
             if param.general:
@@ -325,6 +325,7 @@ class _View(object):
     view_help = None
     view_extensions = []
     view_layout = "BaseView"
+    view_require_session = True
 
     def render(self):
         pass
@@ -420,13 +421,16 @@ class ViewManager:
         return self._views.get(view_id.lower())
 
     def loadView(self, request, userl):
+        view = view_layout = None
+
         view_id = self.getViewID(request)
         if view_id:
             view = self.getView(view_id)
         else:
             view = next((x for x in hookmanager.trigger("HOOK_VIEW_LOAD", request, userl) if x), None)
 
-        view_layout = view.view_layout if view else "BaseView"
+        if view:
+            view_layout = view.view_layout
 
         if not request.is_xhr and not request.is_stream and view_layout and not "_download" in request.arguments:
             view = self.getView(view_layout)

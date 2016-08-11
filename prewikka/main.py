@@ -221,14 +221,17 @@ class Core:
 
     def process(self, request):
         env.request.init(request)
-        view_object = None
+        view_object = user = autherr = None
 
         encoding = env.config.general.get("encoding", "utf8")
         try:
             self._prewikka_init_if_needed()
 
-            env.request.user = user = env.session.get_user(request)
-            user.set_locale()
+            try:
+                env.request.user = user = env.session.get_user(request)
+                user.set_locale()
+            except Exception as autherr:
+                pass
 
             if not all(hookmanager.trigger("HOOK_PROCESS_REQUEST", request, user)):
                 return
@@ -242,6 +245,8 @@ class Core:
                 raise error.RedirectionError("%s%s" % (request.getBaseURL(), default_view), 302)
 
             env.request.view = view_object = env.viewmanager.loadView(request, user)
+            if view_object.view_require_session and autherr:
+                raise autherr
 
             resolve.process(env.dns_max_delay)
             response = view_object.respond()
