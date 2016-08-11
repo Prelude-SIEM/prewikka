@@ -318,7 +318,7 @@ if ( window._messagelisting_title_array == undefined ) {
   <td>$column</td>
   #end for
 
-  #if $messages and $prewikka.user.has("IDMEF_ALTER")
+  #if $messages and $env.request.user.has("IDMEF_ALTER")
   <td><input class="checkbox" type="checkbox" id="allbox" /></td>
   #end if
 
@@ -534,7 +534,7 @@ $text
 
 
 #block message_extra_footer
-  #if $prewikka.user.has("IDMEF_ALTER")
+  #if $env.request.user.has("IDMEF_ALTER")
   <div class="pull-right">
     <div class="form-inline">
       <input type="submit" class="btn btn-primary" name="listing_apply" value="$_("Apply")" data-confirm="$_("Delete the selected alerts?")" />

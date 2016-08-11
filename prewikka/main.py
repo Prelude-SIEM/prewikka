@@ -236,13 +236,13 @@ class Core:
             if not all(hookmanager.trigger("HOOK_PROCESS_REQUEST", request, user)):
                 return
 
-            if not request.path or request.path == "/":
+            if request.path == "/":
                 default_view = env.config.general.get("default_view", "alerts/alerts")
                 if not env.viewmanager.getViewIDFromPaths(default_view.split('/')):
                     # The configured view does not exist. Fall back to "settings/my_account"
                     # which does not require any specific permission.
                     default_view = "settings/my_account"
-                raise error.RedirectionError("%s%s" % (request.getBaseURL(), default_view), 302)
+                raise error.RedirectionError("%s%s" % (request.get_baseurl(), default_view), 302)
 
             env.request.view = view_object = env.viewmanager.loadView(request, user)
             if view_object.view_require_session and autherr:
@@ -252,7 +252,7 @@ class Core:
             response = view_object.respond()
 
         except error.RedirectionError as err:
-            return request.sendRedirect(err.location, err.code)
+            return request.send_redirect(err.location, err.code)
 
         except error.PrewikkaUserError as err:
             response = err.respond()
@@ -260,4 +260,4 @@ class Core:
         except Exception, err:
             response = error.PrewikkaUserError(_("Prelude internal error"), err, display_traceback=True).respond()
 
-        request.sendResponse(response)
+        request.send_response(response)

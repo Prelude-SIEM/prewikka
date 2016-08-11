@@ -91,7 +91,7 @@ class Session(pluginmanager.PluginBase):
         hookmanager.register("HOOK_USER_DELETE", lambda user: self._db.delete_session(user=user))
 
     def __set_session(self, request, sessionid):
-        request.addCookie("sessionid", sessionid, self._expiration * 3)
+        request.add_cookie("sessionid", sessionid, self._expiration * 3)
 
     def __check_session(self, request):
         sessionid = request.input_cookie.get("sessionid")
@@ -111,7 +111,7 @@ class Session(pluginmanager.PluginBase):
         try:
             login, t = self._db.get_session(sessionid)
         except:
-            request.deleteCookie("sessionid")
+            request.delete_cookie("sessionid")
             raise SessionInvalid(template=self.template)
 
         # Check that the session is still alive...
@@ -143,7 +143,7 @@ class Session(pluginmanager.PluginBase):
 
     def __delete_session(self, request):
         self._db.delete_session(sessionid=request.input_cookie["sessionid"].value)
-        request.deleteCookie("sessionid")
+        request.delete_cookie("sessionid")
 
     def __get_user_by_token(self, request):
         authorization = request.getHeader('Authorization').strip().split(' ')
@@ -151,7 +151,7 @@ class Session(pluginmanager.PluginBase):
         token = None
         if authorization[0].lower() == "token" and len(authorization) == 2:
             token = authorization[1]
-        
+
         user = env.auth.authenticateByToken(token)
         return user
 

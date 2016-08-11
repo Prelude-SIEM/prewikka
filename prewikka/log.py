@@ -103,9 +103,9 @@ class Log:
         if not env.request.web:
             return ""
 
-        hdr = "".join(("[", env.request.web.getClientAddr()))
+        hdr = "".join(("[", env.request.web.get_remote_addr()))
 
-        port = env.request.web.getClientPort()
+        port = env.request.web.get_remote_port()
         if port:
             hdr = ":".join((hdr, str(port)))
 
@@ -117,7 +117,7 @@ class Log:
         elif env.request.web.is_stream:
            flags = " (sse)"
 
-        return "".join((hdr, env.request.web.getView(), flags, "]"))
+        return "".join((hdr, env.request.web.path, flags, "]"))
 
 
     def _get_log(self, details):

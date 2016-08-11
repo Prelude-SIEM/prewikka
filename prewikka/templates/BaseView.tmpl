@@ -23,7 +23,7 @@ function check_same_origin(url) {
 }
 
 \$(document).ready(function() {
-        prewikka_loadTab({url: "$document.fullhref", data: "$document.query_string", type: "$document.request_method"});
+        prewikka_loadTab({url: "$document.fullhref", data: "$env.request.web.get_query_string()", type: "$env.request.web.method"});
 
         /*
          * Back/Forward support.
@@ -129,7 +129,7 @@ function check_same_origin(url) {
         #for $name, $views in $interface.sections.get($section).items()
             #set $firstview = $views.values()[0]
 
-            #if $prewikka.user and not $prewikka.user.has($firstview.view_permissions):
+            #if $env.request.user and not $env.request.user.has($firstview.view_permissions):
                 #continue
             #end if
 

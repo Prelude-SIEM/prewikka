@@ -1,4 +1,4 @@
-#from prewikka import usergroup
+#from prewikka import usergroup, env
 
 #block messagelisting_scripts
 $messagelisting_scripts
@@ -90,7 +90,7 @@ $message_listing_header
       #set global $message = $message
         <tr>
           $message_fields
-          #if $prewikka.user.has("IDMEF_ALTER")
+          #if $env.request.user.has("IDMEF_ALTER")
           <td>
             <input class="checkbox" type="checkbox" name="selection" value="$message.selection"/>
           </td>

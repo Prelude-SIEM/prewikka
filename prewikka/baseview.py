@@ -89,7 +89,7 @@ class BaseView(view._View):
         self.dataset["prewikka.logout_link"] = (user and env.session.can_logout()) and utils.create_link("logout") or None
 
         try:
-            paths = env.request.web.getViewElements()
+            paths = env.request.web.path_elements
             active_section, active_tab = paths[0], paths[1]
         except:
             active_section, active_tab = "", ""
@@ -104,13 +104,8 @@ class BaseView(view._View):
 
     @staticmethod
     def setup_dataset(dataset):
-        dataset["document.base_url"] = env.request.web.getBaseURL()
-        dataset["document.fullhref"] = "/".join(env.request.web.getViewElements()) # Needed for view that aren't completly ported to ajax
-        dataset["document.href"] = "/".join(env.request.web.getViewElements()[0:2]) # Subview are hidden
-        dataset["document.request_method"] = env.request.web.getMethod()
-        dataset["document.query_string"] = env.request.web.getQueryString()
-        dataset["document.charset"] = localization.getCurrentCharset()
+        dataset["document.base_url"] = env.request.web.get_baseurl()
+        dataset["document.fullhref"] = "/".join(env.request.web.path_elements) # Needed for view that aren't completly ported to ajax
+        dataset["document.href"] = "/".join(env.request.web.path_elements[0:2]) # Subview are hidden
         dataset["toplayout_extra_content"] = ""
-        dataset["prewikka.user"] = env.request.user
-        dataset["prewikka.about"] = utils.create_link("About")
 

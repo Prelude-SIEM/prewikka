@@ -18,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import cgi
+import wsgiref.util, wsgiref.headers, urllib
 from prewikka.web import request
 from prewikka import main, env
 
@@ -32,17 +33,23 @@ defined_status = {
 }
 
 class WSGIRequest(request.Request):
-    def init(self, core, environ, start_response):
+    def __init__(self, core, environ, start_response):
+        request.Request.__init__(self)
+
+        self._headers = None
+
         self._environ = environ
         self._start_response = start_response
+        self.method = environ['REQUEST_METHOD']
 
+        self.path = environ["PATH_INFO"]
         request.Request.init(self, core)
 
-        if self.getMethod() != 'POST':
-            self.arguments = cgi.parse_qs(self.getQueryString())
+        if self.method != 'POST':
+            self.arguments = cgi.parse_qs(self._environ.get('QUERY_STRING'))
         else:
             if self._environ.get("CONTENT_TYPE", "").startswith("multipart/form-data"):
-                self.arguments = self.handleMultipart(fp=environ['wsgi.input'], environ=environ)
+                self.arguments = self._handle_multipart(fp=environ['wsgi.input'], environ=environ)
             else:
                 self.arguments = cgi.parse_qs(environ['wsgi.input'].read())
 
@@ -56,62 +63,63 @@ class WSGIRequest(request.Request):
         if self._environ.get("HTTP_ACCEPT", "text/html") == "text/event-stream":
             self.is_stream = True
 
-
-    def getBaseURL(self):
-        return (env.config.general.reverse_path or self._environ["SCRIPT_NAME"]) + "/"
-
-    def getMethod(self):
-        return self._environ['REQUEST_METHOD']
-
     def write(self, data):
         self._write(data)
 
-    def sendHeaders(self, headers=None, code=200, status_text=None):
-        if not headers:
-            headers = self.output_headers
-
-        if self.output_cookie:
-            headers.extend(("Set-Cookie", c.OutputString()) for c in self.output_cookie.values())
+    def send_headers(self, headers=None, code=200, status_text=None):
+        if self._output_cookie:
+            headers = headers + [("Set-Cookie", c.OutputString()) for c in self._output_cookie.values()]
 
         if not status_text:
             status_text = defined_status.get(code, "Unknown")
 
-        self._write = self._start_response("%d %s" % (code, status_text), headers)
+        self._write = self._start_response("%d %s" % (code, status_text or ""), headers)
 
-    def getHeader(self, name):
-        return self._environ[name]
-
-    def getQueryString(self):
-        return self._environ.get('QUERY_STRING')
-
-    def getCookieString(self):
+    def get_cookie(self):
         return self._environ.get('HTTP_COOKIE', '')
 
-    def getReferer(self):
-        return self._req.headers_in.get('HTTP_REFERER', '')
-
-    def getClientAddr(self):
+    def get_remote_addr(self):
         return self._environ.get('REMOTE_ADDR')
 
-    def getClientPort(self):
-        return int(self._environ.get('REMOTE_PORT'))
+    def get_remote_port(self):
+        return int(self._environ.get('REMOTE_PORT', 0))
 
+    def get_query_string(self):
+        return self._environ.get('QUERY_STRING')
+
+    def get_baseurl(self):
+        return (env.config.general.reverse_path or self._environ["SCRIPT_NAME"]) + "/"
+
+    def get_raw_uri(self, include_qs=False):
+        return wsgiref.util.request_uri(self._environ, include_query=include_qs)
+
+    @property
+    def headers(self):
+        if self._headers:
+            return self._headers
+
+        lst = []
+        for key, value in self._environ.items():
+            if key.find("HTTP_") == -1:
+                continue
+
+            lst.append((key[5:].replace("_", "-").lower(), value))
+
+        self._headers = wsgiref.headers.Headers(lst)
+        return self._headers
 
 def application(environ, start_response):
-        req = WSGIRequest()
-
-        core = main.get_core_from_config(environ.get("PREWIKKA_CONFIG", None))
-        req.init(core, environ, start_response)
-
         # Check whether the URL got a trailing "/", if not perform a redirect
         if not environ["PATH_INFO"]:
-                start_response('301 Redirect', [('Location', environ['SCRIPT_NAME'] + "/"),])
+            start_response('301 Redirect', [('Location', environ['SCRIPT_NAME'] + "/"),])
 
-        path = req.resolveStaticPath(environ["PATH_INFO"])
+        core = main.get_core_from_config(environ.get("PREWIKKA_CONFIG", None))
+
+        req = WSGIRequest(core, environ, start_response)
+
+        path = req._resolve_static(req.path)
         if path:
-                return req.processStatic(path, lambda fd: fd) or []
-        else:
-                req.path = environ["PATH_INFO"]
-                core.process(req)
+            return req._process_static(path, lambda fd: fd) or []
 
+        core.process(req)
         return []

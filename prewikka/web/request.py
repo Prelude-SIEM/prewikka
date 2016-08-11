@@ -18,10 +18,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import abc
 import sys, os, os.path, time, copy, Cookie
-import mimetypes, urllib, cgi
+import mimetypes, urllib, cgi, urlparse
 from prewikka import env, error
-from prewikka.response import PrewikkaResponse, PrewikkaDownloadResponse
+from prewikka.response import PrewikkaResponse, PrewikkaDirectResponse
 
 _ADDITIONAL_MIME_TYPES = [("application/vnd.oasis.opendocument.formula-template", ".otf"),
                           ("application/vnd.ms-fontobject", ".eot"),
@@ -55,72 +56,65 @@ class BufferedWriter:
                         self.flush()
 
 
-class Request:
-    path = None
+class Request(object):
+    def __init__(self, *args, **kwargs):
+        env.request.web = self
 
-    def init(self, core):
-        # all of this should be done in constructor __init__, but the way
-        # BaseHTTPServer.BaseHTTPRequestHandler is designed forbid us to do so
         self.is_xhr = False
         self.is_multipart = False
         self.is_stream = False
         self._buffer = None
-
-        self._core = core
-
         self.arguments = { }
-
-        cookie = Cookie.SimpleCookie(self.getCookieString())
+        self._output_cookie = None
         self.input_cookie = { }
+        self.body = None
+
+    def init(self, core):
+        self._core = core
+        self._path = self.path
+
+        self._uri = urlparse.urlparse(self.path)
+
+        self._query_string = self._uri.query
+        self.path = urllib.url2pathname(self._uri.path or "/")
+
+        self.path_elements = self.path.strip('/').split("/")
+
+        cookie = Cookie.SimpleCookie(self.get_cookie())
         for key, value in cookie.items():
             self.input_cookie[key] = value
 
-        self.output_cookie = None
+    def add_cookie(self, param, value, expires, path="/"):
+        if not self._output_cookie:
+            self._output_cookie = Cookie.SimpleCookie()
 
-    def addCookie(self, param, value, expires, path="/"):
-        if not self.output_cookie:
-            self.output_cookie = Cookie.SimpleCookie()
-
-        self.output_cookie[param] = value
-        self.output_cookie[param]["expires"] = expires
+        self._output_cookie[param] = value
+        self._output_cookie[param]["expires"] = expires
         if path:
-            self.output_cookie[param]["path"] = path
+            self._output_cookie[param]["path"] = path
 
+    def delete_cookie(self, param):
+        self.add_cookie(param, "deleted", 0)
 
-    def deleteCookie(self, param):
-        self.addCookie(param, "deleted", 0)
-
-    def read(self, *args):
-        pass
-
-    def write(self, data):
-        pass
-
-    def sendHeaders(self, headers=[], code=200, status_text=None):
-        if self.output_cookie:
-            headers = headers + [("Set-Cookie", c.OutputString()) for c in self.output_cookie.values()]
+    def send_headers(self, headers=[], code=200, status_text=None):
+        if self._output_cookie:
+            headers = headers + [("Set-Cookie", c.OutputString()) for c in self._output_cookie.values()]
 
         for name, value in headers:
-            self.sendHeader(name, value)
+            self.write("%s: %s\r\n" % (name, value))
 
-        self.endHeaders()
-
-    def sendHeader(self, name, value):
-        self.write("%s: %s\r\n" % (name, value))
-
-    def endHeaders(self):
         self.write("\r\n")
 
-    def sendRedirect(self, location, redirect_code=307):
-        self.sendHeaders([('Location', location)], code=redirect_code, status_text="%d Redirect" % redirect_code)
+    def send_redirect(self, location, code=307):
+        self.send_headers([('Location', location)], code=code, status_text="%d Redirect" % code)
 
-    def sendStream(self, data, event=None, evid=None, retry=None, sync=False):
+    def send_stream(self, data, event=None, evid=None, retry=None, sync=False):
         if self._buffer is None:
             self.is_stream = True
             self._buffer = BufferedWriter(self.write)
             self.write = self._buffer.write
 
-            self.sendHeaders([("Content-Type", "text/event-stream")])
+            self.send_headers([("Content-Type", "text/event-stream")])
 
             if retry:
                  self._buffer.write("retry: %d\n" % retry)
@@ -128,55 +122,55 @@ class Request:
         # Join is used in place of concatenation / formatting, because we
         # prefer performance over readability in this place
         if event:
-                self._buffer.write("".join(["event: ", event, "\n"]))
+            self._buffer.write("".join(["event: ", event, "\n"]))
 
         if data:
-                self._buffer.write("".join(["data: ", data, "\n\n"]))
+            self._buffer.write("".join(["data: ", data, "\n\n"]))
 
         if sync:
-                self._buffer.flush()
+            self._buffer.flush()
 
-    def sendResponse(self, response, code=200, status_text=None):
+    def send_response(self, response, code=200, status_text=None):
         """Send a PrewikkaResponse response."""
 
-        if not response:
-            response = PrewikkaResponse()
+        if not isinstance(response, PrewikkaResponse):
+            response = PrewikkaDirectResponse(response, code=code, status_text=status_text)
 
-        if env.request.web.is_stream:
+        if self.is_stream:
             if isinstance(response.data, error.PrewikkaUserError):
-                env.request.web.sendStream(response.content(), event="error")
+                self.send_stream(response.content(), event="error")
 
             self._buffer.flush()
         else:
-            env.request.web.sendHeaders(response.headers.items(), response.code or code, response.status_text or status_text)
+            self.send_headers(response.headers.items(), response.code or code, response.status_text or status_text)
 
             data = response.content()
             if data:
                 env.request.web.write(data)
 
-    def resolveStaticPath(self, fname):
+    def _resolve_static(self, fname):
         pathmap = env.htdocs_mapping
-        pathkey = fname[1:].split("/")[0]
+        pathkey = self.path_elements[0]
 
         mapping = pathmap.get(pathkey, None)
         if not mapping:
            return
 
-        path = os.path.abspath(os.path.join(mapping, urllib.unquote(fname[len(pathkey) + 2:])))
+        path = os.path.abspath(os.path.join(mapping, fname[len(pathkey) + 2:]))
         if not path.startswith(mapping):
-                self.sendResponse(None, 403, status_text="Request Forbidden")
-                return
+            self.send_response(None, 403, status_text="Request Forbidden")
+            return
 
         # If the path doesn't exist or is not a regular file return None so that prewikka
         # attempt to resolve a view with the same name as the defined file mapping
         return path if os.path.isfile(path) else None
 
-    def processStatic(self, path, copyfunc):
+    def _process_static(self, path, copyfunc):
         try:
-                fd = open(path, "r")
+            fd = open(path, "r")
         except:
-                self.sendResponse(None, 404, status_text="File not found")
-                return
+            self.send_response(None, 404, status_text="File not found")
+            return
 
         stat = os.fstat(fd.fileno())
 
@@ -185,13 +179,13 @@ class Request:
             env.log.warning("Serving file with unknown MIME type: %s" % path)
             content_type = "application/octet-stream"
 
-        self.sendHeaders([('Content-Type', content_type),
+        self.send_headers([('Content-Type', content_type),
                           ('Content-Length', str(stat[6])),
                           ('Last-Modified', time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8])))])
 
         return copyfunc(fd)
 
-    def handleMultipart(self, *args, **kwargs):
+    def _handle_multipart(self, *args, **kwargs):
         arguments = {}
         fs = cgi.FieldStorage(**kwargs)
 
@@ -213,41 +207,26 @@ class Request:
         self.is_multipart = True
         return arguments
 
-    def getView(self):
-        if not self.path:
-                return "/"
 
-        return self.path
-
-    def getViewElements(self):
-        return self.getView().strip("/").split("/")
-
-    def getBaseURL(self):
+    def get_baseurl(self):
         return env.config.general.reverse_path + "/"
 
-    def getQueryString(self):
+    @abc.abstractmethod
+    def get_raw_uri(self, include_qs=False):
         pass
 
-    def getHeader(self, name):
+    @abc.abstractmethod
+    def get_remote_addr(self):
         pass
 
-    def getClientAddr(self):
+    @abc.abstractmethod
+    def get_remote_port(self):
         pass
 
-    def getClientPort(self):
+    @abc.abstractmethod
+    def get_cookie(self):
         pass
 
-    def getServerAddr(self):
-        pass
-
-    def getServerPort(self):
-        pass
-
-    def getUserAgent(self):
-        pass
-
-    def getMethod(self):
-        pass
-
-    def getURI(self):
+    @abc.abstractmethod
+    def write(self, data):
         pass

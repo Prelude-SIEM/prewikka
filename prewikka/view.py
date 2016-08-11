@@ -400,8 +400,7 @@ class ViewManager:
         return getViewPath(view_id, default)
 
     def getViewID(self, request):
-        paths = request.getViewElements()
-        return self.getViewIDFromPaths(paths)
+        return self.getViewIDFromPaths(request.path_elements)
 
     def getViewIDFromPaths(self, paths):
         sections = env.menumanager.get_sections_path()
@@ -436,7 +435,7 @@ class ViewManager:
             view = self.getView(view_layout)
 
         if not view:
-            raise InvalidViewError(_("View '%s' does not exist") % request.getView())
+            raise InvalidViewError(_("View '%s' does not exist") % request.path)
 
         env.log.info("Loading view %s" % view.view_id)
         if userl and view.view_permissions and not userl.has(view.view_permissions):

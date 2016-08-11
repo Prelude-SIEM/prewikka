@@ -37,11 +37,13 @@ class PrewikkaServer(BaseHTTPServer.HTTPServer):
 
 
 class PrewikkaRequestHandler(request.Request, BaseHTTPServer.BaseHTTPRequestHandler):
+    def __init__(self, *args, **kwargs):
+        request.Request.__init__(self, *args, **kwargs)
+        BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
 
     def init(self, method):
         request.Request.init(self, self.server.core)
-
-        self._method = method
+        self.method = method
 
         if self.headers.get("x-requested-with", "") == "XMLHttpRequest":
             self.is_xhr = True
@@ -49,85 +51,77 @@ class PrewikkaRequestHandler(request.Request, BaseHTTPServer.BaseHTTPRequestHand
         if self.headers.get("accept", "") == "text/event-stream":
             self.is_stream = True
 
-    def getCookieString(self):
-        return self.headers.get("Cookie")
-
-    def getQueryString(self):
-        return self._query_string
-
-    def getReferer(self):
-        try:
-            return self.input_headers["referer"]
-        except KeyError:
-            return ""
-
-    def write(self, data):
-        self.wfile.write(data)
-
-    def read(self, *args, **kwargs):
-        return apply(self.rfile.read, args, kwargs)
-
     def log_request(self, code):
         pass
 
-    def _processDynamic(self, arguments):
+    def _process_dynamic(self, arguments):
         for name, value in arguments.items():
             self.arguments[name] = (len(value) == 1) and value[0] or value
 
         self.server.core.process(self)
 
-    def sendHeaders(self, headers=None, code=200, status_text=None):
-        self.send_response(code)
-        request.Request.sendHeaders(self, headers)
+    def send_headers(self, headers=None, code=200, status_text=None):
+        BaseHTTPServer.BaseHTTPRequestHandler.send_response(self, code, status_text)
+        request.Request.send_headers(self, headers)
 
-    def getMethod(self):
-        return self._method
+    def send_error(self, code, status_text):
+        self.send_response(None, code=code, status_text=status_text)
 
     def do_GET(self):
-
-        uri = urlparse.urlparse(self.path)
-        self.path = urllib.url2pathname(uri.path)
-        self._query_string = uri.query
-
         self.init("GET")
 
-        path = self.resolveStaticPath(self.path)
+        path = self._resolve_static(self.path)
         if path:
-           return self.processStatic(path, lambda fd: shutil.copyfileobj(fd, self.wfile))
+           return self._process_static(path, lambda fd: shutil.copyfileobj(fd, self.wfile))
 
-        self._processDynamic(urlparse.parse_qs(uri.query))
+        self._process_dynamic(urlparse.parse_qs(self._uri.query))
 
     def do_HEAD(self):
         self.do_GET()
 
     def do_POST(self):
-        uri = urlparse.urlparse(self.path)
-        self.path = urllib.url2pathname(uri.path)
-
         self.init("POST")
 
         if self.headers.get("content-type", "").startswith("multipart/form-data"):
             self._query_string = ""
-            arguments = self.handleMultipart(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
+            self.body = arguments = self._handle_multipart(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
         else:
-            qs = self.rfile.read(int(self.headers["Content-Length"]))
-            if uri.query:
-                qs = "&".join((uri.query, qs))
+            self.body = qs = self.rfile.read(int(self.headers["Content-Length"]))
+            if self._uri.query:
+                qs = "&".join((self._uri.query, qs))
 
             self._query_string = qs
             arguments = urlparse.parse_qs(qs)
 
-        self._processDynamic(arguments)
+        self._process_dynamic(arguments)
 
-    def getClientAddr(self):
+    def write(self, data):
+        self.wfile.write(data)
+
+    def get_remote_addr(self):
         return self.client_address[0]
 
-    def getClientPort(self):
+    def get_remote_port(self):
         return self.client_address[1]
 
-    def getHeader(self, name):
-        return self.headers[name]
+    def get_query_string(self):
+        return self._query_string
 
+    def get_cookie(self):
+        return self.headers.get("Cookie")
+
+    def get_query_string(self):
+        return self._query_string
+
+    def get_raw_uri(self, include_qs=False):
+        uri = self._path
+
+        if include_qs:
+            qs = self.get_query_string()
+            if qs:
+                uri = "?".join((uri, qs))
+
+        return uri
 
 def serve_forever(server, config_file):
     server.core = main.get_core_from_config(config_file)
