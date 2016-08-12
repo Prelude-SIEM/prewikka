@@ -146,10 +146,23 @@ class MyConfigParser:
         self._sections[name].append(ConfigParserSection(instance))
         return self._sections[name][-1]
 
+    def read_string(self, string):
+        """Read and parse a string."""
+        self._read(string.splitlines())
+
+    def readfp(self, fp):
+        """Like read() but the argument must be a file-like object."""
+        self._read(fp.readlines())
+
     def read(self, filename):
+        """Read and parse a filename."""
+        with open(filename, 'r') as f:
+            self.readfp(f)
+
+    def _read(self, iterable):
         cursection = None
 
-        for lineno, line in enumerate(open(filename).readlines()):
+        for lineno, line in enumerate(iterable):
             result = self.EMPTY_LINE_REGEXP.match(line)
             if result:
                 continue
@@ -162,6 +175,9 @@ class MyConfigParser:
             result = self.OPTION_REGEXP.match(line)
             if not result:
                 raise ParseError(file.name, lineno + 1, line)
+
+            if not cursection:
+                continue
 
             name, value = result.group("name").strip(), result.group("value")
             cursection[name] = ConfigParserOption(name, value.strip() if value else None)
