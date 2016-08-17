@@ -22,7 +22,7 @@ import re, operator, pkg_resources, pkgutil
 from datetime import datetime
 
 import preludedb
-from prewikka import log, error, utils, version, env, compat
+from prewikka import log, error, utils, version, env, compat, usergroup
 
 
 class DatabaseSchemaError(error.PrewikkaUserError):
@@ -486,7 +486,7 @@ class Database(preludedb.SQL):
                res = self.query("SELECT userid FROM Prewikka_User_Configuration WHERE name = %s AND value = %s", key, value)
                yield set([x[0] for x in res])
 
-        return list(reduce(lambda x,y: x.intersection(y), get_data(keys)))
+        return [usergroup.User(userid=x) for x in reduce(lambda x,y: x.intersection(y), get_data(keys))]
 
     @use_transaction
     def set_property(self, user, key, value, view=None):
