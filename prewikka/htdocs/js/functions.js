@@ -31,6 +31,10 @@ $(document).ready(function(){
   });
 
 
+  $(document).on("click", "#logout", function() {
+    this.href = encodeURI("logout?redirect=" + location.href);
+  });
+
 // Repeatable entries
 
   $(document).on("click", ".del_entry_row", function() {
@@ -268,8 +272,8 @@ function prewikka_dialog(data)
     }
 
     $("#prewikka-dialog").dialog('option', 'buttons', [{
-        text: 'Ok',
-        'class': 'btn btn-default',
+        html: (data.code != 401) ? 'OK' : '<i class="fa fa-sign-in"/> Sign in',
+        'class': (data.code != 401) ? 'btn btn-default' : 'btn btn-primary',
         click: function() {
             $(this).dialog('close');
             /*
@@ -277,8 +281,8 @@ function prewikka_dialog(data)
              * when the user validates the dialog. This will redirect the user
              * to the Prewikka login page.
              */
-            if ( data.code === 401 )
-                location.reload();
+            if ( data.code == 401 )
+                window.location = window.location.href;
         }
     }]);
 

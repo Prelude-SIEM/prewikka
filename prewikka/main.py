@@ -38,13 +38,22 @@ from prewikka.utils import viewhelpers
 
 
 class Logout(view._View):
-    view_parameters = view.Parameters
+    class LogoutParameters(view.Parameters):
+        def register(self):
+            self.optional("redirect", str)
+
+    view_parameters = LogoutParameters
     view_permissions = []
     view_layout = None
 
     def render(self):
-        env.session.logout(env.request.web)
+        try:
+            env.session.logout(env.request.web)
+        except:
+            # logout always generate an exception to render the logout template
+            pass
 
+        return env.request.web.send_redirect(self.parameters.get("redirect", env.request.web.get_baseurl()), code=302)
 
 _core_cache = {}
 _core_cache_lock = Lock()
