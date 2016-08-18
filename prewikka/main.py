@@ -258,6 +258,10 @@ class Core:
             response = err.respond()
 
         except Exception, err:
-            response = error.PrewikkaUserError(_("Prelude internal error"), err, display_traceback=True).respond()
+            response = error.PrewikkaUserError(
+                _("Prelude internal error"),
+                err,
+                display_traceback=env.config.general.get("enable_error_traceback") not in ('no', 'false')
+            ).respond()
 
         request.send_response(response)
