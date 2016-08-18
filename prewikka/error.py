@@ -77,7 +77,10 @@ class PrewikkaUserError(PrewikkaError):
         for i in ("name", "message", "code", "traceback"):
             v.dataset[i] = getattr(self, i)
 
-        return v.respond()
+        ret = v.respond()
+        ret.code = self.code
+
+        return ret
 
     def respond(self):
         if str(self):
