@@ -219,32 +219,36 @@ class Core:
         hookmanager.unregister()
         self._loadPlugins(last_change=last)
 
-    def process(self, request):
-        env.request.init(request)
-        view_object = user = autherr = None
+    def _redirect_default(self, request):
+        default_view = env.config.general.get("default_view", "alerts/alerts")
+        if not env.viewmanager.getViewIDFromPaths(default_view.split('/')):
+            # The configured view does not exist. Fall back to "settings/my_account"
+            # which does not require any specific permission.
+            default_view = "settings/my_account"
+
+        return request.send_redirect("%s%s" % (request.get_baseurl(), default_view), 302)
+
+    def process(self, webreq):
+        env.request.init(webreq)
+        view_object = autherr = None
 
         encoding = env.config.general.get("encoding", "utf8")
         try:
             self._prewikka_init_if_needed()
 
             try:
-                env.request.user = user = env.session.get_user(request)
-                user.set_locale()
+                env.request.user = env.session.get_user(webreq)
+                env.request.user.set_locale()
             except Exception as autherr:
                 pass
 
-            if not all(hookmanager.trigger("HOOK_PROCESS_REQUEST", request, user)):
+            if not all(hookmanager.trigger("HOOK_PROCESS_REQUEST", webreq, env.request.user)):
                 return
 
-            if request.path == "/":
-                default_view = env.config.general.get("default_view", "alerts/alerts")
-                if not env.viewmanager.getViewIDFromPaths(default_view.split('/')):
-                    # The configured view does not exist. Fall back to "settings/my_account"
-                    # which does not require any specific permission.
-                    default_view = "settings/my_account"
-                raise error.RedirectionError("%s%s" % (request.get_baseurl(), default_view), 302)
+            if webreq.path == "/":
+                return self._redirect_default(webreq)
 
-            env.request.view = view_object = env.viewmanager.loadView(request, user)
+            env.request.view = view_object = env.viewmanager.loadView(webreq, env.request.user)
             if view_object.view_require_session and autherr:
                 raise autherr
 
@@ -252,7 +256,7 @@ class Core:
             response = view_object.respond()
 
         except error.RedirectionError as err:
-            return request.send_redirect(err.location, err.code)
+            return webreq.send_redirect(err.location, err.code)
 
         except error.PrewikkaUserError as err:
             response = err.respond()
@@ -264,4 +268,4 @@ class Core:
                 display_traceback=env.config.general.get("enable_error_traceback") not in ('no', 'false')
             ).respond()
 
-        request.send_response(response)
+        webreq.send_response(response)
