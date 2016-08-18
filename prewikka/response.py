@@ -22,6 +22,9 @@ import json, time
 from prewikka import env, compat, utils, template
 
 
+_sentinel = object()
+
+
 class PrewikkaResponse(object):
     """
         HTML response
@@ -35,18 +38,21 @@ class PrewikkaResponse(object):
         If the type of data is a dict, it will be cast in a JSON string
     """
 
-    def __init__(self, data=None, headers={}, code=None, status_text=None):
+    def __init__(self, data=None, headers=_sentinel, code=None, status_text=None):
         self.data = data
         self.code = code
         self.status_text = status_text
         self.ext_content = {}
 
-        self.headers = headers or utils.OrderedDict((("Content-type", "text/html"),
-                                                    ("Last-Modified", time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())),
-                                                    ("Expires", "Fri, 01 Jan 1999 00:00:00 GMT"),
-                                                    ("Cache-control", "no-store, no-cache, must-revalidate"),
-                                                    ("Cache-control", "post-check=0, pre-check=0"),
-                                                    ("Pragma", "no-cache")))
+        if headers is not _sentinel:
+            self.headers = headers
+        else:
+            self.headers = utils.OrderedDict((("Content-type", "text/html"),
+                                              ("Last-Modified", time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())),
+                                              ("Expires", "Fri, 01 Jan 1999 00:00:00 GMT"),
+                                              ("Cache-control", "no-store, no-cache, must-revalidate"),
+                                              ("Cache-control", "post-check=0, pre-check=0"),
+                                              ("Pragma", "no-cache")))
 
     def add_ext_content(self, key, value):
         """Add an extra content to the response (add in XHR request)."""
