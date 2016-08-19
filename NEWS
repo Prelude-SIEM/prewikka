@@ -1,3 +1,26 @@
+* 2016-08-19, prewikka-3.1.0rc2:
+
+Author: Thomas Andrejak
+
+- Fix WSGI headers to be a standard dict
+- Fix behavior of get_users_by_properties function
+
+Author: Sélim Menouar
+
+- Add option to disable error traceback
+- Add readfp and read_string methods in ConfigParser
+
+Author: Yoann Vandoorselaere
+
+- PrewikkaResponse() allow empty headers argument
+- Correctly propagate error code in case of HTML error response
+- Support view that does not require authentication
+- Headers can now be specified in PrewikkaResponse
+- sendStream fixes, "close" event is not part of the protocol
+- PrewikkaTemplate now provides  __json__
+
+
+
 * 2016-08-05, prewikka-3.1.0rc1:
 
 Author: Thomas Andrejak
