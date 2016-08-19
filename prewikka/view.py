@@ -331,6 +331,17 @@ class _View(object):
         pass
 
     def _render(self):
+        self.parameters = {}
+        if self.view_parameters:
+            self.parameters = self.view_parameters(self, env.request.web.arguments)
+            self.parameters.normalize(self.view_id, env.request.user)
+            self.parameters.handleLists()
+
+        env.request.parameters = self.parameters
+
+        if self.view_template and self.dataset is None:
+            self.dataset = template.PrewikkaTemplate(self.view_template)
+
         if self.dataset is not None:
             _VIEWS["baseview"].setup_dataset(self.dataset)
 
@@ -341,6 +352,8 @@ class _View(object):
             obj.render()
 
     def respond(self):
+        env.log.info("Loading view %s" % (self.view_id))
+
         self._render()
         response = self.render()
 
@@ -358,6 +371,8 @@ class _View(object):
         return response
 
     def __init__(self):
+        self.dataset = None
+
         if not self.view_id:
             self.view_id = self.__class__.__name__.lower()
 
@@ -437,21 +452,11 @@ class ViewManager:
         if not view:
             raise InvalidViewError(_("View '%s' does not exist") % request.path)
 
-        env.log.info("Loading view %s" % view.view_id)
         if userl and view.view_permissions and not userl.has(view.view_permissions):
             raise usergroup.PermissionDeniedError(view.view_permissions, view.view_id)
 
-        parameters = {}
-        if view.view_parameters:
-            parameters = view.view_parameters(view, request.arguments)
-            parameters.normalize(view.view_id, userl)
-            parameters.handleLists()
+        return copy(view)
 
-        view = copy(view)
-        view.parameters = env.request.parameters = parameters
-        view.dataset = env.request.dataset = template.PrewikkaTemplate(view.view_template) if view.view_template else None
-
-        return view
 
     def addView(self, view):
         if view.view_name:
