@@ -95,17 +95,16 @@ class WSGIRequest(request.Request):
 
     @property
     def headers(self):
-        if self._headers:
+        if self._headers is not None:
             return self._headers
 
-        lst = []
+        self._headers = {}
         for key, value in self._environ.items():
             if key.find("HTTP_") == -1:
                 continue
 
-            lst.append((key[5:].replace("_", "-").lower(), value))
+            self._headers[key[5:].replace("_", "-").lower()] = value
 
-        self._headers = wsgiref.headers.Headers(lst)
         return self._headers
 
 def application(environ, start_response):
