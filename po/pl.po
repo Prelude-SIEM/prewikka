@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-07 00:06+0200\n"
+"POT-Creation-Date: 2016-08-21 01:43+0200\n"
 "PO-Revision-Date: 2008-03-04 09:30+0100\n"
 "Last-Translator: Konrad Kosmowski <konrad@kosmosik.net>\n"
 "Language-Team: Polish\n"
@@ -104,7 +104,7 @@ msgstr ""
 msgid "Plugin for fetching IDMEF alerts from the Prelude database"
 msgstr ""
 
-#: prewikka/error.py:106
+#: prewikka/error.py:109
 #, fuzzy
 msgid "Invalid query"
 msgstr "Nieprawidłowa sesja"
@@ -181,7 +181,7 @@ msgstr ""
 msgid "Session '%s' does not accept any authentication module"
 msgstr ""
 
-#: prewikka/main.py:256
+#: prewikka/main.py:266
 msgid "Prelude internal error"
 msgstr ""
 
@@ -302,7 +302,7 @@ msgstr "Nieprawidłowa sesja"
 msgid "Session expired"
 msgstr "Sesja wygasła"
 
-#: prewikka/session/session.py:186
+#: prewikka/session/session.py:173
 msgid "Logged out"
 msgstr "Wylogowany"
 
@@ -363,37 +363,37 @@ msgstr ""
 msgid "Go!"
 msgstr ""
 
-#: prewikka/templates/TopLayout.py:101
+#: prewikka/templates/TopLayout.py:102
 msgid "Detail"
 msgstr "Szczegół"
 
-#: prewikka/templates/TopLayout.py:127
+#: prewikka/templates/TopLayout.py:128
 msgid "Please Confirm"
 msgstr ""
 
-#: prewikka/templates/TopLayout.py:137
+#: prewikka/templates/TopLayout.py:138
 #: prewikka/views/usermanagement/templates/UserSettings.py:260
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: prewikka/templates/TopLayout.py:143
+#: prewikka/templates/TopLayout.py:144
 #: prewikka/views/warning/templates/warning.py:99
 msgid "OK"
 msgstr ""
 
-#: prewikka/templates/TopLayout.py:257
+#: prewikka/templates/TopLayout.py:258
 msgid "This app has been disabled or failed to load."
 msgstr ""
 
-#: prewikka/templates/TopLayout.py:280 prewikka/templates/TopLayout.py:288
+#: prewikka/templates/TopLayout.py:281 prewikka/templates/TopLayout.py:289
 msgid "About"
 msgstr "O systemie"
 
-#: prewikka/templates/TopLayout.py:296 prewikka/templates/TopLayout.py:309
+#: prewikka/templates/TopLayout.py:297 prewikka/templates/TopLayout.py:310
 msgid "Logout"
 msgstr "Wyloguj"
 
-#: prewikka/templates/TopLayout.py:304
+#: prewikka/templates/TopLayout.py:305
 msgid "Are you sure you want to log out?"
 msgstr ""
 
@@ -416,7 +416,7 @@ msgstr "Odmowa dostępu"
 msgid "Offline"
 msgstr "Niedostepny"
 
-#: prewikka/utils/misc.py:40 prewikka/view.py:364
+#: prewikka/utils/misc.py:40 prewikka/view.py:365
 #: prewikka/views/agents/agents.py:206
 msgid "Unknown"
 msgstr "Nieznany"
@@ -458,7 +458,7 @@ msgstr ""
 msgid "Invalid view"
 msgstr "Nieprawidłowa sesja"
 
-#: prewikka/view.py:435
+#: prewikka/view.py:438
 #, python-format
 msgid "View '%s' does not exist"
 msgstr ""
