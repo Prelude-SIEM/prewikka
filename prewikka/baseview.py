@@ -18,7 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-from prewikka import view, resource, localization, hookmanager, utils, env, templates
+from prewikka import view, resource, hookmanager, env, templates
 
 
 _CSS_FILES = [resource.CSSLink(link) for link in (
@@ -51,17 +51,12 @@ class BaseView(view._View):
     view_template = templates.BaseView
 
     def render(self):
-        user = env.request.user
-        interface = env.config.interface
-
         # The database attribute might be None in case of initialisation error
         # FIXME: move me to a plugin !
         try:
-            theme_name = user.get_property("theme", default=env.config.general.default_theme)
+            theme_name = env.request.user.get_property("theme", default=env.config.general.default_theme)
         except:
             theme_name = env.config.general.default_theme
-
-        self.dataset["document.title"] = interface.get("browser_title", "Prelude OSS")
 
         theme_file = resource.CSSLink("prewikka/css/themes/%s.css" % theme_name)
         head = _CSS_FILES + [theme_file] + _JS_FILES
@@ -70,42 +65,6 @@ class BaseView(view._View):
             head += (content for content in i if content not in head)
 
         self.dataset["document.head_content"] = head
-
-        self.dataset["prewikka.favicon"] = interface.get(
-            "favicon",
-            "prewikka/images/favicon.ico"
-        )
-        self.dataset["prewikka.software"] = interface.get(
-            "software",
-            "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />"
-        )
-
-        if user:
-            if interface.get("user_display") == "name":
-                self.dataset["prewikka.user_display"] = user.get_property("fullname", default=user.name)
-            else:
-                self.dataset["prewikka.user_display"] = user.name
-
-        self.dataset["prewikka.logout_link"] = (user and env.session.can_logout()) and utils.create_link("logout") or None
-
-        try:
-            paths = env.request.web.path_elements
-            active_section, active_tab = paths[0], paths[1]
-        except:
-            active_section, active_tab = "", ""
-
-        self.dataset["interface.active_tab"] = active_tab
-        self.dataset["interface.active_section"] = active_section
-        self.dataset["interface.sections"] = env.menumanager.get_sections(user) if env.menumanager else {}
-        self.dataset["interface.menu"] = env.menumanager.get_menus(user) if env.menumanager else {}
         self.dataset["toplayout_extra_content"] = ""
 
-        all(hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT", self.dataset))
-
-    @staticmethod
-    def setup_dataset(dataset):
-        dataset["document.base_url"] = env.request.web.get_baseurl()
-        dataset["document.fullhref"] = "/".join(env.request.web.path_elements) # Needed for view that aren't completly ported to ajax
-        dataset["document.href"] = "/".join(env.request.web.path_elements[0:2]) # Subview are hidden
-        dataset["toplayout_extra_content"] = ""
-
+        list(hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT", self.dataset))

@@ -1,5 +1,5 @@
 #extends prewikka.templates.HTMLDocument
-#from prewikka import utils
+#from prewikka import utils, env
 
 #block main_content
 #end block
@@ -11,9 +11,11 @@
 #end block
 
 #block body
+#set $software = $env.config.interface.get("software", "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />")
+#set $menus = $env.menumanager.get_menus($env.request.user) if $env.menumanager else {}
+
 #filter CleanOutput
 <body>
-    <span id="prewikka-title" class="hidden">$document.title</span>
     <div id="prewikka-dialog">
         <div class="content"></div>
         <div class="traceback" style="display:none;">
@@ -52,7 +54,7 @@
     <div id="top_view">
         <nav class="navbar navbar-fixed-top navbar-primary" id="top_view_navbar">
             <div class="navbar-header">
-                <div class="navbar-brand visible-xs-block">$prewikka.software</div>
+                <div class="navbar-brand visible-xs-block">$software</div>
                 <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main_navbar_collapse" aria-expanded="false">
                     <i class=" fa fa-bars fa-2x"></i>
                 </button>
@@ -62,7 +64,7 @@
                 $toplayout_menu
                 <ul class="nav navbar-nav navbar-right" id="nav_top_view_header">
                     <li class="visible-lg-inline">
-                        <div class="navbar-brand">$prewikka.software</div>
+                        <div class="navbar-brand">$software</div>
                     </li>
                     $toplayout_extra_content
                 </ul>

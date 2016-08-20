@@ -248,7 +248,7 @@ class Core:
             if webreq.path == "/":
                 return self._redirect_default(webreq)
 
-            env.request.view = view_object = env.viewmanager.loadView(webreq, env.request.user)
+            view_object = env.viewmanager.loadView(webreq, env.request.user)
             if view_object.view_require_session and autherr:
                 raise autherr
 

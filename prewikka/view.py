@@ -330,6 +330,10 @@ class _View(object):
     def render(self):
         pass
 
+    def _setup_dataset_default(self):
+        self.dataset["document.base_url"] = env.request.web.get_baseurl()
+        self.dataset["document.href"] = "/".join(env.request.web.path_elements)
+
     def _render(self):
         self.parameters = {}
         if self.view_parameters:
@@ -343,7 +347,7 @@ class _View(object):
             self.dataset = template.PrewikkaTemplate(self.view_template)
 
         if self.dataset is not None:
-            _VIEWS["baseview"].setup_dataset(self.dataset)
+            self._setup_dataset_default()
 
         for name, classobj in self.view_extensions:
             obj = classobj()

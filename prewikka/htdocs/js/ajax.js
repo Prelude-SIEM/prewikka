@@ -157,7 +157,10 @@ function _url2menu(url)
         if ( tab ) {
                 /* Update the document's title according to the names of the section and tab */
                 if ( pathtbl[0] != undefined && pathtbl[1] != undefined ) {
-                        document.title = $("#prewikka-title").text() + " - " + pathtbl[0].capitalize() + " (" + pathtbl[1].capitalize() + ")";
+                        if ( ! document.orig_title )
+                           document.orig_title = document.title;
+
+                        document.title = document.orig_title + " - " + pathtbl[0].capitalize() + " (" + pathtbl[1].capitalize() + ")";
                 }
 
                 /*

@@ -3,6 +3,8 @@
 #extends prewikka.templates.TopLayout
 
 #block toplayout_content
+#set $sections = $env.menumanager.get_sections($env.request.user) if $env.menumanager else {}
+
 #filter CleanOutput
 <script type="text/javascript">
 
@@ -23,7 +25,7 @@ function check_same_origin(url) {
 }
 
 \$(document).ready(function() {
-        prewikka_loadTab({url: "$document.fullhref", data: "$env.request.web.get_query_string()", type: "$env.request.web.method"});
+        prewikka_loadTab({url: "$document.href", data: "$env.request.web.get_query_string()", type: "$env.request.web.method"});
 
         /*
          * Back/Forward support.
@@ -118,22 +120,22 @@ function check_same_origin(url) {
   <div class="topmenu_nav">
     <div class="topmenu_nav_container"></div>
     <div class="topmenu_content">
-    #for $section in $interface.sections.keys():
+    #for $section in $sections.keys():
         #set $style = ""
 
-        #if $nameToPath($section) != $interface.active_section
+        #if $nameToPath($section) != $env.request.web.path_elements[0] if $len($env.request.web.path_elements) > 0 else ""
             #set $style="display:none;"
         #end if
 
         <ul style="$style" class="nav nav-tabs topmenu_section" id="topmenu_$nameToPath($section)">
-        #for $name, $views in $interface.sections.get($section).items()
+        #for $name, $views in $sections.get($section).items()
             #set $firstview = $views.values()[0]
 
             #if $env.request.user and not $env.request.user.has($firstview.view_permissions):
                 #continue
             #end if
 
-            #if $nameToPath($name) == $interface.active_tab
+            #if $nameToPath($name) == $env.request.web.path_elements[1] if $len($env.request.web.path_elements) > 1 else ""
                 #set $class_ = 'active'
             #else
                 #set $class_ = ''
