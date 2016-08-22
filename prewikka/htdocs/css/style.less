@@ -154,7 +154,7 @@ p {
     position: fixed;
     top: 41px;
     z-index: 4;
-    max-width: 50%;
+    max-width: 60%;
     right: 0;
     #main_menu_navbar {
         margin-bottom: 0px;
@@ -210,11 +210,14 @@ p {
         width: 100%;
     }
 }
+
 .label-xs {
-    margin-bottom: -2px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin-bottom: -4px;
     margin-top: -6px;
     font-size: 62.5%;
-    margin-bottom: 0;
 }
 
 label.required:after {
