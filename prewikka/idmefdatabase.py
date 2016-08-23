@@ -65,7 +65,8 @@ class IDMEFDatabase(preludedb.DB):
 
         all(hookmanager.trigger("HOOK_IDMEFDATABASE_CRITERIA_PREPARE", criteria, criteria_type))
 
-        criteria = " && ".join(criteria) % {"backend": criteria_type, "time_field": "create_time"}
+        # Do not use string formatting to avoid errors when criteria contains '%'
+        criteria = " && ".join(criteria).replace("%(backend)s", criteria_type).replace("%(time_field)s", "create_time")
 
         if len(criteria) > 0:
             return prelude.IDMEFCriteria(criteria)
