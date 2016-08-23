@@ -673,7 +673,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                 else:
                     alert = env.idmef_db.getAlert(results[0], htmlsafe=True)["alert"]
                     link = utils.create_link("/".join(env.request.web.path_elements[:2] + [self.view_id]), {"ident": results[0]})
-                    content += "<li><a href=\"%s\">%s</a></li>" % (link, alert["classification.text"])
+                    content += '<li><a class="widget-link" title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, alert["classification.text"])
 
             if missing > 0:
                 content += "<li>" + (_("%d linked alerts missing (probably deleted)") % missing) + "</li>"
