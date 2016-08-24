@@ -1,4 +1,4 @@
-#from prewikka import env
+#from prewikka import env, utils
 #from prewikka.utils import nameToPath
 #extends prewikka.templates.TopLayout
 
@@ -148,13 +148,77 @@ function check_same_origin(url) {
 </div>
 <a type="button" id="config-button" data-toggle="collapse" data-target=".prewikka-view-config"><i class="fa fa-cog"></i></a>
 #end filter
+#end block toplayout_content
 
-<div id="_main_viewport"></div>
-<div id="_main">
+#block toplayout_menu
+
+#set $menus = $env.menumanager.get_menus($env.request.user) if $env.menumanager else {}
+#set $sections = $env.menumanager.get_sections($env.request.user) if $env.menumanager else {}
+
+#if $env.request.user
+    <ul id="top_view_navbar_menu" class="nav navbar-nav navbar-primary">
+    #for $name, $menu_item in $menus.items()
+        <li class="dropdown">
+            <a class="dropdown-toggle" data-toggle="dropdown">
+                #if $menu_item.icon
+                    <i class="fa fa-$menu_item.icon"></i>
+                #end if
+                $_($name)
+                <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu" role="menu">
+            #for $section in $menu_item.entries
+                #if $section.views
+                    #if len($section.views) == 1
+                <li>
+                    <a href="$section.views[0].view_path">
+                    #if $section.icon
+                        <i class="fa fa-$section.icon"></i>
+                    #end if
+                        $_($section.name)
+                    </a>
+                </li>
+                    #else
+                <li class="dropdown dropdown-submenu">
+                    <a class="dropdown-toggle" data-toggle="dropdown">
+                    #if $section.icon
+                        <i class="fa fa-$section.icon"></i>
+                    #end if
+                        $_($section.name)
+                    </a>
+                    <ul class="dropdown-menu">
+                    #for view in $section.views
+                        <li><a href="$view.view_path">$_($view.view_name)</a></li>
+                    #end for
+                    </ul>
+                </li>
+                    #end if
+                #else
+                <li class="disabled" title="$_('This app has been disabled or failed to load.')"><a>
+                    #if $section.icon
+                    <i class="fa fa-$section.icon"></i>
+                    #end if
+                    $_($section.name)
+                </a></li>
+                #end if
+            #end for
+            #if $menu_item.default
+                <li role="separator" class="divider"></li>
+                <li><a class="widget-link" title="$_("About")" href="$utils.create_link('About')">$_("About")</a></li>
+                #if $env.session.can_logout
+                <li><a id="logout" title="$_("Logout")" class="ajax-bypass" href="$utils.create_link('logout')" data-confirm="$_("Are you sure you want to log out?")">$_("Logout")</a></li>
+                #end if
+            #end if
+            </ul>
+        </li>
+    #end for
+    </ul>
+#end if
+#end block toplayout_menu
+
+#block main_content
     <div id="ajax-spinner" class="ajax-spinner" style="display:none;">
         <div class="loader">$_("Loading")</div>
     </div>
     <div id="main" class="content" />
-</div>
-
-#end block toplayout_content
+#end block
