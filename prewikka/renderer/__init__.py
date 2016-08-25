@@ -114,6 +114,9 @@ class RendererPluginManager(pluginmanager.PluginManager):
             if not i.renderer_type in self._default_backends:
                 self._default_backends[i.renderer_type] = i.renderer_backend
 
+    def get_types(self):
+        return self._default_backends.keys()
+
     def has_backend(self, wanted_backend, wanted_type=None):
         if wanted_backend not in self._renderer:
             return False
