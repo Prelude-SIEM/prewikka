@@ -30,6 +30,15 @@ $(document).ready(function(){
     $(this).next().popupUnique(function(data){data.show('fast'); data.css('display','block')}, function(data){data.hide('fast')});
   });
 
+  $(document).on("show.bs.popover", '[data-toggle="popover"]', function() {
+    $('[data-toggle="popover"]').not(this).popover("hide");
+  });
+
+  $(document).on("hidden.bs.popover", '[data-toggle="popover"]', function() {
+    // See https://github.com/twbs/bootstrap/issues/16732
+    $(this).data("bs.popover").inState.click = false;
+  });
+
 
   $(document).on("click", "#logout", function() {
     this.href = encodeURI("logout?redirect=" + location.href);

@@ -45,6 +45,11 @@ function _mergedict(obj1, obj2) {
 }
 
 
+function _initialize_components(container) {
+    $(container).find('[data-toggle="tooltip"]').tooltip();
+    $(container).find('[data-toggle="popover"]').popover();
+}
+
 
 function __ie_fixes(data)
 {
@@ -131,9 +136,7 @@ function prewikka_drawTab(data)
         });
     }
 
-    $(function () {
-        $('[data-toggle="tooltip"]').tooltip();
-    });
+    _initialize_components("#main");
 }
 
 /* Update the tab's menu according to the url */
@@ -284,6 +287,7 @@ function prewikka_widget(settings)
                 $(dlg).dialog("open");
                 $(dlg).append(content);
                 $(dlg).dialog("option", "position", conf.position);
+                _initialize_components(dlg);
         });
 }
 
