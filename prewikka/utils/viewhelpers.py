@@ -17,9 +17,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from prewikka import view, env, utils, hookmanager
-
+import json
 from string import Template
+
+from prewikka import view, env, utils, hookmanager, response
+
 
 class GridAjaxParameters(view.Parameters):
     """Handle parameters sent by jqGrid."""
@@ -53,13 +55,19 @@ class AjaxHostURL(view.View):
 
             yield urlname.capitalize(), url
 
+    @classmethod
+    def _link_generator(cls, infos):
+        for urlname, url in cls._value_generator(infos):
+            yield '<a href="%(url)s" target="_%(urlname)s">%(urlname)s</a>' % {
+                "urlname": utils.escape_html_string(urlname),
+                "url": utils.escape_html_string(url)
+            }
+
     def render(self):
         infos = {"host": self.parameters["host"]}
 
         for info in hookmanager.trigger("HOOK_HOST_INFO", self.parameters["host"]):
             infos.update(info)
 
-        return ['<a href="%(url)s" target="_%(urlname)s">%(urlname)s</a>' % {
-            "urlname": utils.escape_html_string(urlname),
-            "url": utils.escape_html_string(url)}
-                for urlname, url in self._value_generator(infos)]
+        return response.PrewikkaDirectResponse(json.dumps(list(self._link_generator(infos))))
+
