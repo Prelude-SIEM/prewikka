@@ -115,7 +115,7 @@ class SensorListing(view.View):
         list(hookmanager.trigger("HOOK_AGENTS_EXTRA_CONTENT", analyzer_data))
 
         self.dataset["data"] = utils.escape_attribute(json.dumps(analyzer_data))
-        self.dataset["extra_columns"] = list(hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN"))
+        self.dataset["extra_columns"] = [col for col in hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN") if col]
 
 
 class SensorMessagesDelete(SensorListing):
