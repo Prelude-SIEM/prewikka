@@ -270,6 +270,10 @@ class CachingIterator(object):
             self._cache.append(value)
             yield value
 
+        # Some iterables can be read through multiple times. We disable this here
+        # This will avoid duplicate data in self._cache
+        self._items = iter([])
+
     def __getitem__(self, key):
         if isinstance(key, slice) :
             return [self[i] for i in xrange(*key.indices(len(self)))]
