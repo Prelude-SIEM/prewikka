@@ -297,7 +297,7 @@ setup(name="prewikka",
       },
 
       package_data= { '': ["htdocs/images/*.*",
-                           "htdocs/js/*.js", "htdocs/js/*.map",
+                           "htdocs/js/*.js", "htdocs/js/locales/*.js", "htdocs/js/*.map",
                            "htdocs/css/*.*", "htdocs/css/themes/*.*",
                            "htdocs/css/images/*.*", "htdocs/css/images/*.*",
                            "htdocs/fonts/*.*",

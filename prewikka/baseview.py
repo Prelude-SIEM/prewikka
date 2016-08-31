@@ -51,15 +51,18 @@ class BaseView(view._View):
     view_template = templates.BaseView
 
     def render(self):
-        # The database attribute might be None in case of initialisation error
-        # FIXME: move me to a plugin !
-        try:
-            theme_name = env.request.user.get_property("theme", default=env.config.general.default_theme)
-        except:
-            theme_name = env.config.general.default_theme
+        # FIXME: move theme management to a plugin !
+        if env.request.user:
+            theme = env.request.user.get_property("theme", default=env.config.general.default_theme)
+            lang = env.request.user.get_property("language", default=env.config.general.default_locale)
+        else:
+            theme = env.config.general.default_theme
+            lang = env.config.general.default_locale
 
-        theme_file = resource.CSSLink("prewikka/css/themes/%s.css" % theme_name)
-        head = _CSS_FILES + [theme_file] + _JS_FILES
+        # The jqgrid locale files use only two characters for identifying the language (e.g. pt_BR -> pt)
+        lang_file = resource.JSLink("prewikka/js/locales/grid.locale-%s.js" % lang[:2])
+        theme_file = resource.CSSLink("prewikka/css/themes/%s.css" % theme)
+        head = _CSS_FILES + [theme_file] + _JS_FILES + [lang_file]
 
         for i in hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT"):
             head += (content for content in i if content not in head)
