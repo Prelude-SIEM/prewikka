@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-08-21 01:43+0200\n"
+"POT-Creation-Date: 2016-09-02 19:20+0200\n"
 "PO-Revision-Date: 2008-02-26 13:12-0300\n"
 "Last-Translator: Edelberto Franco Silva <edeunix@edeunix.com>\n"
 "Language-Team: Portuguese\n"
@@ -40,54 +40,71 @@ msgstr ""
 msgid "database activation required"
 msgstr ""
 
-#: prewikka/database.py:311
+#: prewikka/database.py:245
+#, python-format
+msgid "database schema branch %(required)s required (found %(current)s)"
+msgstr ""
+
+#: prewikka/database.py:249
+#, python-format
+msgid "database schema version %(required)s required (found %(current)s)"
+msgstr ""
+
+#: prewikka/database.py:314
 msgid "Database installation error"
 msgstr ""
 
-#: prewikka/database.py:311
+#: prewikka/database.py:315
 #, python-format
 msgid ""
 "No database installation script found for module %(module)s, version %"
 "(version)s"
 msgstr ""
 
-#: prewikka/database.py:318 prewikka/database.py:350
+#: prewikka/database.py:323 prewikka/database.py:362
 msgid "Database migration error"
 msgstr ""
 
-#: prewikka/database.py:350
+#: prewikka/database.py:324
+#, python-format
+msgid ""
+"No database branch migration script found for module %(module)s, branch "
+"transition %(current)s -> %(required)s"
+msgstr ""
+
+#: prewikka/database.py:363
 #, python-format
 msgid ""
 "No linear migration script found for module %(module)s %(version1)s -> %"
 "(version2)s"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:46 prewikka/dataprovider/__init__.py:78
+#: prewikka/dataprovider/__init__.py:46 prewikka/dataprovider/__init__.py:79
 #, fuzzy
 msgid "Conversion error"
 msgstr "AlertasDeCorreção"
 
-#: prewikka/dataprovider/__init__.py:47 prewikka/dataprovider/__init__.py:79
+#: prewikka/dataprovider/__init__.py:47 prewikka/dataprovider/__init__.py:80
 #, python-format
 msgid "Value %(value)r cannot be converted to %(type)s"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:169
+#: prewikka/dataprovider/__init__.py:171
 #, python-format
 msgid "Invalid normalizer for '%s' datatype"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:176
+#: prewikka/dataprovider/__init__.py:178
 #, python-format
 msgid "No handler configured for '%s' datatype"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:186
+#: prewikka/dataprovider/__init__.py:188
 #, fuzzy
 msgid "Configuration error"
 msgstr "AlertasDeCorreção"
 
-#: prewikka/dataprovider/__init__.py:187
+#: prewikka/dataprovider/__init__.py:189
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
 msgstr ""
@@ -121,31 +138,31 @@ msgstr ""
 msgid "All paths"
 msgstr ""
 
-#: prewikka/localization.py:121
+#: prewikka/localization.py:141
 msgid "%m/%Y"
 msgstr "%m/%Y"
 
-#: prewikka/localization.py:122
+#: prewikka/localization.py:142
 msgid "%m/%d/%Y"
 msgstr "%d/%m/%Y"
 
-#: prewikka/localization.py:123
+#: prewikka/localization.py:143
 msgid "%m/%d/%Y %Hh"
 msgstr "%d/%m/%Y %H:00"
 
-#: prewikka/localization.py:124
+#: prewikka/localization.py:144
 msgid "%m/%d/%Y %H:%M"
 msgstr "%d/%m/%Y %H:%M"
 
-#: prewikka/localization.py:125
+#: prewikka/localization.py:145
 msgid "%m/%d/%Y %H:%M:%S"
 msgstr "%d/%m/%Y %H:%M:%S"
 
-#: prewikka/localization.py:127
+#: prewikka/localization.py:147
 msgid "%H:%M"
 msgstr "%H:%M"
 
-#: prewikka/localization.py:128
+#: prewikka/localization.py:148
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
@@ -154,34 +171,40 @@ msgstr "%H:%M:%S"
 msgid "Unknown logtype specified: '%s'"
 msgstr "Tipo de log especificado é desconhecido: '%s'"
 
-#: prewikka/main.py:69
+#: prewikka/main.py:78
 msgid "Version Requirement error"
 msgstr ""
 
-#: prewikka/main.py:71
+#: prewikka/main.py:81
 #, python-format
 msgid "Prewikka %(vPre)s requires libprelude %(vLib)s or higher"
 msgstr ""
 
-#: prewikka/main.py:74
+#: prewikka/main.py:86
 #, python-format
 msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
 msgstr ""
 
-#: prewikka/main.py:137
+#: prewikka/main.py:150
 msgid "Database error"
 msgstr ""
 
-#: prewikka/main.py:139
+#: prewikka/main.py:152 prewikka/main.py:168
 msgid "Initialization error"
 msgstr ""
 
-#: prewikka/main.py:189
+#: prewikka/main.py:169
+#, python-format
+msgid ""
+"Cannot use %(type)s mode '%(name)s', please contact your local administrator."
+msgstr ""
+
+#: prewikka/main.py:202
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
 msgstr ""
 
-#: prewikka/main.py:266
+#: prewikka/main.py:279
 msgid "Prelude internal error"
 msgstr ""
 
@@ -274,6 +297,27 @@ msgstr ""
 msgid "N/a"
 msgstr ""
 
+#: prewikka/renderer/__init__.py:146 prewikka/renderer/__init__.py:149
+#: prewikka/renderer/__init__.py:153
+#, fuzzy
+msgid "Renderer error"
+msgstr "AlertasDeCorreção"
+
+#: prewikka/renderer/__init__.py:146
+#, python-format
+msgid "No backend supporting render type '%s'"
+msgstr ""
+
+#: prewikka/renderer/__init__.py:150
+#, python-format
+msgid "No backend named '%s'"
+msgstr ""
+
+#: prewikka/renderer/__init__.py:154
+#, python-format
+msgid "Backend '%(backend)s' does not support render type '%(type)s'"
+msgstr ""
+
 #: prewikka/resolve.py:164
 #, python-format
 msgid ""
@@ -286,28 +330,44 @@ msgstr ""
 msgid "Anonymous authentication"
 msgstr "A auntenticação falhou"
 
-#: prewikka/session/session.py:31
+#: prewikka/session/session.py:37
 msgid "Invalid session"
 msgstr "Sessão inválida"
 
-#: prewikka/session/session.py:41 prewikka/session/session.py:121
+#: prewikka/session/session.py:41 prewikka/session/session.py:118
 msgid "Session expired"
 msgstr "Sessão expirada"
 
-#: prewikka/session/session.py:173
+#: prewikka/session/session.py:170
 msgid "Logged out"
 msgstr "Deslogado"
 
-#: prewikka/templates/BaseView.py:275
+#: prewikka/templates/BaseView.py:387
+msgid "This app has been disabled or failed to load."
+msgstr ""
+
+#: prewikka/templates/BaseView.py:410 prewikka/templates/BaseView.py:418
+msgid "About"
+msgstr "Sobre"
+
+#: prewikka/templates/BaseView.py:426 prewikka/templates/BaseView.py:439
+msgid "Logout"
+msgstr "Sair"
+
+#: prewikka/templates/BaseView.py:434
+msgid "Are you sure you want to log out?"
+msgstr ""
+
+#: prewikka/templates/BaseView.py:478
 #, fuzzy
 msgid "Loading"
 msgstr "Carregar"
 
-#: prewikka/templates/ErrorTemplate.py:114
+#: prewikka/templates/ErrorTemplate.py:109
 msgid "Back"
 msgstr ""
 
-#: prewikka/templates/ErrorTemplate.py:120
+#: prewikka/templates/ErrorTemplate.py:115
 msgid "Retry"
 msgstr ""
 
@@ -359,39 +419,23 @@ msgstr ""
 msgid "Go!"
 msgstr ""
 
-#: prewikka/templates/TopLayout.py:102
+#: prewikka/templates/TopLayout.py:180
 #, fuzzy
 msgid "Detail"
 msgstr "Alertas"
 
-#: prewikka/templates/TopLayout.py:128
+#: prewikka/templates/TopLayout.py:206
 msgid "Please Confirm"
 msgstr ""
 
-#: prewikka/templates/TopLayout.py:138
+#: prewikka/templates/TopLayout.py:216
 #: prewikka/views/usermanagement/templates/UserSettings.py:260
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: prewikka/templates/TopLayout.py:144
+#: prewikka/templates/TopLayout.py:222
 #: prewikka/views/warning/templates/warning.py:99
 msgid "OK"
-msgstr ""
-
-#: prewikka/templates/TopLayout.py:258
-msgid "This app has been disabled or failed to load."
-msgstr ""
-
-#: prewikka/templates/TopLayout.py:281 prewikka/templates/TopLayout.py:289
-msgid "About"
-msgstr "Sobre"
-
-#: prewikka/templates/TopLayout.py:297 prewikka/templates/TopLayout.py:310
-msgid "Logout"
-msgstr "Sair"
-
-#: prewikka/templates/TopLayout.py:305
-msgid "Are you sure you want to log out?"
 msgstr ""
 
 #: prewikka/usergroup.py:34
@@ -400,12 +444,12 @@ msgid ""
 "Access to view '%(view)s' forbidden. Required permissions: %(permissions)s"
 msgstr "A visualização de '%(view)s' está proibida : %(permissions)s"
 
-#: prewikka/usergroup.py:39
+#: prewikka/usergroup.py:37
 #, python-format
 msgid "Required permissions: %s"
 msgstr ""
 
-#: prewikka/usergroup.py:41
+#: prewikka/usergroup.py:39
 msgid "Permission Denied"
 msgstr "Permissão Negada"
 
@@ -413,7 +457,7 @@ msgstr "Permissão Negada"
 msgid "Offline"
 msgstr "Desligado"
 
-#: prewikka/utils/misc.py:40 prewikka/view.py:365
+#: prewikka/utils/misc.py:40 prewikka/view.py:387
 #: prewikka/views/agents/agents.py:206
 msgid "Unknown"
 msgstr "Desconhecido"
@@ -431,7 +475,7 @@ msgstr "Conectado"
 msgid "The path '%s' cannot be mapped to a column"
 msgstr ""
 
-#: prewikka/view.py:35 prewikka/view.py:41 prewikka/view.py:47
+#: prewikka/view.py:35 prewikka/view.py:42 prewikka/view.py:49
 msgid "Parameters Normalization failed"
 msgstr "A normalização dos parâmetros falhou"
 
@@ -440,21 +484,21 @@ msgstr "A normalização dos parâmetros falhou"
 msgid "Parameter '%s' is not valid"
 msgstr ""
 
-#: prewikka/view.py:42
+#: prewikka/view.py:43
 #, python-format
 msgid "Invalid value '%(value)s' for parameter '%(name)s'"
 msgstr ""
 
-#: prewikka/view.py:48
+#: prewikka/view.py:50
 #, python-format
 msgid "Required parameter '%s' is missing"
 msgstr ""
 
-#: prewikka/view.py:54
+#: prewikka/view.py:57
 msgid "Invalid view"
 msgstr "Visão inválida"
 
-#: prewikka/view.py:438
+#: prewikka/view.py:460
 #, python-format
 msgid "View '%s' does not exist"
 msgstr ""
@@ -542,7 +586,7 @@ msgid "Apps"
 msgstr "Apps"
 
 #: prewikka/views/aboutplugin/__init__.py:37
-#: prewikka/views/filter/filter.py:184
+#: prewikka/views/filter/filter.py:186
 #: prewikka/views/usermanagement/usermanagement.py:27
 msgid "Settings"
 msgstr "Ajustes"
@@ -700,7 +744,7 @@ msgid "Agents status information page"
 msgstr "Endereço da informação"
 
 #: prewikka/views/agents/agents.py:53 prewikka/views/agents/agents.py:123
-#: prewikka/views/agents/agents.py:140 prewikka/views/filter/filter.py:186
+#: prewikka/views/agents/agents.py:140 prewikka/views/filter/filter.py:188
 #: prewikka/views/messagelisting/alertlisting.py:680
 #: prewikka/views/messagelisting/heartbeatlisting.py:60
 #: prewikka/views/messagesummary/messagesummary.py:361
@@ -857,7 +901,7 @@ msgstr "Heartbeats"
 
 #: prewikka/views/agents/templates/SensorListing.py:266
 #: prewikka/views/agents/templates/SensorListing.py:276
-#: prewikka/views/filter/filter.py:356
+#: prewikka/views/filter/filter.py:358
 #: prewikka/views/filter/templates/FilterEdition.py:351
 #: prewikka/views/filter/templates/FilterEdition.py:361
 #: prewikka/views/messagelisting/templates/AlertListing.py:1660
@@ -869,123 +913,123 @@ msgstr "Apagar"
 msgid "Delete the selected IDMEF messages?"
 msgstr ""
 
-#: prewikka/views/filter/filter.py:46
+#: prewikka/views/filter/filter.py:47
 #, fuzzy
 msgid "Invalid filter element"
 msgstr "Sessão inválida"
 
-#: prewikka/views/filter/filter.py:46
+#: prewikka/views/filter/filter.py:48
 #, python-format
 msgid "Invalid filter element '%s' referenced from filter formula"
 msgstr "Elemento de filtro '%s' inválido, referenciado pela fórmula do filtro"
 
-#: prewikka/views/filter/filter.py:177
+#: prewikka/views/filter/filter.py:179
 #, fuzzy
 msgid "Filters management page"
 msgstr "Filtro no agente"
 
-#: prewikka/views/filter/filter.py:181
+#: prewikka/views/filter/filter.py:183
 msgid "Filters"
 msgstr "Filtros"
 
-#: prewikka/views/filter/filter.py:253
+#: prewikka/views/filter/filter.py:255
 #: prewikka/views/messagelisting/templates/AlertListing.py:121
 msgid "Equal"
 msgstr "Igual"
 
-#: prewikka/views/filter/filter.py:254
+#: prewikka/views/filter/filter.py:256
 msgid "Equal (case-insensitive)"
 msgstr "Igual (case-insensitive)"
 
-#: prewikka/views/filter/filter.py:255
+#: prewikka/views/filter/filter.py:257
 #: prewikka/views/messagelisting/templates/AlertListing.py:127
 msgid "Not equal"
 msgstr "Não igual"
 
-#: prewikka/views/filter/filter.py:256
+#: prewikka/views/filter/filter.py:258
 msgid "Not equal (case-insensitive)"
 msgstr "Não igual (case-insensitive)"
 
-#: prewikka/views/filter/filter.py:257
+#: prewikka/views/filter/filter.py:259
 #: prewikka/views/messagelisting/templates/AlertListing.py:169
 msgid "Regular expression"
 msgstr "Expressão regular"
 
-#: prewikka/views/filter/filter.py:258
+#: prewikka/views/filter/filter.py:260
 #: prewikka/views/messagelisting/templates/AlertListing.py:175
 msgid "Regular expression (case-insensitive)"
 msgstr "Expressão regular (case-insensitive)"
 
-#: prewikka/views/filter/filter.py:259
+#: prewikka/views/filter/filter.py:261
 msgid "Not regular expression"
 msgstr "Não expressão regular"
 
-#: prewikka/views/filter/filter.py:260
+#: prewikka/views/filter/filter.py:262
 msgid "Not regular expression (case-insensitive)"
 msgstr "Não expressão regular (case-insensitive)"
 
-#: prewikka/views/filter/filter.py:261
+#: prewikka/views/filter/filter.py:263
 #: prewikka/views/messagelisting/templates/AlertListing.py:133
 msgid "Lesser than"
 msgstr "Menor que"
 
-#: prewikka/views/filter/filter.py:262
+#: prewikka/views/filter/filter.py:264
 #: prewikka/views/messagelisting/templates/AlertListing.py:145
 msgid "Lesser or equal"
 msgstr "Menor ou igual"
 
-#: prewikka/views/filter/filter.py:263
+#: prewikka/views/filter/filter.py:265
 #: prewikka/views/messagelisting/templates/AlertListing.py:139
 msgid "Greater than"
 msgstr "Maior que"
 
-#: prewikka/views/filter/filter.py:264
+#: prewikka/views/filter/filter.py:266
 #: prewikka/views/messagelisting/templates/AlertListing.py:151
 msgid "Greater or equal"
 msgstr "Maior ou igual"
 
-#: prewikka/views/filter/filter.py:265
+#: prewikka/views/filter/filter.py:267
 #: prewikka/views/messagelisting/templates/AlertListing.py:157
 msgid "Substring"
 msgstr "Substring"
 
-#: prewikka/views/filter/filter.py:266
+#: prewikka/views/filter/filter.py:268
 #: prewikka/views/messagelisting/templates/AlertListing.py:163
 msgid "Substring (case-insensitive)"
 msgstr "Substring (case-insensitive)"
 
-#: prewikka/views/filter/filter.py:267
+#: prewikka/views/filter/filter.py:269
 msgid "Not substring"
 msgstr "Não substring"
 
-#: prewikka/views/filter/filter.py:268
+#: prewikka/views/filter/filter.py:270
 msgid "Not substring (case-insensitive)"
 msgstr "Não substring (case-insensitive)"
 
-#: prewikka/views/filter/filter.py:325 prewikka/views/filter/filter.py:329
-#: prewikka/views/filter/filter.py:332 prewikka/views/filter/filter.py:335
+#: prewikka/views/filter/filter.py:327 prewikka/views/filter/filter.py:331
+#: prewikka/views/filter/filter.py:334 prewikka/views/filter/filter.py:337
 msgid "Could not save Filter"
 msgstr ""
 
-#: prewikka/views/filter/filter.py:325 prewikka/views/filter/filter.py:332
+#: prewikka/views/filter/filter.py:327 prewikka/views/filter/filter.py:334
 msgid "No valid filter formula provided"
 msgstr ""
 
-#: prewikka/views/filter/filter.py:329
+#: prewikka/views/filter/filter.py:331
 msgid "No name for this filter was provided"
 msgstr ""
 
-#: prewikka/views/filter/filter.py:335
+#: prewikka/views/filter/filter.py:337
 msgid "The filter name is already used by another filter"
 msgstr ""
 
-#: prewikka/views/filter/filter.py:350
+#: prewikka/views/filter/filter.py:352
 #: prewikka/views/filter/templates/FilterEdition.py:340
 #: prewikka/views/filter/templates/FilterEdition.py:345
 msgid "Load"
 msgstr "Carregar"
 
-#: prewikka/views/filter/filter.py:353
+#: prewikka/views/filter/filter.py:355
 #: prewikka/views/filter/templates/FilterEdition.py:570
 #: prewikka/views/filter/templates/FilterEdition.py:575
 #: prewikka/views/usermanagement/templates/UserSettings.py:266
@@ -1217,6 +1261,7 @@ msgid "Date"
 msgstr "Data"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1065
+#: prewikka/views/messagesummary/messagesummary.py:676
 #, fuzzy
 msgid "Alert details"
 msgstr "Alertas"
