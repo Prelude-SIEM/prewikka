@@ -146,19 +146,21 @@ class SQLScript(object):
                   ("\"([^\"]*)\"", "'\\1'"),
                   ("\"\([^\"]*\)\"", "'\1'"),
                   ("(\S*) ENUM\((.*)\)", "\\1 TEXT CHECK (\\1 IN (\\2))"),
-                  ("VARCHAR[ ]*[^)]+\)", "TEXT") ]
+                  ("VARCHAR[ ]*[^)]+\)", "TEXT"),
+                  ("(DROP INDEX [^ ]*) ON [^;]*", "\\1")]
 
         return self._sub(_stbl, input)
 
     def _mysql2sqlite(self, input):
         _stbl = [ ("#.*", ""),
-                  ("DROP .*", ""),
                   ("[a-zA-Z]*INT ", "INTEGER "),
                   ("UNSIGNED ", ""),
                   ("ENUM[ ]*[^)]+\)", "TEXT"),
                   ("VARCHAR[ ]*[^)]+\)", "TEXT"),
                   ("AUTO_INCREMENT", "AUTOINCREMENT"),
-                  ("ENGINE=InnoDB", "") ]
+                  ("ENGINE=InnoDB", ""),
+                  ("ALTER TABLE [^ ]* DROP.*", ""),
+                  ("(DROP INDEX [^ ]*) ON [^;]*", "\\1")]
 
         return self._sub(_stbl, input)
 
