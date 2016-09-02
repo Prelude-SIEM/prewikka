@@ -1,3 +1,30 @@
+* 2016-09-01, prewikka-3.1.0rc3:
+
+Author: Antoine Luong
+
+- Translate error messages in interface, but not in logs
+- Fix a bug with the '%' character in IDMEF criteria
+- Control menu display fixes
+- Fix hook in agents returning None
+- Add a Cheetah filter for JSON
+
+Author: Sélim Menouar
+
+- Avoid double iteration in CachingIterator
+- Use response for ajax host url
+- Display CorrelationAlert children in widget
+
+Author: Yoann Vandoorselaere
+
+- Logout / session expiration fixes
+
+    - logout redirect to Prewikka baseurl or to optional redirect argument
+    - Prevent location.reload() on session expire to avoid POST warning
+
+- Normalize parameters only when using view.respond()
+
+
+
 * 2016-08-19, prewikka-3.1.0rc2:
 
 Author: Thomas Andrejak
