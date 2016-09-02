@@ -1,17 +1,15 @@
-#import cgi
 #extends prewikka.templates.BaseView
 
 #block main_content
 #filter CleanOutput
 
-<div id="fieldset_page" style="position: absolute; top: 25%; left: 50%; width:600px; margin-left:-220px;">
+<div id="fieldset_page" style="position: absolute; top: 25%; left: 50%; width:600px; margin-left:-300px;">
     <fieldset style="text-align: center; vertical-align: middle;">
     <div class="alert alert-danger"><b>$message</b></div>
     #if $traceback
-    <pre>$traceback</pre>
-    <textarea rows="10" cols=75 readonly="readonly">$traceback</textarea>
+    <textarea class="form-control" rows="10" cols=75 readonly="readonly">$traceback</textarea>
     #end if
-    <br/><br/>
+    <br/>
 
     <input class="btn btn-default" style="float: left; position: relative;" type="button" value="$_("Back")" onclick="history.back()" />
     <input class="btn btn-primary" style="float: right; position: relative;" type="submit" value="$_("Retry")" onclick="location.reload()"/>
