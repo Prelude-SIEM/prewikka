@@ -3,13 +3,15 @@
 # This file is distributed under the same license as the prewikka package.
 # bogdanov.valentin@gmail.com, 2007.
 #
+# Modification for Prewikka 3.0 by IS-Systems LLC
+# info@is-systems.org, 2016
 msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-02 19:20+0200\n"
+"POT-Creation-Date: 2016-09-13 21:57+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: Valentin Bogdanov <bogdanov.valentin@gmail.com>\n"
+"Last-Translator: Alex Bochkin <ba@is-systems.org>\n"
 "Language-Team: Russian\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
@@ -23,53 +25,57 @@ msgstr "Ошибка аутентификации"
 #: prewikka/config.py:28
 #, python-format
 msgid "parse error in \"%(txt)s\" at %(file)s line %(line)d"
-msgstr ""
+msgstr "Ошибка обработки в \"%(txt)s\" в %(file)s строка %(line)d"
 
 #: prewikka/database.py:30
 msgid "Database schema error"
-msgstr ""
+msgstr "Ошибка схемы базы данных"
 
-#: prewikka/database.py:239
+#: prewikka/database.py:265
 msgid "database installation required"
-msgstr ""
+msgstr "Необходима установка базы данных"
 
-#: prewikka/database.py:242
+#: prewikka/database.py:268
 msgid "database activation required"
-msgstr ""
+msgstr "Требуется активация базы данных"
 
-#: prewikka/database.py:245
+#: prewikka/database.py:271
 #, python-format
 msgid "database schema branch %(required)s required (found %(current)s)"
 msgstr ""
 
-#: prewikka/database.py:249
+#: prewikka/database.py:275
 #, python-format
 msgid "database schema version %(required)s required (found %(current)s)"
 msgstr ""
 
-#: prewikka/database.py:314
+#: prewikka/database.py:340
 msgid "Database installation error"
-msgstr ""
+msgstr "Ошибка установки базы данных"
 
-#: prewikka/database.py:315
+#: prewikka/database.py:341
 #, python-format
 msgid ""
 "No database installation script found for module %(module)s, version %"
 "(version)s"
 msgstr ""
+"Не найдет скрипт установки базы данных для модуля %(module)s, version %"
+"(version)s"
 
-#: prewikka/database.py:323 prewikka/database.py:362
+#: prewikka/database.py:349 prewikka/database.py:388
 msgid "Database migration error"
-msgstr ""
+msgstr "Ошибка миграции базы данных"
 
-#: prewikka/database.py:324
-#, python-format
+#: prewikka/database.py:350
+#, fuzzy, python-format
 msgid ""
 "No database branch migration script found for module %(module)s, branch "
 "transition %(current)s -> %(required)s"
 msgstr ""
+"Не найдет скрипт установки базы данных для модуля %(module)s, version %"
+"(version)s"
 
-#: prewikka/database.py:363
+#: prewikka/database.py:389
 #, python-format
 msgid ""
 "No linear migration script found for module %(module)s %(version1)s -> %"
@@ -79,7 +85,7 @@ msgstr ""
 #: prewikka/dataprovider/__init__.py:46 prewikka/dataprovider/__init__.py:79
 #, fuzzy
 msgid "Conversion error"
-msgstr "Событие корреляции"
+msgstr "Ошибка конфигурации"
 
 #: prewikka/dataprovider/__init__.py:47 prewikka/dataprovider/__init__.py:80
 #, python-format
@@ -89,50 +95,49 @@ msgstr ""
 #: prewikka/dataprovider/__init__.py:171
 #, python-format
 msgid "Invalid normalizer for '%s' datatype"
-msgstr ""
+msgstr "Неверная нормализация для '%s' типа данных"
 
 #: prewikka/dataprovider/__init__.py:178
 #, python-format
 msgid "No handler configured for '%s' datatype"
-msgstr ""
+msgstr "Не сконфигурирован обработчик для '%s' типа данных"
 
 #: prewikka/dataprovider/__init__.py:188
-#, fuzzy
 msgid "Configuration error"
-msgstr "Событие корреляции"
+msgstr "Ошибка конфигурации"
 
 #: prewikka/dataprovider/__init__.py:189
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
-msgstr ""
+msgstr "Только один менеджер может быть сконфигурирован для '%s' бэкенда"
 
 #: prewikka/dataprovider/alert.py:13
 msgid "Provides an API to fetch security alerts"
-msgstr ""
+msgstr "Предоставляет API для получения событий безопасности"
 
 #: prewikka/dataprovider/pathparser.py:7 prewikka/dataprovider/pathparser.py:8
 msgid "Backend normalization error"
-msgstr ""
+msgstr "Ошибка нормализации на бэкенде"
 
 #: prewikka/dataprovider/plugins/alert/idmef.py:30
 msgid "Plugin for fetching IDMEF alerts from the Prelude database"
-msgstr ""
+msgstr "Плагин для получения событий IDMEF из базы данных Prelude"
 
 #: prewikka/error.py:109
 msgid "Invalid query"
-msgstr ""
+msgstr "Неверный запрос"
 
 #: prewikka/idmefbrowser.py:93
 msgid "Select paths..."
-msgstr ""
+msgstr "Выберите пути..."
 
 #: prewikka/idmefbrowser.py:100
 msgid "Default paths"
-msgstr ""
+msgstr "Пути по-умолчанию"
 
 #: prewikka/idmefbrowser.py:107
 msgid "All paths"
-msgstr ""
+msgstr "Все пути"
 
 #: prewikka/localization.py:141
 msgid "%m/%Y"
@@ -169,25 +174,25 @@ msgstr "Указан неизвестный тип лога: '%s'"
 
 #: prewikka/main.py:78
 msgid "Version Requirement error"
-msgstr ""
+msgstr "Ошибка соответствия версии"
 
 #: prewikka/main.py:81
 #, python-format
 msgid "Prewikka %(vPre)s requires libprelude %(vLib)s or higher"
-msgstr ""
+msgstr "Prewikka %(vPre)s требует libprelude %(vLib)s или выше"
 
 #: prewikka/main.py:86
 #, python-format
 msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
-msgstr ""
+msgstr "Prewikka %(vPre)s требует libpreludedb %(vLib)s или выше"
 
 #: prewikka/main.py:150
 msgid "Database error"
-msgstr ""
+msgstr "Ошибка базы данных"
 
 #: prewikka/main.py:152 prewikka/main.py:168
 msgid "Initialization error"
-msgstr ""
+msgstr "Ошибка инициализации"
 
 #: prewikka/main.py:169
 #, python-format
@@ -198,11 +203,11 @@ msgstr ""
 #: prewikka/main.py:202
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
-msgstr ""
+msgstr "Сессия '%s' не принимает ни одного модуля аутентификации"
 
 #: prewikka/main.py:279
 msgid "Prelude internal error"
-msgstr ""
+msgstr "Внутренняя ошибка Prelude"
 
 #: prewikka/mainmenu.py:128
 msgid "Today"
@@ -263,7 +268,7 @@ msgstr[1] "%d минуты"
 
 #: prewikka/mainmenu.py:294 prewikka/templates/MainMenu.py:226
 msgid "Custom"
-msgstr "Индивидуальные"
+msgstr "Настраиваемый"
 
 #: prewikka/mainmenu.py:296 prewikka/templates/MainMenu.py:193
 msgid "Inactive"
@@ -287,7 +292,7 @@ msgstr "Информационный"
 
 #: prewikka/renderer/__init__.py:48
 msgid "No data to display."
-msgstr ""
+msgstr "Нет данных для отображения"
 
 #: prewikka/renderer/__init__.py:67
 msgid "N/a"
@@ -297,7 +302,7 @@ msgstr ""
 #: prewikka/renderer/__init__.py:153
 #, fuzzy
 msgid "Renderer error"
-msgstr "Событие корреляции"
+msgstr "Внутренняя ошибка Prelude"
 
 #: prewikka/renderer/__init__.py:146
 #, python-format
@@ -322,13 +327,12 @@ msgid ""
 msgstr ""
 
 #: prewikka/session/anonymous/anonymous.py:28
-#, fuzzy
 msgid "Anonymous authentication"
-msgstr "Aутентификация пользователя"
+msgstr "Анонимная аутентификация"
 
 #: prewikka/session/session.py:37
 msgid "Invalid session"
-msgstr ""
+msgstr "Неверная сессия"
 
 #: prewikka/session/session.py:41 prewikka/session/session.py:118
 msgid "Session expired"
@@ -340,7 +344,7 @@ msgstr "Пользователь вышел из системы"
 
 #: prewikka/templates/BaseView.py:387
 msgid "This app has been disabled or failed to load."
-msgstr ""
+msgstr "Это приложение было выключено или возникла ошибка при его загрузке"
 
 #: prewikka/templates/BaseView.py:410 prewikka/templates/BaseView.py:418
 msgid "About"
@@ -352,20 +356,19 @@ msgstr "Выход"
 
 #: prewikka/templates/BaseView.py:434
 msgid "Are you sure you want to log out?"
-msgstr ""
+msgstr "Вы уверены что хотите выйти?"
 
 #: prewikka/templates/BaseView.py:478
-#, fuzzy
 msgid "Loading"
-msgstr "Загрузить"
+msgstr "Загрузка"
 
 #: prewikka/templates/ErrorTemplate.py:109
 msgid "Back"
-msgstr ""
+msgstr "Назад"
 
 #: prewikka/templates/ErrorTemplate.py:115
 msgid "Retry"
-msgstr ""
+msgstr "Повторная попытка"
 
 #: prewikka/templates/MainMenu.py:161
 msgid "Refresh:"
@@ -373,7 +376,7 @@ msgstr "Обновить:"
 
 #: prewikka/templates/MainMenu.py:167
 msgid "Update frequency of the current page"
-msgstr ""
+msgstr "Частота обновления текущей страницы"
 
 #: prewikka/templates/MainMenu.py:205
 msgid "Period:"
@@ -381,7 +384,7 @@ msgstr "Период:"
 
 #: prewikka/templates/MainMenu.py:211
 msgid "Period to visualize"
-msgstr ""
+msgstr "Период для визуализации"
 
 #: prewikka/templates/MainMenu.py:254
 msgid "Start:"
@@ -393,7 +396,7 @@ msgstr "нача́ло"
 
 #: prewikka/templates/MainMenu.py:265
 msgid "Date of the oldest alert to visualize"
-msgstr ""
+msgstr "Дата старейшего события для визулизации"
 
 #: prewikka/templates/MainMenu.py:274
 msgid "End:"
@@ -405,20 +408,19 @@ msgstr "конец"
 
 #: prewikka/templates/MainMenu.py:285
 msgid "Date of the newest alert to visualize"
-msgstr ""
+msgstr "Дата новейшего события для визуализации"
 
 #: prewikka/templates/MainMenu.py:293
 msgid "Go!"
-msgstr ""
+msgstr "Применить"
 
 #: prewikka/templates/TopLayout.py:180
-#, fuzzy
 msgid "Detail"
-msgstr "Сигналы тревоги"
+msgstr "Детали"
 
 #: prewikka/templates/TopLayout.py:206
 msgid "Please Confirm"
-msgstr ""
+msgstr "Пожалуйста подтвердите"
 
 #: prewikka/templates/TopLayout.py:216
 #: prewikka/views/usermanagement/templates/UserSettings.py:260
@@ -434,12 +436,12 @@ msgstr ""
 #, python-format
 msgid ""
 "Access to view '%(view)s' forbidden. Required permissions: %(permissions)s"
-msgstr "Просмотр '%(view)s' запрещен : %(permissions)s"
+msgstr "Просмотр '%(view)s' запрещен. Требуемые права : %(permissions)s"
 
 #: prewikka/usergroup.py:37
 #, python-format
 msgid "Required permissions: %s"
-msgstr ""
+msgstr "Требуемые права: %s"
 
 #: prewikka/usergroup.py:39
 msgid "Permission Denied"
@@ -447,7 +449,7 @@ msgstr "Недостаточно прав"
 
 #: prewikka/utils/misc.py:37
 msgid "Offline"
-msgstr ""
+msgstr "Выключен"
 
 #: prewikka/utils/misc.py:40 prewikka/view.py:387
 #: prewikka/views/agents/agents.py:206
@@ -456,16 +458,16 @@ msgstr "Неизвестен"
 
 #: prewikka/utils/misc.py:43
 msgid "Missing"
-msgstr ""
+msgstr "Отсутствует"
 
 #: prewikka/utils/misc.py:45
 msgid "Online"
-msgstr ""
+msgstr "Доступен"
 
 #: prewikka/utils/url.py:57
 #, python-format
 msgid "The path '%s' cannot be mapped to a column"
-msgstr ""
+msgstr "Для '%s' не может быть найдено соответствие колонке"
 
 #: prewikka/view.py:35 prewikka/view.py:42 prewikka/view.py:49
 msgid "Parameters Normalization failed"
@@ -474,40 +476,41 @@ msgstr "Ошибка нормализации параметров"
 #: prewikka/view.py:36
 #, python-format
 msgid "Parameter '%s' is not valid"
-msgstr ""
+msgstr "Параметр '%s' неверен"
 
 #: prewikka/view.py:43
 #, python-format
 msgid "Invalid value '%(value)s' for parameter '%(name)s'"
-msgstr ""
+msgstr "Неверное значение '%(value)s' для параметра '%(name)s'"
 
 #: prewikka/view.py:50
 #, python-format
 msgid "Required parameter '%s' is missing"
-msgstr ""
+msgstr "Требуемый параметр '%s' отсутствует"
 
 #: prewikka/view.py:57
-#, fuzzy
 msgid "Invalid view"
-msgstr "Язык:"
+msgstr "Неверное отображение"
 
 #: prewikka/view.py:460
 #, python-format
 msgid "View '%s' does not exist"
-msgstr ""
+msgstr "Отображение '%s' не существует"
 
 #: prewikka/views/about/__init__.py:12
 msgid "Prelude About page"
-msgstr ""
+msgstr "Страница о Prelude"
 
 #: prewikka/views/about/templates/About.py:90
 #, python-format
 msgid "Prelude version %s"
-msgstr ""
+msgstr "Версия Prelude %s"
 
 #: prewikka/views/about/templates/About.py:97
 msgid "Prelude is a SIEM (Security Information and Event Management)"
 msgstr ""
+"Prelude это SIEM (Security Information and Event Management)(Управление "
+"событиями безопасности)"
 
 #: prewikka/views/about/templates/About.py:104
 #, python-format
@@ -518,20 +521,27 @@ msgid ""
 "global vision of your system's security level and thus prevent attacks, "
 "intrusions as well as viral infections."
 msgstr ""
+"%s это решение управления безопасностью, которое собирает, фильтрует и "
+"нормализует,коррелирует, хранит и архивирует данные от различных источников "
+"вашихинформационных систем. Основываясь на данной информации Prelude может "
+"предоставитьобщий вид уровня безопасности ваших систем и соответственно "
+"предотвратить атаки, вторжения, а также вирусные инфекции."
 
 #: prewikka/views/about/templates/About.py:110
 msgid "Prelude Team:"
-msgstr ""
+msgstr "Команда Prelude:"
 
 #: prewikka/views/about/templates/About.py:116
 msgid ""
 "Prelude OSS is an open-source project originally created by Yoann "
 "Vandoorselaere in 1998."
 msgstr ""
+"Prelude OSS проект с открытым исходным кодом изначально созданный Yoann "
+"Vandoorselaere в 1998."
 
 #: prewikka/views/about/templates/About.py:123
 msgid "Vigilo is a NMS (Network Management System)"
-msgstr ""
+msgstr "Vigilo это NMS (Network Management System)(Система управления сетью.)"
 
 #: prewikka/views/about/templates/About.py:130
 #, python-format
@@ -542,6 +552,12 @@ msgid ""
 "features required for performance supervision: states and alarms management, "
 "metrology, cartography, event correlation and reporting."
 msgstr ""
+"%s представляет собой комплексное решение для мониторинга и управления "
+"производительностью, способноеобработывать данные средних и крупномасштабных "
+"систем (сеть, сервера, приложения)благодаря своей распределенной и модульной "
+"архитектуре. Vigilo предлагает всефункции, необходимые для надзора за "
+"производительностью: управление состоянием и событиями, метрология, "
+"картография, корреляция событий и отчетность."
 
 #: prewikka/views/about/templates/About.py:138
 #, python-format
@@ -549,6 +565,8 @@ msgid ""
 "Prelude SIEM and Vigilo NMS are being developed by the %s company, designer, "
 "integrator and operator of mission critical systems."
 msgstr ""
+"Prelude SIEM и Vigilo NMS разрабатываются в компании %s - дизайнере, "
+"интеграторе и операторе критически важных систем."
 
 #: prewikka/views/about/templates/About.py:156
 msgid "Contact"
@@ -572,7 +590,7 @@ msgstr "Веб-сайты"
 
 #: prewikka/views/aboutplugin/__init__.py:32
 msgid "Plugin installation and activation management page"
-msgstr ""
+msgstr "Страница управления установкой и активацией плагинов"
 
 #: prewikka/views/aboutplugin/__init__.py:35
 msgid "Apps"
@@ -586,130 +604,127 @@ msgstr "Настройки"
 
 #: prewikka/views/aboutplugin/__init__.py:38
 msgid "USER_MANAGEMENT"
-msgstr ""
+msgstr "Управление пользователями"
 
 #: prewikka/views/aboutplugin/__init__.py:47
 msgid "Apps: View"
-msgstr ""
+msgstr "Плагины просмотра"
 
 #: prewikka/views/aboutplugin/__init__.py:48
 msgid "Apps: API"
-msgstr ""
+msgstr "Плагины API"
 
 #: prewikka/views/aboutplugin/__init__.py:49
 msgid "Apps: Dataprovider backend"
-msgstr ""
+msgstr "Плагины провайдера данных для бэкенда"
 
 #: prewikka/views/aboutplugin/__init__.py:50
 msgid "Apps: Dataprovider type"
-msgstr ""
+msgstr "Плаины типы провайдера данных"
 
 #: prewikka/views/aboutplugin/__init__.py:51
-#, fuzzy
 msgid "Apps: Authentication"
-msgstr "Aутентификация пользователя"
+msgstr "Плагины аутентификации пользователя"
 
 #: prewikka/views/aboutplugin/__init__.py:52
 msgid "Apps: Identification"
-msgstr ""
+msgstr "Плагины идентификации"
 
 #: prewikka/views/aboutplugin/__init__.py:53
 msgid "Apps: Renderer backend"
-msgstr ""
+msgstr "Плагины рендеринга бэкенда"
 
 #: prewikka/views/aboutplugin/__init__.py:54
 msgid "Apps: Renderer type"
-msgstr ""
+msgstr "Плагины типа рендеринга"
 
 #: prewikka/views/aboutplugin/__init__.py:70
 #, python-format
 msgid "Applying %(module)s %(script)s..."
-msgstr ""
+msgstr "Применяется %(module)s %(script)s..."
 
 #: prewikka/views/aboutplugin/__init__.py:79
 msgid "All updates applied"
-msgstr ""
+msgstr "Все обновления применены"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:135
-#, fuzzy
 msgid "Update complete"
-msgstr "ошибка"
+msgstr "Обновление завершено"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:157
-#, fuzzy
 msgid "Close"
-msgstr "Код"
+msgstr "Закрыть"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:207
-#, fuzzy
 msgid "Update failed"
-msgstr "ошибка"
+msgstr "Ошибка обновления"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:260
 msgid "Applying Updates"
-msgstr ""
+msgstr "Применение обновлений"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:269
-#, fuzzy
 msgid "Update log"
-msgstr "ошибка"
+msgstr "Журнал обновлений"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:276
 msgid "Updates: {0} successful, {1} failed"
-msgstr ""
+msgstr "Обновления: {0} удачно, {1} с ошибкой"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:296
 msgid "Plugin Maintenance"
-msgstr ""
+msgstr "Управление плагинами"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:305
 msgid ""
 "The following apps need to be updated before they can be loaded into the "
 "system"
 msgstr ""
+"Слебующие плагины необходимо обновить прежде чем они могут быть загружены в "
+"систему"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:323
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:430
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:100
 #: prewikka/views/agents/templates/SensorListing.py:120
-#: prewikka/views/messagesummary/messagesummary.py:306
-#: prewikka/views/messagesummary/messagesummary.py:459
-#: prewikka/views/messagesummary/messagesummary.py:695
-#: prewikka/views/messagesummary/messagesummary.py:712
-#: prewikka/views/messagesummary/messagesummary.py:735
-#: prewikka/views/messagesummary/messagesummary.py:796
-#: prewikka/views/messagesummary/messagesummary.py:815
-#: prewikka/views/messagesummary/messagesummary.py:851
+#: prewikka/views/messagesummary/messagesummary.py:307
+#: prewikka/views/messagesummary/messagesummary.py:460
+#: prewikka/views/messagesummary/messagesummary.py:696
+#: prewikka/views/messagesummary/messagesummary.py:713
+#: prewikka/views/messagesummary/messagesummary.py:736
+#: prewikka/views/messagesummary/messagesummary.py:797
+#: prewikka/views/messagesummary/messagesummary.py:816
+#: prewikka/views/messagesummary/messagesummary.py:852
 #: prewikka/views/usermanagement/templates/UserSettings.py:141
 msgid "Name"
 msgstr "Имя"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:328
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:435
-#: prewikka/views/messagesummary/messagesummary.py:763
-#: prewikka/views/messagesummary/messagesummary.py:769
+#: prewikka/views/messagesummary/messagesummary.py:764
+#: prewikka/views/messagesummary/messagesummary.py:770
 msgid "Description"
 msgstr "Описание"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:333
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:440
 #: prewikka/views/agents/templates/SensorListing.py:140
-#: prewikka/views/messagesummary/messagesummary.py:461
-#: prewikka/views/messagesummary/messagesummary.py:566
+#: prewikka/views/messagesummary/messagesummary.py:462
+#: prewikka/views/messagesummary/messagesummary.py:567
 msgid "Version"
 msgstr "Версия"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:338
 msgid "Current Database Version"
-msgstr ""
+msgstr "Текущая версия базы данных"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:343
 msgid "Required Database Update"
-msgstr ""
+msgstr "Требуется обновление базы данных"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:400
 msgid "Install Update"
-msgstr ""
+msgstr "Установить обновления"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:412
 msgid "Installed Apps"
@@ -725,82 +740,77 @@ msgstr "Активный"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:514
 msgid "Update the selected apps?"
-msgstr ""
+msgstr "Обновить выбранные плагины?"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.py:519
 msgid "Update"
 msgstr "Обновить"
 
 #: prewikka/views/agents/__init__.py:10
-#, fuzzy
 msgid "Agents status information page"
-msgstr "Информация об адресе"
+msgstr "Страница информации о статусе агентов"
 
 #: prewikka/views/agents/agents.py:53 prewikka/views/agents/agents.py:123
 #: prewikka/views/agents/agents.py:140 prewikka/views/filter/filter.py:188
 #: prewikka/views/messagelisting/alertlisting.py:680
 #: prewikka/views/messagelisting/heartbeatlisting.py:60
-#: prewikka/views/messagesummary/messagesummary.py:361
+#: prewikka/views/messagesummary/messagesummary.py:362
 msgid "IDMEF_VIEW"
-msgstr ""
+msgstr "IDMEF_VIEW (Просмотр IDMEF)"
 
 #: prewikka/views/agents/agents.py:91
-#, fuzzy
 msgid "Node name n/a"
-msgstr "Имя узла"
+msgstr "Имя узла неизвестно"
 
 #: prewikka/views/agents/agents.py:92
-#, fuzzy
 msgid "OS version n/a"
-msgstr "Ошибка сессии"
+msgstr "Версия ОС неизвестна"
 
 #: prewikka/views/agents/agents.py:93
 msgid "OS type n/a"
-msgstr ""
+msgstr "Тип ОС неизвестен"
 
 #: prewikka/views/agents/agents.py:97
-#, fuzzy
 msgid "Node location n/a"
-msgstr "Расположение узла"
+msgstr "Расположение узла неизвестно"
 
 #: prewikka/views/agents/agents.py:107
 msgid "Alert listing"
 msgstr "Список событий"
 
 #: prewikka/views/agents/agents.py:108
-#, fuzzy
 msgid "Heartbeat listing"
-msgstr "Анализ пульса"
+msgstr "Анализ событий состояния"
 
 #: prewikka/views/agents/agents.py:109 prewikka/views/agents/agents.py:110
 msgid "Heartbeat analysis"
-msgstr "Анализ пульса"
+msgstr "Анализ событий состояния"
 
 #: prewikka/views/agents/agents.py:123
 msgid "IDMEF_ALTER"
-msgstr ""
+msgstr "IDMEF_ALTER (Изменение IDMEF)"
 
 #: prewikka/views/agents/agents.py:181
 #, python-format
 msgid "Sensor is down since %s"
-msgstr ""
+msgstr "Сенсор недоступен с %s"
 
 #: prewikka/views/agents/agents.py:186
 msgid "Normal sensor start"
-msgstr ""
+msgstr "Нормальный запуск сенсора"
 
 #: prewikka/views/agents/agents.py:188
 msgid "Unexpected sensor restart"
-msgstr ""
+msgstr "Неожиданный перезапуск сенсора"
 
 #: prewikka/views/agents/agents.py:194
 #, python-format
 msgid "Unexpected heartbeat interval: %(delta)s"
-msgstr ""
+msgstr "Неожиданный интервал статусного сообщения (heartbeat): %(delta)s"
 
 #: prewikka/views/agents/agents.py:198
 msgid "Normal sensor stop"
-msgstr ""
+msgstr "Нормальная остановка сенсора"
 
 #: prewikka/views/agents/agents.py:211
 #, python-format
@@ -808,43 +818,45 @@ msgid ""
 "No anomaly in the last %(count)d heartbeats (one heartbeat every %(delta)s "
 "average)"
 msgstr ""
+"Без аномалий в последних %(count)d статусных сообщениях (heartbeats) (одно "
+"сообщение каждые %(delta)s в среднем)"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:106
 #: prewikka/views/agents/templates/SensorListing.py:135
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:166
-#: prewikka/views/messagesummary/messagesummary.py:458
+#: prewikka/views/messagesummary/messagesummary.py:459
 msgid "Model"
 msgstr "Модель"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:112
 msgid "OS"
-msgstr ""
+msgstr "ОС"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:118
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:153
-#: prewikka/views/messagesummary/messagesummary.py:447
+#: prewikka/views/messagesummary/messagesummary.py:448
 msgid "Node name"
 msgstr "Имя узла"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:124
-#: prewikka/views/messagesummary/messagesummary.py:425
+#: prewikka/views/messagesummary/messagesummary.py:426
 msgid "Node location"
 msgstr "Расположение узла"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:130
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:140
-#: prewikka/views/messagesummary/messagesummary.py:452
+#: prewikka/views/messagesummary/messagesummary.py:453
 msgid "Node address"
 msgstr "Адрес узла"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:136
 #: prewikka/views/agents/templates/SensorListing.py:158
 msgid "Latest heartbeat"
-msgstr "Последнее время пульса"
+msgstr "Последнее время событий состояния"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:142
 msgid "Current status"
-msgstr "нынешнее состояние"
+msgstr "Текущее состояние"
 
 #: prewikka/views/agents/templates/HeartbeatAnalyze.py:211
 msgid "Events"
@@ -856,21 +868,19 @@ msgid "Agents"
 msgstr "Агенты"
 
 #: prewikka/views/agents/templates/SensorListing.py:112
-#, fuzzy
 msgid "Search:"
-msgstr "Нача́ло:"
+msgstr "Поиск:"
 
 #: prewikka/views/agents/templates/SensorListing.py:125
-#, fuzzy
 msgid "Location"
-msgstr "Загрузить"
+msgstr "Расположение"
 
 #: prewikka/views/agents/templates/SensorListing.py:130
 msgid "Node"
 msgstr "Узел"
 
 #: prewikka/views/agents/templates/SensorListing.py:145
-#: prewikka/views/messagesummary/messagesummary.py:462
+#: prewikka/views/messagesummary/messagesummary.py:463
 msgid "Class"
 msgstr "Класс"
 
@@ -880,7 +890,7 @@ msgstr "Состояние"
 
 #: prewikka/views/agents/templates/SensorListing.py:235
 msgid "Show/Hide all"
-msgstr ""
+msgstr "Показать/Скрыть всё"
 
 #: prewikka/views/agents/templates/SensorListing.py:250
 #: prewikka/views/messagelisting/alertlisting.py:678
@@ -891,7 +901,7 @@ msgstr "Сигналы тревоги"
 #: prewikka/views/agents/templates/SensorListing.py:259
 #: prewikka/views/messagelisting/heartbeatlisting.py:58
 msgid "Heartbeats"
-msgstr "Пульс"
+msgstr "События состояния"
 
 #: prewikka/views/agents/templates/SensorListing.py:266
 #: prewikka/views/agents/templates/SensorListing.py:276
@@ -905,12 +915,11 @@ msgstr "Удалить"
 
 #: prewikka/views/agents/templates/SensorListing.py:271
 msgid "Delete the selected IDMEF messages?"
-msgstr ""
+msgstr "Удалить выбранные сообщения IDMEF?"
 
 #: prewikka/views/filter/filter.py:47
-#, fuzzy
 msgid "Invalid filter element"
-msgstr "Язык:"
+msgstr "Неверный элемент фильтра"
 
 #: prewikka/views/filter/filter.py:48
 #, python-format
@@ -918,9 +927,8 @@ msgid "Invalid filter element '%s' referenced from filter formula"
 msgstr "Ошибка в элементе фильтра '%s', на который ссылается формула фильтра"
 
 #: prewikka/views/filter/filter.py:179
-#, fuzzy
 msgid "Filters management page"
-msgstr "Фильтровать по агенту"
+msgstr "Страница управления фильтрами"
 
 #: prewikka/views/filter/filter.py:183
 msgid "Filters"
@@ -932,19 +940,17 @@ msgid "Equal"
 msgstr "Равно"
 
 #: prewikka/views/filter/filter.py:256
-#, fuzzy
 msgid "Equal (case-insensitive)"
-msgstr "Подстрока (нечувствительная к регистру)"
+msgstr "Соответствует (нечувствительная к регистру)"
 
 #: prewikka/views/filter/filter.py:257
 #: prewikka/views/messagelisting/templates/AlertListing.py:127
 msgid "Not equal"
-msgstr ""
+msgstr "Не соответствует"
 
 #: prewikka/views/filter/filter.py:258
-#, fuzzy
 msgid "Not equal (case-insensitive)"
-msgstr "Подстрока (нечувствительная к регистру)"
+msgstr "Не соответствует (нечувствительная к регистру)"
 
 #: prewikka/views/filter/filter.py:259
 #: prewikka/views/messagelisting/templates/AlertListing.py:169
@@ -954,17 +960,15 @@ msgstr "Регулярное выражение"
 #: prewikka/views/filter/filter.py:260
 #: prewikka/views/messagelisting/templates/AlertListing.py:175
 msgid "Regular expression (case-insensitive)"
-msgstr "Регулярное выражени (нечувствительное к регистру)"
+msgstr "Регулярное выражение (нечувствительное к регистру)"
 
 #: prewikka/views/filter/filter.py:261
-#, fuzzy
 msgid "Not regular expression"
-msgstr "Регулярное выражение"
+msgstr "Не регулярное выражение"
 
 #: prewikka/views/filter/filter.py:262
-#, fuzzy
 msgid "Not regular expression (case-insensitive)"
-msgstr "Регулярное выражени (нечувствительное к регистру)"
+msgstr "Не регулярное выражение (нечувствительное к регистру)"
 
 #: prewikka/views/filter/filter.py:263
 #: prewikka/views/messagelisting/templates/AlertListing.py:133
@@ -997,31 +1001,29 @@ msgid "Substring (case-insensitive)"
 msgstr "Подстрока (нечувствительная к регистру)"
 
 #: prewikka/views/filter/filter.py:269
-#, fuzzy
 msgid "Not substring"
-msgstr "Подстрока"
+msgstr "Не подстрока"
 
 #: prewikka/views/filter/filter.py:270
-#, fuzzy
 msgid "Not substring (case-insensitive)"
-msgstr "Подстрока (нечувствительная к регистру)"
+msgstr "Не подстрока (нечувствительная к регистру)"
 
 #: prewikka/views/filter/filter.py:327 prewikka/views/filter/filter.py:331
 #: prewikka/views/filter/filter.py:334 prewikka/views/filter/filter.py:337
 msgid "Could not save Filter"
-msgstr ""
+msgstr "Невозможно сохранить фильтр"
 
 #: prewikka/views/filter/filter.py:327 prewikka/views/filter/filter.py:334
 msgid "No valid filter formula provided"
-msgstr ""
+msgstr "Не предоставлена верная формула для фильтра"
 
 #: prewikka/views/filter/filter.py:331
 msgid "No name for this filter was provided"
-msgstr ""
+msgstr "Не введено имя фильтра"
 
 #: prewikka/views/filter/filter.py:337
 msgid "The filter name is already used by another filter"
-msgstr ""
+msgstr "Имя данного фильтра уже существует"
 
 #: prewikka/views/filter/filter.py:352
 #: prewikka/views/filter/templates/FilterEdition.py:340
@@ -1038,14 +1040,13 @@ msgstr "Сохранить"
 
 #: prewikka/views/filter/templates/FilterEdition.py:100
 msgid "Select an IDMEF path"
-msgstr ""
+msgstr "Выбор пути IDMEF"
 
 #: prewikka/views/filter/templates/FilterEdition.py:112
 msgid "Operator"
-msgstr ""
+msgstr "Оператор"
 
 #: prewikka/views/filter/templates/FilterEdition.py:136
-#, fuzzy
 msgid "value"
 msgstr "Значение"
 
@@ -1057,25 +1058,27 @@ msgstr "Доступные фильтры:"
 
 #: prewikka/views/filter/templates/FilterEdition.py:315
 msgid "Select a filter"
-msgstr ""
+msgstr "Выбор фильтра"
 
 #: prewikka/views/filter/templates/FilterEdition.py:356
 msgid "Delete this filter?"
-msgstr ""
+msgstr "Удалить фильтр?"
 
 #: prewikka/views/filter/templates/FilterEdition.py:379
 msgid "Add / Modify"
-msgstr ""
+msgstr "Добавить/Изменить"
 
 #: prewikka/views/filter/templates/FilterEdition.py:405
 msgid "You are in the process of creating a new Prelude filter."
-msgstr ""
+msgstr "Вы в процессе создания нового фильтра Prelude."
 
 #: prewikka/views/filter/templates/FilterEdition.py:413
 msgid ""
 "Filters can be selected while on the alerts view, using the control menu in "
 "the top right corner."
 msgstr ""
+"Фильтры могут быть выбраны на странице просмотра событий, с помощью меню "
+"управления вверхнием правом углу."
 
 #: prewikka/views/filter/templates/FilterEdition.py:426
 msgid "Filter Type:"
@@ -1083,19 +1086,18 @@ msgstr "Тип фильтра:"
 
 #: prewikka/views/filter/templates/FilterEdition.py:438
 #: prewikka/views/messagelisting/templates/AlertListing.py:726
-#: prewikka/views/messagesummary/messagesummary.py:1019
+#: prewikka/views/messagesummary/messagesummary.py:1020
 msgid "Alert"
-msgstr "Сигнал тревоги"
+msgstr "Событие"
 
 #: prewikka/views/filter/templates/FilterEdition.py:447
-#: prewikka/views/messagesummary/messagesummary.py:1122
+#: prewikka/views/messagesummary/messagesummary.py:1123
 msgid "Heartbeat"
-msgstr "Пульс"
+msgstr "события состояния"
 
 #: prewikka/views/filter/templates/FilterEdition.py:456
-#, fuzzy
 msgid "Generic (Alert and Heartbeat)"
-msgstr "Просмотр пульса"
+msgstr "Просмотр событий состояния"
 
 #: prewikka/views/filter/templates/FilterEdition.py:515
 msgid "Formula:"
@@ -1111,7 +1113,6 @@ msgid "Name:"
 msgstr "Имя:"
 
 #: prewikka/views/filter/templates/FilterEdition.py:545
-#, fuzzy
 msgid "Filter name"
 msgstr "Фильтровать по:"
 
@@ -1128,19 +1129,18 @@ msgid "No filter"
 msgstr "Нет фильтра"
 
 #: prewikka/views/messagelisting/__init__.py:13
-#, fuzzy
 msgid "Alert and Heartbeat listing page"
-msgstr "Просмотр пульса"
+msgstr "Страница просмотра статусных сообщений (heartbeat) и событий"
 
 #: prewikka/views/messagelisting/alertlisting.py:583
-#: prewikka/views/messagesummary/messagesummary.py:693
-#: prewikka/views/messagesummary/messagesummary.py:1010
+#: prewikka/views/messagesummary/messagesummary.py:694
+#: prewikka/views/messagesummary/messagesummary.py:1011
 msgid "Correlation Alert"
 msgstr "Событие корреляции"
 
 #: prewikka/views/messagelisting/alertlisting.py:587
-#: prewikka/views/messagesummary/messagesummary.py:710
-#: prewikka/views/messagesummary/messagesummary.py:1013
+#: prewikka/views/messagesummary/messagesummary.py:711
+#: prewikka/views/messagesummary/messagesummary.py:1014
 msgid "Tool Alert"
 msgstr "Событие со средства защиты"
 
@@ -1154,38 +1154,32 @@ msgid "n/a"
 msgstr ""
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:115
-#, fuzzy
 msgid "Not defined"
-msgstr "Имя узла"
+msgstr "Не определено"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:202
-#, fuzzy
 msgid "Reset to null"
-msgstr "Зарезервировано"
+msgstr "Сбросить в null"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:207
-#, fuzzy
 msgid "Reset to default"
-msgstr "Зарезервировано"
+msgstr "Сбросить в значение по-умолчанию"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:212
-#, fuzzy
 msgid "Reset to saved"
-msgstr "Зарезервировано"
+msgstr "Сбросить в сохраненное состояние"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:217
-#, fuzzy
 msgid "Reset to current"
-msgstr "Зарезервировано"
+msgstr "Сбросить в текущее состояние"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:406
-#, fuzzy
 msgid "Filter on"
 msgstr "Фильтровать по:"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:411
 msgid "advanced"
-msgstr "передовой"
+msgstr "расширенный"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:535
 msgid "Group entry by:"
@@ -1193,14 +1187,12 @@ msgstr "Группировать записи по:"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:590
 #: prewikka/views/messagelisting/templates/AlertListing.py:598
-#, fuzzy
 msgid "filtered"
-msgstr "Фильтры"
+msgstr "отфильтровано"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:638
-#, fuzzy
 msgid "Reset"
-msgstr "Зарезервировано"
+msgstr "Сброс"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:644
 #: prewikka/views/messagelisting/templates/AlertListing.py:1647
@@ -1266,41 +1258,36 @@ msgid "Date"
 msgstr "Дата"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1065
-#: prewikka/views/messagesummary/messagesummary.py:676
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:677
 msgid "Alert details"
 msgstr "Сигналы тревоги"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1073
-#, fuzzy
 msgid "See alert details"
-msgstr "Сигналы тревоги"
+msgstr "Просмотр событий"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1084
 #: prewikka/views/messagelisting/templates/AlertListing.py:1092
-#, fuzzy
 msgid "Filter on this classification"
-msgstr "Фильтровать по адресу"
+msgstr "Фильтровать по классификации"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1203
-#, fuzzy
 msgid "Filter on this port/protocol"
-msgstr "Фильтровать по адресу"
+msgstr "Фильтровать по этому адресу/протоколу"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1224
-#, fuzzy
 msgid "Port/protocol information"
-msgstr "Информация об учетной записи"
+msgstr "Информация о порте/протоколе"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1294
 #, python-format
 msgid "%(hidden)d of %(total)d alerts not shown..."
-msgstr ""
+msgstr "%(hidden)d из %(total)d событий не показаны..."
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1305
 #: prewikka/views/messagelisting/templates/AlertListing.py:1390
 msgid "expand"
-msgstr ""
+msgstr "раскрыть"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1338
 msgid "alert"
@@ -1319,55 +1306,50 @@ msgstr "цель"
 #: prewikka/views/messagelisting/templates/AlertListing.py:1379
 #, python-format
 msgid "%(hidden)d of %(total)d %(name)ss not shown..."
-msgstr ""
+msgstr "%(hidden)d из %(total)d %(name)ss не показаны..."
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1428
-#, fuzzy, python-format
+#, python-format
 msgid "Filter on this %s"
-msgstr "Фильтровать по адресу"
+msgstr "Фильтровать по %s"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1449
-#, fuzzy, python-format
+#, python-format
 msgid "%s information"
-msgstr "Информация об адресе"
+msgstr "%s информация"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1518
-#, fuzzy
 msgid "Filter on this Analyzer"
-msgstr "Фильтровать по адресу"
+msgstr "Фильтровать по этому анализатору"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1541
-#, fuzzy
 msgid "Filter on this Host"
-msgstr "Фильтровать по адресу"
+msgstr "Фильтровать по этому хосту"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1599
-#, fuzzy, python-format
+#, python-format
 msgid "sent at %s"
-msgstr "Зарезервировано"
+msgstr "отправлено в %s"
 
 #: prewikka/views/messagelisting/templates/AlertListing.py:1652
 msgid "Delete the selected alerts?"
-msgstr ""
+msgstr "Удалить выбранные события?"
 
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:127
 msgid "Agent"
 msgstr "Агент"
 
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:231
-#, fuzzy
 msgid "Heartbeat details"
-msgstr "Анализ пульса"
+msgstr "Детали событий состояния"
 
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:236
-#, fuzzy
 msgid "See heartbeat details"
-msgstr "Сигналы тревоги"
+msgstr "Просмотр деталей событий состояния"
 
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:245
-#, fuzzy
 msgid "Filter on agent"
-msgstr "Фильтровать по:"
+msgstr "Фильтровать по агенту"
 
 #: prewikka/views/messagelisting/templates/HeartbeatListing.py:266
 msgid "Filter on address"
@@ -1383,436 +1365,423 @@ msgstr "всего"
 
 #: prewikka/views/messagesummary/__init__.py:10
 msgid "Detailed alert and heartbeat page"
-msgstr ""
+msgstr "Детализированная страница событий и событий состояния"
 
-#: prewikka/views/messagesummary/messagesummary.py:307
-#: prewikka/views/messagesummary/messagesummary.py:614
+#: prewikka/views/messagesummary/messagesummary.py:308
+#: prewikka/views/messagesummary/messagesummary.py:615
 msgid "Code"
 msgstr "Код"
 
-#: prewikka/views/messagesummary/messagesummary.py:308
-msgid "Data length"
-msgstr "Размер данных"
-
 #: prewikka/views/messagesummary/messagesummary.py:309
+msgid "Data length"
+msgstr "Длина данных"
+
+#: prewikka/views/messagesummary/messagesummary.py:310
 msgid "Data"
 msgstr "Данные"
 
-#: prewikka/views/messagesummary/messagesummary.py:394
-#, fuzzy, python-format
+#: prewikka/views/messagesummary/messagesummary.py:395
+#, python-format
 msgid "(agent local time: %s)"
-msgstr "Локальное время сенсора"
+msgstr "(Локальное время сенсора: %s)"
 
-#: prewikka/views/messagesummary/messagesummary.py:401
-#: prewikka/views/messagesummary/messagesummary.py:853
+#: prewikka/views/messagesummary/messagesummary.py:402
+#: prewikka/views/messagesummary/messagesummary.py:854
 msgid "Create time"
 msgstr "Время создания"
 
-#: prewikka/views/messagesummary/messagesummary.py:404
+#: prewikka/views/messagesummary/messagesummary.py:405
 msgid "Detect time"
 msgstr "Время обнаружения"
 
-#: prewikka/views/messagesummary/messagesummary.py:409
+#: prewikka/views/messagesummary/messagesummary.py:410
 msgid "Analyzer time"
 msgstr "Время анализатора"
 
-#: prewikka/views/messagesummary/messagesummary.py:415
+#: prewikka/views/messagesummary/messagesummary.py:416
 msgid "Process"
 msgstr "Процесс"
 
-#: prewikka/views/messagesummary/messagesummary.py:416
+#: prewikka/views/messagesummary/messagesummary.py:417
 msgid "Process Path"
 msgstr "Путь процесса"
 
-#: prewikka/views/messagesummary/messagesummary.py:417
+#: prewikka/views/messagesummary/messagesummary.py:418
 msgid "Process PID"
 msgstr "PID процесса"
 
-#: prewikka/views/messagesummary/messagesummary.py:450
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:451
 msgid "Node name (resolved)"
 msgstr "Имя узла"
 
-#: prewikka/views/messagesummary/messagesummary.py:460
+#: prewikka/views/messagesummary/messagesummary.py:461
 msgid "Analyzerid"
 msgstr "Идентификатор анализатора"
 
-#: prewikka/views/messagesummary/messagesummary.py:464
+#: prewikka/views/messagesummary/messagesummary.py:465
 msgid "Manufacturer"
 msgstr "Производитель"
 
-#: prewikka/views/messagesummary/messagesummary.py:472
+#: prewikka/views/messagesummary/messagesummary.py:473
 msgid "Operating System"
 msgstr "Операционная система"
 
-#: prewikka/views/messagesummary/messagesummary.py:490
+#: prewikka/views/messagesummary/messagesummary.py:491
 #, python-format
 msgid "Analyzer Path (%d not shown)"
 msgstr "Путь анализатора (%d не показан)"
 
-#: prewikka/views/messagesummary/messagesummary.py:497
-#: prewikka/views/messagesummary/messagesummary.py:1055
-#: prewikka/views/messagesummary/messagesummary.py:1125
+#: prewikka/views/messagesummary/messagesummary.py:498
+#: prewikka/views/messagesummary/messagesummary.py:1056
+#: prewikka/views/messagesummary/messagesummary.py:1126
 #, python-format
 msgid "Analyzer #%d"
 msgstr "Анализатор #%d"
 
-#: prewikka/views/messagesummary/messagesummary.py:507
+#: prewikka/views/messagesummary/messagesummary.py:508
 msgid "Additional data"
 msgstr "Дополнительные данные"
 
-#: prewikka/views/messagesummary/messagesummary.py:510
-#: prewikka/views/messagesummary/messagesummary.py:736
+#: prewikka/views/messagesummary/messagesummary.py:511
+#: prewikka/views/messagesummary/messagesummary.py:737
 msgid "Meaning"
 msgstr "Смысл"
 
-#: prewikka/views/messagesummary/messagesummary.py:511
+#: prewikka/views/messagesummary/messagesummary.py:512
 msgid "Value"
 msgstr "Значение"
 
-#: prewikka/views/messagesummary/messagesummary.py:567
-#: prewikka/views/messagesummary/messagesummary.py:588
+#: prewikka/views/messagesummary/messagesummary.py:568
+#: prewikka/views/messagesummary/messagesummary.py:589
 msgid "Header length"
 msgstr "Длина заголовка"
 
-#: prewikka/views/messagesummary/messagesummary.py:568
+#: prewikka/views/messagesummary/messagesummary.py:569
 msgid "TOS"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:569
-#: prewikka/views/messagesummary/messagesummary.py:607
+#: prewikka/views/messagesummary/messagesummary.py:570
+#: prewikka/views/messagesummary/messagesummary.py:608
 msgid "Length"
 msgstr "Длина"
 
-#: prewikka/views/messagesummary/messagesummary.py:570
-#: prewikka/views/messagesummary/messagesummary.py:616
+#: prewikka/views/messagesummary/messagesummary.py:571
+#: prewikka/views/messagesummary/messagesummary.py:617
 msgid "Id"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:574
-msgid "Ip offset"
-msgstr ""
-
 #: prewikka/views/messagesummary/messagesummary.py:575
-msgid "TTL"
-msgstr ""
+msgid "Ip offset"
+msgstr "Смещение Ip"
 
 #: prewikka/views/messagesummary/messagesummary.py:576
-#: prewikka/views/messagesummary/messagesummary.py:945
-#: prewikka/views/messagesummary/messagesummary.py:948
-#: prewikka/views/messagesummary/messagesummary.py:951
+msgid "TTL"
+msgstr "TTL"
+
+#: prewikka/views/messagesummary/messagesummary.py:577
+#: prewikka/views/messagesummary/messagesummary.py:946
+#: prewikka/views/messagesummary/messagesummary.py:949
+#: prewikka/views/messagesummary/messagesummary.py:952
 msgid "Protocol"
 msgstr "Протокол"
 
-#: prewikka/views/messagesummary/messagesummary.py:577
-#: prewikka/views/messagesummary/messagesummary.py:599
-#: prewikka/views/messagesummary/messagesummary.py:608
-#: prewikka/views/messagesummary/messagesummary.py:615
+#: prewikka/views/messagesummary/messagesummary.py:578
+#: prewikka/views/messagesummary/messagesummary.py:600
+#: prewikka/views/messagesummary/messagesummary.py:609
+#: prewikka/views/messagesummary/messagesummary.py:616
 msgid "Checksum"
 msgstr "Контрольная сумма"
 
-#: prewikka/views/messagesummary/messagesummary.py:578
+#: prewikka/views/messagesummary/messagesummary.py:579
 msgid "Source address"
 msgstr "Адрес источника"
 
-#: prewikka/views/messagesummary/messagesummary.py:579
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:580
 msgid "Target address"
-msgstr "Адрес узла"
-
-#: prewikka/views/messagesummary/messagesummary.py:584
-#: prewikka/views/messagesummary/messagesummary.py:605
-msgid "Source port"
-msgstr "Порт источника"
+msgstr "Адрес назначения"
 
 #: prewikka/views/messagesummary/messagesummary.py:585
 #: prewikka/views/messagesummary/messagesummary.py:606
+msgid "Source port"
+msgstr "Порт источника"
+
+#: prewikka/views/messagesummary/messagesummary.py:586
+#: prewikka/views/messagesummary/messagesummary.py:607
 msgid "Target port"
 msgstr "Порт цели"
 
-#: prewikka/views/messagesummary/messagesummary.py:589
+#: prewikka/views/messagesummary/messagesummary.py:590
 msgid "Reserved"
 msgstr "Зарезервировано"
 
-#: prewikka/views/messagesummary/messagesummary.py:598
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:599
 msgid "Window"
 msgstr "Окно"
 
-#: prewikka/views/messagesummary/messagesummary.py:600
+#: prewikka/views/messagesummary/messagesummary.py:601
 msgid "URP"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:613
-#: prewikka/views/messagesummary/messagesummary.py:762
-#: prewikka/views/messagesummary/messagesummary.py:795
-#: prewikka/views/messagesummary/messagesummary.py:814
+#: prewikka/views/messagesummary/messagesummary.py:614
+#: prewikka/views/messagesummary/messagesummary.py:763
+#: prewikka/views/messagesummary/messagesummary.py:796
+#: prewikka/views/messagesummary/messagesummary.py:815
 msgid "Type"
 msgstr "Тип"
 
-#: prewikka/views/messagesummary/messagesummary.py:617
+#: prewikka/views/messagesummary/messagesummary.py:618
 msgid "Seq #"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:618
+#: prewikka/views/messagesummary/messagesummary.py:619
 msgid "Mask"
 msgstr "Маска"
 
-#: prewikka/views/messagesummary/messagesummary.py:619
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:620
 msgid "Gateway Address"
 msgstr "Адрес шлюза"
 
-#: prewikka/views/messagesummary/messagesummary.py:620
+#: prewikka/views/messagesummary/messagesummary.py:621
 msgid "Num address"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:621
+#: prewikka/views/messagesummary/messagesummary.py:622
 msgid "Wpa"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:622
+#: prewikka/views/messagesummary/messagesummary.py:623
 msgid "Lifetime"
 msgstr "Время жизни"
 
-#: prewikka/views/messagesummary/messagesummary.py:623
+#: prewikka/views/messagesummary/messagesummary.py:624
 msgid "Otime"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:624
+#: prewikka/views/messagesummary/messagesummary.py:625
 msgid "Rtime"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:625
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:626
 msgid "Ttime"
-msgstr "Время"
+msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:631
-#: prewikka/views/messagesummary/messagesummary.py:1102
+#: prewikka/views/messagesummary/messagesummary.py:632
+#: prewikka/views/messagesummary/messagesummary.py:1103
 msgid "Payload"
 msgstr "Полезная нагрузка"
 
-#: prewikka/views/messagesummary/messagesummary.py:679
+#: prewikka/views/messagesummary/messagesummary.py:680
 #, python-format
 msgid "%d linked alerts missing (probably deleted)"
-msgstr ""
+msgstr "%d связанных событий отсутствует (вероятно удалено)"
 
-#: prewikka/views/messagesummary/messagesummary.py:699
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:700
 msgid "Correlated Alerts"
 msgstr "Событие корреляции"
 
-#: prewikka/views/messagesummary/messagesummary.py:700
-#: prewikka/views/messagesummary/messagesummary.py:717
+#: prewikka/views/messagesummary/messagesummary.py:701
+#: prewikka/views/messagesummary/messagesummary.py:718
 msgid "Source Analyzer"
-msgstr ""
+msgstr "Анализатор источника"
 
-#: prewikka/views/messagesummary/messagesummary.py:716
+#: prewikka/views/messagesummary/messagesummary.py:717
 msgid "Linked Alerts"
-msgstr "Связанное событие"
+msgstr "Связанноые события"
 
-#: prewikka/views/messagesummary/messagesummary.py:727
+#: prewikka/views/messagesummary/messagesummary.py:728
 msgid "Text"
 msgstr "Текст"
 
-#: prewikka/views/messagesummary/messagesummary.py:729
+#: prewikka/views/messagesummary/messagesummary.py:730
 msgid "Ident"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:734
+#: prewikka/views/messagesummary/messagesummary.py:735
 msgid "Origin"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:756
+#: prewikka/views/messagesummary/messagesummary.py:757
 msgid "Severity"
 msgstr "Важность"
 
-#: prewikka/views/messagesummary/messagesummary.py:759
+#: prewikka/views/messagesummary/messagesummary.py:760
 msgid "Completion"
 msgstr "Завершенность"
 
-#: prewikka/views/messagesummary/messagesummary.py:768
+#: prewikka/views/messagesummary/messagesummary.py:769
 msgid "Category"
 msgstr "Категория"
 
-#: prewikka/views/messagesummary/messagesummary.py:792
+#: prewikka/views/messagesummary/messagesummary.py:793
 msgid "User category"
 msgstr "Категория пользователя"
 
-#: prewikka/views/messagesummary/messagesummary.py:797
-#: prewikka/views/messagesummary/messagesummary.py:816
+#: prewikka/views/messagesummary/messagesummary.py:798
+#: prewikka/views/messagesummary/messagesummary.py:817
 msgid "Number"
 msgstr "Номер"
 
-#: prewikka/views/messagesummary/messagesummary.py:798
+#: prewikka/views/messagesummary/messagesummary.py:799
 msgid "Tty"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:817
+#: prewikka/views/messagesummary/messagesummary.py:818
 msgid "Permission"
 msgstr "Привилегии"
 
-#: prewikka/views/messagesummary/messagesummary.py:839
-msgid "Change time"
-msgstr ""
-
 #: prewikka/views/messagesummary/messagesummary.py:840
-#, fuzzy
+msgid "Change time"
+msgstr "Изменение времени"
+
+#: prewikka/views/messagesummary/messagesummary.py:841
 msgid "Inode Number"
 msgstr "Номер inode"
 
-#: prewikka/views/messagesummary/messagesummary.py:841
+#: prewikka/views/messagesummary/messagesummary.py:842
 msgid "Major device"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:842
+#: prewikka/views/messagesummary/messagesummary.py:843
 msgid "Minor device"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:843
+#: prewikka/views/messagesummary/messagesummary.py:844
 msgid "C Major device"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:844
+#: prewikka/views/messagesummary/messagesummary.py:845
 msgid "C Minor device"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:848
-#, fuzzy, python-format
+#: prewikka/views/messagesummary/messagesummary.py:849
+#, python-format
 msgid "Target file %s"
 msgstr "Целевой файл %s"
 
-#: prewikka/views/messagesummary/messagesummary.py:848
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:849
 msgid "category"
 msgstr "Категория"
 
-#: prewikka/views/messagesummary/messagesummary.py:852
+#: prewikka/views/messagesummary/messagesummary.py:853
 msgid "Path"
 msgstr "Путь"
 
-#: prewikka/views/messagesummary/messagesummary.py:854
+#: prewikka/views/messagesummary/messagesummary.py:855
 msgid "Modify time"
 msgstr "Время модификации"
 
-#: prewikka/views/messagesummary/messagesummary.py:855
+#: prewikka/views/messagesummary/messagesummary.py:856
 msgid "Access time"
 msgstr "Время доступа"
 
-#: prewikka/views/messagesummary/messagesummary.py:856
+#: prewikka/views/messagesummary/messagesummary.py:857
 msgid "Data size"
 msgstr "Размер данных"
 
-#: prewikka/views/messagesummary/messagesummary.py:857
+#: prewikka/views/messagesummary/messagesummary.py:858
 msgid "Disk size"
 msgstr "Размер диска"
 
-#: prewikka/views/messagesummary/messagesummary.py:876
+#: prewikka/views/messagesummary/messagesummary.py:877
 msgid "Web Service"
 msgstr "Web сервис"
 
-#: prewikka/views/messagesummary/messagesummary.py:879
+#: prewikka/views/messagesummary/messagesummary.py:880
 msgid "Url"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:880
+#: prewikka/views/messagesummary/messagesummary.py:881
 msgid "Cgi"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:881
+#: prewikka/views/messagesummary/messagesummary.py:882
 msgid "Http Method"
 msgstr "Метод http"
 
-#: prewikka/views/messagesummary/messagesummary.py:884
+#: prewikka/views/messagesummary/messagesummary.py:885
 msgid "CGI Argument"
 msgstr "Аргумент CGI"
 
-#: prewikka/views/messagesummary/messagesummary.py:893
+#: prewikka/views/messagesummary/messagesummary.py:894
 msgid "SNMP Service"
 msgstr "SNMP-сервис"
 
-#: prewikka/views/messagesummary/messagesummary.py:896
+#: prewikka/views/messagesummary/messagesummary.py:897
 msgid "oid"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:897
+#: prewikka/views/messagesummary/messagesummary.py:898
 msgid "messageProcessingModel"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:898
+#: prewikka/views/messagesummary/messagesummary.py:899
 msgid "securityModel"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:899
+#: prewikka/views/messagesummary/messagesummary.py:900
 msgid "securityName"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:900
+#: prewikka/views/messagesummary/messagesummary.py:901
 msgid "securityLevel"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:901
-#, fuzzy
-msgid "contextName"
-msgstr "Имя контекста"
-
 #: prewikka/views/messagesummary/messagesummary.py:902
-msgid "contextEngineID"
+msgid "contextName"
 msgstr ""
 
 #: prewikka/views/messagesummary/messagesummary.py:903
+msgid "contextEngineID"
+msgstr ""
+
+#: prewikka/views/messagesummary/messagesummary.py:904
 msgid "command"
 msgstr "команда"
 
-#: prewikka/views/messagesummary/messagesummary.py:916
-#: prewikka/views/messagesummary/messagesummary.py:918
+#: prewikka/views/messagesummary/messagesummary.py:917
+#: prewikka/views/messagesummary/messagesummary.py:919
 msgid "Port"
 msgstr "Порт"
 
-#: prewikka/views/messagesummary/messagesummary.py:938
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:939
 msgid "PortList"
 msgstr "Порт"
 
-#: prewikka/views/messagesummary/messagesummary.py:941
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:942
 msgid "ip_version"
 msgstr "Версия"
 
-#: prewikka/views/messagesummary/messagesummary.py:977
+#: prewikka/views/messagesummary/messagesummary.py:978
 #, python-format
 msgid "Source(%d)"
 msgstr "Источник(%d)"
 
-#: prewikka/views/messagesummary/messagesummary.py:992
+#: prewikka/views/messagesummary/messagesummary.py:993
 #, python-format
 msgid "Target(%d)"
 msgstr "Цель(%d)"
 
-#: prewikka/views/messagesummary/messagesummary.py:1016
+#: prewikka/views/messagesummary/messagesummary.py:1017
 msgid "Overflow Alert"
 msgstr "Событие переполнения"
 
-#: prewikka/views/messagesummary/messagesummary.py:1038
+#: prewikka/views/messagesummary/messagesummary.py:1039
 msgid "MessageID"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:1046
+#: prewikka/views/messagesummary/messagesummary.py:1047
 msgid "Actions"
 msgstr "Действие"
 
-#: prewikka/views/messagesummary/messagesummary.py:1085
-#, fuzzy
+#: prewikka/views/messagesummary/messagesummary.py:1086
 msgid "Network centric information"
 msgstr "Информация об учетной записи"
 
-#: prewikka/views/messagesummary/messagesummary.py:1105
+#: prewikka/views/messagesummary/messagesummary.py:1106
 msgid "ASCII Payload"
 msgstr ""
 
 #: prewikka/views/usermanagement/__init__.py:10
-#, fuzzy
 msgid "User settings page"
 msgstr "Настройки"
 
@@ -1842,35 +1811,32 @@ msgstr "Часовой пояс:"
 
 #: prewikka/views/usermanagement/usermanagement.py:28
 msgid "My account"
-msgstr "Мой счет"
+msgstr "Моя учетная запись"
 
 #: prewikka/views/usermanagement/usermanagement.py:41
-#, fuzzy
 msgid "Invalid User"
-msgstr "Язык:"
+msgstr "Неверный пользователь"
 
 #: prewikka/views/usermanagement/usermanagement.py:41
 #, python-format
 msgid "Requested user '%s' does not exist"
-msgstr ""
+msgstr "запрощенный пользователь '%s' не существует"
 
 #: prewikka/views/usermanagement/usermanagement.py:70
-#, fuzzy
 msgid "Invalid Language"
-msgstr "Язык:"
+msgstr "Неверный язык"
 
 #: prewikka/views/usermanagement/usermanagement.py:70
 msgid "Specified language does not exist"
-msgstr ""
+msgstr "Выбранный язык не существует"
 
 #: prewikka/views/usermanagement/usermanagement.py:78
-#, fuzzy
 msgid "Invalid Timezone"
-msgstr "Язык:"
+msgstr "неверная временная зона"
 
 #: prewikka/views/usermanagement/usermanagement.py:78
 msgid "Specified timezone does not exist"
-msgstr ""
+msgstr "Выбранная временная зона не существует"
 
 #: prewikka/views/warning/__init__.py:29
 msgid "Prelude Warning message"
@@ -1878,11 +1844,12 @@ msgstr ""
 
 #: prewikka/views/warning/templates/warning.py:87
 msgid "WARNING"
-msgstr ""
+msgstr "ВНИМАНИЕ!"
 
 #: prewikka/views/warning/templates/warning.py:115
 msgid "Prelude OSS is the open-source version of the Prelude SIEM"
 msgstr ""
+"Prelude OSS это версия с открытым исходным кодом приложения Prelude SIEM"
 
 #: prewikka/views/warning/templates/warning.py:123
 #, python-format
@@ -1891,17 +1858,22 @@ msgid ""
 "span> and <span style='font-weight: bold'>less <a href='%s'>features</a></"
 "span> than the Pro/Enterprise versions."
 msgstr ""
+"Эта OSS версия имеет <span style='font-weight: bold'>пониженную "
+"производительность</span> и <span style='font-weight: bold'> меньше <a "
+"href='%s'>возможностей</a></span> чем Pro/Enterprise версия."
 
 #: prewikka/views/warning/templates/warning.py:131
 msgid ""
 "It is intended for tests and small environments, and should not be used in "
 "critical environments."
 msgstr ""
+"Предполагается для тестов и небольших окружений. Не следует использовать "
+"вкритически важных системах"
 
 #: prewikka/views/warning/templates/warning.py:139
 #, python-format
 msgid "Prelude OSS is distributed under the %s."
-msgstr ""
+msgstr "Prelude OSS распространяется под %s."
 
 #: prewikka/views/warning/templates/warning.py:147
 msgid ""
