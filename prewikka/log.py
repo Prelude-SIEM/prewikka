@@ -59,7 +59,7 @@ class Log:
             hdlr = logging.FileHandler(config["file"])
 
         elif logtype == 'nteventlog':
-            hdlr = logging.handlers.NTEventLogHandler(logid, logtype='Application')
+            hdlr = logging.handlers.NTEventLogHandler("Prewikka", logtype='Application')
 
         elif logtype in ['syslog', 'unix']:
             hdlr = logging.handlers.SysLogHandler(self._getSyslogHandlerAddress(), facility=logging.handlers.SysLogHandler.LOG_DAEMON)
