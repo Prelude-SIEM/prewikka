@@ -298,7 +298,7 @@ function prewikka_EventSource(config)
 
     if ( config['error'] == undefined ) {
         config['error'] = function(e) {
-            prewikka_dialog(e);
+            prewikka_dialog("Connection error");
             jsonStream.close();
         };
     }
@@ -326,7 +326,7 @@ function prewikka_EventSource(config)
     }
 
     jsonStream.onmessage = function(e) { config['message'](decode_json(e)) };
-    jsonStream.onerror = function(e) { config['error'](decode_json(e)) };
+    jsonStream.onerror = function(e) { config['error'](e) };
 
     return jsonStream;
 }

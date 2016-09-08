@@ -77,7 +77,7 @@ class AboutPlugin(view.View):
                         continue
 
         env.request.web.send_stream(data=json.dumps({"label": _("All updates applied")}), event="finish", sync=True)
-
+        env.request.web.send_stream("close", event="close")
 
     def _add_plugin_info(self, data, catname, mod):
         upinfo = uperror = None
