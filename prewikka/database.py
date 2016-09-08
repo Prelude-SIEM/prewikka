@@ -22,7 +22,11 @@ import re, operator, pkg_resources, pkgutil
 from datetime import datetime
 
 import preludedb
+import collections
 from prewikka import log, error, utils, version, env, compat, usergroup
+
+
+ModuleInfo = collections.namedtuple("ModuleInfo", ["branch", "version", "enabled"])
 
 
 class DatabaseSchemaError(error.PrewikkaUserError):
@@ -49,7 +53,7 @@ def _use_flock(func):
 
 def use_transaction(func):
     def inner(self, *args, **kwargs):
-        if env.db._in_transaction:
+        if env.db._transaction_state:
             return func(self, *args, **kwargs)
 
         env.db.transaction_start()
@@ -237,20 +241,20 @@ class DatabaseHelper(object):
         return self.__dict__.get(x, getattr(env.db, x))
 
 
-class DatabaseUpdateHelper(DatabaseHelper):
-    def _get_database_version(self):
-        try:
-                infos = self.query("SELECT branch, version, enabled FROM Prewikka_Module_Registry WHERE module = %s", self._module_name)
-                branch, version, enabled = infos[0]
-        except Exception as e:
-                return None, None, False
 
-        return branch, version, not(bool(int(enabled)))
+class DatabaseUpdateHelper(DatabaseHelper):
+    _default_modinfo = ModuleInfo(None, None, True)
 
     def _init_version_attr(self):
-        if not self._initialized:
-            self._from_branch, self._from_version, self._need_enable = self._get_database_version()
-            self._initialized = True
+        if self._initialized:
+            return
+
+        module = self.modinfos.get(self._module_name, self._default_modinfo)
+
+        self._from_branch = module.branch
+        self._from_version = module.version
+        self._need_enable = not(module.enabled)
+        self._initialized = True
 
     def __init__(self, module_name, reqversion, reqbranch=None):
         DatabaseHelper.__init__(self) #for use_transaction
@@ -423,6 +427,23 @@ class Database(preludedb.SQL):
     __sentinel = object()
     __ALL_PROPERTIES = object()
 
+    __TRANSACTION_STATE_NONE  = 0
+    __TRANSACTION_STATE_BEGIN = 1
+    __TRANSACTION_STATE_QUERY = 2
+
+    @property
+    def modinfos(self):
+        if self._modinfos:
+            return self._modinfos
+
+        try:
+            rows = self.query("SELECT module, branch, version, enabled FROM Prewikka_Module_Registry")
+        except:
+            return {}
+
+        self._modinfos = dict((i[0], ModuleInfo(i[1], i[2], int(i[3]))) for i in rows)
+        return self._modinfos
+
     def __init__(self, config):
         env.db = self
 
@@ -430,13 +451,21 @@ class Database(preludedb.SQL):
         settings.update([(k, str(v)) for k, v in config.items()])
 
         preludedb.SQL.__init__(self, settings)
+
+        self._modinfos = {}
         self._dbtype = settings["type"]
-        self._in_transaction = False
+        self._transaction_state = self.__TRANSACTION_STATE_NONE
 
         dh = DatabaseUpdateHelper("prewikka", self.required_version, self.required_branch)
         dh.apply()
 
+        self._last_plugin_activation_change = self._get_last_plugin_changed()
+
     def query(self, sql, *args, **kwargs):
+        if self._transaction_state == self.__TRANSACTION_STATE_BEGIN:
+            self.transactionStart()
+            self._transaction_state = self.__TRANSACTION_STATE_QUERY
+
         if args:
             sql = sql % tuple(self.escape(value) for value in args)
         elif kwargs:
@@ -484,15 +513,26 @@ class Database(preludedb.SQL):
         return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
 
     def is_plugin_active(self, plugin):
-        r = self.query("SELECT enabled FROM Prewikka_Module_Registry WHERE module = %s", plugin)
-        if r:
-            return int(r[0][0]) == 1
+        plugin = self.modinfos.get(plugin)
+        if plugin:
+            return plugin.enabled == 1
 
         return True
 
-    def get_last_plugin_activation_change(self):
-        d = self.query("SELECT time FROM Prewikka_Module_Changed")[0][0]
-        return utils.timeutil.get_timestamp_from_string(d)
+    def _get_last_plugin_changed(self):
+        rows = self.query("SELECT time FROM Prewikka_Module_Changed")[0][0]
+        return utils.timeutil.get_timestamp_from_string(rows)
+
+    def has_plugin_changed(self):
+        last = self._get_last_plugin_changed()
+
+        if last <= self._last_plugin_activation_change:
+            return False
+
+        self._last_plugin_activation_change = last
+        self._modinfos = {}
+
+        return True
 
     def trigger_plugin_change(self):
         self.query("UPDATE Prewikka_Module_Changed SET time=current_timestamp")
@@ -561,13 +601,17 @@ class Database(preludedb.SQL):
             self.query("UNLOCK TABLES;")
 
     def transaction_start(self):
-        self.transactionStart()
-        self._in_transaction = True
+        # The actual transaction will be started on the first query
+        self._transaction_state = self.__TRANSACTION_STATE_BEGIN
 
     def transaction_end(self):
-        self.transactionEnd()
-        self._in_transaction = False
+        if self._transaction_state == self.__TRANSACTION_STATE_QUERY:
+            self.transactionEnd()
+
+        self._transaction_state = self.__TRANSACTION_STATE_NONE
 
     def transaction_abort(self):
-        self.transactionAbort()
-        self._in_transaction = False
+        if self._transaction_state == self.__TRANSACTION_STATE_QUERY:
+            self.transactionAbort()
+
+        self._transaction_state = self.__TRANSACTION_STATE_NONE

@@ -174,7 +174,7 @@ class Core:
         setattr(env, typename, obj)
         obj.init(config)
 
-    def _loadPlugins(self, last_change=None):
+    def _loadPlugins(self):
         env.menumanager = menu.MenuManager()
         env.dataprovider = dataprovider.DataProviderManager()
         env.viewmanager = view.ViewManager()
@@ -219,18 +219,15 @@ class Core:
 
         env.renderer = renderer.RendererPluginManager()
 
-        self._last_plugin_activation_change = last_change or env.db.get_last_plugin_activation_change()
-
     def _reload_plugin_if_needed(self):
-        last = env.db.get_last_plugin_activation_change()
-        if last <= self._last_plugin_activation_change:
+        if not env.db.has_plugin_changed():
             return
 
         # Some changes happened, and every process has to reload the plugin configuration
         env.log.warning("plugins were activated: triggering reload")
 
         hookmanager.unregister()
-        self._loadPlugins(last_change=last)
+        self._loadPlugins()
 
     def _redirect_default(self, request):
         default_view = env.config.general.get("default_view", "alerts/alerts")
