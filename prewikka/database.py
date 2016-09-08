@@ -49,15 +49,41 @@ def use_flock(func):
 
 def use_transaction(func):
     def inner(self, *args, **kwargs):
-        self.transactionStart()
+        if env.db._in_transaction:
+            return func(self, *args, **kwargs)
+
+        env.db.transaction_start()
         try:
             ret = func(self, *args, **kwargs)
         except:
-            self.transactionAbort()
+            env.db.transaction_abort()
             raise
-        self.transactionEnd()
+
+        env.db.transaction_end()
         return ret
+
     return inner
+
+
+def use_lock(table):
+    def real_decorator(func):
+
+        @use_transaction
+        def inner(self, *args, **kwargs):
+            env.db._lock_table(table)
+
+            try:
+                ret = func(self, *args, **kwargs)
+            except:
+                env.db._unlock_table(table)
+                raise
+
+            env.db._unlock_table(table)
+            return ret
+
+        return inner
+
+    return real_decorator
 
 
 class SQLScript(object):
@@ -403,6 +429,7 @@ class Database(preludedb.SQL):
 
         preludedb.SQL.__init__(self, settings)
         self._dbtype = settings["type"]
+        self._in_transaction = False
 
         dh = DatabaseUpdateHelper("prewikka", self.required_version, self.required_branch)
         dh.apply()
@@ -503,7 +530,7 @@ class Database(preludedb.SQL):
 
         return [usergroup.User(userid=x) for x in reduce(lambda x,y: x.intersection(y), get_data(keys))]
 
-    @use_transaction
+    @use_lock("Prewikka_User_Configuration")
     def set_property(self, user, key, value, view=None):
         self.del_property(user, key, view)
 
@@ -519,3 +546,26 @@ class Database(preludedb.SQL):
 
     def del_properties(self, user, view=__ALL_PROPERTIES):
         return self.del_property(user, None, view=view)
+
+    def _lock_table(self, table):
+        if self._dbtype == "pgsql":
+            self.query("LOCK TABLE %s IN EXCLUSIVE MODE" % ", ".join(self._mklist(table)))
+
+        elif self._dbtype == "mysql":
+            self.query("LOCK TABLES %s" % ", ".join(t + " WRITE" for t in self._mklist(table)))
+
+    def _unlock_table(self, table):
+        if self._dbtype == "mysql":
+            self.query("UNLOCK TABLES;")
+
+    def transaction_start(self):
+        self.transactionStart()
+        self._in_transaction = True
+
+    def transaction_end(self):
+        self.transactionEnd()
+        self._in_transaction = False
+
+    def transaction_abort(self):
+        self.transactionAbort()
+        self._in_transaction = False
