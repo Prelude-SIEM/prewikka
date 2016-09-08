@@ -628,6 +628,180 @@ class Database(preludedb.SQL):
     def del_properties(self, user, view=__ALL_PROPERTIES):
         return self.del_property(user, None, view=view)
 
+    def _get_merge_value(self, merged, field, rownum):
+        value = merged[field]
+        if not isinstance(value, (tuple, list)):
+            return value
+
+        if rownum >= len(value):
+            raise Exception("merge value should be unique, or list with the same number of rows")
+
+        return value[rownum]
+
+
+    def _upsert_prepare(self, pkey, fields, values_rows, returning=[], merge={}, func=None):
+        up = []
+        if func:
+            up = ["%s=%s" % (f, func(f)) for f in fields]
+
+        merged = {} if isinstance(merge, int) else merge
+
+        vl = []
+        delq = []
+
+        for idx, row in enumerate(values_rows):
+            vl.append(str(self.escape(row)))
+
+            if not merge:
+                continue
+
+            tmpl = []
+            for field, value in zip(fields, row):
+                if field in merged:
+                    tmpl.append("%s = %s" % (field, self.escape(self._get_merge_value(merged, field, idx))))
+
+                elif field in pkey:
+                    tmpl.append("%s = %s" % (field, self.escape(value)))
+
+            delq.append("NOT(" + " AND ".join(tmpl) + ")")
+
+        return ", ".join(fields), ", ".join(vl), ", ".join(up), ", ".join(returning), " AND ".join(delq)
+
+
+    def _pgsql_upsert_cte_query(self, table, pkey, upfmt, fieldfmt, vlfmt, retfmt):
+        up_pkfmt = []
+        in_pkfmt = []
+        for v in pkey:
+            up_pkfmt.append("%s.%s = nv.%s" % (table, v, v))
+            in_pkfmt.append("updated.%s = nv.%s" % (v, v))
+
+        update = "UPDATE %s SET %s FROM nv WHERE %s RETURNING %s.*" % (table, upfmt, " AND ".join(up_pkfmt), table)
+        insert = "INSERT INTO %s (%s) SELECT %s FROM nv WHERE NOT EXISTS (SELECT 1 FROM updated WHERE %s)" % (table, fieldfmt, fieldfmt, " AND ".join(in_pkfmt))
+        if retfmt:
+            insert = "%s RETURNING %s" % (insert, retfmt)
+
+        query = "WITH nv (%s) AS (VALUES %s), updated AS (%s)" % (fieldfmt, vlfmt, update)
+        if retfmt:
+            query = "%s, inserted AS (%s) SELECT %s FROM inserted UNION ALL SELECT %s FROM updated" % (query, insert, retfmt, retfmt)
+        else:
+            query = " ".join((query, insert))
+
+        return self.query(query)
+
+    def _pgsql_upsert_cte(self, table, pkey, fields, values_rows, returning=[], merge={}):
+        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge, lambda x: "nv.%s" % x)
+        if not vlfmt:
+            return []
+
+        self._lock_table(table)
+        try:
+            ret = self._pgsql_upsert_cte_query(table, pkey, upfmt, fieldfmt, vlfmt, retfmt)
+            if delfmt:
+                self.query("DELETE FROM %s WHERE %s" % (table, delfmt))
+        finally:
+            self._unlock_table(table)
+
+        if retfmt:
+            return ret
+
+    def _pgsql_upsert(self, table, pkey, fields, values_rows, returning=[], merge={}):
+        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge, lambda x: "EXCLUDED.%s" % (x))
+        if vlfmt:
+            if retfmt:
+                retfmt = " RETURNING %s" % retfmt
+
+            ret = self.query("INSERT INTO %s (%s) VALUES %s ON CONFLICT (%s) DO UPDATE SET %s%s" % (table, fieldfmt, vlfmt, ",".join(pkey), upfmt, retfmt))
+
+        if delfmt:
+            self.query("DELETE FROM %s WHERE %s" % (table, delfmt))
+
+        if vlfmt and retfmt:
+            return ret
+
+    def _pgsql_upsert_emulate_single(self, table, pkey, fields, row, fieldfmt, retfmt):
+        up_fmt = []
+        wh_fmt = []
+        vl_fmt = []
+
+        for i, v in enumerate(fields):
+            if v in pkey:
+                wh_fmt.append("%s = %s" % (v, self.escape(row[i])))
+
+            up_fmt.append("%s = %s" % (v, self.escape(row[i])))
+            vl_fmt.append(self.escape(row[i]))
+
+        ret = self.query("UPDATE %s SET %s WHERE %s%s" % (table, ", ".join(up_fmt), " AND ".join(wh_fmt), retfmt))
+        if ret:
+            return ret
+
+        return self.query("INSERT INTO %s (%s) SELECT %s WHERE NOT EXISTS (SELECT 1 FROM %s WHERE %s)%s" %
+                          (table, fieldfmt, ", ".join(vl_fmt), table, " AND ".join(wh_fmt), retfmt))
+
+    def _pgsql_upsert_emulate(self, table, pkey, fields, values_rows, returning=[], merge={}):
+        values_rows = list(values_rows)
+
+        fieldfmt, _, _, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge)
+        if retfmt:
+            retfmt = " RETURNING %s" % retfmt
+
+        returning = []
+        self._lock_table(table)
+
+        try:
+            for row in values_rows:
+                ret = self._pgsql_upsert_emulate_single(table, pkey, fields, row, fieldfmt, retfmt)
+                if ret and retfmt:
+                    returning.append(ret)
+
+            if delfmt:
+                self.query("DELETE FROM %s WHERE %s" % (table, delfmt))
+
+        finally:
+            self._unlock_table(table)
+
+        return returning
+
+    def _mysql_upsert(self, table, pkey, fields, values_rows, returning=[], merge={}):
+        if returning:
+            values_rows = list(values_rows)
+
+        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge, lambda x: "VALUES(%s)" % x)
+
+        if vlfmt:
+            self.query("INSERT INTO %s (%s) VALUES %s ON DUPLICATE KEY UPDATE %s" % (table, fieldfmt, vlfmt, upfmt))
+
+        if delfmt:
+            self.query("DELETE FROM %s WHERE %s" % (table, delfmt))
+
+        if retfmt:
+            wh = []
+            for row in values_rows:
+                vl = " AND ".join([ "%s = %s" % (field, self.escape(row[i])) for i, field in enumerate(pkey) ])
+                wh.append("(%s)" % (vl))
+
+            return self.query("SELECT %s FROM %s WHERE %s" % (retfmt, table, " OR ".join(wh)))
+
+    @use_transaction
+    def upsert(self, table, fields, values_rows, pkey=[], returning=[], merge={}):
+        if not pkey:
+            pkey = fields
+
+        if self._dbtype == "pgsql":
+            version = self.getServerVersion()
+            if version >= 90500:
+                ret = self._pgsql_upsert(table, pkey, fields, values_rows, returning, merge)
+
+            elif version >= 90100:
+                ret = self._pgsql_upsert_cte(table, pkey, fields, values_rows, returning, merge)
+
+            else:
+                ret = self._pgsql_upsert_emulate(table, pkey, fields, values_rows, returning, merge)
+
+        elif self._dbtype == "mysql":
+            ret = self._mysql_upsert(table, pkey, fields, values_rows, returning, merge)
+
+        return ret
+
     def _lock_table(self, table):
         if self._dbtype == "pgsql":
             self.query("LOCK TABLE %s IN EXCLUSIVE MODE" % ", ".join(self._mklist(table)))
