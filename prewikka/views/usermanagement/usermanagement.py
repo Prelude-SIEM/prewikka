@@ -41,14 +41,14 @@ class UserSettingsDisplay(view.View):
             raise error.PrewikkaUserError(_("Invalid User"), N_("Requested user '%s' does not exist", self._object))
 
         self.dataset["object"] = self._object
-        self.dataset["fullname"] = env.db.get_property(self._object, "fullname")
-        self.dataset["email"] = env.db.get_property(self._object, "email")
+        self.dataset["fullname"] = self._object.get_property("fullname")
+        self.dataset["email"] = self._object.get_property("email")
         self.dataset["available_timezones"] = localization.get_timezones()
-        self.dataset["timezone"] = env.db.get_property(self._object, "timezone", default=env.config.general.default_timezone)
+        self.dataset["timezone"] = self._object.get_property("timezone", default=env.config.general.default_timezone)
         self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
-        self.dataset["language"] = env.db.get_property(self._object, "language", default=env.config.general.default_locale)
+        self.dataset["language"] = self._object.get_property("language", default=env.config.general.default_locale)
         self.dataset["available_themes"] = theme.getThemes()
-        self.dataset["user.theme"] = env.db.get_property(self._object, "theme", default=env.config.general.default_theme)
+        self.dataset["user.theme"] = self._object.get_property("theme", default=env.config.general.default_theme)
 
 
 class UserSettingsModify(view.View):
