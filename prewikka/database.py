@@ -200,22 +200,14 @@ class SQLScript(object):
     def run(self):
         pass
 
-    def __metadata_upsert(self):
-        # Update or insert metadata for the module as necessary,
-        # depending on whether the plugin already existed without a schema
-        # or not.
-        if self.db.query('SELECT 1 FROM Prewikka_Module_Registry WHERE module = %s', self._module_name):
-            self.db.query('UPDATE Prewikka_Module_Registry SET branch = %s, version = %s WHERE module = %s',
-                  self.branch, self.version, self._module_name)
-        else:
-            self.db.query('INSERT INTO Prewikka_Module_Registry(module, branch, version, enabled) VALUES(%s, %s, %s, 1)',
-                  self._module_name, self.branch, self.version)
+    @use_transaction
+    def apply(self):
+        log.getLogger().info("%s: please standby while %s is applied", self._module_name, str(self))
 
-    def __apply(self):
         self.run()
 
         if self.type == "install":
-            self.__metadata_upsert()
+            env.db.upsert("Prewikka_Module_Registry", ("module", "branch", "version"), ((self._module_name, self.branch, self.version),), pkey=("module",))
 
         elif self.type == "update":
             self.db.query("UPDATE Prewikka_Module_Registry SET version=%s WHERE module=%s%s" % (self.db.escape(self.version), self.db.escape(self._module_name), self.db._chknull("branch", self.branch)))
@@ -225,22 +217,6 @@ class SQLScript(object):
                           self.branch, self.version, self._module_name)
 
         self.db._update_state(self.version, self.branch)
-
-    def apply(self, transaction=True):
-        log.getLogger().info("%s: please standby while %s is applied", self._module_name, str(self))
-
-        if not transaction:
-            return self.__apply()
-
-        else:
-            self.db.transactionStart()
-            try:
-                self.__apply()
-            except Exception as e:
-                self.db.transactionAbort()
-                raise e
-
-            self.db.transactionEnd()
 
     def get_version_string(self):
         if not self.branch:
@@ -423,7 +399,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
     @use_transaction
     def _apply(self):
-        [ update.apply(transaction=False) for update in self.list() ]
+        [ update.apply() for update in self.list() ]
         self.check()
 
     @_use_flock

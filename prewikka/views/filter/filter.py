@@ -97,25 +97,15 @@ class FilterDatabase(database.DatabaseHelper):
 
     @database.use_transaction
     def upsert_filter(self, user, filter):
-        rows = self.query("SELECT id FROM Prewikka_Filter WHERE userid = %s AND name = %s", user.id, filter.name)
+        values = (user.id, filter.name, filter.type, filter.comment, filter.formula)
 
-        values = (user.id, filter.type, filter.name, filter.comment, filter.formula)
+        fid = int(self.upsert("Prewikka_Filter", ("userid", "name", "type", "comment", "formula"), [values], pkey=("userid", "name"), returning=["id"])[0][0])
+        upval = ([fid, name] + list(e) for name, e in filter.elements.items())
 
-        if not rows:
-            self.query("INSERT INTO Prewikka_Filter (userid, type, name, comment, formula) VALUES (%s, %s, %s, %s, %s)", *values)
-            id = int(self.query("SELECT MAX(id) FROM Prewikka_Filter")[0][0])
-        else:
-            id = int(rows[0][0])
-            self.query("DELETE FROM Prewikka_Filter_Criterion WHERE Prewikka_Filter_Criterion.id = %d" % (id, ))
-            self.query("UPDATE Prewikka_Filter SET userid=%s, type=%s, name=%s, comment=%s, formula=%s WHERE id = %d", *(values + (id,)))
-
-        for name, element in filter.elements.items():
-            self.query("INSERT INTO Prewikka_Filter_Criterion (id, name, path, operator, value) VALUES (%d, %s, %s, %s, %s)",
-                       id, name, *element)
+        self.upsert("Prewikka_Filter_Criterion", ("id", "name", "path", "operator", "value"), upval, pkey=("id", "name"), merge={"id": fid})
 
     def get_filter(self, user, name):
-        rows = self.query("SELECT id, comment, formula, type FROM Prewikka_Filter WHERE userid = %s AND name = %s",
-                          user.id, name)
+        rows = self.query("SELECT id, comment, formula, type FROM Prewikka_Filter WHERE userid = %s AND name = %s", user.id, name)
         if len(rows) == 0:
             return None
 

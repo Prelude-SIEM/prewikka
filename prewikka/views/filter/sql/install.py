@@ -30,8 +30,7 @@ CREATE TABLE Prewikka_Filter_Criterion (
         name VARCHAR(16) NOT NULL,
         path VARCHAR(255) NOT NULL,
         operator VARCHAR(8) NULL,
-        value VARCHAR(255) NULL
+        value VARCHAR(255) NULL,
+        PRIMARY KEY(id, name)
 ) ENGINE=InnoDB;
-
-CREATE INDEX prewikka_filter_criterion_index_id ON Prewikka_Filter_Criterion (id);
 """)
