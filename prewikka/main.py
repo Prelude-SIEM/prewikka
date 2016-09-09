@@ -227,7 +227,7 @@ class Core:
             return
 
         # Some changes happened, and every process has to reload the plugin configuration
-        env.log.warning("plugins were activated: triggering reload (hook warning may follow)")
+        env.log.warning("plugins were activated: triggering reload")
 
         hookmanager.unregister()
         self._loadPlugins(last_change=last)
