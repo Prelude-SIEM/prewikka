@@ -22,15 +22,6 @@ def format_timedelta(delta, granularity='second', threshold=.85,
     else:
         seconds = delta
 
-    def _iter_choices(unit):
-        if add_direction:
-            if seconds >= 0:
-                yield unit + '-future'
-            else:
-                yield unit + '-past'
-        yield unit + ':' + format
-        yield unit
-
     for unit, secs_per_unit in TIMEDELTA_UNITS:
         value = abs(seconds) / secs_per_unit
         if value >= threshold or unit == granularity:
@@ -38,6 +29,13 @@ def format_timedelta(delta, granularity='second', threshold=.85,
                 value = max(1, value)
             value = int(round(value))
 
-            return u"%d %s ago" % (value, unit)
+            if not add_direction:
+                return u"%d %s" % (value, unit)
+
+            elif seconds >= 0:
+                return u"in %d %s" % (value, unit)
+
+            else:
+                return u"%d %s ago" % (value, unit)
 
     return u''
