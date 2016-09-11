@@ -21,7 +21,7 @@
 import abc
 
 from prewikka import log, pluginmanager, env, hookmanager, usergroup
-from prewikka.error import PrewikkaUserError
+from prewikka.error import PrewikkaUserError, NotImplementedError
 
 
 class AuthError(PrewikkaUserError):
@@ -38,6 +38,9 @@ class _AuthUser(object):
 
     def canSetPassword(self):
         return "setPassword" in self.__class__.__dict__
+
+    def canManagePermissions(self):
+        return "setUserPermissions" in self.__class__.__dict__
 
     def createUser(self, user):
         list(hookmanager.trigger("HOOK_USER_CREATE", user))
@@ -62,11 +65,13 @@ class _AuthUser(object):
     def getUserPermissions(self, login, ignore_group=False):
         return []
 
+    @abc.abstractmethod
     def getUserPermissionsFromGroups(self, login):
         return []
 
+    @abc.abstractmethod
     def setUserPermissions(self, login, permissions):
-        pass
+        raise NotImplementedError
 
 
 class _AuthGroup(object):
@@ -79,6 +84,9 @@ class _AuthGroup(object):
     def canManageGroupMembers(self):
         return "setGroupMembers" in self.__class__.__dict__
 
+    def canManageGroupPermissions(self):
+        return "setGroupPermissions" in self.__class__.__dict__
+
     def getGroupList(self, search=None):
         return []
 
@@ -89,28 +97,28 @@ class _AuthGroup(object):
         list(hookmanager.trigger("HOOK_GROUP_DELETE", group))
 
     def setGroupPermissions(self, group, permissions):
-        pass
+        raise NotImplementedError
 
     def getGroupPermissions(self, group):
         return []
 
     def setGroupMembers(self, group, logins):
-        pass
+        raise NotImplementedError
 
     def getGroupMembers(self, group):
         return []
 
     def setMemberOf(self, login, groups):
-        pass
+        raise NotImplementedError
 
     def getMemberOf(self, login):
         return []
 
     def isMemberOf(self, group, login):
-        pass
+        raise NotImplementedError
 
     def hasGroup(self, group):
-        pass
+        raise NotImplementedError
 
 
 class Auth(pluginmanager.PluginBase, _AuthUser, _AuthGroup):
@@ -126,7 +134,7 @@ class Auth(pluginmanager.PluginBase, _AuthUser, _AuthGroup):
         pass
 
     def authenticate(self, login, password="", no_password_check=False):
-        pass
+        raise NotImplementedError
 
     def getDefaultSession(self):
-        pass
+        raise NotImplementedError

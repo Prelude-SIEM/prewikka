@@ -21,7 +21,7 @@ import sys
 import traceback
 import json
 
-from prewikka import template, log, env, response
+from prewikka import template, log, env, response, localization
 from prewikka.templates import ErrorTemplate
 
 
@@ -107,3 +107,8 @@ class PrewikkaUserError(PrewikkaError):
 class PrewikkaInvalidQueryError(PrewikkaUserError):
     def __init__(self, message):
         PrewikkaUserError.__init__(self, _("Invalid query"), message, log_priority=log.ERROR)
+
+
+class NotImplementedError(PrewikkaUserError):
+    def __init__(self, message=N_("Backend does not implement this operation")):
+        PrewikkaUserError.__init__(self, _("Not implemented"), message, log_priority=log.ERROR)
