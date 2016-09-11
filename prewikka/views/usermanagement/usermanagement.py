@@ -3,7 +3,7 @@
 
 import pkg_resources
 
-from prewikka import view, localization, theme, log, usergroup, error, env
+from prewikka import view, localization, theme, log, usergroup, error, env, hookmanager
 from . import templates
 
 
@@ -70,6 +70,8 @@ class UserSettingsModify(view.View):
             raise error.PrewikkaUserError(_("Invalid Language"), N_("Specified language does not exist"), log_priority=log.WARNING)
 
         env.db.set_property(user, "language", lang)
+        list(hookmanager.trigger("HOOK_USERMANAGEMENT_USER_MODIFY", user))
+
         if user == env.request.user:
             env.request.user.set_locale()
 
