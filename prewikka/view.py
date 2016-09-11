@@ -20,7 +20,7 @@
 
 import operator, json, time
 from copy import copy
-from prewikka import pluginmanager, template, usergroup, error, log, utils, env, hookmanager
+from prewikka import pluginmanager, template, usergroup, error, log, utils, env, hookmanager, database
 from prewikka.response import PrewikkaResponse
 
 
@@ -136,6 +136,18 @@ class Parameters(dict):
 
         self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save, general=general)
 
+    @database.use_transaction
+    def process(self, view_id):
+        # In the future, the following should be handled directly in normalize()
+        if env.request.user:
+            env.request.user.begin_properties_change()
+
+        self.normalize(view_id, env.request.user)
+        self.handleLists()
+
+        if env.request.user:
+            env.request.user.commit_properties_change()
+
     def normalize(self, view, user):
         do_load = True
         do_save = "_save" in self
@@ -153,10 +165,7 @@ class Parameters(dict):
 
             value = param.parse(value)
             if user and param.save and do_save:
-                if param.general:
-                    user.set_property(name, value)
-                else:
-                    user.set_property(name, value, view=view)
+                user.set_property(name, value, view if not(param.general) else None)
 
             self[name] = value
 
@@ -182,9 +191,7 @@ class Parameters(dict):
             else:
                 save_view = view
 
-            if do_save:
-                user.del_property(name, view=save_view)
-            else:
+            if not do_save:
                 if not name in user.configuration.get(save_view, {}):
                     continue
 
@@ -341,8 +348,7 @@ class _View(object):
         self.parameters = {}
         if self.view_parameters:
             self.parameters = self.view_parameters(self, env.request.web.arguments)
-            self.parameters.normalize(self.view_id, env.request.user)
-            self.parameters.handleLists()
+            self.parameters.process(self.view_id)
 
         env.request.parameters = self.parameters
 

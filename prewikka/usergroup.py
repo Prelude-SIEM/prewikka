@@ -125,6 +125,7 @@ class User(NameID):
 
     def __init__(self, login=None, userid=None):
         NameID.__init__(self, login, userid)
+        self._properties = None
 
     def _id2name(self, id):
         return env.auth.hasUser(self).name
@@ -192,8 +193,19 @@ class User(NameID):
         return self.get_property_fail(key, view, default)
 
     def set_property(self, key, value, view=None):
-        env.db.set_property(self, key, value, view)
         self.configuration.setdefault(view, {})[key] = value
+
+        if self._properties is None:
+            env.db.set_properties(self, [(view, key, value)])
+        else:
+            self._properties.append((view, key, value))
+
+    def begin_properties_change(self):
+        self._properties = []
+
+    def commit_properties_change(self):
+        env.db.set_properties(self, self._properties)
+        self._properties = None
 
     def has(self, perm):
         if type(perm) in (list, tuple):

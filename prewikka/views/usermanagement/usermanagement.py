@@ -58,28 +58,24 @@ class UserSettingsModify(view.View):
 
     def render(self):
         login = self.parameters.get("name", env.request.user.name)
-
         self._object = user = usergroup.User(login)
 
-        env.db.set_property(user, "fullname", self.parameters.get("fullname"))
-        env.db.set_property(user, "email", self.parameters.get("email"))
-        env.db.set_property(user, "theme", self.parameters.get("theme"))
-
-        lang = self.parameters["language"]
-        if not lang in localization.getLanguagesIdentifiers():
+        if not self.parameters["language"] in localization.getLanguagesIdentifiers():
             raise error.PrewikkaUserError(_("Invalid Language"), N_("Specified language does not exist"), log_priority=log.WARNING)
 
-        env.db.set_property(user, "language", lang)
         list(hookmanager.trigger("HOOK_USERMANAGEMENT_USER_MODIFY", user))
-
-        if user == env.request.user:
-            env.request.user.set_locale()
-
-        timezone = self.parameters["timezone"]
-        if not timezone in localization.get_timezones():
+        if not self.parameters["timezone"] in localization.get_timezones():
             raise error.PrewikkaUserError(_("Invalid Timezone"), N_("Specified timezone does not exist"), log_priority=log.WARNING)
 
-        env.db.set_property(user, "timezone", timezone)
+        user.begin_properties_change()
+
+        for param in ("fullname", "email", "theme", "language", "timezone"):
+            user.set_property(param, self.parameters.get(param))
+
+        if user == env.request.user:
+            user.set_locale()
+
+        user.commit_properties_change()
 
         # Make sure nothing is returned (reset the default dataset)
         self.dataset = None

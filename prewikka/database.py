@@ -17,7 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time, abc, fcntl, types
+import time, abc, fcntl, types, json
 import re, operator, pkg_resources, pkgutil
 from datetime import datetime
 
@@ -554,52 +554,31 @@ class Database(preludedb.SQL):
 
     def get_property_fail(self, user, key, view=None, default=__sentinel):
         config = {}
+        view = view or ""
 
-        rows = self.query("SELECT view, name, value FROM Prewikka_User_Configuration WHERE userid = %s%s%s" % (self.escape(user.id), self._chknull("view", view), self._chk("name", key)))
+        rows = self.query("SELECT view, name, value FROM Prewikka_User_Configuration WHERE userid = %s%s%s" % (self.escape(user.id), self._chk("view", view), self._chk("name", key)))
         for vname, name, val in rows:
-            viewd = config.setdefault(vname, {})
-
-            if not name in viewd:
-                viewd[name] = val
-            else:
-                if not isinstance(viewd[name], list):
-                    viewd[name] = [ viewd[name] ]
-
-                viewd[name].append(val)
+            viewd = config.setdefault(vname or None, {})
+            viewd[name] = utils.json_deep_encode(json.loads(val))
 
         if view is self.__ALL_PROPERTIES:
             return config
 
-        view = config.get(view, {})
+        view = config.get(view or None, {})
         return view.get(key, default) if default is not self.__sentinel else view[key]
 
     def get_properties(self, user):
         return self.get_property_fail(user, None, view=self.__ALL_PROPERTIES)
 
-    def get_property(self, user, key, view=None, default=None):
-        return self.get_property_fail(user, key, view, default)
-
-    def get_users_by_properties(self, keys):
-        def get_data(keys):
-           for key, value in keys.items():
-               res = self.query("SELECT userid FROM Prewikka_User_Configuration WHERE name = %s AND value = %s", key, value)
-               yield set([x[0] for x in res])
-
-        return [usergroup.User(userid=x) for x in reduce(lambda x,y: x.intersection(y), get_data(keys))]
-
-    @use_lock("Prewikka_User_Configuration")
-    def set_property(self, user, key, value, view=None):
-        self.del_property(user, key, view)
-
-        view, userid, key = self.escape(view), self.escape(user.id), self.escape(key)
-        for val in self._mklist(value):
-            self.query("INSERT INTO Prewikka_User_Configuration (view, userid, name, value) VALUES (%s,%s,%s,%s)" % (view, userid, key, self.escape(val)))
+    def set_properties(self, user, values):
+        rows = [(view or "", user.id, key, json.dumps(value)) for view, key, value in values]
+        self.upsert("Prewikka_User_Configuration", ("view", "userid", "name", "value"), rows, pkey=("view", "userid", "name"))
 
     def has_property(self, user, key):
-        return bool(self.query("SELECT value FROM Prewikka_User_Configuration WHERE userid = %s AND name = %s AND value IS NOT NULL", user.id, key))
+        return bool(self.query("SELECT value FROM Prewikka_User_Configuration WHERE userid = %s AND view = '' AND name = %s AND value IS NOT NULL", user.id, key))
 
     def del_property(self, user, key, view=None):
-        self.query("DELETE FROM Prewikka_User_Configuration WHERE userid = %s%s%s" %  (self.escape(user.id), self._chknull("view", view), self._chk("name", key)))
+        self.query("DELETE FROM Prewikka_User_Configuration WHERE userid = %s%s%s" %  (self.escape(user.id), self._chk("view", view or ""), self._chk("name", key)))
 
     def del_properties(self, user, view=__ALL_PROPERTIES):
         return self.del_property(user, None, view=view)

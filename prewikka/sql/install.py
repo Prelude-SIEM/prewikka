@@ -40,8 +40,7 @@ CREATE TABLE Prewikka_User_Configuration (
     userid VARCHAR(255) NOT NULL,
     view VARCHAR(32) NULL,
     name VARCHAR(255) NOT NULL,
-    value VARCHAR(255) NULL
+    value VARCHAR(255) NULL,
+    PRIMARY KEY(userid, view, name)
 ) ENGINE=InnoDB;
-
-CREATE INDEX prewikka_user_configuration_index ON Prewikka_User_Configuration (name, userid, view);
 """)
