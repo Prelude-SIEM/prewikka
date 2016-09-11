@@ -23,6 +23,7 @@ from datetime import datetime
 
 import preludedb
 import collections
+from prewikka.utils import cache
 from prewikka import log, error, utils, version, env, compat, usergroup
 
 
@@ -431,18 +432,14 @@ class Database(preludedb.SQL):
     __TRANSACTION_STATE_BEGIN = 1
     __TRANSACTION_STATE_QUERY = 2
 
-    @property
+    @cache.memoize_property("modinfos_cache")
     def modinfos(self):
-        if self._modinfos:
-            return self._modinfos
-
         try:
             rows = self.query("SELECT module, branch, version, enabled FROM Prewikka_Module_Registry")
         except:
             return {}
 
-        self._modinfos = dict((i[0], ModuleInfo(i[1], i[2], int(i[3]))) for i in rows)
-        return self._modinfos
+        return dict((i[0], ModuleInfo(i[1], i[2], int(i[3]))) for i in rows)
 
     def __init__(self, config):
         env.db = self
@@ -452,7 +449,6 @@ class Database(preludedb.SQL):
 
         preludedb.SQL.__init__(self, settings)
 
-        self._modinfos = {}
         self._dbtype = settings["type"]
         self._transaction_state = self.__TRANSACTION_STATE_NONE
 
@@ -530,7 +526,7 @@ class Database(preludedb.SQL):
             return False
 
         self._last_plugin_activation_change = last
-        self._modinfos = {}
+        self.modinfos_cache.clear()
 
         return True
 

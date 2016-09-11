@@ -21,6 +21,7 @@ import abc
 import hashlib
 import compat
 import utils
+from prewikka.utils import cache
 from prewikka import error, log, localization, env
 
 ADMIN_LOGIN = "admin"
@@ -124,36 +125,25 @@ class User(NameID):
 
     def __init__(self, login=None, userid=None):
         NameID.__init__(self, login, userid)
-        self._configuration = self._permissions = self._timezone = None
 
     def _id2name(self, id):
         return env.auth.hasUser(self).name
 
-    @property
+    @cache.request_memoize_property("user_permissions")
     def permissions(self):
-        if self._permissions is None:
-            self._permissions = env.auth.getUserPermissions(self)
-
-        return self._permissions
+        return env.auth.getUserPermissions(self)
 
     @permissions.setter
     def permissions(self, permissions):
         env.auth.setUserPermissions(self, permissions)
-        self._permissions = permissions
 
-    @property
+    @cache.request_memoize_property("user_configuration")
     def configuration(self):
-        if self._configuration is None:
-            self._configuration = env.db.get_properties(self)
+        return env.db.get_properties(self)
 
-        return self._configuration
-
-    @property
+    @cache.request_memoize_property("user_timezone")
     def timezone(self):
-        if not self._timezone:
-            self._timezone = utils.timeutil.timezone(self.get_property("timezone", default=env.config.general.default_timezone))
-
-        return self._timezone
+        return utils.timeutil.timezone(self.get_property("timezone", default=env.config.general.default_timezone))
 
     def set_locale(self):
         lang = self.get_property("language", default=env.config.general.default_locale)
