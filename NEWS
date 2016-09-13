@@ -1,3 +1,18 @@
+* 2016-09-14, prewikka-3.1.0:
+
+Author: Antoine Luong
+
+- Language fix in Babel polyfill
+- Add missing import detected by pylint
+- Fix endless reloading loop in Apps
+- Fix undefined variable for NTEventLog
+
+Author: Yoann Vandoorselaere
+
+- Implement use_lock() decorator, use_transaction() improvement
+
+
+
 * 2016-09-01, prewikka-3.1.0rc3:
 
 Author: Antoine Luong
