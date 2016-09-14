@@ -30,17 +30,17 @@ class DatabaseSchemaError(error.PrewikkaUserError):
         error.PrewikkaUserError.__init__(self, _("Database schema error"), message, **kwargs)
 
 
-__flock_fd = open(__file__, 'r')
 
+def _use_flock(func):
 
-def use_flock(func):
     def inner(self, *args, **kwargs):
-        fcntl.flock(__flock_fd, fcntl.LOCK_EX)
+        fd = open(__file__, 'r')
 
+        fcntl.flock(fd, fcntl.LOCK_EX)
         try:
             ret = func(self, *args, **kwargs)
         finally:
-            fcntl.flock(__flock_fd, fcntl.LOCK_UN)
+            fcntl.flock(fd, fcntl.LOCK_UN)
 
         return ret
 
@@ -401,7 +401,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
         [ update.apply(transaction=False) for update in self.list() ]
         self.check()
 
-    @use_flock
+    @_use_flock
     def apply(self):
         # We call _init_version_attr() outside the transaction because it fails
         # when the tables do not exist (eg. during database initialization)
