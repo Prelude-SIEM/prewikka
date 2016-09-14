@@ -26,19 +26,17 @@ from prewikka.error import PrewikkaUserError
 class _SessionError(PrewikkaUserError):
     code = 401
 
-    def __init__(self, login=None, message=None, **kwargs):
-        if message is None:
-            message = _(self._default_message)
-
-        PrewikkaUserError.__init__(self, None, message, log_user=login, **kwargs)
+    def __init__(self, login=None, **kwargs):
+        PrewikkaUserError.__init__(self, log_user=login, **kwargs)
 
 
 class SessionInvalid(_SessionError):
-    _default_message = N_("Invalid session")
-
+    name = N_("Invalid session")
+    message = N_("The session cookie carried by your browser is invalid")
 
 class SessionExpired(_SessionError):
-    _default_message = N_("Session expired")
+    name = N_("Session expired")
+    message = N_("Your session has expired: please sign in again to continue using Prewikka")
 
 
 class SessionUserInfo(object):
@@ -115,7 +113,7 @@ class Session(pluginmanager.PluginBase):
         now = int(time.time())
         if now - t > self._expiration:
             self.__delete_session(request)
-            raise SessionExpired(login, message=_("Session expired"), template=self.template)
+            raise SessionExpired(login, template=self.template)
 
         # And that the user it carry still exist in the current authentication
         # backend (which might have changed)

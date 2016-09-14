@@ -15,10 +15,10 @@ $(document).ready(function(){
        if ( error == "abort" )
            return;
 
-       if ( ! xhr.responseText )
-           prewikka_dialog({message: error || "Connection error"});
+       if ( xhr.responseText )
+           prewikka_json_dialog($.parseJSON(xhr.responseText));
        else
-           prewikka_dialog($.parseJSON(xhr.responseText));
+           $("#prewikka-dialog-connection-error").modal();
   });
 
   $(window).on('resize', prewikka_resizeTopMenu);
@@ -298,7 +298,11 @@ function prewikka_EventSource(config)
 
     if ( config['error'] == undefined ) {
         config['error'] = function(e) {
-            prewikka_dialog("Connection error");
+            if ( e.data )
+                prewikka_json_dialog($.parseJSON(e.data));
+            else
+                $("#prewikka-dialog-connection-error").modal();
+
             jsonStream.close();
         };
     }

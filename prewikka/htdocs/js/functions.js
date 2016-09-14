@@ -130,31 +130,6 @@ $(document).ready(function(){
         text: false
     });
 
-  $("#prewikka-dialog").dialog({
-      modal: true,
-      appendTo: "#_main",
-      autoOpen: false,
-      draggable: false,
-      width: 400,
-      maxHeight: prewikka_dialog_getMaxHeight(),
-      position: { my: "center bottom", at: "center", of: "#_main_viewport", within: "#_main_viewport" },
-      show: {
-          effect: "blind",
-          duration: 500
-      },
-      hide: {
-          effect: "blind",
-          duration: 500
-      },
-      buttons: {
-          Ok: function() {
-              $( this ).dialog( "close" );
-          }
-      }
-  });
-
-  $("div.traceback").accordion({collapsible: true, active: false, heightStyle: "content"});
-
   $(document).on('click', '[data-confirm]', function() {
       var input = $(this);
       var confirm = input.data("confirm");
@@ -169,14 +144,14 @@ $(document).ready(function(){
            */
           input[0].click();
           input.attr("data-confirm", confirm).data("confirm", confirm);
-          $('#dataConfirmModal').modal('hide');
+          $('#prewikka-dialog-confirm').modal('hide');
           return false;
       }
 
-      $('#dataConfirmModal').find('.modal-body').text(confirm);
       // Remove the handler in case it was already set. And set the correct handler
-      $('#dataConfirmOK').off("click").on("click", confirm_handler);
-      $('#dataConfirmModal').modal({show: true});
+      $('#prewikka-dialog-confirm-OK').off("click").on("click", confirm_handler);
+
+      prewikka_dialog({message: confirm, type: "confirm"});
       return false;
   });
 
@@ -209,7 +184,21 @@ $(document).ready(function(){
     $("#prewikka-notification").hide();
   });
 
+  /*
+   * Make sure bootstrap modal appear in the order they are drawn (as opposed to html order).
+   */
+  $(document).on('show.bs.modal', '.modal', function () {
+    var zIndex = 1050 + $('.modal-backdrop:visible').length;
+    $(this).css('z-index', zIndex);
+  });
 
+  /*
+   * Destroy AJAX modal completly when they are removed.
+   */
+  $(document).on('hidden.bs.modal', '.ajax-modal', function () {
+    $(this).data('bs.modal', null);
+    $(this).remove();
+  });
 });
 
 function prewikka_resizeTopMenu() {
@@ -246,56 +235,63 @@ function prewikka_resizeTopMenu() {
 }
 
 
-function prewikka_notification(data)
+function setup_position(obj)
 {
-    if ( typeof(data.classname) === 'undefined' )
-        data.classname = "success";
-
-    $("#prewikka-notification .alert").removeClass().addClass("alert alert-" + data.classname);
-
-    $("#prewikka-notification .fa").removeClass().addClass("fa fa-" + data.icon);
-    $("#prewikka-notification .title").text(data.name || "");
-    $("#prewikka-notification .content").text(data.message);
-
-    $("#prewikka-notification").css({top:0, left:0}).position({
+    $(obj).css({top:0, left:0}).position({
         my: "center top",
         at: "center top",
         of: $(window),
         collision: "none"
     });
+}
 
-    $("#prewikka-notification").stop().fadeIn(0).show().delay(data.duration || 2000).fadeOut(1000);
+
+function prewikka_notification(data)
+{
+    var notification = $("#prewikka-notification");
+
+    setup_position(notification);
+
+    $(notification).find(".title").text(data.name || "");
+    $(notification).find(".content").text(data.message);
+
+    if ( typeof(data.classname) === 'undefined' )
+        data.classname = "success";
+
+    $(notification).find(".alert").removeClass().addClass("alert alert-" + data.classname);
+    $(notification).find(".fa").removeClass().addClass("fa fa-" + data.icon);
+    $(notification).stop().fadeIn(0).show().delay(data.duration || 2000).fadeOut(1000);
+}
+
+
+function prewikka_json_dialog(data)
+{
+    var dialog;
+
+    $("#prewikka-dialog-container").append(data.html);
+    dialog = $("#prewikka-dialog-container > :last-child");
+
+    setup_position(dialog);
+    $(dialog).modal();
 }
 
 
 function prewikka_dialog(data)
 {
-    $("#prewikka-dialog").dialog("option", "title", data.name || "Prelude Dialog");
-    $("#prewikka-dialog .content").text(data.message);
+    if ( typeof(data.type) == 'undefined' )
+        data.type = "standard";
 
-    if ( data.traceback ) {
-        $("#prewikka-dialog div.traceback").show();
-        $("#prewikka-dialog div.traceback textarea").text(data.traceback);
-    } else {
-        $("#prewikka-dialog div.traceback").hide();
-    }
+    var dialog = $("#prewikka-dialog-" + data.type);
+    var header = $(dialog).find(".modal-header");
 
-    $("#prewikka-dialog").dialog('option', 'buttons', [{
-        html: (data.code != 401) ? 'OK' : '<i class="fa fa-sign-in"/> Sign in',
-        'class': (data.code != 401) ? 'btn btn-default' : 'btn btn-primary',
-        click: function() {
-            $(this).dialog('close');
-            /*
-             * If the session expired, we proceed to reloading the whole page
-             * when the user validates the dialog. This will redirect the user
-             * to the Prewikka login page.
-             */
-            if ( data.code == 401 )
-                window.location = window.location.href;
-        }
-    }]);
+    setup_position(dialog);
 
-    $("#prewikka-dialog").dialog("open");
+    $(header).removeClass().addClass("modal-header");
+    if ( data.classname )
+            $(header).addClass("alert-" + data.classname);
+
+    $(dialog).find(".content").text(data.message);
+    dialog.modal();
 }
 
 

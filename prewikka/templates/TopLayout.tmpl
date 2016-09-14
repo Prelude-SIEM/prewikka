@@ -16,13 +16,6 @@
 
 #filter CleanOutput
 <body>
-    <div id="prewikka-dialog">
-        <div class="content"></div>
-        <div class="traceback" style="display:none;">
-            <h3>$_("Detail")</h3>
-            <div style="padding: 5px"><textarea style="width: calc(100% - 10px);" class="traceback" rows="10" readonly="readonly"></textarea></div>
-        </div>
-    </div>
     <div id="prewikka-notification">
         <div class="alert">
             <button type="button" class="close">
@@ -34,21 +27,55 @@
         </div>
     </div>
 #end filter
-    <div id="dataConfirmModal" class="modal fade" role="dialog" aria-labelledby="dataConfirmLabel" aria-hidden="true">
+
+    <div id="prewikka-dialog-container" class="container">
+      <div id="prewikka-dialog-confirm" class="modal fade" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="true" data-keyboard="true" tabindex="-1">
         <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h3 class="modal-title" id="dataConfirmLabel">$_('Please Confirm')</h3>
-                </div>
-                <div class="modal-body">
-                </div>
-                <div class="modal-footer">
-                    <button class="btn btn-default" data-dismiss="modal" aria-hidden="true">$_('Cancel')</button>
-                    <a class="btn btn-primary" aria-hidden="true" data-dismiss="modal" id="dataConfirmOK">$_('OK')</a>
-                </div>
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h3 class="modal-title title" id="dialogLabel">$_('Please Confirm')</h3>
             </div>
+            <div class="modal-body content"></div>
+            <div class="modal-footer">
+              <button class="btn btn-default cancel" data-dismiss="modal" aria-hidden="true">$_('Cancel')</button>
+              <a class="btn btn-primary ok" aria-hidden="true" data-dismiss="modal" id="prewikka-dialog-confirm-OK">$_('OK')</a>
+            </div>
+          </div>
         </div>
+      </div>
+
+      <div id="prewikka-dialog-standard" class="modal fade" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="true" data-keyboard="true" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h3 class="modal-title title" id="dialogLabel">$_('Prelude Dialog')</h3>
+            </div>
+            <div class="modal-body content"></div>
+            <div class="modal-footer">
+              <a class="btn btn-primary ok" aria-hidden="true" data-dismiss="modal">$_('OK')</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="prewikka-dialog-connection-error" class="modal fade" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="static" data-keyboard="true" tabindex="-1">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header alert-danger">
+              <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+              <h3 class="modal-title title" id="dialogLabel">$_('Connection error')</h3>
+            </div>
+            <div class="modal-body content">
+            $_("Connection failed, the server may be down or you may be experiencing network issues.")
+            </div>
+            <div class="modal-footer">
+              <a class="btn btn-primary ok" aria-hidden="true" data-dismiss="modal">$_('OK')</a>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div id="top_view">

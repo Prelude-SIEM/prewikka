@@ -30,10 +30,28 @@ from prewikka import log, error, utils, version, env, compat, usergroup
 ModuleInfo = collections.namedtuple("ModuleInfo", ["branch", "version", "enabled"])
 
 
-class DatabaseSchemaError(error.PrewikkaUserError):
-    def __init__(self, message, **kwargs):
-        error.PrewikkaUserError.__init__(self, _("Database schema error"), message, **kwargs)
+class DatabaseError(error.PrewikkaUserError):
+    name = N_("Database error")
 
+    def __init__(self, message, **kwargs):
+        error.PrewikkaUserError.__init__(self, message=message, **kwargs)
+
+
+class DatabaseSchemaError(DatabaseError):
+    name = N_("Database schema error")
+
+
+
+# Internal workaround since SWIG generated exception use class RuntimeError
+def _fix_exception(func):
+        def inner(self, *args, **kwargs):
+            try:
+                ret = func(self, *args, **kwargs)
+            except RuntimeError as e:
+                raise DatabaseError(message=str(e))
+
+            return ret
+        return inner
 
 
 def _use_flock(func):
@@ -276,12 +294,12 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
         if self._reqbranch and self._from_branch != self._reqbranch:
             raise DatabaseSchemaError(N_("database schema branch %(required)s required (found %(current)s)",
-                                         {'required': self._reqbranch, 'current': self._from_branch}))
+                                      {'required': self._reqbranch, 'current': self._from_branch}))
 
         if self._reqversion and self._from_version != self._reqversion:
             raise DatabaseSchemaError(N_("database schema version %(required)s required (found %(current)s)",
-                                         {'required': self._get_version_string(self._reqbranch, self._reqversion),
-                                          'current': self._get_version_string(self._from_branch, self._from_version)}))
+                                      {'required': self._get_version_string(self._reqbranch, self._reqversion),
+                                       'current': self._get_version_string(self._from_branch, self._from_version)}))
 
     def _update_state(self, version, branch):
         self._from_branch = branch
@@ -441,6 +459,7 @@ class Database(preludedb.SQL):
 
         return dict((i[0], ModuleInfo(i[1], i[2], int(i[3]))) for i in rows)
 
+    @_fix_exception
     def __init__(self, config):
         env.db = self
 

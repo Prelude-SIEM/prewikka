@@ -137,7 +137,7 @@ class Request(object):
             response = PrewikkaDirectResponse(response, code=code, status_text=status_text)
 
         if self.is_stream:
-            if isinstance(response.data, error.PrewikkaUserError):
+            if isinstance(response.data, error.PrewikkaError):
                 self.send_stream(response.content(), event="error")
 
             self._buffer.flush()

@@ -2,6 +2,14 @@
 #from prewikka.utils import nameToPath
 #extends prewikka.templates.TopLayout
 
+#block content
+#end block
+
+## Overriden in ErrorTemplate.tmpl
+#def is_error_template
+    #return False
+#end def
+
 #block toplayout_content
 #set $sections = $env.menumanager.get_sections($env.request.user) if $env.menumanager else {}
 
@@ -25,7 +33,9 @@ function check_same_origin(url) {
 }
 
 \$(document).ready(function() {
-        prewikka_loadTab({url: "$document.href", data: "$env.request.web.get_query_string()", type: "$env.request.web.method"});
+        #if not($is_error_template())
+           prewikka_loadTab({url: "$document.href", data: "$env.request.web.get_query_string()", type: "$env.request.web.method"});
+        #end if
 
         /*
          * Back/Forward support.
@@ -222,5 +232,5 @@ function check_same_origin(url) {
     <div id="ajax-spinner" class="ajax-spinner" style="display:none;">
         <div class="loader">$_("Loading")</div>
     </div>
-    <div id="main" class="content" />
+    <div id="main" class="content">$content</div>
 #end block

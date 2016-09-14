@@ -22,38 +22,48 @@ import traceback
 import json
 
 from prewikka import template, log, env, response, localization
-from prewikka.templates import ErrorTemplate
+from prewikka.templates import ErrorTemplate, AJAXErrorTemplate
 
 
-
-class PrewikkaError(Exception):
-    pass
-
-
-class RedirectionError(PrewikkaError):
+class RedirectionError(Exception):
     def __init__(self, location, code):
         self.location = location
         self.code = code
 
 
-class PrewikkaUserError(PrewikkaError):
+class PrewikkaError(Exception):
     template = ErrorTemplate.ErrorTemplate
-    name = None
+    name = N_("An unexpected condition happened")
     message = ""
+    details = ""
     code = 500
     log_priority = log.ERROR
+    display_traceback = True
 
-    def __init__(self, name, message, display_traceback=False, log_priority=None, log_user=None, template=None, code=None):
-        if template:
-            self.template = template
-
-        PrewikkaError.__init__(self, message)
-
-        if name:
+    def __init__(self, message, name=None, details=None, log_priority=None, log_user=None, template=None, code=None):
+        if name is not None:
             self.name = name
 
-        if message:
-            self.message = str(message)
+        if message is not None:
+            self.message = message
+
+        if details is not None:
+            self.details = details
+
+        self._untranslated_details = str(self.details)
+        self._untranslated_message = str(self.message)
+
+        if self.name:
+            self.name = _(self.name)
+
+        if self.message:
+            self.message = _(self._untranslated_message)
+
+        if self.details:
+            self.details = _(self._untranslated_details)
+
+        if template:
+            self.template = template
 
         if code:
             self.code = code
@@ -61,30 +71,43 @@ class PrewikkaUserError(PrewikkaError):
         if log_priority:
             self.log_priority = log_priority
 
+        self.traceback = self._get_traceback()
         self.log_user = log_user
-        self.traceback = None
-        if display_traceback:
-            exc_type, exc_value, exc_tb = sys.exc_info()
-            if exc_tb:
-                self.traceback = "".join(traceback.format_exception(exc_type, exc_value, exc_tb))
+
+    def _setup_template(self, tmpl, ajax_error):
+        dataset = template.PrewikkaTemplate(tmpl)
+
+        for i in ("name", "message", "details", "code", "traceback"):
+            dataset[i] = getattr(self, i)
+
+        dataset["is_ajax_error"] = ajax_error
+        dataset["document.base_url"] = env.request.web.get_baseurl()
+
+        return dataset
 
     def _html_respond(self):
         from prewikka import baseview
 
         v = baseview.BaseView()
-        v.dataset = template.PrewikkaTemplate(self.template)
-
-        for i in ("name", "message", "code", "traceback"):
-            v.dataset[i] = getattr(self, i)
+        v.dataset = self._setup_template(self.template, False)
 
         ret = v.respond()
         ret.code = self.code
 
         return ret
 
+    def _get_traceback(self):
+        if self.display_traceback and env.config.general.get("enable_error_traceback") not in ('no', 'false'):
+            exc = sys.exc_info()
+            if exc[0]:
+                return "".join(traceback.format_exception(*exc))
+
     def respond(self):
-        if str(self):
+        if self.message:
             env.log.log(self.log_priority, self)
+
+        if not self.traceback:
+            self.traceback = self._get_traceback()
 
         if not (env.request.web.is_stream or env.request.web.is_xhr):
             # This case should only occur in case of auth error (and viewmgr might not exist at this time)
@@ -92,23 +115,31 @@ class PrewikkaUserError(PrewikkaError):
 
         return response.PrewikkaResponse(self, code=self.code)
 
+    @staticmethod
+    def _format_error(message, details):
+        if details:
+            return message + ": " + details
+
+        return message
+
     def __str__(self):
-        return self.message
+        return self._format_error(self._untranslated_message, self._untranslated_details)
 
     def __json__(self):
-        return {
-            "name": self.name,
-            "message": _(self.message),
-            "code": self.code,
-            "traceback": self.traceback
-        }
+        dset = self._setup_template(AJAXErrorTemplate.AJAXErrorTemplate, True)
+        return { "html": dset.render() }
 
 
-class PrewikkaInvalidQueryError(PrewikkaUserError):
-    def __init__(self, message):
-        PrewikkaUserError.__init__(self, _("Invalid query"), message, log_priority=log.ERROR)
+
+class PrewikkaUserError(PrewikkaError):
+    display_traceback = False
+
+    def __init__(self, name=None, message=None, **kwargs):
+        PrewikkaError.__init__(self, message, name=name, **kwargs)
 
 
-class NotImplementedError(PrewikkaUserError):
+class NotImplementedError(PrewikkaError):
+    name = N_("Not implemented")
+
     def __init__(self, message=N_("Backend does not implement this operation")):
-        PrewikkaUserError.__init__(self, _("Not implemented"), message, log_priority=log.ERROR)
+        PrewikkaError.__init__(self, message, log_priority=log.ERROR)

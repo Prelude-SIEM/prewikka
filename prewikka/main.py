@@ -144,12 +144,10 @@ class Core:
             self._initURL()
             self._loadPlugins()
             self._prewikka_initialized = True
-        except error.PrewikkaUserError, e:
+        except error.PrewikkaError, e:
             self._prewikka_initialized = e
-        except (database.DatabaseSchemaError, preludedb.PreludeDBError), e:
-            self._prewikka_initialized = error.PrewikkaUserError(_("Database error"), e)
         except Exception, e:
-            self._prewikka_initialized = error.PrewikkaUserError(_("Initialization error"), e)
+            self._prewikka_initialized = error.PrewikkaError(_("Initialization error"), e)
 
         if isinstance(self._prewikka_initialized, Exception):
             env.log.log(self._prewikka_initialized.log_priority, str(self._prewikka_initialized))
@@ -249,7 +247,7 @@ class Core:
             try:
                 env.request.user = env.session.get_user(webreq)
                 env.request.user.set_locale()
-            except Exception as autherr:
+            except error.PrewikkaError as autherr:
                 pass
 
             if not all(hookmanager.trigger("HOOK_PROCESS_REQUEST", webreq, env.request.user)):
@@ -260,7 +258,7 @@ class Core:
 
             view_object = env.viewmanager.loadView(webreq, env.request.user)
             if view_object.view_require_session and autherr:
-                raise autherr
+                view_object = autherr
 
             resolve.process(env.dns_max_delay)
             response = view_object.respond()
@@ -268,14 +266,13 @@ class Core:
         except error.RedirectionError as err:
             return webreq.send_redirect(err.location, err.code)
 
-        except error.PrewikkaUserError as err:
+        except error.PrewikkaError as err:
             response = err.respond()
 
         except Exception, err:
-            response = error.PrewikkaUserError(
-                _("Prelude internal error"),
-                err,
-                display_traceback=env.config.general.get("enable_error_traceback") not in ('no', 'false')
+            response = error.PrewikkaError(
+                N_("An unexpected condition happened while trying to load %s") % (webreq.path),
+                details=err,
             ).respond()
 
         webreq.send_response(response)
