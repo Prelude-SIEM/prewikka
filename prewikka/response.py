@@ -91,6 +91,7 @@ class PrewikkaResponse(object):
             res = ""
 
         if not isinstance(res, compat.STRING_TYPES):
+            self.headers["Content-type"] = "application/json"
             res = json.dumps(res, cls=utils.PrewikkaJSONEncoder)
 
         return res.encode(env.config.general.get("encoding", "utf8"), "xmlcharrefreplace")
