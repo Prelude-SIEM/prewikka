@@ -18,7 +18,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import json, time
+import json, time, os, mimetypes
 from prewikka import env, compat, utils, template
 
 
@@ -38,7 +38,7 @@ class PrewikkaResponse(object):
         If the type of data is a dict, it will be cast in a JSON string
     """
 
-    def __init__(self, data=None, headers=_sentinel, code=None, status_text=None):
+    def __init__(self, data=None, headers=_sentinel, code=200, status_text=None):
         self.data = data
         self.code = code
         self.status_text = status_text
@@ -103,6 +103,12 @@ class PrewikkaResponse(object):
 
         return data
 
+    def write(self, request):
+        content = self.content()
+
+        request.send_headers(self.headers.items(), self.code, self.status_text)
+        request.write(content)
+
 
 class PrewikkaDownloadResponse(PrewikkaResponse):
     """
@@ -139,3 +145,28 @@ class PrewikkaDirectResponse(PrewikkaResponse):
     def content(self):
         return self._encode_response(self.data)
 
+
+class PrewikkaFileResponse(PrewikkaResponse):
+    """
+        Static File response
+    """
+    def __init__(self, path):
+        PrewikkaResponse.__init__(self)
+
+        self.fd = open(path, "r")
+        stat = os.fstat(self.fd.fileno())
+
+        content_type = mimetypes.guess_type(env.request.web.path)[0] or "application/octet-stream"
+
+        self.headers = utils.OrderedDict((('Content-Type', content_type),
+                                          ('Content-Length', str(stat[6])),
+                                          ('Last-Modified', time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8])))
+                                        ))
+
+    def write(self, request):
+        request.send_headers(self.headers.items(), self.code, self.status_text)
+
+        for i in iter(lambda: self.fd.read(8192), ''):
+            request.write(i)
+
+        self.fd.close()
