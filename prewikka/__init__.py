@@ -1,3 +1,5 @@
+import __builtin__
+
 try:
     from threading import local
 except ImportError:
@@ -27,4 +29,10 @@ class Env:
     htdocs_mapping = {}
     request = Request()
 
+
 env = Env()
+__builtin__.env = env
+
+
+# import after env creation
+import localization

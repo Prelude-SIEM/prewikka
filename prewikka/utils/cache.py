@@ -19,7 +19,6 @@
 
 import functools
 import collections
-from prewikka import env
 
 
 _CacheInfo = collections.namedtuple("CacheInfo", ["hits", "misses", "size"])

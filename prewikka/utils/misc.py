@@ -26,7 +26,7 @@ import struct
 import json
 import datetime
 
-from prewikka import compat, env
+from prewikka import compat
 
 port_dict = {}
 read_done = False

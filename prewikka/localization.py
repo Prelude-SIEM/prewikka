@@ -20,7 +20,7 @@
 
 import prelude
 import pkg_resources, locale, gettext, __builtin__, datetime, pytz
-from prewikka import utils, env, log
+from prewikka import utils, log
 
 from threading import local, Lock
 

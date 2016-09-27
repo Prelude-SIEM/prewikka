@@ -21,7 +21,7 @@ import sys
 import traceback
 import json
 
-from prewikka import template, log, env, response, localization
+from prewikka import template, log, response
 from prewikka.templates import ErrorTemplate, AJAXErrorTemplate
 
 

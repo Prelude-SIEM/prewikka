@@ -18,7 +18,6 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import logging, logging.handlers, os, stat, sys
-from prewikka import env
 
 DEBUG = logging.DEBUG
 INFO = logging.INFO
