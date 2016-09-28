@@ -174,6 +174,12 @@ function getCellValue(cellvalue, options, cell) {
     return $(cell).text() || $(cell).find(":input").val();
 }
 
+function clearGridEdition(grid) {
+    var param = grid.jqGrid("getGridParam");
+    grid.jqGrid("saveCell", param.iRow, param.iCol);
+    delete param.iRow;
+}
+
 function setConfirmDialogPosition(grid, form) {
     var rowid = grid.jqGrid('getGridParam', 'selrow');
     // Do not use jQuery selector because rowid may contain dots
