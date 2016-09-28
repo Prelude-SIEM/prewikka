@@ -28,7 +28,7 @@ _CSS_FILES = [resource.CSSLink(link) for link in (
     "prewikka/css/jquery-ui-timepicker-addon.min.css",
     "prewikka/css/font-awesome.min.css",
     "prewikka/css/ui.jqgrid.min.css",
-    "prewikka/css/ui.multiselect.css",
+    "prewikka/css/ui.multiselect.min.css",
     "prewikka/css/loader.css")
 ]
 
@@ -40,7 +40,7 @@ _JS_FILES = [resource.JSLink(link) for link in (
     "prewikka/js/ajax.js",
     "prewikka/js/underscore-min.js",
     "prewikka/js/jquery-ui-timepicker-addon.min.js",
-    "prewikka/js/ui.multiselect.js",
+    "prewikka/js/ui.multiselect.min.js",
     "prewikka/js/jquery.jqgrid.min.js",
     "prewikka/js/commonlisting.js",
     "prewikka/js/jquery.jstree.js")
