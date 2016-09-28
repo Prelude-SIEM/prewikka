@@ -50,34 +50,6 @@ function _initialize_components(container) {
     $(container).find('[data-toggle="popover"]').popover();
 }
 
-
-function __ie_fixes(data)
-{
-    /*
-     * Return if not IE, or IE >= 10
-     */
-    if ( 'baseURI' in document || window.atob )
-        return data;
-
-    var absolute = new RegExp('^(?:[a-z]+:)?//', 'i');
-
-    /*
-     * IE9 does not take base url into account for link parameters.
-     * Also add the link element to document head to prevent loading problem.
-     */
-    $(data).filter("link").add($(data).find("link")).each(function() {
-        var href = $(this).attr("href");
-
-        if ( href[0] != '/' && ! absolute.test(href) ) {
-            var base = document.getElementsByTagName('base')[0];
-            $(this).attr("href", base.href + href);
-            $('<link rel="stylesheet" href="' + base.href + href +  '" type="text/css" />').appendTo('head');
-        }
-    });
-
-    return data;
-}
-
 function handle_notifications(data)
 {
     if ( data.notifications ) {
@@ -90,7 +62,7 @@ function handle_notifications(data)
 function prewikka_drawTab(data)
 {
     var form;
-    var content = __ie_fixes($(data.content));
+    var content = $(data.content);
 
     handle_notifications(data);
 

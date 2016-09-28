@@ -60,7 +60,6 @@ class BufferedWriter:
 class Request(object):
     def __init__(self, *args, **kwargs):
         self.is_xhr = False
-        self.is_multipart = False
         self.is_stream = False
         self._buffer = None
         self.arguments = { }
@@ -139,29 +138,6 @@ class Request(object):
             self._buffer.flush()
         else:
             response.write(self)
-
-
-    def _handle_multipart(self, *args, **kwargs):
-        arguments = {}
-        fs = cgi.FieldStorage(**kwargs)
-
-        for key in fs.keys():
-            # FIXME : remove next part when IE9 support will be dropped
-            # Support for jquery-iframe-transport
-            if key == "X-Requested-With" and fs[key].value == "IFrame":
-                self.is_xhr = True
-                continue
-
-            value = fs[key]
-            for i, f in enumerate(value if isinstance(value, list) else [value]):
-                if f.filename:
-                    arguments["%s_data_%d" % (key, i)] = f.value
-                    arguments["%s_name_%d" % (key, i)] = f.filename
-                else:
-                    arguments[key] = f.value
-
-        self.is_multipart = True
-        return arguments
 
 
     def get_baseurl(self):

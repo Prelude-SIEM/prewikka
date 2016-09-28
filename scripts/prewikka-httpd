@@ -77,16 +77,12 @@ class PrewikkaRequestHandler(request.Request, BaseHTTPServer.BaseHTTPRequestHand
     def do_POST(self):
         self.init("POST")
 
-        if self.headers.get("content-type", "").startswith("multipart/form-data"):
-            self._query_string = ""
-            self.body = arguments = self._handle_multipart(fp=self.rfile, headers=self.headers, environ={'REQUEST_METHOD': 'POST'})
-        else:
-            self.body = qs = self.rfile.read(int(self.headers["Content-Length"]))
-            if self._uri.query:
-                qs = "&".join((self._uri.query, qs))
+        self.body = qs = self.rfile.read(int(self.headers["Content-Length"]))
+        if self._uri.query:
+            qs = "&".join((self._uri.query, qs))
 
-            self._query_string = qs
-            arguments = urlparse.parse_qs(qs)
+        self._query_string = qs
+        arguments = urlparse.parse_qs(qs)
 
         self._process_dynamic(arguments)
 

@@ -18,14 +18,14 @@
 
 function check_same_origin(url) {
     /*
-     * Force url.hostname to be defined in IE9
+     * Force url.hostname to be defined in IE
      * (problem with dynamically created links)
      */
     if ( ! url.hostname )
         url.href = url.href;
 
     /*
-     * When the default port is used in IE9,
+     * When the default port is used in IE,
      * location.port is empty but url.port is not
      */
     default_port = {"http:": "80", "https:": "443"};
