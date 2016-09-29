@@ -42,6 +42,7 @@ class PluginBase(registrar.DelayedRegistrar):
     plugin_htdocs = None
     plugin_locale = None
 
+    plugin_require = []
     plugin_deprecate = []
     plugin_mandatory = False
 
@@ -83,8 +84,9 @@ class PluginManager(object):
 
     @staticmethod
     def iter_plugins(entrypoint):
-        plist = []
-        ignore = []
+        plist = {}
+        ignore = {}
+        module_map = {}
 
         for i in pkg_resources.iter_entry_points(entrypoint):
             if i.module_name in ignore:
@@ -100,10 +102,23 @@ class PluginManager(object):
             plugin_class._assigned_name = i.name
             plugin_class.full_module_name = ":".join((plugin_class.__module__, i.attrs[0]))
 
-            plist.append(plugin_class)
-            ignore.extend(plugin_class.plugin_deprecate)
+            if plugin_class.full_module_name in ignore:
+                continue
 
-        return (i for i in plist if i.__module__ not in ignore)
+            plist[plugin_class.full_module_name] = plugin_class
+            module_map.setdefault(plugin_class.__module__, {})[plugin_class.full_module_name] = True
+
+            for j in plugin_class.plugin_deprecate:
+                ignore[j] = True
+
+                ret = plist.pop(j, None)
+                if ret:
+                    continue
+
+                for mod in module_map.get(j, []):
+                    plist.pop(mod)
+
+        return plist
 
     def _handle_preload(self, plugin_class, autoupdate):
         # Get sections from all views before testing plugin database version
@@ -116,24 +131,65 @@ class PluginManager(object):
             i.full_module_name = ":".join((i.__module__, i.__name__))
             self._addPlugin(i, autoupdate)
 
+    def _load_single(self, plugin_class, autoupdate):
+        try:
+            if issubclass(plugin_class, PluginPreload):
+                self._handle_preload(plugin_class, autoupdate)
+            else:
+                self._handle_section(plugin_class)
+                self._addPlugin(plugin_class, autoupdate, name=plugin_class._assigned_name)
+
+        except error.PrewikkaUserError as e:
+            logger.warning("%s: plugin loading failed: %s", plugin_class.full_module_name, e)
+            return False
+
+        except Exception as e:
+            logger.exception("%s: plugin loading failed: %s", plugin_class.full_module_name, e)
+            return False
+
+        return True
+
+    def _load_plugin_with_dependencies(self, mname, pmap, autoupdate, loaded, deplist):
+        if mname in loaded:
+            return loaded[mname]
+
+        if mname in deplist:
+            logger.warning("%s: plugin loading failed, circular dependencies detected: %s -> %s" % (mname, " -> ".join(deplist), mname))
+            return False
+
+        plugin_class = pmap.get(mname)
+        if not plugin_class:
+            return False
+
+        plist = [(p, True) for p in plugin_class.plugin_require]
+        ret = self._load_plugin_list(plist, pmap, autoupdate, loaded, deplist + [mname])
+        if ret is not True:
+            logger.warning("%s: plugin loading failed: missing dependency '%s'" % (mname, ret))
+            return False
+
+        ret = self._load_single(plugin_class, autoupdate)
+        if not ret:
+            return False
+
+        return True
+
+    def _load_plugin_list(self, plist, pmap, autoupdate, loaded, deplist):
+        for mname, needed in plist:
+            ret = self._load_plugin_with_dependencies(mname, pmap, autoupdate, loaded, deplist)
+            loaded[mname] = ret
+            if not ret and needed:
+                return mname
+
+        return True
+
     def __init__(self, entrypoint, autoupdate=False):
         self._count = 0
         self.__instances = []
         self.__dinstances = {}
 
-        for plugin_class in self.iter_plugins(entrypoint):
-            try:
-                if issubclass(plugin_class, PluginPreload):
-                    self._handle_preload(plugin_class, autoupdate)
-                else:
-                    self._handle_section(plugin_class)
-                    self._addPlugin(plugin_class, autoupdate, name=plugin_class._assigned_name)
-
-            except error.PrewikkaUserError as e:
-                logger.warning("%s: plugin loading failed: %s", plugin_class.full_module_name, e)
-
-            except Exception as e:
-                logger.exception("%s: plugin loading failed: %s", plugin_class.full_module_name, e)
+        plugins = self.iter_plugins(entrypoint)
+        plist = [(p, False) for p in plugins]
+        self._load_plugin_list(plist, plugins, autoupdate, {}, [])
 
     def getPluginCount(self):
         return self._count

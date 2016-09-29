@@ -65,7 +65,7 @@ class AboutPlugin(view.View):
 
     def _iter_plugin(self):
         for catname, entrypoint in self._all_plugins:
-            for plugin in pluginmanager.PluginManager.iter_plugins(entrypoint):
+            for plugin in pluginmanager.PluginManager.iter_plugins(entrypoint).values():
                 yield catname, plugin
 
     def _get_plugin_infos(self):
