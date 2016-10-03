@@ -43,7 +43,7 @@ $messagelisting_scripts
                     type: "GET",
                     url: \$(this).data("title"),
                     success: function(data) {
-                        title = JSON.parse(data).content;
+                        title = data.content;
                         if ( title instanceof Array ) {
                             title = title.map(function(v, i) {
                                 return \$("<div>").text(v).html();

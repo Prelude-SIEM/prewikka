@@ -69,5 +69,5 @@ class AjaxHostURL(view.View):
         for info in hookmanager.trigger("HOOK_HOST_INFO", self.parameters["host"]):
             infos.update(info)
 
-        return response.PrewikkaDirectResponse(json.dumps(list(self._link_generator(infos))))
+        return response.PrewikkaDirectResponse(list(self._link_generator(infos)))
 

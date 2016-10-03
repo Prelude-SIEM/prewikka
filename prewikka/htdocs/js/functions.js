@@ -198,9 +198,8 @@ $(document).ready(function(){
           type: "GET",
           url: $(this).data("popup-url"),
           success: function(data) {
-              var items = JSON.parse(data);
               popup_menu.find(".popup_menu_loading").remove();
-              popup_menu.append(items.join(""));
+              popup_menu.append(data.join(""));
           }
       });
   });
