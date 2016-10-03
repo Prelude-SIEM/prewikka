@@ -53,7 +53,7 @@ class Logout(view._View):
             # logout always generate an exception to render the logout template
             pass
 
-        return env.request.web.send_redirect(self.parameters.get("redirect", env.request.web.get_baseurl()), code=302)
+        return response.PrewikkaRedirectResponse(self.parameters.get("redirect", env.request.web.get_baseurl()), code=302)
 
 _core_cache = {}
 _core_cache_lock = Lock()
@@ -234,7 +234,7 @@ class Core:
             # which does not require any specific permission.
             default_view = "settings/my_account"
 
-        return request.send_redirect("%s%s" % (request.get_baseurl(), default_view), 302)
+        return response.PrewikkaRedirectResponse(request.get_baseurl() + default_view, code=302)
 
     def _process_static(self, webreq):
         pathkey = webreq.path_elements[0]
@@ -288,16 +288,10 @@ class Core:
     def process(self, webreq):
         env.request.init(webreq)
 
-        encoding = env.config.general.get("encoding", "utf8")
         try:
-            response = self._process_static(webreq)
-            if not response:
-                response = self._process_dynamic(webreq)
+            response = self._process_static(webreq) or self._process_dynamic(webreq)
 
-        except error.RedirectionError as err:
-            return webreq.send_redirect(err.location, err.code)
-
-        except error.PrewikkaError as err:
+        except error.PrewikkaException as err:
             response = err.respond()
 
         except Exception, err:

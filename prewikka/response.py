@@ -171,3 +171,13 @@ class PrewikkaFileResponse(PrewikkaResponse):
             request.write(i)
 
         self.fd.close()
+
+
+
+class PrewikkaRedirectResponse(PrewikkaResponse):
+    """
+        Redirect response
+    """
+    def __init__(self, location, code=302, status_text=None):
+        PrewikkaResponse.__init__(self, code=code, status_text=status_text or "%d Redirect" % code)
+        self.headers = utils.OrderedDict((('Location', location),))

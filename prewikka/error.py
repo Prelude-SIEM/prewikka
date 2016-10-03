@@ -20,18 +20,32 @@
 import sys
 import traceback
 import json
+import abc
 
 from prewikka import template, log, response
 from prewikka.templates import ErrorTemplate, AJAXErrorTemplate
 
 
-class RedirectionError(Exception):
+class PrewikkaException(Exception):
+    __metaclass__ = abc.ABCMeta
+
+    @abc.abstractmethod
+    def respond(self):
+        pass
+
+
+
+class RedirectionError(PrewikkaException):
     def __init__(self, location, code):
         self.location = location
         self.code = code
 
+    def respond(self):
+        return response.PrewikkaRedirectResponse(self.location, code=self.code)
 
-class PrewikkaError(Exception):
+
+
+class PrewikkaError(PrewikkaException):
     template = ErrorTemplate.ErrorTemplate
     name = N_("An unexpected condition happened")
     message = ""
