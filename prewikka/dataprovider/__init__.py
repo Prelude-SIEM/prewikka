@@ -235,22 +235,34 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         return list(res)[0]
 
-    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None):
+    def _check_data_type(self, type, *args):
         if not type:
-            type = self._guess_data_type(paths, criteria)
+            type = self._guess_data_type(*args)
 
         if type not in self._type_handlers or type not in self._backends:
             raise NoBackendError("No backend available for '%s' datatype" % type)
 
+        return type
+
+    def _normalize(self, type, paths=None, criteria=None):
+        if paths is None:
+            paths = []
+
         if criteria is None:
             criteria = []
 
+        paths_types = []
         normalizer = self._type_handlers[type]
 
-        paths_types = []
         if normalizer:
             paths, paths_types = normalizer.parse_paths(paths, type)
             criteria = normalizer.parse_criteria(criteria, type)
+
+        return paths, paths_types, criteria
+
+    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None):
+        type = self._check_data_type(type, paths, criteria)
+        paths, paths_types, criteria = self._normalize(type, paths, criteria)
 
         start = time.time()
         results = self._backends[type].get_values(paths, criteria, distinct, limit, offset)
@@ -260,6 +272,32 @@ class DataProviderManager(pluginmanager.PluginManager):
         results._paths_types = paths_types
 
         return results
+
+    def get_by_id(self, type, id_):
+        return self._backends[type].get_by_id(id_)
+
+    def get(self, criteria=None, order_by="time_desc", type=None):
+        if order_by not in ("time_asc", "time_desc"):
+            raise DataProviderError("Invalid value for parameter 'order_by'")
+
+        type = self._check_data_type(type, [], criteria)
+        criteria = self._normalize(type, criteria=criteria)[2]
+        return self._backends[type].get(criteria, order_by)
+
+    def delete(self, criteria=None, type=None):
+        type = self._check_data_type(type, [], criteria)
+        criteria = self._normalize(type, criteria=criteria)[2]
+        return self._backends[type].delete(criteria)
+
+    def insert(self, data, criteria=None, type=None):
+        type = self._check_data_type(type, data.keys())
+        criteria = self._normalize(type, criteria=criteria)[2]
+        return self._backends[type].insert(data, criteria)
+
+    def update(self, data, criteria=None, type=None):
+        type = self._check_data_type(type, data.keys(), criteria)
+        criteria = self._normalize(type, criteria=criteria)[2]
+        return self._backends[type].update(data, criteria)
 
     def has_type(self, wanted_type):
         return wanted_type in self._backends
