@@ -191,8 +191,8 @@
           <tr><th style="width:20%">$_("Name")</th><th>$_("Description")</th><th style="width:10%">$_("Version")</th><th style="width:15%">$_("Current Database Version")</th><th class="right" style="width:15%">$_("Required Database Update")</th></tr>
 
         #set $cnt = 0
-        #for $mod, $fv, $tv in $sorted($list, $key=lambda x: $x[0].__module__)
-          #set $plugin_name = $mod.plugin_name or $mod.__module__
+        #for $mod, $fv, $uplist in $sorted($list, $key=lambda x: $x[0].full_module_name)
+          #set $plugin_name = $mod.plugin_name or $mod.full_module_name
           <tr class="$row_classes[$cnt % 2]">
             <td>$plugin_name</td><td>$_($mod.plugin_description)</td><td>$mod.plugin_version</td>
             <td>
@@ -202,7 +202,7 @@
               -
           #end if
             </td>
-            <td class="right">$tv</td>
+            <td class="right">$str(", ").join([$str($i) for $i in $uplist])</td>
           </tr>
           #set $cnt += 1
         #end for
@@ -243,7 +243,7 @@
           #else
             #set $disabled = ""
           #end if
-          #set $plugin_name = $mod.plugin_name or $mod.__module__
+          #set $plugin_name = $mod.plugin_name or $mod.full_module_name
 
           <tr class="$row_classes[$cnt % 2]">
             <td>$plugin_name</td><td>$_($mod.plugin_description)</td><td>$mod.plugin_version</td>
@@ -253,7 +253,7 @@
              -
                 #end if
             </td>
-            <td class="right"><input type="checkbox" name="enable_plugin" value="$mod.__module__" $checked $disabled/></td></tr>
+            <td class="right"><input type="checkbox" name="enable_plugin" value="$mod.full_module_name" $checked $disabled/></td></tr>
           #set $cnt += 1
         #end for
         </table>

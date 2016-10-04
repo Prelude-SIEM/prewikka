@@ -17,10 +17,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import pkg_resources, os, json
+import pkg_resources, os, json, itertools
 
 from . import templates
-from prewikka import view, database, version, env, error
+from prewikka import view, database, version, env, error, pluginmanager
 
 
 class AboutPlugin(view.View):
@@ -57,90 +57,52 @@ class AboutPlugin(view.View):
         self.dataset = None
         env.request.web.send_stream(json.dumps({"total": data.maintenance_total}), event="begin", sync=True)
 
-        for lst in data.maintenance.values():
+        for mod, fromversion, uplist in itertools.chain.from_iterable(data.maintenance.values()):
 
-            for mod, fromversion, toversion in lst:
-                dbup = database.DatabaseUpdateHelper(mod.__module__, mod.plugin_database_version, mod.plugin_database_branch)
+            for upscript in uplist:
+                label = _("Applying %(module)s %(script)s...") % {'module': mod.full_module_name, 'script': str(upscript)}
+                env.request.web.send_stream(json.dumps({"label": label}), sync=True)
+
                 try:
-                    l = dbup.list()
+                    upscript.apply()
                 except Exception as e:
-                    continue
-
-                for upscript in l:
-                    label = _("Applying %(module)s %(script)s...") % {'module': mod.__module__, 'script': str(upscript)}
-                    env.request.web.send_stream(json.dumps({"label": label}), sync=True)
-
-                    try:
-                        upscript.apply()
-                    except Exception as e:
-                        env.request.web.send_stream(json.dumps({"error": str(e)}), sync=True)
-                        continue
+                    env.request.web.send_stream(json.dumps({"error": str(e)}), sync=True)
 
         env.request.web.send_stream(data=json.dumps({"label": _("All updates applied")}), event="finish", sync=True)
         env.request.web.send_stream("close", event="close")
 
     def _add_plugin_info(self, data, catname, mod):
-        upinfo = uperror = None
+        dbup = database.DatabaseUpdateHelper(mod.full_module_name, mod.plugin_database_version, mod.plugin_database_branch)
+        curversion = dbup.get_schema_version()
 
-        dbup = database.DatabaseUpdateHelper(mod.__module__, mod.plugin_database_version, mod.plugin_database_branch)
         try:
             upinfo = dbup.list()
+            if upinfo:
+                data.maintenance_total += len(upinfo)
+                data.maintenance.setdefault(catname, []).append((mod, curversion, upinfo))
+            else:
+                data.installed.setdefault(catname, []).append((mod, env.db.is_plugin_active(mod.full_module_name)))
+
         except error.PrewikkaUserError as e:
-            uperror = e
-
-        if uperror:
-            data.maintenance.setdefault(catname, []).append((mod, dbup.get_schema_version(), uperror))
-
-        elif upinfo:
-            data.maintenance_total += len(upinfo)
-            data.maintenance.setdefault(catname, []).append((mod, dbup.get_schema_version(), ", ".join([str(i) for i in upinfo])))
-
-        else:
-            if "enable_plugin" in self.parameters:
-                enabled = mod.plugin_mandatory or mod.__module__ in self.parameters["enable_plugin"]
-                self._dbup(mod, enabled)
-
-            data.installed.setdefault(catname, []).append((mod, env.db.is_plugin_active(mod.__module__)))
-
-
-    def _dbup(self, mod, enabled):
-        mname = env.db.escape(mod.__module__)
-
-        if env.db.query("SELECT module FROM Prewikka_Module_Registry WHERE module = %s" % (mname)):
-            env.db.query("UPDATE Prewikka_Module_Registry SET enabled=%d WHERE module=%s" % (enabled, mname))
-        else:
-            assert(not mod.plugin_database_version)
-            env.db.query("INSERT INTO Prewikka_Module_Registry(module, enabled) VALUES(%s, %d)" % (mname, enabled))
+            data.maintenance.setdefault(catname, []).append((mod, curversion, e))
 
     def render(self):
-        class _data:
-            pass
-
+        class _data(object): pass
         data = _data()
-        data.installed = {}
-        data.maintenance = {}
-        data.maintenance_total = 0
+        data.installed, data.maintenance, data.maintenance_total = {}, {}, 0
 
-        plist = []
-        ignore = []
-
+        upsrt = []
         for catname, entrypoint in self._all_plugins:
-            for p in pkg_resources.iter_entry_points(entrypoint):
-                if p.module_name in ignore:
-                    continue
+            for plugin in pluginmanager.PluginManager.iter_plugins(entrypoint):
 
-                try:
-                    mod = p.load()
-                    ignore.extend(mod.plugin_deprecate)
-                except Exception as e:
-                    env.log.error("[%s]: error loading plugin, %s" % (p.module_name, e))
-                    continue
+                self._add_plugin_info(data, catname, plugin)
 
-                plist.append((catname, p.module_name, mod))
+                if "enable_plugin" in self.parameters:
+                    enabled = plugin.plugin_mandatory or plugin.full_module_name in self.parameters["enable_plugin"]
+                    upsrt.append((plugin.full_module_name, int(enabled)))
 
-        for catname, mname, mod in plist:
-            if mname not in ignore:
-                self._add_plugin_info(data, catname, mod)
+        if upsrt:
+            env.db.upsert("Prewikka_Module_Registry", ["module", "enabled"], upsrt, pkey=["module"])
 
         if "apply_update" in self.parameters or "enable_plugin" in self.parameters:
             env.db.trigger_plugin_change()

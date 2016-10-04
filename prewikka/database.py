@@ -134,6 +134,7 @@ class SQLScript(object):
     def __init__(self, dbup):
         self.db = dbup
         self._module_name = dbup._module_name
+        self._full_module_name = dbup._full_module_name
         self._query_filter = { "sqlite3": self._mysql2sqlite, "pgsql": self._mysql2pgsql, "mysql": self._mysqlhandler }[self.db.getType()]
 
         if self.type in ("install", "update"):
@@ -202,19 +203,19 @@ class SQLScript(object):
 
     @use_transaction
     def apply(self):
-        log.getLogger().info("%s: please standby while %s is applied", self._module_name, str(self))
+        log.getLogger().info("%s: please standby while %s is applied", self._full_module_name, str(self))
 
         self.run()
 
         if self.type == "install":
-            env.db.upsert("Prewikka_Module_Registry", ("module", "branch", "version"), ((self._module_name, self.branch, self.version),), pkey=("module",))
+            env.db.upsert("Prewikka_Module_Registry", ("module", "branch", "version"), ((self._full_module_name, self.branch, self.version),), pkey=("module",))
 
         elif self.type == "update":
-            self.db.query("UPDATE Prewikka_Module_Registry SET version=%s WHERE module=%s%s" % (self.db.escape(self.version), self.db.escape(self._module_name), self.db._chknull("branch", self.branch)))
+            self.db.query("UPDATE Prewikka_Module_Registry SET version=%s WHERE module=%s%s" % (self.db.escape(self.version), self.db.escape(self._full_module_name), self.db._chknull("branch", self.branch)))
 
         elif self.type == "branch":
             self.db.query("UPDATE Prewikka_Module_Registry SET branch=%s, version=%s, enabled=1 WHERE module=%s",
-                          self.branch, self.version, self._module_name)
+                          self.branch, self.version, self._full_module_name)
 
         self.db._update_state(self.version, self.branch)
 
@@ -244,7 +245,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
         if self._initialized:
             return
 
-        module = self.modinfos.get(self._module_name, self._default_modinfo)
+        module = self.modinfos.get(self._full_module_name, self._default_modinfo)
 
         self._from_branch = module.branch
         self._from_version = module.version
@@ -256,7 +257,8 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
         self._reqbranch = reqbranch
         self._reqversion = reqversion
-        self._module_name = module_name
+        self._module_name = module_name.split(":")[0]
+        self._full_module_name = module_name
         self._initialized = False
 
     def check(self):
@@ -286,7 +288,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
             try:
                 yield i.load().__path__[0]
             except Exception as e:
-                log.getLogger().exception("[%s]: error loading SQL updates: %s", self._module_name, e)
+                log.getLogger().exception("[%s]: error loading SQL updates: %s", self._full_module_name, e)
 
     def _get_schema_list(self, **kwargs):
         from_version = to_version = None
@@ -303,7 +305,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
             try:
                 mod = importer.find_module(package_name).load_module(package_name).SQLUpdate(self)
             except Exception as e:
-                log.getLogger().exception("[%s]: error loading SQL update '%s' : %s" % (self._module_name, package_name, e))
+                log.getLogger().exception("[%s]: error loading SQL update '%s' : %s" % (self._full_module_name, package_name, e))
                 continue
 
             if any(kwargs[k] != getattr(mod, k) for k in kwargs.keys()):
@@ -340,7 +342,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
         if not ret:
             raise error.PrewikkaUserError(_("Database installation error"),
                                           N_("No database installation script found for module %(module)s, version %(version)s",
-                                             {'module': self._module_name, 'version': self._get_version_string(self._reqbranch, self._reqversion)}))
+                                             {'module': self._full_module_name, 'version': self._get_version_string(self._reqbranch, self._reqversion)}))
 
         return ret[-1]
 
@@ -350,7 +352,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
             raise error.PrewikkaUserError(_("Database migration error"),
                                           N_("No database branch migration script found for module %(module)s, branch transition %(current)s -> %(required)s",
                                           {
-                                            'module': self._module_name,
+                                            'module': self._full_module_name,
                                             'current': self._get_version_string(self._from_branch, self._from_version),
                                             'required': self._get_version_string(self._reqbranch, "<=" + self._reqversion)
                                           }))
@@ -389,7 +391,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
                 _("Database migration error"),
                 N_("No linear migration script found for module %(module)s %(version1)s -> %(version2)s",
                 {
-                    'module': self._module_name,
+                    'module': self._full_module_name,
                     'version1': self._get_version_string(self._from_branch, self._from_version),
                     'version2': self._get_version_string(self._reqbranch, self._reqversion)
                 }

@@ -62,7 +62,7 @@ class PluginManager:
         for permission in getattr(plugin_class, "additional_permissions", []):
             usergroup.ALL_PERMISSIONS.declare(permission)
 
-        dh = database.DatabaseUpdateHelper(plugin_class.__module__, plugin_class.plugin_database_version, plugin_class.plugin_database_branch)
+        dh = database.DatabaseUpdateHelper(plugin_class.full_module_name, plugin_class.plugin_database_version, plugin_class.plugin_database_branch)
         if autoupdate or plugin_class.plugin_database_autoupdate:
             dh.apply()
         else:
@@ -75,15 +75,11 @@ class PluginManager:
 
     def _addPlugin(self, plugin_class, autoupdate, name=None):
         self._handle_attributes(plugin_class, autoupdate)
-
         self[name or plugin_class.__name__] = plugin_class
         self._count += 1
 
-    def __init__(self, entrypoint, autoupdate=False):
-        self._count = 0
-        self.__instances = []
-        self.__dinstances = {}
-
+    @staticmethod
+    def iter_plugins(entrypoint):
         plist = []
         ignore = []
 
@@ -98,27 +94,43 @@ class PluginManager:
                 logger.exception("%s: %s", i.module_name, e)
                 continue
 
-            plist.append((i.module_name, i.name, plugin_class))
+            plugin_class._assigned_name = i.name
+            plugin_class.full_module_name = ":".join((plugin_class.__module__, i.attrs[0]))
+
+            plist.append(plugin_class)
             ignore.extend(plugin_class.plugin_deprecate)
 
-        for mname, name, plugin_class in plist:
-            if mname in ignore:
-                continue
+        return (i for i in plist if i.__module__ not in ignore)
 
+    def _handle_preload(self, plugin_class, autoupdate):
+        # Get sections from all views before testing plugin database version
+        for x in plugin_class.plugin_classes:
+            self._handle_section(x)
+
+        self._handle_attributes(plugin_class, autoupdate)
+
+        for i in plugin_class().plugin_classes:
+            i.full_module_name = ":".join((i.__module__, i.__name__))
+            self._addPlugin(i, autoupdate)
+
+    def __init__(self, entrypoint, autoupdate=False):
+        self._count = 0
+        self.__instances = []
+        self.__dinstances = {}
+
+        for plugin_class in self.iter_plugins(entrypoint):
             try:
                 if issubclass(plugin_class, PluginPreload):
-                    # Get sections from all views before testing plugin database version
-                    [self._handle_section(x) for x in plugin_class.plugin_classes]
-                    self._handle_attributes(plugin_class, autoupdate)
-                    [self._addPlugin(x, autoupdate) for x in plugin_class().plugin_classes]
+                    self._handle_preload(plugin_class, autoupdate)
                 else:
                     self._handle_section(plugin_class)
-                    self._addPlugin(plugin_class, autoupdate, name=name)
+                    self._addPlugin(plugin_class, autoupdate, name=plugin_class._assigned_name)
 
             except error.PrewikkaUserError as e:
-                logger.warning("%s: plugin loading failed: %s", plugin_class.__module__, e)
+                logger.warning("%s: plugin loading failed: %s", plugin_class.full_module_name, e)
+
             except Exception as e:
-                logger.exception("%s: plugin loading failed: %s", plugin_class.__module__, e)
+                logger.exception("%s: plugin loading failed: %s", plugin_class.full_module_name, e)
 
     def getPluginCount(self):
         return self._count
