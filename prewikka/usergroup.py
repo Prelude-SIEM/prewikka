@@ -137,6 +137,13 @@ class User(NameID):
     def permissions(self, permissions):
         env.auth.setUserPermissions(self, permissions)
 
+    def _permissions(self, permissions):
+        self.permissions # make sure the cache has been created
+        env.request.cache.user_permissions._set((self,), permissions)
+
+    # Support access to _permissions to modify object permission without backend modification.
+    _permissions = property(permissions, _permissions)
+
     @cache.request_memoize_property("user_configuration")
     def configuration(self):
         return env.db.get_properties(self)
