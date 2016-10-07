@@ -685,7 +685,7 @@ class Database(preludedb.SQL):
                 wh_fmt.append("%s = %s" % (v, self.escape(row[i])))
 
             up_fmt.append("%s = %s" % (v, self.escape(row[i])))
-            vl_fmt.append(self.escape(row[i]))
+            vl_fmt.append(str(self.escape(row[i])))
 
         ret = self.query("UPDATE %s SET %s WHERE %s%s" % (table, ", ".join(up_fmt), " AND ".join(wh_fmt), retfmt))
         if ret:
