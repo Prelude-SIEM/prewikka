@@ -244,8 +244,8 @@ def deprecated(func):
 
 
 class CachingIterator(object):
-    def __init__(self, items):
-        self._count = None
+    def __init__(self, items, count=None):
+        self._count = count
         self._cache = []
         self._items = iter(items)
 

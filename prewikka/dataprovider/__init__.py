@@ -17,10 +17,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import types
+import types, time
 from datetime import datetime
 
-from prewikka import pluginmanager, error, env
+from prewikka import pluginmanager, error, env, hookmanager
 from prewikka.utils.timeutil import parser
 from prewikka.utils import CachingIterator
 
@@ -64,36 +64,45 @@ class NoBackendError(DataProviderError):
 
 
 class QueryResultsRow(CachingIterator):
-    def __init__(self, items, types):
+    __slots__ = ("_parent")
+
+    def __init__(self, parent, items):
         CachingIterator.__init__(self, items)
-        self._types = types
+        self._parent = parent
+
+    def _get_current_path_type(self):
+        return self._parent._paths_types[len(self._cache)]
+
+    def _get_current_path(self):
+        return self._parent._paths[len(self._cache)]
+
+    def _cast(self, value):
+        type = self._get_current_path_type()
+
+        try:
+            return TYPES_FUNC_MAP[type](value)
+        except (KeyError, ValueError):
+            raise error.PrewikkaUserError(_("Conversion error"),
+                                          N_("Value %(value)r cannot be converted to %(type)s", {"value": value, "type": type}))
 
     def preprocess_value(self, value):
         if value is None:
             return None
 
-        type = self._types[len(self._cache)]
-        try:
-            return TYPES_FUNC_MAP[type](value)
-        except (KeyError, ValueError):
-            raise error.PrewikkaUserError(_("Conversion error"),
-                                          N_("Value %(value)r cannot be converted to %(type)s",
-                                             {"value": value, "type": type}))
+        if self._parent._paths_types:
+            value = self._cast(value)
+
+        cont = [self._get_current_path(), value]
+        list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE", cont))
+
+        return cont[1]
 
 
 class QueryResults(CachingIterator):
-    def __init__(self, duration=-1, count=None, rows=None):
-        CachingIterator.__init__(self, rows)
-        self._count = count
-        self._duration = duration
-        self.paths_types = []
-
-    @property
-    def duration(self):
-        return self._duration
+    __slots__ = ("_paths", "_paths_types", "duration")
 
     def preprocess_value(self, value):
-        return QueryResultsRow(value, self.paths_types)
+        return QueryResultsRow(self, value)
 
 
 class DataProviderBackend(pluginmanager.PluginBase):
@@ -223,8 +232,13 @@ class DataProviderManager(pluginmanager.PluginManager):
             paths, paths_types = normalizer.parse_paths(paths, type)
             criteria = normalizer.parse_criteria(criteria, type)
 
+        start = time.time()
         results = self._backends[type].get_values(paths, criteria, distinct, limit, offset)
-        results.paths_types = paths_types
+        results.duration = time.time() - start
+
+        results._paths = paths
+        results._paths_types = paths_types
+
         return results
 
     def has_type(self, wanted_type):

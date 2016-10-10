@@ -8,17 +8,23 @@ from prelude import IDMEFTime
 from prewikka import pluginmanager, version, env, usergroup, utils
 from prewikka.dataprovider import QueryResults, DataProviderBackend, QueryResultsRow
 
+
 class IDMEFQueryResultsRow(QueryResultsRow):
+    __slots__ = ()
+
     def preprocess_value(self, value):
         if isinstance(value, IDMEFTime):
             return datetime.fromtimestamp(value, utils.timeutil.tzoffset(None, value.getGmtOffset()))
 
-        return value
+        return QueryResultsRow.preprocess_value(self, value)
 
 
 class IDMEFQueryResults(QueryResults):
+    __slots__ = ()
+
     def preprocess_value(self, value):
-        return IDMEFQueryResultsRow(value, self.paths_types)
+        return IDMEFQueryResultsRow(self, value)
+
 
 class IDMEFAlertPlugin(DataProviderBackend):
     type = "alert"
@@ -32,5 +38,4 @@ class IDMEFAlertPlugin(DataProviderBackend):
     @usergroup.permissions_required(["IDMEF_VIEW"])
     def get_values(self, paths, criteria, distinct, limit, offset):
         # This method acts as a pass-through to libpreludedb.
-        results = env.idmef_db.getValues(paths, criteria, distinct, limit, offset)
-        return IDMEFQueryResults(rows=results)
+        return IDMEFQueryResults(env.idmef_db.getValues(paths, criteria, distinct, limit, offset))
