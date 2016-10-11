@@ -4,11 +4,20 @@
 from prewikka import pluginmanager, version
 from prewikka.dataprovider import DataProviderNormalizer
 
-class AlertDataProvider(pluginmanager.PluginBase):
-    plugin_name = "Alert data provider"
+
+class _IDMEFProvider(pluginmanager.PluginBase):
     plugin_version = version.__version__
     plugin_author = version.__author__
     plugin_license = version.__license__
     plugin_copyright = version.__copyright__
-    plugin_description = N_("Provides an API to fetch security alerts")
     normalizer = DataProviderNormalizer('create_time')
+
+
+class IDMEFAlertProvider(_IDMEFProvider):
+    plugin_name = "IDMEF Alert provider"
+    plugin_description = N_("Provides an API to fetch IDMEF alerts")
+
+
+class IDMEFHeartbeatProvider(_IDMEFProvider):
+    plugin_name = "IDMEF Heartbeat provider"
+    plugin_description = N_("Provides an API to fetch IDMEF heartbeats")

@@ -186,7 +186,6 @@ class DataProviderManager(pluginmanager.PluginManager):
         self._backends = {}
 
         pluginmanager.PluginManager.__init__(self, "prewikka.dataprovider.type")
-
         for k in self.keys():
             try:
                 p = self[k]()
@@ -197,12 +196,13 @@ class DataProviderManager(pluginmanager.PluginManager):
             normalizer = getattr(p, "normalizer", None)
             if not isinstance(normalizer, (types.NoneType, DataProviderNormalizer)):
                 raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
+
             self._type_handlers[k] = normalizer
 
         for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend"):
+
             if plugin.type not in self._type_handlers:
-                env.log.warning("%s: plugin failed to load: %s" % (
-                    plugin.__name__,
+                env.log.warning("%s: plugin failed to load: %s" % (plugin.__name__,
                     _("No handler configured for '%s' datatype" % plugin.type)))
                 continue
 
@@ -246,6 +246,7 @@ class DataProviderManager(pluginmanager.PluginManager):
             criteria = []
 
         normalizer = self._type_handlers[type]
+
         paths_types = []
         if normalizer:
             paths, paths_types = normalizer.parse_paths(paths, type)

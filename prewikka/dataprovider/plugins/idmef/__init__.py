@@ -26,16 +26,26 @@ class IDMEFQueryResults(QueryResults):
         return IDMEFQueryResultsRow(self, value)
 
 
-class IDMEFAlertPlugin(DataProviderBackend):
-    type = "alert"
-    plugin_name = "IDMEF Alerts Plugin"
+class _IDMEFPlugin(DataProviderBackend):
     plugin_version = version.__version__
     plugin_author = version.__author__
     plugin_license = version.__license__
     plugin_copyright = version.__copyright__
-    plugin_description = N_("Plugin for fetching IDMEF alerts from the Prelude database")
 
     @usergroup.permissions_required(["IDMEF_VIEW"])
     def get_values(self, paths, criteria, distinct, limit, offset):
         # This method acts as a pass-through to libpreludedb.
         return IDMEFQueryResults(env.idmef_db.getValues(paths, criteria, distinct, limit, offset))
+
+
+
+class IDMEFAlertPlugin(_IDMEFPlugin):
+    type = "alert"
+    plugin_name = "IDMEF Alert Plugin"
+    plugin_description = N_("Plugin for fetching IDMEF messages from the Prelude database")
+
+
+class IDMEFHeartbeatPlugin(_IDMEFPlugin):
+    type = "heartbeat"
+    plugin_name = "IDMEF Heartbeat Plugin"
+    plugin_description = N_("Plugin for fetching IDMEF heartbeat from the Prelude database")

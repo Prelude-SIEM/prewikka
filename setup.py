@@ -261,11 +261,13 @@ setup(name="prewikka",
                 ],
 
                 'prewikka.dataprovider.backend': [
-                        'IDMEFAlert = prewikka.dataprovider.plugins.alert.idmef:IDMEFAlertPlugin',
+                        'IDMEFAlert = prewikka.dataprovider.plugins.idmef:IDMEFAlertPlugin',
+                        'IDMEFHeartbeat = prewikka.dataprovider.plugins.idmef:IDMEFHeartbeatPlugin',
                 ],
 
                 'prewikka.dataprovider.type': [
-                        'Alert = prewikka.dataprovider.alert:AlertDataProvider',
+                        'alert = prewikka.dataprovider.idmef:IDMEFAlertProvider',
+                        'heartbeat = prewikka.dataprovider.idmef:IDMEFHeartbeatProvider',
                 ],
 
                 'prewikka.plugins': [
