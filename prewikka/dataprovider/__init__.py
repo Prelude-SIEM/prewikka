@@ -130,35 +130,54 @@ class DataProviderBackend(pluginmanager.PluginBase):
 
 
 class DataProviderNormalizer(object):
+    def __init__(self, time_field=None):
+        if time_field is None:
+            raise error.PrewikkaUserError(_("Backend normalization error"), _("Backend normalization error"))
+
+        self._time_field = time_field
+
     def parse_paths(self, paths, type):
         """
-        Parse paths and turn them into a structure
-        that can be used by the backend.
+        Parse paths and turn them into a structure that can be used by the backend.
 
-        @param paths: List of paths in natural syntax
-            (eg. ["foo.bar", "count(foo.id)"])
+        @param paths: List of paths in natural syntax (eg. ["foo.bar", "count(foo.id)"])
         @type paths: list
         @param type: type of backend
         @type type: string
-        @return: The paths as a structure that can easily
-            be used by the backend.
+        @return: The paths as a structure that can easily be used by the backend.
         """
-        pass
+
+        parsed_paths = []
+        paths_types = []
+
+        for path in paths:
+            try:
+                parsed_paths.append(path % { 'backend' : type, 'time_field' : self._time_field })
+            except:
+                parsed_paths.append(path)
+
+        return parsed_paths, paths_types
 
     def parse_criteria(self, criteria, type):
         """
-        Parse criteria and turn them into a structure
-        that can be used by the backend.
+        Parse criteria and turn them into a structure that can be used by the backend.
 
-        @param criteria: List of criteria in natural syntax
-            (eg. ["foo.bar == 42 || foo.id = 23"])
+        @param criteria: List of criteria in natural syntax (eg. ["foo.bar == 42 || foo.id = 23"])
         @type criteria: list
         @param type: type of backend
         @type type: string
-        @return: The criteria as a structure that can easily
-            be used by the backend.
+        @return: The criteria as a structure that can easily be used by the backend.
         """
-        pass
+
+        parsed_criteria = []
+
+        for criterion in criteria:
+            try:
+                parsed_criteria.append(criterion % { 'backend' : type, 'time_field' : self._time_field })
+            except:
+                parsed_criteria.append(criterion)
+
+        return parsed_criteria
 
 
 class DataProviderManager(pluginmanager.PluginManager):

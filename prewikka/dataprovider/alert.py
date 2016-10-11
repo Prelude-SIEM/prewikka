@@ -2,7 +2,7 @@
 # Author: Abdel ELMILI <abdel.elmili@c-s.fr>
 
 from prewikka import pluginmanager, version
-from prewikka.dataprovider.pathparser import DataProviderNormalizerGeneric
+from prewikka.dataprovider import DataProviderNormalizer
 
 class AlertDataProvider(pluginmanager.PluginBase):
     plugin_name = "Alert data provider"
@@ -11,4 +11,4 @@ class AlertDataProvider(pluginmanager.PluginBase):
     plugin_license = version.__license__
     plugin_copyright = version.__copyright__
     plugin_description = N_("Provides an API to fetch security alerts")
-    normalizer = DataProviderNormalizerGeneric('create_time')
+    normalizer = DataProviderNormalizer('create_time')
