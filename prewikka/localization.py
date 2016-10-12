@@ -119,9 +119,6 @@ class _DeferredGettext(str):
         o._arguments = arguments
         return o
 
-    def __str__(self):
-        return self
-
     def translate(self):
         s = translation.gettext(self._text)
         return s % self._arguments if self._arguments else s
