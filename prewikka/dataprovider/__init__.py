@@ -276,13 +276,13 @@ class DataProviderManager(pluginmanager.PluginManager):
     def get_by_id(self, type, id_):
         return self._backends[type].get_by_id(id_)
 
-    def get(self, criteria=None, order_by="time_desc", type=None):
+    def get(self, criteria=None, order_by="time_desc", limit=-1, offset=-1, type=None):
         if order_by not in ("time_asc", "time_desc"):
             raise DataProviderError("Invalid value for parameter 'order_by'")
 
         type = self._check_data_type(type, [], criteria)
         criteria = self._normalize(type, criteria=criteria)[2]
-        return self._backends[type].get(criteria, order_by)
+        return self._backends[type].get(criteria, order_by, limit, offset)
 
     def delete(self, criteria=None, type=None):
         type = self._check_data_type(type, [], criteria)
