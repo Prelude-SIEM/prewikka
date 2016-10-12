@@ -84,7 +84,7 @@ class AboutPlugin(view.View):
                 data.installed.setdefault(catname, []).append((mod, env.db.is_plugin_active(mod.full_module_name)))
 
         except error.PrewikkaUserError as e:
-            data.maintenance.setdefault(catname, []).append((mod, curversion, e))
+            data.maintenance.setdefault(catname, []).append((mod, curversion, [e]))
 
     def render(self):
         class _data(object): pass
