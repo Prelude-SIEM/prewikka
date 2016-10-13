@@ -21,6 +21,7 @@ import json
 import pkg_resources
 import time
 
+from prewikka.dataprovider import Criterion
 from prewikka import view, utils, localization, env, mainmenu, hookmanager
 from . import templates
 
@@ -61,10 +62,10 @@ class SensorListing(view.View):
         self._heartbeat_error_margin = int(env.config.general.get("heartbeat_error_margin", 3))
 
     def _get_analyzers(self):
-        criteria = None
         if "filter_path" in self.parameters:
-            criteria = "%s == '%s'" % (self.parameters["filter_path"],
-                                       utils.escape_criteria(self.parameters["filter_value"]))
+            criteria = Criterion(self.parameters["filter_path"], "=", self.parameters["filter_value"])
+        else:
+            criteria = []
 
         for (analyzerid,) in env.idmef_db.getValues(["heartbeat.analyzer(-1).analyzerid/group_by"], criteria):
             analyzer, heartbeat = env.idmef_db.getAnalyzer(analyzerid)

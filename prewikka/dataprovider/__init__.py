@@ -20,7 +20,7 @@
 import types, time
 from datetime import datetime
 
-from prewikka import pluginmanager, error, env, hookmanager
+from prewikka import pluginmanager, error, utils, hookmanager
 from prewikka.utils.timeutil import parser
 from prewikka.utils import CachingIterator
 
@@ -179,6 +179,35 @@ class DataProviderNormalizer(object):
 
         return parsed_criteria
 
+    def parse_criterion(self, path, operator, value):
+        return "%s %s '%s'" % (path, operator, utils.escape_criteria(utils.filter_value_adjust(operator, value)))
+
+
+class Criteria(list):
+    def __add__(self, other):
+        return Criteria(list.__add__(self, other))
+
+
+class Criterion(str):
+    def __new__(cls, path, operator, value=None):
+
+        tpl = [path, operator, value]
+        list(hookmanager.trigger("HOOK_CRITERION_LOAD", tpl))
+
+        normalizer = env.dataprovider._type_handlers[env.dataprovider._guess_data_type([path])]
+
+        obj = str.__new__(cls, normalizer.parse_criterion(*tpl))
+        obj.path = path
+
+        return obj
+
+    # Allow iteration on a criterion, to emulate it as a criteria
+    def __iter__(self):
+        return iter((self,))
+
+    def __add__(self, other):
+        return Criteria([self, other])
+
 
 class DataProviderManager(pluginmanager.PluginManager):
     def __init__(self):
@@ -218,18 +247,33 @@ class DataProviderManager(pluginmanager.PluginManager):
 
             self._backends[p.type] = p
 
-    def _guess_data_type(self, paths, criteria=None):
-        res = set()
-        for path in paths:
-            tmp = path.partition('.')
-            if not tmp[1]:
-                continue
-            tmp = tmp[0].rpartition('(')[2]
-            # Exclude generic paths, eg. "%(backend)s.%(time_field)s".
-            if tmp != 'backend)s':
-                res.add(tmp)
+    @staticmethod
+    def _parse_path(path):
+        tmp = path.partition('.')
+        if not tmp[1]:
+            return
 
-        # FIXME Try to guess the backend using criteria first
+        tmp = tmp[0].rpartition('(')[2]
+        # Exclude generic paths, eg. "%(backend)s.%(time_field)s".
+        if tmp != 'backend)s':
+            return tmp
+
+    def _guess_data_type(self, paths, criteria=[]):
+        res = set()
+
+        for criterion in criteria:
+            if not isinstance(criterion, Criterion):
+                continue
+
+            path = self._parse_path(criterion.path)
+            if path:
+                res.add(path)
+
+        for path in paths:
+            path = self._parse_path(path)
+            if path:
+                res.add(path)
+
         if len(res) != 1:
             raise DataProviderError("Unable to guess data type: incompatible paths")
 
@@ -260,7 +304,7 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         return paths, paths_types, criteria
 
-    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None):
+    def query(self, paths, criteria=[], distinct=0, limit=-1, offset=-1, type=None):
         type = self._check_data_type(type, paths, criteria)
         paths, paths_types, criteria = self._normalize(type, paths, criteria)
 
@@ -276,7 +320,7 @@ class DataProviderManager(pluginmanager.PluginManager):
     def get_by_id(self, type, id_):
         return self._backends[type].get_by_id(id_)
 
-    def get(self, criteria=None, order_by="time_desc", limit=-1, offset=-1, type=None):
+    def get(self, criteria=[], order_by="time_desc", limit=-1, offset=-1, type=None):
         if order_by not in ("time_asc", "time_desc"):
             raise DataProviderError("Invalid value for parameter 'order_by'")
 
@@ -284,17 +328,17 @@ class DataProviderManager(pluginmanager.PluginManager):
         criteria = self._normalize(type, criteria=criteria)[2]
         return self._backends[type].get(criteria, order_by, limit, offset)
 
-    def delete(self, criteria=None, type=None):
+    def delete(self, criteria=[], type=None):
         type = self._check_data_type(type, [], criteria)
         criteria = self._normalize(type, criteria=criteria)[2]
         return self._backends[type].delete(criteria)
 
-    def insert(self, data, criteria=None, type=None):
+    def insert(self, data, criteria=[], type=None):
         type = self._check_data_type(type, data.keys())
         criteria = self._normalize(type, criteria=criteria)[2]
         return self._backends[type].insert(data, criteria)
 
-    def update(self, data, criteria=None, type=None):
+    def update(self, data, criteria=[], type=None):
         type = self._check_data_type(type, data.keys(), criteria)
         criteria = self._normalize(type, criteria=criteria)[2]
         return self._backends[type].update(data, criteria)

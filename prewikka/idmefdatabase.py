@@ -60,7 +60,7 @@ class IDMEFDatabase(preludedb.DB):
         if not criteria:
             criteria = []
 
-        if type(criteria) is not list:
+        if not isinstance(criteria, list):
             criteria = [ criteria ]
 
         all(hookmanager.trigger("HOOK_IDMEFDATABASE_CRITERIA_PREPARE", criteria, criteria_type))

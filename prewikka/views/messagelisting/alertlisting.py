@@ -1230,11 +1230,7 @@ class AlertListing(MessageListing):
 
         self._setTimelineChart()
 
-        criteria = [ ]
-
-        time_criteria = self.menu.get_criteria()
-        if time_criteria:
-                criteria.append(time_criteria)
+        criteria = self.menu.get_criteria()
 
         self._applyFilters(criteria)
         self._adjustCriteria(criteria)

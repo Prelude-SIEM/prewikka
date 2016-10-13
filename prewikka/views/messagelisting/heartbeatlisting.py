@@ -100,12 +100,8 @@ class HeartbeatListing(MessageListing):
     def render(self):
         MessageListing.render(self)
 
-        criteria = [ ]
+        criteria = self.menu.get_criteria()
         start = end = None
-
-        time_criteria = self.menu.get_criteria()
-        if time_criteria:
-            criteria.append(time_criteria)
 
         self._applyInlineFilters(criteria)
         self._adjustCriteria(criteria)
