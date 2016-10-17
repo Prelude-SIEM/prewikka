@@ -23,7 +23,6 @@ import time
 import sys
 import re
 import struct
-import json
 import datetime
 
 from prewikka import compat
@@ -85,12 +84,6 @@ def nameToPath(name):
 
     return name.lower().replace(" ", "_")
 
-def escape_attribute(value):
-    if not isinstance(value, compat.STRING_TYPES):
-        value = str(value)
-
-    # Escape '\' since it's a valid js escape.
-    return value.replace("\\", "\\\\").replace("\"", "\\\"").replace("/", "\\/")
 
 def escape_criteria(criteria):
     if not isinstance(criteria, compat.STRING_TYPES):
@@ -196,33 +189,6 @@ def hexdump(content):
         i += 16
 
     return content
-
-def json_type(field):
-    """Load a json and correctly encode it."""
-    return json_deep_encode(json.loads(field))
-
-def json_deep_encode(obj, encoding="utf-8"):
-    """Recursive encode an object."""
-    if isinstance(obj, unicode):
-        return obj.encode(encoding)
-
-    if isinstance(obj, list):
-        return [json_deep_encode(o, encoding) for o in obj]
-
-    if isinstance(obj, dict):
-        return dict((json_deep_encode(key, encoding), json_deep_encode(value, encoding)) for key, value in obj.iteritems())
-
-    return obj
-
-class PrewikkaJSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if hasattr(obj, "__json__"):
-            return obj.__json__()
-
-        if isinstance(obj, datetime.datetime):
-            return str(obj)
-
-        return json.JSONEncoder.default(self, obj)
 
 
 def deprecated(func):

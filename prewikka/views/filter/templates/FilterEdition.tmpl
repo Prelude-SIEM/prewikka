@@ -36,15 +36,15 @@ function newFilterElement(name, idmef_object, idmef_operator, object_value) {
     }
 
     if ( current_type === 'alert' ) {
-        var options = $json.dumps($alert_objects);
+        var options = $alert_objects;
     } else {
-        var options = $json.dumps($generic_objects);
+        var options = $generic_objects;
     }
 
     \$("#form_filter_objects").append($json.dumps($filter_options()));
 
     \$.each(options, function(index, option) {
-        \$('#object_example').append(\$("<option></option>").attr("value", option).text(option)); 
+        \$('#object_example').append(\$("<option></option>").attr("value", option).text(option));
     });
 
     \$("#form_filter_example").data("value", name).attr("id", "form_filter_" + name);
@@ -206,9 +206,9 @@ function newFilterElement(name, idmef_object, idmef_operator, object_value) {
 #filter Filter
 
 <script type="text/javascript"><!--
-#for $element in $elements
-    newFilterElement("$utils.escape_attribute($element.name)", "$utils.escape_attribute($element.object)", "$utils.escape_attribute($element.operator)", "$utils.escape_attribute($element.value)");
-#end for
+\$.each($elements, function(i, element) {
+    newFilterElement(element.name, element.object, element.operator, element.value);
+});
 //--></script>
 
 #end filter

@@ -17,13 +17,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time, abc, fcntl, types, json
+import time, abc, fcntl, types
 import re, operator, pkg_resources, pkgutil
 from datetime import datetime
 
 import preludedb
 import collections
-from prewikka.utils import cache
+from prewikka.utils import json, cache
 from prewikka import log, error, utils, version, env, compat, usergroup
 
 
@@ -561,7 +561,7 @@ class Database(preludedb.SQL):
         rows = self.query("SELECT view, name, value FROM Prewikka_User_Configuration WHERE userid = %s%s%s" % (self.escape(user.id), self._chk("view", view), self._chk("name", key)))
         for vname, name, val in rows:
             viewd = config.setdefault(vname or None, {})
-            viewd[name] = utils.json_deep_encode(json.loads(val))
+            viewd[name] = json.loads(val)
 
         if view is self.__ALL_PROPERTIES:
             return config

@@ -18,7 +18,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import json, copy, re, urllib, prelude, time, pkg_resources, datetime, itertools
+import copy, re, urllib, prelude, time, pkg_resources, datetime, itertools
+from prewikka.utils import json
 from prewikka import view, usergroup, utils, error, mainmenu, localization, env, hookmanager
 from . import templates
 from messagelisting import MessageListingParameters, MessageListing, ListedMessage

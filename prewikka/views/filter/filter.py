@@ -19,6 +19,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import prelude, re
+from prewikka.utils import json, html
 from prewikka import view, error, usergroup, template, database, utils, version, env, hookmanager
 from . import templates
 
@@ -238,8 +239,8 @@ class AlertFilterEdition(view.View):
         self.dataset["type"] = self.parameters.get("type", "filter")
         self.dataset["filters"] = self._db.get_filter_list(env.request.user)
 
-        self.dataset["alert_objects"] = self._flatten(prelude.IDMEFClass("alert"))
-        self.dataset["generic_objects"] = self._flatten(prelude.IDMEFClass("heartbeat"))
+        self.dataset["alert_objects"] = html.escapejson(json.dumps(self._flatten(prelude.IDMEFClass("alert"))))
+        self.dataset["generic_objects"] = html.escapejson(json.dumps(self._flatten(prelude.IDMEFClass("heartbeat"))))
 
         self.dataset["operators"] = [
             ("=", _("Equal")),
@@ -347,3 +348,5 @@ class AlertFilterEdition(view.View):
 
         elif self.parameters["mode"] == _("Delete"):
             self._delete()
+
+        self.dataset["elements"] = html.escapejson(json.dumps(self.dataset["elements"]))

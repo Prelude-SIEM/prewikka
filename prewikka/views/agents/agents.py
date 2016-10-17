@@ -17,10 +17,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import json
 import pkg_resources
 import time
 
+from prewikka.utils import json, html
 from prewikka.dataprovider import Criterion
 from prewikka import view, utils, localization, env, mainmenu, hookmanager
 from . import templates
@@ -115,7 +115,7 @@ class SensorListing(view.View):
         analyzer_data = list(self._get_analyzers())
         list(hookmanager.trigger("HOOK_AGENTS_EXTRA_CONTENT", analyzer_data))
 
-        self.dataset["data"] = utils.escape_attribute(json.dumps(analyzer_data))
+        self.dataset["data"] = html.escapejson(json.dumps(analyzer_data))
         self.dataset["extra_columns"] = [col for col in hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN") if col]
 
 

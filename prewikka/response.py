@@ -18,7 +18,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import json, time, os, mimetypes
+import time, os, mimetypes
+from prewikka.utils import json
 from prewikka import env, compat, utils, template
 
 
@@ -92,7 +93,7 @@ class PrewikkaResponse(object):
 
         if not isinstance(res, compat.STRING_TYPES):
             self.headers["Content-type"] = "application/json"
-            res = json.dumps(res, cls=utils.PrewikkaJSONEncoder)
+            res = json.dumps(res)
 
         return res.encode(env.config.general.get("encoding", "utf8"), "xmlcharrefreplace")
 

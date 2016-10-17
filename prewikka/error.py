@@ -19,9 +19,9 @@
 
 import sys
 import traceback
-import json
 import abc
 
+from prewikka.utils import json
 from prewikka import template, log, response
 from prewikka.templates import ErrorTemplate, AJAXErrorTemplate
 
