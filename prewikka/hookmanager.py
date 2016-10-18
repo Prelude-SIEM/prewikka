@@ -17,6 +17,7 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+_sentinel = object()
 
 
 def _register_decorator(hook):
@@ -52,8 +53,8 @@ class HookManager:
             for i in self._hooks:
                 self._hooks[i] = []
 
-    def register(self, hook, method=None):
-        if method:
+    def register(self, hook, method=_sentinel):
+        if method is not _sentinel:
             self._hooks.setdefault(hook, []).append(method)
         else:
             return _register_decorator(hook)
