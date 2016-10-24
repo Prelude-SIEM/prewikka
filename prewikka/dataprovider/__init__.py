@@ -163,7 +163,27 @@ class DataProviderBackend(pluginmanager.PluginBase):
         @return: A result set containing the values matching the various criteria
         @rtype QueryResults
         """
-        pass
+        raise error.NotImplementedError
+
+    def get_by_id(self, id_):
+        """Retrieve a root object by its ID."""
+        raise error.NotImplementedError
+
+    def get(self, criteria, order_by, limit, offset):
+        """Retrieve root objects matching the given criteria."""
+        raise error.NotImplementedError
+
+    def delete(self, criteria, paths):
+        """Delete objects (or, if a root path is given, subobjects) matching the given criteria."""
+        raise error.NotImplementedError
+
+    def insert(self, data, criteria):
+        """Insert a root object, or, if criteria are given, a subobject."""
+        raise error.NotImplementedError
+
+    def update(self, data, criteria):
+        """Update root objects matching the given criteria."""
+        raise error.NotImplementedError
 
 
 class DataProviderNormalizer(object):
