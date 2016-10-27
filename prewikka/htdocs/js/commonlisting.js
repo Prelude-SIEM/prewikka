@@ -1,13 +1,13 @@
 function CommonListing(elem, text, options) {
 
-    $(elem).addClass("commonlisting");
+    $(elem).addClass("commonlisting table");
 
     if ( ! options['colModel'][0].formatter ) {
         options['colModel'][0].formatter = function(cellValue, opts, rowObj) {
             var link = $('<a>', {
-                class: rowObj.class || "widget-link",
-                title: rowObj.title,
-                href: rowObj.link
+                class: rowObj._class || "widget-link",
+                title: rowObj._title,
+                href: rowObj._link
             }).text(cellValue);
             return link.wrap("<div>").parent().html();
         };
@@ -27,7 +27,9 @@ function CommonListing(elem, text, options) {
         globalSearch: false,
         gridComplete: grid_buttons_state,
         onSelectAll: grid_buttons_state,
-        onSelectRow: grid_buttons_state
+        onSelectRow: grid_buttons_state,
+        loadComplete: resizeGrid,
+        loadError: null  // This prevents an error row to appear in the grid
     }, options);
 
     function grid_buttons_state() {
