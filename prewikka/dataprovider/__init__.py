@@ -17,12 +17,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import types, time
+import copy, types, time
 from datetime import datetime
 
 from prewikka import pluginmanager, error, utils, hookmanager
 from prewikka.utils.timeutil import parser
-from prewikka.utils import CachingIterator
+from prewikka.utils import CachingIterator, json, compat
 
 
 def _str_to_datetime(date):
@@ -105,6 +105,43 @@ class QueryResults(CachingIterator):
         return QueryResultsRow(self, value)
 
 
+
+class ResultObject(object):
+    def __init__(self, obj, curpath=None):
+        self._obj = obj
+        self._curpath = curpath or []
+
+    def preprocess_value(self, value):
+        return value
+
+    def _wrapobj(self, obj, curpath):
+        if type(obj) == type(self._obj):
+            return ResultObject(obj, curpath)
+
+        elif isinstance(obj, tuple):
+            return CachingIterator((self._wrapobj(i, curpath) for i in obj))
+
+        return obj
+
+    def get(self, key, default=None):
+        value = self._obj.get(key)
+        if value is None:
+            return default
+
+        curpath = self._curpath + [key]
+
+        cont = [ ".".join(curpath), self.preprocess_value(value) ]
+        list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE", cont))
+
+        return self._wrapobj(cont[1], curpath)
+
+    def __getattr__(self, x):
+        return self.__dict__.get(x, getattr(self._obj, x))
+
+    def __getitem__(self, key, default=None):
+        return self.get(key, default)
+
+
 class DataProviderBackend(pluginmanager.PluginBase):
     type = None
 
@@ -136,6 +173,13 @@ class DataProviderNormalizer(object):
 
         self._time_field = time_field
 
+    @staticmethod
+    def _value_escape(value):
+        if not isinstance(value, compat.STRING_TYPES):
+            value = str(value)
+
+        return value.replace("\\", "\\\\").replace("'", "\\'")
+
     def parse_paths(self, paths, type):
         """
         Parse paths and turn them into a structure that can be used by the backend.
@@ -146,67 +190,120 @@ class DataProviderNormalizer(object):
         @type type: string
         @return: The paths as a structure that can easily be used by the backend.
         """
-
-        parsed_paths = []
-        paths_types = []
-
-        for path in paths:
-            try:
-                parsed_paths.append(path % { 'backend' : type, 'time_field' : self._time_field })
-            except:
-                parsed_paths.append(path)
-
-        return parsed_paths, paths_types
+        return [p.format(backend=type, time_field=self._time_field) for p in paths], []
 
     def parse_criteria(self, criteria, type):
         """
         Parse criteria and turn them into a structure that can be used by the backend.
 
-        @param criteria: List of criteria in natural syntax (eg. ["foo.bar == 42 || foo.id = 23"])
-        @type criteria: list
+        @param criteria: Criteria string (eg. "foo.bar == 42 || foo.id = 23")
+        @type criteria: str
         @param type: type of backend
         @type type: string
         @return: The criteria as a structure that can easily be used by the backend.
         """
-
-        parsed_criteria = []
-
-        for criterion in criteria:
-            try:
-                parsed_criteria.append(criterion % { 'backend' : type, 'time_field' : self._time_field })
-            except:
-                parsed_criteria.append(criterion)
-
-        return parsed_criteria
-
-    def parse_criterion(self, path, operator, value):
-        return "%s %s '%s'" % (path, operator, utils.escape_criteria(utils.filter_value_adjust(operator, value)))
+        return criteria
 
 
-class Criteria(list):
+    def parse_criterion(self, path, operator, value, type):
+        path = path.format(backend=type, time_field=self._time_field)
+
+        if operator in ("=", "==") and value is None:
+            return "!%s" % (path)
+
+        if operator in ("!=", None) and value is None:
+            return path
+
+        return "%s %s '%s'" % (path, operator, self._value_escape(value))
+
+
+
+class Criterion(json.JSONObject):
+    def _init(self, left, operator, right):
+        self.left, self.operator, self.right = left, operator, right
+
+    def __init__(self, left=None, operator=None, right=None):
+        json.JSONObject.__init__(self)
+        self._init(left, operator, right)
+
+    def get_paths(self):
+        if self.operator in ("&&", "||"):
+            return self.left.get_paths() | self.right.get_paths()
+
+        res = set()
+        if self.left:
+            res.add(self.left)
+
+        return res
+
+    def _resolve(self, type):
+        list(hookmanager.trigger("HOOK_CRITERION_LOAD", self))
+
+        if not type:
+            return " ".join(str(i) for i in [self.left, self.operator, self.right])
+
+        return env.dataprovider._type_handlers[type].parse_criterion(self.left, self.operator, self.right, type)
+
+    def to_string(self, type=None):
+        if not self.left:
+            return ""
+
+        if self.operator in ("&&", "||"):
+            out = "(" + " ".join((self.left.to_string(type), self.operator, self.right.to_string(type))) + ")"
+        else:
+            out = self._resolve(type)
+
+        return out
+
+    def _apply_self(self, operator, other):
+        if not other:
+            return self
+
+        if self:
+            self._init(copy.copy(self), operator, other)
+        else:
+            self._init(other.left, other.operator, other.right)
+
+        return self
+
+    def _apply_new(self, operator, other):
+        if not other:
+            return self
+
+        elif not self:
+            return other
+
+        return Criterion(self, operator, other)
+
+    def __str__(self):
+        return self.to_string()
+
+    def __nonzero__(self):
+        return self.left is not None
+
+    def __copy__(self):
+        return Criterion(self.left, self.operator, self.right)
+
+    def __json__(self):
+        return [self.left, self.operator, self.right]
+
+    def __iadd__(self, other):
+        return self._apply_self("&&", other)
+
+    def __ior__(self, other):
+        return self._apply_self("||", other)
+
+    def __iand__(self, other):
+        return self._apply_self("&&", other)
+
     def __add__(self, other):
-        return Criteria(list.__add__(self, other))
+        return self._apply_new("&&", other)
 
+    def __or__(self, other):
+        return self._apply_new("||", other)
 
-class Criterion(str):
-    def __new__(cls, path, operator, value=None):
+    __and__ = __add__
 
-        tpl = [path, operator, value]
-        list(hookmanager.trigger("HOOK_CRITERION_LOAD", tpl))
-
-        normalizer = env.dataprovider._type_handlers[env.dataprovider._guess_data_type([path])]
-
-        obj = str.__new__(cls, normalizer.parse_criterion(*tpl))
-        obj.path = path
-
-        return obj
-
-    # Allow iteration on a criterion, to emulate it as a criteria
-    def __iter__(self):
-        return iter((self,))
-
-    def __add__(self, other):
-        return Criteria([self, other])
 
 
 class DataProviderManager(pluginmanager.PluginManager):
@@ -254,22 +351,14 @@ class DataProviderManager(pluginmanager.PluginManager):
             return
 
         tmp = tmp[0].rpartition('(')[2]
-        # Exclude generic paths, eg. "%(backend)s.%(time_field)s".
-        if tmp != 'backend)s':
+        # Exclude generic paths, eg. "{backend}.{time_field}".
+        if tmp != '{backend}':
             return tmp
 
-    def _guess_data_type(self, paths, criteria=[]):
+    def _guess_data_type(self, paths, criteria=None):
         res = set()
 
-        for criterion in criteria:
-            if not isinstance(criterion, Criterion):
-                continue
-
-            path = self._parse_path(criterion.path)
-            if path:
-                res.add(path)
-
-        for path in paths:
+        for path in set(paths) | criteria.get_paths():
             path = self._parse_path(path)
             if path:
                 res.add(path)
@@ -293,20 +382,25 @@ class DataProviderManager(pluginmanager.PluginManager):
             paths = []
 
         if criteria is None:
-            criteria = []
+            criteria = Criterion()
 
+        type = self._check_data_type(type, paths, criteria)
+
+        compcrit = None
         paths_types = []
         normalizer = self._type_handlers[type]
 
+        list(hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", criteria, type))
+
         if normalizer:
             paths, paths_types = normalizer.parse_paths(paths, type)
-            criteria = normalizer.parse_criteria(criteria, type)
+            if criteria:
+                compcrit = normalizer.parse_criteria(criteria.to_string(type), type)
 
-        return paths, paths_types, criteria
+        return type, paths, paths_types, compcrit
 
-    def query(self, paths, criteria=[], distinct=0, limit=-1, offset=-1, type=None):
-        type = self._check_data_type(type, paths, criteria)
-        paths, paths_types, criteria = self._normalize(type, paths, criteria)
+    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None):
+        type, paths, paths_types, criteria = self._normalize(type, paths, criteria)
 
         start = time.time()
         results = self._backends[type].get_values(paths, criteria, distinct, limit, offset)
@@ -320,27 +414,23 @@ class DataProviderManager(pluginmanager.PluginManager):
     def get_by_id(self, type, id_):
         return self._backends[type].get_by_id(id_)
 
-    def get(self, criteria=[], order_by="time_desc", limit=-1, offset=-1, type=None):
+    def get(self, criteria=None, order_by="time_desc", limit=-1, offset=-1, type=None):
         if order_by not in ("time_asc", "time_desc"):
             raise DataProviderError("Invalid value for parameter 'order_by'")
 
-        type = self._check_data_type(type, [], criteria)
-        criteria = self._normalize(type, criteria=criteria)[2]
+        type, _, _, criteria = self._normalize(type, criteria=criteria)
         return self._backends[type].get(criteria, order_by, limit, offset)
 
-    def delete(self, criteria=[], type=None):
-        type = self._check_data_type(type, [], criteria)
-        criteria = self._normalize(type, criteria=criteria)[2]
+    def delete(self, criteria=None, type=None):
+        type, _, _, criteria = self._normalize(type, criteria=criteria)
         return self._backends[type].delete(criteria)
 
-    def insert(self, data, criteria=[], type=None):
-        type = self._check_data_type(type, data.keys())
-        criteria = self._normalize(type, criteria=criteria)[2]
+    def insert(self, data, criteria=None, type=None):
+        type, _, _, criteria = self._normalize(type, criteria=criteria)
         return self._backends[type].insert(data, criteria)
 
-    def update(self, data, criteria=[], type=None):
-        type = self._check_data_type(type, data.keys(), criteria)
-        criteria = self._normalize(type, criteria=criteria)[2]
+    def update(self, data, criteria=None, type=None):
+        type, _, _, criteria = self._normalize(type, criteria=criteria)
         return self._backends[type].update(data, criteria)
 
     def has_type(self, wanted_type):

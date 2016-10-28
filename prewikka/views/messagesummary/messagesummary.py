@@ -26,22 +26,20 @@ import urllib
 import pkg_resources
 
 from datetime import datetime
+from prewikka.dataprovider import Criterion
 from prewikka import view, usergroup, utils, resolve, localization, env, hookmanager
 
 from . import templates
 
-def getUriCriteria(parameters):
-    if not parameters.has_key("messageid"):
+def getUriCriteria(parameters, ptype):
+    if not "messageid" in parameters:
         return None
 
-    if parameters.has_key("analyzerid"):
-        criteria = "alert.analyzer(-1).analyzerid = '%s' &&" % utils.escape_criteria(parameters["analyzerid"])
-    else:
-        criteria = ""
+    criteria = Criterion()
+    if "analyzerid" in parameters:
+        criteria += Criterion("%s.analyzer(-1).analyzerid" % (ptype), "=", parameters["analyzerid"])
 
-    criteria += "alert.messageid = '%s'" % utils.escape_criteria(parameters["messageid"])
-
-    return criteria
+    return criteria + Criterion("%s.messageid" % (ptype), "=", parameters["messageid"])
 
 
 class Table(object):
@@ -352,7 +350,6 @@ class TcpIpOptions(Table):
 class MessageParameters(view.Parameters):
     def register(self):
         view.Parameters.register(self)
-        self.optional("ident", long)
         self.optional("analyzerid", str)
         self.optional("messageid", str)
 
@@ -665,15 +662,15 @@ class AlertSummary(TcpIpOptions, MessageSummary):
             content = ""
             missing = 0
             for ident in calist[analyzerid]:
-                criteria = "alert.analyzer.analyzerid = '%s' && alert.messageid = '%s'" % (analyzerid, ident)
+                criteria = Criterion("alert.analyzer.analyzerid", "=", analyzerid), Criterion("alert.messageid", "=", ident)
 
-                results = env.idmef_db.getAlertIdents(criteria)
+                results = env.dataprovider.get(criteria)
                 if len(results) == 0:
                     missing += 1
                     #content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": ident } + "</li>"
                 else:
-                    alert = env.idmef_db.getAlert(results[0], htmlsafe=True)["alert"]
-                    link = utils.create_link("/".join(env.request.web.path_elements[:2] + [self.view_id]), {"ident": results[0]})
+                    alert = results[0]["alert"]
+                    link = utils.create_link("/".join(env.request.web.path_elements[:2] + [self.view_id]), {"analyzerid": analyzerid, "messageid": ident})
                     content += '<li><a class="widget-link" title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, alert["classification.text"])
 
             if missing > 0:
@@ -1022,13 +1019,8 @@ class AlertSummary(TcpIpOptions, MessageSummary):
         return section
 
     def render(self):
-        criteria = getUriCriteria(self.parameters)
-        if criteria is not None:
-            ident = env.idmef_db.getAlertIdents(criteria)[0]
-        else:
-            ident = self.parameters["ident"]
+        alert = env.dataprovider.get(getUriCriteria(self.parameters, "alert"))[0]["alert"]
 
-        alert = env.idmef_db.getAlert(ident, htmlsafe=True)["alert"]
         self.dataset["sections"] = [ ]
 
         self.beginSection(self.getSectionName(alert))
@@ -1111,13 +1103,8 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
 class HeartbeatSummary(MessageSummary):
     def render(self):
-        criteria = getUriCriteria(self.parameters)
-        if criteria is not None:
-            ident = env.idmef_db.getHeartbeatIdents(criteria)[0]
-        else:
-            ident = self.parameters["ident"]
+        heartbeat = env.dataprovider.get(getUriCriteria(self.parameters, "heartbeat"))[0]["heartbeat"]
 
-        heartbeat = env.idmef_db.getHeartbeat(ident, htmlsafe=True)["heartbeat"]
         self.dataset["sections"] = [ ]
 
         self.beginSection(_("Heartbeat"))

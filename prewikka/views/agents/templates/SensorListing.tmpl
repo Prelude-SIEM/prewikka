@@ -87,11 +87,11 @@
 
   <div class="footer-buttons form-inline">
     <div class="checkbox">
-      <input id="agent_delete_alerts" class="checkbox" type="checkbox" name="alerts" />
+      <input id="agent_delete_alerts" class="checkbox" type="checkbox" name="types" value="alert" />
       <label for="agent_delete_alerts">$_("Alerts")</label>
     </div>
     <div class="checkbox">
-      <input id="agent_delete_heartbeats" class="checkbox" type="checkbox" name="heartbeats" />
+      <input id="agent_delete_heartbeats" class="checkbox" type="checkbox" name="types" value="heartbeat" />
       <label for="agent_delete_heartbeats">$_("Heartbeats")</label>
     </div>
     &nbsp;<button class="btn btn-danger needone" type="submit" value="$_("Delete")" data-confirm="$_("Delete the selected IDMEF messages?")"><i class="fa fa-trash"></i> $_("Delete")</button>

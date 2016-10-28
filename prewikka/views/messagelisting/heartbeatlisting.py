@@ -17,7 +17,9 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from prewikka.dataprovider import Criterion
 from prewikka import view, usergroup, utils, mainmenu, env
+from prewikka.utils import json
 from . import templates
 from messagelisting import MessageListing, MessageListingParameters, ListedMessage
 
@@ -34,9 +36,8 @@ class HeartbeatListingParameters(MessageListingParameters):
 
 class ListedHeartbeat(ListedMessage):
     def setMessage(self, message, ident):
-
-        self["selection"] = ident
-        self["summary"] = self.createMessageLink(ident, "HeartbeatSummary")
+        self["selection"] = json.dumps(Criterion("heartbeat.messageid", "=", ident))
+        self["summary"] = self.createMessageIdentLink(ident, "HeartbeatSummary")
         self["agent"] = self.createInlineFilteredField("heartbeat.analyzer(-1).name",
                                                        message["heartbeat.analyzer(-1).name"])
         self["model"] = self.createInlineFilteredField("heartbeat.analyzer(-1).model",
@@ -67,12 +68,6 @@ class HeartbeatListing(MessageListing):
     filters = { }
     listed_heartbeat = ListedHeartbeat
 
-    def _getMessageIdents(self, criteria, limit=-1, offset=-1, order_by="time_desc"):
-        return env.idmef_db.getHeartbeatIdents(criteria, limit, offset, order_by)
-
-    def _fetchMessage(self, ident):
-        return env.idmef_db.getHeartbeat(ident)
-
     def _setMessage(self, message, ident):
         msg = self.listed_heartbeat(self.view_path, self.parameters)
         msg.view_name = self.view_name
@@ -90,12 +85,9 @@ class HeartbeatListing(MessageListing):
             self.dataset[column + "_filtered"] = False
             if not filter_found:
                 if self.parameters.has_key(path):
-                    criteria.append("%s == '%s'" % (path, utils.escape_criteria(self.parameters[path])))
+                    criteria.append(Criterion(path, "=", self.parameters[path]))
                     self.dataset[column + "_filtered"] = True
                     filter_found = True
-
-    def _deleteMessage(self, ident, is_ident):
-        env.idmef_db.deleteHeartbeat(ident)
 
     def render(self):
         MessageListing.render(self)
@@ -106,7 +98,7 @@ class HeartbeatListing(MessageListing):
         self._applyInlineFilters(criteria)
         self._adjustCriteria(criteria)
 
-        self._updateMessages(self._deleteMessage, criteria)
+        self._updateMessages(env.dataprovider.delete, criteria)
 
         self._setNavPrev(self.parameters["offset"])
 

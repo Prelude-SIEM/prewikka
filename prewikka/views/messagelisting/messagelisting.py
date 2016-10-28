@@ -19,7 +19,9 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import copy, time, urllib, pkg_resources
-from prewikka import view, usergroup, utils, resolve, mainmenu, localization, env, hookmanager
+from prewikka.utils import json
+from prewikka.dataprovider import Criterion
+from prewikka import view, usergroup, utils, resolve, mainmenu, localization, hookmanager
 
 class MessageListingParameters(mainmenu.MainMenuParameters):
     def register(self):
@@ -27,7 +29,7 @@ class MessageListingParameters(mainmenu.MainMenuParameters):
 
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50, save=True)
-        self.optional("selection", list, [ ])
+        self.optional("selection", [ json.loads ], Criterion())
         self.optional("listing_apply", str)
         self.optional("action", str)
 
@@ -123,10 +125,8 @@ class ListedMessage(dict):
         return field
 
     def createMessageIdentLink(self, messageid, view):
-        return utils.create_link("/".join((self.view_path, view)), { "messageid": messageid })
-
-    def createMessageLink(self, ident, view):
-        return utils.create_link("/".join((self.view_path, view)), { "ident": ident })
+        if messageid:
+            return utils.create_link("/".join((self.view_path, view)), { "messageid": messageid })
 
 class HostInfoAjax(view.View):
     class HostInfoAjaxParameters(view.Parameters):
@@ -175,37 +175,24 @@ class MessageListing(view.View):
 
     def _setMessages(self, criteria):
         self.dataset["messages"] = [ ]
+        offset, limit = self.parameters["offset"], self.parameters["limit"]
 
         # count_asc and count_desc methods are not valid for message enumeration
         order_by = "time_asc" if self.parameters["orderby"] in ("count_asc", "count_desc") else self.parameters["orderby"]
 
-        results = self._getMessageIdents(criteria, order_by=order_by)
-        for ident in results[self.parameters["offset"] : self.parameters["offset"] + self.parameters["limit"]]:
-            message = self._fetchMessage(ident)
-            dataset = self._setMessage(message, ident)
+        results = env.dataprovider.get(criteria=criteria, offset=offset, limit=offset+limit, order_by=order_by, type=self.root)
+        for obj in results:
+            dataset = self._setMessage(obj, obj["%s.messageid" % self.root])
             self.dataset["messages"].append(dataset)
 
-        return len(results)
+        return env.dataprovider.query(["count(1)"], criteria=criteria, type=self.root)[0][0]
 
-    def _updateMessages(self, action, criteria, crit_and_ident=False):
-        if len(self.parameters["selection"]) == 0:
+    def _updateMessages(self, action, criteria):
+        if not self.parameters["selection"]:
             return
 
         if not env.request.user.has("IDMEF_ALTER"):
             raise usergroup.PermissionDeniedError(["IDMEF_ALTER"], self.current_view)
 
-        idents = [ ]
-        criterial = []
-        for item in self.parameters["selection"]:
-            if item.isdigit():
-                idents += [ long(item) ]
-            else:
-                crit = " && ".join(criteria + [urllib.unquote_plus(item)])
-
-                if not crit_and_ident:
-                        idents += self._getMessageIdents(crit)
-                else:
-                        criterial.append(crit)
-
-        action((idents, criterial) if crit_and_ident else idents, is_ident=crit_and_ident)
+        action(reduce(lambda x,y: x | y, self.parameters["selection"]))
         del self.parameters["selection"]

@@ -20,7 +20,8 @@
 
 import copy, re, urllib, prelude, time, pkg_resources, datetime, itertools
 from prewikka.utils import json
-from prewikka import view, usergroup, utils, error, mainmenu, localization, env, hookmanager
+from prewikka.dataprovider import Criterion
+from prewikka import view, usergroup, utils, error, mainmenu, localization, hookmanager, compat
 from . import templates
 from messagelisting import MessageListingParameters, MessageListing, ListedMessage
 
@@ -60,6 +61,18 @@ GENERIC_SEARCH_TABLE = { "classification": CLASSIFICATION_GENERIC_SEARCH_FIELDS,
 class AlertListingParameters(MessageListingParameters):
     allow_extra_parameters = True
 
+    def _get_aggregated_alert(self, ident):
+        aggreg_type = ""
+
+        alert = env.dataprovider.get(criteria=Criterion("alert.messageid", "=", ident))[0]
+        if alert["alert.correlation_alert"]:
+            aggreg_type = "alert.correlation_alert"
+
+        elif alert["alert.tool_alert"]:
+            aggreg_type = "alert.tool_alert"
+
+        return alert, aggreg_type
+
     def __init__(self, *args, **kwargs):
         MessageListingParameters.__init__(self, *args, **kwargs)
         self._dynamic_param = { "classification": {}, "source": {}, "target": {}, "analyzer": {} }
@@ -68,13 +81,7 @@ class AlertListingParameters(MessageListingParameters):
         self._linked_alerts = []
 
         if "aggregated_alert_id" in self:
-            alert = env.idmef_db.getAlert(int(self.get("aggregated_alert_id")))
-            if alert["alert.correlation_alert"]:
-                aggreg_type = "alert.correlation_alert"
-            elif alert["alert.tool_alert"]:
-                aggreg_type = "alert.tool_alert"
-            else:
-                pass
+            alert, aggreg_type = self._get_aggregated_alert(self.get("aggregated_alert_id"))
             for alertident in alert[aggreg_type]["alertident"]:
                 self._linked_alerts.append("alert.messageid=%s" % alertident["alertident"])
 
@@ -96,7 +103,7 @@ class AlertListingParameters(MessageListingParameters):
     def _check_value(self, obj, operator, value):
         if operator != "!" and obj != "__all__":
             try:
-                prelude.IDMEFCriteria(obj + " " + operator + " '" + value + "'")
+                prelude.IDMEFCriteria(Criterion(obj, operator, value).to_string("alert"))
             except RuntimeError:
                 raise view.InvalidParameterValueError(obj, value)
 
@@ -435,7 +442,7 @@ class ListedAlert(ListedMessage):
         if message["alert.correlation_alert.name"]:
             self["aggregated_source_expand"] = self["sub_alert_display"]
         else:
-            self["aggregated_source_expand"] = self.createMessageLink(ident, "AlertSummary")
+            self["aggregated_source_expand"] = self.createMessageIdentLink(ident, "AlertSummary")
 
     def _setMessageTarget(self, message, ident):
         index = 0
@@ -473,7 +480,7 @@ class ListedAlert(ListedMessage):
         if message["alert.correlation_alert.name"]:
             self["aggregated_target_expand"] = self["sub_alert_display"]
         else:
-            self["aggregated_source_expand"] = self.createMessageLink(ident, "AlertSummary")
+            self["aggregated_source_expand"] = self.createMessageIdentLink(ident, "AlertSummary")
 
 
     def _setMessageClassificationReferences(self, dataset, message):
@@ -516,7 +523,7 @@ class ListedAlert(ListedMessage):
     def _setMessageAlertIdentInfo(self, message, alert, ident):
         self["sub_alert_number"] = len(alert["alertident"])
         self["sub_alert_name"] = alert["name"]
-        self["sub_alert_link"] = self.createMessageLink(ident, "AlertSummary")
+        self["sub_alert_link"] = self.createMessageIdentLink(ident, "AlertSummary")
 
         params = { }
         params["timeline_unit"] = "unlimited"
@@ -526,15 +533,17 @@ class ListedAlert(ListedMessage):
 
     def _setClassificationInfos(self, dataset, message, ident):
         dataset["count"] = 1
-        dataset["display"] = self.createMessageLink(ident, "AlertSummary")
+        dataset["display"] = self.createMessageIdentLink(ident, "AlertSummary")
         dataset["severity"] = { "value": message["alert.assessment.impact.severity"] }
         dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"])
         dataset["description"] = message["alert.assessment.impact.description"]
 
     def _setMessageTimeURL(self, t, host):
         ret = []
+
         if "time" in env.url and t:
-            t = str(int(t))
+            epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=utils.timeutil.tzutc())
+            t = str(int(compat.timedelta_total_seconds(t - epoch) * 1000))
 
             for urlname, url in env.url["time"].items():
                 url = url.replace("$time", t)
@@ -548,7 +557,7 @@ class ListedAlert(ListedMessage):
         self["time"] = self.createTimeField(message["alert.create_time"])
         self["time"]["time_url"] = self._setMessageTimeURL(message["alert.analyzer_time"], message["alert.analyzer(-1).node.name"])
         if (message["alert.analyzer_time"] is not None and
-            abs(int(message["alert.create_time"]) - int(message["alert.analyzer_time"])) > 60):
+            abs(compat.timedelta_total_seconds(message["alert.create_time"] - message["alert.analyzer_time"])) > 60):
             self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"])
         else:
             self["analyzer_time"] = { "value": None }
@@ -571,7 +580,7 @@ class ListedAlert(ListedMessage):
     def setMessage(self, message, ident, extra_link=True):
         self["infos"] = [ { } ]
         self["aggregated"] = False
-        self["selection"] = ident
+        self["selection"] = json.dumps(Criterion("alert.messageid", "=", ident))
 
         self.addSensor(message)
         self._setMessageTime(message)
@@ -655,7 +664,7 @@ class ListedAggregatedAlert(ListedAlert):
         self["time_max"] = self.createTimeField(time_max)
 
     def setCriteriaForSelection(self, select_criteria):
-        self["selection"] = urllib.quote_plus(" && ".join(select_criteria))
+        self["selection"] = json.dumps(select_criteria)
 
     def setInfos(self, count, classification, severity, completion):
         infos = {
@@ -693,22 +702,13 @@ class AlertListing(MessageListing):
         MessageListing.__init__(self)
         self._max_aggregated_classification = int(env.config.general.get("max_aggregated_classification", 10))
 
-    def _getMessageIdents(self, criteria, limit=-1, offset=-1, order_by="time_desc"):
-        return env.idmef_db.getAlertIdents(criteria, limit, offset, order_by)
-
-    def _fetchMessage(self, ident):
-        return env.idmef_db.getAlert(ident)
-
     def _setMessage(self, message, ident):
         msg = self.listed_alert(self.view_path, self.parameters)
         msg.setMessage(message, ident)
         msg["aggregated"] = False
-        msg["selection"] = ident
+        msg["selection"] = json.dumps(Criterion("alert.messageid", "=", ident))
 
         return msg
-
-    def _deleteMessage(self, ident, is_ident):
-        env.idmef_db.deleteAlert(ident)
 
     def _lists_have_same_content(self, l1, l2):
         l1 = copy.copy(l1)
@@ -720,16 +720,12 @@ class AlertListing(MessageListing):
 
     def _applyOptionalEnumFilter(self, criteria, column, object, values, objpath=None, unsetval="n/a"):
         if ( self.parameters.has_key(object) and not self._lists_have_same_content(self.parameters[object], values) ):
-            new = [ ]
+            new = Criterion()
             for value in set(values) | set(self.parameters[object]):
                 if value in self.parameters[object]:
-                    if value == unsetval:
-                        new.append("!%s" % (objpath or object))
-                    else:
-                        new.append("%s = '%s'" % (objpath or object, utils.escape_criteria(value)))
+                    new |= Criterion(objpath or object, "=", value if value != unsetval else None)
 
-            if new:
-                criteria.append("(" + " || ".join(new) + ")")
+            criteria += new
             self.dataset[object] = self.parameters[object]
         else:
             self.dataset[object] = values
@@ -741,25 +737,18 @@ class AlertListing(MessageListing):
         else:
             have_base = False
 
-        new = [ ]
+        new = Criterion()
 
         for param in ["alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"]:
             if not have_base:
                 if param in self.parameters["alert.type"]:
-                    new.append("%s" % param)
+                    new |= Criterion(param, "!=", None)
             else:
                 if not param in self.parameters["alert.type"]:
-                    new.append("!%s" % param)
+                    new &= Criterion(param, "=", None)
 
         self.dataset["alert.type"] = self.parameters["alert.type"]
-
-        if len(new) == 0:
-            return
-
-        if not have_base:
-            criteria.append("(" + " || ".join(new) + ")")
-        else:
-            criteria.append("(" + " && ".join(new) + ")")
+        criteria += new
 
     def _applyClassificationFilters(self, criteria):
         self._applyAlertTypeFilters(criteria)
@@ -768,31 +757,17 @@ class AlertListing(MessageListing):
                                       ["info", "low", "medium", "high", "n/a"])
 
     def _filterTupleToString(self, filtertpl):
-        prev_val = filtertpl
-
-        for i in hookmanager.trigger("HOOK_FILTER_CRITERIA_LOAD", filtertpl):
-            if i:
-                filtertpl = i
-
-        object, operator, value = filtertpl
-
-        if operator == "!":
-            return "! %s" % (object)
-
-        if prev_val == filtertpl:
-            value = "'%s'" % utils.escape_criteria(utils.filter_value_adjust(operator, value))
-
-        return "%s %s (%s)" % (object, operator, value)
+        return Criterion(*filtertpl)
 
     def _getOperatorForPath(self, path, value):
         # Check whether the path can handle substring comparison
         # this need to be done first, since enum check with * won't work with "=" operator.
         try:
-            c = prelude.IDMEFCriteria(path + " <>* '" + utils.escape_criteria(value) + "'")
+            c = prelude.IDMEFCriteria(Criterion(path, "<>*", value))
         except:
             # Check whether this path can handle the provided value.
             try:
-                c = prelude.IDMEFCriteria(path + "  = '" + utils.escape_criteria(value) + "'")
+                c = prelude.IDMEFCriteria(Criterion(path, "=", value))
             except:
                 return None
 
@@ -802,16 +777,10 @@ class AlertListing(MessageListing):
 
     def _adjustCriteria(self, criteria):
         if "aggregated_alert_id" in self.parameters:
-            alert = env.idmef_db.getAlert(int(self.parameters["aggregated_alert_id"]))["alert"]
-            if alert["correlation_alert"]:
-                aggreg_type = "correlation_alert"
-            elif alert["tool_alert"]:
-                aggreg_type = "tool_alert"
-            else:
-                pass
+            alert, aggreg_type = self.parameters._get_aggregated_alert(self.get("aggregated_alert_id"))
 
             source_analyzer = None
-            newcrit = [ ]
+            newcrit = Criterion()
 
             for alertident in alert[aggreg_type]["alertident"]:
                 # IDMEF draft 14 page 27
@@ -827,10 +796,9 @@ class AlertListing(MessageListing):
                                 source_analyzer = analyzerid = a["analyzerid"]
                                 break
 
-                newcrit.append("(alert.messageid = '%s' && alert.analyzer.analyzerid = '%s')" %
-                               (utils.escape_criteria(alertident["alertident"]),
-                                utils.escape_criteria(analyzerid)))
-            criteria.append("(" + " || ".join(newcrit) + ")")
+                newcrit |= Criterion("alert.messageid", "=", alertident["alertident"]) + Criterion("alert.analyzer.analyzerid", "=", analyzerid)
+
+            criteria += newcrit
 
     def _applyFiltersForCategory(self, criteria, type):
         if not self.parameters[type]:
@@ -843,7 +811,7 @@ class AlertListing(MessageListing):
         # We apply an AND operator between the different objects.
 
         merge = { }
-        newcrit = ""
+        newcrit = Criterion()
         for obj in self.parameters[type]:
             if obj[0] == "__all__":
                 # We want to lookup the value in our set of predefined path, but also in aggregated
@@ -851,27 +819,17 @@ class AlertListing(MessageListing):
                 for path in GENERIC_SEARCH_TABLE[type] + self.parameters.get("aggregated_%s" % type):
                     op = self._getOperatorForPath(path, obj[2])
                     if op:
-                        if len(newcrit) > 0:
-                            newcrit += " || "
-                        newcrit += self._filterTupleToString((path, op, obj[2]))
+                        newcrit |= Criterion(path, op, obj[2])
             else:
                 if merge.has_key(obj[0]):
                     merge[obj[0]] += [ obj ]
                 else:
                     merge[obj[0]] =  [ obj ]
 
-        if len(newcrit):
-            newcrit = "(" + newcrit + ")"
-
         for key in iter(merge):
-            if len(newcrit) > 0:
-                newcrit += " && "
+            newcrit += reduce(lambda x,y: x|y, (Criterion(*x) for x in merge[key]))
 
-            newcrit += "(" + " || ".join(map(self._filterTupleToString, merge[key])) + ")"
-
-        if newcrit:
-            criteria.append(newcrit)
-
+        criteria += newcrit
         self.dataset[type] = [ (path.replace("(0)", "").replace("(-1)", ""), operator, value) for path, operator, value in self.parameters[type] ]
 
     def _applyFilters(self, criteria):
@@ -898,7 +856,7 @@ class AlertListing(MessageListing):
                 index += 1
 
         selection = [ "%s/group_by" % i[0] for i in selection_list ]
-        alert_list = env.idmef_db.getValues( selection + ["max(alert.messageid)", "count(alert.messageid)" ], criteria2)
+        alert_list = env.dataprovider.query( selection + ["max(alert.messageid)", "count(alert.messageid)" ], criteria2)
         alertsraw = { }
         nodesraw = { }
 
@@ -956,8 +914,8 @@ class AlertListing(MessageListing):
             if count == 1:
                 if aggregated_count == 1:
                     message.reset()
-                    ident = env.idmef_db.getAlertIdents("alert.messageid = '%s'" % utils.escape_criteria(messageid))[0]
-                    message.setMessage(self._fetchMessage(ident), ident, extra_link=False)
+                    res = env.dataprovider.get(Criterion("alert.messageid", "=", messageid))[0]
+                    message.setMessage(res, messageid, extra_link=False)
                 else:
                     infos["display"] = message.createMessageIdentLink(messageid, "AlertSummary")
             else:
@@ -996,7 +954,7 @@ class AlertListing(MessageListing):
         elif self.parameters["orderby"] == "count_asc":
             selection += [ "count(alert.create_time)/order_asc", "max(alert.create_time)", "min(alert.create_time)" ]
 
-        results = env.idmef_db.getValues(selection, criteria)
+        results = env.dataprovider.query(selection, criteria)
         total_results = len(results)
 
         for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
@@ -1030,8 +988,7 @@ class AlertListing(MessageListing):
 
             aggregated_count = values[start]
 
-            criteria2 = criteria[:]
-            select_criteria = [ ]
+            select_criteria = Criterion()
             message = self.listed_aggregated_alert(self.view_path, self.parameters)
 
             valueshash = {}
@@ -1045,19 +1002,10 @@ class AlertListing(MessageListing):
                 else:
                     direction = None
 
-                if value == None:
-                    if prelude.IDMEFPath(path).getValueType() != prelude.IDMEFValue.TYPE_STRING:
-                        criterion = "! %s" % (path)
-                    else:
-                        criterion = "(! %s || %s == '')" % (path, path)
-                else:
-                    criterion = "%s == '%s'" % (path, utils.escape_criteria(value))
-
                 if direction != None:
                     message.setMessageDirectionGeneric(direction, path, value)
 
-                criteria2.append(criterion)
-                select_criteria.append(criterion)
+                select_criteria += Criterion(path, "==", value)
 
             time_max = values[start + 1]
             time_min = values[start + 2]
@@ -1077,15 +1025,13 @@ class AlertListing(MessageListing):
                                                                                     { "aggregated_classification":
                                                                                       "alert.classification.text" } )
 
-            self._getMissingAggregatedInfos(message, valueshash, parameters, criteria2, aggregated_count, time_min, time_max)
-            select_criteria.append("alert.create_time >= '%s'" % time_min.toString())
-            select_criteria.append("alert.create_time <= '%s'" % time_max.toString())
+            self._getMissingAggregatedInfos(message, valueshash, parameters, criteria + select_criteria, aggregated_count, time_min, time_max)
 
             self.dataset["messages"].append(message)
             message.setTime(time_min, time_max)
 
             if not message.has_key("selection"):
-                message.setCriteriaForSelection(select_criteria)
+                message.setCriteriaForSelection(select_criteria + Criterion("alert.create_time", ">=", time_min) + Criterion("alert.create_time", "<=", time_max))
 
         return total_results
 
@@ -1238,7 +1184,7 @@ class AlertListing(MessageListing):
 
         if "listing_apply" in self.parameters:
             if self.parameters["action"] == "delete_message":
-                self._updateMessages(self._deleteMessage, criteria)
+                self._updateMessages(env.dataprovider.delete, criteria)
 
         self._setNavPrev(self.parameters["offset"])
 

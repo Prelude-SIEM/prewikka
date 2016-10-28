@@ -20,63 +20,50 @@
 
 import prelude, re
 from prewikka.utils import json, html
+from prewikka.dataprovider import Criterion
 from prewikka import view, error, usergroup, template, database, utils, version, env, hookmanager
 from . import templates
 
 
-class Filter:
-    _typetbl = { "generic": "alert", "alert": "alert", "heartbeat": "heartbeat" }
+_OP_TBL   = { "AND": "&&", "OR": "||" }
+_TYPE_TBL = { "generic": "alert", "alert": "alert", "heartbeat": "heartbeat" }
 
+
+class Filter:
     def __init__(self, name, ftype, comment, elements, formula):
         self.name = name
         self.type = ftype
         self.comment = comment
         self.elements = elements
         self.formula = formula
-        crit = prelude.IDMEFCriteria(str(self))
+        crit = prelude.IDMEFCriteria(self.get_criteria(self.type).to_string())
 
-    def _replace(self, element):
-        element = element.group(1)
-        if element in ("and", "AND", "&&"):
-            return "&&"
-
-        if element in ("or", "OR", "||"):
-            return "||"
-
-        if not element in self.elements:
-            raise error.PrewikkaUserError(
-                _("Invalid filter element"),
-                N_("Invalid filter element '%s' referenced from filter formula", element))
-
-        prev_val = self.elements[element][2]
-        elements = self.elements[element]
-        for i in hookmanager.trigger("HOOK_FILTER_CRITERIA_LOAD", elements):
-            if i:
-                elements = i
-
-        criteria, operator, value = elements
-        if value == prev_val:
-            value = "'%s'" % utils.escape_criteria(utils.filter_value_adjust(operator, value))
-
-        if self.type:
-            criteria = ".".join((self._typetbl[self.type], criteria))
-
-        return "%s %s (%s)" % (criteria, operator, value)
-
-    def __str__(self):
-        return "(%s)" % re.sub("(\w+)", self._replace, self.formula)
-
-
-    def get_criteria_cast(self, wanted_type):
-        if self.type != "generic" and self.type != wanted_type:
+    def get_criteria(self, wtype):
+        if self.type != "generic" and self.type != wtype:
             return None
 
-        old_type = self.type
-        self.type = wanted_type
-        fstr = str(self)
-        self.type = old_type
+        prev_op = None
+        ret = Criterion()
 
-        return fstr
+        for i in re.finditer("(\w+)", self.formula):
+            val = i.group(1)
+
+            op = _OP_TBL.get(val.upper())
+            if op:
+                prev_op = op
+                continue
+
+            if not val in self.elements:
+                raise error.PrewikkaUserError(_("Invalid filter element"),
+                    N_("Invalid filter element '%s' referenced from filter formula", val))
+
+            criteria, op, value = self.elements[val]
+            criteria = ".".join((_TYPE_TBL[wtype], criteria))
+
+            cur = Criterion(criteria, op, value)
+            ret = Criterion(ret, prev_op, cur) if prev_op else cur
+
+        return ret
 
 
 class FilterDatabase(database.DatabaseHelper):
@@ -192,7 +179,7 @@ class AlertFilterEdition(view.View):
         view.optional("filter", str, save=True)
         return ["filter"]
 
-    @hookmanager.register("HOOK_IDMEFDATABASE_CRITERIA_PREPARE")
+    @hookmanager.register("HOOK_DATAPROVIDER_CRITERIA_PREPARE")
     def _filter_get_criteria(self, criteria, ctype):
         menu = env.request.menu
         if not menu:
@@ -206,11 +193,9 @@ class AlertFilterEdition(view.View):
         if not f:
             return
 
-        f = f.get_criteria_cast(ctype)
+        f = f.get_criteria(ctype)
         if f:
-            criteria.append(f)
-
-        return f
+            criteria += f
 
     @hookmanager.register("HOOK_MAINMENU_EXTRA_CONTENT")
     def _filter_html_menu(self, ctype):

@@ -22,7 +22,7 @@ import time
 
 from prewikka.utils import json, html
 from prewikka.dataprovider import Criterion
-from prewikka import view, utils, localization, env, mainmenu, hookmanager
+from prewikka import view, utils, localization, mainmenu, hookmanager
 from . import templates
 
 
@@ -43,9 +43,7 @@ class SensorMessagesDeleteParameters(SensorListingParameters):
     def register(self):
         SensorListingParameters.register(self)
         self.optional("analyzerid", list, default=[])
-        self.optional("alerts", str, default=None)
-        self.optional("heartbeats", str, default=None)
-
+        self.optional("types", list, default=[])
 
 class SensorListing(view.View):
     view_name = "Agents"
@@ -61,14 +59,21 @@ class SensorListing(view.View):
         self._heartbeat_count = int(env.config.general.get("heartbeat_count", 30))
         self._heartbeat_error_margin = int(env.config.general.get("heartbeat_error_margin", 3))
 
+    def _get_analyzer(self, analyzerid):
+        res = env.dataprovider.get(Criterion("heartbeat.analyzer(-1).analyzerid", "=", analyzerid), limit=1)
+        heartbeat = res[0]["heartbeat"]
+        analyzer = heartbeat["analyzer"][-1]
+
+        return analyzer, heartbeat
+
     def _get_analyzers(self):
+        criteria = None
+
         if "filter_path" in self.parameters:
             criteria = Criterion(self.parameters["filter_path"], "=", self.parameters["filter_value"])
-        else:
-            criteria = []
 
-        for (analyzerid,) in env.idmef_db.getValues(["heartbeat.analyzer(-1).analyzerid/group_by"], criteria):
-            analyzer, heartbeat = env.idmef_db.getAnalyzer(analyzerid)
+        for (analyzerid,) in env.dataprovider.query(["heartbeat.analyzer(-1).analyzerid/group_by"], criteria):
+            analyzer, heartbeat = self._get_analyzer(analyzerid)
             status, status_text = utils.get_analyzer_status_from_latest_heartbeat(
                 heartbeat, self._heartbeat_error_margin
             )
@@ -125,13 +130,9 @@ class SensorMessagesDelete(SensorListing):
 
     def render(self):
         for analyzerid in self.parameters["analyzerid"]:
-            if self.parameters.has_key("alerts"):
-                criteria = "alert.analyzer.analyzerid == '%s'" % utils.escape_criteria(analyzerid)
-                env.idmef_db.deleteAlert(env.idmef_db.getAlertIdents(criteria))
-
-            if self.parameters.has_key("heartbeats"):
-                criteria = "heartbeat.analyzer(-1).analyzerid == '%s'" % utils.escape_criteria(analyzerid)
-                env.idmef_db.deleteHeartbeat(env.idmef_db.getHeartbeatIdents(criteria))
+            for i in self.parameters["types"]:
+                if i in ("alert", "heartbeat"):
+                    env.dataprovider.delete(Criterion("%s.analyzer.analyzerid" % i, "=", analyzerid))
 
         SensorListing.render(self)
 
@@ -144,26 +145,26 @@ class HeartbeatAnalyze(SensorListing):
     def render(self):
         analyzerid = self.parameters["analyzerid"]
 
-        analyzer, heartbeat = env.idmef_db.getAnalyzer(analyzerid)
+        analyzer, heartbeat = self._get_analyzer(analyzerid)
         delta = float(heartbeat["create_time"]) - time.time()
         analyzer.last_heartbeat_time = localization.format_timedelta(delta, add_direction=True)
 
         analyzer.status = None
         analyzer.events = [ ]
 
-        idents = env.idmef_db.getHeartbeatIdents(criteria="heartbeat.analyzer(-1).analyzerid == %s" % analyzerid,
-                                                      limit=self._heartbeat_count)
+        res = env.dataprovider.get(Criterion("heartbeat.analyzer(-1).analyzerid", "=", analyzerid), limit=self._heartbeat_count)
+
         prev = None
         latest = True
         total_interval = 0
 
-        for idx, ident in enumerate(idents):
-            cur = env.idmef_db.getHeartbeat(ident)["heartbeat"]
+        for idx, cur in enumerate(res):
+            cur = cur["heartbeat"]
             cur_status, cur_interval, cur_time = cur.get("additional_data('Analyzer status').data")[0], cur["heartbeat_interval"], cur["create_time"]
             cur_time_str = localization.format_datetime(float(cur_time))
 
             try:
-                prev = env.idmef_db.getHeartbeat(idents[idx + 1])["heartbeat"]
+                prev = res[idx + 1]["heartbeat"]
                 prev_status, prev_time = prev.get("additional_data('Analyzer status').data")[0], prev["create_time"]
             except:
                 break

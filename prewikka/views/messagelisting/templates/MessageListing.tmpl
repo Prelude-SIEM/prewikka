@@ -92,7 +92,9 @@ $message_listing_header
           $message_fields
           #if $env.request.user.has("IDMEF_ALTER")
           <td>
+            #filter CleanOutput
             <input class="checkbox" type="checkbox" name="selection" value="$message.selection"/>
+            #end filter
           </td>
           #end if
         </tr>

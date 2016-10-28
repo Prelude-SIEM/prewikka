@@ -7,14 +7,28 @@ from prewikka.dataprovider import DataProviderNormalizer
 
 
 class IDMEFNormalizer(DataProviderNormalizer):
-    def parse_criterion(self, path, operator, value):
+
+    @staticmethod
+    def _value_adjust(operator, value):
+        if operator not in ("<>*", "<>"):
+            return value
+
+        value = value.strip()
+
+        has_wildcard = utils.find_unescaped_characters(value, ["*"])
+        if has_wildcard:
+            return value
+
+        return "*%s*" % value
+
+    def parse_criterion(self, path, operator, value, type):
         if not(value) and operator in ("=", "==", "!"):
             if prelude.IDMEFPath(path).getValueType() == prelude.IDMEFValue.TYPE_STRING:
                  return "(! %s || %s == '')" % (path, path)
 
             return "! %s" % (path)
 
-        return DataProviderNormalizer.parse_criterion(self, path, operator, value)
+        return DataProviderNormalizer.parse_criterion(self, path, operator, self._value_adjust(operator, value), type)
 
 
 class _IDMEFProvider(pluginmanager.PluginBase):

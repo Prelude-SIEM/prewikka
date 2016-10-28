@@ -85,13 +85,6 @@ def nameToPath(name):
     return name.lower().replace(" ", "_")
 
 
-def escape_criteria(criteria):
-    if not isinstance(criteria, compat.STRING_TYPES):
-        criteria = str(criteria)
-
-    return criteria.replace("\\", "\\\\").replace("'", "\\'")
-
-
 def property(type, name, parameter, value=None):
     return { "type": type, "name": name, "parameter": parameter, "value": value }
 
@@ -151,19 +144,6 @@ def split_unescaped_characters(value, characters):
             escaped = True
 
     yield value[start:]
-
-
-def filter_value_adjust(operator, value):
-    if operator not in ("<>*", "<>"):
-        return value
-
-    value = value.strip()
-
-    has_wildcard = find_unescaped_characters(value, ["*"])
-    if has_wildcard:
-        return value
-
-    return "*%s*" % value
 
 
 def hexdump(content):

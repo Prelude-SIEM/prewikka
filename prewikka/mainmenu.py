@@ -23,7 +23,7 @@ import datetime
 import calendar
 import itertools
 
-from prewikka.dataprovider import Criteria
+from prewikka.dataprovider import Criterion
 from prewikka import view, template, localization, utils, env, hookmanager
 from prewikka.templates import MainMenu as MainMenuTemplate
 
@@ -258,11 +258,11 @@ class MainMenu:
         return int(calendar.timegm(tpl))
 
     def get_criteria(self):
-        criteria = []
+        criteria = Criterion()
 
         if self.start:
             start = self.start.astimezone(utils.timeutil.timezone("UTC"))
-            criteria.append("%%(backend)s.%%(time_field)s >= '%s'" % start)
+            criteria += Criterion("{backend}.{time_field}", ">=", start)
 
         if self.end:
             end = self.end
@@ -270,9 +270,9 @@ class MainMenu:
                 end = self.end + relativedelta(minutes=1)
 
             end = self.end.astimezone(utils.timeutil.timezone("UTC"))
-            criteria.append("%%(backend)s.%%(time_field)s < '%s'" % end)
+            criteria += Criterion("{backend}.{time_field}", "<", end)
 
-        return Criteria([" && ".join(criteria)])
+        return criteria
 
     def get_step(self, stepno=None):
         if stepno:
