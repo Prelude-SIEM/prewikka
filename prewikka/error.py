@@ -70,10 +70,10 @@ class PrewikkaError(PrewikkaException):
         if self.name:
             self.name = _(self.name)
 
-        if self.message:
+        if self._untranslated_message:
             self.message = _(self._untranslated_message)
 
-        if self.details:
+        if self._untranslated_details:
             self.details = _(self._untranslated_details)
 
         if template:
