@@ -51,11 +51,11 @@ class _AuthUser(object):
         return []
 
     @abc.abstractmethod
-    def hasUser(self, user):
+    def getUserByID(self, id_):
         pass
 
     @abc.abstractmethod
-    def hasUserName(self, name):
+    def hasUser(self, user):
         pass
 
     @abc.abstractmethod
@@ -81,6 +81,9 @@ class _AuthGroup(object):
 
     def getGroupList(self, search=None):
         return []
+
+    def getGroupByID(self, id_):
+        raise NotImplementedError
 
     def createGroup(self, group):
         list(hookmanager.trigger("HOOK_GROUP_CREATE", group))

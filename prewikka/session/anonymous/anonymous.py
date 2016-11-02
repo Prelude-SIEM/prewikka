@@ -42,6 +42,9 @@ class AnonymousSession(auth.Auth, session.Session):
     def getUserList(self, search=None):
         return [ usergroup.User("anonymous") ]
 
+    def getUserByID(self, id_):
+        return usergroup.User("anonymous")
+
     def hasUser(self, other):
         return usergroup.User("anonymous")
 
