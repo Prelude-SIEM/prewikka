@@ -106,6 +106,9 @@ class NameID(object):
 
         return self.id == other.id
 
+    def __ne__(self, other):
+        return not (self == other)
+
     def __hash__(self):
         return int(self.id, 16)
 
@@ -118,7 +121,7 @@ class Group(NameID):
         NameID.__init__(self, name, groupid)
 
     def _id2name(self, id):
-        return env.auth.hasGroup(self).name
+        return env.auth.getGroupByID(id).name
 
 
 class User(NameID):
@@ -129,7 +132,7 @@ class User(NameID):
         self._properties = None
 
     def _id2name(self, id):
-        return env.auth.hasUser(self).name
+        return env.auth.getUserByID(id).name
 
     @cache.request_memoize_property("user_permissions")
     def permissions(self):
