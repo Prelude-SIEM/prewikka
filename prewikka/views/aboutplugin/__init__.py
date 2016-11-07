@@ -61,12 +61,14 @@ class AboutPlugin(view.View):
 
             for upscript in uplist:
                 label = _("Applying %(module)s %(script)s...") % {'module': mod.full_module_name, 'script': str(upscript)}
-                env.request.web.send_stream(json.dumps({"label": label}), sync=True)
+                env.request.web.send_stream(json.dumps({"label": label, 'module': mod.full_module_name, 'script': str(upscript)}), sync=True)
 
                 try:
                     upscript.apply()
                 except Exception as e:
-                    env.request.web.send_stream(json.dumps({"error": str(e)}), sync=True)
+                    env.request.web.send_stream(json.dumps({"logs": "\n".join(upscript.query_logs), "error": str(e)}), sync=True)
+                else:
+                    env.request.web.send_stream(json.dumps({"logs": "\n".join(upscript.query_logs), "success": True}), sync=True)
 
         env.request.web.send_stream(data=json.dumps({"label": _("All updates applied")}), event="finish", sync=True)
         env.request.web.send_stream("close", event="close")

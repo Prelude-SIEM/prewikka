@@ -1,83 +1,58 @@
-
 <script type="text/javascript">
     var slice = 0;
-    var progressbar = \$("#progressbar"), progressLabel = \$(".progress-label");
 
-\$.fn.shiftcheckbox = function() {
-    var allbox = \$(this);
+    \$.fn.shiftcheckbox = function() {
+        var allbox = \$(this);
 
-    var lastChecked = null;
+        var lastChecked = null;
 
-    \$(allbox).click(function(e) {
-        if ( ! lastChecked ) {
+        \$(allbox).click(function(e) {
+            if ( ! lastChecked ) {
+                lastChecked = this;
+                return;
+            }
+
+            if ( e.shiftKey ) {
+                var start = allbox.index(this);
+                var end = allbox.index(lastChecked);
+                allbox.slice(Math.min(start, end), Math.max(start, end) + 1).prop("checked", lastChecked.checked);
+            }
+
             lastChecked = this;
-            return;
-        }
+        });
+    };
 
-        if ( e.shiftKey ) {
-            var start = allbox.index(this);
-            var end = allbox.index(lastChecked);
-            allbox.slice(Math.min(start, end), Math.max(start, end) + 1).prop("checked", lastChecked.checked);
+    \$("input[type=checkbox]:not(:disabled)").shiftcheckbox();
 
-        }
+    function update_log(data, nb_plugin) {
+            if ( ! data["logs"] ) {
+                var curval = parseFloat(\$('.progress-bar').attr('aria-valuenow'));
+                var newval = curval + slice;
+                \$('.progress-bar').css('width', newval + '%').attr('aria-valuenow', newval).text(Math.round(newval) + '%');
 
-        lastChecked = this;
-    });
-};
+                \$("table.update_log tbody").append(`<tr data-toggle="collapse" data-target="#detail\${(nb_plugin + 1)}">
+                                                      <td>\${prewikka_escape_html(data["module"])}</td><td>\${prewikka_escape_html(data["script"])}</td><td class="result">...</td>
+                                                     </tr>`);
+            }
 
-    \$("input[type=checkbox]").shiftcheckbox();
+            else {
+                var result = data["error"] ? '$_("ERROR")' : '$_("OK")';
+                var classname = data["error"] ? "danger" : "success";
 
-    function update_log(data, is_error, nb_plugin, nb_error) {
-            if ( ! data )
-                data = "";
+                if ( data["error"] )
+                    \$('#update-dialog .progress-bar').addClass('progress-bar-danger').text('$_("Update failed")');
 
-            curval = \$(".update-log").text();
-            if ( curval.length )
-                curval += (is_error) ? "\n" : "done.\n";
-
-            \$(".update-log").text(curval + data);
-            \$(".update-log").scrollTop(\$(".update-log")[0].scrollHeight);
-            if (nb_plugin) {
-                \$("#update_success").text(nb_plugin - nb_error);
-                \$("#update_error").text(nb_error);
+                \$("table.update_log tbody tr:last").addClass(classname);
+                \$("table.update_log tbody tr:last td.result").text(result);
+                \$("table.update_log tbody").append(`<tr><td colspan="3" class="hiddenRow">
+                                                          <div class="collapse panel panel-\${classname}" id="detail\${nb_plugin}">
+                                                           <div class="panel-heading">\${prewikka_escape_html(data["error"])}</div>
+                                                           <pre>\${prewikka_escape_html(data["logs"])}</pre>
+                                                          </div>
+                                                     </td></tr>`);
             }
     }
 
-    progressbar.progressbar({
-        value: false,
-        change: function() {
-            progressLabel.text( Math.round(progressbar.progressbar("value")) + "%" );
-        },
-        complete: function() {
-            progressLabel.text('$_("Update complete")');
-        }
-    });
-
-    \$("#update-dialog" ).dialog({
-        modal: true,
-        autoOpen: false,
-        draggable: false,
-        resizable: false,
-        width: 600,
-        appendTo: \$("#main"),
-        position: { my: "center bottom", at: "center", of: "#_main_viewport", within: "#_main_viewport" },
-        closeOnEscape: false,
-        dialogClass: "update-ui-dialog",
-
-        buttons: [{
-            'class': 'btn btn-default',
-            text: '$_("Close")',
-            click: function() {
-                 \$(this).dialog("close");
-
-                 /*
-                  * Fully reload the interface (menu might have been activated).
-                  */
-                 location.replace(prewikka_location().href);
-                 return false;
-            }
-        }]
-    });
 
     \$(".activate-button").click(function(e) {
         if ( ! \$(this).attr("data-confirm") ) {
@@ -95,81 +70,102 @@
     });
 
     \$(".update-button").click(function() {
-        \$("#update-dialog").dialog("open");
-        \$("#update-button").prop("disabled", true);
-        \$(".update-ui-dialog button").button("disable");
 
-        var nb_plugin = nb_error = 0;
+        var nb_plugin = 0;
+
+        \$("#update-dialog tbody").empty();
+        \$("#update-dialog .btn").prop("disabled", true);
+        \$('#update-dialog .progress-bar').removeClass('progress-bar-danger').addClass('active').css('width', '0%').attr('aria-valuenow', 0).text("0%");
+        \$("#update-dialog").modal();
+
         prewikka_EventSource({
             url: prewikka_location().pathname + "?apply_update=true",
 
             events: {
-                "begin": function(data) { slice = 100 / data["total"]; },
-                "finish": function(data) { update_log(); \$(".update-ui-dialog button").button("enable"); },
+                "begin": function(data) {
+                    slice = 100 / data["total"];
+                },
+                "finish": function(data) {
+                    \$("#update-dialog .btn").prop("disabled", false);
+                    \$('#update-dialog .progress-bar').removeClass('active')
+                },
             },
 
             message: function(data) {
-                if ( data["error"] ) {
-                    update_log(data["error"], true, nb_plugin, ++nb_error);
-                    progressLabel.text('$_("Update failed")');
-                    \$(".update-ui-dialog button").button("enable");
-                    return;
-                }
-
-                var curval = progressbar.progressbar("value") || 0;
-                progressbar.progressbar("value", curval + slice);
-
-                update_log(data["label"], false, ++nb_plugin, nb_error);
+                update_log(data, nb_plugin++);
             }
         });
 
         return false;
     });
+
+    \$('.collapse').on('show.bs.collapse', function () {
+        \$('.collapse.in').collapse('hide');
+    });
+
+    \$("#update-dialog .btn").click(function() {
+            location.replace(prewikka_location().href);
+            return false;
+    });
+
 </script>
 
 <style>
-    .ui-progressbar {
-        position: relative;
-    }
-
-    .progress-label {
-        width: 100%;
-        position: absolute;
-        text-align: center;
-        top: 4px;
-        font-weight: bold;
-        text-shadow: 1px 1px 0 #fff;
-    }
-
-    .update-log {
-        width: 100%;
-        height: 100px;
-    }
-
-    .button {
-        margin-top: 15pt;
-        float: right;
-    }
-
     .fieldset_heading .right {
         text-align: right;
+    }
+
+    table.update_log {
+        border-collapse: collapse;
+    }
+
+    table.update_log tbody {
+        height: 200px;
+        overflow-y: auto;
+    }
+
+    table.update_log td.result {
+        font-weight: bold;
+    }
+
+    .hiddenRow {
+        padding: 0 !important;
     }
 </style>
 
 
-<div id="update-dialog" title="Applying Updates">
-  <div id="progressbar">
-    <div class="progress-label">$_("Applying Updates")...</div>
+<div class="container">
+<div id="update-dialog" title="Applying Updates" class="modal fade" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title title" id="dialogLabel">$_('Update Dialog')</h3>
+      </div>
+      <div class="modal-body content">
+        <div class="progress">
+          <div class="progress-bar progress-bar-striped" role="progressbar" style="width:0%" aria-valuenow="0">0%</div>
+        </div>
+        <div>
+          <table class="table table-condensed table-hover update_log">
+           <thead>
+            <tr>
+             <th>$_("Plugin")</th>
+             <th>$_("Script")</th>
+             <th>$_("Result")</th>
+            </tr>
+           </thead>
+           <tbody>
+           </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a class="btn btn-primary" aria-hidden="true" data-dismiss="modal">$_('Close')</a>
+      </div>
+    </div>
   </div>
-
-  <fieldset>
-    <h4>$_("Update log")</h4>
-    <textarea class="update-log" readonly=""></textarea>
-    #set update_state = $_("Updates: {0} successful, {1} failed").format('<span id="update_success">0</span>', '<span id="update_error">0</span>')
-    <p>$update_state</p>
-  </fieldset>
 </div>
-
+</div>
 
 #set $row_classes = ("table_row_even", "table_row_odd")
 

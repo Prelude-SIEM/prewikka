@@ -133,6 +133,7 @@ class SQLScript(object):
 
     def __init__(self, dbup):
         self.db = dbup
+        self.query_logs = []
         self._module_name = dbup._module_name
         self._full_module_name = dbup._full_module_name
         self._query_filter = { "sqlite3": self._mysql2sqlite, "pgsql": self._mysql2pgsql, "mysql": self._mysqlhandler }[self.db.getType()]
@@ -195,6 +196,7 @@ class SQLScript(object):
         for q in self._query_filter(input).split(";"):
             q = q.strip()
             if q:
+                self.query_logs.append(q);
                 self.db.query(q)
 
     @abc.abstractmethod
