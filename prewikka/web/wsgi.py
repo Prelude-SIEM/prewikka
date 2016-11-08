@@ -107,6 +107,7 @@ class WSGIRequest(request.Request):
 
         return self._headers
 
+
 def application(environ, start_response):
         # Check whether the URL got a trailing "/", if not perform a redirect
         if not environ["PATH_INFO"]:
@@ -114,11 +115,5 @@ def application(environ, start_response):
 
         core = main.get_core_from_config(environ.get("PREWIKKA_CONFIG", None))
 
-        req = WSGIRequest(core, environ, start_response)
-
-        path = req._resolve_static(req.path)
-        if path:
-            return req._process_static(path, lambda fd: fd) or []
-
-        core.process(req)
+        core.process(WSGIRequest(core, environ, start_response))
         return []

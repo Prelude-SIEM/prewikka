@@ -241,32 +241,63 @@ class Core:
 
         return request.send_redirect("%s%s" % (request.get_baseurl(), default_view), 302)
 
+    def _process_static(self, webreq):
+        pathkey = webreq.path_elements[0]
+
+        mapping = env.htdocs_mapping.get(pathkey, None)
+        if not mapping:
+            return
+
+        path = os.path.abspath(os.path.join(mapping, webreq.path[len(pathkey) + 2:]))
+        if not path.startswith(mapping):
+            return response.PrewikkaDirectResponse(code=403, status_text="Request Forbidden")
+
+        # If the path doesn't map to a regular file, let prewikka continue the processing
+        if not os.path.isfile(path):
+            return
+
+        try:
+            return response.PrewikkaFileResponse(path)
+        except Exception as e:
+            return response.PrewikkaDirectResponse(code=404, status_text="File not found")
+
+    def _process_dynamic(self, webreq):
+        self._prewikka_init_if_needed()
+
+        # Some newly loaded plugin from another request may have modified globally loadeds
+        # JS/CSS scripts. We thus need to call _process_static() again after _prewikka_init_if_needed()
+        response = self._process_static(webreq)
+        if response:
+            return response
+
+        autherr = None
+        try:
+            env.request.user = env.session.get_user(webreq)
+            env.request.user.set_locale()
+        except error.PrewikkaError as autherr:
+            pass
+
+        if not all(hookmanager.trigger("HOOK_PROCESS_REQUEST", webreq, env.request.user)):
+            return
+
+        if webreq.path == "/":
+            return self._redirect_default(webreq)
+
+        view_object = env.viewmanager.loadView(webreq, env.request.user)
+        if view_object.view_require_session and autherr:
+            raise autherr
+
+        resolve.process(env.dns_max_delay)
+        return view_object.respond()
+
     def process(self, webreq):
         env.request.init(webreq)
-        view_object = autherr = None
 
         encoding = env.config.general.get("encoding", "utf8")
         try:
-            self._prewikka_init_if_needed()
-
-            try:
-                env.request.user = env.session.get_user(webreq)
-                env.request.user.set_locale()
-            except Exception as autherr:
-                pass
-
-            if not all(hookmanager.trigger("HOOK_PROCESS_REQUEST", webreq, env.request.user)):
-                return
-
-            if webreq.path == "/":
-                return self._redirect_default(webreq)
-
-            view_object = env.viewmanager.loadView(webreq, env.request.user)
-            if view_object.view_require_session and autherr:
-                raise autherr
-
-            resolve.process(env.dns_max_delay)
-            response = view_object.respond()
+            response = self._process_static(webreq)
+            if not response:
+                response = self._process_dynamic(webreq)
 
         except error.RedirectionError as err:
             return webreq.send_redirect(err.location, err.code)

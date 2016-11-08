@@ -69,11 +69,6 @@ class PrewikkaRequestHandler(request.Request, BaseHTTPServer.BaseHTTPRequestHand
 
     def do_GET(self):
         self.init("GET")
-
-        path = self._resolve_static(self.path)
-        if path:
-           return self._process_static(path, lambda fd: shutil.copyfileobj(fd, self.wfile))
-
         self._process_dynamic(urlparse.parse_qs(self._uri.query))
 
     def do_HEAD(self):

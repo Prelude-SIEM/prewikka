@@ -56,10 +56,9 @@ class BufferedWriter:
                         self.flush()
 
 
+
 class Request(object):
     def __init__(self, *args, **kwargs):
-        env.request.web = self
-
         self.is_xhr = False
         self.is_multipart = False
         self.is_stream = False
@@ -142,48 +141,8 @@ class Request(object):
 
             self._buffer.flush()
         else:
-            self.send_headers(response.headers.items(), response.code or code, response.status_text or status_text)
+            response.write(self)
 
-            data = response.content()
-            if data:
-                env.request.web.write(data)
-
-    def _resolve_static(self, fname):
-        pathmap = env.htdocs_mapping
-        pathkey = self.path_elements[0]
-
-        mapping = pathmap.get(pathkey, None)
-        if not mapping:
-           return
-
-        path = os.path.abspath(os.path.join(mapping, fname[len(pathkey) + 2:]))
-        if not path.startswith(mapping):
-            self.send_response(None, 403, status_text="Request Forbidden")
-            return
-
-        # If the path doesn't exist or is not a regular file return None so that prewikka
-        # attempt to resolve a view with the same name as the defined file mapping
-        return path if os.path.isfile(path) else None
-
-    def _process_static(self, path, copyfunc):
-        try:
-            fd = open(path, "r")
-        except:
-            self.send_response(None, 404, status_text="File not found")
-            return
-
-        stat = os.fstat(fd.fileno())
-
-        content_type = mimetypes.guess_type(path)[0]
-        if not content_type:
-            env.log.warning("Serving file with unknown MIME type: %s" % path)
-            content_type = "application/octet-stream"
-
-        self.send_headers([('Content-Type', content_type),
-                          ('Content-Length', str(stat[6])),
-                          ('Last-Modified', time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8])))])
-
-        return copyfunc(fd)
 
     def _handle_multipart(self, *args, **kwargs):
         arguments = {}
