@@ -20,23 +20,32 @@
 import sys
 import traceback
 import json
+import abc
 
 from prewikka import template, log, env, response
 from prewikka.templates import ErrorTemplate
 
 
+class PrewikkaException(Exception):
+    __metaclass__ = abc.ABCMeta
 
-class PrewikkaError(Exception):
-    pass
+    @abc.abstractmethod
+    def respond(self):
+        pass
 
 
-class RedirectionError(PrewikkaError):
+
+class RedirectionError(PrewikkaException):
     def __init__(self, location, code):
         self.location = location
         self.code = code
 
+    def respond(self):
+        return response.PrewikkaRedirectResponse(self.location, code=self.code)
 
-class PrewikkaUserError(PrewikkaError):
+
+
+class PrewikkaUserError(PrewikkaException):
     template = ErrorTemplate.ErrorTemplate
     name = None
     message = ""
@@ -46,8 +55,6 @@ class PrewikkaUserError(PrewikkaError):
     def __init__(self, name, message, display_traceback=False, log_priority=None, log_user=None, template=None, code=None):
         if template:
             self.template = template
-
-        PrewikkaError.__init__(self, message)
 
         if name:
             self.name = name

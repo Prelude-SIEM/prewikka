@@ -104,9 +104,6 @@ class Request(object):
 
         self.write("\r\n")
 
-    def send_redirect(self, location, code=307):
-        self.send_headers([('Location', location)], code=code, status_text="%d Redirect" % code)
-
     def send_stream(self, data, event=None, evid=None, retry=None, sync=False):
         if self._buffer is None:
             self.is_stream = True
