@@ -421,17 +421,19 @@ class DataProviderManager(pluginmanager.PluginManager):
         type, _, _, criteria = self._normalize(type, criteria=criteria)
         return self._backends[type].get(criteria, order_by, limit, offset)
 
-    def delete(self, criteria=None, type=None):
-        type, _, _, criteria = self._normalize(type, criteria=criteria)
-        return self._backends[type].delete(criteria)
+    def delete(self, criteria=None, paths=None, type=None):
+        type, paths, _, criteria = self._normalize(type, paths, criteria)
+        return self._backends[type].delete(criteria, paths)
 
     def insert(self, data, criteria=None, type=None):
-        type, _, _, criteria = self._normalize(type, criteria=criteria)
-        return self._backends[type].insert(data, criteria)
+        paths, values = zip(*data.items())
+        type, paths, _, criteria = self._normalize(type, paths, criteria)
+        return self._backends[type].insert(zip(paths, values), criteria)
 
     def update(self, data, criteria=None, type=None):
-        type, _, _, criteria = self._normalize(type, criteria=criteria)
-        return self._backends[type].update(data, criteria)
+        paths, values = zip(*data.items())
+        type, paths, _, criteria = self._normalize(type, paths, criteria)
+        return self._backends[type].update(zip(paths, values), criteria)
 
     def has_type(self, wanted_type):
         return wanted_type in self._backends
