@@ -105,7 +105,7 @@ class PrewikkaRequestHandler(request.Request, BaseHTTPServer.BaseHTTPRequestHand
         return self._query_string
 
     def get_raw_uri(self, include_qs=False):
-        uri = self._path
+        uri = self.path
 
         if include_qs:
             qs = self.get_query_string()
