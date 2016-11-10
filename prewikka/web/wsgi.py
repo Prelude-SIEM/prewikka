@@ -51,7 +51,8 @@ class WSGIRequest(request.Request):
             if self._environ.get("CONTENT_TYPE", "").startswith("multipart/form-data"):
                 self.arguments = self._handle_multipart(fp=environ['wsgi.input'], environ=environ)
             else:
-                self.arguments = cgi.parse_qs(environ['wsgi.input'].read())
+                self.body = environ['wsgi.input'].read()
+                self.arguments = cgi.parse_qs(self.body)
 
         for name, value in self.arguments.items():
             self.arguments[name] = (len(value) == 1) and value[0] or value
