@@ -48,7 +48,8 @@ class WSGIRequest(request.Request):
         if self.method != 'POST':
             self.arguments = cgi.parse_qs(self._environ.get('QUERY_STRING'))
         else:
-            self.arguments = cgi.parse_qs(environ['wsgi.input'].read())
+            self.body = environ['wsgi.input'].read()
+            self.arguments = cgi.parse_qs(self.body)
 
         for name, value in self.arguments.items():
             self.arguments[name] = (len(value) == 1) and value[0] or value
