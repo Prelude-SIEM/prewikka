@@ -169,7 +169,7 @@ class SQLScript(object):
                   (" TINYINT ", " INT2 "),
                   (" SMALLINT UNSIGNED ", " INT8 "),
                   (" SMALLINT ", " INT4 "),
-                  (" BIGINT UNSIGNED ", " NUMERIC(20) "),
+                  (" BIGINT UNSIGNED ", " INT8 "),
                   (" BIGINT ", " INT8 "),
                   (" INT(EGER)? UNSIGNED ", " INT8 "),
                   (" INT(EGER)? ", " INT4 "),
