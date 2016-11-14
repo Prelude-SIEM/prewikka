@@ -1,3 +1,23 @@
+* 2016-11-14, prewikka-3.1.1:
+
+Author: Thomas Andrejak
+
+- Fix prewikka-httpd get_raw_uri and querystring
+- Fix WSGI self.body not filled
+
+Author: Yoann Vandoorselaere
+
+- Fix WSGI redirect
+- Properly set content-type for JSON response
+- Do not pass the request to Prewikka core on invalid static files
+
+Author: Antoine Luong
+
+- Auth and user fixes
+- Add a function to clear jqGrid edition
+
+
+
 * 2016-09-14, prewikka-3.1.0:
 
 Author: Antoine Luong
