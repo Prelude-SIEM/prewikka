@@ -213,3 +213,7 @@ class User(NameID):
             return self.permissions.issuperset(perm)
 
         return perm in self.permissions
+
+    def check(self, perm, view=None):
+        if not self.has(perm):
+            raise PermissionDeniedError(perm, view)
