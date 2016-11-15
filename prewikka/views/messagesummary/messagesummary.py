@@ -17,19 +17,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import hashlib
 import re
-import time
-import struct
 import socket
+import struct
+import time
 import urllib
-import pkg_resources
-
 from datetime import datetime
-from prewikka.dataprovider import Criterion
-from prewikka import view, usergroup, utils, resolve, localization, env, hookmanager
 
-from . import templates
+import pkg_resources
+from prewikka import hookmanager, localization, resolve, resource, template, usergroup, utils, view
+from prewikka.dataprovider import Criterion
+from prewikka.utils import html
+
 
 def getUriCriteria(parameters, ptype):
     if not "messageid" in parameters:
@@ -204,41 +206,41 @@ class TcpIpOptions(Table):
             return "&nbsp;"
 
     def _decodeOption8(self, data):
-        return str(struct.unpack(">B", data)[0])
+        return text_type(struct.unpack(b">B", data)[0])
 
     def _decodeOption16(self, data):
-        return str(struct.unpack(">H", data)[0])
+        return text_type(struct.unpack(b">H", data)[0])
 
     def _decodeOption32(self, data):
-        return str(struct.unpack(">L", data)[0])
+        return text_type(struct.unpack(b">L", data)[0])
 
     def _decodeOptionTimestamp(self, data):
-        x = struct.unpack(">LL", data)
+        x = struct.unpack(b">LL", data)
         return "TS Value (%d)<br/>TS Echo Reply (%d)" % (x[0], x[1])
 
     def _decodeOptionSack(self, data):
-        x = struct.unpack(">" + "L" * (len(data) / 4), data)
+        x = struct.unpack(b">" + "L" * (len(data) / 4), data)
 
         s = ""
         for i in x:
             if len(s):
                 s += "<br/>"
 
-            s += str(i)
+            s += text_type(i)
 
         return s
 
 
     def _decodeOptionMd5(self, data):
-        md = hashlib.md5(struct.unpack(">B" * 16, data)[0])
+        md = hashlib.md5(struct.unpack(b">B" * 16, data)[0])
         return md.hexdigest()
 
     def _decodeOptionPartialOrderProfile(self, data):
-        x = struct.unpack(">B", data)
+        x = struct.unpack(b">B", data)
         return "Start_Flags=%d End_Flags=%d" % (data & 0x80, data & 0x40)
 
     def _decodeOptionTcpAltChecksumRequest(self, data):
-        x = struct.unpack(">B", data)
+        x = struct.unpack(b">B", data)
         if x == 0:
             return "TCP checksum"
 
@@ -315,7 +317,7 @@ class TcpIpOptions(Table):
             self.newTableCol(idx, option[0])
 
             if len(dec) == 2 and dec[1] != -1 and dec[1] != option[1]:
-                self.newTableCol(idx, "<b style='color:red;'>%d</b> (expected %d)" % (option[1], dec[1]))
+                self.newTableCol(idx, resource.HTMLSource("<b style='color:red;'>%d</b> (expected %d)" % (option[1], dec[1])))
             else:
                 self.newTableCol(idx, "%d" % option[1])
 
@@ -350,14 +352,14 @@ class TcpIpOptions(Table):
 class MessageParameters(view.Parameters):
     def register(self):
         view.Parameters.register(self)
-        self.optional("analyzerid", str)
-        self.optional("messageid", str)
+        self.optional("analyzerid", text_type)
+        self.optional("messageid", text_type)
 
 
 class MessageSummary(Table, view.View):
     view_parameters = MessageParameters
     view_permissions = [ N_("IDMEF_VIEW") ]
-    view_template = templates.MessageSummary
+    view_template = template.PrewikkaTemplate(__name__, 'templates/messagesummary.mak')
     plugin_htdocs = (("messagesummary", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     def __init__(self, *args, **kwargs):
@@ -378,7 +380,7 @@ class MessageSummary(Table, view.View):
             else:
                 return name
 
-        return '<a target="%s" href="%s">%s</a>' % (env.external_link_target, url, name)
+        return resource.HTMLSource('<a target="%s" href="%s">%s</a>' % (env.external_link_target, html.escape(url), html.escape(name)))
 
     def getTime(self, dt):
         if not dt:
@@ -545,15 +547,15 @@ class MessageSummary(Table, view.View):
             for url, text in hookmanager.trigger("HOOK_ALERTSUMMARY_MEANING_LINK", alert, meaning, value):
                 if url:
                     links.append("<a target='%s' href='%s'>%s</a>" % \
-                                 (env.external_link_target, url, text))
+                                 (env.external_link_target, html.escape(url), html.escape(text)))
 
             if links:
                 meaning = "<a class='popup_menu_toggle'>%s</a><span class='popup_menu'>%s</span>" % \
-                          (meaning, "".join(links))
+                          (html.escape(meaning), "".join(links))
 
             if not ignored.has_key(meaning):
-                self.newTableCol(index, meaning or "Data content")
-                self.newTableCol(index, utils.escape_html_string(value) if value is not None else None)
+                self.newTableCol(index, resource.HTMLSource(meaning or "Data content"))
+                self.newTableCol(index, html.escape(value) if value else None)
                 index += 1
 
         self.endTable()
@@ -566,9 +568,9 @@ class MessageSummary(Table, view.View):
         ip.register(_("TOS"), "ip_tos")
         ip.register(_("Length"), "ip_len")
         ip.register(_("Id"), "ip_id")
-        ip.register("R<br/>F", "ip_off", self._isFlagSet, (0x8000, 15))
-        ip.register("D<br/>F", "ip_off", self._isFlagSet, (0x4000, 14))
-        ip.register("M<br/>F", "ip_off", self._isFlagSet, (0x2000, 13))
+        ip.register(resource.HTMLSource("R<br/>F"), "ip_off", self._isFlagSet, (0x8000, 15))
+        ip.register(resource.HTMLSource("D<br/>F"), "ip_off", self._isFlagSet, (0x4000, 14))
+        ip.register(resource.HTMLSource("M<br/>F"), "ip_off", self._isFlagSet, (0x2000, 13))
         ip.register(_("Ip offset"), "ip_off", (lambda x: x & 0x1fff))
         ip.register(_("TTL"), "ip_ttl")
         ip.register(_("Protocol"), "ip_proto")
@@ -585,14 +587,14 @@ class MessageSummary(Table, view.View):
         tcp.register("Ack #", "tcp_ack")
         tcp.register(_("Header length"), "tcp_off")
         tcp.register(_("Reserved"), "tcp_res")
-        tcp.register("R<br/>1", "tcp_flags", self._isFlagSet, (0x80,))
-        tcp.register("R<br/>2", "tcp_flags", self._isFlagSet, (0x40,))
-        tcp.register("U<br/>R<br/>G", "tcp_flags", self._isFlagSet, (0x20,))
-        tcp.register("A<br/>C<br/>K", "tcp_flags", self._isFlagSet, (0x10,))
-        tcp.register("P<br/>S<br/>H", "tcp_flags", self._isFlagSet, (0x08,))
-        tcp.register("R<br/>S<br/>T", "tcp_flags", self._isFlagSet, (0x04,))
-        tcp.register("S<br/>Y<br/>N", "tcp_flags", self._isFlagSet, (0x02,))
-        tcp.register("F<br/>I<br/>N", "tcp_flags", self._isFlagSet, (0x01,))
+        tcp.register(resource.HTMLSource("R<br/>1"), "tcp_flags", self._isFlagSet, (0x80,))
+        tcp.register(resource.HTMLSource("R<br/>2"), "tcp_flags", self._isFlagSet, (0x40,))
+        tcp.register(resource.HTMLSource("U<br/>R<br/>G"), "tcp_flags", self._isFlagSet, (0x20,))
+        tcp.register(resource.HTMLSource("A<br/>C<br/>K"), "tcp_flags", self._isFlagSet, (0x10,))
+        tcp.register(resource.HTMLSource("P<br/>S<br/>H"), "tcp_flags", self._isFlagSet, (0x08,))
+        tcp.register(resource.HTMLSource("R<br/>S<br/>T"), "tcp_flags", self._isFlagSet, (0x04,))
+        tcp.register(resource.HTMLSource("S<br/>Y<br/>N"), "tcp_flags", self._isFlagSet, (0x02,))
+        tcp.register(resource.HTMLSource("F<br/>I<br/>N"), "tcp_flags", self._isFlagSet, (0x01,))
         tcp.register(_("Window"), "tcp_win")
         tcp.register(_("Checksum"), "tcp_sum")
         tcp.register(_("URP"), "tcp_urp")
@@ -627,7 +629,7 @@ class MessageSummary(Table, view.View):
     def buildPayloadTable(self, alert):
         data = HeaderTable()
         data.register(_("Payload"), "payload")
-        #data.register("ASCII Payload", "payload", utils.escape_html_string)
+        #data.register("ASCII Payload", "payload", html.escape)
         return data
 
 
@@ -662,7 +664,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
             content = ""
             missing = 0
             for ident in calist[analyzerid]:
-                criteria = Criterion("alert.analyzer.analyzerid", "=", analyzerid), Criterion("alert.messageid", "=", ident)
+                criteria = Criterion("alert.analyzer.analyzerid", "=", analyzerid) & Criterion("alert.messageid", "=", ident)
 
                 results = env.dataprovider.get(criteria)
                 if len(results) == 0:
@@ -671,12 +673,12 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                 else:
                     alert = results[0]["alert"]
                     link = utils.create_link("/".join(env.request.web.path_elements[:2] + [self.view_id]), {"analyzerid": analyzerid, "messageid": ident})
-                    content += '<li><a class="widget-link" title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, alert["classification.text"])
+                    content += '<li><a class="widget-link" title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, html.escape(alert["classification.text"]))
 
             if missing > 0:
                 content += "<li>" + (_("%d linked alerts missing (probably deleted)") % missing) + "</li>"
 
-            self.newTableCol(idx, "<ul style='padding: 0px; margin: 0px 0px 0px 10px;'>%s</ul>" % content)
+            self.newTableCol(idx, resource.HTMLSource("<ul style='padding: 0px; margin: 0px 0px 0px 10px;'>%s</ul>" % content))
             self.buildAnalyzer(alert["analyzer(-1)"])
             self.newTableRow()
 
@@ -778,7 +780,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
             user_str += "(%d)" % number
 
         elif number:
-            user_str = str(number)
+            user_str = text_type(number)
 
         if tty:
             user_str += " on tty " + tty
@@ -909,7 +911,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
             return
 
         if service["port"]:
-            port = str(service["port"])
+            port = text_type(service["port"])
             if env.enable_details:
                 self.newTableEntry(_("Port"), self.getUrlLink(port, "%s?port=%s" % (env.port_details_url, port)))
             else:
@@ -1090,11 +1092,11 @@ class AlertSummary(TcpIpOptions, MessageSummary):
             if ignored_value.has_key("payload"):
                 val = {}
 
-                payload = utils.escape_html_string(utils.hexdump(ignored_value["payload"])).replace(" ", "&nbsp;")
-                val["payload"] = "<span class='fixed'>%s</span>" % payload
+                payload = html.escape(utils.hexdump(ignored_value["payload"])).replace(" ", "&nbsp;")
+                val["payload"] = resource.HTMLSource("<span class='fixed'>%s</span>" % payload)
                 data.render_table(self, _("Payload"), val)
 
-                val["payload"] = "<div style='overflow: auto;'>%s</div>" % utils.escape_html_string(ignored_value["payload"]).replace("\n", "<br/>")
+                val["payload"] = resource.HTMLSource("<div style='overflow: auto;'>%s</div>" % html.escape(ignored_value["payload"]).replace("\n", "<br/>"))
                 data.render_table(self, _("ASCII Payload"), val)
 
             self.endTable()
@@ -1119,4 +1121,3 @@ class HeartbeatSummary(MessageSummary):
         self.endSection()
 
         self.buildAdditionalData(heartbeat)
-

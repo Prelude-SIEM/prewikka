@@ -1,9 +1,14 @@
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import sys
-from ordereddict import *
 
 if sys.version_info[0] >= 3:
+    import collections
+
     STRING_TYPES = str,
+    OrderedDict = collections.OrderedDict
 else:
+    from .ordereddict import OrderedDict
     STRING_TYPES = basestring,
 
 

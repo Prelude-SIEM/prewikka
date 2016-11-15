@@ -20,107 +20,39 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 import sys
-import shutil
-from optparse import OptionParser
-import multiprocessing
-import urllib, urlparse
-import BaseHTTPServer
 import ssl
+import multiprocessing
 
-from prewikka.web import request
-from prewikka import main, siteconfig, localization
+from optparse import OptionParser
+from wsgiref.simple_server import WSGIServer, WSGIRequestHandler, make_server
+
+from prewikka.web import wsgi
+from prewikka import siteconfig, main
 
 
-
-class PrewikkaServer(BaseHTTPServer.HTTPServer):
-    pass
+global options
 
 
-class PrewikkaRequestHandler(request.Request, BaseHTTPServer.BaseHTTPRequestHandler):
-    def __init__(self, *args, **kwargs):
-        request.Request.__init__(self, *args, **kwargs)
-        BaseHTTPServer.BaseHTTPRequestHandler.__init__(self, *args, **kwargs)
-
-    def init(self, method):
-        request.Request.init(self, self.server.core)
-        self.method = method
-
-        if self.headers.get("x-requested-with", "") == "XMLHttpRequest":
-            self.is_xhr = True
-
-        if self.headers.get("accept", "") == "text/event-stream":
-            self.is_stream = True
-
-    def log_request(self, code):
+class WSGIRequest(WSGIRequestHandler):
+    def log_message(self, format, *args):
         pass
 
-    def _process_dynamic(self, arguments):
-        for name, value in arguments.items():
-            self.arguments[name] = (len(value) == 1) and value[0] or value
 
-        self.server.core.process(self)
+class MyWSGIServer(WSGIServer):
+    def serve_forever(self):
+        # Preload Prewikka server
+        main.get_core_from_config(options.config)
 
-    def send_headers(self, headers=None, code=200, status_text=None):
-        BaseHTTPServer.BaseHTTPRequestHandler.send_response(self, code, status_text)
-        request.Request.send_headers(self, headers)
+        try:
+            WSGIServer.serve_forever(self)
+        except KeyboardInterrupt:
+            pass
 
-    def send_error(self, code, status_text):
-        self.send_response(None, code=code, status_text=status_text)
 
-    def do_GET(self):
-        self.init("GET")
-        self._process_dynamic(urlparse.parse_qs(self._uri.query))
+def application(environ, start_response):
+    environ["PREWIKKA_CONFIG"] = options.config
+    return wsgi.application(environ, start_response)
 
-    def do_HEAD(self):
-        self.do_GET()
-
-    def do_POST(self):
-        self.init("POST")
-
-        self.body = qs = self.rfile.read(int(self.headers["Content-Length"]))
-        if self._uri.query:
-            qs = "&".join((self._uri.query, qs))
-
-        self._query_string = qs
-        arguments = urlparse.parse_qs(qs)
-
-        self._process_dynamic(arguments)
-
-    def write(self, data):
-        self.wfile.write(data)
-
-    def get_remote_addr(self):
-        return self.client_address[0]
-
-    def get_remote_port(self):
-        return self.client_address[1]
-
-    def get_query_string(self):
-        return self._query_string
-
-    def get_cookie(self):
-        return self.headers.get("Cookie")
-
-    def get_query_string(self):
-        return self._query_string
-
-    def get_raw_uri(self, include_qs=False):
-        uri = self.path
-
-        if include_qs:
-            qs = self.get_query_string()
-            if qs:
-                uri = "?".join((uri, qs))
-
-        return uri
-
-def serve_forever(server, config_file):
-    server.core = main.get_core_from_config(config_file)
-
-    try:
-        server.serve_forever()
-    except KeyboardInterrupt:
-        pass
 
 if __name__ == "__main__":
     parser = OptionParser(epilog=" ")
@@ -135,11 +67,15 @@ if __name__ == "__main__":
 
     (options, args) = parser.parse_args()
 
-    server = PrewikkaServer((options.addr, options.port), PrewikkaRequestHandler)
+    server = make_server(options.addr, options.port, application, server_class=MyWSGIServer, handler_class=WSGIRequest)
     if options.key and options.cert:
         server.socket = ssl.wrap_socket(server.socket, keyfile=options.key, certfile=options.cert, server_side=True)
 
     for i in range(options.num_process - 1):
-        multiprocessing.Process(target=serve_forever, args=(server, options.config)).start()
+        p = multiprocessing.Process(target=server.serve_forever)
+        p.daemon = True
 
-    serve_forever(server, options.config)
+        p.start()
+
+    server.serve_forever()
+

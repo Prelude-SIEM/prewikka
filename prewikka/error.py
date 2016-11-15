@@ -17,13 +17,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import abc
 import sys
 import traceback
-import abc
 
-from prewikka.utils import json
-from prewikka import template, log, response
-from prewikka.templates import ErrorTemplate, AJAXErrorTemplate
+import pkg_resources
+from prewikka import log, response, template
+from prewikka.utils import AttrObj, json
 
 
 class PrewikkaException(Exception):
@@ -46,7 +48,7 @@ class RedirectionError(PrewikkaException):
 
 
 class PrewikkaError(PrewikkaException):
-    template = ErrorTemplate.ErrorTemplate
+    template = template.PrewikkaTemplate(__name__, 'templates/error.mak')
     name = N_("An unexpected condition happened")
     message = ""
     details = ""
@@ -64,8 +66,8 @@ class PrewikkaError(PrewikkaException):
         if details is not None:
             self.details = details
 
-        self._untranslated_details = str(self.details)
-        self._untranslated_message = str(self.message)
+        self._untranslated_details = text_type(self.details)
+        self._untranslated_message = text_type(self.message)
 
         if self.name:
             self.name = _(self.name)
@@ -88,14 +90,16 @@ class PrewikkaError(PrewikkaException):
         self.traceback = self._get_traceback()
         self.log_user = log_user
 
-    def _setup_template(self, tmpl, ajax_error):
-        dataset = template.PrewikkaTemplate(tmpl)
+    def _setup_template(self, template, ajax_error):
+        dataset = template.dataset()
 
         for i in ("name", "message", "details", "code", "traceback"):
             dataset[i] = getattr(self, i)
 
         dataset["is_ajax_error"] = ajax_error
-        dataset["document.base_url"] = env.request.web.get_baseurl()
+        dataset["document"] = AttrObj()
+        dataset["document"].base_url = env.request.web.get_baseurl()
+        dataset["is_error_template"] = True
 
         return dataset
 
@@ -103,6 +107,7 @@ class PrewikkaError(PrewikkaException):
         from prewikka import baseview
 
         v = baseview.BaseView()
+        v.view_template = self.template
         v.dataset = self._setup_template(self.template, False)
 
         ret = v.respond()
@@ -112,9 +117,7 @@ class PrewikkaError(PrewikkaException):
 
     def _get_traceback(self):
         if self.display_traceback and env.config.general.get("enable_error_traceback") not in ('no', 'false'):
-            exc = sys.exc_info()
-            if exc[0]:
-                return "".join(traceback.format_exception(*exc))
+            return sys.exc_info()
 
     def respond(self):
         if self.message:
@@ -140,8 +143,8 @@ class PrewikkaError(PrewikkaException):
         return self._format_error(self._untranslated_message, self._untranslated_details)
 
     def __json__(self):
-        dset = self._setup_template(AJAXErrorTemplate.AJAXErrorTemplate, True)
-        return { "html": dset.render() }
+        dset = self._setup_template(PrewikkaError.template, True)
+        return { "content": dset.render() }
 
 
 

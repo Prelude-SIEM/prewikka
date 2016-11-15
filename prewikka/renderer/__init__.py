@@ -17,8 +17,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import uuid, json
-from prewikka import pluginmanager, env, error
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import json
+import uuid
+
+from prewikka import error, pluginmanager, resource
 
 RED_STD = "E78D90"
 ORANGE_STD = "F5B365"
@@ -108,7 +112,7 @@ class RendererPluginManager(pluginmanager.PluginManager):
         for i in self:
             try:
                 self._renderer.setdefault(i.renderer_backend, {})[i.renderer_type] = i()
-            except Exception, e:
+            except Exception as e:
                 env.log.error("%s: %s" % (i.__module__, e))
 
             if not i.renderer_type in self._default_backends:
@@ -158,19 +162,19 @@ class RendererPluginManager(pluginmanager.PluginManager):
             kwargs["names_and_colors"] = COLOR_MAP
 
         classname = kwargs["class"] = "-".join((renderer, type))
-        cssid = kwargs["cssid"] = "-".join((classname, str(uuid.uuid4())))
+        cssid = kwargs["cssid"] = "-".join((classname, text_type(uuid.uuid4())))
 
         try:
             data = self._renderer[renderer][type].render(data, **kwargs)
-            html = """<div id="%s" class="renderer-elem %s">%s</div>""" % (cssid, classname, data.get("html", ""))
+            html = resource.HTMLSource("""<div id="%s" class="renderer-elem %s">%s</div>""" % (cssid, classname, data.get("html", "")))
 
-            return {"html": html, "script": data.get("script", "")}
+            return {"html": html, "script": resource.HTMLSource(data.get("script", "")) }
         except RendererNoDataException as e:
-            html = """<div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>""" % (cssid, classname, str(e))
-            script = """
+            html = resource.HTMLSource("""<div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>""" % (cssid, classname, text_type(e)))
+            script = resource.HTMLSource("""
                  var size = prewikka_getRenderSize("#%s", %s);
 
                  $("#%s").width(size[0]).css("height", size[1] + 'px').css("line-height", size[1] + 'px');
-                """ % (cssid, json.dumps(kwargs), cssid)
+                """ % (cssid, json.dumps(kwargs), cssid))
 
             return {"html": html, "script": script}

@@ -17,15 +17,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time, abc, fcntl, types
-import re, operator, pkg_resources, pkgutil
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import abc
+import collections
+import fcntl
+import operator
+import pkgutil
+import re
+import time
+import types
 from datetime import datetime
 
+import pkg_resources
 import preludedb
-import collections
-from prewikka.utils import json, cache
-from prewikka import log, error, utils, version, env, compat, usergroup
-
+from prewikka import compat, env, error, log, usergroup, utils, version
+from prewikka.utils import cache, json
 
 ModuleInfo = collections.namedtuple("ModuleInfo", ["branch", "version", "enabled"])
 
@@ -48,7 +55,7 @@ def _fix_exception(func):
             try:
                 ret = func(self, *args, **kwargs)
             except RuntimeError as e:
-                raise DatabaseError(message=str(e))
+                raise DatabaseError(message=text_type(e))
 
             return ret
         return inner
@@ -205,7 +212,7 @@ class SQLScript(object):
 
     @use_transaction
     def apply(self):
-        log.getLogger().info("%s: please standby while %s is applied", self._full_module_name, str(self))
+        log.getLogger().info("%s: please standby while %s is applied", self._full_module_name, text_type(self))
 
         self.run()
 
@@ -325,7 +332,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
                 return outstack + [upd]
 
             elif upd in outstack:
-                log.getLogger().warning("cyclic branch dependencies detected: %s",  " -> ".join(str(i) for i in outstack + [upd]))
+                log.getLogger().warning("cyclic branch dependencies detected: %s",  " -> ".join(text_type(i) for i in outstack + [upd]))
                 continue
 
             else:
@@ -442,7 +449,7 @@ class Database(preludedb.SQL):
     def _prefilter_iterate(self, l):
         tmp = []
         for v in l:
-            tmp.append(str(self.escape(v)))
+            tmp.append(text_type(self.escape(v)))
 
         if self.__ESCAPE_PREFILTER.get(type(v)) == self._prefilter_iterate:
             fmt = '%s'
@@ -464,7 +471,7 @@ class Database(preludedb.SQL):
         }
 
         settings = { "host": "localhost", "name": "prewikka", "user": "prewikka", "type": "mysql" }
-        settings.update([(k, str(v)) for k, v in config.items()])
+        settings.update([(k, text_type(v)) for k, v in config.items()])
 
         preludedb.SQL.__init__(self, settings)
 
@@ -609,7 +616,7 @@ class Database(preludedb.SQL):
         delq = []
 
         for idx, row in enumerate(values_rows):
-            vl.append(str(self.escape(row)))
+            vl.append(text_type(self.escape(row)))
 
             if not merge:
                 continue
@@ -687,7 +694,7 @@ class Database(preludedb.SQL):
                 wh_fmt.append("%s = %s" % (v, self.escape(row[i])))
 
             up_fmt.append("%s = %s" % (v, self.escape(row[i])))
-            vl_fmt.append(str(self.escape(row[i])))
+            vl_fmt.append(text_type(self.escape(row[i])))
 
         ret = self.query("UPDATE %s SET %s WHERE %s%s" % (table, ", ".join(up_fmt), " AND ".join(wh_fmt), retfmt))
         if ret:

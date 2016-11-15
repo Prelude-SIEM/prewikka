@@ -18,22 +18,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function
+
 import abc
-import sys, os, os.path, time, copy, Cookie
-import mimetypes, urllib, cgi, urlparse
+import cgi
+import Cookie
+import copy
+import mimetypes
+import os
+import os.path
+import sys
+import time
+import urllib
+import urlparse
+
 from prewikka import env, error
-from prewikka.response import PrewikkaResponse, PrewikkaDirectResponse
-
-_ADDITIONAL_MIME_TYPES = [("application/vnd.oasis.opendocument.formula-template", ".otf"),
-                          ("application/vnd.ms-fontobject", ".eot"),
-                          ("image/vnd.microsoft.icon", ".ico"),
-                          ("application/font-woff", ".woff"),
-                          ("application/font-sfnt", ".ttf"),
-                          ("application/json", ".map"),
-                          ("font/woff2", ".woff2")]
-
-for mtype, extension in _ADDITIONAL_MIME_TYPES:
-    mimetypes.add_type(mtype, extension)
+from prewikka.response import PrewikkaDirectResponse, PrewikkaResponse
 
 
 class BufferedWriter:
@@ -86,6 +86,9 @@ class Request(object):
         if not self._output_cookie:
             self._output_cookie = Cookie.SimpleCookie()
 
+        if sys.version_info < (3,0):
+            param = param.encode("utf8")
+
         self._output_cookie[param] = value
         self._output_cookie[param]["expires"] = expires
         if path:
@@ -117,10 +120,10 @@ class Request(object):
         # Join is used in place of concatenation / formatting, because we
         # prefer performance over readability in this place
         if event:
-            self._buffer.write("".join(["event: ", event, "\n"]))
+            self._buffer.write("".join(["event: ", event.encode("utf8"), "\n"]))
 
         if data:
-            self._buffer.write("".join(["data: ", data, "\n\n"]))
+            self._buffer.write("".join(["data: ", data.encode("utf8"), "\n\n"]))
 
         if sync:
             self._buffer.flush()

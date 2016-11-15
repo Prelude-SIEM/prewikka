@@ -17,10 +17,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import pkg_resources, os, json, itertools
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from . import templates
-from prewikka import view, database, version, env, error, pluginmanager
+import itertools
+import json
+import os
+
+import pkg_resources
+from prewikka import database, error, pluginmanager, template, version, view
+from prewikka.utils import html
 
 
 class AboutPlugin(view.View):
@@ -33,15 +38,15 @@ class AboutPlugin(view.View):
     plugin_mandatory = True
 
     view_name = N_("Apps")
-    view_template = templates.aboutplugin
+    view_template = template.PrewikkaTemplate(__name__, "templates/aboutplugin.mak")
     view_section = N_("Settings")
     view_permissions = [ N_("USER_MANAGEMENT") ]
     view_order = 6
 
     class AboutPluginParameters(view.Parameters):
         def register(self):
-            self.optional("apply_update", str)
-            self.optional("enable_plugin", [str])
+            self.optional("apply_update", text_type)
+            self.optional("enable_plugin", [text_type])
 
     view_parameters = AboutPluginParameters
     _all_plugins = ((_("Apps: View"), "prewikka.views"),
@@ -60,15 +65,15 @@ class AboutPlugin(view.View):
         for mod, fromversion, uplist in itertools.chain.from_iterable(data.maintenance.values()):
 
             for upscript in uplist:
-                label = _("Applying %(module)s %(script)s...") % {'module': mod.full_module_name, 'script': str(upscript)}
-                env.request.web.send_stream(json.dumps({"label": label, 'module': mod.full_module_name, 'script': str(upscript)}), sync=True)
+                label = _("Applying %(module)s %(script)s...") % {'module': mod.full_module_name, 'script': text_type(upscript)}
+                env.request.web.send_stream(json.dumps({"label": html.escape(label), 'module': html.escape(mod.full_module_name), 'script': html.escape(text_type(upscript))}), sync=True)
 
                 try:
                     upscript.apply()
                 except Exception as e:
-                    env.request.web.send_stream(json.dumps({"logs": "\n".join(upscript.query_logs), "error": str(e)}), sync=True)
+                    env.request.web.send_stream(json.dumps({"logs": "\n".join(html.escape(x) for x in upscript.query_logs), "error": html.escape(text_type(e))}), sync=True)
                 else:
-                    env.request.web.send_stream(json.dumps({"logs": "\n".join(upscript.query_logs), "success": True}), sync=True)
+                    env.request.web.send_stream(json.dumps({"logs": "\n".join(html.escape(x) for x in upscript.query_logs), "success": True}), sync=True)
 
         env.request.web.send_stream(data=json.dumps({"label": _("All updates applied")}), event="finish", sync=True)
         env.request.web.send_stream("close", event="close")

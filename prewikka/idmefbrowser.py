@@ -17,8 +17,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import prelude
-from prewikka.utils import OrderedDict, escape_html_string
+from prewikka import resource
+from prewikka.utils.html import Markup
+from prewikka.utils import OrderedDict, json
+
 
 def _normalizeName(name):
     return "".join([ i.capitalize() for i in name.split("_") ])
@@ -48,7 +53,7 @@ def getHTML(rootcl, rootidx=0):
 
         out += '</li>'
 
-    return out + "</ul>"
+    return resource.HTMLSource(out + "</ul>")
 
 
 def _get_path_list(rootcl=prelude.IDMEFClass("alert")):
@@ -60,12 +65,13 @@ def _get_path_list(rootcl=prelude.IDMEFClass("alert")):
             yield node.getPath()
 
 def _gen_option_list(iterator, selected):
-    out = ""
+    out = resource.HTMLSource()
+
     for name, path in iterator:
         if path in selected:
-            out += "<option value='{0}' selected>{1}</option>".format(path, name)
+            out += resource.HTMLSource("<option value='{0}' selected>{1}</option>").format(path, name)
         else:
-            out += "<option value='{0}'>{1}</option>".format(path, name)
+            out += resource.HTMLSource("<option value='{0}'>{1}</option>").format(path, name)
 
     return out
 
@@ -83,30 +89,20 @@ def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max
         selected_paths = []
 
     _html_default_value = _gen_option_list(_default_paths.items(), selected_paths)
+    if all_paths:
+        _html_all_value = _gen_option_list(((i, i) for i in _get_path_list() if i not in _default_paths.values()), selected_paths)
+        all_paths = resource.HTMLSource('<optgroup label="%s">%s</optgroup>') % (_("All paths"), _html_all_value)
 
-    html = """
+    html = resource.HTMLSource("""
 <link rel="stylesheet" type="text/css" href="prewikka/css/chosen.min.css">
-<link rel="stylesheet" type="text/css" href="prewikka/css/bootstrap-chosen.css">"""
+<link rel="stylesheet" type="text/css" href="prewikka/css/bootstrap-chosen.css">
 
-    html += """<select class="data-paths chosen-sortable form-control" %s name="selected_path" data-placeholder="%s">""" % (
-        "multiple" if max_paths != 1 else "",
-        escape_html_string(_("Select paths..."))
-    )
-
-    html += """
+<select class="data-paths chosen-sortable form-control" %s name="selected_path" data-placeholder="%s">
     <optgroup label="%s">
     %s
     </optgroup>
-""" % (escape_html_string(_("Default paths")), _html_default_value)
 
-    if all_paths:
-        _html_all_value = _gen_option_list(((i, i) for i in _get_path_list() if i not in _default_paths.values()), selected_paths)
-        html += """
-    <optgroup label="%s">
     %s
-    </optgroup>""" % (escape_html_string(_("All paths")), _html_all_value)
-
-    html += """
 </select>
 
 <script type="text/javascript">
@@ -121,6 +117,7 @@ def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max
             $(".data-paths").chosenSetOrder(%s);
          });
 </script>
-""" % (max_paths, list(selected_paths))
+""") % (resource.HTMLSource('multiple') if max_paths != 1 else "", _("Select paths..."),
+        _("Default paths"), _html_default_value, all_paths or "", max_paths, Markup(json.dumps(selected_paths)))
 
     return html

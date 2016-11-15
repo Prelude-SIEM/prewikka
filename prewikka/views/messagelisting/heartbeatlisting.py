@@ -17,21 +17,23 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from prewikka import mainmenu, template, usergroup, utils, view
 from prewikka.dataprovider import Criterion
-from prewikka import view, usergroup, utils, mainmenu, env
 from prewikka.utils import json
-from . import templates
-from messagelisting import MessageListing, MessageListingParameters, ListedMessage
+
+from .messagelisting import ListedMessage, MessageListing, MessageListingParameters
 
 
 class HeartbeatListingParameters(MessageListingParameters):
     def register(self):
         MessageListingParameters.register(self)
-        self.optional("heartbeat.analyzer(-1).analyzerid", str)
-        self.optional("heartbeat.analyzer(-1).name", str)
-        self.optional("heartbeat.analyzer(-1).node.address.address", str)
-        self.optional("heartbeat.analyzer(-1).node.name", str)
-        self.optional("heartbeat.analyzer(-1).model", str)
+        self.optional("heartbeat.analyzer(-1).analyzerid", text_type)
+        self.optional("heartbeat.analyzer(-1).name", text_type)
+        self.optional("heartbeat.analyzer(-1).node.address.address", text_type)
+        self.optional("heartbeat.analyzer(-1).node.name", text_type)
+        self.optional("heartbeat.analyzer(-1).model", text_type)
 
 
 class ListedHeartbeat(ListedMessage):
@@ -59,7 +61,7 @@ class HeartbeatListing(MessageListing):
     view_name = N_("Heartbeats")
     view_parameters = HeartbeatListingParameters
     view_permissions = [ N_("IDMEF_VIEW") ]
-    view_template = templates.HeartbeatListing
+    view_template = template.PrewikkaTemplate(__name__, "templates/heartbeatlisting.mak")
     view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
     view_section = N_("Agents")
     view_order = 1
@@ -81,11 +83,11 @@ class HeartbeatListing(MessageListing):
                              ("name", "heartbeat.analyzer(-1).name"),
                              ("model", "heartbeat.analyzer(-1).model"),
                              ("address", "heartbeat.analyzer(-1).node.address.address"),
-                             ("node.name", "heartbeat.analyzer(-1).node.name")):
+                             ("node_name", "heartbeat.analyzer(-1).node.name")):
             self.dataset[column + "_filtered"] = False
             if not filter_found:
                 if self.parameters.has_key(path):
-                    criteria.append(Criterion(path, "=", self.parameters[path]))
+                    criteria += Criterion(path, "=", self.parameters[path])
                     self.dataset[column + "_filtered"] = True
                     filter_found = True
 
@@ -104,8 +106,8 @@ class HeartbeatListing(MessageListing):
 
         count = self._setMessages(criteria)
 
-        self.dataset["nav.from"] = self.parameters["offset"] + 1
-        self.dataset["nav.to"] = self.parameters["offset"] + len(self.dataset["messages"])
+        self.dataset["nav"]["from"] = self.parameters["offset"] + 1
+        self.dataset["nav"]["to"] = self.parameters["offset"] + len(self.dataset["messages"])
         self.dataset["limit"] = self.parameters["limit"]
         self.dataset["total"] = count
 

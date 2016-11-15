@@ -17,10 +17,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from __future__ import absolute_import
-import json
-import datetime
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
+import json
+
+from prewikka.utils import html
 
 _TYPES = {}
 
@@ -51,48 +53,29 @@ class PrewikkaJSONEncoder(json.JSONEncoder):
             return obj.__json__()
 
         elif isinstance(obj, datetime.datetime):
-            return str(obj)
+            return text_type(obj)
 
         return json.JSONEncoder.default(self, obj)
 
 
-class PrewikkaJSONDecoder(json.JSONDecoder):
-    def __init__(self, *args, **kwargs):
-        json.JSONDecoder.__init__(self, object_hook=self._object_hook, *args, **kwargs)
+def _object_hook(obj):
+    cls = obj.get("__prewikka_class__")
+    if cls:
+        return _TYPES[cls[0]](*cls[1])
 
-    def _byteify(self, data, ignore_dicts=False):
-        if isinstance(data, unicode):
-            return data.encode('utf-8')
-
-        elif isinstance(data, list):
-            return [self._byteify(item, ignore_dicts=True) for item in data]
-
-        elif isinstance(data, dict) and not ignore_dicts:
-            return dict((self._byteify(key, ignore_dicts=True), self._byteify(value, ignore_dicts=True)) for key, value in data.iteritems())
-
-        return data
-
-    def _object_hook(self, obj):
-        obj = self._byteify(obj)
-
-        cls = obj.get("__prewikka_class__")
-        if cls:
-            return _TYPES[cls[0]](*cls[1])
-
-        return obj
+    return obj
 
 
 def load(*args, **kwargs):
-    return json.load(cls=PrewikkaJSONDecoder, *args, **kwargs)
+    return json.load(*args, object_hook=_object_hook, **kwargs)
 
 
 def loads(*args, **kwargs):
-    return json.loads(cls=PrewikkaJSONDecoder, *args, **kwargs)
+    return json.loads(*args, object_hook=_object_hook, **kwargs)
 
 
 def dump(*args, **kwargs):
-    return json.dump(cls=PrewikkaJSONEncoder, *args, **kwargs)
-
+    return html.escapejson(json.dump(cls=PrewikkaJSONEncoder, *args, **kwargs))
 
 def dumps(*args, **kwargs):
-    return json.dumps(cls=PrewikkaJSONEncoder, *args, **kwargs)
+    return html.escapejson(json.dumps(cls=PrewikkaJSONEncoder, *args, **kwargs))

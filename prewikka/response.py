@@ -18,12 +18,29 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time, os, mimetypes
+from __future__ import absolute_import, division, print_function
+
+import mimetypes
+import os
+import time
+
+from prewikka import compat, template, utils
 from prewikka.utils import json
-from prewikka import env, compat, utils, template
 
 
 _sentinel = object()
+
+_ADDITIONAL_MIME_TYPES = [("application/vnd.oasis.opendocument.formula-template", ".otf"),
+                          ("application/vnd.ms-fontobject", ".eot"),
+                          ("image/vnd.microsoft.icon", ".ico"),
+                          ("application/font-woff", ".woff"),
+                          ("application/font-sfnt", ".ttf"),
+                          ("application/json", ".map"),
+                          ("font/woff2", ".woff2")]
+
+
+for mtype, extension in _ADDITIONAL_MIME_TYPES:
+    mimetypes.add_type(mtype, extension)
 
 
 class PrewikkaResponse(object):
@@ -48,7 +65,7 @@ class PrewikkaResponse(object):
         if headers is not _sentinel:
             self.headers = headers
         else:
-            self.headers = utils.OrderedDict((("Content-type", "text/html"),
+            self.headers = utils.OrderedDict((("Content-Type", "text/html"),
                                               ("Last-Modified", time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())),
                                               ("Expires", "Fri, 01 Jan 1999 00:00:00 GMT"),
                                               ("Cache-control", "no-store, no-cache, must-revalidate"),
@@ -71,8 +88,9 @@ class PrewikkaResponse(object):
             "duration": duration
         })
 
-    def _is_xhr_embedded_content(self, obj):
-        is_json = hasattr(self.data, '__json__')
+    @staticmethod
+    def _is_xhr_embedded_content(obj):
+        is_json = hasattr(obj, '__json__')
         if is_json and not isinstance(obj, template.PrewikkaTemplate):
             return False
 
@@ -92,7 +110,7 @@ class PrewikkaResponse(object):
             res = ""
 
         if not isinstance(res, compat.STRING_TYPES):
-            self.headers["Content-type"] = "application/json"
+            self.headers["Content-Type"] = "application/json"
             res = json.dumps(res)
 
         return res.encode(env.config.general.get("encoding", "utf8"), "xmlcharrefreplace")
@@ -128,7 +146,7 @@ class PrewikkaDownloadResponse(PrewikkaResponse):
         PrewikkaResponse.__init__(self, data)
         self.headers.update((
             ("Content-Type", type),
-            ("Content-Disposition", "attachment; filename=%s" % filename),
+            ("Content-Disposition", "attachment; filename=\"%s\"" % filename),
             ("Pragma", "public"),
             ("Cache-Control", "max-age=0")
         ))
@@ -168,7 +186,7 @@ class PrewikkaFileResponse(PrewikkaResponse):
     def write(self, request):
         request.send_headers(self.headers.items(), self.code, self.status_text)
 
-        for i in iter(lambda: self.fd.read(8192), ''):
+        for i in iter(lambda: self.fd.read(8192), b''):
             request.write(i)
 
         self.fd.close()

@@ -18,7 +18,13 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-import os, glob, pkg_resources
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import glob
+import os
+
+import pkg_resources
+
 
 def getThemes():
     theme_list = []

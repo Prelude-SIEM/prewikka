@@ -267,10 +267,12 @@ function prewikka_json_dialog(data)
 {
     var dialog;
 
-    $("#prewikka-dialog-container").append(data.html);
+    $("#prewikka-dialog-container").append(data.content);
     dialog = $("#prewikka-dialog-container > :last-child");
 
     setup_position(dialog);
+
+    $(dialog).addClass("ajax-modal modal fade");
     $(dialog).modal();
 }
 
@@ -296,22 +298,6 @@ function prewikka_dialog(data)
 
 function prewikka_dialog_getMaxHeight() {
     return $(window).height() - $("#topmenu").height() - 100;
-}
-
-var _entity_map = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': '&quot;',
-    "'": '&#39;',
-    "/": '&#x2F;'
-};
-
-function prewikka_escape_html(data)
-{
-    return String(data).replace(/[&<>"'\/]/g, function(s) {
-        return _entity_map[s];
-    });
 }
 
 

@@ -17,8 +17,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import pkg_resources, sys, os, traceback
-from prewikka import log, utils, error, database, env, usergroup, hookmanager
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import os
+import sys
+import traceback
+
+import pkg_resources
+from prewikka import database, env, error, hookmanager, log, usergroup, utils
 from prewikka.localization import translation
 
 logger = log.getLogger(__name__)
@@ -150,4 +156,3 @@ class PluginManager:
 
     def __contains__(self, item):
         return item in self.__dinstances
-

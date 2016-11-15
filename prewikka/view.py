@@ -18,11 +18,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import operator, json, time
-from copy import copy
-from prewikka import pluginmanager, template, usergroup, error, log, utils, env, hookmanager, database
-from prewikka.response import PrewikkaResponse
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+import json
+import operator
+import time
+from copy import copy
+
+from prewikka import database, env, error, hookmanager, log, pluginmanager, template, usergroup, utils
+from prewikka.response import PrewikkaResponse
 
 logger = log.getLogger(__name__)
 
@@ -77,7 +81,7 @@ class ParameterDesc(object):
         self.mandatory = mandatory
 
         if type is list:
-            self.type = [ str ]
+            self.type = [ text_type ]
         else:
             self.type = type
 
@@ -119,8 +123,8 @@ class Parameters(dict):
         self._parameters = { }
 
         self.register()
-        self.optional("_save", str)
-        self.optional("_download", str)
+        self.optional("_save", text_type)
+        self.optional("_download", text_type)
 
         list(hookmanager.trigger("HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper(), self))
 
@@ -196,7 +200,6 @@ class Parameters(dict):
                     continue
 
                 value = param.parse(user.get_property(name, view=save_view))
-
                 self._default[name] = value
                 if do_load:
                     self[name] = value
@@ -341,8 +344,9 @@ class _View(object):
         pass
 
     def _setup_dataset_default(self):
-        self.dataset["document.base_url"] = env.request.web.get_baseurl()
-        self.dataset["document.href"] = "/".join(env.request.web.path_elements)
+        self.dataset["document"] = utils.AttrObj()
+        self.dataset["document"].base_url = env.request.web.get_baseurl()
+        self.dataset["document"].href = "/".join(env.request.web.path_elements)
 
     def _render(self):
         self.parameters = {}
@@ -353,7 +357,7 @@ class _View(object):
         env.request.parameters = self.parameters
 
         if self.view_template and self.dataset is None:
-            self.dataset = template.PrewikkaTemplate(self.view_template)
+            self.dataset = self.view_template.dataset()
 
         if self.dataset is not None:
             self._setup_dataset_default()
@@ -379,12 +383,15 @@ class _View(object):
         if self.dataset:
             for name, clname in self.view_extensions:
                 obj = getattr(self, name)
-                response.ext_content[name] = obj.dataset.render([self.dataset or {}])
+                response.ext_content[name] = obj.dataset.render()
 
         return response
 
     def __init__(self):
         self.dataset = None
+
+        if self.view_template and not isinstance(self.view_template, template.PrewikkaTemplate):
+            self.view_template = template.PrewikkaTemplate(self.view_template)
 
         if not self.view_id:
             self.view_id = self.__class__.__name__.lower()
@@ -481,7 +488,7 @@ class ViewManager:
 
     def loadViews(self):
         #Import here, because of cyclic dependency
-        from baseview import BaseView
+        from prewikka.baseview import BaseView
         self.addView(BaseView())
 
         for view_class in sorted(pluginmanager.PluginManager("prewikka.views"), key=operator.attrgetter("view_order")):

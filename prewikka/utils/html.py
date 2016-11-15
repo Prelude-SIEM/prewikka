@@ -17,13 +17,32 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from prewikka import compat
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import markupsafe
+
+
+class Markup(markupsafe.Markup):
+    @classmethod
+    def escape(cls, value):
+        if value is None:
+            return Markup()
+
+        return markupsafe.escape(value)
+
 
 def escape(value):
-    if not isinstance(value, compat.STRING_TYPES):
-        value = str(value)
-
-    return value.replace("<", "&lt;").replace(">", "&gt;").replace('"', "&quot;").replace("'", "&#39;").replace("&", "&amp;")
+    return Markup.escape(value)
 
 def escapejson(value):
-    return value.replace("/", "\\/")
+    return value.replace("</", "<\\/")
+
+
+def selected(condition):
+    return "selected" if condition else ""
+
+def checked(condition):
+    return "checked" if condition else ""
+
+def disabled(condition):
+    return "disabled" if condition else ""

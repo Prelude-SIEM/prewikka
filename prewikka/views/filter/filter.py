@@ -18,12 +18,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import prelude, re
-from prewikka.utils import json, html
-from prewikka.dataprovider import Criterion
-from prewikka import view, error, usergroup, template, database, utils, version, env, hookmanager
-from . import templates
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+import re
+
+import pkg_resources
+import prelude
+from prewikka import database, error, hookmanager, resource, template, usergroup, utils, version, view
+from prewikka.dataprovider import Criterion
+from prewikka.utils import AttrObj, html, json
 
 _OP_TBL   = { "AND": "&&", "OR": "||" }
 _TYPE_TBL = { "generic": "alert", "alert": "alert", "heartbeat": "heartbeat" }
@@ -126,11 +129,11 @@ class AlertFilterEditionParameters(view.Parameters):
     allow_extra_parameters = True
 
     def register(self):
-        self.optional("mode", str)
-        self.optional("filter_name", str)
-        self.optional("filter_comment", str, default="")
-        self.optional("filter_formula", str, default="")
-        self.optional("load", str)
+        self.optional("mode", text_type)
+        self.optional("filter_name", text_type)
+        self.optional("filter_comment", text_type, default="")
+        self.optional("filter_formula", text_type, default="")
+        self.optional("load", text_type)
 
     def normalize(self, *args, **kwargs):
         view.Parameters.normalize(self, *args, **kwargs)
@@ -160,10 +163,12 @@ class AlertFilterEdition(view.View):
 
     view_name = N_("Filters")
     view_parameters = AlertFilterEditionParameters
-    view_template = templates.FilterEdition
+    view_template = template.PrewikkaTemplate(__name__, "templates/filteredition.mak")
     view_section = N_("Settings")
     view_order = 1
     view_permissions = [ N_("IDMEF_VIEW") ]
+
+    _filter_menu_tmpl = template.PrewikkaTemplate(__name__, "templates/menu.mak")
 
     @hookmanager.register("HOOK_USER_DELETE")
     def _user_delete(self, user):
@@ -176,7 +181,7 @@ class AlertFilterEdition(view.View):
 
     @hookmanager.register("HOOK_MAINMENU_PARAMETERS_REGISTER")
     def _filter_parameters_register(self, view):
-        view.optional("filter", str, save=True)
+        view.optional("filter", text_type, save=True)
         return ["filter"]
 
     @hookmanager.register("HOOK_DATAPROVIDER_CRITERIA_PREPARE")
@@ -202,10 +207,11 @@ class AlertFilterEdition(view.View):
         if ctype not in ("alert", "heartbeat"):
             return
 
-        tmpl = template.PrewikkaTemplate(templates.menu)
-        tmpl["current_filter"] = env.request.parameters.get("filter", "")
-        tmpl["filters"] = self._db.get_filter_list(env.request.user, ctype)
-        return tmpl.render()
+        dset = self._filter_menu_tmpl.dataset()
+        dset["current_filter"] = env.request.parameters.get("filter", "")
+        dset["filter_list"] = self._db.get_filter_list(env.request.user, ctype)
+
+        return resource.HTMLSource(dset.render())
 
     def __init__(self):
         view.View.__init__(self)
@@ -222,10 +228,10 @@ class AlertFilterEdition(view.View):
 
     def _set_common(self):
         self.dataset["type"] = self.parameters.get("type", "filter")
-        self.dataset["filters"] = self._db.get_filter_list(env.request.user)
+        self.dataset["filter_list"] = self._db.get_filter_list(env.request.user)
 
-        self.dataset["alert_objects"] = html.escapejson(json.dumps(self._flatten(prelude.IDMEFClass("alert"))))
-        self.dataset["generic_objects"] = html.escapejson(json.dumps(self._flatten(prelude.IDMEFClass("heartbeat"))))
+        self.dataset["alert_objects"] = self._flatten(prelude.IDMEFClass("alert"))
+        self.dataset["generic_objects"] = self._flatten(prelude.IDMEFClass("heartbeat"))
 
         self.dataset["operators"] = [
             ("=", _("Equal")),
@@ -246,10 +252,7 @@ class AlertFilterEdition(view.View):
             ("!<>*", _("Not substring (case-insensitive)"))]
 
         self.dataset["elements"] = [self._element("A")]
-        self.dataset["fltr.name"] = ""
-        self.dataset["fltr.type"] = ""
-        self.dataset["fltr.comment"] = ""
-        self.dataset["fltr.formula"] = ""
+        self.dataset["fltr"] = AttrObj(name="", type="", comment="", formula="")
 
     def _reload(self):
         self.dataset["elements"] = []
@@ -257,10 +260,8 @@ class AlertFilterEdition(view.View):
         for name, obj, operator, value in self.parameters.get("elements", [ ]):
             self.dataset["elements"].append(self._element(name, obj, operator, value))
 
-        self.dataset["fltr.type"] = self.parameters.get("filter_type", "")
-        self.dataset["fltr.name"] = self.parameters.get("filter_name", "")
-        self.dataset["fltr.comment"] = self.parameters.get("filter_comment", "")
-        self.dataset["fltr.formula"] = self.parameters["filter_formula"]
+        for i in ("name", "type", "comment", "formula"):
+            setattr(self.dataset["fltr"], i, self.parameters.get("filter_%s" % i, ""))
 
     def _element(self, name, obj="", operator="", value=""):
         return {
@@ -277,10 +278,9 @@ class AlertFilterEdition(view.View):
         if fname:
             filter = self._db.get_filter(env.request.user, fname)
 
-            self.dataset["fltr.type"] = filter.type
-            self.dataset["fltr.name"] = filter.name
-            self.dataset["fltr.comment"] = filter.comment
-            self.dataset["fltr.formula"] = filter.formula
+            for i in ("name", "type", "comment", "formula"):
+                setattr(self.dataset["fltr"], i, getattr(filter, i))
+
             self.dataset["elements"] = []
 
             for name in sorted(filter.elements.keys()):
@@ -334,4 +334,4 @@ class AlertFilterEdition(view.View):
         elif self.parameters["mode"] == _("Delete"):
             self._delete()
 
-        self.dataset["elements"] = html.escapejson(json.dumps(self.dataset["elements"]))
+        self.dataset["elements"] = self.dataset["elements"]

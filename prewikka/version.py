@@ -1,5 +1,8 @@
-__version_info__ = (3, 1, "0")
-__version__ = ".".join(str(i) for i in __version_info__)
+from __future__ import absolute_import, division, print_function, unicode_literals
+import pkg_resources
+
+__version__ = pkg_resources.get_distribution("prewikka").version
+__version_info__ = __version__.split(".")
 __branch__ = "3.1"
 __author__ = "Prelude Team"
 __license__ = "GPL"

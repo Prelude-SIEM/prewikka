@@ -17,9 +17,10 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import functools
-import collections
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+import collections
+import functools
 
 _CacheInfo = collections.namedtuple("CacheInfo", ["hits", "misses", "size"])
 

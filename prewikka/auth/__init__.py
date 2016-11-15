@@ -1,1 +1,2 @@
-from auth import Auth, AuthError
+from __future__ import absolute_import, division, print_function, unicode_literals
+from .auth import Auth, AuthError

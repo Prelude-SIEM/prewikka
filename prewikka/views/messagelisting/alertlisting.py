@@ -18,12 +18,22 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import copy, re, urllib, prelude, time, pkg_resources, datetime, itertools
-from prewikka.utils import json
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import copy
+import datetime
+import itertools
+import re
+import time
+import urllib
+
+import pkg_resources
+import prelude
+from prewikka import compat, error, hookmanager, localization, mainmenu, template, usergroup, utils, view
 from prewikka.dataprovider import Criterion
-from prewikka import view, usergroup, utils, error, mainmenu, localization, hookmanager, compat
-from . import templates
-from messagelisting import MessageListingParameters, MessageListing, ListedMessage
+from prewikka.utils import json
+
+from .messagelisting import AttrDict, ListedMessage, MessageListing, MessageListingParameters
 
 
 def cmp_severities(x, y):
@@ -64,12 +74,12 @@ class AlertListingParameters(MessageListingParameters):
     def _get_aggregated_alert(self, ident):
         aggreg_type = ""
 
-        alert = env.dataprovider.get(criteria=Criterion("alert.messageid", "=", ident))[0]
-        if alert["alert.correlation_alert"]:
-            aggreg_type = "alert.correlation_alert"
+        alert = env.dataprovider.get(criteria=Criterion("alert.messageid", "=", ident))[0]["alert"]
+        if alert["correlation_alert"]:
+            aggreg_type = "correlation_alert"
 
-        elif alert["alert.tool_alert"]:
-            aggreg_type = "alert.tool_alert"
+        elif alert["tool_alert"]:
+            aggreg_type = "tool_alert"
 
         return alert, aggreg_type
 
@@ -135,11 +145,11 @@ class AlertListingParameters(MessageListingParameters):
                 self.max_index = num + 1
 
             ret = True
-            operator = params_dict.get(column + "_operator_" + str(num), "=")
+            operator = params_dict.get(column + "_operator_" + text_type(num), "=")
             self._checkOperator(operator)
 
             try:
-                value = params_dict[column + "_value_" + str(num)]
+                value = params_dict[column + "_value_" + text_type(num)]
             except KeyError:
                 if operator != "!":
                     continue
@@ -276,9 +286,9 @@ class ListedAlert(ListedMessage):
         dataset[name] = value
 
     def _initDirection(self, dataset):
-        self._initValue(dataset, "port", { "value": None })
-        self._initValue(dataset, "protocol", { "value": None })
-        self._initValue(dataset, "service", { "value": None, "inline_filter": None, "already_filtered": False })
+        self._initValue(dataset, "port", AttrDict(value=None))
+        self._initValue(dataset, "protocol", AttrDict(value=None))
+        self._initValue(dataset, "service", AttrDict(value=None, inline_filter=None, already_filtered=False))
         self._initValue(dataset, "addresses", [ ])
         self._initValue(dataset, "listed_values", [ ])
         self._initValue(dataset, "aggregated_hidden", 0)
@@ -286,16 +296,16 @@ class ListedAlert(ListedMessage):
 
     def _initDirectionIfNeeded(self, direction):
         if len(self[direction]) == 0:
-            self[direction].append(self._initDirection({ }))
+            self[direction].append(self._initDirection(AttrDict()))
 
     def _setMainAndExtraValues(self, dataset, name, object_main, object_extra):
         if object_main != None:
-            dataset[name] = { "value": object_main }
-            dataset[name + "_extra"] = { "value": object_extra }
+            dataset[name] = AttrDict(value=object_main)
+            dataset[name + "_extra"] = AttrDict(value=object_extra)
 
         else:
-            dataset[name] = { "value": object_extra }
-            dataset[name + "_extra"] = { "value": None }
+            dataset[name] = AttrDict(value=object_extra)
+            dataset[name + "_extra"] = AttrDict(value=None)
 
     def _guessAddressCategory(self, address):
         if re.compile("\d\.\d\.\d\.\d").match(address):
@@ -354,7 +364,7 @@ class ListedAlert(ListedMessage):
             dataset["listed_values"].append(item)
 
     def _setMessageDirection(self, dataset, direction, obj):
-        dataset["interface"] = { "value": obj["interface"] }
+        dataset["interface"] = AttrDict(value=obj["interface"])
 
         for userid in obj["user.user_id"]:
             self._setMessageDirectionOther(dataset, direction, "alert.%s.user.user_id.name" % direction, userid["name"],
@@ -396,7 +406,7 @@ class ListedAlert(ListedMessage):
             if obj["service.port"]:
                 pl.append("alert.%s.service.port" % direction)
                 vl.append(obj["service.port"])
-                pstr = str(obj["service.port"])
+                pstr = text_type(obj["service.port"])
                 if proto:
                     pstr += "/" + proto
             elif proto:
@@ -419,7 +429,7 @@ class ListedAlert(ListedMessage):
         total = 0
         index = 0
         for source in message["alert.source"]:
-            dataset = { }
+            dataset = AttrDict()
             self._initDirection(dataset)
             self._setMessageDirection(dataset, "source", source)
 
@@ -449,7 +459,7 @@ class ListedAlert(ListedMessage):
         total = 0
 
         for target in message["alert.target"]:
-            dataset = { }
+            dataset = AttrDict()
             self._initDirection(dataset)
             self._setMessageDirection(dataset, "target", target)
 
@@ -534,7 +544,7 @@ class ListedAlert(ListedMessage):
     def _setClassificationInfos(self, dataset, message, ident):
         dataset["count"] = 1
         dataset["display"] = self.createMessageIdentLink(ident, "AlertSummary")
-        dataset["severity"] = { "value": message["alert.assessment.impact.severity"] }
+        dataset["severity"] = AttrDict(value=message["alert.assessment.impact.severity"])
         dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"])
         dataset["description"] = message["alert.assessment.impact.description"]
 
@@ -543,7 +553,7 @@ class ListedAlert(ListedMessage):
 
         if "time" in env.url and t:
             epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=utils.timeutil.tzutc())
-            t = str(int(compat.timedelta_total_seconds(t - epoch) * 1000))
+            t = text_type(int(compat.timedelta_total_seconds(t - epoch) * 1000))
 
             for urlname, url in env.url["time"].items():
                 url = url.replace("$time", t)
@@ -560,10 +570,10 @@ class ListedAlert(ListedMessage):
             abs(compat.timedelta_total_seconds(message["alert.create_time"] - message["alert.analyzer_time"])) > 60):
             self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"])
         else:
-            self["analyzer_time"] = { "value": None }
+            self["analyzer_time"] = AttrDict(value=None)
 
     def addSensor(self, message):
-        sensor = { }
+        sensor = AttrDict()
         self["sensors"].append(sensor)
 
         for path in ("alert.analyzer(-1).name", "alert.analyzer(-1).model"):
@@ -578,7 +588,7 @@ class ListedAlert(ListedMessage):
 
 
     def setMessage(self, message, ident, extra_link=True):
-        self["infos"] = [ { } ]
+        self["infos"] = [ AttrDict() ]
         self["aggregated"] = False
         self["selection"] = json.dumps(Criterion("alert.messageid", "=", ident))
 
@@ -631,7 +641,7 @@ class ListedAlert(ListedMessage):
             function(dataset, direction, value)
         else:
             if type(dataset[dset_name]) is list:
-                dataset[dset_name].append({ "value": value })
+                dataset[dset_name].append(AttrDict(value=value))
             else:
                 dataset[dset_name]["value"] = value
 
@@ -667,15 +677,11 @@ class ListedAggregatedAlert(ListedAlert):
         self["selection"] = json.dumps(select_criteria)
 
     def setInfos(self, count, classification, severity, completion):
-        infos = {
-            "classification_references": "",
-            "classification_url": "",
-            "count": count,
-            "description": "",
-            "classification": self.createInlineFilteredField("alert.classification.text", classification, direction="classification"),
-            "severity": { "value": severity },
-            "completion": self.createInlineFilteredField("alert.assessment.impact.completion", completion)
-            }
+        infos = AttrDict(classification_references="", classification_url="", count=count, description="",
+                classification=self.createInlineFilteredField("alert.classification.text", classification, direction="classification"),
+                severity=AttrDict(value=severity),
+                completion=self.createInlineFilteredField("alert.assessment.impact.completion", completion))
+
         self._setMessageClassificationURL(infos, classification)
 
         self["infos"].append(infos)
@@ -688,7 +694,7 @@ class AlertListing(MessageListing):
     view_name = N_("Alerts")
     view_parameters = AlertListingParameters
     view_permissions = [ N_("IDMEF_VIEW") ]
-    view_template = templates.AlertListing
+    view_template = template.PrewikkaTemplate(__name__, "templates/alertlisting.mak")
     view_extensions = (("menu", mainmenu.MainMenuAlert),)
     view_section = N_("Alerts")
     view_order = 0
@@ -747,7 +753,7 @@ class AlertListing(MessageListing):
                 if not param in self.parameters["alert.type"]:
                     new &= Criterion(param, "=", None)
 
-        self.dataset["alert.type"] = self.parameters["alert.type"]
+        self.dataset["alert_type"] = self.parameters["alert.type"]
         criteria += new
 
     def _applyClassificationFilters(self, criteria):
@@ -777,7 +783,7 @@ class AlertListing(MessageListing):
 
     def _adjustCriteria(self, criteria):
         if "aggregated_alert_id" in self.parameters:
-            alert, aggreg_type = self.parameters._get_aggregated_alert(self.get("aggregated_alert_id"))
+            alert, aggreg_type = self.parameters._get_aggregated_alert(self.parameters.get("aggregated_alert_id"))
 
             source_analyzer = None
             newcrit = Criterion()
@@ -1118,9 +1124,9 @@ class AlertListing(MessageListing):
     def _setDatasetConstants(self):
         d = {}
         for i in COLUMN_LIST:
-            d[i] = self.dataset[i]
+            d[i] = self.dataset.get(i)
             n = "aggregated_" + i
-            d[n] = self.dataset[n]
+            d[n] = self.dataset.get(n)
             d[n + "_saved"] = self.dataset[n + "_saved"] = self.parameters.getDefault(n, usedb=True)
             d[n + "_default"] = self.dataset[n + "_default"] = self.parameters.getDefault(n, usedb=False)
             d[i + "_saved"] = self.dataset[i + "_saved"] = self.parameters._saved[i]
@@ -1128,7 +1134,7 @@ class AlertListing(MessageListing):
         d["special"] = {}
         for i in ("alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"):
             d["special"].setdefault("classification", []).append(i)
-            d[i] = self.dataset[i]
+            d[i] = self.dataset.get(i)
             d[i + "_saved"] = self.dataset[i + "_saved"] = self.parameters.getDefault(i, usedb=True)
             d[i + "_default"] =self.dataset[i + "_default"] = self.parameters.getDefault(i, usedb=False)
 
@@ -1154,7 +1160,7 @@ class AlertListing(MessageListing):
 
         d["column_names"] = COLUMN_LIST[:]
 
-        self.dataset["columns_data"] = json.dumps(d)
+        self.dataset["columns_data"] = d
 
         self.dataset["classification_filtered"] = self._paramChanged("classification", c_params)
         self.dataset["source_filtered"] = self._paramChanged("source", s_params)
@@ -1192,8 +1198,8 @@ class AlertListing(MessageListing):
         total = self._setMessages(criteria)
         self._setDatasetConstants()
 
-        self.dataset["nav.from"] = localization.format_number(self.parameters["offset"] + 1)
-        self.dataset["nav.to"] = localization.format_number(self.parameters["offset"] + len(self.dataset["messages"]))
+        self.dataset["nav"]["from"] = localization.format_number(self.parameters["offset"] + 1)
+        self.dataset["nav"]["to"] = localization.format_number(self.parameters["offset"] + len(self.dataset["messages"]))
         self.dataset["limit"] = localization.format_number(self.parameters["limit"])
         self.dataset["total"] = localization.format_number(total)
         self.dataset["correlation_alert_view"] = False

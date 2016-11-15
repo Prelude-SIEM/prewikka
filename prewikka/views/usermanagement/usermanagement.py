@@ -1,10 +1,10 @@
 # Copyright (C) 2004-2016 CS-SI. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 
-import pkg_resources
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import view, localization, theme, log, usergroup, error, env, hookmanager
-from . import templates
+import pkg_resources
+from prewikka import error, hookmanager, localization, log, template, theme, usergroup, view
 
 
 class UserSettingsDisplayParameters(view.Parameters):
@@ -30,7 +30,7 @@ class UserSettingsDisplay(view.View):
 
     view_parameters = UserSettingsDisplayParameters
     view_permissions = [ ]
-    view_template = templates.UserSettings
+    view_template = template.PrewikkaTemplate(__name__, 'templates/usersettings.mak')
     plugin_htdocs = (("usermanagement", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     def render(self):
@@ -48,7 +48,7 @@ class UserSettingsDisplay(view.View):
         self.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
         self.dataset["language"] = self._object.get_property("language", default=env.config.general.default_locale)
         self.dataset["available_themes"] = theme.getThemes()
-        self.dataset["user.theme"] = self._object.get_property("theme", default=env.config.general.default_theme)
+        self.dataset["selected_theme"] = self._object.get_property("theme", default=env.config.general.default_theme)
 
 
 class UserSettingsModify(view.View):

@@ -1,5 +1,8 @@
-from babel.core import Locale
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from datetime import timedelta
+
+from babel.core import Locale
 
 TIMEDELTA_UNITS = (
     ('year',   3600 * 24 * 365),

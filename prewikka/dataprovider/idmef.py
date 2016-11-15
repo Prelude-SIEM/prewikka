@@ -1,8 +1,10 @@
 # Copyright (C) 2016 CS-SI. All Rights Reserved.
 # Author: Abdel ELMILI <abdel.elmili@c-s.fr>
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import prelude
-from prewikka import pluginmanager, version, utils
+from prewikka import pluginmanager, utils, version
 from prewikka.dataprovider import DataProviderNormalizer
 
 

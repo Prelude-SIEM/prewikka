@@ -17,40 +17,40 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import pkg_resources
+from __future__ import absolute_import, division, print_function, unicode_literals
 import time
 
-from prewikka.utils import json, html
+import pkg_resources
+from prewikka import hookmanager, localization, mainmenu, template, utils, view
 from prewikka.dataprovider import Criterion
-from prewikka import view, utils, localization, mainmenu, hookmanager
-from . import templates
+from prewikka.utils import html, json
 
 
-class SensorListingParameters(mainmenu.MainMenuParameters):
+class AgentsParameters(mainmenu.MainMenuParameters):
     def register(self):
         mainmenu.MainMenuParameters.register(self)
-        self.optional("filter_path", str)
-        self.optional("filter_value", str)
+        self.optional("filter_path", text_type)
+        self.optional("filter_value", text_type)
         self.optional("status", list, default=[])
 
 
 class HeartbeatAnalyzeParameters(view.Parameters):
     def register(self):
-        self.mandatory("analyzerid", str)
+        self.mandatory("analyzerid", text_type)
 
 
-class SensorMessagesDeleteParameters(SensorListingParameters):
+class SensorMessagesDeleteParameters(AgentsParameters):
     def register(self):
         SensorListingParameters.register(self)
         self.optional("analyzerid", list, default=[])
         self.optional("types", list, default=[])
 
-class SensorListing(view.View):
+class Agents(view.View):
     view_name = "Agents"
     view_section = "Agents"
-    view_parameters = SensorListingParameters
+    view_parameters = AgentsParameters
     view_permissions = [ N_("IDMEF_VIEW") ]
-    view_template = templates.SensorListing
+    view_template = template.PrewikkaTemplate(__name__, "templates/agents.mak")
     view_order = 0
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
@@ -117,14 +117,13 @@ class SensorListing(view.View):
                    ]}
 
     def render(self):
-        analyzer_data = list(self._get_analyzers())
+        self.dataset["data"] = analyzer_data = list(self._get_analyzers())
         list(hookmanager.trigger("HOOK_AGENTS_EXTRA_CONTENT", analyzer_data))
 
-        self.dataset["data"] = html.escapejson(json.dumps(analyzer_data))
-        self.dataset["extra_columns"] = [col for col in hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN") if col]
+        self.dataset["extra_columns"] = filter(None, hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN"))
 
 
-class SensorMessagesDelete(SensorListing):
+class SensorMessagesDelete(Agents):
     view_parameters = SensorMessagesDeleteParameters
     view_permissions = [ N_("IDMEF_VIEW"), N_("IDMEF_ALTER") ]
 
@@ -134,13 +133,13 @@ class SensorMessagesDelete(SensorListing):
                 if i in ("alert", "heartbeat"):
                     env.dataprovider.delete(Criterion("%s.analyzer.analyzerid" % i, "=", analyzerid))
 
-        SensorListing.render(self)
+        AgentsListing.render(self)
 
 
-class HeartbeatAnalyze(SensorListing):
+class HeartbeatAnalyze(Agents):
     view_parameters = HeartbeatAnalyzeParameters
     view_permissions = [ N_("IDMEF_VIEW") ]
-    view_template = templates.HeartbeatAnalyze
+    view_template = template.PrewikkaTemplate(__name__, "templates/heartbeatanalyze.mak")
 
     def render(self):
         analyzerid = self.parameters["analyzerid"]
@@ -180,24 +179,24 @@ class HeartbeatAnalyze(SensorListing):
                     utils.get_analyzer_status_from_latest_heartbeat(cur, self._heartbeat_error_margin)
                 if analyzer.status == "missing":
                     delta = time.time() - float(cur_time)
-                    analyzer.events.append({ "time": cur_time_str, "value": _("Sensor is down since %s") % localization.format_timedelta(delta), "type": "down"})
+                    analyzer.events.append(utils.AttrObj(time=cur_time_str, value=_("Sensor is down since %s") % localization.format_timedelta(delta), type="down"))
 
             event = None
             if cur_status == "starting":
                 if prev_status == "exiting":
-                    event = { "time": cur_time_str, "value": _("Normal sensor start"), "type": "start" }
+                    event = utils.AttrObj(time=cur_time_str, value=_("Normal sensor start"), type="start")
                 else:
-                    event = { "time": cur_time_str, "value": _("Unexpected sensor restart"), "type": "unexpected_restart" }
+                    event = utils.AttrObj(time=cur_time_str, value=_("Unexpected sensor restart"), type="unexpected_restart")
 
             elif cur_status == "running":
                 delta = abs(int(cur_time) - int(prev_time) - int(cur_interval))
                 if delta > self._heartbeat_error_margin:
                     delta = localization.format_timedelta(delta, granularity="second")
-                    event = { "time": cur_time_str, "value": _("Unexpected heartbeat interval: %(delta)s") % {'delta': delta}, "type": "abnormal_heartbeat_interval" }
+                    event = utils.AttrObj(time=cur_time_str, value=_("Unexpected heartbeat interval: %(delta)s") % {'delta': delta}, type="abnormal_heartbeat_interval")
 
 
             elif cur_status == "exiting":
-                event = { "time": cur_time_str, "value": _("Normal sensor stop"), "type": "normal_stop" }
+                event = utils.AttrObj(time=cur_time_str, value=_("Normal sensor stop"), type="normal_stop")
 
 
             if event:

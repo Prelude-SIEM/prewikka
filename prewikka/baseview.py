@@ -17,11 +17,15 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import view, resource, hookmanager, env, templates
+import copy
+import itertools
 
+import pkg_resources
+from prewikka import hookmanager, resource, template, utils, view
 
-_CSS_FILES = [resource.CSSLink(link) for link in (
+_CSS_FILES = utils.OrderedDict((resource.CSSLink(link), True) for link in (
     "prewikka/css/jquery-ui.min.css",
     "prewikka/css/bootstrap.min.css",
     "prewikka/css/jquery.jstree.css",
@@ -30,9 +34,10 @@ _CSS_FILES = [resource.CSSLink(link) for link in (
     "prewikka/css/ui.jqgrid.min.css",
     "prewikka/css/ui.multiselect.min.css",
     "prewikka/css/loader.css")
-]
+)
 
-_JS_FILES = [resource.JSLink(link) for link in (
+
+_JS_FILES = utils.OrderedDict((resource.JSLink(link), True) for link in (
     "prewikka/js/jquery.js",
     "prewikka/js/jquery-ui.min.js",
     "prewikka/js/bootstrap.min.js",
@@ -44,11 +49,11 @@ _JS_FILES = [resource.JSLink(link) for link in (
     "prewikka/js/jquery.jqgrid.min.js",
     "prewikka/js/commonlisting.js",
     "prewikka/js/jquery.jstree.js")
-]
+)
 
 
 class BaseView(view._View):
-    view_template = templates.BaseView
+    view_template = template.PrewikkaTemplate(__name__, 'templates/baseview.mak')
 
     def render(self):
         # FIXME: move theme management to a plugin !
@@ -59,15 +64,20 @@ class BaseView(view._View):
             theme = env.config.general.default_theme
             lang = env.config.general.default_locale
 
+        _HEAD = copy.copy(_CSS_FILES)
+        _HEAD[resource.CSSLink("prewikka/css/themes/%s.css" % theme)] = True
+        _HEAD.update(_JS_FILES)
+
         # The jqgrid locale files use only two characters for identifying the language (e.g. pt_BR -> pt)
-        lang_file = resource.JSLink("prewikka/js/locales/grid.locale-%s.js" % lang[:2])
-        theme_file = resource.CSSLink("prewikka/css/themes/%s.css" % theme)
-        head = _CSS_FILES + [theme_file] + _JS_FILES + [lang_file]
+        _HEAD[resource.JSLink("prewikka/js/locales/grid.locale-%s.js" % lang[:2])] = True
 
-        for i in hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT"):
-            head += (content for content in i if content not in head)
+        for contents in itertools.ifilter(None, hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT")):
+            _HEAD.update((i, True) for i in contents)
 
-        self.dataset["document.head_content"] = head
-        self.dataset["toplayout_extra_content"] = ""
+        _BODY = utils.OrderedDict()
+        for contents in itertools.ifilter(None, hookmanager.trigger("HOOK_LOAD_BODY_CONTENT")):
+            _BODY.update((i, True) for i in contents)
 
-        list(hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT", self.dataset))
+        self.dataset["document"].head_content = _HEAD
+        self.dataset["document"].body_content = _BODY
+        self.dataset["toplayout_extra_content"] = itertools.ifilter(None, hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT"))

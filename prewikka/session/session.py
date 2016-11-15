@@ -17,9 +17,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time, os, struct
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import database, log, utils, usergroup, pluginmanager, env, hookmanager
+import os
+import struct
+import time
+
+from prewikka import database, env, hookmanager, log, pluginmanager, usergroup, utils
 from prewikka.error import PrewikkaUserError
 
 
@@ -131,7 +135,7 @@ class Session(pluginmanager.PluginBase):
         t = time.time()
 
         self._db.delete_expired_sessions(t - self._expiration)
-        sessionid = (os.urandom(16) + struct.pack(">d", t)).encode("hex")
+        sessionid = (os.urandom(16) + struct.pack(b">d", t)).encode("hex")
 
         self._db.create_session(sessionid, user, int(t))
         self.__set_session(request, sessionid)

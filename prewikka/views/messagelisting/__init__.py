@@ -1,8 +1,11 @@
-from alertlisting import AlertListing, CorrelationAlertListing
-from heartbeatlisting import HeartbeatListing
-from messagelisting import HostInfoAjax
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from prewikka import pluginmanager, version
+
+from .alertlisting import AlertListing, CorrelationAlertListing
+from .heartbeatlisting import HeartbeatListing
+from .messagelisting import HostInfoAjax
+
 
 class MessageListing(pluginmanager.PluginPreload):
     plugin_name = "Alert and Heartbeat listing"

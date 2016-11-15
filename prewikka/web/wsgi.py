@@ -17,10 +17,23 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import cgi
-import wsgiref.util, wsgiref.headers, urllib
+from __future__ import absolute_import, division, print_function
+
+import sys
+import urllib
+import wsgiref.headers
+import wsgiref.util
+
+from prewikka import main, utils
 from prewikka.web import request
-from prewikka import main, env
+
+if sys.version_info >= (3,0):
+    Py3 = True
+    import urllib.parse
+else:
+    Py3 = False
+    import urlparse
+
 
 defined_status = {
         200: 'OK',
@@ -32,10 +45,11 @@ defined_status = {
         500: 'INTERNAL SERVER ERROR',
 }
 
+
+
 class WSGIRequest(request.Request):
     def __init__(self, core, environ, start_response):
         request.Request.__init__(self)
-
         self._headers = None
 
         self._environ = environ
@@ -46,10 +60,18 @@ class WSGIRequest(request.Request):
         request.Request.init(self, core)
 
         if self.method != 'POST':
-            self.arguments = cgi.parse_qs(self._environ.get('QUERY_STRING'))
+            qs = self._environ.get('QUERY_STRING')
         else:
-            self.body = environ['wsgi.input'].read()
-            self.arguments = cgi.parse_qs(self.body)
+            qs = self.body = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
+            if Py3:
+                qs = self.body = qs.decode()
+
+        if Py3:
+            self.arguments = urllib.parse.parse_qs(qs)
+        else:
+            self.arguments = {}
+            for k, v in urlparse.parse_qsl(qs):
+                self.arguments.setdefault(k.decode("utf8"), []).append(v.decode("utf8"))
 
         for name, value in self.arguments.items():
             self.arguments[name] = (len(value) == 1) and value[0] or value
@@ -65,8 +87,13 @@ class WSGIRequest(request.Request):
         self._write(data)
 
     def send_headers(self, headers=None, code=200, status_text=None):
+        if sys.version_info[0] >= 3:
+            headers = list(headers)
+        else:
+            headers = [ (k.encode("ISO-8859-1"), v.encode("ISO-8859-1")) for k, v in headers ]
+
         if self._output_cookie:
-            headers = headers + [("Set-Cookie", c.OutputString()) for c in self._output_cookie.values()]
+            headers += [("Set-Cookie", c.OutputString()) for c in self._output_cookie.values()]
 
         if not status_text:
             status_text = defined_status.get(code, "Unknown")

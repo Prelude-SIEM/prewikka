@@ -18,17 +18,30 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import datetime
 import os.path
-import time
-import sys
 import re
 import struct
-import datetime
+import sys
+import time
 
 from prewikka import compat
 
 port_dict = {}
 read_done = False
+
+if sys.version_info >= (3,0):
+    text_type = str
+else:
+    text_type = unicode
+
+
+class AttrObj(object):
+    def __init__(self, **kwargs):
+        self.__dict__.update(kwargs)
+
 
 # FIXME: Need appropriate implementation
 def get_analyzer_status_from_latest_heartbeat(heartbeat, error_margin):
@@ -80,7 +93,7 @@ def protocol_number_to_name(num):
 
 def nameToPath(name):
     if not isinstance(name, compat.STRING_TYPES):
-        name = str(name)
+        name = text_type(name)
 
     return name.lower().replace(" ", "_")
 
@@ -99,17 +112,6 @@ def password_property(name, parameter):
 
 def boolean_property(name, parameter, value=False):
     return property("checkbox", name, parameter, value)
-
-
-def escape_html_string(s):
-    if not isinstance(s, compat.STRING_TYPES):
-        s = str(s)
-
-    s = s.replace("<", "&lt;")
-    s = s.replace(">", "&gt;")
-    s = s.replace("\"", "&quot;")
-    s = s.replace("'", "&#39;")
-    return s
 
 
 def find_unescaped_characters(value, characters=None):

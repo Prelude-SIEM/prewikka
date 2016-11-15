@@ -23,63 +23,50 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-class Link(object):
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+from prewikka.utils import html
+
+
+class Link(html.Markup):
     """
     A link to an external resource, like a JS or CSS file.
     """
-    def __init__(self, link):
-        self.link = link
-
-    def __hash__(self):
-        return hash(self.link)
-
-    def __eq__(self, other):
-        return self.link == getattr(other, "link", None)
-
-    def __str__(self):
-        return self.template % self.link
+    pass
 
 
 class CSSLink(Link):
     """
     A link to an external CSS file.
     """
-    template = """<link rel="stylesheet" type="text/css" href="%s"/>"""
+    def __new__(cls, link):
+        return Link.__new__(cls, html.Markup('<link rel="stylesheet" type="text/css" href="%s" />') % link)
 
 
 class JSLink(Link):
     """
     A link to an external JS file.
     """
-    template = """<script type="text/javascript" src="%s"></script>"""
+    def __new__(cls, link):
+        return Link.__new__(cls, html.Markup('<script type="text/javascript" src="%s"></script>') % link)
 
 
-class Source(object):
-    """
-    An inlined chunk of source code.
-    """
-    def __init__(self, src):
-        self.src = src
 
-    def __hash__(self):
-        return hash(self.src)
-
-    def __eq__(self, other):
-        return self.src == getattr(other, "src", None)
-
-    def __str__(self):
-        return self.template % self.src
+class HTMLSource(html.Markup):
+    pass
 
 
-class CSSSource(Source):
+class CSSSource(HTMLSource):
     """
     An inlined chunk of CSS source code.
     """
-    template = """<style type="text/css">%s</style>"""
+    def __new__(cls, src):
+        return HTMLSource.__new__(cls, html.Markup('<style type="text/css">%s</style>') % src)
 
 
-class JSSource(Source):
+class JSSource(HTMLSource):
     """
     An inlined chunk of JS source code.
     """
-    template = """<script type="text/javascript">%s</script>"""
+    def __new__(cls, src):
+        return HTMLSource.__new__(cls, html.Markup('<script type="text/javascript">%s</script>') % src)

@@ -1,7 +1,8 @@
-import pkg_resources
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from . import templates
-from prewikka import view, version
+import pkg_resources
+from prewikka import version, view
+
 
 class About(view.View):
     plugin_name = "About"
@@ -12,5 +13,4 @@ class About(view.View):
     plugin_description = N_("Prelude About page")
     plugin_htdocs = (("about", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
-    view_template = templates.About
-    view_parameters = view.Parameters
+    view_template = pkg_resources.resource_filename(__name__, 'templates/about.mak')

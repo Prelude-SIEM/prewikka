@@ -1,10 +1,7 @@
 *~
+*.pyc
 build
-locale
-ez_setup.pyc
 prewikka.egg-info
+prewikka/htdocs/css/themes/*.css
+prewikka/locale/*/LC_MESSAGES/*.mo
 prewikka/siteconfig.py
-prewikka/templates/*.py
-prewikka/*/*/templates/*.py
-prewikka/*/*/*/templates/*.py
-!__init__.py

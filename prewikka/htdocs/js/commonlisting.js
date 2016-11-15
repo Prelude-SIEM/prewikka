@@ -103,7 +103,7 @@ function CommonListing(elem, text, options) {
 
     $(".button-add").on("click", function() {
         prewikka_widget({
-            url: prewikka_location().href + "/" + options.editLink,
+            url: prewikka_location().pathname + "/" + options.editLink,
             dialog: {
                 title: text['new']
             }
@@ -113,7 +113,7 @@ function CommonListing(elem, text, options) {
         var row = grid.getGridParam("selrow");
         if ( ! row ) return;
         prewikka_widget({
-            url: prewikka_location().href + "/" + options.editLink,
+            url: prewikka_location().pathname + "/" + options.editLink,
             data: {id: row, duplicate: "true"},
             dialog: {
                 title: text['new']

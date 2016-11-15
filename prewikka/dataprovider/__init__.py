@@ -17,12 +17,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import copy, types, time
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import copy
+import time
+import types
 from datetime import datetime
 
-from prewikka import pluginmanager, error, utils, hookmanager
+from prewikka import error, hookmanager, pluginmanager, utils
+from prewikka.utils import CachingIterator, compat, json
 from prewikka.utils.timeutil import parser
-from prewikka.utils import CachingIterator, json, compat
 
 
 def _str_to_datetime(date):
@@ -34,7 +38,7 @@ def _str_to_datetime(date):
 CONVERTERS = {
     int: datetime.utcfromtimestamp,
     float: datetime.utcfromtimestamp,
-    str: _str_to_datetime,
+    text_type: _str_to_datetime,
     datetime: lambda x:x,
     types.NoneType: lambda x:x
 }
@@ -49,9 +53,9 @@ def to_datetime(date):
 TYPES_FUNC_MAP = {
     "int": int,
     "float": float,
-    "long": long,
+    "long": int,
     "datetime": to_datetime,
-    "str": str
+    "str": text_type
 }
 
 
@@ -196,7 +200,7 @@ class DataProviderNormalizer(object):
     @staticmethod
     def _value_escape(value):
         if not isinstance(value, compat.STRING_TYPES):
-            value = str(value)
+            value = text_type(value)
 
         return value.replace("\\", "\\\\").replace("'", "\\'")
 
@@ -260,7 +264,7 @@ class Criterion(json.JSONObject):
         list(hookmanager.trigger("HOOK_CRITERION_LOAD", self))
 
         if not type:
-            return " ".join(str(i) for i in [self.left, self.operator, self.right])
+            return " ".join(text_type(i) for i in [self.left, self.operator, self.right])
 
         return env.dataprovider._type_handlers[type].parse_criterion(self.left, self.operator, self.right, type)
 
@@ -420,10 +424,10 @@ class DataProviderManager(pluginmanager.PluginManager):
         return type, paths, paths_types, compcrit
 
     def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None):
-        type, paths, paths_types, criteria = self._normalize(type, paths, criteria)
+        type, parsed_paths, paths_types, criteria = self._normalize(type, paths, criteria)
 
         start = time.time()
-        results = self._backends[type].get_values(paths, criteria, distinct, limit, offset)
+        results = self._backends[type].get_values(parsed_paths, criteria, distinct, limit, offset)
         results.duration = time.time() - start
 
         results._paths = paths

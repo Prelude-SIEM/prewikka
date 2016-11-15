@@ -1,14 +1,14 @@
 # Copyright (C) 2016 CS-SI. All Rights Reserved.
 # Author: Abdel ELMILI <abdel.elmili@c-s.fr>
 
-import preludedb
-from prelude import IDMEFTime
+from __future__ import absolute_import, division, print_function, unicode_literals
 
 from datetime import datetime
 
-from prewikka import pluginmanager, version, env, usergroup, utils
-from prewikka.dataprovider import QueryResults, DataProviderBackend, QueryResultsRow, ResultObject
-
+import preludedb
+from prelude import IDMEFTime, IDMEFValue
+from prewikka import env, pluginmanager, usergroup, utils, version
+from prewikka.dataprovider import DataProviderBackend, QueryResults, QueryResultsRow, ResultObject
 
 _ORDER_MAP = { "time_asc": preludedb.DB.ORDER_BY_CREATE_TIME_ASC, "time_desc": preludedb.DB.ORDER_BY_CREATE_TIME_DESC }
 
@@ -52,8 +52,8 @@ class _IDMEFPlugin(DataProviderBackend):
             yield res
 
     def update(self, data, criteria):
-        paths, values = zip(*data.items())
-        env.idmef_db.update(list(paths), list(values), criteria)
+        paths, values = zip(*data)
+        env.idmef_db.update(list(paths), [IDMEFValue(v) for v in values], criteria)
 
     def get(self, criteria, order_by, limit, offset):
         results = self._get_idents(criteria, limit, offset, _ORDER_MAP[order_by])
@@ -64,8 +64,8 @@ class _IDMEFPlugin(DataProviderBackend):
         return IDMEFQueryResults(env.idmef_db.getValues(paths, criteria, bool(distinct), limit, offset))
 
     @usergroup.permissions_required(["IDMEF_ALTER"])
-    def delete(self, criteria):
-        env.idmef_db.remove(" AND ".join(criteria))
+    def delete(self, criteria, paths):
+        env.idmef_db.remove(criteria)
 
 
 class IDMEFAlertPlugin(_IDMEFPlugin):

@@ -17,11 +17,17 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import pkg_resources
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import mimetypes
 import os
+
+import pkg_resources
 import prelude
 import preludedb
-import mimetypes
+from prewikka import (auth, config, database, dataprovider, env, error, hookmanager, idmefdatabase, localization, log,
+                      menu, pluginmanager, renderer, resolve, response, siteconfig, version, view)
+from prewikka.utils import viewhelpers
 
 try:
     from threading import Lock, local
@@ -29,18 +35,13 @@ except ImportError:
     from dummy_threading import Lock, local
 
 
-from prewikka import view, config, log, database, idmefdatabase, version, \
-                     auth, error, localization, resolve, \
-                     pluginmanager, renderer, env, dataprovider, menu, \
-                     siteconfig, hookmanager, response
 
-from prewikka.utils import viewhelpers
 
 
 class Logout(view._View):
     class LogoutParameters(view.Parameters):
         def register(self):
-            self.optional("redirect", str)
+            self.optional("redirect", text_type)
 
     view_parameters = LogoutParameters
     view_permissions = []
@@ -147,10 +148,10 @@ class Core:
         except error.PrewikkaError, e:
             self._prewikka_initialized = e
         except Exception, e:
-            self._prewikka_initialized = error.PrewikkaError(_("Initialization error"), e)
+            self._prewikka_initialized = error.PrewikkaError(e, name=_("Initialization error"))
 
         if isinstance(self._prewikka_initialized, Exception):
-            env.log.log(self._prewikka_initialized.log_priority, str(self._prewikka_initialized))
+            env.log.log(self._prewikka_initialized.log_priority, text_type(self._prewikka_initialized))
             raise self._prewikka_initialized
 
     def _initURL(self):

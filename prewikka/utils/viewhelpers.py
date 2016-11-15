@@ -17,18 +17,21 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from string import Template
-from prewikka import view, env, utils, hookmanager, response
+
+from prewikka import hookmanager, resource, response, utils, view
 
 
 class GridAjaxParameters(view.Parameters):
     """Handle parameters sent by jqGrid."""
     def register(self):
-        self.optional("query", str)  # query string
+        self.optional("query", text_type)  # query string
         self.optional("page", int, 1)  # requested page
         self.optional("rows", int, 10)  # number of rows requested
-        self.optional("sort_index", str)  # sorting column
-        self.optional("sort_order", str)  # sort order (asc or desc)
+        self.optional("sort_index", text_type)  # sorting column
+        self.optional("sort_order", text_type)  # sort order (asc or desc)
 
     def get_response(self, total_results):
         # Ceil division (use // instead of / for Python3 compatibility):
@@ -39,7 +42,7 @@ class GridAjaxParameters(view.Parameters):
 class AjaxHostURL(view.View):
     class AjaxHostURLParameters(view.Parameters):
         def register(self):
-            self.mandatory("host", str)
+            self.mandatory("host", text_type)
 
     view_parameters = AjaxHostURLParameters
 
@@ -56,10 +59,7 @@ class AjaxHostURL(view.View):
     @classmethod
     def _link_generator(cls, infos):
         for urlname, url in cls._value_generator(infos):
-            yield '<a href="%(url)s" target="_%(urlname)s">%(urlname)s</a>' % {
-                "urlname": utils.escape_html_string(urlname),
-                "url": utils.escape_html_string(url)
-            }
+            yield resource.Link('<a href="{url}" target="{urlname}">{urlname}</a>').format(urlname=urlname, url=url)
 
     def render(self):
         infos = {"host": self.parameters["host"]}
@@ -68,4 +68,3 @@ class AjaxHostURL(view.View):
             infos.update(info)
 
         return response.PrewikkaDirectResponse(list(self._link_generator(infos)))
-

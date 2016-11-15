@@ -6,7 +6,6 @@ include README
 include ez_setup.py
 include prewikka.pot
 include conf/prewikka.conf
-include po/*.po
 include themes/*.less
 include scripts/prewikka.wsgi
 recursive-include prewikka *

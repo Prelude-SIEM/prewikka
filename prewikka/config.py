@@ -18,9 +18,14 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 
-import re, os, glob
-from prewikka import siteconfig, utils
+from __future__ import absolute_import, division, print_function, unicode_literals
 
+import io
+import glob
+import os
+import re
+
+from prewikka import siteconfig, utils
 
 
 class ParseError(Exception):
@@ -31,9 +36,9 @@ class ParseError(Exception):
         return self._message
 
 
-class ConfigParserOption(str):
+class ConfigParserOption(text_type):
     def __new__(cls, *args, **kw):
-        return str.__new__(cls, args[1])
+        return text_type.__new__(cls, args[1])
 
     def __init__(self, name, value):
         self.name = name
@@ -156,7 +161,7 @@ class MyConfigParser:
 
     def read(self, filename):
         """Read and parse a filename."""
-        with open(filename, 'r') as f:
+        with io.open(filename, 'r', encoding="utf8") as f:
             self.readfp(f)
 
     def _read(self, iterable):

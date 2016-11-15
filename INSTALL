@@ -15,15 +15,16 @@ Dependencies
 Build requires:
 
 - python >= 2.6 (not python 3.x)
+- python-babel
 - python-lesscpy
 - python-argparse
 - python-setuptools
-- python-cheetah
 
 Run requires:
 
 - python >= 2.6 (not python 3.x)
 - python-babel
+- python-mako >= 0.8.1
 - libprelude with python bindings
 - libpreludedb with python bindings
 

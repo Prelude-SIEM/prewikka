@@ -17,9 +17,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import socket
-from prewikka import env
+import time
+
+from prewikka import compat
 
 resolver = None
 import_fail = None
@@ -121,7 +124,7 @@ class AddressResolve:
     def __init__(self, addr, format=None):
         global resolver
 
-        if not isinstance(addr, str):
+        if not isinstance(addr, compat.STRING_TYPES):
             raise TypeError('AddressResolve expects a valid IP address to resolve')
 
         self._addr = addr
@@ -165,4 +168,3 @@ def init():
        return
 
     resolver = DNSResolver()
-

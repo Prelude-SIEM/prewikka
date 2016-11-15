@@ -17,11 +17,26 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import urllib
 import prelude
 
+def _convert(d):
+    if isinstance(d, (list, tuple)):
+        return [_convert(i) for i in d]
+
+    elif isinstance(d, text_type):
+        return d.encode("utf8")
+
+    else:
+        return d
+
 def urlencode(parameters, doseq=False):
-    return urllib.urlencode(parameters, doseq).replace('&', '&amp;')
+    if hasattr(parameters, "items"):
+        parameters = parameters.items()
+
+    return urllib.urlencode([(k.encode("utf8"), _convert(v)) for k, v in parameters], doseq)
 
 
 def create_link(path, parameters=None):
@@ -54,7 +69,7 @@ def idmef_criteria_to_urlparams(paths, values, operators=None, index=0):
             ctype = "classification"
 
         if ctype not in ("classification", "source", "target", "analyzer"):
-            raise Exception, _("The path '%s' cannot be mapped to a column") % path
+            raise Exception(_("The path '%s' cannot be mapped to a column") % path)
 
         params.append(("%s_object_%d" % (ctype, index), path))
         params.append(("%s_operator_%d" % (ctype, index), operator if value else "!"))

@@ -1,5 +1,8 @@
-from agents import SensorListing, SensorMessagesDelete, HeartbeatAnalyze
+from __future__ import absolute_import, division, print_function, unicode_literals
 from prewikka import pluginmanager, version
+
+from .agents import Agents, SensorMessagesDelete, HeartbeatAnalyze
+
 
 class AgentPlugin(pluginmanager.PluginPreload):
     plugin_name = "Agents status"
@@ -8,4 +11,4 @@ class AgentPlugin(pluginmanager.PluginPreload):
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
     plugin_description = N_("Agents status information page")
-    plugin_classes = [ SensorListing, SensorMessagesDelete, HeartbeatAnalyze ]
+    plugin_classes = [ Agents, SensorMessagesDelete, HeartbeatAnalyze ]

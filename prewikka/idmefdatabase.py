@@ -17,43 +17,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import time, types
-import prelude, preludedb
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import hookmanager
-from prewikka.utils import escape_html_string
+import preludedb
 
-class Message(object):
-    def __init__(self, idmef, ident, htmlsafe=False):
-        self._idmef = idmef
-        self._htmlsafe = htmlsafe
-
-    def _escape_idmef(self, obj):
-        if isinstance(obj, prelude.IDMEF):
-            return Message(obj, self.ident, htmlsafe=True)
-
-        elif isinstance(obj, str):
-            return escape_html_string(obj)
-
-        elif isinstance(obj, tuple):
-            return tuple((self._escape_idmef(o) for o in obj))
-
-        return obj
-
-    def get(self, default=None, htmlsafe=False):
-        try:
-            if htmlsafe or self._htmlsafe:
-                return self._escape_idmef(self._idmef.get(default))
-            else:
-                return self._idmef.get(default)
-        except IndexError as exc:
-            return default
-
-    def __getitem__(self, k):
-       return self.get(k)
+preludedb.python2_return_unicode(True)
 
 
 class IDMEFDatabase(preludedb.DB):
     def __init__(self, config):
-        sql = preludedb.SQL(dict((k, str(v)) for k, v in config.items()))
+        sql = preludedb.SQL(dict((k, text_type(v)) for k, v in config.items()))
         preludedb.DB.__init__(self, sql)

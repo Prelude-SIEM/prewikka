@@ -17,7 +17,13 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import logging, logging.handlers, os, stat, sys
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import logging
+import logging.handlers
+import os
+import stat
+import sys
 
 DEBUG = logging.DEBUG
 INFO = logging.INFO
@@ -33,7 +39,7 @@ class Log:
 
             config = { }
             for key, value in logconfig.items():
-                config[key] = str(value)
+                config[key] = text_type(value)
 
             self._logger = logging.getLogger()
             self._logger.setLevel(logging.NOTSET)
@@ -43,7 +49,7 @@ class Log:
         for f in ("/dev/log", "/var/run/log", "/var/run/syslog"):
             try:
                 if stat.S_ISSOCK(os.stat(f).st_mode):
-                    return f
+                    return str(f)
             except:
                 pass
 
@@ -106,7 +112,7 @@ class Log:
 
         port = env.request.web.get_remote_port()
         if port:
-            hdr = ":".join((hdr, str(port)))
+            hdr = ":".join((hdr, text_type(port)))
 
         hdr = " ".join((hdr, "%s@" % (env.request.user) if env.request.user else ""))
 
@@ -124,9 +130,9 @@ class Log:
         hdr = [ hdr ] if hdr else []
 
         if isinstance(details, Exception):
-            details = " ".join([str(getattr(details, "code", 500)), str(details)])
+            details = " ".join([text_type(getattr(details, "code", 500)), text_type(details)])
 
-        return " ".join(hdr + [str(details)])
+        return " ".join(hdr + [text_type(details)])
 
     def debug(self, message):
         if self._logger:
@@ -157,4 +163,3 @@ class Log:
 
 def getLogger(name=__name__):
         return logging.getLogger(name)
-

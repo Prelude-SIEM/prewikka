@@ -17,9 +17,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 from copy import copy
 
-from prewikka import env, utils, hookmanager
+from prewikka import hookmanager, utils
+from prewikka.utils import AttrObj
 
 
 class MenuManager(object):
@@ -80,7 +83,8 @@ class MenuManager(object):
         """
         loaded_sections = self.get_sections(user)
         menus = utils.OrderedDict()
-        default_menu = {'icon': self._DEFAULT_ICON, 'entries': [], 'default': True}
+        default_menu = AttrObj(icon=self._DEFAULT_ICON, entries=[], default=True)
+
         section_order_instance = env.config.general.get("section_order")
         section_order = next((sec for sec in env.config.section_order
                                       if sec.get_instance_name() == section_order_instance), {})
@@ -93,21 +97,21 @@ class MenuManager(object):
 
                 # Put the section in the previous menu (or in the default one if there is none)
                 current_menu = menus.values()[-1] if menus else default_menu
-                current_menu["entries"].append({'name': section, 'views': views, 'icon': icon.value})
+                current_menu.entries.append(AttrObj(name=section, views=views, icon=icon.value))
 
             else:
                 # Create a new menu if the section_order entry does not match a section
                 is_default = section == self._DEFAULT_MENU
-                menus[section] = {'icon': icon.value, 'entries': [], 'default': is_default}
+                menus[section] = AttrObj(icon=icon.value, entries=[], default=is_default)
 
         for section in loaded_sections:
             # Put the sections not declared in section_order in the default menu
             if section not in section_order:
                 views = self._get_display_views(loaded_sections.get(section))
-                default_menu["entries"].append({'name': section, 'views': views, 'icon': None})
+                default_menu.entries.append(AttrObj(name=section, views=views, icon=None))
 
         if self._DEFAULT_MENU in menus:
-            menus[self._DEFAULT_MENU]["entries"] += default_menu["entries"]
+            menus[self._DEFAULT_MENU].entries += default_menu.entries
         else:
             menus[self._DEFAULT_MENU] = default_menu
 

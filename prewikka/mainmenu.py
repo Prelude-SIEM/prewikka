@@ -17,16 +17,18 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-from dateutil.relativedelta import relativedelta
-import time
-import datetime
+from __future__ import absolute_import, division, print_function, unicode_literals
+
 import calendar
+import datetime
 import itertools
+import time
 
+from dateutil.relativedelta import relativedelta
+from prewikka import hookmanager, localization, template, utils, view
 from prewikka.dataprovider import Criterion
-from prewikka import view, template, localization, utils, env, hookmanager
-from prewikka.templates import MainMenu as MainMenuTemplate
 
+_MAINMENU_TEMPLATE = template.PrewikkaTemplate(__name__, "templates/mainmenu.mak")
 
 class MainMenuParameters(view.Parameters):
     allow_extra_parameters = False
@@ -41,13 +43,13 @@ class MainMenuParameters(view.Parameters):
         view.Parameters.register(self)
 
         self.optional("timeline_value", int, default=1, save=True, general=True)
-        self.optional("timeline_unit", str, default="month", save=True, general=True)
+        self.optional("timeline_unit", text_type, default="month", save=True, general=True)
         self.optional("timeline_absolute", int, default=0, save=True, general=True)
         self.optional("timeline_end", long, save=True, general=True)
         self.optional("timeline_start", long, save=True, general=True)
-        self.optional("orderby", str, "time_desc")
+        self.optional("orderby", text_type, "time_desc")
         self.optional("auto_apply_value", int, default=0, save=True, general=True)
-        self.optional("auto_apply_enable", str, default="false", save=True, general=True)
+        self.optional("auto_apply_enable", text_type, default="false", save=True, general=True)
 
         for i in hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_REGISTER", self):
             self._INTERNAL_PARAMETERS = self._INTERNAL_PARAMETERS + i
@@ -68,7 +70,7 @@ class TimeUnit(object):
 
     @property
     def dbunit(self):
-        return self._dbunit[str(self)]
+        return self._dbunit[text_type(self)]
 
     def __init__(self, unit):
         if isinstance(unit, int):
@@ -114,18 +116,21 @@ class MainMenuStep(object):
               "minute": (relativedelta(minutes=value), _(localization.TIME_HM_FMT), "min"),
         }
 
-        self.unit = str(unit)
+        self.unit = text_type(unit)
         self.timedelta, self.unit_format, self.dbunit = d[self.unit]
 
 
-class MainMenu:
+
+class MainMenu(object):
     _criteria_type = None
+    template = _MAINMENU_TEMPLATE
 
     def __init__(self):
-        self.dataset = template.PrewikkaTemplate(MainMenuTemplate.MainMenu)
         env.request.menu = self
+        self.dataset = self.template.dataset()
 
-        self.dataset["timeline.quick"] = [
+        self.dataset["timeline"] = utils.AttrObj()
+        self.dataset["timeline"].quick = [
             (_("Today"), 1, "day", 1),
             (_("This month"), 1, "month", 1),
             (ngettext("%d hour", "%d hours", 1) % 1, 1, "hour", 0),
@@ -137,7 +142,7 @@ class MainMenu:
             (ngettext("%d month", "%d months", 3) % 3, 3, "month", 0),
             (ngettext("%d year", "%d years", 1) % 1, 1, "year", 0)]
 
-        self.dataset["timeline.refresh"] = [
+        self.dataset["timeline"].refresh = [
             (ngettext("%d second", "%d seconds", 30) % 30, 30),
             (ngettext("%d minute", "%d minutes", 1) % 1, 60),
             (ngettext("%d minute", "%d minutes", 5) % 5, 60*5),
@@ -145,15 +150,15 @@ class MainMenu:
 
     def _set_timeline(self, start, end):
         for unit in "minute", "hour", "day", "month", "year", "unlimited":
-             self.dataset["timeline.%s_selected" % unit] = ""
+             setattr(self.dataset["timeline"], "%s_selected" % unit, "")
 
-        self.dataset["timeline.%s_selected" % self.parameters["timeline_unit"]] = "selected='selected'"
+        setattr(self.dataset["timeline"], "%s_selected" % self.parameters["timeline_unit"], "selected='selected'")
 
         if not start and not end:
             return
 
-        self.dataset["timeline.start"] = start.replace(tzinfo=None).isoformat()
-        self.dataset["timeline.end"] = end.replace(tzinfo=None).isoformat()
+        self.dataset["timeline"].start = start.replace(tzinfo=None).isoformat()
+        self.dataset["timeline"].end = end.replace(tzinfo=None).isoformat()
 
     def _get_unit(self):
         delta = self.end - self.start
@@ -288,26 +293,26 @@ class MainMenu:
     def render(self):
         self.parameters = env.request.parameters
 
-        self.dataset["timeline.order_by"] = self.parameters["orderby"]
-        self.dataset["timeline.value"] = self.parameters["timeline_value"]
-        self.dataset["timeline.unit"] = self.parameters["timeline_unit"]
-        self.dataset["timeline.absolute"] = self.parameters["timeline_absolute"]
-        self.dataset["timeline.quick_selected"] = _("Custom")
-        self.dataset["timeline.quick_custom"] = True
-        self.dataset["timeline.refresh_selected"] = _("Inactive")
+        self.dataset["timeline"].order_by = self.parameters["orderby"]
+        self.dataset["timeline"].value = self.parameters["timeline_value"]
+        self.dataset["timeline"].unit = self.parameters["timeline_unit"]
+        self.dataset["timeline"].absolute = self.parameters["timeline_absolute"]
+        self.dataset["timeline"].quick_selected = _("Custom")
+        self.dataset["timeline"].quick_custom = True
+        self.dataset["timeline"].refresh_selected = _("Inactive")
         self.dataset["auto_apply_value"] = self.parameters["auto_apply_value"]
         self.dataset["auto_apply_enable"] = self.parameters["auto_apply_enable"]
-        self.dataset["timeline.time_format"] = localization.get_calendar_format()
+        self.dataset["timeline"].time_format = localization.get_calendar_format()
 
-        for label, value in self.dataset["timeline.refresh"]:
+        for label, value in self.dataset["timeline"].refresh:
             if value == self.parameters["auto_apply_value"]:
-                self.dataset["timeline.refresh_selected"] = label
+                self.dataset["timeline"].refresh_selected = label
 
         if "timeline_start" not in self.parameters and "timeline_end" not in self.parameters:
-            for label, value, unit, absolute in self.dataset["timeline.quick"]:
+            for label, value, unit, absolute in self.dataset["timeline"].quick:
                 if value == self.parameters["timeline_value"] and unit == self.parameters["timeline_unit"] and absolute == self.parameters["timeline_absolute"]:
-                    self.dataset["timeline.quick_selected"] = label
-                    self.dataset["timeline.quick_custom"] = False
+                    self.dataset["timeline"].quick_selected = label
+                    self.dataset["timeline"].quick_custom = False
                     break
 
         self._setup_timeline_range()

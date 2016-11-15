@@ -1,4 +1,17 @@
-import __builtin__
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import sys
+
+import prelude
+
+if sys.version_info >= (3, 0):
+    import builtins
+    builtins.text_type = str
+else:
+    import __builtin__ as builtins
+    builtins.text_type = unicode
+    prelude.python2_return_unicode(True)
+
 
 try:
     from threading import local
@@ -31,8 +44,7 @@ class Env:
 
 
 env = Env()
-__builtin__.env = env
-
+builtins.env = env
 
 # import after env creation
-import localization
+from . import localization

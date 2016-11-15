@@ -18,10 +18,23 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import copy, time, urllib, pkg_resources
-from prewikka.utils import json
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import copy
+import time
+import urllib
+
+import pkg_resources
+from prewikka import hookmanager, localization, mainmenu, resolve, usergroup, utils, view
 from prewikka.dataprovider import Criterion
-from prewikka import view, usergroup, utils, resolve, mainmenu, localization, hookmanager
+from prewikka.utils import json
+
+
+class AttrDict(dict):
+    def __init__(self, *a, **kw):
+        dict.__init__(self, *a, **kw)
+        self.__dict__ = self
+
 
 class MessageListingParameters(mainmenu.MainMenuParameters):
     def register(self):
@@ -30,8 +43,8 @@ class MessageListingParameters(mainmenu.MainMenuParameters):
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50, save=True)
         self.optional("selection", [ json.loads ], Criterion())
-        self.optional("listing_apply", str)
-        self.optional("action", str)
+        self.optional("listing_apply", text_type)
+        self.optional("action", text_type)
 
         # submit with an image passes the x and y coordinate values
         # where the image was clicked
@@ -45,8 +58,9 @@ class MessageListingParameters(mainmenu.MainMenuParameters):
 
           return mainmenu.MainMenuParameters.normalize(self, *args, **kwargs)
 
-class ListedMessage(dict):
+class ListedMessage(AttrDict):
     def __init__(self, view_path, parameters):
+        AttrDict.__init__(self)
         self.parameters = parameters
         self.view_path = view_path
 
@@ -61,7 +75,7 @@ class ListedMessage(dict):
             path = [ path ]
         else:
             if not path:
-                return { "value": None, "inline_filter": None, "already_filtered": False }
+                return AttrDict(value=None, inline_filter=None, already_filtered=False)
 
         if type(value) is not list and type(value) is not tuple:
             if not real_value:
@@ -94,13 +108,13 @@ class ListedMessage(dict):
                 extra[p] = v or ""
 
         link = utils.create_link(self.view_path, self.parameters + extra - [ "offset" ])
-        return { "value": utils.escape_html_string(real_value), "inline_filter": link, "already_filtered": alreadyf }
+        return AttrDict(value=real_value, inline_filter=link, already_filtered=alreadyf)
 
     def createTimeField(self, timeobj):
         if not timeobj:
             return { "value": "n/a" }
 
-        return { "value": localization.format_datetime(timeobj, format="short") }
+        return AttrDict(value=localization.format_datetime(timeobj, format="short"))
 
     def createHostField(self, object, value, category=None, direction=None, dns=True):
         field = self.createInlineFilteredField(object, value, direction)
@@ -131,7 +145,7 @@ class ListedMessage(dict):
 class HostInfoAjax(view.View):
     class HostInfoAjaxParameters(view.Parameters):
         def register(self):
-            self.mandatory("host", str)
+            self.mandatory("host", text_type)
 
     view_parameters = HostInfoAjaxParameters
 
@@ -151,24 +165,25 @@ class MessageListing(view.View):
     def render(self):
         view.View.render(self)
         self.dataset["order_by"] = self.parameters["orderby"]
+        self.dataset["nav"] = {}
 
     def _setNavPrev(self, offset):
         if offset:
-            self.dataset["nav.first"] = utils.create_link(self.view_path, self.parameters - [ "offset" ])
-            self.dataset["nav.prev"] = utils.create_link(self.view_path,
+            self.dataset["nav"]["first"] = utils.create_link(self.view_path, self.parameters - [ "offset" ])
+            self.dataset["nav"]["prev"] = utils.create_link(self.view_path,
                                                          self.parameters +
                                                          { "offset": offset - self.parameters["limit"] })
         else:
-            self.dataset["nav.prev"] = None
+            self.dataset["nav"]["prev"] = None
 
     def _setNavNext(self, offset, count):
         if count > offset + self.parameters["limit"]:
             offset = offset + self.parameters["limit"]
-            self.dataset["nav.next"] = utils.create_link(self.view_path, self.parameters + { "offset": offset })
+            self.dataset["nav"]["next"] = utils.create_link(self.view_path, self.parameters + { "offset": offset })
             offset = count - ((count % self.parameters["limit"]) or self.parameters["limit"])
-            self.dataset["nav.last"] = utils.create_link(self.view_path, self.parameters + { "offset": offset })
+            self.dataset["nav"]["last"] = utils.create_link(self.view_path, self.parameters + { "offset": offset })
         else:
-            self.dataset["nav.next"] = None
+            self.dataset["nav"]["next"] = None
 
     def _getInlineFilter(self, name):
         return name, self.parameters.get(name)

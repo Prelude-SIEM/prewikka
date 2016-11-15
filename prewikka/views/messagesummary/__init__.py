@@ -1,5 +1,8 @@
-from messagesummary import AlertSummary, HeartbeatSummary
+from __future__ import absolute_import, division, print_function, unicode_literals
 from prewikka import pluginmanager, version
+
+from .messagesummary import AlertSummary, HeartbeatSummary
+
 
 class MessageSummary(pluginmanager.PluginPreload):
     plugin_name = "Detailed alert and heartbeat"

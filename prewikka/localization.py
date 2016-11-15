@@ -18,14 +18,27 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import prelude
-import pkg_resources, locale, gettext, __builtin__, datetime, pytz
-from prewikka import utils, log
+from __future__ import absolute_import, division, print_function, unicode_literals
 
-from threading import local, Lock
+import datetime
+import gettext
+import locale
+import sys
+from threading import Lock, local
 
+import babel.core
 # Babel functions
-import babel.dates, babel.numbers, babel.core
+import babel.dates
+import babel.numbers
+import pkg_resources
+import prelude
+import pytz
+from prewikka import log, utils
+
+if sys.version_info >= (3,0):
+    import builtins
+else:
+    import __builtin__ as builtins
 
 try:
     from babel.dates import format_timedelta as _format_timedelta
@@ -85,36 +98,21 @@ class TranslationProxy(object):
         self._data.catalog = first
 
     def gettext(self, s):
-        return self._data.catalog.gettext(s) if hasattr(self._data, "catalog") else s
-
-    def dgettext(self, domain, s):
-        if not hasattr(self._data, "catalog"):
-                return s
-
-        if s in self._data.catalog:
-                return self._data.catalog.dgettext(domain, s)
-
-        return self._data.catalog.gettext(s)
+        return self._data.catalog.ugettext(s) if hasattr(self._data, "catalog") else s
 
     def ngettext(self, singular, plural, num):
         if not hasattr(self._data, "catalog"):
             return singular if num <= 1 else plural
 
-        return self._data.catalog.ngettext(singular, plural, num)
-
-    def dngettext(self, domain, singular, plural, num):
-        if hasattr(self._data, "catalog"):
-            return singular if num <= 1 else plural
-
-        return self._data.catalog.ngettext(domain, singular, plural, num)
+        return self._data.catalog.ungettext(singular, plural, num)
 
 translation = TranslationProxy()
 
 
-class _DeferredGettext(str):
+class _DeferredGettext(text_type):
     def __new__(cls, text, arguments=None):
         message = text % arguments if arguments else text
-        o = str.__new__(cls, message)
+        o = text_type.__new__(cls, message)
         o._text = text
         o._arguments = arguments
         return o
@@ -130,10 +128,9 @@ def _translate(s):
     else:
         return translation.gettext(s)
 
-__builtin__._ = _translate
-__builtin__.N_ = _DeferredGettext
-__builtin__.ngettext = translation.ngettext
-
+builtins._ = _translate
+builtins.N_ = _DeferredGettext
+builtins.ngettext = translation.ngettext
 
 DATE_YM_FMT = N_("%m/%Y")
 DATE_YMD_FMT = N_("%m/%d/%Y")
@@ -191,7 +188,7 @@ def format_date(date=None, tzinfo=None, **kwargs):
     if date:
         date = date.astimezone(tzinfo or env.request.user.timezone)
 
-    return babel.dates.format_date(date, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
+    return babel.dates.format_date(date, locale=translation.getLocale(), **kwargs)
 
 def format_time(dt=None, tzinfo=None, **kwargs):
     if isinstance(dt, (float, int, prelude.IDMEFTime)):
@@ -200,7 +197,7 @@ def format_time(dt=None, tzinfo=None, **kwargs):
     if not tzinfo:
         tzinfo = env.request.user.timezone
 
-    return babel.dates.format_time(dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
+    return babel.dates.format_time(dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs)
 
 def format_datetime(dt=None, tzinfo=None, **kwargs):
     if isinstance(dt, (float, int, prelude.IDMEFTime)):
@@ -209,13 +206,13 @@ def format_datetime(dt=None, tzinfo=None, **kwargs):
     if not tzinfo:
         tzinfo = env.request.user.timezone
 
-    return babel.dates.format_datetime(datetime=dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
+    return babel.dates.format_datetime(datetime=dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs)
 
 def format_timedelta(*args, **kwargs):
-    return _format_timedelta(*args, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
+    return _format_timedelta(*args, locale=translation.getLocale(), **kwargs)
 
 def format_number(*args, **kwargs):
-    return babel.numbers.format_number(*args, locale=translation.getLocale(), **kwargs).encode(getCurrentCharset())
+    return babel.numbers.format_number(*args, locale=translation.getLocale(), **kwargs)
 
 
 def get_period_names(*args, **kwargs):
