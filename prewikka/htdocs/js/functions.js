@@ -382,3 +382,42 @@ function prewikka_grid(table, settings) {
 
     return $(table).jqGrid(conf);
 }
+
+
+function prewikka_autocomplete(field, url, submit) {
+    field.autocomplete({
+        minLength: 0,
+        autoFocus: true,
+        source: function(request, response) {
+            $.ajax({
+                url: url,
+                data: {query: request.term},
+                dataType: "json",
+                global: false, // No prewikka dialog in case of error
+                success: function(data) {
+                    var rows = $.map(data.rows, function(row) {
+                        return row.cell.name;
+                    });
+                    response(rows);
+                    field.parent("div").toggleClass("has-error", !rows.length);
+                    field.next().toggleClass("fa-close", !rows.length);
+                    if ( submit ) submit.prop("disabled", $(".has-error").length);
+                },
+                error: function(xhr, status, error) {
+                    field.parent("div").addClass("has-error");
+                    field.next().addClass("fa-close");
+                    if ( submit ) submit.prop("disabled", true);
+                    var message = xhr.responseText ? $.parseJSON(xhr.responseText).details : error || "Connection error";
+                    field.prop("title", message);
+                    response([]);
+                }
+            });
+        },
+        select: function() {
+            if ( submit ) submit.prop("disabled", $(".has-error").length);
+        }
+    })
+    .focus(function() {
+        $(this).autocomplete("search");
+    });
+}
