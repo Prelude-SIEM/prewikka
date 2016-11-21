@@ -41,7 +41,7 @@ $(document).ready(function(){
 
 
   $(document).on("click", "#logout", function() {
-    this.href = encodeURI("logout?redirect=" + location.href);
+    this.href = "logout?redirect=" + encodeURIComponent(location.href);
   });
 
 // Repeatable entries
