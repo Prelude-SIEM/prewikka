@@ -73,8 +73,13 @@ class IDMEFAlertPlugin(_IDMEFPlugin):
     plugin_name = "IDMEF Alert Plugin"
     plugin_description = N_("Plugin for fetching IDMEF messages from the Prelude database")
 
-    _get_object = env.idmef_db.getAlert
-    _get_idents = env.idmef_db.getAlertIdents
+    @property
+    def _get_object(self):
+        return env.idmef_db.getAlert
+
+    @property
+    def _get_idents(self):
+        return env.idmef_db.getAlertIdents
 
 
 class IDMEFHeartbeatPlugin(_IDMEFPlugin):
@@ -82,5 +87,10 @@ class IDMEFHeartbeatPlugin(_IDMEFPlugin):
     plugin_name = "IDMEF Heartbeat Plugin"
     plugin_description = N_("Plugin for fetching IDMEF heartbeat from the Prelude database")
 
-    _get_object = env.idmef_db.getHeartbeat
-    _get_idents = env.idmef_db.getHeartbeatIdents
+    @property
+    def _get_object(self):
+        return env.idmef_db.getHeartbeat
+
+    @property
+    def _get_idents(self):
+        return env.idmef_db.getHeartbeatIdents
