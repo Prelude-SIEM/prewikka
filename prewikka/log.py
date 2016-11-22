@@ -73,7 +73,7 @@ class Log:
         else:
             raise _("Unknown logtype specified: '%s'") % logtype
 
-        format = '%(name)s (pid:%(process)d) %(levelname)s: %(message)s'
+        format = 'prewikka (pid:%(process)d) %(name)s %(levelname)s: %(message)s'
         if logtype in ['file', 'stderr']:
             format = '%(asctime)s ' + format
 
