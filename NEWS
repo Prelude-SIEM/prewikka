@@ -1,3 +1,11 @@
+* 2016-11-22, prewikka-3.0.1:
+
+Author: Antoine Luong
+
+- Set the process name to 'prewikka' in logs
+
+
+
 * 2016-04-22, prewikka-3.0.0:
 
 Author: Sélim Menouar
