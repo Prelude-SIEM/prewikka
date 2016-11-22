@@ -173,7 +173,7 @@ class PrewikkaFileResponse(PrewikkaResponse):
     def __init__(self, path):
         PrewikkaResponse.__init__(self)
 
-        self.fd = open(path, "r")
+        self.fd = open(path, "rb")
         stat = os.fstat(self.fd.fileno())
 
         content_type = mimetypes.guess_type(env.request.web.path)[0] or "application/octet-stream"

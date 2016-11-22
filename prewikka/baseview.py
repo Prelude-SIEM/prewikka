@@ -71,13 +71,13 @@ class BaseView(view._View):
         # The jqgrid locale files use only two characters for identifying the language (e.g. pt_BR -> pt)
         _HEAD[resource.JSLink("prewikka/js/locales/grid.locale-%s.js" % lang[:2])] = True
 
-        for contents in itertools.ifilter(None, hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT")):
+        for contents in filter(None, hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT")):
             _HEAD.update((i, True) for i in contents)
 
         _BODY = utils.OrderedDict()
-        for contents in itertools.ifilter(None, hookmanager.trigger("HOOK_LOAD_BODY_CONTENT")):
+        for contents in filter(None, hookmanager.trigger("HOOK_LOAD_BODY_CONTENT")):
             _BODY.update((i, True) for i in contents)
 
         self.dataset["document"].head_content = _HEAD
         self.dataset["document"].body_content = _BODY
-        self.dataset["toplayout_extra_content"] = itertools.ifilter(None, hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT"))
+        self.dataset["toplayout_extra_content"] = filter(None, hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT"))

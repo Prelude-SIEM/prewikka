@@ -96,7 +96,7 @@ class MenuManager(object):
                 views = self._get_display_views(loaded_sections.get(section))
 
                 # Put the section in the previous menu (or in the default one if there is none)
-                current_menu = menus.values()[-1] if menus else default_menu
+                current_menu = next(reversed(menus.values())) if menus else default_menu
                 current_menu.entries.append(AttrObj(name=section, views=views, icon=icon.value))
 
             else:
@@ -122,11 +122,14 @@ class MenuManager(object):
         if not section:
             return None
 
-        views = [view.values()[0] for view in section.values() if view.values()[0].view_subsection]
+        viewlist = []
 
-        if not views:
-            return [cls._get_first_view(section)]
-        return views
+        for views in section.values():
+            view = next(iter(views.values()))
+            if view.view_subsection:
+                viewlist.append(view)
+
+        return viewlist or [cls._get_first_view(section)]
 
     @staticmethod
     def _get_first_view(section):
@@ -134,4 +137,4 @@ class MenuManager(object):
             return None
 
         # Take the parent of the first view
-        return section.values()[0].values()[0]
+        return next(iter(next(iter(section.values())).values()))

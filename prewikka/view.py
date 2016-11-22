@@ -102,7 +102,7 @@ class ParameterDesc(object):
 
         try:
             if isinstance(self.type, list):
-                value = map(self.type[0], self._mklist(value))
+                value = [ self.type[0](i) for i in self._mklist(value) ]
             else:
                 value = self.type(value)
 
@@ -286,9 +286,9 @@ class Parameters(dict):
 
     def isDefault(self, param, usedb=True):
         if not usedb:
-            return self._hard_default.has_key(param)
+            return param in self._hard_default
         else:
-            return self._default.has_key(param)
+            return param in self._default
 
     def __add__(self, src):
         dst = copy(self)
@@ -445,7 +445,7 @@ class ViewManager:
                 if not views:
                         return
 
-                view_id = views.keys()[0] if len(paths) == 2 else paths[-1]
+                view_id = next(iter(views.keys())) if len(paths) == 2 else paths[-1]
         except:
                 return paths[-1] if paths else None # View identified solely by ID, like /logout
 

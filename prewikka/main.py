@@ -145,9 +145,9 @@ class Core:
             self._initURL()
             self._loadPlugins()
             self._prewikka_initialized = True
-        except error.PrewikkaError, e:
+        except error.PrewikkaError as e:
             self._prewikka_initialized = e
-        except Exception, e:
+        except Exception as e:
             self._prewikka_initialized = error.PrewikkaError(e, name=_("Initialization error"))
 
         if isinstance(self._prewikka_initialized, Exception):
@@ -295,7 +295,7 @@ class Core:
         except error.PrewikkaException as err:
             response = err.respond()
 
-        except Exception, err:
+        except Exception as err:
             response = error.PrewikkaError(
                 N_("An unexpected condition happened while trying to load %s") % (webreq.path),
                 details=err,

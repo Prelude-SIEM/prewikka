@@ -30,7 +30,7 @@ import_fail = None
 try:
     from twisted.internet import reactor
     from twisted.names import client, dns, hosts, cache, resolve
-except Exception, err:
+except Exception as err:
     import_fail = err
 
 try:
@@ -53,7 +53,9 @@ class DNSResolver:
         if failure.check(dns.DomainError, dns.AuthoritativeDomainError):
             return
 
-    def _resolve_cb(self, (ans, auth, add), ptr, resolve_cb):
+    def _resolve_cb(self, tpl, ptr, resolve_cb):
+        ans, auth, add = tpl
+
         self._query -= 1
         name = str(ans[0].payload.name)
 
@@ -164,7 +166,7 @@ def init():
         return
 
     if import_fail:
-       env.log.warning(_("Asynchronous DNS resolution disabled: twisted.names and twisted.internet required: %s") % err)
+       env.log.warning(_("Asynchronous DNS resolution disabled: twisted.names and twisted.internet required: %s") % import_fail)
        return
 
     resolver = DNSResolver()

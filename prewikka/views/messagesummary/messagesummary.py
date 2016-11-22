@@ -102,7 +102,7 @@ class Table(object):
         has_data = False
 
         if len(self._current_table["rows"]) <= 1 :
-            if not parent or not parent.has_key("rows"):
+            if not parent or not "rows" in parent:
                 self._current_table = None
             else:
                 self._current_table = parent
@@ -112,7 +112,7 @@ class Table(object):
             self._current_section["tables"].append(self._current_table)
             self._current_table = None
         else:
-            if parent.has_key("rows"):
+            if "rows" in parent:
                 col = { "name": None, "header": None, "emphase": None, "tables": [ self._current_table ] }
                 if len(parent["rows"]):
                     parent["rows"][-1] += [col]
@@ -172,7 +172,7 @@ class HeaderTable(Table):
 
         for field in self.field_list:
 
-            if not dataset.has_key(field[0]) and not field[2]:
+            if not field[0] in dataset and not field[2]:
                 continue
 
             if field[2]:
@@ -553,7 +553,7 @@ class MessageSummary(Table, view.View):
                 meaning = "<a class='popup_menu_toggle'>%s</a><span class='popup_menu'>%s</span>" % \
                           (html.escape(meaning), "".join(links))
 
-            if not ignored.has_key(meaning):
+            if not meaning in ignored:
                 self.newTableCol(index, resource.HTMLSource(meaning or "Data content"))
                 self.newTableCol(index, html.escape(value) if value else None)
                 index += 1
@@ -653,7 +653,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                         analyzerid = a["analyzerid"]
                         break
 
-            if not calist.has_key(analyzerid):
+            if not analyzerid in calist:
                 calist[analyzerid] = []
 
             calist[analyzerid].append(alertident["alertident"])
@@ -1089,7 +1089,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
             udp.render_table(self, "UDP", ignored_value)
             icmp.render_table(self, "ICMP", ignored_value)
 
-            if ignored_value.has_key("payload"):
+            if "payload" in ignored_value:
                 val = {}
 
                 payload = html.escape(utils.hexdump(ignored_value["payload"])).replace(" ", "&nbsp;")

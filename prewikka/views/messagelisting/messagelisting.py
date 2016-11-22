@@ -21,6 +21,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import copy
+import functools
 import time
 import urllib
 
@@ -46,17 +47,6 @@ class MessageListingParameters(mainmenu.MainMenuParameters):
         self.optional("listing_apply", text_type)
         self.optional("action", text_type)
 
-        # submit with an image passes the x and y coordinate values
-        # where the image was clicked
-        self.optional("x", int)
-        self.optional("y", int)
-
-    def normalize(self, *args, **kwargs):
-          # Filter out invalid limit which would trigger an exception.
-          if self.has_key("limit") and int(self["limit"]) <= 0:
-                self.pop("limit")
-
-          return mainmenu.MainMenuParameters.normalize(self, *args, **kwargs)
 
 class ListedMessage(AttrDict):
     def __init__(self, view_path, parameters):
@@ -65,10 +55,11 @@ class ListedMessage(AttrDict):
         self.view_path = view_path
 
     def _isAlreadyFiltered(self, column, path, criterion, value):
-        if not self.parameters.has_key(column):
+        col = self.parameters.get(column)
+        if not column:
             return False
 
-        return (path, criterion, value) in self.parameters[column]
+        return (path, criterion, value) in col
 
     def createInlineFilteredField(self, path, value, direction=None, real_value=None):
         if type(path) is not list and type(path) is not tuple:
@@ -102,7 +93,8 @@ class ListedMessage(AttrDict):
                 self.parameters.max_index += 1
 
             else:
-                if alreadyf is not False and (self.parameters.has_key(p) and self.parameters[p] == [v]):
+                val = self.parameters.get(p)
+                if alreadyf is not False and (val and val == [v]):
                         alreadyf = True
 
                 extra[p] = v or ""
@@ -209,5 +201,5 @@ class MessageListing(view.View):
         if not env.request.user.has("IDMEF_ALTER"):
             raise usergroup.PermissionDeniedError(["IDMEF_ALTER"], self.current_view)
 
-        action(reduce(lambda x,y: x | y, self.parameters["selection"]))
+        action(functools.reduce(lambda x,y: x | y, self.parameters["selection"]))
         del self.parameters["selection"]

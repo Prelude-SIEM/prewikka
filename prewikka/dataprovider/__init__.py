@@ -40,7 +40,7 @@ CONVERTERS = {
     float: datetime.utcfromtimestamp,
     text_type: _str_to_datetime,
     datetime: lambda x:x,
-    types.NoneType: lambda x:x
+    type(None): lambda x:x
 }
 
 def to_datetime(date):
@@ -302,7 +302,7 @@ class Criterion(json.JSONObject):
     def __str__(self):
         return self.to_string()
 
-    def __nonzero__(self):
+    def __bool__(self):
         return self.left is not None
 
     def __copy__(self):
@@ -327,6 +327,8 @@ class Criterion(json.JSONObject):
         return self._apply_new("||", other)
 
     __and__ = __add__
+    __nonzero__ = __bool__
+
 
 
 
@@ -344,7 +346,7 @@ class DataProviderManager(pluginmanager.PluginManager):
                 continue
 
             normalizer = getattr(p, "normalizer", None)
-            if not isinstance(normalizer, (types.NoneType, DataProviderNormalizer)):
+            if not isinstance(normalizer, (type(None), DataProviderNormalizer)):
                 raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
 
             self._type_handlers[k] = normalizer

@@ -22,10 +22,16 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import copy
 import datetime
+import functools
 import itertools
 import re
+import sys
 import time
-import urllib
+
+if sys.version_info >= (3,0):
+    from urllib.parse import quote
+else:
+    from urllib import quote
 
 import pkg_resources
 import prelude
@@ -124,10 +130,10 @@ class AlertListingParameters(MessageListingParameters):
             self._default_param[column][param] = value
             user.set_property(param, value, view=view_name)
 
-        elif user.configuration.has_key(view_name) and user.configuration[view_name].has_key(param) and user.configuration[view_name][param] != value:
+        elif view_name in user.configuration and param in user.configuration[view_name] and user.configuration[view_name][param] != value:
             self._default_param[column][param] = value
 
-        if not self.has_key(param):
+        if not param in self:
             # the parameter is loaded from config
             self[param] = value
 
@@ -191,7 +197,7 @@ class AlertListingParameters(MessageListingParameters):
 
     def normalize(self, view_name, user):
 
-        do_save = self.has_key("_save")
+        do_save = "_save" in self
         do_load = MessageListingParameters.normalize(self, view_name, user)
 
         for severity in self["alert.assessment.impact.severity"]:
@@ -212,12 +218,12 @@ class AlertListingParameters(MessageListingParameters):
             if ret:
                 load_saved = False
 
-        if load_saved and do_load and user.configuration.has_key(view_name):
+        if load_saved and do_load and view_name in user.configuration:
             for column in "classification", "source", "target", "analyzer":
                 self._loadColumnParam(view_name, user, user.configuration[view_name], column, do_save)
 
         for column in COLUMN_LIST:
-            if user.configuration.has_key(view_name):
+            if view_name in user.configuration:
                 for i in self._paramDictToList(user.configuration[view_name], column)[1]:
                     self._saved[column].append(i[1:])
 
@@ -227,7 +233,7 @@ class AlertListingParameters(MessageListingParameters):
 
             i = 0
             for path in self["aggregated_%s" % column]:
-                if self["aggregated_%s" % column].count(path) > 1:
+                if list(self["aggregated_%s" % column]).count(path) > 1:
                     self["aggregated_%s" % column].remove(path)
 
                 if path[0] == "!":
@@ -242,10 +248,10 @@ class AlertListingParameters(MessageListingParameters):
         return self._dynamic_param[column]
 
     def _isSaved(self, column, param):
-        if not self._default_param[column].has_key(param):
+        if not param in self._default_param[column]:
             return False
 
-        if not self.has_key(param):
+        if not param in self:
             return False
 
         if self._default_param[column][param] == self[param]:
@@ -270,7 +276,7 @@ class CorrelationAlertListingParameters(AlertListingParameters):
 
 class ListedAlert(ListedMessage):
     def __init__(self, *args, **kwargs):
-        apply(ListedMessage.__init__, (self, ) + args, kwargs)
+        ListedMessage.__init__(self, *args, **kwargs)
         self.reset()
 
         self._max_aggregated_source = int(env.config.general.get("max_aggregated_source", 10))
@@ -323,11 +329,7 @@ class ListedAlert(ListedMessage):
         if (category == None or category == "unknown") and address:
             category = self._guessAddressCategory(address)
 
-        if dataset.has_key("no_dns"):
-            dns = False
-        else:
-            dns = True
-
+        dns = "no_dns" not in dataset
         hfield = self.createHostField("alert.%s.node.address.address" % direction, address,
                                       category=category, direction=direction, dns=dns)
         dataset["addresses"].append(hfield)
@@ -512,9 +514,9 @@ class ListedAlert(ListedMessage):
                 vl.append(name)
                 fstr += ":" + name
 
-            urlstr = "%s?origin=%s&name=%s" % (env.reference_details_url, urllib.quote(ref["origin"]), urllib.quote(ref["name"]))
+            urlstr = "%s?origin=%s&name=%s" % (env.reference_details_url, quote(ref["origin"]), quote(ref["name"]))
             if ref["origin"] in ("vendor-specific", "user-specific"):
-                urlstr += "&url=" + urllib.quote(ref["url"], safe="")
+                urlstr += "&url=" + quote(ref["url"], safe="")
 
             fstr = self.createInlineFilteredField(pl, vl, "classification", fstr)
             dataset["classification_references"].append((urlstr, fstr))
@@ -626,7 +628,7 @@ class ListedAlert(ListedMessage):
                 'time_min': ctime,
                 'time_max': ctime
             }
-            self["extra_link"] = itertools.ifilterfalse(lambda x: x is None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
+            self["extra_link"] = filter(None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
 
     def setMessageDirectionGeneric(self, direction, object, value, allow_empty_value=True):
         self._initDirectionIfNeeded(direction)
@@ -662,7 +664,8 @@ class ListedAlert(ListedMessage):
 
 class ListedAggregatedAlert(ListedAlert):
     def __init__(self, *args, **kwargs):
-        apply(ListedAlert.__init__, (self,) + args, kwargs)
+        ListedAlert.__init__(self, *args, **kwargs)
+
         self["aggregated"] = True
         self["aggregated_classification_hidden"] = 0
         self["infos"] = [ ]
@@ -716,23 +719,16 @@ class AlertListing(MessageListing):
 
         return msg
 
-    def _lists_have_same_content(self, l1, l2):
-        l1 = copy.copy(l1)
-        l2 = copy.copy(l2)
-        l1.sort()
-        l2.sort()
-
-        return l1 == l2
-
     def _applyOptionalEnumFilter(self, criteria, column, object, values, objpath=None, unsetval="n/a"):
-        if ( self.parameters.has_key(object) and not self._lists_have_same_content(self.parameters[object], values) ):
+        obj = self.parameters.get(object)
+
+        if obj and set(obj) != set(values):
             new = Criterion()
-            for value in set(values) | set(self.parameters[object]):
-                if value in self.parameters[object]:
-                    new |= Criterion(objpath or object, "=", value if value != unsetval else None)
+            for value in obj:
+                new |= Criterion(objpath or object, "=", value if value != unsetval else None)
 
             criteria += new
-            self.dataset[object] = self.parameters[object]
+            self.dataset[object] = obj
         else:
             self.dataset[object] = values
 
@@ -827,13 +823,13 @@ class AlertListing(MessageListing):
                     if op:
                         newcrit |= Criterion(path, op, obj[2])
             else:
-                if merge.has_key(obj[0]):
+                if obj[0] in merge:
                     merge[obj[0]] += [ obj ]
                 else:
                     merge[obj[0]] =  [ obj ]
 
         for key in iter(merge):
-            newcrit += reduce(lambda x,y: x|y, (Criterion(*x) for x in merge[key]))
+            newcrit += functools.reduce(lambda x,y: x|y, (Criterion(*x) for x in merge[key]))
 
         criteria += newcrit
         self.dataset[type] = [ (path.replace("(0)", "").replace("(-1)", ""), operator, value) for path, operator, value in self.parameters[type] ]
@@ -857,7 +853,7 @@ class AlertListing(MessageListing):
 
         for path in path_list:
 
-            if not path_value_hash.has_key(path):
+            if not path in path_value_hash:
                 selection_list += [ (path, index) ]
                 index += 1
 
@@ -882,18 +878,17 @@ class AlertListing(MessageListing):
 
             alertkey = (classification or "") + "-" + (severity or "") + "-" + (completion or "")
 
-            if alertsraw.has_key(alertkey):
+            if alertkey in alertsraw:
                alertsraw[alertkey][-2] += alert_count
             else:
                alertsraw[alertkey] = ( [classification, severity, completion, alert_count, max_messageid] )
 
             nodekey = (analyzer_name or analyzer_model or "") + "-" + (analyzer_node_name or "")
-            if not nodesraw.has_key(nodekey):
+            if not nodekey in nodesraw:
                message.addSensor(path_value_hash)
                nodesraw[nodekey] = True
 
-        res = alertsraw.values()
-        res.sort(lambda x, y: cmp_severities(x[1], y[1]))
+        res = sorted(alertsraw.values(), key=lambda y: { None: 4, "info": 3, "low": 2, "medium": 1, "high": 0 }[y[1]])
 
         source_value = path_value_hash.get("alert.source(0).node.address(0).address", None)
         target_value = path_value_hash.get("alert.target(0).node.address(0).address", None)
@@ -905,7 +900,7 @@ class AlertListing(MessageListing):
             'time_min': time_min,
             'time_max': time_max
         }
-        message.extra_link = itertools.ifilterfalse(lambda x: x is None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
+        message.extra_link = filter(None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
 
         result_count = 0
         for classification, severity, completion, count, messageid in res:
@@ -1036,7 +1031,7 @@ class AlertListing(MessageListing):
             self.dataset["messages"].append(message)
             message.setTime(time_min, time_max)
 
-            if not message.has_key("selection"):
+            if not "selection" in message:
                 message.setCriteriaForSelection(select_criteria + Criterion("alert.create_time", ">=", time_min) + Criterion("alert.create_time", "<=", time_max))
 
         return total_results
@@ -1070,16 +1065,15 @@ class AlertListing(MessageListing):
         self.dataset["aggregated_classification"] = self.parameters["aggregated_classification"]
         self.dataset["aggregated_analyzer"] = self.parameters["aggregated_analyzer"]
 
-        self.dataset["extra_column"] = itertools.ifilterfalse(lambda x: x is None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN"))
+        self.dataset["extra_column"] = filter(None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN"))
 
-        ag_s = self.parameters["aggregated_source"][:]
-        ag_t = self.parameters["aggregated_target"][:]
-        ag_c = self.parameters["aggregated_classification"][:]
-        ag_a = self.parameters["aggregated_analyzer"][:]
+        def cmp(x):
+            return x != "none"
 
-        for l in ag_s, ag_t, ag_c, ag_a:
-            while "none" in l:
-                l.remove("none")
+        ag_s = list(filter(cmp, self.parameters["aggregated_source"]))
+        ag_t = list(filter(cmp, self.parameters["aggregated_target"]))
+        ag_c = list(filter(cmp, self.parameters["aggregated_classification"]))
+        ag_a = list(filter(cmp, self.parameters["aggregated_analyzer"]))
 
         if len(ag_s + ag_t + ag_c + ag_a) > 0:
             return self._setAggregatedMessagesNoValues(criteria, ag_s, ag_t, ag_c, ag_a)
@@ -1093,19 +1087,19 @@ class AlertListing(MessageListing):
         default = self.parameters.getDefaultValues()
         default.update(cd)
 
-        for param in paramlist + cd.keys():
+        for param in itertools.chain(paramlist, cd.keys()):
             if ret != 2 and self.parameters.isSaved(column, param):
                 ret = 1
 
-            if not default.has_key(param):
-                if self.parameters.has_key(param):
+            if not param in default:
+                if param in self.parameters:
                     if self.parameters[param] != []:
                         ret = 2
                         break
 
                     continue
 
-            if not self.parameters.has_key(param):
+            if not param in self.parameters:
                 ret = 2
                 break
 
@@ -1152,11 +1146,10 @@ class AlertListing(MessageListing):
 
         self.dataset["checkbox_fields"] = ["alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"]
 
-        c_params = ["aggregated_classification"] + self.parameters.getDynamicParams("classification").keys()
-        c_params += self.dataset["checkbox_fields"]
-        s_params = ["aggregated_source"] + self.parameters.getDynamicParams("source").keys()
-        t_params = ["aggregated_target"] + self.parameters.getDynamicParams("target").keys()
-        a_params = ["aggregated_analyzer"] + self.parameters.getDynamicParams("analyzer").keys()
+        c_params = itertools.chain(["aggregated_classification"], self.parameters.getDynamicParams("classification").keys(), self.dataset["checkbox_fields"])
+        s_params = itertools.chain(["aggregated_source"], self.parameters.getDynamicParams("source").keys())
+        t_params = itertools.chain(["aggregated_target"], self.parameters.getDynamicParams("target").keys())
+        a_params = itertools.chain(["aggregated_analyzer"], self.parameters.getDynamicParams("analyzer").keys())
 
         d["column_names"] = COLUMN_LIST[:]
 

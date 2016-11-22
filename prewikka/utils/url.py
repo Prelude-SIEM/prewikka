@@ -19,28 +19,38 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import urllib
+import sys
 import prelude
 
-def _convert(d):
-    if isinstance(d, (list, tuple)):
-        return [_convert(i) for i in d]
+if sys.version_info >= (3,0):
+    from urllib.request import pathname2url
+    from urllib.parse import urlencode as _urlencode
+else:
+    from urllib import pathname2url
+    from urllib import urlencode as __urlencode
 
-    elif isinstance(d, text_type):
-        return d.encode("utf8")
+    def _convert(d):
+        if isinstance(d, (list, tuple)):
+            return [_convert(i) for i in d]
 
-    else:
-        return d
+        elif isinstance(d, text_type):
+            return d.encode("utf8")
+
+        else:
+            return d
+
+    def _urlencode(parameters, doseq=False):
+        if hasattr(parameters, "items"):
+            parameters = parameters.items()
+
+        return __urlencode([(k.encode("utf8"), _convert(v)) for k, v in parameters], doseq)
 
 def urlencode(parameters, doseq=False):
-    if hasattr(parameters, "items"):
-        parameters = parameters.items()
-
-    return urllib.urlencode([(k.encode("utf8"), _convert(v)) for k, v in parameters], doseq)
+    return _urlencode(parameters, doseq).replace('&', '&amp;')
 
 
 def create_link(path, parameters=None):
-    link = urllib.pathname2url(path)
+    link = pathname2url(path)
 
     if parameters:
         link += "?%s" % urlencode(parameters, doseq=True)

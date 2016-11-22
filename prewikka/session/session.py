@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import binascii
 import os
 import struct
 import time
@@ -135,7 +136,7 @@ class Session(pluginmanager.PluginBase):
         t = time.time()
 
         self._db.delete_expired_sessions(t - self._expiration)
-        sessionid = (os.urandom(16) + struct.pack(b">d", t)).encode("hex")
+        sessionid = text_type(binascii.hexlify(os.urandom(16) + struct.pack(b">d", t)))
 
         self._db.create_session(sessionid, user, int(t))
         self.__set_session(request, sessionid)

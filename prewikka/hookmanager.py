@@ -36,7 +36,7 @@ def _register_decorator(hook):
 
 class HookRegistrar(object):
     def __init__(self, *args, **kwargs):
-        for name, ref in self.__class__.__dict__.iteritems():
+        for name, ref in self.__class__.__dict__.items():
             for hook in getattr(ref, "__prewikka_hook__", []):
                 hookmgr.register(hook, getattr(self, name))
 

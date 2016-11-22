@@ -24,7 +24,10 @@ def inherit(context):
     src = tback.source
     line = tback.lineno
     if src:
-        lines = src.split('\n')
+        if isinstance(src, bytes):
+            src = src.decode()
+
+        lines = src.split("\n")
     else:
         lines = None
 %>

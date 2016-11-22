@@ -471,10 +471,12 @@ class Database(preludedb.SQL):
         }
 
         settings = { "host": "localhost", "name": "prewikka", "user": "prewikka", "type": "mysql" }
-        settings.update([(k, text_type(v)) for k, v in config.items()])
+        stpl = tuple((k, v) for k, v in config.items())
+        settings.update(stpl)
 
         preludedb.SQL.__init__(self, settings)
 
+        self._dbhash = hash(stpl)
         self._dbtype = settings["type"]
         self._transaction_state = self.__TRANSACTION_STATE_NONE
 
@@ -794,3 +796,6 @@ class Database(preludedb.SQL):
             self.transactionAbort()
 
         self._transaction_state = self.__TRANSACTION_STATE_NONE
+
+    def __hash__(self):
+        return self._dbhash

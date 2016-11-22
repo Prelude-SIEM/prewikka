@@ -97,7 +97,7 @@ class NameID(object):
         if md5:
             return md5
 
-        md5 = _NAMEID_TBL[name] = hashlib.md5(name).hexdigest()
+        md5 = _NAMEID_TBL[name] = hashlib.md5(name.encode("utf8")).hexdigest()
         return md5
 
     def __eq__(self, other):

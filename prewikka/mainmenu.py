@@ -45,8 +45,8 @@ class MainMenuParameters(view.Parameters):
         self.optional("timeline_value", int, default=1, save=True, general=True)
         self.optional("timeline_unit", text_type, default="month", save=True, general=True)
         self.optional("timeline_absolute", int, default=0, save=True, general=True)
-        self.optional("timeline_end", long, save=True, general=True)
-        self.optional("timeline_start", long, save=True, general=True)
+        self.optional("timeline_end", int, save=True, general=True)
+        self.optional("timeline_start", int, save=True, general=True)
         self.optional("orderby", text_type, "time_desc")
         self.optional("auto_apply_value", int, default=0, save=True, general=True)
         self.optional("auto_apply_enable", text_type, default="false", save=True, general=True)
@@ -256,7 +256,7 @@ class MainMenu(object):
         tpl = list(dt.timetuple())
 
         if precision is not None:
-            for i in xrange(precision, len(tpl)):
+            for i in range(precision, len(tpl)):
                 # calendar.timegm() won't accept 0 as a valid year/month
                 tpl[i] = 1 if i <= 1 else 0
 
@@ -318,7 +318,7 @@ class MainMenu(object):
         self._setup_timeline_range()
         self._set_timeline(self.start, self.end)
 
-        self.dataset["menu_extra"] = itertools.ifilter(None, hookmanager.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type))
+        self.dataset["menu_extra"] = filter(None, hookmanager.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type))
 
 
 class MainMenuAlert(MainMenu):

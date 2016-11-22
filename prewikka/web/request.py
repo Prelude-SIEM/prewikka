@@ -22,7 +22,6 @@ from __future__ import absolute_import, division, print_function
 
 import abc
 import cgi
-import Cookie
 import copy
 import mimetypes
 import os
@@ -30,7 +29,15 @@ import os.path
 import sys
 import time
 import urllib
-import urlparse
+
+if sys.version_info >= (3,0):
+    from http import cookies
+    from urllib.parse import urlparse
+    from urllib.request import url2pathname
+else:
+    import Cookie as cookies
+    from urlparse import urlparse
+    from urllib import url2pathname
 
 from prewikka import env, error
 from prewikka.response import PrewikkaDirectResponse, PrewikkaResponse
@@ -71,20 +78,20 @@ class Request(object):
         self._core = core
         self._path = self.path
 
-        self._uri = urlparse.urlparse(self.path)
+        self._uri = urlparse(self.path)
 
         self._query_string = self._uri.query
-        self.path = urllib.url2pathname(self._uri.path or "/")
+        self.path = url2pathname(self._uri.path or "/")
 
         self.path_elements = self.path.strip('/').split("/")
 
-        cookie = Cookie.SimpleCookie(self.get_cookie())
+        cookie = cookies.SimpleCookie(self.get_cookie())
         for key, value in cookie.items():
             self.input_cookie[key] = value
 
     def add_cookie(self, param, value, expires, path="/"):
         if not self._output_cookie:
-            self._output_cookie = Cookie.SimpleCookie()
+            self._output_cookie = cookies.SimpleCookie()
 
         if sys.version_info < (3,0):
             param = param.encode("utf8")

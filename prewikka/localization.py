@@ -98,13 +98,19 @@ class TranslationProxy(object):
         self._data.catalog = first
 
     def gettext(self, s):
-        return self._data.catalog.ugettext(s) if hasattr(self._data, "catalog") else s
+        if sys.version_info < (3,0):
+            return self._data.catalog.ugettext(s) if hasattr(self._data, "catalog") else s
+        else:
+            return self._data.catalog.gettext(s) if hasattr(self._data, "catalog") else s
 
     def ngettext(self, singular, plural, num):
         if not hasattr(self._data, "catalog"):
             return singular if num <= 1 else plural
 
-        return self._data.catalog.ungettext(singular, plural, num)
+        if sys.version_info < (3,0):
+            return self._data.catalog.ungettext(singular, plural, num)
+        else:
+            return self._data.catalog.ngettext(singular, plural, num)
 
 translation = TranslationProxy()
 
@@ -163,18 +169,14 @@ def setLocale(lang):
 
 
 def getLanguages():
-    l = _LANGUAGES.keys()
-    l.sort()
-    return l
+    return sorted(_LANGUAGES)
 
 def getLanguagesIdentifiers():
     return _LANGUAGES.values()
 
 
 def getLanguagesAndIdentifiers():
-    l = _LANGUAGES.keys()
-    l.sort()
-    return [ (_(x), _LANGUAGES[x]) for x in l ]
+    return [ (_(x), _LANGUAGES[x]) for x in sorted(_LANGUAGES) ]
 
 
 def getCurrentCharset():
@@ -243,7 +245,7 @@ def get_calendar_format():
     return calendar_format.replace("yy", "y").replace("MM", "mm")
 
 def get_timezones():
-    return sorted(zone for zone in babel.core.get_global('zone_territories').keys() + ["UTC"] if not zone.startswith('Etc/'))
+    return sorted(babel.core.get_global('zone_territories'))
 
 def get_system_timezone():
     try:

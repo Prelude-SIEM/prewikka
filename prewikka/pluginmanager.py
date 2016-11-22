@@ -96,7 +96,7 @@ class PluginManager:
             logger.debug("loading plugin '%s'" % i.name)
             try:
                 plugin_class = i.load()
-            except Exception, e:
+            except Exception as e:
                 logger.exception("%s: %s", i.module_name, e)
                 continue
 

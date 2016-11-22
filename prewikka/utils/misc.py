@@ -86,7 +86,7 @@ def _load_protocol():
 def protocol_number_to_name(num):
      port_dict = _load_protocol()
 
-     if port_dict.has_key(num):
+     if num in port_dict:
          return port_dict[num][0]
 
      return None
@@ -224,14 +224,14 @@ class CachingIterator(object):
 
     def __getitem__(self, key):
         if isinstance(key, slice) :
-            return [self[i] for i in xrange(*key.indices(len(self)))]
+            return [self[i] for i in range(*key.indices(len(self)))]
 
         elif isinstance(key, int):
             if key < 0:
                 key += len(self)
 
         try:
-            for i in xrange((key + 1) - len(self._cache)):
+            for i in range((key + 1) - len(self._cache)):
                 self._cache.append(self.preprocess_value(next(self._items)))
         except StopIteration:
             raise IndexError

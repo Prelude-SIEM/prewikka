@@ -86,7 +86,7 @@ class HeartbeatListing(MessageListing):
                              ("node_name", "heartbeat.analyzer(-1).node.name")):
             self.dataset[column + "_filtered"] = False
             if not filter_found:
-                if self.parameters.has_key(path):
+                if path in self.parameters:
                     criteria += Criterion(path, "=", self.parameters[path])
                     self.dataset[column + "_filtered"] = True
                     filter_found = True

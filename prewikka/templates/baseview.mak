@@ -1,6 +1,12 @@
 <%!
+import sys
 from prewikka import env, utils
 from prewikka.utils import nameToPath
+
+if sys.version_info >= (3,0):
+    import builtins
+else:
+    import __builtin__ as builtins
 %>
 
 <%inherit file="/prewikka/templates/toplayout.mak" />
@@ -139,7 +145,7 @@ $(document).ready(function() {
         % for name, views in sections.get(section).items():
             <%
             class_ = ""
-            firstview = views.values()[0]
+            firstview = builtins.next(builtins.iter(views.values()))
             %>
 
             % if env.request.user and not env.request.user.has(firstview.view_permissions):
