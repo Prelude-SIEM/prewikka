@@ -1,3 +1,16 @@
+* 2016-11-28, prewikka-3.1.2:
+
+Author: Antoine Luong
+
+- Set the process name to 'prewikka' in logs
+- Fix escaping of redirect link
+
+Author: Thomas Andrejak
+
+- Enable translation for label in URL links
+
+
+
 * 2016-11-14, prewikka-3.1.1:
 
 Author: Thomas Andrejak
