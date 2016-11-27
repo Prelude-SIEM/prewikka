@@ -505,7 +505,7 @@ class ListedAlert(ListedMessage):
         dataset["classification_url"] = [ ]
         if "classification" in env.url:
             for urlname, url in env.url["classification"].items():
-                dataset["classification_url"].append((urlname.capitalize(), url.replace("$classification", classification)))
+                dataset["classification_url"].append((_(urlname), url.replace("$classification", classification)))
 
     def _setMessageClassification(self, dataset, message):
         self._setMessageClassificationReferences(dataset, message)
@@ -539,7 +539,7 @@ class ListedAlert(ListedMessage):
                 url = url.replace("$time", t)
                 if host:
                     url = url.replace("$host", host)
-                ret.append((urlname.capitalize(), url))
+                ret.append((_(urlname), url))
 
         return ret
 
