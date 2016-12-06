@@ -149,7 +149,7 @@ def split_unescaped_characters(value, characters):
 
 
 def hexdump(content):
-    decoded = struct.unpack("B" * len(content), content)
+    decoded = struct.unpack(b"B" * len(content), content)
     content = ""
     i = 0
 

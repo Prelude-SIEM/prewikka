@@ -203,7 +203,7 @@ class TcpIpOptions(Table):
         if (bits & flag) >> shift:
             return "X"
         else:
-            return "&nbsp;"
+            return resource.HTMLSource("&nbsp;")
 
     def _decodeOption8(self, data):
         return text_type(struct.unpack(b">B", data)[0])
@@ -324,7 +324,7 @@ class TcpIpOptions(Table):
             if len(dec) == 3 and (dec[1] == -1 or dec[1] == option[1]):
                 self.newTableCol(idx, "%s" % dec[2](option[2]))
             else:
-                self.newTableCol(idx, "&nbsp;")
+                self.newTableCol(idx, resource.HTMLSource("&nbsp;"))
 
         self.endTable()
 
@@ -1092,11 +1092,11 @@ class AlertSummary(TcpIpOptions, MessageSummary):
             if "payload" in ignored_value:
                 val = {}
 
-                payload = html.escape(utils.hexdump(ignored_value["payload"])).replace(" ", "&nbsp;")
+                payload = html.escape(utils.hexdump(ignored_value["payload"])).replace(" ", resource.HTMLSource("&nbsp;"))
                 val["payload"] = resource.HTMLSource("<span class='fixed'>%s</span>" % payload)
                 data.render_table(self, _("Payload"), val)
 
-                val["payload"] = resource.HTMLSource("<div style='overflow: auto;'>%s</div>" % html.escape(ignored_value["payload"]).replace("\n", "<br/>"))
+                val["payload"] = resource.HTMLSource("<div style='overflow: auto;'>%s</div>" % html.escape(ignored_value["payload"]).replace("\n", resource.HTMLSource("<br/>")))
                 data.render_table(self, _("ASCII Payload"), val)
 
             self.endTable()
