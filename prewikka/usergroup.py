@@ -136,7 +136,7 @@ class User(NameID):
 
     @cache.request_memoize_property("user_permissions")
     def permissions(self):
-        return env.auth.getUserPermissions(self)
+        return set(env.auth.getUserPermissions(self))
 
     @permissions.setter
     def permissions(self, permissions):
@@ -144,7 +144,7 @@ class User(NameID):
 
     def _permissions(self, permissions):
         self.permissions # make sure the cache has been created
-        env.request.cache.user_permissions._set((self,), permissions)
+        env.request.cache.user_permissions._set((self,), set(permissions))
 
     # Support access to _permissions to modify object permission without backend modification.
     _permissions = property(permissions, _permissions)
