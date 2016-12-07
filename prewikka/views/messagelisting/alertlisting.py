@@ -765,11 +765,11 @@ class AlertListing(MessageListing):
         # Check whether the path can handle substring comparison
         # this need to be done first, since enum check with * won't work with "=" operator.
         try:
-            c = prelude.IDMEFCriteria(Criterion(path, "<>*", value))
+            c = prelude.IDMEFCriteria(Criterion(path, "<>*", value).to_string("alert"))
         except:
             # Check whether this path can handle the provided value.
             try:
-                c = prelude.IDMEFCriteria(Criterion(path, "=", value))
+                c = prelude.IDMEFCriteria(Criterion(path, "=", value).to_string("alert"))
             except:
                 return None
 
