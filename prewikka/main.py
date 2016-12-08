@@ -159,7 +159,7 @@ class Core:
     def _load_auth_or_session(self, typename, plugins, name, config=config.SectionRoot()):
         if name not in plugins:
             raise error.PrewikkaUserError(
-                _("Initialization error"),
+                N_("Initialization error"),
                 N_("Cannot use %(type)s mode '%(name)s', please contact your local administrator.",
                    {'type': typename, 'name': name})
             )
@@ -295,7 +295,7 @@ class Core:
         except Exception as err:
             response = error.PrewikkaError(
                 N_("An unexpected condition happened while trying to load %s") % (webreq.path),
-                details=err,
+                details=err
             ).respond()
 
         webreq.send_response(response)

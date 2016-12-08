@@ -18,7 +18,7 @@ class UserSettings(view.View):
         self._object = env.request.user
 
         if not env.auth.hasUser(self._object):
-            raise error.PrewikkaUserError(_("Invalid User"), N_("Requested user '%s' does not exist", self._object))
+            raise error.PrewikkaUserError(N_("Invalid User"), N_("Requested user '%s' does not exist", self._object))
 
         dataset = {}
         dataset["object"] = self._object
@@ -39,11 +39,11 @@ class UserSettings(view.View):
         self._object = user = usergroup.User(env.request.parameters.get("name", env.request.user.name))
 
         if not env.request.parameters["language"] in localization.getLanguagesIdentifiers():
-            raise error.PrewikkaUserError(_("Invalid Language"), N_("Specified language does not exist"), log_priority=log.WARNING)
+            raise error.PrewikkaUserError(N_("Invalid Language"), N_("Specified language does not exist"), log_priority=log.WARNING)
 
         list(hookmanager.trigger("HOOK_USERMANAGEMENT_USER_MODIFY", user))
         if not env.request.parameters["timezone"] in localization.get_timezones():
-            raise error.PrewikkaUserError(_("Invalid Timezone"), N_("Specified timezone does not exist"), log_priority=log.WARNING)
+            raise error.PrewikkaUserError(N_("Invalid Timezone"), N_("Specified timezone does not exist"), log_priority=log.WARNING)
 
         need_reload = False
         user.begin_properties_change()

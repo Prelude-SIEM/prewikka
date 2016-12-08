@@ -38,7 +38,7 @@ class PermissionDeniedError(error.PrewikkaUserError):
         else:
             msg = N_("Required permissions: %s", ", ".join(permissions))
 
-        error.PrewikkaUserError.__init__(self, _("Permission Denied"), msg, log_priority=log.WARNING)
+        error.PrewikkaUserError.__init__(self, N_("Permission Denied"), msg, log_priority=log.WARNING)
 
 _NAMEID_TBL = {}
 

@@ -66,11 +66,12 @@ class PrewikkaError(PrewikkaException):
         if details is not None:
             self.details = details
 
-        self._untranslated_details = text_type(self.details)
+        self._untranslated_name = text_type(self.name)
         self._untranslated_message = text_type(self.message)
+        self._untranslated_details = text_type(self.details)
 
-        if self.name:
-            self.name = _(self.name)
+        if self._untranslated_name:
+            self.name = _(self._untranslated_name)
 
         if self._untranslated_message:
             self.message = _(self._untranslated_message)

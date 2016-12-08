@@ -47,7 +47,7 @@ def to_datetime(date):
     try:
         return CONVERTERS[type(date)](date)
     except KeyError:
-        raise error.PrewikkaUserError(_("Conversion error"),
+        raise error.PrewikkaUserError(N_("Conversion error"),
                                       N_("Value %(value)r cannot be converted to %(type)s",
                                          {"value": date, "type": "datetime"}))
 TYPES_FUNC_MAP = {
@@ -86,7 +86,7 @@ class QueryResultsRow(CachingIterator):
         try:
             return TYPES_FUNC_MAP[type](value)
         except (KeyError, ValueError):
-            raise error.PrewikkaUserError(_("Conversion error"),
+            raise error.PrewikkaUserError(N_("Conversion error"),
                                           N_("Value %(value)r cannot be converted to %(type)s", {"value": value, "type": type}))
 
     def preprocess_value(self, value):
@@ -193,7 +193,7 @@ class DataProviderBackend(pluginmanager.PluginBase):
 class DataProviderNormalizer(object):
     def __init__(self, time_field=None):
         if time_field is None:
-            raise error.PrewikkaUserError(_("Backend normalization error"), _("Backend normalization error"))
+            raise error.PrewikkaUserError(N_("Backend normalization error"), N_("Backend normalization error"))
 
         self._time_field = time_field
 
@@ -365,7 +365,7 @@ class DataProviderManager(pluginmanager.PluginManager):
                 continue
 
             if p.type in self._backends:
-                raise error.PrewikkaUserError(_("Configuration error"),
+                raise error.PrewikkaUserError(N_("Configuration error"),
                                               N_("Only one manager should be configured for '%s' backend", p.type))
 
             self._backends[p.type] = p

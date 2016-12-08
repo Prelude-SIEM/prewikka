@@ -46,30 +46,29 @@ class ParameterError(Exception):
 
 class InvalidParameterError(error.PrewikkaUserError):
     def __init__(self, name):
-        error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
+        error.PrewikkaUserError.__init__(self, N_("Parameters Normalization failed"),
                                          N_("Parameter '%s' is not valid", name),
                                          log_priority=log.WARNING)
 
 
 class InvalidParameterValueError(error.PrewikkaUserError):
     def __init__(self, name, value):
-        error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
+        error.PrewikkaUserError.__init__(self, N_("Parameters Normalization failed"),
                                          N_("Invalid value '%(value)s' for parameter '%(name)s'", {'value': value, 'name': name}),
                                          log_priority=log.WARNING)
 
 
 class MissingParameterError(error.PrewikkaUserError):
     def __init__(self, name):
-        error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
+        error.PrewikkaUserError.__init__(self, N_("Parameters Normalization failed"),
                                          N_("Required parameter '%s' is missing", name),
                                          log_priority=log.WARNING)
-
 
 class InvalidViewError(error.PrewikkaUserError):
     code = 404
 
     def __init__(self, message, log_priority=None, **kwargs):
-        error.PrewikkaUserError.__init__(self, _("Invalid view"), message, log_priority=log.ERROR, **kwargs)
+        error.PrewikkaUserError.__init__(self, N_("Invalid view"), message, log_priority=log.ERROR, **kwargs)
 
 
 class ListConverter(BaseConverter):

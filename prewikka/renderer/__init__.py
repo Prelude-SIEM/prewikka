@@ -147,14 +147,15 @@ class RendererPluginManager(pluginmanager.PluginManager):
             renderer = self.get_default_backend(type)
 
             if renderer is None:
-                raise error.PrewikkaUserError(_("Renderer error"), N_("No backend supporting render type '%s'", type))
+                raise error.PrewikkaUserError(N_("Renderer error"),
+                                              N_("No backend supporting render type '%s'", type))
 
         if renderer not in self._renderer:
-            raise error.PrewikkaUserError(_("Renderer error"),
+            raise error.PrewikkaUserError(N_("Renderer error"),
                                           N_("No backend named '%s'", renderer))
 
         if type not in self._renderer[renderer]:
-            raise error.PrewikkaUserError(_("Renderer error"),
+            raise error.PrewikkaUserError(N_("Renderer error"),
                                           N_("Backend '%(backend)s' does not support render type '%(type)s'",
                                              {'backend': renderer, 'type': type}))
 

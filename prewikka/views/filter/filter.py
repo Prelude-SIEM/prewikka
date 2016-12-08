@@ -56,7 +56,7 @@ class Filter:
                 continue
 
             if not val in self.elements:
-                raise error.PrewikkaUserError(_("Invalid filter element"),
+                raise error.PrewikkaUserError(N_("Invalid filter element"),
                     N_("Invalid filter element '%s' referenced from filter formula", val))
 
             criteria, op, value = self.elements[val]
@@ -298,17 +298,17 @@ class AlertFilterEdition(view.View):
         for name, obj, operator, value in env.request.parameters["elements"]:
             elements[name] = (obj, operator, value)
             if name not in env.request.parameters["filter_formula"]:
-                raise error.PrewikkaUserError(_("Could not save Filter"), N_("No valid filter formula provided"))
+                raise error.PrewikkaUserError(N_("Could not save Filter"), N_("No valid filter formula provided"))
 
         fname = env.request.parameters.get("filter_name")
         if not fname:
-            raise error.PrewikkaUserError(_("Could not save Filter"), N_("No name for this filter was provided"))
+            raise error.PrewikkaUserError(N_("Could not save Filter"), N_("No name for this filter was provided"))
 
         if not env.request.parameters["filter_formula"]:
-            raise error.PrewikkaUserError(_("Could not save Filter"), N_("No valid filter formula provided"))
+            raise error.PrewikkaUserError(N_("Could not save Filter"), N_("No valid filter formula provided"))
 
         if env.request.parameters.get("load") != fname and self._db.get_filter(env.request.user, fname):
-            raise error.PrewikkaUserError(_("Could not save Filter"), N_("The filter name is already used by another filter"))
+            raise error.PrewikkaUserError(N_("Could not save Filter"), N_("The filter name is already used by another filter"))
 
         fltr = Filter(fname,
                       env.request.parameters["filter_type"],

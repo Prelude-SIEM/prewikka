@@ -281,12 +281,12 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
         if self._reqbranch and self._from_branch != self._reqbranch:
             raise DatabaseSchemaError(N_("database schema branch %(required)s required (found %(current)s)",
-                                      {'required': self._reqbranch, 'current': self._from_branch}))
+                                         {'required': self._reqbranch, 'current': self._from_branch}))
 
         if self._reqversion and self._from_version != self._reqversion:
             raise DatabaseSchemaError(N_("database schema version %(required)s required (found %(current)s)",
-                                      {'required': self._get_version_string(self._reqbranch, self._reqversion),
-                                       'current': self._get_version_string(self._from_branch, self._from_version)}))
+                                         {'required': self._get_version_string(self._reqbranch, self._reqversion),
+                                          'current': self._get_version_string(self._from_branch, self._from_version)}))
 
     def _update_state(self, version, branch):
         self._from_branch = branch
@@ -349,7 +349,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
     def _get_install_schema(self):
         ret = self._list(to_version=self._reqversion, branch=self._reqbranch, type="install")
         if not ret:
-            raise error.PrewikkaUserError(_("Database installation error"),
+            raise error.PrewikkaUserError(N_("Database installation error"),
                                           N_("No database installation script found for module %(module)s, version %(version)s",
                                              {'module': self._full_module_name, 'version': self._get_version_string(self._reqbranch, self._reqversion)}))
 
@@ -358,13 +358,13 @@ class DatabaseUpdateHelper(DatabaseHelper):
     def _get_branch_update(self):
         prev = self._resolve_branch_switch(self._from_branch, self._from_version)
         if not prev:
-            raise error.PrewikkaUserError(_("Database migration error"),
-                                          N_("No database branch migration script found for module %(module)s, branch transition %(current)s -> %(required)s",
-                                          {
-                                            'module': self._full_module_name,
-                                            'current': self._get_version_string(self._from_branch, self._from_version),
-                                            'required': self._get_version_string(self._reqbranch, "<=" + self._reqversion)
-                                          }))
+            raise error.PrewikkaUserError(
+                N_("Database migration error"),
+                N_("No database branch migration script found for module %(module)s, branch transition %(current)s -> %(required)s",
+                    {'module': self._full_module_name,
+                     'current': self._get_version_string(self._from_branch, self._from_version),
+                     'required': self._get_version_string(self._reqbranch, "<=" + self._reqversion)})
+            )
 
         return prev
 
@@ -397,14 +397,12 @@ class DatabaseUpdateHelper(DatabaseHelper):
         ret = self._list(from_version=from_version, to_version=self._reqversion, branch=self._reqbranch, type="update")
         if not(ret) or ret[-1].version != self._reqversion:
             raise error.PrewikkaUserError(
-                _("Database migration error"),
+                N_("Database migration error"),
                 N_("No linear migration script found for module %(module)s %(version1)s -> %(version2)s",
-                {
-                    'module': self._full_module_name,
-                    'version1': self._get_version_string(self._from_branch, self._from_version),
-                    'version2': self._get_version_string(self._reqbranch, self._reqversion)
-                }
-            ))
+                    {'module': self._full_module_name,
+                     'version1': self._get_version_string(self._from_branch, self._from_version),
+                     'version2': self._get_version_string(self._reqbranch, self._reqversion)})
+            )
 
         return prev + ret
 

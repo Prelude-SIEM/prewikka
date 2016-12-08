@@ -159,7 +159,7 @@ class Session(pluginmanager.PluginBase):
         self.__create_session(request, user)
 
         is_admin = set(user.permissions) == usergroup.ALL_PERMISSIONS
-        env.log.info("User \"{0}\" logged in with profile \"{1}\"".format(user.name, "admin" if is_admin else "default"))
+        env.log.info("User login with profile '%s'" % ("admin" if is_admin else "default"))
 
         raise RedirectionError(env.request.web.get_raw_uri(True), 303)
 
@@ -171,7 +171,10 @@ class Session(pluginmanager.PluginBase):
         self.__delete_session(request)
         env.log.info("Logged out")
 
-        raise SessionInvalid(message=_("Logged out"), login=login, log_priority=log.INFO, template=self.template)
+        raise SessionInvalid(message=N_("Logged out"),
+                             login=login,
+                             log_priority=log.INFO,
+                             template=self.template)
 
     def can_logout(self):
         return "logout" in self.__class__.__dict__
