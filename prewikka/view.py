@@ -20,39 +20,50 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import json
+import sys
 import operator
-import time
-from copy import copy
 
+from copy import copy
 from prewikka import database, env, error, hookmanager, log, pluginmanager, template, usergroup, utils
 from prewikka.response import PrewikkaResponse
 
+import werkzeug.exceptions
+from werkzeug.routing import Map, Rule, BaseConverter
+
+if sys.version_info >= (3, 0):
+    import builtins
+else:
+    import __builtin__ as builtins
+
+
+_URL_ADAPTER_CACHE = {}
 logger = log.getLogger(__name__)
 
 
 class ParameterError(Exception):
         pass
 
+
 class InvalidParameterError(error.PrewikkaUserError):
     def __init__(self, name):
         error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
-                                               N_("Parameter '%s' is not valid", name),
-                                               log_priority=log.WARNING)
+                                         N_("Parameter '%s' is not valid", name),
+                                         log_priority=log.WARNING)
 
 
 class InvalidParameterValueError(error.PrewikkaUserError):
     def __init__(self, name, value):
         error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
-                                               N_("Invalid value '%(value)s' for parameter '%(name)s'", {'value': value, 'name': name}),
-                                               log_priority=log.WARNING)
+                                         N_("Invalid value '%(value)s' for parameter '%(name)s'", {'value': value, 'name': name}),
+                                         log_priority=log.WARNING)
 
 
 class MissingParameterError(error.PrewikkaUserError):
     def __init__(self, name):
         error.PrewikkaUserError.__init__(self, _("Parameters Normalization failed"),
-                                               N_("Required parameter '%s' is missing", name),
-                                               log_priority=log.WARNING)
+                                         N_("Required parameter '%s' is missing", name),
+                                         log_priority=log.WARNING)
+
 
 class InvalidViewError(error.PrewikkaUserError):
     code = 404
@@ -60,6 +71,13 @@ class InvalidViewError(error.PrewikkaUserError):
     def __init__(self, message, log_priority=None, **kwargs):
         error.PrewikkaUserError.__init__(self, _("Invalid view"), message, log_priority=log.ERROR, **kwargs)
 
+
+class ListConverter(BaseConverter):
+    def to_python(self, value):
+        return value.split(',')
+
+    def to_url(self, values):
+        return ','.join(BaseConverter.to_url(self, value) for value in values)
 
 
 class ParameterDesc(object):
@@ -113,14 +131,14 @@ class ParameterDesc(object):
 
 
 class Parameters(dict):
-    allow_extra_parameters = False
+    allow_extra_parameters = True
 
     def __init__(self, view, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
 
         self._hard_default = {}
         self._default = {}
-        self._parameters = { }
+        self._parameters = {}
 
         self.register()
         self.optional("_save", text_type)
@@ -164,7 +182,7 @@ class Parameters(dict):
 
                 continue
 
-            if not name in self._parameters or param.mandatory is False:
+            if name not in self._parameters or param.mandatory is False:
                 do_load = False
 
             value = param.parse(value)
@@ -219,9 +237,9 @@ class Parameters(dict):
         """
         Return the object list from POST parameters
         """
-        obj_list = [ ]
-        obj_dict = { }
-        obj_order = [ ]
+        obj_list = []
+        obj_dict = {}
+        obj_order = []
         for key, value in self.items():
             if not key.startswith('%s%s' % (prefix, separator)):
                 continue
@@ -235,9 +253,8 @@ class Parameters(dict):
                 field = key[len(prefix) + len(separator):]
                 order = 0
 
-
             if order not in obj_dict:
-                obj_dict[order] = { } if has_value else [ ]
+                obj_dict[order] = {} if has_value else []
                 obj_order.append(order)
             if has_value:
                 obj_dict[order][field] = value
@@ -266,7 +283,7 @@ class Parameters(dict):
             return self._default
 
     def isSaved(self, param):
-        if not param in self._parameters:
+        if param not in self._parameters:
             return False
 
         if not self._parameters[param].save:
@@ -312,43 +329,34 @@ class Parameters(dict):
 
         return new
 
+    def getlist(self, key):
+        ret = self.get(key, [])
+        if not ret:
+            return ret
+
+        if not isinstance(ret, list):
+            ret = [ ret ]
+
+        return ret
 
 
-_VIEWS = {}
 _sentinel = object()
 
-def getViewPath(view_id, default=_sentinel):
-    view_id = view_id.lower()
 
-    if default is _sentinel:
-        return _VIEWS[view_id].view_path
-
-    v = _VIEWS.get(view_id)
-    return v.view_path if v else default
-
-
-class _View(object):
-    view_id = None
-    view_name = None
-    view_parameters = None
-    view_subsection = False
-    view_permissions = [ ]
+class _ViewDescriptor(object):
+    view_parameters = Parameters
+    view_permissions = []
     view_template = None
-    view_section = None
-    view_order = 10
-    view_parent = None
-    view_help = None
+    view_require_session = True
     view_extensions = []
     view_layout = "BaseView"
-    view_require_session = True
-
-    def render(self):
-        pass
+    view_subsection = False
+    view_endpoint = None
 
     def _setup_dataset_default(self):
         env.request.dataset["document"] = utils.AttrObj()
         env.request.dataset["document"].base_url = env.request.web.get_baseurl()
-        env.request.dataset["document"].href = "/".join(env.request.web.path_elements)
+        env.request.dataset["document"].href = env.request.web.get_uri()
 
     def _render(self, dataset):
         env.request.parameters = {}
@@ -373,10 +381,10 @@ class _View(object):
         return env.request.dataset
 
     def respond(self, dataset=None, code=None):
-        env.log.info("Loading view %s" % (self.view_id))
+        env.log.info("Loading view %s, endpoint %s" % (self.__class__.__name__, self.view_endpoint))
 
         dataset = self._render(dataset)
-        response = self.render()
+        response = self.render(**env.request.view_kwargs)
 
         if response and not issubclass(response.__class__, PrewikkaResponse):
             response = PrewikkaResponse(response, code=code)
@@ -390,6 +398,17 @@ class _View(object):
 
         return response
 
+
+class _View(_ViewDescriptor):
+    view_id = None
+    view_path = None
+    view_menu = []
+    view_order = 10
+    view_parent = None
+
+    def render(self):
+        pass
+
     def __init__(self):
         if self.view_template and not isinstance(self.view_template, template.PrewikkaTemplate):
             self.view_template = template.PrewikkaTemplate(self.view_template)
@@ -397,31 +416,20 @@ class _View(object):
         if not self.view_id:
             self.view_id = self.__class__.__name__.lower()
 
-        if not self.view_section:
-            self.view_section = _("Unknown")
-
         if self.view_parent:
+            env.log.warning("%s use deprecated attribute: view_parent." % (self.__class__.__name__))
             self.view_section, self.view_name = self.view_parent.view_section, self.view_parent.view_name
 
-        self.view_path = None
+        if not self.view_menu and hasattr(self, "view_name"):
+            env.log.warning("%s use deprecated attribute: view_name / view_section." % (self.__class__.__name__))
+            self.view_menu = [getattr(self, "view_section", None), self.view_name]
 
-        if self.view_name:
-                self.view_path = self.view_section + "/" + self.view_name
+        if not self.view_path:
+            if self.view_menu:
+                self.view_path = "/" + "/".join(self.view_menu)
 
-        if self.view_parent:
-                self.view_path += "/" + self.view_id
-
-        if self.view_path:
+            if self.view_path:
                 self.view_path = utils.nameToPath(self.view_path)
-
-        _VIEWS[self.view_id] = self
-
-    def __copy__(self):
-        ret = self.__class__.__new__(self.__class__)
-        ret.__dict__.update(self.__dict__)
-        return ret
-
-
 
 
 class View(_View, pluginmanager.PluginBase):
@@ -430,79 +438,155 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
+class _Route(object):
+    def __init__(self, path, methods=["GET"], permissions=[], menu=None):
+        self.permissions = permissions
+        self.path = path
+        self.methods = methods
+        self.menu = menu
 
-class ViewManager:
-    def getViewPath(self, view_id, default=_sentinel):
-        return getViewPath(view_id, default)
 
-    def getViewID(self, request):
-        return self.getViewIDFromPaths(request.path_elements)
+def route(route, methods=["GET"], permissions=[], menu=None, template=None):
+    usergroup.ALL_PERMISSIONS.declare(permissions)
 
-    def getViewIDFromPaths(self, paths):
-        sections = env.menumanager.get_sections_path()
-        view_id = None
-        try:
-                views = sections.get(paths[0], {}).get(paths[1])
-                if not views:
-                        return
+    def decorator(func):
+        r = getattr(func, "__prewikka_route__", None)
+        if not r:
+            func.__prewikka_route__ = []
 
-                view_id = next(iter(views.keys())) if len(paths) == 2 else paths[-1]
-        except:
-                return paths[-1] if paths else None # View identified solely by ID, like /logout
+        func.__prewikka_route__.append(_Route(route, methods, permissions, menu))
+        return func
 
-        return view_id
+    return decorator
 
+
+class ViewManager(object):
     def getView(self, view_id):
         return self._views.get(view_id.lower())
 
     def loadView(self, request, userl):
-        view = view_layout = None
+        view = view_kwargs = view_layout = None
 
-        view_id = self.getViewID(request)
-        if view_id:
-            view = self.getView(view_id)
-        else:
+        try:
+            endpoint, view_kwargs = env.request.url_adapter.match(request.path, method=request.method)
+            view = self._views_endpoint[endpoint]
+
+        except werkzeug.exceptions.MethodNotAllowed:
+            raise
+
+        except Exception:
             view = next((x for x in hookmanager.trigger("HOOK_VIEW_LOAD", request, userl) if x), None)
 
         if view:
             view_layout = view.view_layout
 
-        if not request.is_xhr and not request.is_stream and view_layout and not "_download" in request.arguments:
-            view = self.getView(view_layout)
+        if not request.is_xhr and not request.is_stream and view_layout and "_download" not in request.arguments:
+            view = self._views.get(view_layout.lower())
+
+        elif view_kwargs:
+            env.request.view_kwargs = view_kwargs
 
         if not view:
             raise InvalidViewError(N_("View '%s' does not exist", request.path))
 
         if userl and view.view_permissions and not userl.has(view.view_permissions):
-            raise usergroup.PermissionDeniedError(view.view_permissions, view.view_id)
+            raise usergroup.PermissionDeniedError(view.view_permissions, request.path)
 
-        return copy(view)
+        env.request.view = view
+        return view
 
+    def _route2viewdesc(self, baseview, function, route):
+        v = _ViewDescriptor()
+        v.view_template = baseview.view_template
+
+        v.view_permissions = list(set(route.permissions) | set(baseview.view_permissions))
+        v.view_id = v.view_path = route.path[1:]
+        v.view_require_session = baseview.view_require_session
+        v.view_layout = baseview.view_layout
+        v.view_extensions = baseview.view_extensions
+        v.view_parameters = baseview.view_parameters
+        v.view_menu = route.menu or baseview.view_menu
+        v.view_basepoint = baseview.__class__.__name__
+        v.view_endpoint = "%s.%s" % (baseview.__class__.__name__, function.__name__)
+        v.render = function
+
+        v.view_subsection = baseview.view_subsection
+
+        if v.view_menu:
+            env.menumanager.add_section_info(v)
+
+        return v
 
     def addView(self, view):
-        if view.view_name:
-            env.menumanager.add_section_info(view)
+        for name in dir(view):
+            if isinstance(getattr(type(view), name, None), property):
+                continue
 
-        env.menumanager.add_section(view.view_section)
+            ref = getattr(view, name)
+            for route in getattr(ref, "__prewikka_route__", []):
+                vd = self._route2viewdesc(view, ref, route)
 
-        self._views[view.view_id] = view
+                self._views_endpoint[vd.view_endpoint] = vd
+                self._rule_map.add(Rule(route.path, methods=route.methods, endpoint=vd.view_endpoint))
+
+        rdfunc = getattr(view, "render")
+        if rdfunc and not getattr(rdfunc, "__prewikka_route__", []):
+            if not view.view_path:
+                view.view_path = "/views/%s" % (view.view_id)
+
+            if view.view_menu:
+                env.menumanager.add_section_info(view)
+
+            view.view_basepoint = view.__class__.__name__
+            view.view_endpoint = "%s.render" % (view.__class__.__name__)
+
+            self._views_endpoint[view.view_endpoint] = view
+            self._rule_map.add(Rule((view.view_path or "/" + view.view_id), endpoint=view.view_endpoint))
+            self._views[view.view_id] = view
 
     def loadViews(self):
-        #Import here, because of cyclic dependency
+        # Import here, because of cyclic dependency
         from prewikka.baseview import BaseView
         self.addView(BaseView())
 
         for view_class in sorted(pluginmanager.PluginManager("prewikka.views"), key=operator.attrgetter("view_order")):
-                try:
-                        vi = view_class()
-                except error.PrewikkaUserError as e:
-                        logger.warning("%s: plugin loading failed: %s", view_class.__name__, e)
-                        continue
-                except Exception as e:
-                        logger.exception("%s: plugin loading failed: %s", view_class.__name__, e)
-                        continue
+            try:
+                vi = view_class()
+            except error.PrewikkaUserError as e:
+                logger.warning("%s: plugin loading failed: %s", view_class.__name__, e)
+                continue
+            except Exception as e:
+                logger.exception("%s: plugin loading failed: %s", view_class.__name__, e)
+                continue
 
-                self.addView(vi)
+            self.addView(vi)
+
+    def set_url_adapter(self, request, cache=True):
+        scname = request.web.get_script_name()
+
+        ad = _URL_ADAPTER_CACHE.get(scname) if cache else None
+        if not ad:
+            ad = _URL_ADAPTER_CACHE[scname] = self._rule_map.bind("", scname)
+
+        request.url_adapter = ad
 
     def __init__(self):
         self._views = {}
+        self._routes = Map()
+
+        self._views_endpoint = {}
+        self._rule_map = Map(converters={'list': ListConverter})
+
+        builtins.url_for = self.url_for
+
+    def url_for(self, endpoint, **kwargs):
+        if endpoint[0] == "." and env.request.view:
+            endpoint = "%s%s" % (env.request.view.view_basepoint, endpoint if len(endpoint) > 1 else "")
+
+        if endpoint[0] != "." and endpoint.find(".") == -1:
+            endpoint += ".render"
+
+        return env.request.url_adapter.build(endpoint, values=kwargs)
+
+    def __contains__(self, view_id):
+        return view_id in self._views

@@ -39,7 +39,7 @@ class HeartbeatListingParameters(MessageListingParameters):
 class ListedHeartbeat(ListedMessage):
     def setMessage(self, message, ident):
         self["selection"] = json.dumps(Criterion("heartbeat.messageid", "=", ident))
-        self["summary"] = self.createMessageIdentLink(ident, "HeartbeatSummary")
+        self["summary"] = url_for("HeartbeatSummary", messageid=ident) if ident else None
         self["agent"] = self.createInlineFilteredField("heartbeat.analyzer(-1).name",
                                                        message["heartbeat.analyzer(-1).name"])
         self["model"] = self.createInlineFilteredField("heartbeat.analyzer(-1).model",

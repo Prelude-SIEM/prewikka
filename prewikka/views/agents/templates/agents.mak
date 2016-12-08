@@ -85,7 +85,7 @@ from prewikka.utils import json
 
 <button type="button" class="btn btn-default btn-sm global_toggle">${ _("Show/Hide all") }</button>
 
-<form action="${ document.href }/SensorMessagesDelete" method="post">
+<form action="${ url_for(".delete") }" method="post">
 
   <div class="footer-buttons form-inline">
     <div class="checkbox">

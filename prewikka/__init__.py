@@ -1,7 +1,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import sys
-
 import prelude
 
 if sys.version_info >= (3, 0):
@@ -32,6 +31,11 @@ class Request(local):
         self.dataset = None
         self.parameters = None
         self.cache = _cache()
+        self.view_kwargs = {}
+
+        # env.viewmanager might be empty in case of early error (database)
+        if request and env.viewmanager:
+            env.viewmanager.set_url_adapter(self)
 
     def __init__(self):
         local.__init__(self)

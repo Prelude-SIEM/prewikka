@@ -21,37 +21,22 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import time
 
 import pkg_resources
-from prewikka import hookmanager, localization, mainmenu, template, utils, view
+from prewikka import hookmanager, localization, mainmenu, template, utils, view, response
 from prewikka.dataprovider import Criterion
 from prewikka.utils import html, json
 
 
-class AgentsParameters(mainmenu.MainMenuParameters):
+class AgentsParameters(view.Parameters):
     def register(self):
-        mainmenu.MainMenuParameters.register(self)
-        self.optional("filter_path", text_type)
-        self.optional("filter_value", text_type)
+        self.optional("types", list, default=[])
+        self.optional("filter", json.loads)
         self.optional("status", list, default=[])
 
 
-class HeartbeatAnalyzeParameters(view.Parameters):
-    def register(self):
-        self.mandatory("analyzerid", text_type)
-
-
-class SensorMessagesDeleteParameters(AgentsParameters):
-    def register(self):
-        SensorListingParameters.register(self)
-        self.optional("analyzerid", list, default=[])
-        self.optional("types", list, default=[])
-
 class Agents(view.View):
-    view_name = "Agents"
-    view_section = "Agents"
     view_parameters = AgentsParameters
-    view_permissions = [ N_("IDMEF_VIEW") ]
-    view_template = template.PrewikkaTemplate(__name__, "templates/agents.mak")
     view_order = 0
+    view_menu = (N_("Agents"), N_("Agents"))
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     def __init__(self):
@@ -66,11 +51,8 @@ class Agents(view.View):
 
         return analyzer, heartbeat
 
-    def _get_analyzers(self):
-        criteria = None
-
-        if "filter_path" in env.request.parameters:
-            criteria = Criterion(env.request.parameters["filter_path"], "=", env.request.parameters["filter_value"])
+    def _get_analyzers(self, reqstatus):
+        criteria = env.request.parameters.get("filter")
 
         for (analyzerid,) in env.dataprovider.query(["heartbeat.analyzer(-1).analyzerid/group_by"], criteria):
             analyzer, heartbeat = self._get_analyzer(analyzerid)
@@ -78,21 +60,14 @@ class Agents(view.View):
                 heartbeat, self._heartbeat_error_margin
             )
 
-            if env.request.parameters["status"] and status not in env.request.parameters["status"]:
+            if reqstatus and status not in reqstatus:
                 continue
 
             delta = float(heartbeat.get("create_time")) - time.time()
 
-            parameters = {"heartbeat.analyzer(-1).analyzerid": analyzerid}
-            heartbeat_listing = utils.create_link(view.getViewPath("HeartbeatListing"), parameters)
-
-            parameters = {"analyzer_object_0": "alert.analyzer.analyzerid",
-                          "analyzer_operator_0": "=",
-                          "analyzer_value_0": analyzerid}
-            alert_listing = utils.create_link(view.getViewPath("AlertListing"), parameters)
-
-            parameters = {"analyzerid": analyzerid}
-            heartbeat_analyze = utils.create_link(self.view_path + "/HeartbeatAnalyze", parameters)
+            heartbeat_listing = url_for("HeartbeatListing.render", **{"heartbeat.analyzer(-1).analyzerid": analyzerid})
+            alert_listing = url_for("AlertListing.render", **{"analyzer_object_0": "alert.analyzer.analyzerid", "analyzer_operator_0": "=", "analyzer_value_0": analyzerid})
+            heartbeat_analyze = url_for(".analyze", analyzerid=analyzerid)
 
             node_name = analyzer["node.name"] or _("Node name n/a")
             osversion = analyzer["osversion"] or _("OS version n/a")
@@ -116,34 +91,29 @@ class Agents(view.View):
                         "class": "widget-link", "title": _("Heartbeat analysis")},
                    ]}
 
-    def render(self):
-        env.request.dataset["data"] = analyzer_data = list(self._get_analyzers())
+    @view.route("/agents/agents/<list:status>", permissions=["IDMEF_VIEW"])
+    @view.route("/agents/agents", permissions=["IDMEF_VIEW"])
+    def agents(self, status=[]):
+        analyzer_data = list(self._get_analyzers(status))
         list(hookmanager.trigger("HOOK_AGENTS_EXTRA_CONTENT", analyzer_data))
+        extra_columns = filter(None, hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN"))
 
-        env.request.dataset["extra_columns"] = filter(None, hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN"))
+        return template.PrewikkaTemplate(__name__, "templates/agents.mak").render(data=analyzer_data, extra_columns=extra_columns)
 
+    @view.route("/agents/delete", methods=["POST"], permissions=["IDMEF_ALTER"])
+    def delete(self):
+        c = Criterion()
 
-class SensorMessagesDelete(Agents):
-    view_parameters = SensorMessagesDeleteParameters
-    view_permissions = [ N_("IDMEF_VIEW"), N_("IDMEF_ALTER") ]
-
-    def render(self):
         for analyzerid in env.request.parameters["analyzerid"]:
             for i in env.request.parameters["types"]:
                 if i in ("alert", "heartbeat"):
-                    env.dataprovider.delete(Criterion("%s.analyzer.analyzerid" % i, "=", analyzerid))
+                    c |= Criterion("%s.analyzer.analyzerid" % i, "=", analyzerid)
 
-        AgentsListing.render(self)
+        env.dataprovider.delete(c)
+        return response.PrewikkaRedirectResponse(url_for(".agents"))
 
-
-class HeartbeatAnalyze(Agents):
-    view_parameters = HeartbeatAnalyzeParameters
-    view_permissions = [ N_("IDMEF_VIEW") ]
-    view_template = template.PrewikkaTemplate(__name__, "templates/heartbeatanalyze.mak")
-
-    def render(self):
-        analyzerid = env.request.parameters["analyzerid"]
-
+    @view.route("/agents/analyze/<analyzerid>", permissions=["IDMEF_VIEW"])
+    def analyze(self, analyzerid):
         analyzer, heartbeat = self._get_analyzer(analyzerid)
         delta = float(heartbeat["create_time"]) - time.time()
         analyzer.last_heartbeat_time = localization.format_timedelta(delta, add_direction=True)
@@ -212,4 +182,4 @@ class HeartbeatAnalyze(Agents):
                                      _("No anomaly in the last %(count)d heartbeats (one heartbeat every %(delta)s average)") %
                                        {'count': self._heartbeat_count, 'delta':delta}, "type": "no_anomaly" })
 
-        env.request.dataset["analyzer"] = analyzer
+        return template.PrewikkaTemplate(__name__, "templates/heartbeatanalyze.mak").render(analyzer=analyzer)

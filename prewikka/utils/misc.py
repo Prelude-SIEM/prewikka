@@ -40,7 +40,11 @@ else:
 
 class AttrObj(object):
     def __init__(self, **kwargs):
+        self._kwargs = kwargs
         self.__dict__.update(kwargs)
+
+    def __repr__(self):
+        return self._kwargs.__repr__()
 
 
 # FIXME: Need appropriate implementation

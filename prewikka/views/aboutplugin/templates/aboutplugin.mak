@@ -59,21 +59,6 @@
     }
 
 
-    $(".activate-button").click(function(e) {
-        if ( ! $(this).attr("data-confirm") ) {
-              $.ajax({url: prewikka_location().href,
-                     type: "POST",
-                     data: $("input[type=checkbox]").serialize(),
-                     dataType: "json"})
-              .done(function(data) {
-                  location.reload();
-                  return false;
-              });
-
-              return false;
-        }
-    });
-
     $(".update-button").click(function() {
 
         var nb_plugin = 0;
@@ -84,7 +69,7 @@
         $("#update-dialog").modal();
 
         prewikka_EventSource({
-            url: prewikka_location().pathname + "?apply_update=true",
+            url: "${ url_for('.update') }",
 
             events: {
                 "begin": function(data) {
@@ -140,38 +125,39 @@
 
 
 <div class="container">
-<div id="update-dialog" title="Applying Updates" class="modal fade" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title title" id="dialogLabel">${ _('Update Dialog') }</h3>
-      </div>
-      <div class="modal-body content">
-        <div class="progress">
-          <div class="progress-bar progress-bar-striped" role="progressbar" style="width:0%" aria-valuenow="0">0%</div>
+  <div id="update-dialog" title="Applying Updates" class="modal fade" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title title" id="dialogLabel">${ _('Update Dialog') }</h3>
         </div>
-        <div>
-          <table class="table table-condensed table-hover update_log">
-           <thead>
-            <tr>
-             <th>${ _("Plugin") }</th>
-             <th>${ _("Script") }</th>
-             <th>${ _("Result") }</th>
-            </tr>
-           </thead>
-           <tbody>
-           </tbody>
-          </table>
+        <div class="modal-body content">
+          <div class="progress">
+            <div class="progress-bar progress-bar-striped" role="progressbar" style="width:0%" aria-valuenow="0">0%</div>
+          </div>
+          <div>
+            <table class="table table-condensed table-hover update_log">
+             <thead>
+              <tr>
+               <th>${ _("Plugin") }</th>
+               <th>${ _("Script") }</th>
+               <th>${ _("Result") }</th>
+              </tr>
+             </thead>
+             <tbody>
+             </tbody>
+            </table>
+          </div>
         </div>
-      </div>
-      <div class="modal-footer">
-        <a class="btn btn-primary" aria-hidden="true" data-dismiss="modal">${ _('Close') }</a>
+        <div class="modal-footer">
+          <a class="btn btn-primary" aria-hidden="true" data-dismiss="modal">${ _('Close') }</a>
+        </div>
       </div>
     </div>
   </div>
 </div>
-</div>
 
+<form method="POST" action="${ url_for('.enable') }">
 <div id="fieldset_page">
 % if len(maintenance) > 0:
   <div class="panel panel-theme">
@@ -233,3 +219,4 @@
     </div>
   </div>
 </div>
+</form>

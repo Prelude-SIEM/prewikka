@@ -76,8 +76,8 @@ class PluginManager:
 
     @staticmethod
     def _handle_section(plugin_class):
-        if hasattr(plugin_class, "view_section") and plugin_class.view_section:
-            env.menumanager.add_section(plugin_class.view_section)
+        if hasattr(plugin_class, "view_menu") and plugin_class.view_menu:
+            env.menumanager.add_section(plugin_class.view_menu[0])
 
     def _addPlugin(self, plugin_class, autoupdate, name=None):
         self._handle_attributes(plugin_class, autoupdate)

@@ -64,6 +64,9 @@ function prewikka_drawTab(data)
     var form;
     var content = $(data.content);
 
+    if ( data.type == "reload" )
+        location.reload(); /* FIXME: move to appropriate place */
+
     handle_notifications(data);
 
     if ( ! data.content ) {
@@ -115,45 +118,24 @@ function prewikka_drawTab(data)
 function _url2menu(url)
 {
         var pathname = unescape(url);
-        if ( pathname.charAt(0) == "/") pathname = pathname.substr(1);
-        if ( pathname.charAt(pathname.length - 1) == "/") pathname = pathname.substr(0, pathname.length - 1);
+        var tab;
 
-        var pathtbl = pathname.split("/");
-        var wanted = pathtbl.slice(0, 2).join("/");
-
-        var tab = null;
         $("#topmenu .topmenu_item").find("a").each(function() {
-                if ( $(this).attr("href").split("?")[0] === wanted ) {
+                if ( $(this).attr("href").split("?")[0] === pathname ) {
                     tab = $(this);
                     return false;
                 }
         });
 
         if ( tab ) {
-                /* Update the document's title according to the names of the section and tab */
-                if ( pathtbl[0] != undefined && pathtbl[1] != undefined ) {
-                        if ( ! document.orig_title )
-                           document.orig_title = document.title;
-
-                        document.title = document.orig_title + " - " + pathtbl[0].capitalize() + " (" + pathtbl[1].capitalize() + ")";
-                }
-
                 /*
-                 * Activate div for the selected section
+                 * FIXME: update the document title (properly propagate menu info here)
                  */
-                $("#menu .menu_item_active").toggleClass("menu_item_inactive", true);
-                $("#menu .menu_item_active").toggleClass("menu_item_active", false);
-                $("#menu .menu_item_" + pathtbl[0]).toggleClass("menu_item_inactive", false);
-                $("#menu .menu_item_" + pathtbl[0]).toggleClass("menu_item_active", true);
 
                 $("#topmenu ul.topmenu_section").hide();
-                $("#topmenu_" + pathtbl[0]).show();
-
-                /*
-                 * show the tab
-                 */
+                $(tab).parent().parent().show();
                 $("#topmenu .active").toggleClass("active", false);
-                $(tab).parents("li").eq(0).toggleClass("active", true);
+                $(tab).parent().toggleClass("active", true);
         }
 }
 

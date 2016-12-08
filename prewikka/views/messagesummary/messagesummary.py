@@ -21,27 +21,22 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import hashlib
 import re
-import socket
 import struct
-import time
 import urllib
 from datetime import datetime
 
 import pkg_resources
-from prewikka import hookmanager, localization, resolve, resource, template, usergroup, utils, view
+from prewikka import hookmanager, localization, resolve, resource, template, utils, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import html
 
 
-def getUriCriteria(parameters, ptype):
-    if not "messageid" in parameters:
-        return None
-
+def getUriCriteria(ptype, analyzerid, messageid):
     criteria = Criterion()
-    if "analyzerid" in parameters:
-        criteria += Criterion("%s.analyzer(-1).analyzerid" % (ptype), "=", parameters["analyzerid"])
+    if analyzerid:
+        criteria += Criterion("%s.analyzer.analyzerid" % (ptype), "=", analyzerid)
 
-    return criteria + Criterion("%s.messageid" % (ptype), "=", parameters["messageid"])
+    return criteria + Criterion("%s.messageid" % (ptype), "=", messageid)
 
 
 class Table(object):
@@ -672,7 +667,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                     #content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": ident } + "</li>"
                 else:
                     alert = results[0]["alert"]
-                    link = utils.create_link("/".join(env.request.web.path_elements[:2] + [self.view_id]), {"analyzerid": analyzerid, "messageid": ident})
+                    link = url_for(".", analyzerid=analyzerid, messageid=ident)
                     content += '<li><a class="widget-link" title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, html.escape(alert["classification.text"]))
 
             if missing > 0:
@@ -1020,8 +1015,10 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
         return section
 
-    def render(self):
-        alert = env.dataprovider.get(getUriCriteria(env.request.parameters, "alert"))[0]["alert"]
+    @view.route("/alerts/summary/<analyzerid>:<messageid>")
+    @view.route("/alerts/summary/<messageid>")
+    def render(self, analyzerid=None, messageid=None):
+        alert = env.dataprovider.get(getUriCriteria("alert", analyzerid, messageid))[0]["alert"]
 
         env.request.dataset["sections"] = [ ]
 
@@ -1104,8 +1101,10 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
 
 class HeartbeatSummary(MessageSummary):
-    def render(self):
-        heartbeat = env.dataprovider.get(getUriCriteria(env.request.parameters, "heartbeat"))[0]["heartbeat"]
+    @view.route("/heartbeats/summary/<analyzerid>:<messageid>")
+    @view.route("/heartbeats/summary/<messageid>")
+    def render(self, analyzerid=None, messageid=None):
+        heartbeat = env.dataprovider.get(getUriCriteria("heartbeat", analyzerid, messageid))[0]["heartbeat"]
 
         env.request.dataset["sections"] = [ ]
 

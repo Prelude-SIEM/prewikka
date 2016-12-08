@@ -26,20 +26,18 @@ import functools
 import itertools
 import re
 import sys
-import time
-
-if sys.version_info >= (3,0):
-    from urllib.parse import quote
-else:
-    from urllib import quote
-
-import pkg_resources
 import prelude
-from prewikka import compat, error, hookmanager, localization, mainmenu, template, usergroup, utils, view
+
+from prewikka import compat, hookmanager, localization, mainmenu, template, utils, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
 from .messagelisting import AttrDict, ListedMessage, MessageListing, MessageListingParameters
+
+if sys.version_info >= (3, 0):
+    from urllib.parse import quote
+else:
+    from urllib import quote
 
 
 def cmp_severities(x, y):
@@ -454,7 +452,7 @@ class ListedAlert(ListedMessage):
         if message["alert.correlation_alert.name"]:
             self["aggregated_source_expand"] = self["sub_alert_display"]
         else:
-            self["aggregated_source_expand"] = self.createMessageIdentLink(ident, "AlertSummary")
+            self["aggregated_source_expand"] = url_for("AlertSummary", messageid=ident)
 
     def _setMessageTarget(self, message, ident):
         index = 0
@@ -492,7 +490,7 @@ class ListedAlert(ListedMessage):
         if message["alert.correlation_alert.name"]:
             self["aggregated_target_expand"] = self["sub_alert_display"]
         else:
-            self["aggregated_source_expand"] = self.createMessageIdentLink(ident, "AlertSummary")
+            self["aggregated_source_expand"] = url_for("AlertSummary", messageid=ident)
 
 
     def _setMessageClassificationReferences(self, dataset, message):
@@ -516,7 +514,7 @@ class ListedAlert(ListedMessage):
 
             urlstr = "%s?origin=%s&name=%s" % (env.reference_details_url, quote(ref["origin"]), quote(ref["name"]))
             if ref["origin"] in ("vendor-specific", "user-specific"):
-                urlstr += "&url=" + quote(ref["url"], safe="")
+                urlstr += "&url=" + quote(ref["url"], safe=b"")
 
             fstr = self.createInlineFilteredField(pl, vl, "classification", fstr)
             dataset["classification_references"].append((urlstr, fstr))
@@ -535,18 +533,18 @@ class ListedAlert(ListedMessage):
     def _setMessageAlertIdentInfo(self, message, alert, ident):
         self["sub_alert_number"] = len(alert["alertident"])
         self["sub_alert_name"] = alert["name"]
-        self["sub_alert_link"] = self.createMessageIdentLink(ident, "AlertSummary")
+        self["sub_alert_link"] = url_for("AlertSummary", messageid=ident)
 
         params = { }
         params["timeline_unit"] = "unlimited"
         params["aggregated_source"] = params["aggregated_target"] = params["aggregated_classification"] = params["aggregated_analyzer"] = "none"
         params["aggregated_alert_id"] = ident
-        self["sub_alert_display"] = utils.create_link(view.getViewPath("AlertListing"), params)
+        self["sub_alert_display"] = url_for("AlertListing", **params)
 
     def _setClassificationInfos(self, dataset, message, ident):
         dataset["count"] = 1
         dataset["severity"] = AttrDict(value=message["alert.assessment.impact.severity"])
-        dataset["links"] = [(_("Alert details"), self.createMessageIdentLink(ident, "AlertSummary"), True)]
+        dataset["links"] = [(_("Alert details"), url_for("AlertSummary", messageid=ident), True)]
         for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", ident):
             if typ == "ident":
                 dataset["links"].append((linkname, link, widget))
@@ -922,7 +920,7 @@ class AlertListing(MessageListing):
                     res = env.dataprovider.get(Criterion("alert.messageid", "=", messageid))[0]
                     message.setMessage(res, messageid, extra_link=False)
                 else:
-                    infos["links"] = [(_("Alert details"), message.createMessageIdentLink(messageid, "AlertSummary"), True)]
+                    infos["links"] = [(_("Alert details"), url_for("AlertSummary", messageid=messageid), True)]
                     for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", messageid):
                         if typ == "messageid":
                             infos["links"].append((linkname, link, widget))
@@ -942,10 +940,10 @@ class AlertListing(MessageListing):
                 entry_param["aggregated_analyzer"] = \
                 entry_param["aggregated_classification"] = "none"
 
-                infos["display"] = utils.create_link(self.view_path, env.request.parameters -
+                infos["display"] = url_for(".", **(env.request.parameters -
                                                      [ "offset", "aggregated_classification",
                                                        "aggregated_source", "aggregated_target", "aggregated_analyzer" ] +
-                                                     parameters + entry_param)
+                                                     parameters + entry_param))
 
     def _setAggregatedMessagesNoValues(self, criteria, ag_s, ag_t, ag_c, ag_a):
         ag_list = ag_s + ag_t + ag_c + ag_a
@@ -1023,15 +1021,14 @@ class AlertListing(MessageListing):
 
             message["aggregated_classifications_total"] = aggregated_count
             message["aggregated_classifications_hidden"] = aggregated_count
-            message["aggregated_classifications_hidden_expand"] = utils.create_link(self.view_path,
-                                                                                    env.request.parameters -
+            message["aggregated_classifications_hidden_expand"] = url_for(".", **(env.request.parameters -
                                                                                     [ "offset",
                                                                                       "aggregated_source",
                                                                                       "aggregated_target",
                                                                                       "aggregated_analyzer" ]
                                                                                     + parameters +
                                                                                     { "aggregated_classification":
-                                                                                      "alert.classification.text" } )
+                                                                                      "alert.classification.text" }) )
 
             self._getMissingAggregatedInfos(message, valueshash, parameters, criteria + select_criteria, aggregated_count, time_min, time_max)
 

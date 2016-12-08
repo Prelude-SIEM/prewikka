@@ -4,61 +4,39 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pkg_resources
-from prewikka import error, hookmanager, localization, log, template, theme, usergroup, view
+from prewikka import error, hookmanager, localization, log, template, theme, usergroup, view, response
 
 
-class UserSettingsDisplayParameters(view.Parameters):
-    def register(self):
-        self.optional("name", str)
-
-
-class UserSettingsModifyParameters(view.Parameters):
-    allow_extra_parameters = True
-
-    def register(self):
-        self.optional("name", str)
-        self.optional("email", str)
-        self.optional("language", str)
-        self.optional("timezone", str)
-        self.optional("theme", str)
-
-
-class UserSettingsDisplay(view.View):
-    view_section = N_("Settings")
-    view_name = N_("My account")
+class UserSettings(view.View):
+    view_menu = (N_("Settings"), N_("My account"))
     view_order = 0
 
-    view_parameters = UserSettingsDisplayParameters
-    view_permissions = [ ]
-    view_template = template.PrewikkaTemplate(__name__, 'templates/usersettings.mak')
     plugin_htdocs = (("usermanagement", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
-    def render(self):
-        login = env.request.parameters.get("name")
-        self._object = usergroup.User(login) if login else env.request.user
+    @view.route("/settings/my_account")
+    def display(self):
+        self._object = env.request.user
 
         if not env.auth.hasUser(self._object):
             raise error.PrewikkaUserError(_("Invalid User"), N_("Requested user '%s' does not exist", self._object))
 
-        env.request.dataset["object"] = self._object
-        env.request.dataset["fullname"] = self._object.get_property("fullname")
-        env.request.dataset["email"] = self._object.get_property("email")
-        env.request.dataset["available_timezones"] = localization.get_timezones()
-        env.request.dataset["timezone"] = self._object.get_property("timezone", default=env.config.general.default_timezone)
-        env.request.dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
-        env.request.dataset["language"] = self._object.get_property("language", default=env.config.general.default_locale)
-        env.request.dataset["available_themes"] = theme.getThemes()
-        env.request.dataset["selected_theme"] = self._object.get_property("theme", default=env.config.general.default_theme)
+        dataset = {}
+        dataset["object"] = self._object
+        dataset["fullname"] = self._object.get_property("fullname")
+        dataset["email"] = self._object.get_property("email")
+        dataset["available_timezones"] = localization.get_timezones()
+        dataset["timezone"] = self._object.get_property("timezone", default=env.config.general.default_timezone)
+        dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
+        dataset["language"] = self._object.get_property("language", default=env.config.general.default_locale)
+        dataset["available_themes"] = theme.getThemes()
+        dataset["selected_theme"] = self._object.get_property("theme", default=env.config.general.default_theme)
+
+        return template.PrewikkaTemplate(__name__, 'templates/usersettings.mak').render(**dataset)
 
 
-class UserSettingsModify(view.View):
-    view_name = None
-    view_parameters = UserSettingsModifyParameters
-    view_permissions = []
-
-    def render(self):
-        login = env.request.parameters.get("name", env.request.user.name)
-        self._object = user = usergroup.User(login)
+    @view.route("/settings/my_account", methods=["POST"])
+    def modify(self):
+        self._object = user = usergroup.User(env.request.parameters.get("name", env.request.user.name))
 
         if not env.request.parameters["language"] in localization.getLanguagesIdentifiers():
             raise error.PrewikkaUserError(_("Invalid Language"), N_("Specified language does not exist"), log_priority=log.WARNING)
@@ -67,9 +45,13 @@ class UserSettingsModify(view.View):
         if not env.request.parameters["timezone"] in localization.get_timezones():
             raise error.PrewikkaUserError(_("Invalid Timezone"), N_("Specified timezone does not exist"), log_priority=log.WARNING)
 
+        need_reload = False
         user.begin_properties_change()
 
-        for param in ("fullname", "email", "theme", "language", "timezone"):
+        for param, reload in (("fullname", False), ("email", False), ("theme", True), ("language", True), ("timezone", False)):
+            if user == env.request.user and reload and env.request.parameters.get(param) != user.get_property(param):
+                need_reload = True
+
             user.set_property(param, env.request.parameters.get(param))
 
         if user == env.request.user:
@@ -79,3 +61,8 @@ class UserSettingsModify(view.View):
 
         # Make sure nothing is returned (reset the default dataset)
         env.request.dataset = None
+
+        if need_reload:
+            return response.PrewikkaDirectResponse({"type": "reload"})
+
+        return response.PrewikkaRedirectResponse(url_for(".display"), 303)

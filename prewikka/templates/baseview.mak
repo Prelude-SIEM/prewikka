@@ -134,7 +134,7 @@ $(document).ready(function() {
       if env.menumanager:
           sections = env.menumanager.get_sections(env.request.user)
     %>
-    % for section in sections.keys():
+    % for section in sections:
         <% style = "" %>
 
         % if nameToPath(section) != env.request.web.path_elements[0] if len(env.request.web.path_elements) > 0 else "":
@@ -152,11 +152,11 @@ $(document).ready(function() {
                 <% continue %>
             % endif
 
-            % if nameToPath(name) == env.request.web.path_elements[1] if len(env.request.web.path_elements) > 1 else "":
+            % if env.request.web.path == firstview.view_path:
                 <% class_ = 'active' %>
             % endif
 
-            <li role="presentation" class="${class_} topmenu_item"><a href="${firstview.view_path}" class="topmenu_links">${_(name)}</a></li>
+            <li role="presentation" class="${class_} topmenu_item"><a href="${ url_for(firstview.view_endpoint) }" class="topmenu_links">${_(name)}</a></li>
         % endfor
         </ul>
     % endfor
@@ -190,7 +190,7 @@ if env.menumanager:
                 % if section.views:
                     % if len(section.views) == 1:
                 <li>
-                    <a href="${section.views[0].view_path}">
+                    <a href="${ url_for(section.views[0].view_endpoint) }">
                     % if section.icon:
                         <i class="fa fa-${section.icon}"></i>
                     % endif
@@ -207,7 +207,7 @@ if env.menumanager:
                     </a>
                     <ul class="dropdown-menu">
                     % for view in section.views:
-                        <li><a href="${view.view_path}">${ _(view.view_name) }</a></li>
+                        <li><a href="${ url_for(view.view_endpoint) }">${ _(view.view_menu[-1]) }</a></li>
                     % endfor
                     </ul>
                 </li>
@@ -223,9 +223,9 @@ if env.menumanager:
             % endfor
             % if menu_item.default:
                 <li role="separator" class="divider"></li>
-                <li><a class="widget-link" title="${ _("About") }" href="${ utils.create_link('About') }">${ _("About") }</a></li>
-                % if env.session.can_logout:
-                <li><a id="logout" title="${ _("Logout") }" class="ajax-bypass" href="${ utils.create_link('logout') }" data-confirm="${ _("Are you sure you want to log out?") }">${ _("Logout") }</a></li>
+                <li><a class="widget-link" title="${ _("About") }" href="${ url_for('About.render') }">${ _("About") }</a></li>
+                % if env.session.can_logout():
+                <li><a id="logout" title="${ _("Logout") }" class="ajax-bypass" href="${ url_for('Logout.render') }" data-confirm="${ _("Are you sure you want to log out?") }">${ _("Logout") }</a></li>
                 % endif
             % endif
             </ul>

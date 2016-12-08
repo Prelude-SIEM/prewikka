@@ -123,8 +123,14 @@ class WSGIRequest(request.Request):
     def get_query_string(self):
         return self._wsgi_get_unicode('QUERY_STRING')
 
+    def get_script_name(self):
+        return self._wsgi_get_unicode("SCRIPT_NAME")
+
     def get_baseurl(self):
-        return (env.config.general.reverse_path or self._wsgi_get_unicode("SCRIPT_NAME")) + "/"
+        return (env.config.general.reverse_path or self.get_script_name()) + "/"
+
+    def get_uri(self):
+        return self.get_script_name() + self.path
 
     def get_raw_uri(self, include_qs=False):
         return wsgiref.util.request_uri(self._environ, include_query=include_qs)
@@ -145,11 +151,7 @@ class WSGIRequest(request.Request):
 
 
 def application(environ, start_response):
-        # Check whether the URL got a trailing "/", if not perform a redirect
-        if not environ["PATH_INFO"]:
-            start_response('301 Redirect', [('Location', environ['SCRIPT_NAME'] + "/"), ])
-
         core = main.get_core_from_config(environ.get("PREWIKKA_CONFIG", None))
-
         core.process(WSGIRequest(environ, start_response))
+
         return []

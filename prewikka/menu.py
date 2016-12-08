@@ -52,15 +52,17 @@ class MenuManager(object):
     def get_sections_path(self):
         return self._sections_path
 
-    def add_section(self, section):
-        self._all_sections.add(section)
+    def add_section(self, name):
+        self._all_sections.add(name)
 
     def add_section_info(self, view):
-        self._loaded_sections.setdefault(view.view_section, utils.OrderedDict()) \
-                             .setdefault(view.view_name, utils.OrderedDict())[view.view_id] = view
+        self.add_section(view.view_menu[0])
 
-        self._sections_path.setdefault(utils.nameToPath(view.view_section), {}) \
-                           .setdefault(utils.nameToPath(view.view_name), utils.OrderedDict())[utils.nameToPath(view.view_id)] = view.view_path
+        self._loaded_sections.setdefault(view.view_menu[0], utils.OrderedDict()) \
+                             .setdefault(view.view_menu[1], utils.OrderedDict())[view.view_id] = view
+
+        self._sections_path.setdefault(utils.nameToPath(view.view_menu[0]), {}) \
+                           .setdefault(utils.nameToPath(view.view_menu[1]), utils.OrderedDict())[utils.nameToPath(view.view_id)] = view.view_path
 
     def get_menus(self, user):
         """

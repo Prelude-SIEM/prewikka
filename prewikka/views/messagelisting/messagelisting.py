@@ -98,7 +98,7 @@ class ListedMessage(AttrDict):
 
                 extra[p] = v or ""
 
-        link = utils.create_link(self.view_path, env.request.parameters + extra - [ "offset" ])
+        link = url_for(".", **(env.request.parameters + extra - [ "offset" ]))
         return AttrDict(value=real_value, inline_filter=link, already_filtered=alreadyf)
 
     def createTimeField(self, timeobj):
@@ -112,8 +112,8 @@ class ListedMessage(AttrDict):
         field["host_links"] = [ ]
         field["category"] = category
 
-        field["url_infos"] = utils.create_link("hostinfoajax", {"host": value}) if "HOOK_HOST_TOOLTIP" in hookmanager.hookmgr else None
-        field["url_popup"] = utils.create_link("AjaxHostURL", {"host": value})
+        field["url_infos"] = url_for("HostInfoAjax", host=value) if "HOOK_HOST_TOOLTIP" in hookmanager.hookmgr else None
+        field["url_popup"] = url_for("AjaxHostURL", host=value)
 
         if value and dns is True:
             field["hostname"] = resolve.AddressResolve(value)
@@ -129,9 +129,6 @@ class ListedMessage(AttrDict):
 
         return field
 
-    def createMessageIdentLink(self, messageid, view):
-        if messageid:
-            return utils.create_link("/".join((self.view_path, view)), { "messageid": messageid })
 
 class HostInfoAjax(view.View):
     class HostInfoAjaxParameters(view.Parameters):
@@ -160,19 +157,17 @@ class MessageListing(view.View):
 
     def _setNavPrev(self, offset):
         if offset:
-            env.request.dataset["nav"]["first"] = utils.create_link(self.view_path, env.request.parameters - [ "offset" ])
-            env.request.dataset["nav"]["prev"] = utils.create_link(self.view_path,
-                                                         env.request.parameters +
-                                                         { "offset": offset - env.request.parameters["limit"] })
+            env.request.dataset["nav"]["first"] = url_for(".", **(env.request.parameters - [ "offset" ]))
+            env.request.dataset["nav"]["prev"] = url_for(".", **(env.request.parameters + { "offset": offset - env.request.parameters["limit"] }))
         else:
             env.request.dataset["nav"]["prev"] = None
 
     def _setNavNext(self, offset, count):
         if count > offset + env.request.parameters["limit"]:
             offset = offset + env.request.parameters["limit"]
-            env.request.dataset["nav"]["next"] = utils.create_link(self.view_path, env.request.parameters + { "offset": offset })
+            env.request.dataset["nav"]["next"] = url_for(".", **(env.request.parameters + { "offset": offset }))
             offset = count - ((count % env.request.parameters["limit"]) or env.request.parameters["limit"])
-            env.request.dataset["nav"]["last"] = utils.create_link(self.view_path, env.request.parameters + { "offset": offset })
+            env.request.dataset["nav"]["last"] = url_for(".", **(env.request.parameters + { "offset": offset }))
         else:
             env.request.dataset["nav"]["next"] = None
 

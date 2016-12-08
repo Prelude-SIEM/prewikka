@@ -1,17 +1,5 @@
-<script type="text/javascript">
-$LAB.script("usermanagement/js/usermanagement.js");
-</script>
-
-<%
-targetView = ""
-%>
-
-% if document.href.split("/")[-1].find("UserSettingsModify") == -1:
-     <% targetView = "UserSettingsModify" %>
-% endif
-
 <div class="container">
-    <form class="form-horizontal usersettings" action="${targetView}" method="POST">
+    <form class="form-horizontal usersettings" action="${ url_for(".modify") }" method="POST">
         <input type="hidden" name="name" value="${object.name}"/>
 
         <div class="form-group">
@@ -38,7 +26,7 @@ targetView = ""
         <div class="form-group">
             <label for="inputUserLanguage" class="col-sm-2 control-label">${ _("Language:") }</label>
             <div class="col-sm-10">
-                <select id="inputUserLanguage" class="form-control need_reload" name="language">
+                <select id="inputUserLanguage" class="form-control" name="language">
                 % for lang, identifier in available_languages:
                     <option value="${identifier}" ${ selected(identifier == language) }>${lang}</option>
                 % endfor
@@ -50,7 +38,7 @@ targetView = ""
         <div class="form-group">
             <label for="inputUserTheme" class="col-sm-2 control-label">${ _("Theme:") }</label>
             <div class="col-sm-10">
-                <select id="inputUserTheme" class="form-control need_reload" name="theme">
+                <select id="inputUserTheme" class="form-control" name="theme">
                 % for theme in available_themes:
                     <option value="${theme}" ${ selected(theme == selected_theme) }>${theme}</option>
                 % endfor

@@ -39,13 +39,8 @@ except ImportError:
 
 
 class Logout(view._View):
-    class LogoutParameters(view.Parameters):
-        def register(self):
-            self.optional("redirect", text_type)
-
-    view_parameters = LogoutParameters
-    view_permissions = []
     view_layout = None
+    view_path = "/logout"
 
     def render(self):
         try:
@@ -228,9 +223,11 @@ class Core:
         hookmanager.unregister()
         self._loadPlugins()
 
+        env.viewmanager.set_url_adapter(env.request, cache=False)
+
     def _redirect_default(self, request):
         default_view = env.config.general.get("default_view", "alerts/alerts")
-        if not env.viewmanager.getViewIDFromPaths(default_view.split('/')):
+        if not default_view in env.viewmanager:
             # The configured view does not exist. Fall back to "settings/my_account"
             # which does not require any specific permission.
             default_view = "settings/my_account"

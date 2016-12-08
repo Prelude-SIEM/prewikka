@@ -19,7 +19,6 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import sys
 import ssl
 import multiprocessing
 
@@ -51,12 +50,22 @@ class MyWSGIServer(WSGIServer):
 
 def application(environ, start_response):
     environ["PREWIKKA_CONFIG"] = options.config
+
+    if options.root:
+        if not environ['PATH_INFO'].startswith(options.root):
+            start_response('301 Redirect', [('Location', options.root + "/"), ])
+            return []
+
+        environ['SCRIPT_NAME'] = options.root
+        environ['PATH_INFO'] = environ['PATH_INFO'][len(options.root):]
+
     return wsgi.application(environ, start_response)
 
 
 if __name__ == "__main__":
     parser = OptionParser(epilog=" ")
 
+    parser.add_option("-r", "--root", action="store", type="string", dest="root", default="", help="Root where the server is accessible")
     parser.add_option("-a", "--address", action="store", type="string", dest="addr", default="0.0.0.0", help="IP to bind to (default: %default)")
     parser.add_option("-p", "--port", action="store", type="int", dest="port", default=8000, help="port number to use (default: %default)")
     parser.add_option("", "--key", action="store", type="string", dest="key", default=None, help="SSL private key to use (default: no SSL)")

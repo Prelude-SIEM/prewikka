@@ -24,7 +24,6 @@ function CommonListing(elem, text, options) {
         pager: true,
         hidegrid: false,
         viewrecords: true,
-        reloadOnDelete: false,
         globalSearch: false,
         gridComplete: grid_buttons_state,
         onSelectAll: grid_buttons_state,
@@ -104,7 +103,7 @@ function CommonListing(elem, text, options) {
 
     $(".button-add").on("click", function() {
         prewikka_widget({
-            url: prewikka_location().pathname + "/" + options.editLink,
+            url: options.editLink,
             dialog: {
                 title: text['new']
             }
@@ -114,8 +113,8 @@ function CommonListing(elem, text, options) {
         var row = grid.getGridParam("selrow");
         if ( ! row ) return;
         prewikka_widget({
-            url: prewikka_location().pathname + "/" + options.editLink,
-            data: {id: row, duplicate: "true"},
+            url: options.editLink,
+            data: {duplicate: row},
             dialog: {
                 title: text['new']
             }
@@ -125,14 +124,10 @@ function CommonListing(elem, text, options) {
         var rows = grid.getGridParam("selarrrow");
         if ( ( rows.length == 0 ) || ( $(this).data("confirm") ) ) return;
         $.ajax({
-            url: prewikka_location().href + "/" + options.deleteLink,
+            url: options.deleteLink,
+            method: "POST",
             data: {action: "delete", id: rows},
             success: function() {
-                if ( options.reloadOnDelete ) {
-                    location.reload();
-                    return;
-                }
-
                 // Iterate upwards because 'rows' gets modified
                 for ( var i = rows.length - 1; i >= 0; i-- )
                     grid.delRowData(rows[i]);

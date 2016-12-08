@@ -118,7 +118,7 @@ class PrewikkaResponse(object):
     def _with_xhr_layout(self, obj):
         """Position the obj in a dict for XHR response"""
 
-        data = {"content": obj}
+        data = {"type": "html", "content": obj}
         data.update(self.ext_content)
 
         return data

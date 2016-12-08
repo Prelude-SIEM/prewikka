@@ -22,11 +22,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import re
 
-import pkg_resources
 import prelude
-from prewikka import database, error, hookmanager, resource, template, usergroup, utils, version, view
+from prewikka import database, error, hookmanager, resource, template, version, view
 from prewikka.dataprovider import Criterion
-from prewikka.utils import AttrObj, html, json
+from prewikka.utils import AttrObj
 
 _OP_TBL   = { "AND": "&&", "OR": "||" }
 _TYPE_TBL = { "generic": "alert", "alert": "alert", "heartbeat": "heartbeat" }
@@ -161,10 +160,9 @@ class AlertFilterEdition(view.View):
     plugin_database_branch = version.__branch__
     plugin_database_version = "0"
 
-    view_name = N_("Filters")
+    view_menu = (N_("Settings"), N_("Filters"))
     view_parameters = AlertFilterEditionParameters
     view_template = template.PrewikkaTemplate(__name__, "templates/filteredition.mak")
-    view_section = N_("Settings")
     view_order = 1
     view_permissions = [ N_("IDMEF_VIEW") ]
 

@@ -24,8 +24,8 @@ import os
 import struct
 import time
 
-from prewikka import database, env, hookmanager, log, pluginmanager, usergroup, utils
-from prewikka.error import PrewikkaUserError
+from prewikka import database, hookmanager, log, pluginmanager, usergroup, utils
+from prewikka.error import PrewikkaUserError, RedirectionError
 
 
 class _SessionError(PrewikkaUserError):
@@ -161,7 +161,7 @@ class Session(pluginmanager.PluginBase):
         is_admin = set(user.permissions) == usergroup.ALL_PERMISSIONS
         env.log.info("User login with profile '%s'" % ("admin" if is_admin else "default"))
 
-        return user
+        raise RedirectionError(env.request.web.get_raw_uri(True), 303)
 
     def authenticate(self, request, info):
         return env.auth.authenticate(info.login, info.password)
