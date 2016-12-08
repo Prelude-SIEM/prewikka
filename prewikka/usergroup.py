@@ -47,8 +47,8 @@ def permissions_required(permissions):
 
     def has_permissions(func):
         def wrapper(*args, **kwargs):
-            if env.request.user and not env.request.user.has(permissions):
-                raise PermissionDeniedError(permissions)
+            if env.request.user:
+                env.request.user.check(permissions)
             return func(*args, **kwargs)
         return wrapper
     return has_permissions
