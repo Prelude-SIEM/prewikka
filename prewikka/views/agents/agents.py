@@ -69,8 +69,8 @@ class Agents(view.View):
     def _get_analyzers(self):
         criteria = None
 
-        if "filter_path" in self.parameters:
-            criteria = Criterion(self.parameters["filter_path"], "=", self.parameters["filter_value"])
+        if "filter_path" in env.request.parameters:
+            criteria = Criterion(env.request.parameters["filter_path"], "=", env.request.parameters["filter_value"])
 
         for (analyzerid,) in env.dataprovider.query(["heartbeat.analyzer(-1).analyzerid/group_by"], criteria):
             analyzer, heartbeat = self._get_analyzer(analyzerid)
@@ -78,7 +78,7 @@ class Agents(view.View):
                 heartbeat, self._heartbeat_error_margin
             )
 
-            if self.parameters["status"] and status not in self.parameters["status"]:
+            if env.request.parameters["status"] and status not in env.request.parameters["status"]:
                 continue
 
             delta = float(heartbeat.get("create_time")) - time.time()
@@ -117,10 +117,10 @@ class Agents(view.View):
                    ]}
 
     def render(self):
-        self.dataset["data"] = analyzer_data = list(self._get_analyzers())
+        env.request.dataset["data"] = analyzer_data = list(self._get_analyzers())
         list(hookmanager.trigger("HOOK_AGENTS_EXTRA_CONTENT", analyzer_data))
 
-        self.dataset["extra_columns"] = filter(None, hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN"))
+        env.request.dataset["extra_columns"] = filter(None, hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN"))
 
 
 class SensorMessagesDelete(Agents):
@@ -128,8 +128,8 @@ class SensorMessagesDelete(Agents):
     view_permissions = [ N_("IDMEF_VIEW"), N_("IDMEF_ALTER") ]
 
     def render(self):
-        for analyzerid in self.parameters["analyzerid"]:
-            for i in self.parameters["types"]:
+        for analyzerid in env.request.parameters["analyzerid"]:
+            for i in env.request.parameters["types"]:
                 if i in ("alert", "heartbeat"):
                     env.dataprovider.delete(Criterion("%s.analyzer.analyzerid" % i, "=", analyzerid))
 
@@ -142,7 +142,7 @@ class HeartbeatAnalyze(Agents):
     view_template = template.PrewikkaTemplate(__name__, "templates/heartbeatanalyze.mak")
 
     def render(self):
-        analyzerid = self.parameters["analyzerid"]
+        analyzerid = env.request.parameters["analyzerid"]
 
         analyzer, heartbeat = self._get_analyzer(analyzerid)
         delta = float(heartbeat["create_time"]) - time.time()
@@ -212,4 +212,4 @@ class HeartbeatAnalyze(Agents):
                                      _("No anomaly in the last %(count)d heartbeats (one heartbeat every %(delta)s average)") %
                                        {'count': self._heartbeat_count, 'delta':delta}, "type": "no_anomaly" })
 
-        self.dataset["analyzer"] = analyzer
+        env.request.dataset["analyzer"] = analyzer

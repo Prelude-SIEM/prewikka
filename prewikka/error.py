@@ -105,15 +105,7 @@ class PrewikkaError(PrewikkaException):
 
     def _html_respond(self):
         from prewikka import baseview
-
-        v = baseview.BaseView()
-        v.view_template = self.template
-        v.dataset = self._setup_template(self.template, False)
-
-        ret = v.respond()
-        ret.code = self.code
-
-        return ret
+        return baseview.BaseView().respond(self._setup_template(self.template, False), self.code)
 
     def _get_traceback(self):
         if self.display_traceback and env.config.general.get("enable_error_traceback") not in ('no', 'false'):

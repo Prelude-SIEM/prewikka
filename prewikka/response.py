@@ -56,9 +56,9 @@ class PrewikkaResponse(object):
         If the type of data is a dict, it will be cast in a JSON string
     """
 
-    def __init__(self, data=None, headers=_sentinel, code=200, status_text=None):
+    def __init__(self, data=None, headers=_sentinel, code=None, status_text=None):
         self.data = data
-        self.code = code
+        self.code = code or 200
         self.status_text = status_text
         self.ext_content = {}
 

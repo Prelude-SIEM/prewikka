@@ -62,9 +62,9 @@ class AjaxHostURL(view.View):
             yield resource.Link('<a href="{url}" target="{urlname}">{urlname}</a>').format(urlname=urlname, url=url)
 
     def render(self):
-        infos = {"host": self.parameters["host"]}
+        infos = {"host": env.request.parameters["host"]}
 
-        for info in hookmanager.trigger("HOOK_HOST_INFO", self.parameters["host"]):
+        for info in hookmanager.trigger("HOOK_HOST_INFO", env.request.parameters["host"]):
             infos.update(info)
 
         return response.PrewikkaDirectResponse(list(self._link_generator(infos)))

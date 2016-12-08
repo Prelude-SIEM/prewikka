@@ -73,7 +73,7 @@ class Table(object):
             return
 
         if not parent:
-            self.dataset["sections"].append(self._current_section)
+            env.request.dataset["sections"].append(self._current_section)
             self._current_section = None
         else:
             parent["sections"].append(self._current_section)
@@ -1021,9 +1021,9 @@ class AlertSummary(TcpIpOptions, MessageSummary):
         return section
 
     def render(self):
-        alert = env.dataprovider.get(getUriCriteria(self.parameters, "alert"))[0]["alert"]
+        alert = env.dataprovider.get(getUriCriteria(env.request.parameters, "alert"))[0]["alert"]
 
-        self.dataset["sections"] = [ ]
+        env.request.dataset["sections"] = [ ]
 
         self.beginSection(self.getSectionName(alert))
 
@@ -1105,9 +1105,9 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
 class HeartbeatSummary(MessageSummary):
     def render(self):
-        heartbeat = env.dataprovider.get(getUriCriteria(self.parameters, "heartbeat"))[0]["heartbeat"]
+        heartbeat = env.dataprovider.get(getUriCriteria(env.request.parameters, "heartbeat"))[0]["heartbeat"]
 
-        self.dataset["sections"] = [ ]
+        env.request.dataset["sections"] = [ ]
 
         self.beginSection(_("Heartbeat"))
         self.buildTime(heartbeat)

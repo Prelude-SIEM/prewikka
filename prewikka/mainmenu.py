@@ -123,11 +123,10 @@ class MainMenuStep(object):
 
 class MainMenu(object):
     _criteria_type = None
-    template = _MAINMENU_TEMPLATE
 
     def __init__(self):
         env.request.menu = self
-        self.dataset = self.template.dataset()
+        self.dataset = _MAINMENU_TEMPLATE.dataset()
 
         self.dataset["timeline"] = utils.AttrObj()
         self.dataset["timeline"].quick = [
@@ -152,7 +151,7 @@ class MainMenu(object):
         for unit in "minute", "hour", "day", "month", "year", "unlimited":
              setattr(self.dataset["timeline"], "%s_selected" % unit, "")
 
-        setattr(self.dataset["timeline"], "%s_selected" % self.parameters["timeline_unit"], "selected='selected'")
+        setattr(self.dataset["timeline"], "%s_selected" % env.request.parameters["timeline_unit"], "selected='selected'")
 
         if not start and not end:
             return
@@ -220,14 +219,14 @@ class MainMenu(object):
 
     def _setup_timeline_range(self):
         self.start = self.end = None
-        if "timeline_start" in self.parameters:
-            self.start = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self.parameters["timeline_start"]))
+        if "timeline_start" in env.request.parameters:
+            self.start = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(env.request.parameters["timeline_start"]))
 
 
-        if "timeline_end" in self.parameters:
-            self.end = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self.parameters["timeline_end"]))
+        if "timeline_end" in env.request.parameters:
+            self.end = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(env.request.parameters["timeline_end"]))
 
-        self._timeunit, self._timevalue = self.parameters["timeline_unit"], self.parameters["timeline_value"]
+        self._timeunit, self._timevalue = env.request.parameters["timeline_unit"], env.request.parameters["timeline_value"]
         if self._timeunit == "unlimited":
             self._timeunit = "year"
 
@@ -241,12 +240,12 @@ class MainMenu(object):
 
         elif self.start is None and self.end is None:
             self.start = self.end = datetime.datetime.now(env.request.user.timezone).replace(second=0, microsecond=0)
-            if not self.parameters["timeline_absolute"]: #relative
+            if not env.request.parameters["timeline_absolute"]: #relative
                 self.start = self.end - delta
 
             else: # absolute
                 self.end = self._round_datetime(self.end, self._timeunit)
-                if self.parameters["timeline_unit"] == "unlimited":
+                if env.request.parameters["timeline_unit"] == "unlimited":
                     self.start = datetime.datetime.fromtimestamp(0).replace(tzinfo=env.request.user.timezone)
                 else:
                     self.start = self.end - delta
@@ -271,7 +270,7 @@ class MainMenu(object):
 
         if self.end:
             end = self.end
-            if not self.parameters["timeline_absolute"]:
+            if not env.request.parameters["timeline_absolute"]:
                 end = self.end + relativedelta(minutes=1)
 
             end = self.end.astimezone(utils.timeutil.timezone("UTC"))
@@ -288,29 +287,27 @@ class MainMenu(object):
         return MainMenuStep(x, 1)
 
     def get_parameters(self):
-        return dict(((key, self.parameters[key]) for key in self.parameters._INTERNAL_PARAMETERS if key in self.parameters))
+        return dict(((key, env.request.parameters[key]) for key in env.request.parameters._INTERNAL_PARAMETERS if key in env.request.parameters))
 
     def render(self):
-        self.parameters = env.request.parameters
-
-        self.dataset["timeline"].order_by = self.parameters["orderby"]
-        self.dataset["timeline"].value = self.parameters["timeline_value"]
-        self.dataset["timeline"].unit = self.parameters["timeline_unit"]
-        self.dataset["timeline"].absolute = self.parameters["timeline_absolute"]
+        self.dataset["timeline"].order_by = env.request.parameters["orderby"]
+        self.dataset["timeline"].value = env.request.parameters["timeline_value"]
+        self.dataset["timeline"].unit = env.request.parameters["timeline_unit"]
+        self.dataset["timeline"].absolute = env.request.parameters["timeline_absolute"]
         self.dataset["timeline"].quick_selected = _("Custom")
         self.dataset["timeline"].quick_custom = True
         self.dataset["timeline"].refresh_selected = _("Inactive")
-        self.dataset["auto_apply_value"] = self.parameters["auto_apply_value"]
-        self.dataset["auto_apply_enable"] = self.parameters["auto_apply_enable"]
+        self.dataset["auto_apply_value"] = env.request.parameters["auto_apply_value"]
+        self.dataset["auto_apply_enable"] = env.request.parameters["auto_apply_enable"]
         self.dataset["timeline"].time_format = localization.get_calendar_format()
 
         for label, value in self.dataset["timeline"].refresh:
-            if value == self.parameters["auto_apply_value"]:
+            if value == env.request.parameters["auto_apply_value"]:
                 self.dataset["timeline"].refresh_selected = label
 
-        if "timeline_start" not in self.parameters and "timeline_end" not in self.parameters:
+        if "timeline_start" not in env.request.parameters and "timeline_end" not in env.request.parameters:
             for label, value, unit, absolute in self.dataset["timeline"].quick:
-                if value == self.parameters["timeline_value"] and unit == self.parameters["timeline_unit"] and absolute == self.parameters["timeline_absolute"]:
+                if value == env.request.parameters["timeline_value"] and unit == env.request.parameters["timeline_unit"] and absolute == env.request.parameters["timeline_absolute"]:
                     self.dataset["timeline"].quick_selected = label
                     self.dataset["timeline"].quick_custom = False
                     break

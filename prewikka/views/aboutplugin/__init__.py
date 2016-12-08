@@ -24,7 +24,7 @@ import json
 import os
 
 import pkg_resources
-from prewikka import database, error, pluginmanager, template, version, view
+from prewikka import database, error, pluginmanager, template, utils, version, view
 from prewikka.utils import html
 
 
@@ -59,7 +59,7 @@ class AboutPlugin(view.View):
                     (_("Apps: Renderer type"), "prewikka.renderer.type"))
 
     def _apply_update(self, data):
-        self.dataset = None
+        env.request.dataset = None
         env.request.web.send_stream(json.dumps({"total": data.maintenance_total}), event="begin", sync=True)
 
         for mod, fromversion, uplist in itertools.chain.from_iterable(data.maintenance.values()):
@@ -94,9 +94,7 @@ class AboutPlugin(view.View):
             data.maintenance.setdefault(catname, []).append((mod, curversion, [e]))
 
     def render(self):
-        class _data(object): pass
-        data = _data()
-        data.installed, data.maintenance, data.maintenance_total = {}, {}, 0
+        data = utils.AttrObj(installed={}, maintenance={}, maintenance_total=0)
 
         upsrt = []
         for catname, entrypoint in self._all_plugins:
@@ -104,19 +102,19 @@ class AboutPlugin(view.View):
 
                 self._add_plugin_info(data, catname, plugin)
 
-                if "enable_plugin" in self.parameters:
-                    enabled = plugin.plugin_mandatory or plugin.full_module_name in self.parameters["enable_plugin"]
+                if "enable_plugin" in env.request.parameters:
+                    enabled = plugin.plugin_mandatory or plugin.full_module_name in env.request.parameters["enable_plugin"]
                     upsrt.append((plugin.full_module_name, int(enabled)))
 
         if upsrt:
             env.db.upsert("Prewikka_Module_Registry", ["module", "enabled"], upsrt, pkey=["module"])
 
-        if "apply_update" in self.parameters or "enable_plugin" in self.parameters:
+        if "apply_update" in env.request.parameters or "enable_plugin" in env.request.parameters:
             env.db.trigger_plugin_change()
 
-        if "apply_update" in self.parameters:
+        if "apply_update" in env.request.parameters:
             return self._apply_update(data)
 
-        self.dataset["installed"] = data.installed
-        self.dataset["maintenance"] = data.maintenance
-        self.dataset["maintenance_total"] = data.maintenance_total
+        env.request.dataset["installed"] = data.installed
+        env.request.dataset["maintenance"] = data.maintenance
+        env.request.dataset["maintenance_total"] = data.maintenance_total

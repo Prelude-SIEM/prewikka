@@ -712,7 +712,7 @@ class AlertListing(MessageListing):
         self._max_aggregated_classification = int(env.config.general.get("max_aggregated_classification", 10))
 
     def _setMessage(self, message, ident):
-        msg = self.listed_alert(self.view_path, self.parameters)
+        msg = self.listed_alert(self.view_path, env.request.parameters)
         msg.setMessage(message, ident)
         msg["aggregated"] = False
         msg["selection"] = json.dumps(Criterion("alert.messageid", "=", ident))
@@ -720,7 +720,7 @@ class AlertListing(MessageListing):
         return msg
 
     def _applyOptionalEnumFilter(self, criteria, column, object, values, objpath=None, unsetval="n/a"):
-        obj = self.parameters.get(object)
+        obj = env.request.parameters.get(object)
 
         if obj and set(obj) != set(values):
             new = Criterion()
@@ -728,13 +728,13 @@ class AlertListing(MessageListing):
                 new |= Criterion(objpath or object, "=", value if value != unsetval else None)
 
             criteria += new
-            self.dataset[object] = obj
+            env.request.dataset[object] = obj
         else:
-            self.dataset[object] = values
+            env.request.dataset[object] = values
 
 
     def _applyAlertTypeFilters(self, criteria):
-        if "alert.create_time" in self.parameters["alert.type"]:
+        if "alert.create_time" in env.request.parameters["alert.type"]:
             have_base = True
         else:
             have_base = False
@@ -743,13 +743,13 @@ class AlertListing(MessageListing):
 
         for param in ["alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"]:
             if not have_base:
-                if param in self.parameters["alert.type"]:
+                if param in env.request.parameters["alert.type"]:
                     new |= Criterion(param, "!=", None)
             else:
-                if not param in self.parameters["alert.type"]:
+                if not param in env.request.parameters["alert.type"]:
                     new &= Criterion(param, "=", None)
 
-        self.dataset["alert_type"] = self.parameters["alert.type"]
+        env.request.dataset["alert_type"] = env.request.parameters["alert.type"]
         criteria += new
 
     def _applyClassificationFilters(self, criteria):
@@ -778,8 +778,8 @@ class AlertListing(MessageListing):
         return "<>*"
 
     def _adjustCriteria(self, criteria):
-        if "aggregated_alert_id" in self.parameters:
-            alert, aggreg_type = self.parameters._get_aggregated_alert(self.parameters.get("aggregated_alert_id"))
+        if "aggregated_alert_id" in env.request.parameters:
+            alert, aggreg_type = env.request.parameters._get_aggregated_alert(env.request.parameters.get("aggregated_alert_id"))
 
             source_analyzer = None
             newcrit = Criterion()
@@ -803,8 +803,8 @@ class AlertListing(MessageListing):
             criteria += newcrit
 
     def _applyFiltersForCategory(self, criteria, type):
-        if not self.parameters[type]:
-            self.dataset[type] = [ ("__all__", "", "") ]
+        if not env.request.parameters[type]:
+            env.request.dataset[type] = [ ("__all__", "", "") ]
             return
 
         # If one object is specified more than one time, and since this object
@@ -814,11 +814,11 @@ class AlertListing(MessageListing):
 
         merge = { }
         newcrit = Criterion()
-        for obj in self.parameters[type]:
+        for obj in env.request.parameters[type]:
             if obj[0] == "__all__":
                 # We want to lookup the value in our set of predefined path, but also in aggregated
                 # value (which the user can see in the filtered columns).
-                for path in GENERIC_SEARCH_TABLE[type] + self.parameters.get("aggregated_%s" % type):
+                for path in GENERIC_SEARCH_TABLE[type] + env.request.parameters.get("aggregated_%s" % type):
                     op = self._getOperatorForPath(path, obj[2])
                     if op:
                         newcrit |= Criterion(path, op, obj[2])
@@ -832,7 +832,7 @@ class AlertListing(MessageListing):
             newcrit += functools.reduce(lambda x,y: x|y, (Criterion(*x) for x in merge[key]))
 
         criteria += newcrit
-        self.dataset[type] = [ (path.replace("(0)", "").replace("(-1)", ""), operator, value) for path, operator, value in self.parameters[type] ]
+        env.request.dataset[type] = [ (path.replace("(0)", "").replace("(-1)", ""), operator, value) for path, operator, value in env.request.parameters[type] ]
 
     def _applyFilters(self, criteria):
         self._applyFiltersForCategory(criteria, "classification")
@@ -923,9 +923,9 @@ class AlertListing(MessageListing):
                 entry_param = {}
 
                 if classification is not None:
-                    entry_param["classification_object_%d" % self.parameters.max_index] = "alert.classification.text"
-                    entry_param["classification_operator_%d" % self.parameters.max_index] = "="
-                    entry_param["classification_value_%d" % self.parameters.max_index] = classification
+                    entry_param["classification_object_%d" % env.request.parameters.max_index] = "alert.classification.text"
+                    entry_param["classification_operator_%d" % env.request.parameters.max_index] = "="
+                    entry_param["classification_value_%d" % env.request.parameters.max_index] = classification
 
                 entry_param["alert.assessment.impact.severity"] = severity or "n/a"
                 entry_param["alert.assessment.impact.completion"] = completion or "n/a"
@@ -935,7 +935,7 @@ class AlertListing(MessageListing):
                 entry_param["aggregated_analyzer"] = \
                 entry_param["aggregated_classification"] = "none"
 
-                infos["display"] = utils.create_link(self.view_path, self.parameters -
+                infos["display"] = utils.create_link(self.view_path, env.request.parameters -
                                                      [ "offset", "aggregated_classification",
                                                        "aggregated_source", "aggregated_target", "aggregated_analyzer" ] +
                                                      parameters + entry_param)
@@ -946,19 +946,19 @@ class AlertListing(MessageListing):
         ##
         selection = [ "%s/group_by" % path for path in ag_list ]
 
-        if self.parameters["orderby"] == "time_asc":
+        if env.request.parameters["orderby"] == "time_asc":
             selection += [ "count(alert.create_time)", "max(alert.create_time)", "min(alert.create_time)/order_asc" ]
-        elif self.parameters["orderby"] == "time_desc":
+        elif env.request.parameters["orderby"] == "time_desc":
             selection += [ "count(alert.create_time)", "max(alert.create_time)/order_desc", "min(alert.create_time)" ]
-        elif self.parameters["orderby"] == "count_desc":
+        elif env.request.parameters["orderby"] == "count_desc":
             selection += [ "count(alert.create_time)/order_desc", "max(alert.create_time)", "min(alert.create_time)" ]
-        elif self.parameters["orderby"] == "count_asc":
+        elif env.request.parameters["orderby"] == "count_asc":
             selection += [ "count(alert.create_time)/order_asc", "max(alert.create_time)", "min(alert.create_time)" ]
 
         results = env.dataprovider.query(selection, criteria)
         total_results = len(results)
 
-        for values in results[self.parameters["offset"]:self.parameters["offset"]+self.parameters["limit"]]:
+        for values in results[env.request.parameters["offset"]:env.request.parameters["offset"]+env.request.parameters["limit"]]:
             start = 0
             aggregated_source_values = []
             aggregated_target_values = []
@@ -990,7 +990,7 @@ class AlertListing(MessageListing):
             aggregated_count = values[start]
 
             select_criteria = Criterion()
-            message = self.listed_aggregated_alert(self.view_path, self.parameters)
+            message = self.listed_aggregated_alert(self.view_path, env.request.parameters)
 
             valueshash = {}
             for path, value in zip(ag_list, values[:start]):
@@ -1017,7 +1017,7 @@ class AlertListing(MessageListing):
             message["aggregated_classifications_total"] = aggregated_count
             message["aggregated_classifications_hidden"] = aggregated_count
             message["aggregated_classifications_hidden_expand"] = utils.create_link(self.view_path,
-                                                                                    self.parameters -
+                                                                                    env.request.parameters -
                                                                                     [ "offset",
                                                                                       "aggregated_source",
                                                                                       "aggregated_target",
@@ -1028,7 +1028,7 @@ class AlertListing(MessageListing):
 
             self._getMissingAggregatedInfos(message, valueshash, parameters, criteria + select_criteria, aggregated_count, time_min, time_max)
 
-            self.dataset["messages"].append(message)
+            env.request.dataset["messages"].append(message)
             message.setTime(time_min, time_max)
 
             if not "selection" in message:
@@ -1044,8 +1044,8 @@ class AlertListing(MessageListing):
                                (aggregated_source_values, "source"),
                                (aggregated_target_values, "target"),
                                (aggregated_analyzer_values, "analyzer")):
-            i = self.parameters.max_index
-            for path, value in zip(self.parameters["aggregated_%s" % column], values):
+            i = env.request.parameters.max_index
+            for path, value in zip(env.request.parameters["aggregated_%s" % column], values):
                 parameters["%s_object_%d" % (column, i)] = path.replace("(0)", "").replace("(-1)", "")
 
                 if value:
@@ -1060,20 +1060,20 @@ class AlertListing(MessageListing):
         return parameters
 
     def _setMessages(self, criteria):
-        self.dataset["aggregated_source"] = self.parameters["aggregated_source"]
-        self.dataset["aggregated_target"] = self.parameters["aggregated_target"]
-        self.dataset["aggregated_classification"] = self.parameters["aggregated_classification"]
-        self.dataset["aggregated_analyzer"] = self.parameters["aggregated_analyzer"]
+        env.request.dataset["aggregated_source"] = env.request.parameters["aggregated_source"]
+        env.request.dataset["aggregated_target"] = env.request.parameters["aggregated_target"]
+        env.request.dataset["aggregated_classification"] = env.request.parameters["aggregated_classification"]
+        env.request.dataset["aggregated_analyzer"] = env.request.parameters["aggregated_analyzer"]
 
-        self.dataset["extra_column"] = filter(None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN"))
+        env.request.dataset["extra_column"] = filter(None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN"))
 
         def cmp(x):
             return x != "none"
 
-        ag_s = list(filter(cmp, self.parameters["aggregated_source"]))
-        ag_t = list(filter(cmp, self.parameters["aggregated_target"]))
-        ag_c = list(filter(cmp, self.parameters["aggregated_classification"]))
-        ag_a = list(filter(cmp, self.parameters["aggregated_analyzer"]))
+        ag_s = list(filter(cmp, env.request.parameters["aggregated_source"]))
+        ag_t = list(filter(cmp, env.request.parameters["aggregated_target"]))
+        ag_c = list(filter(cmp, env.request.parameters["aggregated_classification"]))
+        ag_a = list(filter(cmp, env.request.parameters["aggregated_analyzer"]))
 
         if len(ag_s + ag_t + ag_c + ag_a) > 0:
             return self._setAggregatedMessagesNoValues(criteria, ag_s, ag_t, ag_c, ag_a)
@@ -1083,33 +1083,33 @@ class AlertListing(MessageListing):
     def _paramChanged(self, column, paramlist):
         ret = 0
 
-        cd = self.parameters.getDefaultParams(column)
-        default = self.parameters.getDefaultValues()
+        cd = env.request.parameters.getDefaultParams(column)
+        default = env.request.parameters.getDefaultValues()
         default.update(cd)
 
         for param in itertools.chain(paramlist, cd.keys()):
-            if ret != 2 and self.parameters.isSaved(column, param):
+            if ret != 2 and env.request.parameters.isSaved(column, param):
                 ret = 1
 
             if not param in default:
-                if param in self.parameters:
-                    if self.parameters[param] != []:
+                if param in env.request.parameters:
+                    if env.request.parameters[param] != []:
                         ret = 2
                         break
 
                     continue
 
-            if not param in self.parameters:
+            if not param in env.request.parameters:
                 ret = 2
                 break
 
             if type(default[param]) is list:
                 default[param].sort()
 
-            if type(self.parameters[param]) is list:
-                self.parameters[param].sort()
+            if type(env.request.parameters[param]) is list:
+                env.request.parameters[param].sort()
 
-            if default[param] != self.parameters[param]:
+            if default[param] != env.request.parameters[param]:
                 ret = 2
                 break
 
@@ -1118,22 +1118,22 @@ class AlertListing(MessageListing):
     def _setDatasetConstants(self):
         d = {}
         for i in COLUMN_LIST:
-            d[i] = self.dataset.get(i)
+            d[i] = env.request.dataset.get(i)
             n = "aggregated_" + i
-            d[n] = self.dataset.get(n)
-            d[n + "_saved"] = self.dataset[n + "_saved"] = self.parameters.getDefault(n, usedb=True)
-            d[n + "_default"] = self.dataset[n + "_default"] = self.parameters.getDefault(n, usedb=False)
-            d[i + "_saved"] = self.dataset[i + "_saved"] = self.parameters._saved[i]
+            d[n] = env.request.dataset.get(n)
+            d[n + "_saved"] = env.request.dataset[n + "_saved"] = env.request.parameters.getDefault(n, usedb=True)
+            d[n + "_default"] = env.request.dataset[n + "_default"] = env.request.parameters.getDefault(n, usedb=False)
+            d[i + "_saved"] = env.request.dataset[i + "_saved"] = env.request.parameters._saved[i]
 
         d["special"] = {}
         for i in ("alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"):
             d["special"].setdefault("classification", []).append(i)
-            d[i] = self.dataset.get(i)
-            d[i + "_saved"] = self.dataset[i + "_saved"] = self.parameters.getDefault(i, usedb=True)
-            d[i + "_default"] =self.dataset[i + "_default"] = self.parameters.getDefault(i, usedb=False)
+            d[i] = env.request.dataset.get(i)
+            d[i + "_saved"] = env.request.dataset[i + "_saved"] = env.request.parameters.getDefault(i, usedb=True)
+            d[i + "_default"] =env.request.dataset[i + "_default"] = env.request.parameters.getDefault(i, usedb=False)
 
         root = prelude.IDMEFClass().get("alert")
-        self.dataset["all_filters"] = { "classification" : [root.get("messageid"),
+        env.request.dataset["all_filters"] = { "classification" : [root.get("messageid"),
                                                             root.get("classification"),
                                                             root.get("assessment"),
                                                             root.get("correlation_alert"),
@@ -1144,60 +1144,60 @@ class AlertListing(MessageListing):
                                         "target": [root.get("target")],
                                         "analyzer": [root.get("analyzer")]}
 
-        self.dataset["checkbox_fields"] = ["alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"]
+        env.request.dataset["checkbox_fields"] = ["alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"]
 
-        c_params = itertools.chain(["aggregated_classification"], self.parameters.getDynamicParams("classification").keys(), self.dataset["checkbox_fields"])
-        s_params = itertools.chain(["aggregated_source"], self.parameters.getDynamicParams("source").keys())
-        t_params = itertools.chain(["aggregated_target"], self.parameters.getDynamicParams("target").keys())
-        a_params = itertools.chain(["aggregated_analyzer"], self.parameters.getDynamicParams("analyzer").keys())
+        c_params = itertools.chain(["aggregated_classification"], env.request.parameters.getDynamicParams("classification").keys(), env.request.dataset["checkbox_fields"])
+        s_params = itertools.chain(["aggregated_source"], env.request.parameters.getDynamicParams("source").keys())
+        t_params = itertools.chain(["aggregated_target"], env.request.parameters.getDynamicParams("target").keys())
+        a_params = itertools.chain(["aggregated_analyzer"], env.request.parameters.getDynamicParams("analyzer").keys())
 
         d["column_names"] = COLUMN_LIST[:]
 
-        self.dataset["columns_data"] = d
+        env.request.dataset["columns_data"] = d
 
-        self.dataset["classification_filtered"] = self._paramChanged("classification", c_params)
-        self.dataset["source_filtered"] = self._paramChanged("source", s_params)
-        self.dataset["target_filtered"] = self._paramChanged("target", t_params)
-        self.dataset["analyzer_filtered"] = self._paramChanged("analyzer", a_params)
+        env.request.dataset["classification_filtered"] = self._paramChanged("classification", c_params)
+        env.request.dataset["source_filtered"] = self._paramChanged("source", s_params)
+        env.request.dataset["target_filtered"] = self._paramChanged("target", t_params)
+        env.request.dataset["analyzer_filtered"] = self._paramChanged("analyzer", a_params)
 
     def _setTimelineChart(self):
-        if self.parameters["timeline_unit"] in ("month", "year"):
+        if env.request.parameters["timeline_unit"] in ("month", "year"):
             unit = "month"
-        elif self.parameters["timeline_unit"] == "day":
+        elif env.request.parameters["timeline_unit"] == "day":
             unit = "day"
         else:
             unit = "hour"
 
     def render(self):
         MessageListing.render(self)
-        if "aggregated_analyzer" in self.parameters:
-            self.parameters["aggregated_analyzer"] = [ i.replace("alert.analyzer(0)","alert.analyzer(-1)")
-                                                           for i in self.parameters["aggregated_analyzer"] ]
+        if "aggregated_analyzer" in env.request.parameters:
+            env.request.parameters["aggregated_analyzer"] = [ i.replace("alert.analyzer(0)","alert.analyzer(-1)")
+                                                           for i in env.request.parameters["aggregated_analyzer"] ]
 
         self._setTimelineChart()
 
-        criteria = self.menu.get_criteria()
+        criteria = env.request.menu.get_criteria()
 
         self._applyFilters(criteria)
         self._adjustCriteria(criteria)
 
-        if "listing_apply" in self.parameters:
-            if self.parameters["action"] == "delete_message":
+        if "listing_apply" in env.request.parameters:
+            if env.request.parameters["action"] == "delete_message":
                 self._updateMessages(env.dataprovider.delete, criteria)
 
-        self._setNavPrev(self.parameters["offset"])
+        self._setNavPrev(env.request.parameters["offset"])
 
-        self.dataset["messages"] = [ ]
+        env.request.dataset["messages"] = [ ]
         total = self._setMessages(criteria)
         self._setDatasetConstants()
 
-        self.dataset["nav"]["from"] = localization.format_number(self.parameters["offset"] + 1)
-        self.dataset["nav"]["to"] = localization.format_number(self.parameters["offset"] + len(self.dataset["messages"]))
-        self.dataset["limit"] = localization.format_number(self.parameters["limit"])
-        self.dataset["total"] = localization.format_number(total)
-        self.dataset["correlation_alert_view"] = False
+        env.request.dataset["nav"]["from"] = localization.format_number(env.request.parameters["offset"] + 1)
+        env.request.dataset["nav"]["to"] = localization.format_number(env.request.parameters["offset"] + len(env.request.dataset["messages"]))
+        env.request.dataset["limit"] = localization.format_number(env.request.parameters["limit"])
+        env.request.dataset["total"] = localization.format_number(total)
+        env.request.dataset["correlation_alert_view"] = False
 
-        self._setNavNext(self.parameters["offset"], total)
+        self._setNavNext(env.request.parameters["offset"], total)
 
 
 class CorrelationAlertListing(AlertListing, view.View):

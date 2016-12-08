@@ -51,11 +51,10 @@ class MessageListingParameters(mainmenu.MainMenuParameters):
 class ListedMessage(AttrDict):
     def __init__(self, view_path, parameters):
         AttrDict.__init__(self)
-        self.parameters = parameters
         self.view_path = view_path
 
     def _isAlreadyFiltered(self, column, path, criterion, value):
-        col = self.parameters.get(column)
+        col = env.request.parameters.get(column)
         if not column:
             return False
 
@@ -86,20 +85,20 @@ class ListedMessage(AttrDict):
                 if alreadyf is not False:
                     alreadyf = self._isAlreadyFiltered(direction, p, operator, v or "")
 
-                index = self.parameters.max_index
+                index = env.request.parameters.max_index
                 extra["%s_object_%d" % (direction, index)] = p
                 extra["%s_operator_%d" % (direction, index)] = operator
                 extra["%s_value_%d" % (direction, index)] = v or ""
-                self.parameters.max_index += 1
+                env.request.parameters.max_index += 1
 
             else:
-                val = self.parameters.get(p)
+                val = env.request.parameters.get(p)
                 if alreadyf is not False and (val and val == [v]):
                         alreadyf = True
 
                 extra[p] = v or ""
 
-        link = utils.create_link(self.view_path, self.parameters + extra - [ "offset" ])
+        link = utils.create_link(self.view_path, env.request.parameters + extra - [ "offset" ])
         return AttrDict(value=real_value, inline_filter=link, already_filtered=alreadyf)
 
     def createTimeField(self, timeobj):
@@ -143,7 +142,7 @@ class HostInfoAjax(view.View):
 
     def render(self):
         infos = []
-        for info in hookmanager.trigger("HOOK_HOST_TOOLTIP", self.parameters["host"]):
+        for info in hookmanager.trigger("HOOK_HOST_TOOLTIP", env.request.parameters["host"]):
             infos.extend(info)
 
         return infos
@@ -156,50 +155,50 @@ class MessageListing(view.View):
 
     def render(self):
         view.View.render(self)
-        self.dataset["order_by"] = self.parameters["orderby"]
-        self.dataset["nav"] = {}
+        env.request.dataset["order_by"] = env.request.parameters["orderby"]
+        env.request.dataset["nav"] = {}
 
     def _setNavPrev(self, offset):
         if offset:
-            self.dataset["nav"]["first"] = utils.create_link(self.view_path, self.parameters - [ "offset" ])
-            self.dataset["nav"]["prev"] = utils.create_link(self.view_path,
-                                                         self.parameters +
-                                                         { "offset": offset - self.parameters["limit"] })
+            env.request.dataset["nav"]["first"] = utils.create_link(self.view_path, env.request.parameters - [ "offset" ])
+            env.request.dataset["nav"]["prev"] = utils.create_link(self.view_path,
+                                                         env.request.parameters +
+                                                         { "offset": offset - env.request.parameters["limit"] })
         else:
-            self.dataset["nav"]["prev"] = None
+            env.request.dataset["nav"]["prev"] = None
 
     def _setNavNext(self, offset, count):
-        if count > offset + self.parameters["limit"]:
-            offset = offset + self.parameters["limit"]
-            self.dataset["nav"]["next"] = utils.create_link(self.view_path, self.parameters + { "offset": offset })
-            offset = count - ((count % self.parameters["limit"]) or self.parameters["limit"])
-            self.dataset["nav"]["last"] = utils.create_link(self.view_path, self.parameters + { "offset": offset })
+        if count > offset + env.request.parameters["limit"]:
+            offset = offset + env.request.parameters["limit"]
+            env.request.dataset["nav"]["next"] = utils.create_link(self.view_path, env.request.parameters + { "offset": offset })
+            offset = count - ((count % env.request.parameters["limit"]) or env.request.parameters["limit"])
+            env.request.dataset["nav"]["last"] = utils.create_link(self.view_path, env.request.parameters + { "offset": offset })
         else:
-            self.dataset["nav"]["next"] = None
+            env.request.dataset["nav"]["next"] = None
 
     def _getInlineFilter(self, name):
-        return name, self.parameters.get(name)
+        return name, env.request.parameters.get(name)
 
     def _setMessages(self, criteria):
-        self.dataset["messages"] = [ ]
-        offset, limit = self.parameters["offset"], self.parameters["limit"]
+        env.request.dataset["messages"] = [ ]
+        offset, limit = env.request.parameters["offset"], env.request.parameters["limit"]
 
         # count_asc and count_desc methods are not valid for message enumeration
-        order_by = "time_asc" if self.parameters["orderby"] in ("count_asc", "count_desc") else self.parameters["orderby"]
+        order_by = "time_asc" if env.request.parameters["orderby"] in ("count_asc", "count_desc") else env.request.parameters["orderby"]
 
         results = env.dataprovider.get(criteria=criteria, offset=offset, limit=offset+limit, order_by=order_by, type=self.root)
         for obj in results:
             dataset = self._setMessage(obj, obj["%s.messageid" % self.root])
-            self.dataset["messages"].append(dataset)
+            env.request.dataset["messages"].append(dataset)
 
         return env.dataprovider.query(["count(1)"], criteria=criteria, type=self.root)[0][0]
 
     def _updateMessages(self, action, criteria):
-        if not self.parameters["selection"]:
+        if not env.request.parameters["selection"]:
             return
 
         if not env.request.user.has("IDMEF_ALTER"):
             raise usergroup.PermissionDeniedError(["IDMEF_ALTER"], self.current_view)
 
-        action(functools.reduce(lambda x,y: x | y, self.parameters["selection"]))
-        del self.parameters["selection"]
+        action(functools.reduce(lambda x,y: x | y, env.request.parameters["selection"]))
+        del env.request.parameters["selection"]

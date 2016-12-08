@@ -190,7 +190,7 @@ class AlertFilterEdition(view.View):
         if not menu:
             return
 
-        fname = menu.parameters.get("filter")
+        fname = env.request.parameters.get("filter")
         if not fname:
             return
 
@@ -227,13 +227,13 @@ class AlertFilterEdition(view.View):
         return ret
 
     def _set_common(self):
-        self.dataset["type"] = self.parameters.get("type", "filter")
-        self.dataset["filter_list"] = self._db.get_filter_list(env.request.user)
+        env.request.dataset["type"] = env.request.parameters.get("type", "filter")
+        env.request.dataset["filter_list"] = self._db.get_filter_list(env.request.user)
 
-        self.dataset["alert_objects"] = self._flatten(prelude.IDMEFClass("alert"))
-        self.dataset["generic_objects"] = self._flatten(prelude.IDMEFClass("heartbeat"))
+        env.request.dataset["alert_objects"] = self._flatten(prelude.IDMEFClass("alert"))
+        env.request.dataset["generic_objects"] = self._flatten(prelude.IDMEFClass("heartbeat"))
 
-        self.dataset["operators"] = [
+        env.request.dataset["operators"] = [
             ("=", _("Equal")),
             ("=*", _("Equal (case-insensitive)")),
             ("!=", _("Not equal")),
@@ -251,17 +251,17 @@ class AlertFilterEdition(view.View):
             ("!<>", _("Not substring")),
             ("!<>*", _("Not substring (case-insensitive)"))]
 
-        self.dataset["elements"] = [self._element("A")]
-        self.dataset["fltr"] = AttrObj(name="", type="", comment="", formula="")
+        env.request.dataset["elements"] = [self._element("A")]
+        env.request.dataset["fltr"] = AttrObj(name="", type="", comment="", formula="")
 
     def _reload(self):
-        self.dataset["elements"] = []
+        env.request.dataset["elements"] = []
 
-        for name, obj, operator, value in self.parameters.get("elements", [ ]):
-            self.dataset["elements"].append(self._element(name, obj, operator, value))
+        for name, obj, operator, value in env.request.parameters.get("elements", [ ]):
+            env.request.dataset["elements"].append(self._element(name, obj, operator, value))
 
         for i in ("name", "type", "comment", "formula"):
-            setattr(self.dataset["fltr"], i, self.parameters.get("filter_%s" % i, ""))
+            setattr(env.request.dataset["fltr"], i, env.request.parameters.get("filter_%s" % i, ""))
 
     def _element(self, name, obj="", operator="", value=""):
         return {
@@ -274,21 +274,21 @@ class AlertFilterEdition(view.View):
     def _load(self):
         self._set_common()
 
-        fname = self.parameters.get("filter_name")
+        fname = env.request.parameters.get("filter_name")
         if fname:
             filter = self._db.get_filter(env.request.user, fname)
 
             for i in ("name", "type", "comment", "formula"):
-                setattr(self.dataset["fltr"], i, getattr(filter, i))
+                setattr(env.request.dataset["fltr"], i, getattr(filter, i))
 
-            self.dataset["elements"] = []
+            env.request.dataset["elements"] = []
 
             for name in sorted(filter.elements.keys()):
                 obj, operator, value = filter.elements[name]
-                self.dataset["elements"].append(self._element(name, obj, operator, value))
+                env.request.dataset["elements"].append(self._element(name, obj, operator, value))
 
     def _delete(self):
-        fname = self.parameters.get("filter_name")
+        fname = env.request.parameters.get("filter_name")
         if fname:
             self._filter_delete(env.request.user, fname)
 
@@ -297,26 +297,26 @@ class AlertFilterEdition(view.View):
     def _save(self):
         elements = { }
 
-        for name, obj, operator, value in self.parameters["elements"]:
+        for name, obj, operator, value in env.request.parameters["elements"]:
             elements[name] = (obj, operator, value)
-            if name not in self.parameters["filter_formula"]:
+            if name not in env.request.parameters["filter_formula"]:
                 raise error.PrewikkaUserError(_("Could not save Filter"), N_("No valid filter formula provided"))
 
-        fname = self.parameters.get("filter_name")
+        fname = env.request.parameters.get("filter_name")
         if not fname:
             raise error.PrewikkaUserError(_("Could not save Filter"), N_("No name for this filter was provided"))
 
-        if not self.parameters["filter_formula"]:
+        if not env.request.parameters["filter_formula"]:
             raise error.PrewikkaUserError(_("Could not save Filter"), N_("No valid filter formula provided"))
 
-        if self.parameters.get("load") != fname and self._db.get_filter(env.request.user, fname):
+        if env.request.parameters.get("load") != fname and self._db.get_filter(env.request.user, fname):
             raise error.PrewikkaUserError(_("Could not save Filter"), N_("The filter name is already used by another filter"))
 
         fltr = Filter(fname,
-                      self.parameters["filter_type"],
-                      self.parameters.get("filter_comment", ""),
+                      env.request.parameters["filter_type"],
+                      env.request.parameters.get("filter_comment", ""),
                       elements,
-                      self.parameters["filter_formula"])
+                      env.request.parameters["filter_formula"])
 
         self._db.upsert_filter(env.request.user, fltr)
 
@@ -325,13 +325,13 @@ class AlertFilterEdition(view.View):
 
 
     def render(self):
-        if self.parameters.get("mode", _("Load")) == _("Load"):
+        if env.request.parameters.get("mode", _("Load")) == _("Load"):
             self._load()
 
-        elif self.parameters["mode"] == _("Save"):
+        elif env.request.parameters["mode"] == _("Save"):
             self._save()
 
-        elif self.parameters["mode"] == _("Delete"):
+        elif env.request.parameters["mode"] == _("Delete"):
             self._delete()
 
-        self.dataset["elements"] = self.dataset["elements"]
+        env.request.dataset["elements"] = env.request.dataset["elements"]

@@ -344,52 +344,51 @@ class _View(object):
         pass
 
     def _setup_dataset_default(self):
-        self.dataset["document"] = utils.AttrObj()
-        self.dataset["document"].base_url = env.request.web.get_baseurl()
-        self.dataset["document"].href = "/".join(env.request.web.path_elements)
+        env.request.dataset["document"] = utils.AttrObj()
+        env.request.dataset["document"].base_url = env.request.web.get_baseurl()
+        env.request.dataset["document"].href = "/".join(env.request.web.path_elements)
 
-    def _render(self):
-        self.parameters = {}
+    def _render(self, dataset):
+        env.request.parameters = {}
         if self.view_parameters:
-            self.parameters = self.view_parameters(self, env.request.web.arguments)
-            self.parameters.process(self.view_id)
+            env.request.parameters = self.view_parameters(self, env.request.web.arguments)
+            env.request.parameters.process(self.view_id)
 
-        env.request.parameters = self.parameters
+        if self.view_template and dataset is None:
+            env.request.dataset = self.view_template.dataset()
+        else:
+            env.request.dataset = dataset
 
-        if self.view_template and self.dataset is None:
-            self.dataset = self.view_template.dataset()
-
-        if self.dataset is not None:
+        if env.request.dataset is not None:
             self._setup_dataset_default()
 
         for name, classobj in self.view_extensions:
             obj = classobj()
-            setattr(self, name, obj)
+            setattr(env.request, name, obj)
 
             obj.render()
 
-    def respond(self):
+        return env.request.dataset
+
+    def respond(self, dataset=None, code=None):
         env.log.info("Loading view %s" % (self.view_id))
 
-        self._render()
+        dataset = self._render(dataset)
         response = self.render()
 
         if response and not issubclass(response.__class__, PrewikkaResponse):
-            response = PrewikkaResponse(response)
+            response = PrewikkaResponse(response, code=code)
 
         if not response:
-            response = PrewikkaResponse(self.dataset.render() if self.dataset else None)
+            response = PrewikkaResponse(dataset.render() if dataset else None, code=code)
 
-        if self.dataset:
+        if dataset:
             for name, clname in self.view_extensions:
-                obj = getattr(self, name)
-                response.ext_content[name] = obj.dataset.render()
+                response.ext_content[name] = getattr(env.request, name).dataset.render()
 
         return response
 
     def __init__(self):
-        self.dataset = None
-
         if self.view_template and not isinstance(self.view_template, template.PrewikkaTemplate):
             self.view_template = template.PrewikkaTemplate(self.view_template)
 

@@ -71,7 +71,7 @@ class HeartbeatListing(MessageListing):
     listed_heartbeat = ListedHeartbeat
 
     def _setMessage(self, message, ident):
-        msg = self.listed_heartbeat(self.view_path, self.parameters)
+        msg = self.listed_heartbeat(self.view_path, env.request.parameters)
         msg.view_name = self.view_name
         msg.setMessage(message, ident)
 
@@ -84,17 +84,17 @@ class HeartbeatListing(MessageListing):
                              ("model", "heartbeat.analyzer(-1).model"),
                              ("address", "heartbeat.analyzer(-1).node.address.address"),
                              ("node_name", "heartbeat.analyzer(-1).node.name")):
-            self.dataset[column + "_filtered"] = False
+            env.request.dataset[column + "_filtered"] = False
             if not filter_found:
-                if path in self.parameters:
-                    criteria += Criterion(path, "=", self.parameters[path])
-                    self.dataset[column + "_filtered"] = True
+                if path in env.request.parameters:
+                    criteria += Criterion(path, "=", env.request.parameters[path])
+                    env.request.dataset[column + "_filtered"] = True
                     filter_found = True
 
     def render(self):
         MessageListing.render(self)
 
-        criteria = self.menu.get_criteria()
+        criteria = env.request.menu.get_criteria()
         start = end = None
 
         self._applyInlineFilters(criteria)
@@ -102,13 +102,13 @@ class HeartbeatListing(MessageListing):
 
         self._updateMessages(env.dataprovider.delete, criteria)
 
-        self._setNavPrev(self.parameters["offset"])
+        self._setNavPrev(env.request.parameters["offset"])
 
         count = self._setMessages(criteria)
 
-        self.dataset["nav"]["from"] = self.parameters["offset"] + 1
-        self.dataset["nav"]["to"] = self.parameters["offset"] + len(self.dataset["messages"])
-        self.dataset["limit"] = self.parameters["limit"]
-        self.dataset["total"] = count
+        env.request.dataset["nav"]["from"] = env.request.parameters["offset"] + 1
+        env.request.dataset["nav"]["to"] = env.request.parameters["offset"] + len(env.request.dataset["messages"])
+        env.request.dataset["limit"] = env.request.parameters["limit"]
+        env.request.dataset["total"] = count
 
-        self._setNavNext(self.parameters["offset"], count)
+        self._setNavNext(env.request.parameters["offset"], count)

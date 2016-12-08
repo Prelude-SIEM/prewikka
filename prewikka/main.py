@@ -54,7 +54,7 @@ class Logout(view._View):
             # logout always generate an exception to render the logout template
             pass
 
-        return response.PrewikkaRedirectResponse(self.parameters.get("redirect", env.request.web.get_baseurl()), code=302)
+        return response.PrewikkaRedirectResponse(env.request.parameters.get("redirect", env.request.web.get_baseurl()), code=302)
 
 _core_cache = {}
 _core_cache_lock = Lock()

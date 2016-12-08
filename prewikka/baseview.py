@@ -78,6 +78,6 @@ class BaseView(view._View):
         for contents in filter(None, hookmanager.trigger("HOOK_LOAD_BODY_CONTENT")):
             _BODY.update((i, True) for i in contents)
 
-        self.dataset["document"].head_content = _HEAD
-        self.dataset["document"].body_content = _BODY
-        self.dataset["toplayout_extra_content"] = filter(None, hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT"))
+        env.request.dataset["document"].head_content = _HEAD
+        env.request.dataset["document"].body_content = _BODY
+        env.request.dataset["toplayout_extra_content"] = filter(None, hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT"))
