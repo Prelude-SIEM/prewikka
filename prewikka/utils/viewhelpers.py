@@ -54,7 +54,7 @@ class AjaxHostURL(view.View):
             except KeyError:
                 continue
 
-            yield urlname.capitalize(), url
+            yield _(urlname), url
 
     @classmethod
     def _link_generator(cls, infos):
