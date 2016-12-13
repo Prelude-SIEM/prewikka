@@ -24,6 +24,7 @@ function CommonListing(elem, text, options) {
         pager: true,
         hidegrid: false,
         viewrecords: true,
+        reloadOnDelete: false,
         globalSearch: false,
         gridComplete: grid_buttons_state,
         onSelectAll: grid_buttons_state,
@@ -127,6 +128,11 @@ function CommonListing(elem, text, options) {
             url: prewikka_location().href + "/" + options.deleteLink,
             data: {action: "delete", id: rows},
             success: function() {
+                if ( options.reloadOnDelete ) {
+                    location.reload();
+                    return;
+                }
+
                 // Iterate upwards because 'rows' gets modified
                 for ( var i = rows.length - 1; i >= 0; i-- )
                     grid.delRowData(rows[i]);
