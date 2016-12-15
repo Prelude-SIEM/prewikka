@@ -21,26 +21,15 @@
 from __future__ import absolute_import, division, print_function
 
 import abc
-import cgi
-import copy
-import mimetypes
-import os
-import os.path
 import sys
-import time
-import urllib
 
-if sys.version_info >= (3,0):
+from prewikka import error
+from prewikka.response import PrewikkaDirectResponse, PrewikkaResponse
+
+if sys.version_info >= (3, 0):
     from http import cookies
-    from urllib.parse import urlparse
-    from urllib.request import url2pathname
 else:
     import Cookie as cookies
-    from urlparse import urlparse
-    from urllib import url2pathname
-
-from prewikka import env, error
-from prewikka.response import PrewikkaDirectResponse, PrewikkaResponse
 
 
 class BufferedWriter:
@@ -63,38 +52,28 @@ class BufferedWriter:
                         self.flush()
 
 
-
 class Request(object):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, path):
+        self.path = path
         self.is_xhr = False
         self.is_stream = False
-        self._buffer = None
-        self.arguments = { }
-        self._output_cookie = None
-        self.input_cookie = { }
         self.body = None
+        self.arguments = {}
+        self._buffer = None
+        self._output_cookie = None
 
-    def init(self, core):
-        self._core = core
-        self._path = self.path
-
-        self._uri = urlparse(self.path)
-
-        self._query_string = self._uri.query
-        self.path = url2pathname(self._uri.path or "/")
-
-        self.path_elements = self.path.strip('/').split("/")
+        self.path_elements = path.strip('/').split("/")
 
         cookie = cookies.SimpleCookie(self.get_cookie())
-        for key, value in cookie.items():
-            self.input_cookie[key] = value
+        self.input_cookie = dict(cookie.items())
 
     def add_cookie(self, param, value, expires, path="/"):
         if not self._output_cookie:
             self._output_cookie = cookies.SimpleCookie()
 
-        if sys.version_info < (3,0):
-            param = param.encode("utf8")
+        if sys.version_info < (3, 0):
+            param = param.encode("ascii")
+            value = value.encode("utf8")
 
         self._output_cookie[param] = value
         self._output_cookie[param]["expires"] = expires
@@ -103,15 +82,6 @@ class Request(object):
 
     def delete_cookie(self, param):
         self.add_cookie(param, "deleted", 0)
-
-    def send_headers(self, headers=[], code=200, status_text=None):
-        if self._output_cookie:
-            headers = headers + [("Set-Cookie", c.OutputString()) for c in self._output_cookie.values()]
-
-        for name, value in headers:
-            self.write("%s: %s\r\n" % (name, value))
-
-        self.write("\r\n")
 
     def send_stream(self, data, event=None, evid=None, retry=None, sync=False):
         if self._buffer is None:
@@ -122,7 +92,7 @@ class Request(object):
             self.send_headers([("Content-Type", "text/event-stream")])
 
             if retry:
-                 self._buffer.write("retry: %d\n" % retry)
+                self._buffer.write("retry: %d\n" % retry)
 
         # Join is used in place of concatenation / formatting, because we
         # prefer performance over readability in this place
@@ -149,9 +119,13 @@ class Request(object):
         else:
             response.write(self)
 
+    @abc.abstractmethod
+    def send_headers(self, headers=[], code=200, status_text=None):
+        pass
 
+    @abc.abstractmethod
     def get_baseurl(self):
-        return env.config.general.reverse_path + "/"
+        pass
 
     @abc.abstractmethod
     def get_raw_uri(self, include_qs=False):

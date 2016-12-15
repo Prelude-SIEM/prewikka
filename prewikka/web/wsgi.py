@@ -24,10 +24,10 @@ import urllib
 import wsgiref.headers
 import wsgiref.util
 
-from prewikka import main, utils
+from prewikka import main
 from prewikka.web import request
 
-if sys.version_info >= (3,0):
+if sys.version_info >= (3, 0):
     Py3 = True
     import urllib.parse
 else:
@@ -36,35 +36,46 @@ else:
 
 
 defined_status = {
-        200: 'OK',
-        400: 'BAD REQUEST',
-        401: 'UNAUTHORIZED',
-        403: 'FORBIDDEN',
-        404: 'NOT FOUND',
-        405: 'METHOD NOT ALLOWED',
-        500: 'INTERNAL SERVER ERROR',
+    200: 'OK',
+    400: 'BAD REQUEST',
+    401: 'UNAUTHORIZED',
+    403: 'FORBIDDEN',
+    404: 'NOT FOUND',
+    405: 'METHOD NOT ALLOWED',
+    500: 'INTERNAL SERVER ERROR',
 }
 
 
-
 class WSGIRequest(request.Request):
-    def __init__(self, core, environ, start_response):
-        request.Request.__init__(self)
-        self._headers = None
 
+    def _wsgi_get_bytes(self, key, default=None):
+        value = self._environ.get(key, default)
+
+        # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
+        # decoded with ISO-8859-1. This is wrong for Prewikka where UTF-8 is the
+        # default. Re-encode to recover the original bytestring.
+        return value.encode("ISO-8859-1") if Py3 else value
+
+    def _wsgi_get_unicode(self, key, default=None):
+        return self._wsgi_get_bytes(key, default).decode("utf8")
+
+    def _wsgi_get_str(self, key, default=None):
+        value = self._wsgi_get_bytes(key, default)
+        return value.decode("utf8") if Py3 else value
+
+    def __init__(self, environ, start_response):
         self._environ = environ
+        self._headers = None
         self._start_response = start_response
         self.method = environ['REQUEST_METHOD']
 
-        self.path = environ["PATH_INFO"]
-        request.Request.init(self, core)
+        request.Request.__init__(self, self._wsgi_get_unicode("PATH_INFO"))
 
         if self.method != 'POST':
-            qs = self._environ.get('QUERY_STRING')
+            qs = self._wsgi_get_str("QUERY_STRING")
         else:
-            qs = self.body = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
-            if Py3:
-                qs = self.body = qs.decode()
+            qs = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
+            qs = self.body = qs.decode("utf8") if Py3 else qs
 
         if Py3:
             self.arguments = urllib.parse.parse_qs(qs)
@@ -101,19 +112,19 @@ class WSGIRequest(request.Request):
         self._write = self._start_response("%d %s" % (code, status_text or ""), headers)
 
     def get_cookie(self):
-        return self._environ.get('HTTP_COOKIE', '')
+        return self._wsgi_get_str('HTTP_COOKIE', '')
 
     def get_remote_addr(self):
-        return self._environ.get('REMOTE_ADDR')
+        return self._wsgi_get_unicode('REMOTE_ADDR')
 
     def get_remote_port(self):
         return int(self._environ.get('REMOTE_PORT', 0))
 
     def get_query_string(self):
-        return self._environ.get('QUERY_STRING')
+        return self._wsgi_get_unicode('QUERY_STRING')
 
     def get_baseurl(self):
-        return (env.config.general.reverse_path or self._environ["SCRIPT_NAME"]) + "/"
+        return (env.config.general.reverse_path or self._wsgi_get_unicode("SCRIPT_NAME")) + "/"
 
     def get_raw_uri(self, include_qs=False):
         return wsgiref.util.request_uri(self._environ, include_query=include_qs)
@@ -136,9 +147,9 @@ class WSGIRequest(request.Request):
 def application(environ, start_response):
         # Check whether the URL got a trailing "/", if not perform a redirect
         if not environ["PATH_INFO"]:
-            start_response('301 Redirect', [('Location', environ['SCRIPT_NAME'] + "/"),])
+            start_response('301 Redirect', [('Location', environ['SCRIPT_NAME'] + "/"), ])
 
         core = main.get_core_from_config(environ.get("PREWIKKA_CONFIG", None))
 
-        core.process(WSGIRequest(core, environ, start_response))
+        core.process(WSGIRequest(environ, start_response))
         return []
