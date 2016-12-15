@@ -623,15 +623,16 @@ class Database(preludedb.SQL):
             if not merge:
                 continue
 
-            tmpl = []
+            tmpl1 = []
+            tmpl2 = []
             for field, value in zip(fields, row):
                 if field in merged:
-                    tmpl.append("%s = %s" % (field, self.escape(self._get_merge_value(merged, field, idx))))
+                    tmpl1.append("%s = %s" % (field, self.escape(self._get_merge_value(merged, field, idx))))
 
                 elif field in pkey:
-                    tmpl.append("%s = %s" % (field, self.escape(value)))
+                    tmpl2.append("%s = %s" % (field, self.escape(value)))
 
-            delq.append("NOT(" + " AND ".join(tmpl) + ")")
+            delq.append(" AND ".join([" AND ".join(tmpl1), "NOT(" + " AND ".join(tmpl2) + ")"]))
 
         return ", ".join(fields), ", ".join(vl), ", ".join(up), ", ".join(returning), " AND ".join(delq)
 
