@@ -77,7 +77,7 @@ $(document).ready(function() {
                 return false;
         });
 
-        $(document).on("submit", "#main form", function() {
+        $(document).on("submit", "body form", function() {
                 $(this).find("input[name=_download]").remove();
 
                 var data = $(this).serialize();
