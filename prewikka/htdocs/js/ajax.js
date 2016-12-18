@@ -212,6 +212,12 @@ function prewikka_widget(settings)
         return $.ajax(settings).done(function(data) {
                 var content = $(data.content);
 
+                if ( $(content).closest(".widget").length > 0 )
+                    return prewikka_json_dialog(data);
+
+                /*
+                 * FIXME: the following code is deprecated, and should be removed.
+                 */
                 if ( ! conf["buttons"] ) {
                         var btbl = Array();
 

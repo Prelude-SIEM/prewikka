@@ -263,6 +263,16 @@ function prewikka_notification(data)
 }
 
 
+function _dialog_common(dialog)
+{
+    $(dialog).modal();
+    setup_position(dialog);
+
+    if ( $(dialog).attr("data-draggable") )
+        $(dialog).draggable();
+}
+
+
 function prewikka_json_dialog(data)
 {
     var dialog;
@@ -270,10 +280,8 @@ function prewikka_json_dialog(data)
     $("#prewikka-dialog-container").append(data.content);
     dialog = $("#prewikka-dialog-container > :last-child");
 
-    setup_position(dialog);
-
-    $(dialog).addClass("ajax-modal modal fade");
-    $(dialog).modal();
+    $(dialog).addClass("modal ajax-modal fade");
+    _dialog_common(dialog);
 }
 
 
@@ -285,14 +293,12 @@ function prewikka_dialog(data)
     var dialog = $("#prewikka-dialog-" + data.type);
     var header = $(dialog).find(".modal-header");
 
-    setup_position(dialog);
-
     $(header).removeClass().addClass("modal-header");
     if ( data.classname )
             $(header).addClass("alert-" + data.classname);
 
     $(dialog).find(".content").text(data.message);
-    dialog.modal();
+    _dialog_common(dialog);
 }
 
 

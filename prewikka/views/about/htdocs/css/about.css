@@ -1,4 +1,4 @@
-#about {
+.about {
     display: table;
     height: 100%;
     min-height: 100%;
@@ -7,12 +7,7 @@
     padding: 1em;
 }
 
-#about_intro {
-    color: grey;
-    font-style: italic;
-}
-
-#about_contact {
+.about .about_contact {
     margin: 1em;
     margin-top: 50px;
     vertical-align: bottom;
@@ -23,13 +18,13 @@
     padding: 1em;
 }
 
-#about_contact div {
+.about .about_contact div {
     display: inline-block;
     margin: 0 25px 0 25px;
     vertical-align: top;
 }
 
-#copyright {
+.about .copyright {
     color: grey;
     font-size: 8pt;
     font-weight: normal;

@@ -95,6 +95,11 @@ $(document).ready(function() {
                         return true;
                 }
 
+                /*
+                 * Close any opened modal.
+                 */
+                $(this).closest(".modal").modal('hide');
+
                 prewikka_loadTab({
                         url: $(this).attr("action"),
                         type: $(this).attr("method"),

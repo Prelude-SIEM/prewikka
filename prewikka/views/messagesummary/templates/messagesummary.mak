@@ -80,6 +80,16 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
     % endfor
 </%def>
 
-<div id="fieldset_page">
- ${ display_node(sections) }
+<div class="widget" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="false" data-keyboard="true" data-draggable="true" tabindex="-1">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h4 class="modal-title">${ _("Summary") }</h4>
+      </div>
+
+    <div class="modal-body">
+      ${ display_node(sections) }
+    </div>
+  </div>
 </div>
