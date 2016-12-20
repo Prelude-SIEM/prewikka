@@ -68,7 +68,7 @@ class RendererItem(object):
 
 
 class RendererUtils(object):
-    _nexist_color = (_("N/a"), GRAY_STD)
+    _nexist_color = (_("n/a"), GRAY_STD)
 
     def __init__(self, options):
         self._color_map_idx = 0

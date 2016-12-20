@@ -72,7 +72,7 @@ class _IDMEFPlugin(DataProviderBackend):
 class IDMEFAlertPlugin(_IDMEFPlugin):
     type = "alert"
     plugin_name = "IDMEF Alert Plugin"
-    plugin_description = N_("Plugin for fetching IDMEF messages from the Prelude database")
+    plugin_description = N_("Plugin for fetching IDMEF alerts from the Prelude database")
 
     @property
     def _get_object(self):
@@ -86,7 +86,7 @@ class IDMEFAlertPlugin(_IDMEFPlugin):
 class IDMEFHeartbeatPlugin(_IDMEFPlugin):
     type = "heartbeat"
     plugin_name = "IDMEF Heartbeat Plugin"
-    plugin_description = N_("Plugin for fetching IDMEF heartbeat from the Prelude database")
+    plugin_description = N_("Plugin for fetching IDMEF heartbeats from the Prelude database")
 
     @property
     def _get_object(self):
