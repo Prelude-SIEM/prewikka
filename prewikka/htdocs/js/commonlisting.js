@@ -1,6 +1,6 @@
 function CommonListing(elem, text, options) {
 
-    $(elem).addClass("commonlisting table");
+    $(elem).addClass("commonlisting table table-striped");
 
     if ( ! options['colModel'][0].formatter ) {
         options['colModel'][0].formatter = function(cellValue, opts, rowObj) {
