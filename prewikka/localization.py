@@ -245,7 +245,7 @@ def get_calendar_format():
     return calendar_format.replace("yy", "y").replace("MM", "mm")
 
 def get_timezones():
-    return sorted(babel.core.get_global('zone_territories'))
+    return sorted(zone for zone in list(babel.core.get_global('zone_territories').keys()) + ["UTC"] if not zone.startswith('Etc/'))
 
 def get_system_timezone():
     try:
