@@ -195,7 +195,9 @@ class Parameters(dict):
             else:
                 save_view = view
 
-            if not do_save:
+            if do_save:
+                user.del_property(name, view=save_view)
+            else:
                 if not name in user.configuration.get(save_view, {}):
                     continue
 
