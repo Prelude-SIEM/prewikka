@@ -163,6 +163,9 @@ $(document).ready(function(){
   $(document).on('click', '.popup_menu_dynamic', function() {
       $(this).removeClass("popup_menu_dynamic");
 
+      if ( ! $(this).data("popup-url") )
+          return;
+
       var popup_menu = $(this).next(".popup_menu");
       popup_menu.append($("<span>", {
         "class": "popup_menu_loading",

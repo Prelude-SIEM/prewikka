@@ -36,12 +36,12 @@ $(document).ready(function() {
         trigger: 'hover',
         delay: { "show": 200, "hide": 0 },
         title: function() {
-            var title = $(this).data("save-title");
-            if ( ! title && $(this).data("title") ) {
+            var title = $(this).data("title");
+            if ( ! title && $(this).data("title-url") ) {
                 $.ajax({
                     async: false,
                     type: "GET",
-                    url: $(this).data("title"),
+                    url: $(this).data("title-url"),
                     success: function(data) {
                         title = data.content;
                         if ( title instanceof Array ) {
@@ -49,10 +49,10 @@ $(document).ready(function() {
                                 return $("<div>").text(v).html();
                             }).join("<br>");
                         }
-
                     }
                 });
-                $(this).data("save-title", title);
+                $(this).data("title-url", null);
+                $(this).data("title", title);
             }
             return title;
         }

@@ -112,8 +112,8 @@ class ListedMessage(AttrDict):
         field["host_links"] = [ ]
         field["category"] = category
 
-        field["url_infos"] = url_for("HostInfoAjax", host=value) if "HOOK_HOST_TOOLTIP" in hookmanager.hookmgr else None
-        field["url_popup"] = url_for("AjaxHostURL", host=value)
+        field["url_infos"] = url_for("HostInfoAjax", host=value) if value and "HOOK_HOST_TOOLTIP" in hookmanager.hookmgr else None
+        field["url_popup"] = url_for("AjaxHostURL", host=value) if value else None
 
         if value and dns is True:
             field["hostname"] = resolve.AddressResolve(value)

@@ -454,7 +454,7 @@ ${ text }
 
       % for address in direction.addresses:
 
-       <a class="popup_menu_toggle ajax-tooltip popup_menu_dynamic" data-title="${ address.url_infos }" data-popup-url="${ address.url_popup }">${ address.hostname }</a><span class="popup_menu">
+       <a class="popup_menu_toggle ajax-tooltip popup_menu_dynamic" data-title-url="${ address.url_infos }" data-popup-url="${ address.url_popup }">${ address.hostname }</a><span class="popup_menu">
          ${ writeInlineFilter(address, _("Filter on this %s") % (name)) }
 
        % if address.value and (not address.category or address.category in ("ipv4-addr", "ipv4-net", "ipv6-addr", "ipv6-net")):
