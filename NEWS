@@ -1,3 +1,62 @@
+* 2016-12-23, prewikka-4.0.0beta1:
+
+Author: Yoann Vandoorselaere
+
+- Core evolutions
+
+    - Implementation of @view.route()
+    - Move dataset, menu and parameters to env.request
+    - Python3 compatibility
+    - Mako templating engine, drop Cheetah
+    - Implement Criterion(), and generalize dataprovider usage
+    - Implement our own JSON layer
+    - Implement generic upsert framework
+    - Unify error handling
+    - Implement generic cache system
+    - Use full module name, plugin loader rework
+
+- Bugfixes
+
+    - Fix WSGI redirect
+    - Do not pass the request to Prewikka core on invalid static files
+    - Do not silently fail when a backend does not support a given operation
+    - Prevent query burst upon start
+    - Handle index create/drop for PostgreSQL/SQLite
+    - use_flock() database loading regression
+
+Author: Thomas Andrejak
+
+- Enable translation for label in URL links
+- Fix prewikka-httpd get_raw_uri and querystring
+- Fix WSGI self.body not filled
+- Fix alertlisting classification alert.type filter
+
+Author: Antoine Luong
+
+- Bugfixes
+
+    - Auth and user fixes
+    - Allow hook registration of an empty object
+    - Fix recursion problem when printing errors
+
+- New prewikka_autocomplete function
+- Add a method for checking user permissions
+- Set the process name to 'prewikka' in logs
+- CommonListing API tweaks
+- Support additional operations in dataproviders
+- Drop IE9 support
+
+Author: Camille Gardet
+
+- Log more actions
+
+Author: Sélim Menouar
+
+- Add HOOK_LINK for messageid and ident in messagelisting
+- Automatically escape different types in SQL query
+
+
+
 * 2016-09-14, prewikka-3.1.0:
 
 Author: Antoine Luong
