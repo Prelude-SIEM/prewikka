@@ -720,7 +720,7 @@ class Database(preludedb.SQL):
             for row in values_rows:
                 ret = self._pgsql_upsert_emulate_single(table, pkey, fields, row, fieldfmt, retfmt)
                 if ret and retfmt:
-                    returning.append(ret)
+                    returning.append(ret[0])
 
             if delfmt:
                 self.query("DELETE FROM %s WHERE %s" % (table, delfmt))
