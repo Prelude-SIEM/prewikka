@@ -199,10 +199,13 @@ class DataProviderNormalizer(object):
 
     @staticmethod
     def _value_escape(value):
+        if isinstance(value, (int, long)):
+            return value
+
         if not isinstance(value, compat.STRING_TYPES):
             value = text_type(value)
 
-        return value.replace("\\", "\\\\").replace("'", "\\'")
+        return "'%s'" % value.replace("\\", "\\\\").replace("'", "\\'")
 
     def parse_paths(self, paths, type):
         """
@@ -238,7 +241,7 @@ class DataProviderNormalizer(object):
         if operator in ("!=", None) and value is None:
             return path
 
-        return "%s %s '%s'" % (path, operator, self._value_escape(value))
+        return "%s %s %s" % (path, operator, self._value_escape(value))
 
 
 
