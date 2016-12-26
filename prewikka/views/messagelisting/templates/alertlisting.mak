@@ -249,7 +249,7 @@ $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
         <td>&nbsp;</td>
         % for name, path in ((N_("Alert"), "alert.create_time"), (N_("CorrelationAlert"), "alert.correlation_alert.name"), (N_("OverflowAlert"), "alert.overflow_alert.program"), (N_("ToolAlert"), "alert.tool_alert.name")):
         <td>
-          <input id="checkbox-type-${ name }" class="checkbox-label" type="checkbox" name="alert.type" value="${ path }" ${ disabled(correlation_alert_view) } ${ checked(path in alert_type) } />
+          <input id="checkbox-type-${ name }" class="checkbox-label" type="checkbox" name="alert.type" value="${ path }" ${ disabled(correlation_alert_view) }  />
           <label for="checkbox-type-${ name }" class="btn btn-default btn-xs label-checkbox">${ _(name) }<span class="badge"></span></label>
         </td>
         % endfor

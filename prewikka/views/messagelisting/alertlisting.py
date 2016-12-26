@@ -751,7 +751,7 @@ class AlertListing(MessageListing):
                 if not param in env.request.parameters["alert.type"]:
                     new &= Criterion(param, "=", None)
 
-        env.request.dataset["alert_type"] = env.request.parameters["alert.type"]
+        env.request.dataset["alert.type"] = env.request.parameters["alert.type"]
         criteria += new
 
     def _applyClassificationFilters(self, criteria):
