@@ -66,6 +66,7 @@ class _IDMEFPlugin(DataProviderBackend):
     @usergroup.permissions_required(["IDMEF_ALTER"])
     def delete(self, criteria, paths):
         env.idmef_db.remove(criteria)
+        env.log.info("Deleted alerts with criteria \"{0}\"".format(criteria))
 
 
 class IDMEFAlertPlugin(_IDMEFPlugin):
