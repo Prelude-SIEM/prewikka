@@ -584,7 +584,14 @@ class ViewManager(object):
         if endpoint[0] != "." and endpoint.find(".") == -1:
             endpoint += ".render"
 
-        return env.request.url_adapter.build(endpoint, values=kwargs)
+        try:
+            return env.request.url_adapter.build(endpoint, values=kwargs)
+        except Exception as e:
+            ret = next(iter(filter(None, hookmanager.trigger("HOOK_URL_FOR", endpoint, kwargs))), None)
+            if not ret:
+                raise e
+
+            return ret
 
     def __contains__(self, view_id):
         return view_id in self._views
