@@ -696,13 +696,11 @@ class ListedAggregatedAlert(ListedAlert):
 
 
 class AlertListing(MessageListing):
-    view_name = N_("Alerts")
+    view_menu = (N_("Alerts"), N_("Alerts"))
     view_parameters = AlertListingParameters
     view_permissions = [ N_("IDMEF_VIEW") ]
     view_template = template.PrewikkaTemplate(__name__, "templates/alertlisting.mak")
     view_extensions = (("menu", mainmenu.MainMenuAlert),)
-    view_section = N_("Alerts")
-    view_order = 0
 
     root = "alert"
     listed_alert = ListedAlert
@@ -1205,7 +1203,6 @@ class AlertListing(MessageListing):
 
 
 class CorrelationAlertListing(AlertListing, view.View):
-    view_name = N_("Threats")
+    view_menu = (N_("Alerts"), N_("Threats"))
     view_parameters = CorrelationAlertListingParameters
     alert_type_default = [ "alert.correlation_alert.name" ]
-    view_order = 1

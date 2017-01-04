@@ -9,8 +9,6 @@ from prewikka import error, hookmanager, localization, log, template, theme, use
 
 class UserSettings(view.View):
     view_menu = (N_("Settings"), N_("My account"))
-    view_order = 0
-
     plugin_htdocs = (("usermanagement", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     @view.route("/settings/my_account")

@@ -231,7 +231,7 @@ setup(name="prewikka",
       },
 
       scripts=[ "scripts/prewikka-httpd" ],
-      conf_files=[ "conf/prewikka.conf" ],
+      conf_files=[ "conf/prewikka.conf", "conf/menu.yml" ],
       cmdclass={ 'build': build,
                  'build_custom': build_custom,
                  'install': my_install },

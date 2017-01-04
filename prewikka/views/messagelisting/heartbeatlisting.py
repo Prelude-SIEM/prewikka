@@ -58,13 +58,11 @@ class ListedHeartbeat(ListedMessage):
 
 
 class HeartbeatListing(MessageListing):
-    view_name = N_("Heartbeats")
+    view_menu = (N_("Agents"), N_("Heartbeats"))
     view_parameters = HeartbeatListingParameters
     view_permissions = [ N_("IDMEF_VIEW") ]
     view_template = template.PrewikkaTemplate(__name__, "templates/heartbeatlisting.mak")
     view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
-    view_section = N_("Agents")
-    view_order = 1
 
     root = "heartbeat"
     filters = { }

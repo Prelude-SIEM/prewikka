@@ -26,6 +26,7 @@ Run requires:
 - python-babel
 - python-mako >= 0.8.1
 - python-werkzeug
+- python-yaml / PyYAML
 - libprelude with python bindings
 - libpreludedb with python bindings
 

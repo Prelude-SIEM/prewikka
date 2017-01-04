@@ -35,7 +35,6 @@ class AgentsParameters(view.Parameters):
 
 class Agents(view.View):
     view_parameters = AgentsParameters
-    view_order = 0
     view_menu = (N_("Agents"), N_("Agents"))
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 

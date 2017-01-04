@@ -36,7 +36,6 @@ class AboutPlugin(view.View):
     plugin_mandatory = True
 
     view_permissions = [ N_("USER_MANAGEMENT") ]
-    view_order = 6
 
     _all_plugins = ((_("Apps: View"), "prewikka.views"),
                     (_("Apps: API"), "prewikka.plugins"),

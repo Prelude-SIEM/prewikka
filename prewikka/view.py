@@ -349,7 +349,6 @@ class _ViewDescriptor(object):
     view_require_session = True
     view_extensions = []
     view_layout = "BaseView"
-    view_subsection = False
     view_endpoint = None
 
     def _setup_dataset_default(self):
@@ -401,7 +400,6 @@ class _View(_ViewDescriptor):
     view_id = None
     view_path = None
     view_menu = []
-    view_order = 10
     view_parent = None
 
     def render(self):
@@ -508,8 +506,6 @@ class ViewManager(object):
         v.view_endpoint = "%s.%s" % (baseview.view_id, function.__name__)
         v.render = function
 
-        v.view_subsection = baseview.view_subsection
-
         if v.view_menu:
             env.menumanager.add_section_info(v)
 
@@ -546,7 +542,7 @@ class ViewManager(object):
         from prewikka.baseview import BaseView
         self.addView(BaseView())
 
-        for view_class in sorted(pluginmanager.PluginManager("prewikka.views"), key=operator.attrgetter("view_order")):
+        for view_class in pluginmanager.PluginManager("prewikka.views"):
             try:
                 vi = view_class()
             except error.PrewikkaUserError as e:
