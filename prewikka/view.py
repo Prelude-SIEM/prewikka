@@ -392,9 +392,8 @@ class _ViewDescriptor(object):
         if not response:
             response = PrewikkaResponse(dataset.render() if dataset else None, code=code)
 
-        if dataset:
-            for name, clname in self.view_extensions:
-                response.ext_content[name] = getattr(env.request, name).dataset.render()
+        for name, clname in self.view_extensions:
+            response.ext_content[name] = getattr(env.request, name).dataset.render()
 
         return response
 
