@@ -634,6 +634,9 @@ class Database(preludedb.SQL):
 
             delq.append(" AND ".join([" AND ".join(tmpl1), "NOT(" + " AND ".join(tmpl2) + ")"]))
 
+        if not values_rows:
+            delq.append(" AND ".join("%s = %s" % (f, self.escape(v)) for f, v in merged.items()))
+
         return ", ".join(fields), ", ".join(vl), ", ".join(up), ", ".join(returning), " AND ".join(delq)
 
 
