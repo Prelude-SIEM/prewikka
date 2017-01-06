@@ -10,12 +10,15 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
 
     $('#timeline_end').datetimepicker("setDate", new Date(moment("${timeline.end}")));
     $('#timeline_start').datetimepicker("setDate", new Date(moment("${timeline.start}")));
+    update_date_input();
 
     % if timeline.quick_custom:
     trigger_custom_date(true);
     % else:
     trigger_custom_date(false);
     % endif
+
+    $('#main_menu_ng').trigger('mainmenu_ready');
 });
 </script>
 

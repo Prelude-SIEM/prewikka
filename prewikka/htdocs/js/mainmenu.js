@@ -22,12 +22,19 @@ function get_time(dt)
 }
 
 
-function update_date() {
+function update_date_input() {
     var start = $("#timeline_start").datetimepicker("getDate");
     $("#hidden_timeline_start").val(start ? get_time(start) : "");
 
     var end = $("#timeline_end").datetimepicker("getDate");
     $("#hidden_timeline_end").val(end ? get_time(end) : "");
+
+    return [start, end];
+}
+
+function update_date() {
+    var ret = update_date_input();
+    var start = ret[0], end = ret[1];
 
     if ( start > end ) {
         $(".input-timeline-datetime").closest(".form-group").addClass('has-error');
