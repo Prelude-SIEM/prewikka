@@ -25,7 +25,8 @@ import traceback
 
 import pkg_resources
 from prewikka import log, response, template
-from prewikka.utils import AttrObj, json
+from prewikka.localization import _DeferredGettext
+from prewikka.utils import AttrObj, json, soundex
 
 
 class PrewikkaException(Exception):
@@ -66,6 +67,7 @@ class PrewikkaError(PrewikkaException):
         if details is not None:
             self.details = details
 
+        self.errno = self._get_errno()
         self._untranslated_name = text_type(self.name)
         self._untranslated_message = text_type(self.message)
         self._untranslated_details = text_type(self.details)
@@ -94,7 +96,7 @@ class PrewikkaError(PrewikkaException):
     def _setup_template(self, template, ajax_error):
         dataset = template.dataset()
 
-        for i in ("name", "message", "details", "code", "traceback"):
+        for i in ("name", "message", "details", "code", "traceback", "errno"):
             dataset[i] = getattr(self, i)
 
         dataset["is_ajax_error"] = ajax_error
@@ -111,6 +113,17 @@ class PrewikkaError(PrewikkaException):
     def _get_traceback(self):
         if self.display_traceback and env.config.general.get("enable_error_traceback") not in ('no', 'false'):
             return sys.exc_info()
+
+    def _get_errno(self):
+        msg = []
+        for val in ('name', 'message'):
+            s = getattr(self, val)
+            if isinstance(s, _DeferredGettext):
+                s = s.origin
+
+            msg.extend(s.split(' '))
+
+        return hash("".join(soundex(x) for x in msg)) & 65535
 
     def respond(self):
         if self.message:

@@ -151,6 +151,30 @@ def split_unescaped_characters(value, characters):
 
     yield value[start:]
 
+# Based on Python recipes 52213
+def soundex(name):
+    """ soundex module conforming to Knuth's algorithm
+        implementation 2000-12-24 by Gregory Jorgensen
+        public domain
+    """
+
+    # digits holds the soundex values for the alphabet
+    digits = '01230120022455012623010202'
+    sndx = ''
+    fc = ''
+
+    # translate alpha chars in name to soundex digits
+    for i, c in enumerate(name):
+        if c.isalpha():
+            if not fc: fc = c   # remember first letter
+            d = digits[ord(c.upper())-ord('A')]
+            # duplicate consecutive soundex digits are skipped
+            if not sndx or (d != sndx[-1]) or (len(sndx) > 1 and d == sndx[-2] and n[i-1] not in ['W','H']):
+                sndx += d
+
+    # replace first digit with first alpha character
+    # remove all 0s from the soundex code
+    return (fc.upper() + sndx[1:]).replace('0','')
 
 def hexdump(content):
     decoded = struct.unpack(b"B" * len(content), content)

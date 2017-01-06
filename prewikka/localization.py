@@ -119,12 +119,12 @@ class _DeferredGettext(text_type):
     def __new__(cls, text, arguments=None):
         message = text % arguments if arguments else text
         o = text_type.__new__(cls, message)
-        o._text = text
+        o.origin = text
         o._arguments = arguments
         return o
 
     def translate(self):
-        s = translation.gettext(self._text)
+        s = translation.gettext(self.origin)
         return s % self._arguments if self._arguments else s
 
 
