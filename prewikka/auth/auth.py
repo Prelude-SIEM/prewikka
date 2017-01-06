@@ -42,7 +42,7 @@ class _AuthUser(object):
         return "setPassword" in self.__class__.__dict__
 
     def canManagePermissions(self):
-        return "setUserPermissions" in self.__class__.__dict__
+        return self.__class__.setUserPermissions != _AuthUser.setUserPermissions
 
     def createUser(self, user):
         list(hookmanager.trigger("HOOK_USER_CREATE", user))
@@ -84,10 +84,10 @@ class _AuthGroup(object):
         return "deleteGroup" in self.__class__.__dict__
 
     def canManageGroupMembers(self):
-        return "setGroupMembers" in self.__class__.__dict__
+        return self.__class__.setGroupMembers != _AuthGroup.setGroupMembers
 
     def canManageGroupPermissions(self):
-        return "setGroupPermissions" in self.__class__.__dict__
+        return self.__class__.setGroupPermissions != _AuthGroup.setGroupPermissions
 
     def getGroupList(self, search=None):
         return []
