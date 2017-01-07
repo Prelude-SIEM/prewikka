@@ -334,28 +334,17 @@ class Criterion(json.JSONObject):
 
 class DataProviderManager(pluginmanager.PluginManager):
     def __init__(self):
+        pluginmanager.PluginManager.__init__(self, "prewikka.dataprovider.type")
+
         self._type_handlers = {}
         self._backends = {}
 
-        pluginmanager.PluginManager.__init__(self, "prewikka.dataprovider.type")
-        for k in self.keys():
-            try:
-                p = self[k]()
-            except error.PrewikkaUserError as err:
-                env.log.warning("%s: plugin failed to load: %s" % (self[k].__name__, err))
-                continue
-
-            normalizer = getattr(p, "normalizer", None)
-            if not isinstance(normalizer, (type(None), DataProviderNormalizer)):
-                raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
-
-            self._type_handlers[k] = normalizer
-
+    def load(self):
         for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend"):
 
-            if plugin.type not in self._type_handlers:
+            if plugin.type not in self.keys():
                 env.log.warning("%s: plugin failed to load: %s" % (plugin.__name__,
-                    _("No handler configured for '%s' datatype" % plugin.type)))
+                                _("No handler configured for '%s' datatype" % plugin.type)))
                 continue
 
             try:
@@ -369,6 +358,21 @@ class DataProviderManager(pluginmanager.PluginManager):
                                               N_("Only one manager should be configured for '%s' backend", p.type))
 
             self._backends[p.type] = p
+
+        for k in self.keys():
+            try:
+                p = self[k]()
+            except error.PrewikkaUserError as err:
+                env.log.warning("%s: plugin failed to load: %s" % (self[k].__name__, err))
+                continue
+
+            normalizer = getattr(p, "normalizer", None)
+            if not isinstance(normalizer, (type(None), DataProviderNormalizer)):
+                raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
+
+            self._type_handlers[k] = normalizer
+
+        return self
 
     @staticmethod
     def _parse_path(path):
