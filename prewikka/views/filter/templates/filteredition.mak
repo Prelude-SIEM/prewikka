@@ -1,213 +1,102 @@
-<script type="text/javascript">
-<%!
-from prewikka.utils import json
+<%! from prewikka.utils import OrderedDict %>
+
+<%namespace file="/prewikka/views/filter/templates/widget.mak" import="init, condition, group"/>
+
+<%
+    default_paths = {}
+    all_paths = {}
+    operators = {}
+    enums = {}
+
+    for typ, label in types:
+        default_paths[typ] = OrderedDict((_(label), path) for label, path in env.dataprovider.get_common_paths(typ))
+        all_paths[typ] = []
+        operators[typ] = {}
+        enums[typ] = {}
+        for path in env.dataprovider.get_paths(typ):
+            path_info = env.dataprovider.get_path_info(path)
+            operators[typ][path] = path_info.operators
+            enums[typ][path] = path_info.value_accept
+
+            if path not in default_paths[typ].values():
+                all_paths[typ].append(path)
 %>
 
-var current_type = '${fltr.type or "alert"}';
 
-var _FILTER_HTML = <%block filter="json.dumps">
-<div class="form-horizontal form-filter" id="form_filter_example" data-value="example">
-  <div class="form-group">
-    <label class="col-sm-2 control-label" id="label_example"></label>
-    <div class="col-sm-10">
-      <div class="col-sm-4">
-        <select class="form-control" id="object_example" name="object_example">
-          <option value="" disabled selected>${ _("Select an IDMEF path") }</option>
-        </select>
-      </div>
+<link rel="stylesheet" type="text/css" href="prewikka/css/chosen.min.css">
+<link rel="stylesheet" type="text/css" href="filter/css/filter.css">
 
-      <div class="col-sm-8">
-        <div class="col-xs-3">
-          <select class="form-control" id="operator_example" name="operator_example">
-            <option value="" disabled selected>${ _("Operator") }</option>
-          % for operator, description in operators:
-            <option value="${operator}" title="${description}">${operator}</option>
-          % endfor
-          </select>
-        </div>
-
-        <div class="col-xs-9">
-          <div class="input-group">
-            <input type="text" class="form-control" id="value_example" name="value_example" placeholder="${ _("value") }">
-            <span class="input-group-btn">
-              <div class="btn btn-default add_entry"><i class="fa fa-plus"></i></div>
-              <div class="btn btn-default del_entry" id="button_example"><i class="fa fa-minus"></i></div>
-            </span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-</%block>
-
-
-function resetFilterType(type)
-{
-    current_type = type
-    $("#form_filter_objects").html("");
-    newFilterElement('A', '', '', '');
-}
-
-function newFilterElement(name, idmef_object, idmef_operator, object_value) {
-    var last_name = $(".form-filter").last().data("value");
-    if ( ! name ) {
-        if ( last_name !== undefined ) {
-            name = last_name;
-            if ( name.charAt(name.length - 1) == "Z" ) {
-                name = name.concat("A");
-            } else {
-                name = name.substr(0, name.length - 1) +
-                             String.fromCharCode(name.charCodeAt(name.length - 1) + 1);
-            }
-        } else {
-            name = "A";
-        }
-    }
-
-    if ( current_type === 'alert' ) {
-        var options = ${alert_objects | n,json.dumps};
-    } else {
-        var options = ${generic_objects | n,json.dumps};
-    }
-
-    $("#form_filter_objects").append(_FILTER_HTML);
-
-    $.each(options, function(index, option) {
-        $('#object_example').append($("<option></option>").attr("value", option).text(option));
+<script type="text/javascript">
+$LAB.script("filter/js/filter.js").script("prewikka/js/chosen.jquery.min.js").wait(function() {
+    $(".type-checkbox").on("change", function() {
+        $(this).closest(".panel-heading").siblings(".panel-body").slideToggle();
     });
 
-    $("#form_filter_example").data("value", name).attr("id", "form_filter_" + name);
-    $("#label_example").html(name).attr("id", "label_" + name);
-    $("#object_example").attr("name", "object_" + name).val(idmef_object).attr("id", "object_" + name);
-    $("#operator_example").attr("name", "operator_" + name).val(idmef_operator).attr("id", "operator_" + name);
-    $("#value_example").attr("name", "value_" + name).val(object_value).attr("id", "value_" + name);
-    $("#button_example").attr("id", "button_" + name);
-
-}
-
-$(document).ready(function() {
-
-    $("input[value=filter]").click(function() {
-        $(".fieldset_heading legend").text("${ _("Available filters") }");
-        $("#curtype").prop("value", "filter");
-        $(".filter_only").show();
-    });
-    $("input[value=filter]").trigger("click");
-
-
-    $("#form_filter_objects").on("click", ".add_entry", function() {
-        newFilterElement('', '', '', '');
+    $("a.type-toggle").on("click", function() {
+        $(this).siblings(".type-checkbox").click();
     });
 
-    $("#form_filter_objects").on("click", ".del_entry", function() {
-        var entry = $(this).parents('.form-filter');
-        if ( entry.data("value") != "A" ) {
-            entry.remove();
-        }
-    });
+    new FilterEdition("div.container",
+                      ${default_paths | n,json.dumps},
+                      ${all_paths | n,json.dumps},
+                      ${operators | n,json.dumps},
+                      ${enums | n,json.dumps}).init();
 
-    $("#filter_type").change(function() {
-        resetFilterType($(this).val());
-    });
 });
-
 </script>
 
 <div class="container">
 
-<form action="${document.href}" method="post">
+<form class="filter-form" action="${url_for('FilterView.save')}" method="post">
 
-<fieldset class="fieldset_heading">
-<legend>${ _("Available filters") }</legend>
+    <div class="form-horizontal">
+      <div class="form-group">
+        <label for="filter_name" class="col-sm-2 control-label required">${ _("Name:") }</label>
+        <div class="col-sm-10">
+          <input class="form-control" type="text" id="filter_name" name="filter_name" value="${fltr.name}" placeholder="${ _("Filter name") }" required/>
+        </div>
+      </div>
 
-  <div class="input-group">
-    <select class="filter_only form-control" name="filter_name">
-      <option value="">${ _("Select a filter") }</option>
-    % for f in filter_list:
-      <option value="${f}" ${'class="selected"' if f == fltr.name else '' | n }>${f}</option>
+      <div class="form-group">
+        <label for="filter_description" class="col-sm-2 control-label">${ _("Description:") }</label>
+        <div class="col-sm-10">
+          <textarea class="form-control" id="filter_description" name="filter_description" rows="4">${fltr.description}</textarea>
+        </div>
+      </div>
+    </div>
+
+    %for typ, label in types:
+    <div class="panel panel-theme">
+        <% enabled = typ in fltr.criteria %>
+        <div class="panel-heading">
+            <h3 class="panel-title">
+                <input type="checkbox" class="type-checkbox" id="type-checkbox-${typ}" ${checked(enabled)}/>
+                <label for="type-checkbox-${typ}"><span class="badge"><a></a></span></label>
+                <a class="type-toggle" style="color: inherit">${label}</a>
+            </h3>
+        </div>
+        <div class="panel-body ${'panel-disabled' if not enabled else ''}">
+            <div class="filter-edition form-inline" data-type="${typ}">
+                <input type="hidden" name="filter_types" value="${typ}"/>
+                <input type="hidden" name="filter_criteria"/>
+                ${init(fltr.criteria.get(typ), root=True, default_paths=default_paths[typ], all_paths=all_paths[typ], operators=operators[typ], enums=enums[typ])}
+            </div>
+        </div>
+    </div>
     % endfor
-    </select>
-    <span class="input-group-btn">
-      <button class="btn btn-default" type="submit" name="mode" value="${ _("Load") }"><i class="fa fa-cloud-download"></i> ${ _("Load") }</button>
-      <button class="btn btn-danger" type="submit" name="mode" value="${ _("Delete") }" data-confirm="${ _("Delete this filter?") }"><i class="fa fa-trash"></i> ${ _("Delete") }</button>
-    </span>
-  </div>
-</fieldset>
 
+    <button class="btn btn-primary widget-control" type="submit"><i class="fa fa-save"></i> ${ _("Save") }</button>
+
+    <input type="hidden" name="filter_id" value="${fltr.name}">
 </form>
 
-<form action="${document.href}" method="post">
-
-<fieldset class="fieldset_heading">
-<legend>${ _("Add / Modify") }</legend>
-
-<div class="filter_only">
-<p>
- <i>${ _("You are in the process of creating a new Prelude filter.") }</i>
-</p>
-<p>
- <i>${ _("Filters can be selected while on the alerts view, using the control menu in the top right corner.") }</i>
-</p>
 </div>
 
-<br />
 
-<div class="form-horizontal">
-  <div class="form-group">
-    <label for="filter_type" class="col-sm-2 control-label">${ _("Filter Type:") }</label>
-
-    <div class="col-sm-10">
-      <select id="filter_type" class="form-control" name="filter_type">
-        %for type, name in (("alert", _("Alert")), ("heartbeat", _("Heartbeat")), ("generic", _("Generic (Alert and Heartbeat)"))):
-          <option ${ selected(type == fltr.type) } value="${type}">${name}</option>
-        %endfor
-      </select>
-    </div>
-  </div>
-</div>
-<hr/>
-
-<div id="form_filter_objects">
+<div id="example-condition" style="display:none">
+    ${condition()}
 </div>
 
-<script type="text/javascript"><!--
-$.each(${elements | n,json.dumps}, function(i, element) {
-    newFilterElement(element.name, element.object, element.operator, element.value);
-});
-//--></script>
-
-<br />
-
-<div class="form-horizontal">
-  <div class="form-group">
-    <label for="filter_formula" class="col-sm-2 control-label">${ _("Formula:") }</label>
-    <div class="col-sm-10">
-      <input class="form-control" type="text" id="filter_formula" name="filter_formula" value="${fltr.formula}" placeholder="${ _("Eg. (A AND B) OR (C AND D)") }"/>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="filter_name" class="col-sm-2 control-label">${ _("Name:") }</label>
-    <div class="col-sm-10">
-      <input class="form-control" type="text" id="filter_name" name="filter_name" value="${fltr.name}" placeholder="${ _("Filter name") }"/>
-    </div>
-  </div>
-
-  <div class="form-group">
-    <label for="filter_comment" class="col-sm-2 control-label">${ _("Comment:") }</label>
-    <div class="col-sm-10">
-      <textarea class="form-control" id="filter_comment" name="filter_comment" rows="4" cols="55">${fltr.comment}</textarea>
-    </div>
-  </div>
-</div>
-
-<button class="pull-right btn btn-primary" type="submit" name="mode" value="${ _("Save") }"><i class="fa fa-save"></i> ${ _("Save") }</button>
-</fieldset>
-
-% if fltr.name:
-  <input type="hidden" name="load" value="${fltr.name}">
-% endif
-</form>
-
+<div id="example-group" style="display:none">
+    ${group(operands=[])}
 </div>

@@ -16,23 +16,10 @@ DROP TABLE IF EXISTS Prewikka_Filter;
 CREATE TABLE Prewikka_Filter (
         id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
         userid VARCHAR(32) NOT NULL,
-        type ENUM("alert", "heartbeat", "generic") NULL,
         name VARCHAR(64) NOT NULL,
-        comment VARCHAR(255) NULL,
-        formula VARCHAR(255) NOT NULL
+        description TEXT NULL,
+        value TEXT NOT NULL
 ) ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX prewikka_filter_index_login_name ON Prewikka_Filter (userid, name);
-
-
-DROP TABLE IF EXISTS Prewikka_Filter_Criterion;
-
-CREATE TABLE Prewikka_Filter_Criterion (
-        id BIGINT UNSIGNED NOT NULL,
-        name VARCHAR(16) NOT NULL,
-        path VARCHAR(255) NOT NULL,
-        operator VARCHAR(8) NULL,
-        value VARCHAR(255) NULL,
-        PRIMARY KEY(id, name)
-) ENGINE=InnoDB;
 """)

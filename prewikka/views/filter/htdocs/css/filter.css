@@ -1,0 +1,104 @@
+div.panel-disabled {
+    display: none;
+}
+
+.type-checkbox {
+    display: none;
+}
+
+.section-checkbox:checked + label a:after {
+    content: "\2714";
+}
+
+.panel-theme .panel-heading .type-checkbox:checked + label > span {
+    background-color: #5CB85C;
+}
+
+.type-checkbox:checked + label a:after {
+    content: "\2714";
+}
+
+.panel-theme .panel-heading .type-checkbox + label > span {
+    background-color: #D9534F;
+}
+
+.type-checkbox + label a:after {
+    content: "\2717";
+}
+
+span.badge > a {
+    color: white;
+    text-decoration: none;
+}
+
+div.filter-edition {
+    background: rgba(250, 240, 210, 0.5);
+    border: 1px solid #dcc896;
+    border-radius: 5px;
+    padding: 5px;
+}
+
+ul.filter-list {
+    list-style: outside none none;
+}
+
+ul.filter-list > *::before {
+    border-width: 0 0 2px 0;
+    border-style: solid;
+    border-color: #ccc;
+    content: "";
+    position: absolute;
+    width: 10px;
+    left: -10px;
+    height: 1px !important;
+    top: 13px !important;
+}
+
+ul.filter-list li:first-child::before {
+    top: 0;
+    height: 50%;
+}
+
+ul.filter-list li {
+    position: relative;
+    margin-bottom: 2px;
+}
+
+ul.filter-list {
+    position: relative;
+}
+
+ul.filter-list::before {
+    border-width: 0 0 0 2px;
+    border-style: solid;
+    border-color: #ccc;
+    content: "";
+    position: absolute;
+    left: 30px;
+    height: calc(100% - 12px);
+    top: -3px;
+}
+
+div.filter-group > button {
+    margin-top: 3px;
+    margin-bottom: 3px;
+}
+
+div.filter-group > span:first-child {
+    margin-right: 50px;
+}
+
+div.operator {
+    padding: 0;
+    min-width: 30px;
+    cursor: pointer;
+}
+
+div.operator > div[data-toggle=dropdown] {
+    line-height: 28px;
+}
+
+.chosen-container-single a.chosen-single {
+    height: 30px; /* same as input-sm */
+    border-radius: 5px 0 0 5px;
+}
