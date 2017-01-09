@@ -498,14 +498,14 @@ class ViewManager(object):
         v.view_template = baseview.view_template
 
         v.view_permissions = list(set(route.permissions) | set(baseview.view_permissions))
-        v.view_id = v.view_path = route.path[1:]
+        v.view_id = baseview.view_id
+        v.view_path = route.path[1:]
         v.view_require_session = baseview.view_require_session
         v.view_layout = baseview.view_layout
         v.view_extensions = baseview.view_extensions
         v.view_parameters = baseview.view_parameters
         v.view_menu = route.menu or baseview.view_menu
-        v.view_basepoint = baseview.__class__.__name__
-        v.view_endpoint = "%s.%s" % (baseview.__class__.__name__, function.__name__)
+        v.view_endpoint = "%s.%s" % (baseview.view_id, function.__name__)
         v.render = function
 
         v.view_subsection = baseview.view_subsection
@@ -535,8 +535,7 @@ class ViewManager(object):
             if view.view_menu:
                 env.menumanager.add_section_info(view)
 
-            view.view_basepoint = view.__class__.__name__
-            view.view_endpoint = "%s.render" % (view.__class__.__name__)
+            view.view_endpoint = "%s.render" % (view.view_id)
 
             self._views_endpoint[view.view_endpoint] = view
             self._rule_map.add(Rule((view.view_path or "/" + view.view_id), endpoint=view.view_endpoint))
@@ -578,8 +577,10 @@ class ViewManager(object):
         builtins.url_for = self.url_for
 
     def url_for(self, endpoint, **kwargs):
+        endpoint = endpoint.lower()
+
         if endpoint[0] == "." and env.request.view:
-            endpoint = "%s%s" % (env.request.view.view_basepoint, endpoint if len(endpoint) > 1 else "")
+            endpoint = "%s%s" % (env.request.view.view_id, endpoint if len(endpoint) > 1 else "")
 
         if endpoint[0] != "." and endpoint.find(".") == -1:
             endpoint += ".render"
