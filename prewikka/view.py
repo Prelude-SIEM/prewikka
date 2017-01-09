@@ -444,7 +444,7 @@ class _Route(object):
         self.menu = menu
 
 
-def route(route, methods=["GET"], permissions=[], menu=None, template=None):
+def route(route, methods=["GET"], permissions=[], menu=None):
     usergroup.ALL_PERMISSIONS.declare(permissions)
 
     def decorator(func):
