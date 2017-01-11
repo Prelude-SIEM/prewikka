@@ -56,6 +56,7 @@ class PrewikkaError(PrewikkaException):
     code = 500
     log_priority = log.ERROR
     display_traceback = True
+    errno = None
 
     def __init__(self, message, name=None, details=None, log_priority=None, log_user=None, template=None, code=None):
         if name is not None:
@@ -67,7 +68,6 @@ class PrewikkaError(PrewikkaException):
         if details is not None:
             self.details = details
 
-        self.errno = self._get_errno()
         self._untranslated_name = text_type(self.name)
         self._untranslated_message = text_type(self.message)
         self._untranslated_details = text_type(self.details)
@@ -114,17 +114,6 @@ class PrewikkaError(PrewikkaException):
         if self.display_traceback and env.config.general.get("enable_error_traceback") not in ('no', 'false'):
             return sys.exc_info()
 
-    def _get_errno(self):
-        msg = []
-        for val in ('name', 'message'):
-            s = getattr(self, val)
-            if isinstance(s, _DeferredGettext):
-                s = s.origin
-
-            msg.extend(s.split(' '))
-
-        return hash("".join(soundex(x) for x in msg)) & 65535
-
     def respond(self):
         if self.message:
             env.log.log(self.log_priority, self)
@@ -159,6 +148,17 @@ class PrewikkaUserError(PrewikkaError):
 
     def __init__(self, name=None, message=None, **kwargs):
         PrewikkaError.__init__(self, message, name=name, **kwargs)
+        self.errno = self._get_errno(name, message)
+
+    def _get_errno(self, name, message):
+        msg = []
+        for s in (name, message):
+            if isinstance(s, _DeferredGettext):
+                s = s.origin
+
+            msg.extend(text_type(s).split())
+
+        return hash("".join(soundex(x) for x in msg)) & 65535
 
 
 class NotImplementedError(PrewikkaError):

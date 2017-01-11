@@ -169,7 +169,7 @@ def soundex(name):
             if not fc: fc = c   # remember first letter
             d = digits[ord(c.upper())-ord('A')]
             # duplicate consecutive soundex digits are skipped
-            if not sndx or (d != sndx[-1]) or (len(sndx) > 1 and d == sndx[-2] and n[i-1] not in ['W','H']):
+            if not sndx or (d != sndx[-1]) or (len(sndx) > 1 and d == sndx[-2] and name[i-1].upper() not in ['W','H']):
                 sndx += d
 
     # replace first digit with first alpha character

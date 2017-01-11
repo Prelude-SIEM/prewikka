@@ -118,7 +118,9 @@ def inherit(context):
       <div class="modal-content">
         <div class="modal-header ${ 'alert-warning' if code == 401 else 'alert-danger' }">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <span style="float:right" title="${ _('Error : {0}').format(errno) if errno else ''}"><i class="fa fa-question-circle"></i></span>
+          % if errno:
+          <span style="float:right; margin-right: 5px" title="${ _('Error: {0}').format(errno)}"><i class="fa fa-question-circle"></i></span>
+          % endif
           <h3 class="modal-title title" id="dialogLabel">${name or _('An unexpected condition happened') }</h3>
         </div>
 
