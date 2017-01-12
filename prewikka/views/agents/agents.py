@@ -90,8 +90,8 @@ class Agents(view.View):
                         "class": "widget-link", "title": _("Heartbeat analysis")},
                    ]}
 
-    @view.route("/agents/agents/<list:status>", permissions=["IDMEF_VIEW"])
-    @view.route("/agents/agents", permissions=["IDMEF_VIEW"])
+    @view.route("/agents/agents/<list:status>", permissions=[N_("IDMEF_VIEW")])
+    @view.route("/agents/agents", permissions=[N_("IDMEF_VIEW")])
     def agents(self, status=[]):
         analyzer_data = list(self._get_analyzers(status))
         list(hookmanager.trigger("HOOK_AGENTS_EXTRA_CONTENT", analyzer_data))
@@ -99,7 +99,7 @@ class Agents(view.View):
 
         return template.PrewikkaTemplate(__name__, "templates/agents.mak").render(data=analyzer_data, extra_columns=extra_columns)
 
-    @view.route("/agents/delete", methods=["POST"], permissions=["IDMEF_ALTER"])
+    @view.route("/agents/delete", methods=["POST"], permissions=[N_("IDMEF_ALTER")])
     def delete(self):
         c = Criterion()
 
@@ -111,7 +111,7 @@ class Agents(view.View):
         env.dataprovider.delete(c)
         return response.PrewikkaRedirectResponse(url_for(".agents"))
 
-    @view.route("/agents/analyze/<analyzerid>", permissions=["IDMEF_VIEW"])
+    @view.route("/agents/analyze/<analyzerid>", permissions=[N_("IDMEF_VIEW")])
     def analyze(self, analyzerid):
         analyzer, heartbeat = self._get_analyzer(analyzerid)
         delta = float(heartbeat["create_time"]) - time.time()
