@@ -1,3 +1,35 @@
+* 2017-01-12, prewikka-4.0.0beta2:
+
+Author: Antoine Luong
+
+- Filter view overhaul
+- Add path-related functions to the dataprovider API
+- Menu rework, use a YAML configuration file
+
+Author: Yoann Vandoorselaere
+
+- Route API fixes
+
+    - Use view_id as the view basepoint
+    - Implement HOOK_URL_FOR to workaround viewmanagement
+    - Fix view_extensions with new @route API
+    - Prevent invalid method error in case of authentication failure
+
+- Correctly check in auth whether the method is not the base implementation
+- Initialize dataprovider backend before type
+- Fix upsert with empty data
+
+Author: Thomas Andrejak
+
+- Add error code for user errors
+- Fix mainmenu initialization
+
+Author: Camille Gardet
+
+- Translate error name when it is needed
+
+
+
 * 2016-12-23, prewikka-4.0.0beta1:
 
 Author: Yoann Vandoorselaere
