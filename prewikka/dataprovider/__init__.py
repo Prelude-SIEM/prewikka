@@ -189,6 +189,19 @@ class DataProviderBackend(pluginmanager.PluginBase):
         """Update root objects matching the given criteria."""
         raise error.NotImplementedError
 
+    def get_path_info(self, path):
+        raise error.NotImplementedError
+
+
+class DataProviderBase(pluginmanager.PluginBase):
+    normalizer = None
+
+    def get_paths(self):
+        raise error.NotImplementedError
+
+    def get_common_paths(self, index=False):
+        return []
+
 
 class DataProviderNormalizer(object):
     def __init__(self, time_field=None):
@@ -269,7 +282,7 @@ class Criterion(json.JSONObject):
         if not type:
             return " ".join(text_type(i) for i in [self.left, self.operator, self.right])
 
-        return env.dataprovider._type_handlers[type].parse_criterion(self.left, self.operator, self.right, type)
+        return env.dataprovider._type_handlers[type].normalizer.parse_criterion(self.left, self.operator, self.right, type)
 
     def to_string(self, type=None):
         if not self.left:
@@ -369,11 +382,10 @@ class DataProviderManager(pluginmanager.PluginManager):
                 env.log.warning("%s: plugin failed to load: %s" % (self[k].__name__, err))
                 continue
 
-            normalizer = getattr(p, "normalizer", None)
-            if not isinstance(normalizer, (type(None), DataProviderNormalizer)):
+            if not isinstance(p.normalizer, (type(None), DataProviderNormalizer)):
                 raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
 
-            self._type_handlers[k] = normalizer
+            self._type_handlers[k] = p
 
     @staticmethod
     def _parse_path(path):
@@ -419,7 +431,7 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         compcrit = None
         paths_types = []
-        normalizer = self._type_handlers[type]
+        normalizer = self._type_handlers[type].normalizer
 
         list(hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", criteria, type))
 
@@ -468,3 +480,13 @@ class DataProviderManager(pluginmanager.PluginManager):
 
     def has_type(self, wanted_type):
         return wanted_type in self._backends
+
+    def get_paths(self, type):
+        return self._type_handlers[type].get_paths()
+
+    def get_common_paths(self, type, index=False):
+        return self._type_handlers[type].get_common_paths(index)
+
+    def get_path_info(self, path):
+        type = self._normalize(None, [path])[0]
+        return self._backends[type].get_path_info(path)

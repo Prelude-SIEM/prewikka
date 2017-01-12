@@ -43,6 +43,9 @@ class AttrObj(object):
         self._kwargs = kwargs
         self.__dict__.update(kwargs)
 
+    def __json__(self):
+        return self._kwargs
+
     def __repr__(self):
         return self._kwargs.__repr__()
 

@@ -22,11 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import prelude
 from prewikka import resource
 from prewikka.utils.html import Markup
-from prewikka.utils import OrderedDict, json
-
-
-def _normalizeName(name):
-    return "".join([ i.capitalize() for i in name.split("_") ])
+from prewikka.utils import json
 
 
 def getOperatorList(type):
@@ -56,14 +52,6 @@ def getHTML(rootcl, rootidx=0):
     return resource.HTMLSource(out + "</ul>")
 
 
-def _get_path_list(rootcl=prelude.IDMEFClass("alert")):
-    for node in rootcl:
-        if node.getValueType() == prelude.IDMEFValue.TYPE_CLASS:
-            for subnode in _get_path_list(node):
-                yield subnode
-        else:
-            yield node.getPath()
-
 def _gen_option_list(iterator, selected):
     out = resource.HTMLSource()
 
@@ -76,21 +64,15 @@ def _gen_option_list(iterator, selected):
     return out
 
 def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max_paths=0):
-    _default_paths = default_paths or {
-        "Source IP": "alert.source(0).node.address(0).address",
-        "Source Port": "alert.source(0).service.port",
-        "Target IP": "alert.target(0).node.address(0).address",
-        "Target Port": "alert.target(0).service.port",
-        "Classification": "alert.classification.text",
-        "Analyzer": "alert.analyzer(-1).name"
-    }
+    if default_paths is None:
+        default_paths = env.dataprovider.get_common_paths("alert", index=True)
 
     if selected_paths is None:
         selected_paths = []
 
-    _html_default_value = _gen_option_list(_default_paths.items(), selected_paths)
+    _html_default_value = _gen_option_list(default_paths, selected_paths)
     if all_paths:
-        _html_all_value = _gen_option_list(((i, i) for i in _get_path_list() if i not in _default_paths.values()), selected_paths)
+        _html_all_value = _gen_option_list(((i, i) for i in env.dataprovider.get_paths("alert") if i not in zip(default_paths)[1]), selected_paths)
         all_paths = resource.HTMLSource('<optgroup label="%s">%s</optgroup>') % (_("All paths"), _html_all_value)
 
     html = resource.HTMLSource("""

@@ -5,10 +5,12 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from datetime import datetime
 
+import prelude
 import preludedb
 from prelude import IDMEFTime, IDMEFValue
 from prewikka import env, pluginmanager, usergroup, utils, version
 from prewikka.dataprovider import DataProviderBackend, QueryResults, QueryResultsRow, ResultObject
+from prewikka.utils import AttrObj
 
 _ORDER_MAP = { "time_asc": preludedb.DB.ORDER_BY_CREATE_TIME_ASC, "time_desc": preludedb.DB.ORDER_BY_CREATE_TIME_DESC }
 
@@ -66,6 +68,22 @@ class _IDMEFPlugin(DataProviderBackend):
     @usergroup.permissions_required(["IDMEF_ALTER"])
     def delete(self, criteria, paths):
         env.idmef_db.remove(criteria)
+
+    def get_path_info(self, path):
+        klass = prelude.IDMEFClass(path)
+        typ = klass.getValueType()
+        return AttrObj(
+            operators=self._get_operators(typ),
+            value_accept=klass.getEnumValues() if typ == prelude.IDMEFValue.TYPE_ENUM else None
+        )
+
+    def _get_operators(self, typ):
+        if typ == prelude.IDMEFValue.TYPE_STRING:
+            return ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*")
+        elif typ == prelude.IDMEFValue.TYPE_DATA:
+            return ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*", "<", ">")
+        else:
+            return ("=", "!=", "<", ">", "<=", ">=")
 
 
 class IDMEFAlertPlugin(_IDMEFPlugin):
