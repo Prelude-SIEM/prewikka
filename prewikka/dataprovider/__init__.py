@@ -375,8 +375,6 @@ class DataProviderManager(pluginmanager.PluginManager):
 
             self._type_handlers[k] = normalizer
 
-        return self
-
     @staticmethod
     def _parse_path(path):
         tmp = path.partition('.')

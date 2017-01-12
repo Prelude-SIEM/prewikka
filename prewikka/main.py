@@ -170,7 +170,8 @@ class Core:
 
     def _loadPlugins(self):
         env.menumanager = menu.MenuManager()
-        env.dataprovider = dataprovider.DataProviderManager().load()
+        env.dataprovider = dataprovider.DataProviderManager()
+        env.dataprovider.load()
         env.viewmanager = view.ViewManager()
 
         env.plugins = {}
