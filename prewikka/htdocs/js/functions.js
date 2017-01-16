@@ -272,7 +272,7 @@ function _dialog_common(dialog)
     setup_position(dialog);
 
     if ( $(dialog).attr("data-draggable") )
-        $(dialog).draggable();
+        $(dialog).draggable({ handle: ".modal-header" });
 }
 
 

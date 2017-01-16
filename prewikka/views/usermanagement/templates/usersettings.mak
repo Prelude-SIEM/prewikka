@@ -58,8 +58,7 @@
         </div>
 
         <div class="pull-right">
-            <input class="btn btn-default widget-control widget-only usersettings cancel" type="button" value="${ _('Cancel') }" />
-            <button class="btn btn-primary widget-control usersettings submit" type="submit"><i class="fa fa-save"></i> ${ _("Save") }</button>
+            <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> ${ _("Save") }</button>
         </div>
     </form>
 </div>

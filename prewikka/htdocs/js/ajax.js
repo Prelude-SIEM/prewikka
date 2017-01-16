@@ -211,9 +211,15 @@ function prewikka_widget(settings)
 
         return $.ajax(settings).done(function(data) {
                 var content = $(data.content);
+                var widget = $(content).find(".widget").addBack(".widget");
 
-                if ( $(content).closest(".widget").length > 0 )
-                    return prewikka_json_dialog(data);
+                if ( widget.length > 0 ) {
+
+                    widget.attr("tabindex", -1);
+                    $(widget).wrapInner('<div class="modal-dialog ' + $(widget).attr("data-widget-options") + '"><div class="modal-content"></div></div>');
+
+                    return prewikka_json_dialog({"content": widget });
+                }
 
                 /*
                  * FIXME: the following code is deprecated, and should be removed.
