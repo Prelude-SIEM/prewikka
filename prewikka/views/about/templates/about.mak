@@ -51,7 +51,7 @@ from prewikka import version
              <p><a href="http://www.c-s.fr">www.c-s.fr</a></p>
           </div>
 
-          <p class="copyright">Copyright &copy; 2004-2016 CS Communication &amp; Syst&egrave;mes. All rights reserved.</p>
+          <p class="copyright">Copyright &copy; 2004-2017 CS Communication &amp; Syst&egrave;mes. All rights reserved.</p>
         </div>
       </div>
     </div>

@@ -1,4 +1,4 @@
-# Copyright (C) 2015-2016 CS-SI. All Rights Reserved.
+# Copyright (C) 2015-2017 CS-SI. All Rights Reserved.
 # Author: Antoine Luong <antoine.luong@c-s.fr>
 #
 # This file is part of the Prewikka program.
