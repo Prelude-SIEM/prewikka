@@ -135,7 +135,7 @@ $(document).ready(function() {
     <%
       sections = {}
       if env.menumanager:
-          sections = env.menumanager.get_sections(env.request.user)
+          sections = env.menumanager.get_sections()
     %>
     % for section in sections:
         <% style = "" %>
@@ -151,7 +151,7 @@ $(document).ready(function() {
             firstview = builtins.next(builtins.iter(views.values()))
             %>
 
-            % if env.request.user and not env.request.user.has(firstview.view_permissions):
+            % if not(firstview.check_permissions(env.request.user)):
                 <% continue %>
             % endif
 
@@ -174,7 +174,7 @@ $(document).ready(function() {
 <%
 menus = {}
 if env.menumanager:
-    menus = env.menumanager.get_menus(env.request.user)
+    menus = env.menumanager.get_menus()
 %>
 
 % if env.request.user:

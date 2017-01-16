@@ -26,6 +26,8 @@ from prewikka import compat, error, localization, log, utils
 from prewikka.utils import cache
 
 ADMIN_LOGIN = "admin"
+_NAMEID_TBL = {}
+
 
 class PermissionDeniedError(error.PrewikkaUserError):
     def __init__(self, permissions, view=None):
@@ -40,7 +42,6 @@ class PermissionDeniedError(error.PrewikkaUserError):
 
         error.PrewikkaUserError.__init__(self, N_("Permission Denied"), msg, log_priority=log.WARNING)
 
-_NAMEID_TBL = {}
 
 def permissions_required(permissions):
     ALL_PERMISSIONS.declare(permissions)
@@ -53,6 +54,7 @@ def permissions_required(permissions):
         return wrapper
     return has_permissions
 
+
 class Permissions(set):
     """ List of all the permissions available """
 
@@ -63,7 +65,9 @@ class Permissions(set):
         else:
             self.update(permission)
 
+
 ALL_PERMISSIONS = Permissions()
+
 
 class NameID(object):
     __metaclass__ = abc.ABCMeta
@@ -143,7 +147,7 @@ class User(NameID):
         env.auth.setUserPermissions(self, permissions)
 
     def _permissions(self, permissions):
-        self.permissions # make sure the cache has been created
+        self.permissions  # make sure the cache has been created
         env.request.cache.user_permissions._set((self,), set(permissions))
 
     # Support access to _permissions to modify object permission without backend modification.
@@ -178,7 +182,7 @@ class User(NameID):
         viewlist = [view] if view else self.configuration.keys()
 
         for v in viewlist:
-            if not v in self.configuration:
+            if v not in self.configuration:
                 continue
 
             for k in self.configuration[v].keys():
@@ -212,7 +216,7 @@ class User(NameID):
         self._properties = None
 
     def has(self, perm):
-        if type(perm) in (list, tuple):
+        if type(perm) in (list, tuple, set):
             return self.permissions.issuperset(perm)
 
         return perm in self.permissions

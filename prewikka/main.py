@@ -19,7 +19,6 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import mimetypes
 import os
 
 import pkg_resources
@@ -213,6 +212,8 @@ class Core:
                 env.viewmanager.addView(Logout())
 
         env.renderer = renderer.RendererPluginManager()
+        list(hookmanager.trigger("HOOK_PLUGINS_LOAD"))
+
 
     def _reload_plugin_if_needed(self):
         if not env.db.has_plugin_changed():

@@ -57,17 +57,8 @@ class MenuManager(object):
 
                 self._declared_sections[section["name"]] = section.get("tabs", [])
 
-    def get_sections(self, user=None):
-        def _merge(d1, d2):
-            for section, tabs in d2.items():
-                d1[section] = copy(d1.get(section, {}))
-                for tab, views in tabs.items():
-                    d1[section][tab] = views
-
-        d = copy(self._loaded_sections)
-        [_merge(d, i) for i in hookmanager.trigger("HOOK_MENU_LOAD", user) if i]
-
-        return d
+    def get_sections(self):
+        return self._loaded_sections
 
     def add_section(self, name):
         self._all_sections.add(name)
@@ -78,7 +69,7 @@ class MenuManager(object):
         self._loaded_sections.setdefault(view.view_menu[0], OrderedDict()) \
                              .setdefault(view.view_menu[1], OrderedDict())[view.view_id] = view
 
-    def _sort_tabs_key(self, section, tab):
+    def _tab_index(self, section, tab):
         try:
             return self._declared_sections[section].index(tab)
         except ValueError:
@@ -86,17 +77,23 @@ class MenuManager(object):
             return 100
 
     def _sort_tabs(self):
+        if self._sorted:
+            return
+
         ret = {}
 
         for section, views in self._loaded_sections.items():
             if section not in self._declared_sections:
                 ret[section] = views
             else:
-                ret[section] = OrderedDict((name, views[name]) for name in sorted(views.keys(), key=lambda tab: self._sort_tabs_key(section, tab)))
+                ret[section] = OrderedDict()
+                for name in sorted(views.keys(), key=lambda tab: self._tab_index(section, tab)):
+                    ret[section][name] = views[name]
 
+        self._sorted = True
         self._loaded_sections = ret
 
-    def get_menus(self, user):
+    def get_menus(self):
         """
         Return the menu structure in the following form:
         {
@@ -115,11 +112,9 @@ class MenuManager(object):
             }
         }
         """
-        if not self._sorted:
-            self._sort_tabs()
-            self._sorted = True
+        self._sort_tabs()
+        loaded_sections = self.get_sections()
 
-        loaded_sections = self.get_sections(user)
         menus = OrderedDict()
         default_menu = AttrObj(icon=self._DEFAULT_ICON, entries=[], default=True)
 

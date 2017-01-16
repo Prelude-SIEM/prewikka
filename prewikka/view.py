@@ -344,12 +344,31 @@ _sentinel = object()
 
 class _ViewDescriptor(object):
     view_parameters = Parameters
-    view_permissions = []
     view_template = None
     view_require_session = True
     view_extensions = []
     view_layout = "BaseView"
     view_endpoint = None
+
+    view_permissions = []
+
+    view_users = []
+    view_users_permissions = []
+
+    view_groups = []
+    view_groups_permissions = []
+
+    @property
+    def view_others_permissions(self):
+        return self.view_permissions
+
+    @view_others_permissions.setter
+    def view_others_permissions(self, permissions):
+        self.view_permissions = permissions
+
+    def __init__(self):
+        self.view_users = set(self.view_users)
+        self.view_groups = set(self.view_groups)
 
     def _setup_dataset_default(self):
         env.request.dataset["document"] = utils.AttrObj()
@@ -395,30 +414,38 @@ class _ViewDescriptor(object):
 
         return response
 
+    def check_permissions(self, user):
+        if user:
+            if user in self.view_users:
+                return user.has(self.view_users_permissions)
+
+            if self.view_groups and set(env.auth.getMemberOf(user)) & self.view_groups:
+                return user.has(self.view_groups_permissions)
+
+            if self.view_permissions:
+                return user.has(self.view_permissions)
+
+        # If this view has no users / groups / others permission defined, then it is considered public and we return True
+        # Otherwise, if any kind of permission is defined and there was no match, return False.
+        return not(self.view_users_permissions or self.view_groups_permissions or self.view_permissions)
+
 
 class _View(_ViewDescriptor):
     view_id = None
     view_path = None
     view_menu = []
-    view_parent = None
 
     def render(self):
         pass
 
     def __init__(self):
+        _ViewDescriptor.__init__(self)
+
         if self.view_template and not isinstance(self.view_template, template.PrewikkaTemplate):
             self.view_template = template.PrewikkaTemplate(self.view_template)
 
         if not self.view_id:
             self.view_id = self.__class__.__name__.lower()
-
-        if self.view_parent:
-            env.log.warning("%s use deprecated attribute: view_parent." % (self.__class__.__name__))
-            self.view_section, self.view_name = self.view_parent.view_section, self.view_parent.view_name
-
-        if not self.view_menu and hasattr(self, "view_name"):
-            env.log.warning("%s use deprecated attribute: view_name / view_section." % (self.__class__.__name__))
-            self.view_menu = [getattr(self, "view_section", None), self.view_name]
 
         if not self.view_path:
             if self.view_menu:
@@ -470,9 +497,6 @@ class ViewManager(object):
         except werkzeug.exceptions.MethodNotAllowed:
             raise
 
-        except Exception:
-            view = next((x for x in hookmanager.trigger("HOOK_VIEW_LOAD", request, userl) if x), None)
-
         if view:
             view_layout = view.view_layout
 
@@ -485,7 +509,7 @@ class ViewManager(object):
         if not view:
             raise InvalidViewError(N_("View '%s' does not exist", request.path))
 
-        if userl and view.view_permissions and not userl.has(view.view_permissions):
+        if not view.check_permissions(userl):
             raise usergroup.PermissionDeniedError(view.view_permissions, request.path)
 
         env.request.view = view
@@ -493,9 +517,12 @@ class ViewManager(object):
 
     def _route2viewdesc(self, baseview, function, route):
         v = _ViewDescriptor()
-        v.view_template = baseview.view_template
 
-        v.view_permissions = list(set(route.permissions) | set(baseview.view_permissions))
+        v.view_template = baseview.view_template
+        v.view_users = baseview.view_users
+        v.view_groups = baseview.view_groups
+        v.view_permissions = set(route.permissions) | set(baseview.view_permissions)
+
         v.view_id = baseview.view_id
         v.view_path = route.path[1:]
         v.view_require_session = baseview.view_require_session
@@ -581,14 +608,7 @@ class ViewManager(object):
         if endpoint[0] != "." and endpoint.find(".") == -1:
             endpoint += ".render"
 
-        try:
-            return env.request.url_adapter.build(endpoint, values=kwargs)
-        except Exception as e:
-            ret = next(iter(filter(None, hookmanager.trigger("HOOK_URL_FOR", endpoint, kwargs))), None)
-            if not ret:
-                raise e
-
-            return ret
+        return env.request.url_adapter.build(endpoint, values=kwargs)
 
     def __contains__(self, view_id):
         return view_id in self._views
