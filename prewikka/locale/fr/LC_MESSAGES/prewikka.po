@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Prewikka 1.3.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-13 21:57+0200\n"
-"PO-Revision-Date: 2017-01-12 18:07+0100\n"
+"PO-Revision-Date: 2017-01-27 15:48+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
@@ -75,7 +75,7 @@ msgid ""
 "transition %(current)s -> %(required)s"
 msgstr ""
 "Aucun script de migration de base de données trouvé pour le module "
-"%(module)s, transition de branche %(current)s -> %(version)s"
+"%(module)s, transition de branche %(current)s -> %(required)s"
 
 #: prewikka/database.py:404
 #, python-format
@@ -86,27 +86,27 @@ msgstr ""
 "Aucun script de migration linéaire trouvé pour le module %(module)s "
 "%(version1)s -> %(version2)s"
 
-#: prewikka/error.py:53 prewikka/templates/error.mak:124
+#: prewikka/error.py:53 prewikka/templates/error.mak:140
 msgid "An unexpected condition happened"
 msgstr "Une erreur inattendue s'est produite"
 
-#: prewikka/error.py:165
+#: prewikka/error.py:152
 msgid "Not implemented"
 msgstr "Non implémenté"
 
-#: prewikka/error.py:167
+#: prewikka/error.py:154
 msgid "Backend does not implement this operation"
 msgstr "Le backend n'implémente pas cette opération"
 
-#: prewikka/idmefbrowser.py:76 prewikka/views/filter/templates/widget.mak:13
+#: prewikka/idmefbrowser.py:60 prewikka/views/filter/templates/widget.mak:13
 msgid "All paths"
 msgstr "Tous les chemins"
 
-#: prewikka/idmefbrowser.py:102
+#: prewikka/idmefbrowser.py:86
 msgid "Select paths..."
 msgstr "Sélectionner des chemins..."
 
-#: prewikka/idmefbrowser.py:103 prewikka/views/filter/templates/widget.mak:7
+#: prewikka/idmefbrowser.py:87 prewikka/views/filter/templates/widget.mak:7
 msgid "Default paths"
 msgstr "Chemins par défaut"
 
@@ -145,27 +145,27 @@ msgstr "%H:%M:%S"
 #: prewikka/log.py:79
 #, python-format
 msgid "Unknown logtype specified: '%s'"
-msgstr "Type de log inconnu : '%s'"
+msgstr "Type de log inconnu : '%s'"
 
-#: prewikka/main.py:74
+#: prewikka/main.py:73
 msgid "Version Requirement error"
 msgstr "Erreur de version requise"
 
-#: prewikka/main.py:77
+#: prewikka/main.py:76
 #, python-format
 msgid "Prewikka %(vPre)s requires libprelude %(vLib)s or higher"
 msgstr "Prewikka %(vPre)s requiert libprelude %(vLib)s ou supérieure"
 
-#: prewikka/main.py:82
+#: prewikka/main.py:81
 #, python-format
 msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
 msgstr "Prewikka %(vPre)s requiert libpreludedb %(vLib)s ou supérieure"
 
-#: prewikka/main.py:146 prewikka/main.py:162
+#: prewikka/main.py:145 prewikka/main.py:161
 msgid "Initialization error"
 msgstr "Erreur d'initialisation"
 
-#: prewikka/main.py:163
+#: prewikka/main.py:162
 #, python-format
 msgid ""
 "Cannot use %(type)s mode '%(name)s', please contact your local "
@@ -174,12 +174,12 @@ msgstr ""
 "Impossible d'utiliser le mode '%(name)s' de type '%(type)s', veuillez "
 "contacter votre administrateur local."
 
-#: prewikka/main.py:197
+#: prewikka/main.py:196
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
 msgstr "La session '%s' n'accepte pas de module d'authentification"
 
-#: prewikka/main.py:302
+#: prewikka/main.py:303
 #, python-format
 msgid "An unexpected condition happened while trying to load %s"
 msgstr "Une erreur inattendue s'est produite au chargement de %s"
@@ -249,16 +249,25 @@ msgstr "Personnalisé"
 msgid "Inactive"
 msgstr "Inactif"
 
-#: prewikka/menu.py:52 prewikka/menu.py:56
+#: prewikka/menu.py:48 prewikka/menu.py:54 prewikka/menu.py:58
+#: prewikka/menu.py:64
 msgid "Menu error"
 msgstr "Erreur du menu"
 
-#: prewikka/menu.py:52
+#: prewikka/menu.py:48
+msgid "Empty menu"
+msgstr ""
+
+#: prewikka/menu.py:54
 #, python-format
 msgid "Menu without a name in %s"
 msgstr "Menu non nommé dans %s"
 
-#: prewikka/menu.py:56
+#: prewikka/menu.py:58
+msgid "Multiple default menus"
+msgstr ""
+
+#: prewikka/menu.py:64
 #, python-format
 msgid "Section without a name in %s"
 msgstr "Section non nommée dans %s"
@@ -269,47 +278,47 @@ msgid ""
 "Asynchronous DNS resolution disabled: twisted.names and twisted.internet "
 "required: %s"
 msgstr ""
-"Résolution DNS asynchrone désactivée : twisted.names et twisted.internet "
-"requis : %s"
-
-#: prewikka/usergroup.py:37
-#, python-format
-msgid "Access to view '%(view)s' forbidden. Required permissions: %(permissions)s"
-msgstr "Accès à la vue '%(view)s' interdit. Permissions requises : %(permissions)s"
+"Résolution DNS asynchrone désactivée : twisted.names et twisted.internet "
+"requis : %s"
 
 #: prewikka/usergroup.py:39
 #, python-format
-msgid "Required permissions: %s"
-msgstr "Permissions requises : %s"
+msgid "Access to view '%(view)s' forbidden. Required permissions: %(permissions)s"
+msgstr "Accès à la vue '%(view)s' interdit. Permissions requises : %(permissions)s"
 
 #: prewikka/usergroup.py:41
+#, python-format
+msgid "Required permissions: %s"
+msgstr "Permissions requises : %s"
+
+#: prewikka/usergroup.py:43
 msgid "Permission Denied"
 msgstr "Accès refusé"
 
-#: prewikka/view.py:49 prewikka/view.py:56 prewikka/view.py:63
+#: prewikka/view.py:50 prewikka/view.py:57 prewikka/view.py:64
 msgid "Parameters Normalization failed"
 msgstr "Échec de normalisation des paramètres"
 
-#: prewikka/view.py:50
+#: prewikka/view.py:51
 #, python-format
 msgid "Parameter '%s' is not valid"
 msgstr "Le paramètre '%s' est invalide"
 
-#: prewikka/view.py:57
+#: prewikka/view.py:58
 #, python-format
 msgid "Invalid value '%(value)s' for parameter '%(name)s'"
 msgstr "Valeur invalide '%(value)s' pour le paramètre '%(name)s'"
 
-#: prewikka/view.py:64
+#: prewikka/view.py:65
 #, python-format
 msgid "Required parameter '%s' is missing"
 msgstr "Le paramètre requis '%s' est manquant"
 
-#: prewikka/view.py:71
+#: prewikka/view.py:72
 msgid "Invalid view"
 msgstr "Vue invalide"
 
-#: prewikka/view.py:486
+#: prewikka/view.py:509
 #, python-format
 msgid "View '%s' does not exist"
 msgstr "La vue '%s' n'existe pas"
@@ -441,9 +450,9 @@ msgstr ""
 "la GPLv2."
 
 #: prewikka/plugins/warning/templates/warning.mak:30
-#: prewikka/templates/error.mak:151 prewikka/templates/toplayout.mak:30
+#: prewikka/templates/error.mak:167 prewikka/templates/toplayout.mak:30
 #: prewikka/templates/toplayout.mak:45 prewikka/templates/toplayout.mak:62
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:42
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:44
 msgid "OK"
 msgstr "OK"
 
@@ -508,7 +517,7 @@ msgstr "Session expirée"
 #: prewikka/session/session.py:44
 msgid "Your session has expired: please sign in again to continue using Prewikka"
 msgstr ""
-"Votre session a expiré : veuillez vous réauthentifier pour continuer "
+"Votre session a expiré : veuillez vous réauthentifier pour continuer "
 "d'utiliser Prewikka"
 
 #: prewikka/session/session.py:174
@@ -519,73 +528,82 @@ msgstr "Session terminée"
 msgid "Anonymous authentication"
 msgstr "Authentification anonyme"
 
-#: prewikka/templates/baseview.mak:221
+#: prewikka/templates/baseview.mak:201
 msgid "This app has been disabled or failed to load."
 msgstr "Cette app a été désactivée ou est impossible à charger"
 
-#: prewikka/templates/baseview.mak:231
+#: prewikka/templates/baseview.mak:207 prewikka/templates/baseview.mak:220
+#: prewikka/templates/baseview.mak:233
+msgid "name"
+msgstr "nom"
+
+#: prewikka/templates/baseview.mak:253
 msgid "About"
 msgstr "À propos"
 
-#: prewikka/templates/baseview.mak:233
+#: prewikka/templates/baseview.mak:256
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: prewikka/templates/baseview.mak:233
+#: prewikka/templates/baseview.mak:256
 msgid "Are you sure you want to log out?"
 msgstr "Êtes-vous sûr de vouloir vous déconnecter ?"
 
-#: prewikka/templates/baseview.mak:245
+#: prewikka/templates/baseview.mak:268
 msgid "Loading"
 msgstr "Chargement"
 
-#: prewikka/templates/error.mak:61
+#: prewikka/templates/error.mak:65
 msgid "Detail"
 msgstr "Détail"
 
-#: prewikka/templates/error.mak:122
+#: prewikka/templates/error.mak:66
+msgid "Copy to clipboard"
+msgstr "Copier dans le presse papier"
+
+#: prewikka/templates/error.mak:138
 msgid "Error: {0}"
-msgstr "Erreur : {0}"
+msgstr "Erreur : {0}"
 
-#: prewikka/templates/error.mak:135
+#: prewikka/templates/error.mak:151
 msgid "This may be due to one or more of the following reasons:"
-msgstr "Cela pourrait être dû à une ou plusieurs des raisons suivantes :"
+msgstr "Cela pourrait être dû à une ou plusieurs des raisons suivantes :"
 
-#: prewikka/templates/error.mak:137
+#: prewikka/templates/error.mak:153
 msgid "You don't have the required permissions."
 msgstr "Vous n'avez pas les permissions requises."
 
-#: prewikka/templates/error.mak:138
+#: prewikka/templates/error.mak:154
 #, python-format
 msgid "Required apps are disabled. See the %s page for more details."
 msgstr ""
 "Les apps nécessaires sont désactivées. Voir la page %s pour plus de "
 "détails."
 
-#: prewikka/templates/error.mak:156 prewikka/templates/toplayout.mak:29
-#: prewikka/views/usermanagement/templates/usersettings.mak:61
+#: prewikka/templates/error.mak:172 prewikka/templates/toplayout.mak:29
+#: prewikka/views/filter/templates/filteredition.mak:119
 msgid "Cancel"
 msgstr "Annuler"
 
-#: prewikka/templates/error.mak:157
+#: prewikka/templates/error.mak:173
 msgid "Sign in"
 msgstr "Authentification"
 
-#: prewikka/templates/error.mak:161
+#: prewikka/templates/error.mak:177
 msgid "Back"
 msgstr "Retour"
 
-#: prewikka/templates/error.mak:164
+#: prewikka/templates/error.mak:180
 msgid "Retry"
 msgstr "Réessayer"
 
-#: prewikka/templates/error.mak:166
+#: prewikka/templates/error.mak:182
 msgid "Redirect to main page"
 msgstr "Page principale"
 
 #: prewikka/templates/mainmenu.mak:44
 msgid "Refresh:"
-msgstr "Rafraîchir :"
+msgstr "Rafraîchir :"
 
 #: prewikka/templates/mainmenu.mak:45
 msgid "Update frequency of the current page"
@@ -593,7 +611,7 @@ msgstr "Mettre à jour la fréquence de rafraîchissement de la page"
 
 #: prewikka/templates/mainmenu.mak:63
 msgid "Period:"
-msgstr "Période :"
+msgstr "Période :"
 
 #: prewikka/templates/mainmenu.mak:64
 msgid "Period to visualize"
@@ -601,7 +619,7 @@ msgstr "Période à visualiser"
 
 #: prewikka/templates/mainmenu.mak:81
 msgid "Start:"
-msgstr "Début :"
+msgstr "Début :"
 
 #: prewikka/templates/mainmenu.mak:82
 msgid "start"
@@ -613,7 +631,7 @@ msgstr "Date de la plus ancienne alerte à visualiser"
 
 #: prewikka/templates/mainmenu.mak:86
 msgid "End:"
-msgstr "Fin :"
+msgstr "Fin :"
 
 #: prewikka/templates/mainmenu.mak:87
 msgid "end"
@@ -651,7 +669,7 @@ msgstr ""
 msgid "Offline"
 msgstr "Déconnecté"
 
-#: prewikka/utils/misc.py:59 prewikka/views/agents/agents.py:176
+#: prewikka/utils/misc.py:59 prewikka/views/agents/agents.py:180
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -663,7 +681,7 @@ msgstr "Manquant"
 msgid "Online"
 msgstr "Connecté"
 
-#: prewikka/utils/url.py:82
+#: prewikka/utils/url.py:71
 #, python-format
 msgid "The path '%s' cannot be mapped to a column"
 msgstr "Le chemin '%s' ne peut pas être mis en correspondance avec une colonne"
@@ -672,16 +690,16 @@ msgstr "Le chemin '%s' ne peut pas être mis en correspondance avec une colonne"
 msgid "Prelude About page"
 msgstr "Page d'à propos de Prelude"
 
-#: prewikka/views/about/templates/about.mak:12
+#: prewikka/views/about/templates/about.mak:11
 #, python-format
 msgid "Prelude version %s"
 msgstr "Prelude version %s"
 
-#: prewikka/views/about/templates/about.mak:17
+#: prewikka/views/about/templates/about.mak:15
 msgid "Prelude is a SIEM (Security Information and Event Management)"
 msgstr "Prelude est un SIEM (Security Information and Event Management)"
 
-#: prewikka/views/about/templates/about.mak:19
+#: prewikka/views/about/templates/about.mak:17
 msgid ""
 "{prelude} is a security management solution that collects, filters, "
 "normalizes, correlates, stores and archives data from various sources of "
@@ -696,11 +714,11 @@ msgstr ""
 "niveau de sécurité de votre système et ainsi prévenir les attaques, "
 "intrusions et autres infections virales."
 
-#: prewikka/views/about/templates/about.mak:21
+#: prewikka/views/about/templates/about.mak:19
 msgid "Prelude Team:"
-msgstr "Équipe Prelude :"
+msgstr "Équipe Prelude :"
 
-#: prewikka/views/about/templates/about.mak:22
+#: prewikka/views/about/templates/about.mak:20
 msgid ""
 "Prelude OSS is an open-source project originally created by Yoann "
 "Vandoorselaere in 1998."
@@ -708,11 +726,11 @@ msgstr ""
 "Prelude OSS est un projet open-source créé à l'origine par Yoann "
 "Vandoorselaere en 1998."
 
-#: prewikka/views/about/templates/about.mak:24
+#: prewikka/views/about/templates/about.mak:22
 msgid "Vigilo is a NMS (Network Management System)"
 msgstr "Vigilo est un NMS (Network Management System)"
 
-#: prewikka/views/about/templates/about.mak:26
+#: prewikka/views/about/templates/about.mak:24
 msgid ""
 "{vigilo} is a complete monitoring and performance management solution "
 "capable of handling medium and large-scale systems (network - servers - "
@@ -724,11 +742,11 @@ msgstr ""
 "{vigilo} est une solution complète de supervision de performances capable"
 " de gérer des systèmes de moyenne et grande envergure (réseau - serveurs "
 "- applications) grâce à une architecture répartie et modulaire. Vigilo "
-"offre toutes les fonctions nécessaires à la supervision de performances :"
+"offre toutes les fonctions nécessaires à la supervision de performances :"
 " la gestion des états et des alarmes, la métrologie, la cartographie, la "
 "corrélation d'événements et le reporting."
 
-#: prewikka/views/about/templates/about.mak:31
+#: prewikka/views/about/templates/about.mak:29
 #, python-format
 msgid ""
 "Prelude SIEM and Vigilo NMS are being developed by the %s company, "
@@ -737,118 +755,121 @@ msgstr ""
 "Prelude SIEM et Vigilo NMS sont développés par la société %s, concepteur,"
 " intégrateur et opérateur de systèmes critiques."
 
-#: prewikka/views/about/templates/about.mak:36
+#: prewikka/views/about/templates/about.mak:34
 msgid "Contact"
 msgstr "Contact"
 
-#: prewikka/views/about/templates/about.mak:38
+#: prewikka/views/about/templates/about.mak:36
 msgid "Phone:"
-msgstr "Téléphone :"
+msgstr "Téléphone :"
 
-#: prewikka/views/about/templates/about.mak:39
+#: prewikka/views/about/templates/about.mak:37
 msgid "Fax:"
-msgstr "Fax :"
+msgstr "Fax :"
 
-#: prewikka/views/about/templates/about.mak:42
+#: prewikka/views/about/templates/about.mak:40
 msgid "Office"
 msgstr "Bureau"
 
-#: prewikka/views/about/templates/about.mak:48
+#: prewikka/views/about/templates/about.mak:46
 msgid "Websites"
 msgstr "Sites web"
 
-#: prewikka/views/aboutplugin/__init__.py:35
+#: prewikka/views/about/templates/about.mak:57
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:132
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:71
+#: prewikka/views/messagesummary/templates/messagesummary.mak:93
+msgid "Close"
+msgstr "Fermer"
+
+#: prewikka/views/aboutplugin/__init__.py:36
 msgid "Plugin installation and activation management page"
 msgstr "Page de gestion des plugins"
 
-#: prewikka/views/aboutplugin/__init__.py:38
+#: prewikka/views/aboutplugin/__init__.py:40
 msgid "USER_MANAGEMENT"
 msgstr "USER MANAGEMENT"
 
-#: prewikka/views/aboutplugin/__init__.py:40
-msgid "Apps: View"
-msgstr "Apps : Vues"
-
-#: prewikka/views/aboutplugin/__init__.py:41
-msgid "Apps: API"
-msgstr "Apps : API"
-
 #: prewikka/views/aboutplugin/__init__.py:42
-msgid "Apps: Dataprovider backend"
-msgstr "Apps : Moteur de collecte de données"
+msgid "Apps: View"
+msgstr "Apps : Vues"
 
 #: prewikka/views/aboutplugin/__init__.py:43
-msgid "Apps: Dataprovider type"
-msgstr "Apps : Type de collecte de données"
+msgid "Apps: API"
+msgstr "Apps : API"
 
 #: prewikka/views/aboutplugin/__init__.py:44
-msgid "Apps: Authentication"
-msgstr "Apps : Authentification"
+msgid "Apps: Dataprovider backend"
+msgstr "Apps : Moteur de collecte de données"
 
 #: prewikka/views/aboutplugin/__init__.py:45
-msgid "Apps: Identification"
-msgstr "Apps : Identification"
+msgid "Apps: Dataprovider type"
+msgstr "Apps : Type de collecte de données"
 
 #: prewikka/views/aboutplugin/__init__.py:46
-msgid "Apps: Renderer backend"
-msgstr "Apps : Moteur de rendu"
+msgid "Apps: Authentication"
+msgstr "Apps : Authentification"
 
 #: prewikka/views/aboutplugin/__init__.py:47
-msgid "Apps: Renderer type"
-msgstr "Apps : Type de rendu"
+msgid "Apps: Identification"
+msgstr "Apps : Identification"
 
-#: prewikka/views/aboutplugin/__init__.py:76
-#: prewikka/views/filter/filter.py:145
+#: prewikka/views/aboutplugin/__init__.py:48
+msgid "Apps: Renderer backend"
+msgstr "Apps : Moteur de rendu"
+
+#: prewikka/views/aboutplugin/__init__.py:49
+msgid "Apps: Renderer type"
+msgstr "Apps : Type de rendu"
+
+#: prewikka/views/aboutplugin/__init__.py:78
+#: prewikka/views/filter/filter.py:126
 #: prewikka/views/usermanagement/usermanagement.py:11
 msgid "Settings"
 msgstr "Paramètres"
 
-#: prewikka/views/aboutplugin/__init__.py:76
+#: prewikka/views/aboutplugin/__init__.py:78
 msgid "Apps"
 msgstr "Apps"
 
-#: prewikka/views/aboutplugin/__init__.py:109
+#: prewikka/views/aboutplugin/__init__.py:111
 #, python-format
 msgid "Applying %(module)s %(script)s..."
 msgstr "Application de %(module)s %(script)s..."
 
-#: prewikka/views/aboutplugin/__init__.py:119
+#: prewikka/views/aboutplugin/__init__.py:121
 msgid "All updates applied"
 msgstr "Toutes les mises à jour appliquées"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:42
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:44
 msgid "ERROR"
 msgstr "ERREUR"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:46
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:48
 msgid "Update failed"
 msgstr "Mise à jour échouée"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:132
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:111
 msgid "Update Dialog"
 msgstr "Dialogue de mise à jour"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:142
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:121
 msgid "Plugin"
 msgstr "Plugin"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:143
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:122
 msgid "Script"
 msgstr "Script"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:144
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:123
 msgid "Result"
 msgstr "Résultat"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:153
-msgid "Close"
-msgstr "Fermer"
-
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:165
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:144
 msgid "Plugin Maintenance"
 msgstr "Maintenance des modules"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:169
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:148
 msgid ""
 "The following apps need to be updated before they can be loaded into the "
 "system"
@@ -856,10 +877,10 @@ msgstr ""
 "Les apps suivantes doivent être mises à jour avant d'être chargées dans "
 "le système"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:176
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:204
-#: prewikka/views/agents/templates/agents.mak:31
-#: prewikka/views/agents/templates/heartbeatanalyze.mak:10
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:155
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:183
+#: prewikka/views/agents/templates/agents.mak:32
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:19
 #: prewikka/views/filter/templates/filterlisting.mak:27
 #: prewikka/views/messagesummary/messagesummary.py:302
 #: prewikka/views/messagesummary/messagesummary.py:454
@@ -873,51 +894,51 @@ msgstr ""
 msgid "Name"
 msgstr "Nom"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:176
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:204
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:155
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:183
 #: prewikka/views/filter/templates/filterlisting.mak:27
 #: prewikka/views/messagesummary/messagesummary.py:758
 #: prewikka/views/messagesummary/messagesummary.py:764
 msgid "Description"
 msgstr "Description"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:176
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:204
-#: prewikka/views/agents/templates/agents.mak:31
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:155
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:183
+#: prewikka/views/agents/templates/agents.mak:32
 #: prewikka/views/messagesummary/messagesummary.py:456
 #: prewikka/views/messagesummary/messagesummary.py:561
 msgid "Version"
 msgstr "Version"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:176
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:155
 msgid "Current Database Version"
 msgstr "Version actuelle de base de données"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:176
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:155
 msgid "Required Database Update"
 msgstr "Mise à jour de base de données nécessaire"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:189
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:168
 msgid "Install Update"
 msgstr "Installer mise à jour"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:197
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:176
 msgid "Installed Apps"
 msgstr "Apps installées"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:204
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:183
 msgid "Database Version"
 msgstr "Version de base de données"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:204
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:183
 msgid "Active"
 msgstr "Actif"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:217
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:196
 msgid "Update the selected apps?"
 msgstr "Mettre à jour les apps sélectionnées ?"
 
-#: prewikka/views/aboutplugin/templates/aboutplugin.mak:217
+#: prewikka/views/aboutplugin/templates/aboutplugin.mak:196
 msgid "Update"
 msgstr "Mettre à jour"
 
@@ -925,75 +946,75 @@ msgstr "Mettre à jour"
 msgid "Agents status information page"
 msgstr "Page d'information sur l'état des agents"
 
-#: prewikka/views/agents/agents.py:38
-#: prewikka/views/agents/templates/agents.mak:28
+#: prewikka/views/agents/agents.py:41
 #: prewikka/views/messagelisting/heartbeatlisting.py:61
 msgid "Agents"
 msgstr "Agents"
 
-#: prewikka/views/agents/agents.py:71
+#: prewikka/views/agents/agents.py:75
 msgid "Node name n/a"
 msgstr "Nom du nœud inconnu"
 
-#: prewikka/views/agents/agents.py:72
+#: prewikka/views/agents/agents.py:76
 msgid "OS version n/a"
 msgstr "Version système inconnu"
 
-#: prewikka/views/agents/agents.py:73
+#: prewikka/views/agents/agents.py:77
 msgid "OS type n/a"
 msgstr "Type du système inconnu"
 
-#: prewikka/views/agents/agents.py:77
+#: prewikka/views/agents/agents.py:81
 msgid "Node location n/a"
 msgstr "Emplacement inconnu"
 
-#: prewikka/views/agents/agents.py:87
+#: prewikka/views/agents/agents.py:91
 msgid "Alert listing"
 msgstr "Liste des alertes"
 
-#: prewikka/views/agents/agents.py:88
+#: prewikka/views/agents/agents.py:92
 msgid "Heartbeat listing"
 msgstr "Liste des pulsations"
 
-#: prewikka/views/agents/agents.py:89 prewikka/views/agents/agents.py:90
+#: prewikka/views/agents/agents.py:93 prewikka/views/agents/agents.py:94
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:12
 msgid "Heartbeat analysis"
 msgstr "Analyse des pulsations"
 
-#: prewikka/views/agents/agents.py:93 prewikka/views/agents/agents.py:94
-#: prewikka/views/agents/agents.py:114 prewikka/views/filter/filter.py:132
+#: prewikka/views/agents/agents.py:97 prewikka/views/agents/agents.py:98
+#: prewikka/views/agents/agents.py:118 prewikka/views/filter/filter.py:113
 #: prewikka/views/messagelisting/alertlisting.py:701
 #: prewikka/views/messagelisting/heartbeatlisting.py:63
 #: prewikka/views/messagesummary/messagesummary.py:356
 msgid "IDMEF_VIEW"
 msgstr "IDMEF VIEW"
 
-#: prewikka/views/agents/agents.py:102
+#: prewikka/views/agents/agents.py:106
 msgid "IDMEF_ALTER"
 msgstr "IDMEF ALTER"
 
-#: prewikka/views/agents/agents.py:151
+#: prewikka/views/agents/agents.py:155
 #, python-format
 msgid "Sensor is down since %s"
 msgstr "Sonde déconnectée depuis %s"
 
-#: prewikka/views/agents/agents.py:156
+#: prewikka/views/agents/agents.py:160
 msgid "Normal sensor start"
 msgstr "Démarrage normal de la sonde"
 
-#: prewikka/views/agents/agents.py:158
+#: prewikka/views/agents/agents.py:162
 msgid "Unexpected sensor restart"
 msgstr "Redémarrage inopiné de la sonde"
 
-#: prewikka/views/agents/agents.py:164
+#: prewikka/views/agents/agents.py:168
 #, python-format
 msgid "Unexpected heartbeat interval: %(delta)s"
-msgstr "Intervalle de pulsation inopiné : %(delta)s"
+msgstr "Intervalle de pulsation inopiné : %(delta)s"
 
-#: prewikka/views/agents/agents.py:168
+#: prewikka/views/agents/agents.py:172
 msgid "Normal sensor stop"
 msgstr "Arrêt normal de la sonde"
 
-#: prewikka/views/agents/agents.py:181
+#: prewikka/views/agents/agents.py:186
 #, python-format
 msgid ""
 "No anomaly in the last %(count)d heartbeats (one heartbeat every "
@@ -1003,91 +1024,91 @@ msgstr ""
 " toutes les %(delta)s en moyenne)"
 
 #: prewikka/views/agents/templates/agents.mak:28
-msgid "Search:"
-msgstr "Recherche :"
+msgid "Show/Hide all"
+msgstr "Afficher/Cacher tout"
 
-#: prewikka/views/agents/templates/agents.mak:31
+#: prewikka/views/agents/templates/agents.mak:28
+msgid "Search:"
+msgstr "Recherche :"
+
+#: prewikka/views/agents/templates/agents.mak:32
 msgid "Location"
 msgstr "Emplacement"
 
-#: prewikka/views/agents/templates/agents.mak:31
+#: prewikka/views/agents/templates/agents.mak:32
 msgid "Node"
 msgstr "Nœud"
 
-#: prewikka/views/agents/templates/agents.mak:31
-#: prewikka/views/agents/templates/heartbeatanalyze.mak:11
+#: prewikka/views/agents/templates/agents.mak:32
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:20
 #: prewikka/views/messagelisting/templates/heartbeatlisting.mak:28
 #: prewikka/views/messagesummary/messagesummary.py:453
 msgid "Model"
 msgstr "Modèle"
 
-#: prewikka/views/agents/templates/agents.mak:31
+#: prewikka/views/agents/templates/agents.mak:32
 #: prewikka/views/messagesummary/messagesummary.py:457
 msgid "Class"
 msgstr "Classe"
 
-#: prewikka/views/agents/templates/agents.mak:35
-#: prewikka/views/agents/templates/heartbeatanalyze.mak:16
+#: prewikka/views/agents/templates/agents.mak:36
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:25
 msgid "Latest heartbeat"
 msgstr "Dernière pulsation"
 
-#: prewikka/views/agents/templates/agents.mak:35
+#: prewikka/views/agents/templates/agents.mak:36
 msgid "Status"
 msgstr "État"
 
-#: prewikka/views/agents/templates/agents.mak:86
-msgid "Show/Hide all"
-msgstr "Afficher/Cacher tout"
-
-#: prewikka/views/agents/templates/agents.mak:93
+#: prewikka/views/agents/templates/agents.mak:90
 #: prewikka/views/filter/filter.py:33
 #: prewikka/views/messagelisting/alertlisting.py:699
 #: prewikka/views/messagelisting/alertlisting.py:1206
 msgid "Alerts"
 msgstr "Alertes"
 
-#: prewikka/views/agents/templates/agents.mak:97
+#: prewikka/views/agents/templates/agents.mak:94
 #: prewikka/views/messagelisting/heartbeatlisting.py:61
 msgid "Heartbeats"
 msgstr "Pulsations"
 
-#: prewikka/views/agents/templates/agents.mak:99
+#: prewikka/views/agents/templates/agents.mak:96
+msgid "Delete the selected IDMEF messages?"
+msgstr "Supprimer les messages IDMEF sélectionnés ?"
+
+#: prewikka/views/agents/templates/agents.mak:96
 #: prewikka/views/filter/templates/filterlisting.mak:47
 #: prewikka/views/messagelisting/templates/alertlisting.mak:533
 #: prewikka/views/messagelisting/templates/heartbeatlisting.mak:96
 msgid "Delete"
 msgstr "Effacer"
 
-#: prewikka/views/agents/templates/agents.mak:99
-msgid "Delete the selected IDMEF messages?"
-msgstr "Supprimer les messages IDMEF sélectionnés ?"
-
-#: prewikka/views/agents/templates/heartbeatanalyze.mak:12
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:21
 msgid "OS"
 msgstr "OS"
 
-#: prewikka/views/agents/templates/heartbeatanalyze.mak:13
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:22
 #: prewikka/views/messagelisting/templates/heartbeatlisting.mak:21
 #: prewikka/views/messagesummary/messagesummary.py:442
 msgid "Node name"
 msgstr "Nom du nœud"
 
-#: prewikka/views/agents/templates/heartbeatanalyze.mak:14
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:23
 #: prewikka/views/messagesummary/messagesummary.py:420
 msgid "Node location"
 msgstr "Emplacement du nœud"
 
-#: prewikka/views/agents/templates/heartbeatanalyze.mak:15
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:24
 #: prewikka/views/messagelisting/templates/heartbeatlisting.mak:14
 #: prewikka/views/messagesummary/messagesummary.py:447
 msgid "Node address"
 msgstr "Adresse du nœud"
 
-#: prewikka/views/agents/templates/heartbeatanalyze.mak:17
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:26
 msgid "Current status"
 msgstr "État actuel"
 
-#: prewikka/views/agents/templates/heartbeatanalyze.mak:47
+#: prewikka/views/agents/templates/heartbeatanalyze.mak:56
 msgid "Events"
 msgstr "Événements"
 
@@ -1103,135 +1124,125 @@ msgstr "Journaux"
 msgid "Tickets"
 msgstr "Tickets"
 
-#: prewikka/views/filter/filter.py:36
-#: prewikka/views/messagelisting/templates/alertlisting.mak:38
-msgid "Equal"
-msgstr "Égal"
-
-#: prewikka/views/filter/filter.py:37
-msgid "Equal (case-insensitive)"
-msgstr "Égal (insensible à la casse)"
-
-#: prewikka/views/filter/filter.py:38
-#: prewikka/views/messagelisting/templates/alertlisting.mak:39
-msgid "Not equal"
-msgstr "Différent"
-
-#: prewikka/views/filter/filter.py:39
-msgid "Not equal (case-insensitive)"
-msgstr "Non égal (insensible à la casse)"
-
-#: prewikka/views/filter/filter.py:40
-#: prewikka/views/messagelisting/templates/alertlisting.mak:46
-msgid "Regular expression"
-msgstr "Expression régulière"
-
-#: prewikka/views/filter/filter.py:41
-#: prewikka/views/messagelisting/templates/alertlisting.mak:47
-msgid "Regular expression (case-insensitive)"
-msgstr "Expression régulière (insensible à la casse)"
-
-#: prewikka/views/filter/filter.py:42
-msgid "Not regular expression"
-msgstr "Non expression régulière"
-
-#: prewikka/views/filter/filter.py:43
-msgid "Not regular expression (case-insensitive)"
-msgstr "Non expression régulière (insensible à la casse)"
-
-#: prewikka/views/filter/filter.py:44
-#: prewikka/views/messagelisting/templates/alertlisting.mak:40
-msgid "Lesser than"
-msgstr "Plus petit que"
-
-#: prewikka/views/filter/filter.py:45
-#: prewikka/views/messagelisting/templates/alertlisting.mak:42
-msgid "Lesser or equal"
-msgstr "Plus petit ou égal"
-
-#: prewikka/views/filter/filter.py:46
-#: prewikka/views/messagelisting/templates/alertlisting.mak:41
-msgid "Greater than"
-msgstr "Plus grand que"
-
-#: prewikka/views/filter/filter.py:47
-#: prewikka/views/messagelisting/templates/alertlisting.mak:43
-msgid "Greater or equal"
-msgstr "Plus grand ou égal"
-
-#: prewikka/views/filter/filter.py:48
-#: prewikka/views/messagelisting/templates/alertlisting.mak:44
-msgid "Substring"
-msgstr "Sous-chaîne"
-
-#: prewikka/views/filter/filter.py:49
-#: prewikka/views/messagelisting/templates/alertlisting.mak:45
-msgid "Substring (case-insensitive)"
-msgstr "Sous-chaîne (insensible à la casse)"
-
-#: prewikka/views/filter/filter.py:50
-msgid "Not substring"
-msgstr "Non sous-chaîne"
-
-#: prewikka/views/filter/filter.py:51
-msgid "Not substring (case-insensitive)"
-msgstr "Non sous-chaîne (insensible à la casse)"
-
-#: prewikka/views/filter/filter.py:145
+#: prewikka/views/filter/filter.py:126
 #: prewikka/views/filter/templates/filterlisting.mak:22
 msgid "Filters"
 msgstr "Filtres"
 
-#: prewikka/views/filter/filter.py:156
+#: prewikka/views/filter/filter.py:137
+#: prewikka/views/filter/templates/filteredition.mak:75
 #, python-format
 msgid "Filter %s"
 msgstr "Filtre %s"
 
-#: prewikka/views/filter/filter.py:230 prewikka/views/filter/filter.py:240
+#: prewikka/views/filter/filter.py:216 prewikka/views/filter/filter.py:226
 msgid "Could not save filter"
 msgstr "Impossible de sauvegarder le filtre"
 
-#: prewikka/views/filter/filter.py:230
+#: prewikka/views/filter/filter.py:216
 msgid "No name for this filter was provided"
 msgstr "Nom du filtre non renseigné"
 
-#: prewikka/views/filter/filter.py:240
+#: prewikka/views/filter/filter.py:226
 msgid "The filter name is already used by another filter"
 msgstr "Le nom du filtre est déjà utilisé par un autre filtre"
 
-#: prewikka/views/filter/templates/filteredition.mak:54
-msgid "You are in the process of creating a new Prelude filter."
-msgstr "Vous êtes en train de créer un filtre Prelude."
+#: prewikka/views/filter/templates/filteredition.mak:7
+#: prewikka/views/messagelisting/templates/alertlisting.mak:38
+msgid "Equal"
+msgstr "Égal"
 
-#: prewikka/views/filter/templates/filteredition.mak:56
-msgid ""
-"Filters can be selected while on the alerts view, using the control menu "
-"in the top right corner."
-msgstr ""
-"Les filtres peuvent être chargés en haut à droite de l'écran, une fois "
-"l'onglet des alertes sélectionné."
+#: prewikka/views/filter/templates/filteredition.mak:8
+msgid "Equal (case-insensitive)"
+msgstr "Égal (insensible à la casse)"
 
-#: prewikka/views/filter/templates/filteredition.mak:62
-#: prewikka/views/usermanagement/templates/usersettings.mak:13
-msgid "Name:"
-msgstr "Nom :"
+#: prewikka/views/filter/templates/filteredition.mak:9
+#: prewikka/views/messagelisting/templates/alertlisting.mak:39
+msgid "Not equal"
+msgstr "Différent"
 
-#: prewikka/views/filter/templates/filteredition.mak:64
-msgid "Filter name"
-msgstr "Nom du filtre"
+#: prewikka/views/filter/templates/filteredition.mak:10
+msgid "Not equal (case-insensitive)"
+msgstr "Non égal (insensible à la casse)"
 
-#: prewikka/views/filter/templates/filteredition.mak:69
-msgid "Description:"
-msgstr "Description :"
+#: prewikka/views/filter/templates/filteredition.mak:11
+#: prewikka/views/messagelisting/templates/alertlisting.mak:46
+msgid "Regular expression"
+msgstr "Expression régulière"
 
-#: prewikka/views/filter/templates/filteredition.mak:96
-#: prewikka/views/usermanagement/templates/usersettings.mak:62
-msgid "Save"
-msgstr "Enregistrer"
+#: prewikka/views/filter/templates/filteredition.mak:12
+#: prewikka/views/messagelisting/templates/alertlisting.mak:47
+msgid "Regular expression (case-insensitive)"
+msgstr "Expression régulière (insensible à la casse)"
 
+#: prewikka/views/filter/templates/filteredition.mak:13
+msgid "Not regular expression"
+msgstr "Non expression régulière"
+
+#: prewikka/views/filter/templates/filteredition.mak:14
+msgid "Not regular expression (case-insensitive)"
+msgstr "Non expression régulière (insensible à la casse)"
+
+#: prewikka/views/filter/templates/filteredition.mak:15
+#: prewikka/views/messagelisting/templates/alertlisting.mak:40
+msgid "Lesser than"
+msgstr "Plus petit que"
+
+#: prewikka/views/filter/templates/filteredition.mak:16
+#: prewikka/views/messagelisting/templates/alertlisting.mak:42
+msgid "Lesser or equal"
+msgstr "Plus petit ou égal"
+
+#: prewikka/views/filter/templates/filteredition.mak:17
+#: prewikka/views/messagelisting/templates/alertlisting.mak:41
+msgid "Greater than"
+msgstr "Plus grand que"
+
+#: prewikka/views/filter/templates/filteredition.mak:18
+#: prewikka/views/messagelisting/templates/alertlisting.mak:43
+msgid "Greater or equal"
+msgstr "Plus grand ou égal"
+
+#: prewikka/views/filter/templates/filteredition.mak:19
+#: prewikka/views/messagelisting/templates/alertlisting.mak:44
+msgid "Substring"
+msgstr "Sous-chaîne"
+
+#: prewikka/views/filter/templates/filteredition.mak:20
+#: prewikka/views/messagelisting/templates/alertlisting.mak:45
+msgid "Substring (case-insensitive)"
+msgstr "Sous-chaîne (insensible à la casse)"
+
+#: prewikka/views/filter/templates/filteredition.mak:21
+msgid "Not substring"
+msgstr "Non sous-chaîne"
+
+#: prewikka/views/filter/templates/filteredition.mak:22
+msgid "Not substring (case-insensitive)"
+msgstr "Non sous-chaîne (insensible à la casse)"
+
+#: prewikka/views/filter/templates/filteredition.mak:75
 #: prewikka/views/filter/templates/filterlisting.mak:22
 msgid "New filter"
 msgstr "Nouveau filtre"
+
+#: prewikka/views/filter/templates/filteredition.mak:82
+#: prewikka/views/usermanagement/templates/usersettings.mak:13
+msgid "Name:"
+msgstr "Nom :"
+
+#: prewikka/views/filter/templates/filteredition.mak:84
+msgid "Filter name"
+msgstr "Nom du filtre"
+
+#: prewikka/views/filter/templates/filteredition.mak:89
+msgid "Description:"
+msgstr "Description :"
+
+#: prewikka/views/filter/templates/filteredition.mak:120
+#: prewikka/views/usermanagement/templates/usersettings.mak:61
+msgid "Save"
+msgstr "Enregistrer"
 
 #: prewikka/views/filter/templates/filterlisting.mak:45
 msgid "Create"
@@ -1247,7 +1258,7 @@ msgstr "Supprimer les filtres sélectionnés ?"
 
 #: prewikka/views/filter/templates/menu.mak:1
 msgid "Filter:"
-msgstr "Filtre :"
+msgstr "Filtre :"
 
 #: prewikka/views/filter/templates/menu.mak:2
 msgid "Available filters"
@@ -1260,6 +1271,39 @@ msgstr "Pas de filtre"
 #: prewikka/views/filter/templates/widget.mak:5
 msgid "Select a path..."
 msgstr "Sélectionner un chemin..."
+
+#: prewikka/views/filter/templates/widget.mak:23
+#: prewikka/views/filter/templates/widget.mak:44
+msgid "Change operator"
+msgstr "Modifier l'opérateur"
+
+#: prewikka/views/filter/templates/widget.mak:30
+msgid "value"
+msgstr "valeur"
+
+#: prewikka/views/filter/templates/widget.mak:32
+msgid "Delete condition"
+msgstr "Supprimer la condition"
+
+#: prewikka/views/filter/templates/widget.mak:40
+msgid "AND"
+msgstr "ET"
+
+#: prewikka/views/filter/templates/widget.mak:40
+msgid "OR"
+msgstr "OU"
+
+#: prewikka/views/filter/templates/widget.mak:54
+msgid "Add condition"
+msgstr "Ajouter une condition"
+
+#: prewikka/views/filter/templates/widget.mak:55
+msgid "Add group"
+msgstr "Ajouter un groupe"
+
+#: prewikka/views/filter/templates/widget.mak:57
+msgid "Delete group"
+msgstr "Supprimer le groupe"
 
 #: prewikka/views/messagelisting/__init__.py:16
 msgid "Alert and Heartbeat listing page"
@@ -1317,7 +1361,7 @@ msgstr "avancé"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:194
 msgid "Group entry by:"
-msgstr "Grouper les entrées par :"
+msgstr "Grouper les entrées par :"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:212
 #: prewikka/views/messagelisting/templates/alertlisting.mak:214
@@ -1336,7 +1380,7 @@ msgstr "Appliquer"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:248
 msgid "Type:"
-msgstr "Type :"
+msgstr "Type :"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:250
 #: prewikka/views/messagesummary/messagesummary.py:1014
@@ -1357,7 +1401,7 @@ msgstr "Alerte d'outil"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:259
 msgid "Severity:"
-msgstr "Gravité :"
+msgstr "Gravité :"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:260
 msgid "info"
@@ -1495,7 +1539,7 @@ msgstr "Données"
 #: prewikka/views/messagesummary/messagesummary.py:389
 #, python-format
 msgid "(agent local time: %s)"
-msgstr "(heure locale de la sonde : %s)"
+msgstr "(heure locale de la sonde : %s)"
 
 #: prewikka/views/messagesummary/messagesummary.py:396
 #: prewikka/views/messagesummary/messagesummary.py:848
@@ -1887,7 +1931,7 @@ msgstr "Charge utile ASCII"
 msgid "Heartbeat"
 msgstr "Pulsation"
 
-#: prewikka/views/messagesummary/templates/messagesummary.mak:88
+#: prewikka/views/messagesummary/templates/messagesummary.mak:85
 msgid "Summary"
 msgstr "Résumé"
 
@@ -1926,11 +1970,11 @@ msgstr "Le fuseau horaire spécifié n'existe pas"
 
 #: prewikka/views/usermanagement/templates/usersettings.mak:6
 msgid "Login:"
-msgstr "Identifiant :"
+msgstr "Identifiant :"
 
 #: prewikka/views/usermanagement/templates/usersettings.mak:20
 msgid "Email:"
-msgstr "Email :"
+msgstr "Email :"
 
 #: prewikka/views/usermanagement/templates/usersettings.mak:22
 msgid "Email"
@@ -1938,12 +1982,13 @@ msgstr "Email"
 
 #: prewikka/views/usermanagement/templates/usersettings.mak:27
 msgid "Language:"
-msgstr "Langue :"
+msgstr "Langue :"
 
 #: prewikka/views/usermanagement/templates/usersettings.mak:39
 msgid "Theme:"
-msgstr "Thème :"
+msgstr "Thème :"
 
 #: prewikka/views/usermanagement/templates/usersettings.mak:50
 msgid "Timezone:"
-msgstr "Fuseau horaire :"
+msgstr "Fuseau horaire :"
+
