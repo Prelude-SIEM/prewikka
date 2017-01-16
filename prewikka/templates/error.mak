@@ -1,4 +1,6 @@
 <%!
+from traceback import format_exception
+
 from prewikka.utils import html
 from mako.exceptions import RichTraceback
 
@@ -57,8 +59,12 @@ def inherit(context):
 % endif
 </style>
 
+<textarea style="position: absolute; visibility: hidden; width: 0; height: 0" class="traceback-value">${"".join(format_exception(*traceback))}</textarea>
+
 <div class="traceback">
-  <h3>${ _("Detail") }</h3>
+  <h3>${ _("Detail") }
+    <span class="traceback-copy pull-right" title="${_('Copy to clipboard')}"><i class="fa fa-clipboard"></i></span>
+  </h3>
   <div>
 
     % if lines:
@@ -110,6 +116,16 @@ def inherit(context):
 <script type="text/javascript">
   $(document).ready(function() {
     $("div.traceback").accordion({collapsible: true, active: false, heightStyle: "content"});
+
+    $(".traceback-copy").on("click", function() {
+        var range = document.createRange();
+        range.selectNodeContents($("textarea.traceback-value")[0]);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        document.execCommand("copy", false, null);
+        return false;
+    });
   });
 </script>
 
