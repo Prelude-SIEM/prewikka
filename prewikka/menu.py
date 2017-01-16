@@ -49,11 +49,11 @@ class MenuManager(object):
 
         for menu in self._menu_order:
             if "name" not in menu:
-                raise error.PrewikkaUserError(N_("Menu error"), N_("Menu without a name in %s") % filename)
+                raise error.PrewikkaUserError(N_("Menu error"), N_("Menu without a name in %s", filename))
 
             for section in menu.get("sections", []):
                 if "name" not in section:
-                    raise error.PrewikkaUserError(N_("Menu error"), N_("Section without a name in %s") % filename)
+                    raise error.PrewikkaUserError(N_("Menu error"), N_("Section without a name in %s", filename))
 
                 self._declared_sections[section["name"]] = section.get("tabs", [])
 

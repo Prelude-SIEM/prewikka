@@ -68,19 +68,6 @@ class PrewikkaError(PrewikkaException):
         if details is not None:
             self.details = details
 
-        self._untranslated_name = text_type(self.name)
-        self._untranslated_message = text_type(self.message)
-        self._untranslated_details = text_type(self.details)
-
-        if self._untranslated_name:
-            self.name = _(self._untranslated_name)
-
-        if self._untranslated_message:
-            self.message = _(self._untranslated_message)
-
-        if self._untranslated_details:
-            self.details = _(self._untranslated_details)
-
         if template:
             self.template = template
 
@@ -130,12 +117,12 @@ class PrewikkaError(PrewikkaException):
     @staticmethod
     def _format_error(message, details):
         if details:
-            return message + ": " + details
+            return "%s: %s" % (message, details)
 
         return message
 
     def __str__(self):
-        return self._format_error(self._untranslated_message, self._untranslated_details)
+        return self._format_error(self.message, self.details)
 
     def __json__(self):
         dset = self._setup_template(PrewikkaError.template, True)

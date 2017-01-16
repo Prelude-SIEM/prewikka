@@ -299,7 +299,7 @@ class Core:
 
         except Exception as err:
             response = error.PrewikkaError(
-                N_("An unexpected condition happened while trying to load %s") % (webreq.path),
+                N_("An unexpected condition happened while trying to load %s", webreq.path),
                 details=err
             ).respond()
 
