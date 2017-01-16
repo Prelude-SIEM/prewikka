@@ -44,7 +44,7 @@ function Criterion(left, operator, right) {
     }
 }
 
-function FilterEdition(selector, default_paths, all_paths, operators, enums) {
+function FilterEdition(selector, default_paths, all_paths, operators, enums, tooltips) {
 
     var that = this;
 
@@ -61,7 +61,26 @@ function FilterEdition(selector, default_paths, all_paths, operators, enums) {
             search_contains: true
         });
 
+        that.init_operators(select);
         that.init_autocomplete(select);
+    }
+
+    this.init_operators = function(select) {
+        var type = select.closest(".filter-edition").data("type");
+        var ul = select.parent().siblings(".operator").children("ul").empty();
+        var opdiv = $(ul).siblings("div[data-toggle=dropdown]");
+        var oplist = operators[type][select.val()];
+
+        $.each(oplist, function(index, operator) {
+            $("<li>").append($("<a>", {
+                "data-value": operator,
+                "title": tooltips[operator]
+            }).text(operator)).appendTo(ul);
+        });
+
+        if ( oplist.indexOf(opdiv.text()) == -1 ) {
+            opdiv.text(oplist[0]);
+        }
     }
 
     this.init_autocomplete = function(select) {
@@ -114,24 +133,12 @@ function FilterEdition(selector, default_paths, all_paths, operators, enums) {
 
     $(selector).on("click", ".dropdown-menu a", function() {
         var menu = $(this).closest(".dropdown-menu")
-        menu.siblings("[data-toggle=dropdown]").text($(this).text());
+        menu.siblings("[data-toggle=dropdown]").children("span").first().text($(this).text());
         menu.siblings(".input-value").val($(this).data("value"));
     });
 
     $(selector).on("change", ".data-paths", function() {
-        var type = $(this).closest(".filter-edition").data("type");
-        var ul = $(this).parent().siblings(".operator").children("ul").empty();
-        var opdiv = $(ul).siblings("div[data-toggle=dropdown]");
-        var oplist = operators[type][$(this).val()];
-
-        $.each(oplist, function(index, operator) {
-            $("<li>").append($("<a>", {"data-value": operator}).text(operator)).appendTo(ul);
-        });
-
-        if ( oplist.indexOf(opdiv.text()) == -1 ) {
-            opdiv.text(oplist[0]);
-        }
-
+        that.init_operators($(this));
         that.init_autocomplete($(this));
     });
 

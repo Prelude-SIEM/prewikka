@@ -20,16 +20,16 @@
             </div>
             <div class="input-group-addon dropdown operator">
                 <input type="hidden" class="input-value" value="${operator}"/>
-                <div data-toggle="dropdown">${operator}</div>
+                <div data-toggle="dropdown" title="${_('Change operator')}"><span>${operator}</span></div>
                 <ul class="dropdown-menu">
                 % for op in (kwargs["operators"].get(field or default_field, []) if "operators" in kwargs else []):
-                    <li><a data-value="${op}">${op}</a></li>
+                    <li><a data-value="${op}" title="${kwargs['tooltips'][op]}">${op}</a></li>
                 % endfor
                 </ul>
             </div>
-            <input type="text" class="form-control input-sm data-value input-value" placeholder="value" value="${value}" style="width: 300px"/>
+            <input type="text" class="form-control input-sm data-value input-value" placeholder="${_('value')}" value="${value}" style="width: 300px"/>
             <span class="input-group-btn">
-                <div class="btn btn-sm btn-danger delcond"><i class="fa fa-trash"></i></div>
+                <div class="btn btn-sm btn-danger delcond" title="${_('Delete condition')}"><i class="fa fa-trash"></i></div>
             </span>
         </div>
     </div>
@@ -37,21 +37,24 @@
 
 
 <%def name="group(operator='&&', operands=None, root=False, **kwargs)">
-    <% OPERATORS = {"&&": "AND", "||": "OR"} %>
+    <% OPERATORS = {"&&": _("AND"), "||": _("OR")} %>
     <div class="filter-group">
         <span class="dropdown">
             <input type="hidden" class="input-value" value="${operator}"/>
-            <button type="button" class="btn btn-xs btn-primary" data-toggle="dropdown">${OPERATORS[operator]}</button>
+            <button type="button" class="btn btn-xs btn-primary" data-toggle="dropdown" title="${_('Change operator')}">
+                <span>${OPERATORS[operator]}</span>
+                <span class="caret"></span>
+            </button>
             <ul class="dropdown-menu">
             % for op, label in OPERATORS.items():
                 <li><a data-value="${op}">${label}</a></li>
             % endfor
             </ul>
         </span>
-        <button type="button" class="btn btn-xs btn-success newcond"><i class="fa fa-plus"></i></button>
-        <button type="button" class="btn btn-xs btn-success newgroup"><b>&amp;</b></button>
+        <button type="button" class="btn btn-xs btn-success newcond" title="${_('Add condition')}"><i class="fa fa-plus"></i></button>
+        <button type="button" class="btn btn-xs btn-success newgroup" title="${_('Add group')}"><b>&amp;</b></button>
         % if not root:
-        <button type="button" class="btn btn-xs btn-danger delgroup"><i class="fa fa-trash"></i></button>
+        <button type="button" class="btn btn-xs btn-danger delgroup" title="${_('Delete group')}"><i class="fa fa-trash"></i></button>
         % endif
         <ul class="filter-list">
         % if operands is not None:

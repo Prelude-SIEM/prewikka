@@ -32,25 +32,6 @@ from . import FilterPlugin
 
 _TYPES = [("alert", N_("Alerts")), ("log", N_("Logs")), ("ticket", N_("Tickets"))]
 
-_OPERATORS = {
-    "=": N_("Equal"),
-    "=*": N_("Equal (case-insensitive)"),
-    "!=": N_("Not equal"),
-    "!=*": N_("Not equal (case-insensitive)"),
-    "~": N_("Regular expression"),
-    "~*": N_("Regular expression (case-insensitive)"),
-    "!~": N_("Not regular expression"),
-    "!~*": N_("Not regular expression (case-insensitive)"),
-    "<": N_("Lesser than"),
-    "<=": N_("Lesser or equal"),
-    ">": N_("Greater than"),
-    ">=": N_("Greater or equal"),
-    "<>": N_("Substring"),
-    "<>*": N_("Substring (case-insensitive)"),
-    "!<>": N_("Not substring"),
-    "!<>*": N_("Not substring (case-insensitive)")
-}
-
 
 def _flatten(criterion):
     if criterion.operator not in ("&&", "||"):
@@ -210,7 +191,6 @@ class FilterView(FilterPlugin, view.View):
             name = env.request.parameters["duplicate"]
 
         dataset = {
-            "operators": _OPERATORS,
             "fltr": AttrObj(name="", description="", criteria={}),
             "types": list(self._get_types())
         }

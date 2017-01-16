@@ -3,6 +3,25 @@
 <%namespace file="/prewikka/views/filter/templates/widget.mak" import="init, condition, group"/>
 
 <%
+    tooltips = {
+        "=": _("Equal"),
+        "=*": _("Equal (case-insensitive)"),
+        "!=": _("Not equal"),
+        "!=*": _("Not equal (case-insensitive)"),
+        "~": _("Regular expression"),
+        "~*": _("Regular expression (case-insensitive)"),
+        "!~": _("Not regular expression"),
+        "!~*": _("Not regular expression (case-insensitive)"),
+        "<": _("Lesser than"),
+        "<=": _("Lesser or equal"),
+        ">": _("Greater than"),
+        ">=": _("Greater or equal"),
+        "<>": _("Substring"),
+        "<>*": _("Substring (case-insensitive)"),
+        "!<>": _("Not substring"),
+        "!<>*": _("Not substring (case-insensitive)")
+    }
+
     default_paths = {}
     all_paths = {}
     operators = {}
@@ -40,7 +59,8 @@ $LAB.script("filter/js/filter.js").script("prewikka/js/chosen.jquery.min.js").wa
                       ${default_paths | n,json.dumps},
                       ${all_paths | n,json.dumps},
                       ${operators | n,json.dumps},
-                      ${enums | n,json.dumps}).init();
+                      ${enums | n,json.dumps},
+                      ${tooltips | n,json.dumps}).init();
 
 });
 </script>
@@ -79,7 +99,7 @@ $LAB.script("filter/js/filter.js").script("prewikka/js/chosen.jquery.min.js").wa
             <div class="filter-edition form-inline" data-type="${typ}">
                 <input type="hidden" name="filter_types" value="${typ}"/>
                 <input type="hidden" name="filter_criteria"/>
-                ${init(fltr.criteria.get(typ), root=True, default_paths=default_paths[typ], all_paths=all_paths[typ], operators=operators[typ], enums=enums[typ])}
+                ${init(fltr.criteria.get(typ), root=True, default_paths=default_paths[typ], all_paths=all_paths[typ], operators=operators[typ], enums=enums[typ], tooltips=tooltips)}
             </div>
         </div>
     </div>
