@@ -116,16 +116,16 @@ class FilterDatabase(database.DatabaseHelper):
 
     @database.use_transaction
     def delete_filter(self, user, name=None):
-        query = "SELECT id FROM Prewikka_Filter WHERE userid = %(user)s"
+        query = "SELECT id, name FROM Prewikka_Filter WHERE userid = %(user)s"
         if name:
             query += " AND name = %(name)s"
 
-        idlist = [id[0] for id in self.query(query, user=user.id, name=name)]
+        rows = self.query(query, user=user.id, name=name)
 
-        if idlist:
-            self.query("DELETE FROM Prewikka_Filter WHERE id IN %s", idlist)
+        if rows:
+            self.query("DELETE FROM Prewikka_Filter WHERE id IN %s", (row[0] for row in rows))
 
-        return idlist
+        return rows
 
 
 class FilterView(FilterPlugin, view.View):
@@ -169,9 +169,9 @@ class FilterView(FilterPlugin, view.View):
     def _user_delete(self, user):
         self._filter_delete(user)
 
-    def _filter_delete(self, user, name):
-        idlist = self._db.delete_filter(user, name)
-        list(hookmanager.trigger("HOOK_FILTER_DELETE", user, name, idlist[0]))
+    def _filter_delete(self, user, name=None):
+        for fid, fname in self._db.delete_filter(user, name):
+            list(hookmanager.trigger("HOOK_FILTER_DELETE", user, fname, fid))
 
     @hookmanager.register("HOOK_MAINMENU_PARAMETERS_REGISTER")
     def _filter_parameters_register(self, view):
