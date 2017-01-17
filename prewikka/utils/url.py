@@ -23,10 +23,8 @@ import sys
 import prelude
 
 if sys.version_info >= (3,0):
-    from urllib.request import pathname2url
     from urllib.parse import urlencode as _urlencode
 else:
-    from urllib import pathname2url
     from urllib import urlencode as __urlencode
 
     def _convert(d):
@@ -47,15 +45,6 @@ else:
 
 def urlencode(parameters, doseq=False):
     return _urlencode(parameters, doseq).replace('&', '&amp;')
-
-
-def create_link(path, parameters=None):
-    link = pathname2url(path)
-
-    if parameters:
-        link += "?%s" % urlencode(parameters, doseq=True)
-
-    return link
 
 
 def idmef_criteria_to_urlparams(paths, values, operators=None, index=0):
