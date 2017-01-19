@@ -273,6 +273,8 @@ function _dialog_common(dialog)
 
     if ( $(dialog).attr("data-draggable") )
         $(dialog).draggable({ handle: ".modal-header" });
+
+    _initialize_components(dialog);
 }
 
 
