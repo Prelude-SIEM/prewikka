@@ -23,11 +23,11 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
 </script>
 
 <div id="main_menu_ng">
-     <input type="hidden" name="timeline_end" id="hidden_timeline_end" value="${timeline.end}">
-     <input type="hidden" name="timeline_start" id="hidden_timeline_start" value="${timeline.start}">
-     <input type="hidden" name="timeline_value" id="hidden_timeline_value" value="${timeline.value}">
-     <input type="hidden" name="timeline_unit" id="hidden_timeline_unit" value="${timeline.unit}">
-     <input type="hidden" name="timeline_absolute" id="hidden_timeline_absolute" value="${timeline.absolute}">
+     <input type="hidden" name="timeline_end" id="hidden_timeline_end" value="${timeline.end}" ${disabled(not timeline.quick_custom)}>
+     <input type="hidden" name="timeline_start" id="hidden_timeline_start" value="${timeline.start}" ${disabled(not timeline.quick_custom)}>
+     <input type="hidden" name="timeline_value" id="hidden_timeline_value" value="${timeline.value}" ${disabled(timeline.quick_custom)}>
+     <input type="hidden" name="timeline_unit" id="hidden_timeline_unit" value="${timeline.unit}" ${disabled(timeline.quick_custom)}>
+     <input type="hidden" name="timeline_absolute" id="hidden_timeline_absolute" value="${timeline.absolute}" ${disabled(timeline.quick_custom)}>
      <input type="hidden" name="auto_apply_enable" id="hidden_auto_apply_enable" value="${auto_apply_enable}">
      <input type="hidden" name="auto_apply_value" id="hidden_auto_apply_value" value="${auto_apply_value}">
      <input type="hidden" name="_save" value="1">
