@@ -28,7 +28,6 @@ from prewikka import hookmanager, resource, template, utils, view
 _CSS_FILES = utils.OrderedDict((resource.CSSLink(link), True) for link in (
     "prewikka/css/jquery-ui.min.css",
     "prewikka/css/bootstrap.min.css",
-    "prewikka/css/jquery.jstree.css",
     "prewikka/css/jquery-ui-timepicker-addon.min.css",
     "prewikka/css/font-awesome.min.css",
     "prewikka/css/ui.jqgrid.min.css",
@@ -47,8 +46,7 @@ _JS_FILES = utils.OrderedDict((resource.JSLink(link), True) for link in (
     "prewikka/js/jquery-ui-timepicker-addon.min.js",
     "prewikka/js/ui.multiselect.min.js",
     "prewikka/js/jquery.jqgrid.min.js",
-    "prewikka/js/commonlisting.js",
-    "prewikka/js/jquery.jstree.js")
+    "prewikka/js/commonlisting.js")
 )
 
 

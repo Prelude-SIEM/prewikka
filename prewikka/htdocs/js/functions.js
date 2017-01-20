@@ -63,73 +63,6 @@ $(document).ready(function(){
       return false;
   });
 
-
-// IDMEF Browser
-
-  var targetElem = null;
-
-  $(document).on("click", ".idmef-browser-open", function(e) {
-      targetElem = $(this).prev(".idmef-browser-target");
-      var tree = $("#idmef-browser-dialog");
-      if ( $(tree).dialog("isOpen") )
-          $(tree).dialog("close");
-      else {
-          $(tree).dialog("option", "position", { my: "left top", at: "center", of: $(this) });
-          $(tree).dialog("open");
-      }
-          e.preventDefault();
-  });
-
-  $("body").on("click", ".idmef-leaf", function(e) {
-      var path = "";
-      $('#idmef-prefix').children("#parenthesis, :visible").each(function() {
-          path += $(this).val();
-      });
-      if ( path )
-          path += ".";
-      path += $(this).attr("id");
-
-      var target = targetElem || $(".idmef-browser-target");
-      if ($(target).is("input")) {
-            $(target).val(path);
-      }
-      else {
-            $(target).html(path);
-      }
-      $("#idmef-browser-dialog").dialog("close");
-  });
-
-  var to = false;
-
-  $(document).on("keyup", "#idmef-browser-search", function() {
-      if (to) { clearTimeout(to); }
-      to = setTimeout(function() {
-          var v = $('#idmef-browser-search').val();
-          $('#idmef-browser-tree').jstree(true).search(v);
-      }, 250);
-  });
-
-    $( "#help-button" ).button({
-        icons: {
-            primary: "ui-icon-help"
-        },
-        text: false
-    }).hide();
-
-    $( "#maximize-button" ).button({
-        icons: {
-            primary: "ui-icon-arrow-4-diag"
-        },
-        text: false
-    });
-
-    $( "#logout-button" ).button({
-        icons: {
-            primary: "ui-icon-closethick"
-        },
-        text: false
-    });
-
   $(document).on('click', '[data-confirm]', function() {
       var input = $(this);
       var confirm = input.data("confirm");
@@ -309,30 +242,6 @@ function prewikka_dialog(data)
 
 function prewikka_dialog_getMaxHeight() {
     return $(window).height() - $("#topmenu").height() - 100;
-}
-
-
-function idmef_browser() {
-
-    $("#idmef-browser-dialog").dialog({ autoOpen: false, title: "IDMEF Browser", zIndex: 99999 });
-    $.jstree.defaults.search.show_only_matches = true;
-    $("#idmef-browser-tree").jstree({
-        "plugins": [ "search" ]
-    })
-    .bind('search.jstree before_open.jstree', function (e, data) {
-        // Search Plugin: Allow to open found subnodes
-        // See https://github.com/vakata/jstree/issues/668
-        if (data.instance.settings.search.show_only_matches) {
-            data.instance._data.search.dom.find('.jstree-node')
-                .show().filter('.jstree-last').filter(function() {
-                    return this.nextSibling;
-                }).removeClass('jstree-last')
-                .end().end().end().find(".jstree-children").each(function() {
-                    $(this).children(".jstree-node:visible").eq(-1).addClass("jstree-last");
-                });
-        }
-    });
-
 }
 
 
