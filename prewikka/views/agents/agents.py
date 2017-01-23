@@ -18,24 +18,28 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-import time
 
 import pkg_resources
+import time
+from dateutil.relativedelta import relativedelta
+
 from prewikka import hookmanager, localization, mainmenu, template, utils, view, response
 from prewikka.dataprovider import Criterion
 from prewikka.utils import html, json
 
 
-class AgentsParameters(view.Parameters):
+class AgentsParameters(mainmenu.MainMenuParameters):
+    allow_extra_parameters = True
+
     def register(self):
-        self.optional("types", list, default=[])
+        mainmenu.MainMenuParameters.register(self)
         self.optional("filter", json.loads)
-        self.optional("status", list, default=[])
 
 
 class Agents(view.View):
     view_parameters = AgentsParameters
     view_menu = (N_("Agents"), N_("Agents"))
+    view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     def __init__(self):
@@ -103,8 +107,8 @@ class Agents(view.View):
     def delete(self):
         c = Criterion()
 
-        for analyzerid in env.request.parameters["analyzerid"]:
-            for i in env.request.parameters["types"]:
+        for analyzerid in env.request.parameters.getlist("id[]"):
+            for i in env.request.parameters.getlist("types[]"):
                 if i in ("alert", "heartbeat"):
                     c |= Criterion("%s.analyzer.analyzerid" % i, "=", analyzerid)
 

@@ -101,6 +101,23 @@ function CommonListing(elem, text, options) {
         });
     }
 
+    grid.delete_rows = function(data) {
+        var rows = grid.getGridParam("selarrrow");
+        if ( rows.length == 0 ) return;
+        $.ajax({
+            url: options.deleteLink,
+            method: "POST",
+            data: _mergedict(data, {id: rows}),
+            success: function() {
+                // Iterate upwards because 'rows' gets modified
+                for ( var i = rows.length - 1; i >= 0; i-- )
+                    grid.delRowData(rows[i]);
+
+                update_buttons_state(0);
+            }
+        });
+    }
+
     $(".button-add").on("click", function() {
         prewikka_widget({
             url: options.editLink,
@@ -121,20 +138,8 @@ function CommonListing(elem, text, options) {
         });
     });
     $(".button-delete").on("click", function() {
-        var rows = grid.getGridParam("selarrrow");
-        if ( ( rows.length == 0 ) || ( $(this).data("confirm") ) ) return;
-        $.ajax({
-            url: options.deleteLink,
-            method: "POST",
-            data: {action: "delete", id: rows},
-            success: function() {
-                // Iterate upwards because 'rows' gets modified
-                for ( var i = rows.length - 1; i >= 0; i-- )
-                    grid.delRowData(rows[i]);
-
-                update_buttons_state(0);
-            }
-        });
+        if ( ! $(this).data("confirm") )
+            grid.delete_rows({});
     });
 
     resizeGrid();

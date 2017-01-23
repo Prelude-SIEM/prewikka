@@ -22,10 +22,3 @@
     font-weight: bold;
     border-top: 10px;
 }
-
-.global_toggle {
-    position: fixed;
-    right: 10px;
-    top: 60px;
-    z-index: 5;
-}

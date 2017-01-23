@@ -25,9 +25,10 @@ from prewikka.utils import json
         return div.html();
     };
 
-    var text = {'title': "${ _('Agents') }", 'search': "${ _('Search:') }"};
+    var text = {'title': '<button type="button" class="btn btn-default global_toggle">${ _("Show/Hide all") }</button>', 'search': "${ _('Search:') }"};
 
     var grid = CommonListing('table#agents', text, {
+        deleteLink: "${url_for('.delete')}",
         colNames: ["${ _('Name') }", "${ _('Location') }", "${ _('Node') }", "${ _('Model') }", "${ _('Version') }", "${ _('Class') }",
                 % for column in extra_columns:
                    "${ column.label }",
@@ -69,23 +70,19 @@ from prewikka.utils import json
         }
     });
 
-    $("form").on("submit", function() {
-        var form = this;
-        var rows = grid.getGridParam("selarrrow");
-        if ( rows.length == 0 || $(this).data("confirm") ) return;
-
-        $.each(rows, function(index, row) {
-            $("<input>", {"type": "hidden", "name": "analyzerid", "value": row}).appendTo(form);
-        });
+    $(".agent-delete").on("click", function() {
+        if ( ! $(this).data("confirm") ) {
+            var types = $.map($("input[name=types]:checked"), function(input) {
+                return $(input).val();
+            });
+            if ( types.length > 0 )
+                grid.delete_rows({"types": types});
+        }
     });
 
 </script>
 
 <table id="agents"></table>
-
-<button type="button" class="btn btn-default btn-sm global_toggle">${ _("Show/Hide all") }</button>
-
-<form action="${ url_for(".delete") }" method="post">
 
   <div class="footer-buttons form-inline">
     <div class="checkbox">
@@ -96,7 +93,5 @@ from prewikka.utils import json
       <input id="agent_delete_heartbeats" class="checkbox" type="checkbox" name="types" value="heartbeat" />
       <label for="agent_delete_heartbeats">${ _("Heartbeats") }</label>
     </div>
-    &nbsp;<button class="btn btn-danger needone" type="submit" value="${ _("Delete") }" data-confirm="${ _("Delete the selected IDMEF messages?") }"><i class="fa fa-trash"></i> ${ _("Delete") }</button>
+    &nbsp;<button type="button" class="btn btn-danger needone agent-delete" data-confirm="${ _("Delete the selected IDMEF messages?") }"><i class="fa fa-trash"></i> ${ _("Delete") }</button>
   </div>
-
-</form>
