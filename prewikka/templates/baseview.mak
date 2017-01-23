@@ -80,6 +80,7 @@ $(document).ready(function() {
         $(document).on("submit", "body form", function() {
                 $(this).find("input[name=_download]").remove();
 
+                var form = this;
                 var data = $(this).serialize();
 
                 if ( $(this).data("clicked") ) {
@@ -95,16 +96,13 @@ $(document).ready(function() {
                         return true;
                 }
 
-                /*
-                 * Close any opened modal.
-                 */
-                $(this).closest(".modal").modal('hide');
-
                 prewikka_loadTab({
                         url: $(this).attr("action"),
                         type: $(this).attr("method"),
                         data: data,
                         success: function() {
+                              /* Close the modal potentially containing the form. */
+                              $(form).closest(".modal").modal('hide');
                               $("#main form").trigger("submit-success");
                         },
                         error: function() {
