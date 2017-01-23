@@ -21,6 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import itertools
 import json
+import pkg_resources
 
 from prewikka import database, error, pluginmanager, template, utils, version, view, response
 from prewikka.utils import html
@@ -34,6 +35,7 @@ class AboutPlugin(view.View):
     plugin_copyright = version.__copyright__
     plugin_description = N_("Plugin installation and activation management page")
     plugin_mandatory = True
+    plugin_htdocs = (("aboutplugin", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     view_permissions = [ N_("USER_MANAGEMENT") ]
 

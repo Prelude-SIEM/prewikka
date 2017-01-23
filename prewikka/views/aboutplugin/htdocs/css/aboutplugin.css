@@ -1,0 +1,21 @@
+.fieldset_heading .right {
+    text-align: right;
+}
+
+table.update_log {
+    border-collapse: collapse;
+}
+
+table.update_log tbody {
+    height: 200px;
+    overflow-y: auto;
+    color: #444;
+}
+
+table.update_log td.result {
+    font-weight: bold;
+}
+
+.hiddenRow {
+    padding: 0 !important;
+}

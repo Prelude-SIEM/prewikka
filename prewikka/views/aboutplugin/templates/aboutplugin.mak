@@ -1,3 +1,5 @@
+<link rel="stylesheet" type="text/css" href="aboutplugin/css/aboutplugin.css" />
+
 <script type="text/javascript">
     var slice = 0;
 
@@ -99,29 +101,6 @@
     });
 
 </script>
-
-<style>
-    .fieldset_heading .right {
-        text-align: right;
-    }
-
-    table.update_log {
-        border-collapse: collapse;
-    }
-
-    table.update_log tbody {
-        height: 200px;
-        overflow-y: auto;
-    }
-
-    table.update_log td.result {
-        font-weight: bold;
-    }
-
-    .hiddenRow {
-        padding: 0 !important;
-    }
-</style>
 
 
 <div class="container">
