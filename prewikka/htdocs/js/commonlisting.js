@@ -61,17 +61,9 @@ function CommonListing(elem, text, options) {
     .jqGrid('navButtonAdd', {
         buttonicon: "ui-icon-gear",
         caption: "",
-        title: "Reorder Columns",
+        title: "Edit columns",
         onClickButton: function() {
-            $(elem).jqGrid('columnChooser', {
-                /* Necessary for the grid width not to expand
-                 * This may be a bug in free-jqGrid / columnChooser
-                 * TODO: test with a more recent version */
-                done: function(perm) {
-                    if ( perm )
-                        resizeGrid();
-                }
-            });
+            $(elem).jqGrid('columnChooser');
         }
     });
 
