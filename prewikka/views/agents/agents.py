@@ -177,8 +177,10 @@ class Agents(view.View):
 
         if not analyzer.events:
             delta = localization.format_timedelta(total_interval / self._heartbeat_count)
-            analyzer.events.append({ "time": "", "value":
-                                     _("No anomaly in the last %(count)d heartbeats (one heartbeat every %(delta)s average)") %
-                                       {'count': self._heartbeat_count, 'delta':delta}, "type": "no_anomaly" })
+            analyzer.events.append(utils.AttrObj(
+                time="",
+                value=_("No anomaly in the last %(count)d heartbeats (one heartbeat every %(delta)s average)") % {'count': self._heartbeat_count, 'delta': delta},
+                type="no_anomaly"
+            ))
 
         return template.PrewikkaTemplate(__name__, "templates/heartbeatanalyze.mak").render(analyzer=analyzer)
