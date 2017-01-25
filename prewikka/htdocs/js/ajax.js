@@ -64,9 +64,6 @@ function prewikka_drawTab(data)
     var form;
     var content = $(data.content);
 
-    if ( data.type == "reload" )
-        location.reload(); /* FIXME: move to appropriate place */
-
     handle_notifications(data);
 
     if ( ! data.content ) {
@@ -82,10 +79,7 @@ function prewikka_drawTab(data)
     /*
      * Check self and descendant
      */
-    form = $(content).closest("form");
-    if ( ! form.length )
-        form = $(content).find("form");
-
+    form = $(content).find("form").addBack("form");
     if ( ! form.length )
         form = content = content.wrapAll('<form method="get" action="' + prewikka_location().pathname + '"></form>').parent();
 
@@ -112,7 +106,32 @@ function prewikka_drawTab(data)
     }
 
     _initialize_components("#main");
+    window.scrollTo(0, 0);
 }
+
+
+function _process_ajax_response(data)
+{
+    if ( data.type == "reload" )
+        location.reload();
+
+    else if ( data.type == "ajax-reload" )
+        return prewikka_loadTab({ url: prewikka_location().href });
+
+    else if ( data.type == "html" )
+        return prewikka_drawTab(data);
+}
+
+
+function prewikka_process_ajax_response(data)
+{
+    if ( data.constructor == Object )
+        return _process_ajax_response(data);
+
+    for ( var i in data )
+        _process_ajax_response(data[i]);
+}
+
 
 /* Update the tab's menu according to the url */
 function _url2menu(url)
@@ -170,8 +189,8 @@ function prewikka_loadTab(settings)
                         if ( settings['success'] )
                                 settings['success']();
                 }
-                prewikka_drawTab(data);
-                window.scrollTo(0, 0);
+
+                prewikka_process_ajax_response(data);
         });
 }
 
