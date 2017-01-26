@@ -36,6 +36,7 @@ else:
     import __builtin__ as builtins
 
 
+_SENTINEL = object()
 _URL_ADAPTER_CACHE = {}
 logger = log.getLogger(__name__)
 
@@ -339,8 +340,6 @@ class Parameters(dict):
         return ret
 
 
-_sentinel = object()
-
 
 class _ViewDescriptor(object):
     view_parameters = Parameters
@@ -607,6 +606,10 @@ class ViewManager(object):
 
         if endpoint[0] != "." and endpoint.find(".") == -1:
             endpoint += ".render"
+
+        default = kwargs.pop("_default", _SENTINEL)
+        if default is not _SENTINEL and endpoint not in self._views_endpoint:
+            return default
 
         return env.request.url_adapter.build(endpoint, values=kwargs)
 
