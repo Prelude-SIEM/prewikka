@@ -175,58 +175,83 @@ $(document).ready(function() {
 menus = {}
 if env.menumanager:
     menus = env.menumanager.get_menus()
+    sections = env.menumanager.get_sections()
+    declared_sections = env.menumanager.get_declared_sections()
+
+def _get_view_url(section, tabs):
+    if section not in sections:
+        return
+
+    for tab in tabs:
+        if tab not in sections[section]:
+            continue
+
+        for view in sections[section][tab].values():
+            if view.check_permissions(env.request.user):
+                return url_for(view.view_endpoint)
 %>
+
+<%def name="write_menu(obj, section, tabs)">
+    <% url = _get_view_url(section, tabs) %>
+
+    % if url:
+    <li>
+        <a href="${ url }">
+    % else:
+    <li class="disabled" title="${ _('This app has been disabled or failed to load.') }">
+        <a>
+    % endif
+            % if "icon" in obj:
+            <i class="fa fa-${obj['icon']}"></i>
+            % endif
+            ${ _(obj["name"]) }
+        </a>
+    </li>
+</%def>
 
 % if env.request.user:
     <ul id="top_view_navbar_menu" class="nav navbar-nav navbar-primary">
-    % for name, menu_item in menus.items():
+    % for menu in menus:
         <li class="dropdown">
             <a class="dropdown-toggle" data-toggle="dropdown">
-                % if menu_item.icon:
-                    <i class="fa fa-${ menu_item.icon }"></i>
+                % if "icon" in menu:
+                <i class="fa fa-${ menu['icon'] }"></i>
                 % endif
-                ${ _(name) }
+                ${ _(menu["name"]) }
                 <span class="caret"></span>
             </a>
             <ul class="dropdown-menu" role="menu">
-            % for section in menu_item.entries:
-                % if section.views:
-                    % if len(section.views) == 1:
-                <li>
-                    <a href="${ url_for(section.views[0].view_endpoint) }">
-                    % if section.icon:
-                        <i class="fa fa-${section.icon}"></i>
-                    % endif
-                        ${ _(section.name) }
-                    </a>
-                </li>
-                    % else:
+            % for section in menu.get("sections", []):
+                % if not section.get("expand"):
+                ${write_menu(section, section["name"], section.get("tabs", []))}
+                % else:
                 <li class="dropdown dropdown-submenu">
                     <a class="dropdown-toggle" data-toggle="dropdown">
-                    % if section.icon:
-                        <i class="fa fa-${section.icon}"></i>
-                    % endif
-                        ${ _(section.name) }
+                        % if "icon" in section:
+                        <i class="fa fa-${section['icon']}"></i>
+                        % endif
+                        ${ _(section["name"]) }
                     </a>
                     <ul class="dropdown-menu">
-                    % for view in section.views:
-                        <li><a href="${ url_for(view.view_endpoint) }">${ _(view.view_menu[-1]) }</a></li>
-                    % endfor
+                        % for tab in section.get("tabs", []):
+                        ${write_menu({"name": tab}, section["name"], [tab])}
+                        % endfor
                     </ul>
                 </li>
-                    % endif
-                % else:
-                <li class="disabled" title="${ _('This app has been disabled or failed to load.') }"><a>
-                    % if section.icon:
-                    <i class="fa fa-${section.icon}"></i>
-                    % endif
-                    ${ _(section.name) }
-                </a></li>
                 % endif
             % endfor
-            % if menu_item.default:
+            % if menu.get("default"):
+
+            ## Put the sections not declared in the YAML file into the default menu
+            % for name in set(sections) - set(declared_sections):
+                ${write_menu({"name": name}, name, sections[name].keys())}
+            % endfor
+
                 <li role="separator" class="divider"></li>
-                <li><a class="widget-link" title="${ _("About") }" href="${ url_for('About.render') }">${ _("About") }</a></li>
+                <% url = url_for('About.render', _default=None) %>
+                % if url:
+                <li><a class="widget-link" title="${ _("About") }" href="${ url }">${ _("About") }</a></li>
+                % endif
                 % if env.session.can_logout():
                 <li><a id="logout" title="${ _("Logout") }" class="ajax-bypass" href="${ url_for('Logout.render') }" data-confirm="${ _("Are you sure you want to log out?") }">${ _("Logout") }</a></li>
                 % endif

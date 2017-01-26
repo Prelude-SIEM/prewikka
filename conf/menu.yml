@@ -16,6 +16,7 @@
             - Heartbeats
 - name: ADMIN
   icon: sliders
+  default: true
   sections:
       - name: Settings
         tabs:

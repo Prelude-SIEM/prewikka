@@ -24,32 +24,40 @@ import yaml
 from copy import copy
 
 from prewikka import error, hookmanager, siteconfig
-from prewikka.utils import AttrObj, OrderedDict
+from prewikka.utils import OrderedDict
 
 
 class MenuManager(object):
     """
     Handle section placement in the menus.
     """
-    _DEFAULT_MENU = "ADMIN"
-    _DEFAULT_ICON = "sliders"
-
     def __init__(self):
         self._all_sections = set()
         self._declared_sections = {}
         self._loaded_sections = {}
         self._sorted = False
 
-        filename = env.config.general.get("menu_order", "menu.yml")
+        filename = env.config.interface.get("menu_order", "menu.yml")
         if not os.path.isabs(filename):
             filename = os.path.join(siteconfig.conf_dir, filename)
 
         with open(filename, "r") as f:
-            self._menu_order = yaml.load(f)
+            self._menus = yaml.load(f)
 
-        for menu in self._menu_order:
+        if not self._menus:
+            raise error.PrewikkaUserError(N_("Menu error"), N_("Empty menu"))
+
+        default = False
+
+        for menu in self._menus:
             if "name" not in menu:
                 raise error.PrewikkaUserError(N_("Menu error"), N_("Menu without a name in %s", filename))
+
+            if menu.get("default"):
+                if default:
+                    raise error.PrewikkaUserError(N_("Menu error"), N_("Multiple default menus"))
+
+                default = True
 
             for section in menu.get("sections", []):
                 if "name" not in section:
@@ -57,8 +65,18 @@ class MenuManager(object):
 
                 self._declared_sections[section["name"]] = section.get("tabs", [])
 
+        if not default:
+            self._menus[-1]["default"] = True
+
     def get_sections(self):
+        self._sort_tabs()
         return self._loaded_sections
+
+    def get_menus(self):
+        return self._menus
+
+    def get_declared_sections(self):
+        return self._declared_sections
 
     def add_section(self, name):
         self._all_sections.add(name)
@@ -92,73 +110,3 @@ class MenuManager(object):
 
         self._sorted = True
         self._loaded_sections = ret
-
-    def get_menus(self):
-        """
-        Return the menu structure in the following form:
-        {
-            menu1: {
-                icon: icon1,
-                entries: [
-                    {name: name11, link: link11, icon: icon11},
-                    {name: name12, link: link12, icon: icon12}
-                ]
-            },
-            menu2: {
-                icon: icon2,
-                entries: [
-                    ...
-                ]
-            }
-        }
-        """
-        self._sort_tabs()
-        loaded_sections = self.get_sections()
-
-        menus = OrderedDict()
-        default_menu = AttrObj(icon=self._DEFAULT_ICON, entries=[], default=True)
-
-        for menu in self._menu_order:
-            current_menu = AttrObj(icon=menu.get("icon"), entries=[], default=(menu["name"] == self._DEFAULT_MENU))
-
-            for section in menu.get("sections", []):
-                name = section["name"]
-                if name not in self._all_sections:
-                    continue
-
-                if name in loaded_sections:
-                    views = self._get_display_views(loaded_sections[name], expand=section.get("expand", False))
-                else:
-                    # Sections that are declared in the YAML file but not loaded
-                    # should appear in the menu, but with an empty link
-                    views = None
-
-                # Put the section in the current menu
-                current_menu.entries.append(AttrObj(name=name, views=views, icon=section.get("icon")))
-
-            menus[menu["name"]] = current_menu
-
-        for section_name in loaded_sections:
-            # Put the sections not declared in the YAML file into the default menu
-            if section_name not in self._declared_sections:
-                views = self._get_display_views(loaded_sections[section_name])
-                default_menu.entries.append(AttrObj(name=section_name, views=views, icon=None))
-
-        if self._DEFAULT_MENU in menus:
-            menus[self._DEFAULT_MENU].entries += default_menu.entries
-        else:
-            menus[self._DEFAULT_MENU] = default_menu
-
-        return menus
-
-    @classmethod
-    def _get_display_views(cls, section, expand=False):
-        if expand:
-            return [next(iter(views.values())) for views in section.values()]
-
-        return [cls._get_first_view(section)]
-
-    @staticmethod
-    def _get_first_view(section):
-        # Take the parent of the first view
-        return next(iter(next(iter(section.values())).values()))
