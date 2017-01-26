@@ -32,7 +32,7 @@ function check_same_origin(url) {
 
 $(document).ready(function() {
         % if not(context.get("is_error_template")):
-           prewikka_loadTab({url: "${document.href}", data: "${env.request.web.get_query_string() | n}", type: "${env.request.web.method}"});
+           prewikka_loadTab({url: window.location.pathname, data: "${env.request.web.get_query_string() | n}", type: "${env.request.web.method}"});
         % endif
 
         /*

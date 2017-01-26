@@ -117,15 +117,7 @@ function prewikka_drawTab(data)
 /* Update the tab's menu according to the url */
 function _url2menu(url)
 {
-        var pathname = unescape(url);
-        var tab;
-
-        $("#topmenu .topmenu_item").find("a").each(function() {
-                if ( $(this).attr("href").split("?")[0] === pathname ) {
-                    tab = $(this);
-                    return false;
-                }
-        });
+        var tab = $("#topmenu .topmenu_item a[href='" + url + "']");
 
         if ( tab ) {
                 /*
