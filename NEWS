@@ -1,3 +1,33 @@
+* 2017-01-27, prewikka-4.0.0rc1:
+
+Author: Yoann Vandoorselaere
+
+- View membership / permissions rework
+
+    UNIX-like permissions for views: a given view can now be owned
+    by a list of users (view_users), or/and a list of groups (view_groups).
+
+- url_for() now has a _default argument
+- Improve widget creation mechanisms
+- Fix upsert with empty generator
+- Fix possible tab activation issue on initial load
+
+Author: Antoine Luong
+
+- Include the control menu in the agent view
+- CSS and theme fixes
+- Fix control menu's unexpected behavior
+- Correctly translate errors
+- Improvements and fixes in filter views
+- Implement copying traceback to clipboard
+- Menu improvements
+- Implement an ajax-reload response type
+
+Author: Thomas Andrejak
+
+- Update messagesummary to Bootstrap
+
+
 * 2017-01-12, prewikka-4.0.0beta2:
 
 Author: Antoine Luong
