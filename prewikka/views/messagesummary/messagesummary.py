@@ -82,11 +82,11 @@ class Table(object):
                                                   "value": value,
                                                   "emphase": emphase })
 
-    def beginTable(self, cl="message_summary", style="", odd_even=False):
+    def beginTable(self, cl="table-striped table-bordered", style="", odd_even=False):
         table = {}
         table["rows"] = []
         table["odd_even"] = odd_even
-        table["class"] = cl
+        table["class"] = "table " + cl
         table["style"] = style
         table["parent"] = self._current_table or self._current_section
         self._current_table = table
@@ -447,7 +447,7 @@ class MessageSummary(Table, view.View):
         self.newTableEntry(_("Node address"), addr_list)
 
     def buildAnalyzer(self, analyzer):
-        self.beginTable(cl="message_summary_no_border")
+        self.beginTable(cl="")
 
         self.beginTable()
         self.newTableEntry(_("Model"), analyzer["model"], cl="section_alert_entry_value_emphasis")

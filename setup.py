@@ -228,7 +228,7 @@ setup(name="prewikka",
                            "templates/*.mak"],
                       'prewikka.views.aboutplugin': ["htdocs/css/*.css"],
                       'prewikka.views.messagelisting': [ "htdocs/css/*.css", "htdocs/js/*.js" ],
-                      'prewikka.views.messagesummary': [ "htdocs/css/*.css", "htdocs/js/*.js" ],
+                      'prewikka.views.messagesummary': [ "htdocs/js/*.js" ],
       },
 
       scripts=[ "scripts/prewikka-httpd" ],

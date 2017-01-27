@@ -11,25 +11,17 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
             <br/>
         % endif
 
-        % if table["odd_even"]:
-            <table class="${table["class"]} table_row_${loop.cycle('even', 'odd')}" style="${table["style"]}">
-        % else:
-            <table class="${table["class"]}" style="${table["style"]}">
-        % endif
-
-        <% row_class = "" %>
+        <table class="${table["class"]}" style="${table["style"]}">
 
         % for row in table["rows"]:
-            <tr class="${row_class}" style="">
+            <tr>
             % for col in row:
                 % if col["header"]:
                     <th>${col["name"]}</th>
-                    <% row_class = "table_row_even" %>
                 % elif col["tables"]:
                     <td>${ display_table(col, depth + 1) }</td>
-                    <% row_class = "" %>
                 % else:
-                    <td class="${col["class"]}">${col["name"]}</td>
+                    <td>${col["name"]}</td>
                 % endif
             % endfor
             </tr>
@@ -41,15 +33,19 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
 
 <%def name="display_node(sections)">
     % for section in sections:
-        <fieldset class="fieldset_heading">
-            <legend><a href="#">${section["title"]}</a></legend>
-            <div style="display: ${section["display"]}; width: 100%;">
+        <div class="panel panel-theme">
+            <div class="panel-heading">
+                <h3 class="panel-title">
+                    <a class="section-toggle">${section["title"]}</a>
+                </h3>
+            </div>
+            <div class="panel-body" style="display: ${section["display"]}; width: 100%;">
             ${ display_table(section, 0) }
 
             % if section["entries"]:
                 <table class="section_alert_entries">
                 % for entry in section["entries"]:
-                    <tr class="section_alert_entry table_row_${loop.cycle('even', 'odd')}">
+                    <tr class="section_alert_entry">
                     % if entry["name"]:
                         <th style="text-align: left; width:150px;">${entry["name"]}</th>
                     % endif
@@ -70,16 +66,18 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
         % endif
 
         </div>
-    </fieldset>
+    </div>
     % endfor
 </%def>
 
 <div class="container">
   <div class="widget" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="false" data-draggable="true" data-widget-options="modal-lg">
-    <link rel="stylesheet" type="text/css" href="messagesummary/css/messagesummary.css" />
 
     <script type="text/javascript">
         $LAB.script("messagesummary/js/messagesummary.js");
+        $("div.modal-body").on("click", "a.section-toggle", function() {
+            $(this).closest(".panel-heading").siblings(".panel-body:first").slideToggle();
+        });
     </script>
 
     <div class="modal-header">
