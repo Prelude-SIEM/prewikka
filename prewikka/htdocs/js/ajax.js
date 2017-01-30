@@ -138,7 +138,7 @@ function _url2menu(url)
 {
         var tab = $("#topmenu .topmenu_item a[href='" + url + "']");
 
-        if ( tab ) {
+        if ( tab.length > 0 ) {
                 /*
                  * FIXME: update the document title (properly propagate menu info here)
                  */
