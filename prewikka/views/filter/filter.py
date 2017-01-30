@@ -160,7 +160,7 @@ class FilterView(FilterPlugin, view.View):
         return ["filter"]
 
     @hookmanager.register("HOOK_DATAPROVIDER_CRITERIA_PREPARE")
-    def _filter_get_criteria(self, criteria, ctype):
+    def _filter_get_criteria(self, ctype):
         if not env.request.menu:
             return
 
@@ -172,9 +172,7 @@ class FilterView(FilterPlugin, view.View):
         if not f:
             return
 
-        f = f.criteria.get(ctype)
-        if f:
-            criteria += f
+        return f.criteria.get(ctype)
 
     @hookmanager.register("HOOK_MAINMENU_EXTRA_CONTENT")
     def _filter_html_menu(self, ctype):

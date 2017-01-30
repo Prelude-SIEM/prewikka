@@ -426,6 +426,8 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         if criteria is None:
             criteria = Criterion()
+        else:
+            criteria = copy.copy(criteria)
 
         type = self._check_data_type(type, paths, criteria)
 
@@ -433,7 +435,8 @@ class DataProviderManager(pluginmanager.PluginManager):
         paths_types = []
         normalizer = self._type_handlers[type].normalizer
 
-        list(hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", criteria, type))
+        for c in filter(None, hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", type)):
+            criteria += c
 
         if normalizer:
             paths, paths_types = normalizer.parse_paths(paths, type)
