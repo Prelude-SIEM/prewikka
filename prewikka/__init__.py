@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import sys
 import prelude
+import preludedb
 
 if sys.version_info >= (3, 0):
     import builtins
@@ -9,8 +10,9 @@ if sys.version_info >= (3, 0):
 else:
     import __builtin__ as builtins
     builtins.text_type = unicode
-    prelude.python2_return_unicode(True)
 
+    prelude.python2_return_unicode(True)
+    preludedb.python2_return_unicode(True)
 
 try:
     from threading import local

@@ -21,8 +21,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import preludedb
 
-preludedb.python2_return_unicode(True)
-
 
 class IDMEFDatabase(preludedb.DB):
     def __init__(self, config):
