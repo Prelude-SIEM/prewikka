@@ -24,5 +24,4 @@ import preludedb
 
 class IDMEFDatabase(preludedb.DB):
     def __init__(self, config):
-        sql = preludedb.SQL(dict((k, text_type(v)) for k, v in config.items()))
-        preludedb.DB.__init__(self, sql)
+        preludedb.DB.__init__(self, preludedb.SQL(dict(config)))

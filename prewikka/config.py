@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import collections
 import io
 import glob
 import os
@@ -48,7 +49,7 @@ class ConfigParserOption(text_type):
         return "<ConfigParserOption %s%s%s>" % (self.name, "=" if self.value else "", self.value or "")
 
 
-class ConfigParserSection(object):
+class ConfigParserSection(collections.Mapping):
     def __init__(self, name):
         object.__setattr__(self, "_instance_name", name)
         object.__setattr__(self, "_od", utils.OrderedDict())
@@ -56,17 +57,24 @@ class ConfigParserSection(object):
     def __repr__(self):
         return "ConfigParserSection<%s,%s>" % (self._instance_name, self._od.items())
 
+    def __len__(self):
+        return self._od.__len__()
+
     def __setitem__(self, key, value):
-        self._od[key] = value
+        return self._od.__setitem__(key, value)
 
     def __getitem__(self, key):
-        return self._od[key]
+        return self._od.__getitem__(key)
 
     def __setattr__(self, key, value):
         self._od[key] = value
 
     def __getattr__(self, key):
-        return self._od[key]
+        ret = self._od.get(key, None)
+        if ret is None:
+            raise AttributeError
+
+        return ret
 
     def __contains__(self, key):
         return self._od.__contains__(key)
@@ -181,7 +189,7 @@ class MyConfigParser:
             if not result:
                 raise ParseError(file.name, lineno + 1, line)
 
-            if not cursection:
+            if cursection is None:
                 continue
 
             name, value = result.group("name").strip(), result.group("value")
