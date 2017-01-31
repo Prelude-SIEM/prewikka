@@ -31,10 +31,6 @@ from prewikka.utils import html, json
 class AgentsParameters(mainmenu.MainMenuParameters):
     allow_extra_parameters = True
 
-    def register(self):
-        mainmenu.MainMenuParameters.register(self)
-        self.optional("filter", json.loads)
-
 
 class Agents(view.View):
     view_parameters = AgentsParameters
@@ -55,9 +51,9 @@ class Agents(view.View):
         return analyzer, heartbeat
 
     def _get_analyzers(self, reqstatus):
-        criteria = env.request.parameters.get("filter")
-
-        for (analyzerid,) in env.dataprovider.query(["heartbeat.analyzer(-1).analyzerid/group_by"], criteria):
+        # Do not take the control menu into account.
+        # The expected behavior is yet to be determined.
+        for (analyzerid,) in env.dataprovider.query(["heartbeat.analyzer(-1).analyzerid/group_by"]):
             analyzer, heartbeat = self._get_analyzer(analyzerid)
             status, status_text = utils.get_analyzer_status_from_latest_heartbeat(
                 heartbeat, self._heartbeat_error_margin

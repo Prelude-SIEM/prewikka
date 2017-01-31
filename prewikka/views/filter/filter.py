@@ -30,7 +30,7 @@ from prewikka.utils import AttrObj, OrderedDict, json
 from . import FilterPlugin
 
 
-_TYPES = [("alert", N_("Alerts")), ("log", N_("Logs")), ("ticket", N_("Tickets"))]
+_TYPES = [("alert", N_("Alerts")), ("heartbeat", N_("Heartbeats")), ("log", N_("Logs")), ("ticket", N_("Tickets"))]
 
 
 def _flatten(criterion):
