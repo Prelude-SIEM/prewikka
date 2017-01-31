@@ -58,7 +58,7 @@
             $(this).siblings(".type-checkbox").click();
         });
 
-        new FilterEdition("div.widget",
+        new FilterEdition("form.filter-form",
                           ${default_paths | n,json.dumps},
                           ${all_paths | n,json.dumps},
                           ${operators | n,json.dumps},

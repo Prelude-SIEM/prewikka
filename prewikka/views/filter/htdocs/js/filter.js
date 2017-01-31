@@ -79,7 +79,7 @@ function FilterEdition(selector, default_paths, all_paths, operators, enums, too
         });
 
         if ( oplist.indexOf(opdiv.text()) == -1 ) {
-            opdiv.text(oplist[0]);
+            opdiv.children("span").first().text(oplist[0]);
         }
     }
 
@@ -142,7 +142,7 @@ function FilterEdition(selector, default_paths, all_paths, operators, enums, too
         that.init_autocomplete($(this));
     });
 
-    $(selector).on("submit", "form.filter-form", function() {
+    $(selector).on("submit", function() {
         $(this).find(".filter-edition").each(function() {
             var value = null;
             if ( $(this).parent().siblings(".panel-heading").find(".type-checkbox").is(":checked") )
