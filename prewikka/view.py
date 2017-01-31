@@ -426,7 +426,7 @@ class _ViewDescriptor(object):
 
         # If this view has no users / groups / others permission defined, then it is considered public and we return True
         # Otherwise, if any kind of permission is defined and there was no match, return False.
-        return not(self.view_users_permissions or self.view_groups_permissions or self.view_permissions)
+        return not(self.view_users or self.view_groups or self.view_permissions)
 
 
 class _View(_ViewDescriptor):
