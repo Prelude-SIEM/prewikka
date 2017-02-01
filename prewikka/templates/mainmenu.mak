@@ -79,12 +79,12 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
 
           <div class="form-group form-group-date">
                <label for="timeline_start" class="label-xs">${ _("Start:") }</label>
-               <input class="form-control input-sm input-timeline-datetime" type="text" id="timeline_start" name="" placeholder="${ _("start") }" value="" data-toggle="tooltip" title="${ _("Date of the oldest alert to visualize") }" data-trigger="hover" data-container="#main">
+               <input class="form-control input-sm input-timeline-datetime" type="text" id="timeline_start" name="" placeholder="${ _("start") }" value="" data-toggle="tooltip" title="${ _("Start date") }" data-trigger="hover" data-container="#main">
           </div>
 
           <div class="form-group form-group-date">
                <label for="timeline_end" class="label-xs">${ _("End:") }</label>
-               <input class="form-control input-sm input-timeline-datetime" type="text" id="timeline_end" placeholder="${ _("end") }" value="" data-toggle="tooltip" title="${ _("Date of the newest alert to visualize") }" data-trigger="hover" data-container="#main">
+               <input class="form-control input-sm input-timeline-datetime" type="text" id="timeline_end" placeholder="${ _("end") }" value="" data-toggle="tooltip" title="${ _("End date") }" data-trigger="hover" data-container="#main">
           </div>
 
           <button class="btn btn-primary btn-sm btn-submit disabled" id="main_menu_form_submit" type="submit">${ _("Go!") }</button>
