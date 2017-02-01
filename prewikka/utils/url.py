@@ -67,6 +67,10 @@ def urlencode(parameters, doseq=False):
 
 
 def idmef_criteria_to_urlparams(paths, values, operators=None, index=0):
+    # FIXME: This function is alertlisting- and IDMEF-specific.
+    # In the long run, we need to standardize all filtering
+    # parameters handling across views and types.
+
     params = []
 
     if not operators:
@@ -77,11 +81,9 @@ def idmef_criteria_to_urlparams(paths, values, operators=None, index=0):
         # Special case for classification checkboxes
         if path in ("alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"):
             # Operators other than '=' are not supported
-            params.append((path, value))
+            params.append((path, value or "n/a"))
             continue
 
-        # FIXME: The column type is alertlisting specific, in the long run, we need
-        # to suppress this, and standardize all IDMEF parameters handling accross view
         ctype = prelude.IDMEFPath(path).getName(1)
         if ctype in ("messageid", "assessment", "correlation_alert", "overflow_alert", "tool_alert", "additional_data"):
             ctype = "classification"
