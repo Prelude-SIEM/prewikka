@@ -21,6 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import hashlib
 import re
+import string
 import struct
 import urllib
 from datetime import datetime
@@ -1093,7 +1094,9 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                 val["payload"] = resource.HTMLSource("<span class='fixed'>%s</span>" % payload)
                 data.render_table(self, _("Payload"), val)
 
-                val["payload"] = resource.HTMLSource("<div style='overflow: auto;'>%s</div>" % html.escape(ignored_value["payload"]).replace("\n", resource.HTMLSource("<br/>")))
+                pset = set(string.printable)
+                payload = ''.join((i if i in pset else '.' for i in ignored_value["payload"]))
+                val["payload"] = resource.HTMLSource("<div style='overflow: auto;'>%s</div>" % html.escape(payload).replace("\n", resource.HTMLSource("<br/>")))
                 data.render_table(self, _("ASCII Payload"), val)
 
             self.endTable()
