@@ -55,7 +55,9 @@ TYPES_FUNC_MAP = {
     "float": float,
     "long": int,
     "datetime": to_datetime,
-    "str": text_type
+    "enum": text_type,
+    "str": text_type,
+    "text": text_type
 }
 
 
