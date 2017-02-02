@@ -53,11 +53,11 @@ def application(environ, start_response):
 
     if options.root:
         if not environ['PATH_INFO'].startswith(options.root):
-            start_response('301 Redirect', [('Location', options.root + "/"), ])
+            start_response('301 Redirect', [('Location', options.root), ])
             return []
 
-        environ['SCRIPT_NAME'] = options.root
-        environ['PATH_INFO'] = environ['PATH_INFO'][len(options.root):]
+        environ['SCRIPT_NAME'] = options.root[:-1]
+        environ['PATH_INFO'] = environ['PATH_INFO'][len(options.root) - 1:]
 
     return wsgi.application(environ, start_response)
 
@@ -75,6 +75,9 @@ if __name__ == "__main__":
                       help="number of processes to use. Default value matches the number of available CPUs (i.e. %d)" % multiprocessing.cpu_count())
 
     (options, args) = parser.parse_args()
+
+    if options.root:
+        options.root = "/%s/" % (options.root.strip("/"))
 
     server = make_server(options.addr, options.port, application, server_class=MyWSGIServer, handler_class=WSGIRequest)
     if options.key and options.cert:
