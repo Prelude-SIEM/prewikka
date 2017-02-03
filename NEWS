@@ -1,3 +1,26 @@
+* 2017-02-03, prewikka-4.0.0rc2:
+
+Author: Song Tran
+
+- Add INSTALL file to MANIFEST.in
+
+Author: Antoine Luong
+
+- Add the "enum" and "text" types in dataprovider
+- Do not modify the passed criteria in dataprovider
+- Fix JS condition causing the tabs to disappear
+- Fix incorrect dropdown display in filter edition
+- Make it possible to create private views
+
+Author: Yoann Vandoorselaere
+
+- Normalize --root parameter
+- Properly map ConfigParserSection
+- Fix encoding problem with external script
+- Filter out invalid characters in ASCII payload dump
+
+
+
 * 2017-01-27, prewikka-4.0.0rc1:
 
 Author: Yoann Vandoorselaere
