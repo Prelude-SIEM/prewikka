@@ -2,7 +2,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml">
     <head>
-        <title>${ env.config.interface.get("browser_title", "Prelude OSS") }</title>
+        <title>${ env.config.interface.get("browser_title", "Prelude") }</title>
         <base href="${document.base_url}" />
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <link rel="icon" type="image/png" sizes="32x32" href="${env.config.interface.get('favicon', 'prewikka/images/favicon.png')}" />

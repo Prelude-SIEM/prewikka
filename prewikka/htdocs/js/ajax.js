@@ -122,6 +122,14 @@ function _process_ajax_response(data)
         return prewikka_drawTab(data);
 }
 
+function _update_browser_title(title)
+{
+    /* Update the document's title according to the names of the section*/
+    if ( ! document.orig_title )
+       document.orig_title = document.title;
+
+    document.title = document.orig_title + " - " + title;
+}
 
 function prewikka_process_ajax_response(data)
 {
@@ -139,14 +147,11 @@ function _url2menu(url)
         var tab = $("#topmenu .topmenu_item a[href='" + url + "']");
 
         if ( tab.length > 0 ) {
-                /*
-                 * FIXME: update the document title (properly propagate menu info here)
-                 */
-
                 $("#topmenu ul.topmenu_section").hide();
                 $(tab).parent().parent().show();
                 $("#topmenu .active").toggleClass("active", false);
                 $(tab).parent().toggleClass("active", true);
+                _update_browser_title($("#topmenu .active").closest("ul").data("section-title"));
         }
 }
 

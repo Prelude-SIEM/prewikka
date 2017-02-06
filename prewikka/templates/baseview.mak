@@ -144,7 +144,7 @@ $(document).ready(function() {
             <% style="display:none;" %>
         % endif
 
-        <ul style="${style}" class="nav nav-tabs topmenu_section" id="topmenu_${ nameToPath(section) }">
+        <ul style="${style}" class="nav nav-tabs topmenu_section" id="topmenu_${ nameToPath(section) }" data-section-title="${ _(section) }">
         % for name, views in sections.get(section).items():
             <%
             class_ = ""
