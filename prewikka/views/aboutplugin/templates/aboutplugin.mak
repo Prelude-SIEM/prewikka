@@ -104,7 +104,7 @@
 
 
 <div class="container">
-  <div id="update-dialog" title="Applying Updates" class="modal fade" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+  <div id="update-dialog" class="modal fade" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
@@ -137,35 +137,41 @@
 </div>
 
 <form method="POST" action="${ url_for('.enable') }">
-<div id="fieldset_page">
+
 % if len(maintenance) > 0:
   <div class="panel panel-theme">
     <div class="panel-heading">
       <h3 class="panel-title">${ _("Plugin Maintenance") }</h3>
     </div>
     <div class="panel-body">
-      <p>
-        <center><b style="color:red;">${ _("The following apps need to be updated before they can be loaded into the system") }</b></center>
-      </p>
+      <div style="text-align: center; font-weight: bold; color:red;">${ _("The following apps need to be updated before they can be loaded into the system") }</div>
 
       % for name, list in sorted(maintenance.items()):
       <fieldset class="fieldset_heading">
         <legend>${ _(name) }</legend>
-        <table>
-          <tr><th style="width:20%">${ _("Name") }</th><th>${ _("Description") }</th><th style="width:10%">${ _("Version") }</th><th style="width:15%">${ _("Current Database Version") }</th><th class="right" style="width:15%">${ _("Required Database Update") }</th></tr>
+        <table class="table table-striped table-condensed">
+          <tr>
+            <th style="width:20%">${ _("Name") }</th>
+            <th>${ _("Description") }</th>
+            <th style="width:10%">${ _("Version") }</th>
+            <th class="text-center" style="width:15%">${ _("Current database version") }</th>
+            <th class="text-right" style="width:15%">${ _("Required database update") }</th>
+          </tr>
 
-        % for mod, fv, uplist in sorted(list, key=lambda x: x[0].full_module_name):
-          <tr class="table_row_${loop.cycle('even', 'odd')}">
-            <td>${ mod.plugin_name or mod.full_module_name }</td><td>${ _(mod.plugin_description) }</td><td>${ mod.plugin_version }</td>
-            <td>${ fv or '-' }</td>
-            <td class="right">${ ", ".join([text_type(i) for i in uplist]) }</td>
+        % for mod, fv, uplist in sorted(list, key=lambda x: x[0].plugin_name or x[0].full_module_name):
+          <tr>
+            <td>${ mod.plugin_name or mod.full_module_name }</td>
+            <td>${ _(mod.plugin_description) }</td>
+            <td>${ mod.plugin_version }</td>
+            <td class="text-center">${ fv or '-' }</td>
+            <td class="text-right">${ ", ".join([text_type(i) for i in uplist]) }</td>
           </tr>
         % endfor
         </table>
       </fieldset>
     % endfor
       <div class="pull-right">
-        <button class="update-button btn btn-danger" ${ disabled(maintenance_total == 0) }>${ _("Install Update") }</button>
+        <button class="update-button btn btn-danger" ${ disabled(maintenance_total == 0) }>${ _("Install update") }</button>
       </div>
     </div>
   </div>
@@ -179,14 +185,22 @@
       % for name, list in sorted(installed.items()):
       <fieldset class="fieldset_heading">
         <legend>${ _(name) }</legend>
-        <table>
-          <tr><th style="width:20%">${ _("Name") }</th><th>${ _("Description") }</th><th style="width:10%">${ _("Version") }</th><th style="width:10%">${ _("Database Version") }</th><th class="right" style="width:5%">${ _("Active") }</th></tr>
+        <table class="table table-striped table-condensed">
+          <tr>
+            <th style="width:20%">${ _("Name") }</th>
+            <th>${ _("Description") }</th>
+            <th style="width:10%">${ _("Version") }</th>
+            <th class="text-center" style="width:15%">${ _("Database version") }</th>
+            <th class="text-right" style="width:5%">${ _("Active") }</th>
+          </tr>
 
-        % for mod, enabled in sorted(list, key=lambda x: x[0].__module__):
-          <tr class="table_row_${loop.cycle('even', 'odd')}">
-            <td>${ mod.plugin_name or mod.full_module_name }</td><td>${ _(mod.plugin_description) }</td><td>${ mod.plugin_version }</td>
-            <td>${ mod.plugin_database_version or '-' }</td>
-            <td class="right"><input type="checkbox" name="enable_plugin" value="${ mod.full_module_name }" ${ checked(enabled) } ${ disabled(mod.plugin_mandatory) } /></td>
+        % for mod, enabled in sorted(list, key=lambda x: x[0].plugin_name or x[0].full_module_name):
+          <tr>
+            <td>${ mod.plugin_name or mod.full_module_name }</td>
+            <td>${ _(mod.plugin_description) }</td>
+            <td>${ mod.plugin_version }</td>
+            <td class="text-center">${ mod.plugin_database_version or '-' }</td>
+            <td class="text-right"><input type="checkbox" name="enable_plugin" value="${ mod.full_module_name }" ${ checked(enabled) } ${ disabled(mod.plugin_mandatory) } /></td>
           </tr>
         % endfor
         </table>
@@ -197,5 +211,5 @@
       </div>
     </div>
   </div>
-</div>
+
 </form>

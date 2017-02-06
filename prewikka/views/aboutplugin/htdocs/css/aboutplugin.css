@@ -1,5 +1,5 @@
-.fieldset_heading .right {
-    text-align: right;
+.fieldset_heading legend {
+    border: none;
 }
 
 table.update_log {

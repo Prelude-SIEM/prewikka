@@ -402,11 +402,11 @@ label.required:after {
 /*
  * random class
  */
-.table_row_even, .table-striped > tbody > tr:nth-of-type(2n+1) {
+.table-striped > tbody > tr:nth-of-type(2n+1) {
     background-color: @table-row-even;
 }
 
-.table_row_odd, .table-striped > tbody > tr:nth-of-type(2n) {
+.table-striped > tbody > tr:nth-of-type(2n) {
     background-color: @table-row-odd;
 }
 
@@ -489,73 +489,8 @@ div.footer-buttons {
  */
 
 .fieldset_heading {
-    background: @fieldset-background;
-    border-radius: 5px;
-
-    .description_title {
-        font-size: 10pt;
-        font-weight: bold;
-        padding-bottom: 5px;
-    }
-
-    .description { }
-
-    h1, h2 {
-        margin: 0;
-    }
-
-    h2 {
-        font-weight: normal;
-        font-size: 150%;
-        margin-bottom: 1em;
-    }
-
-    .date {
-        color: #996;
-        font-size: 130%;
-        float: right;
-        position: relative;
-    }
-
-    table {
-        border-collapse: collapse;
-        width: 100%;
-    }
-
-    tr {
-        border-bottom: 1px dashed @border;
-    }
-
-    .nodash, .nodash th, .nodash tr, .nodash td {
-        border-bottom: 0px;
-    }
-
-    .nowrap label {
-        white-space: nowrap;
-    }
-
-    td, th {
-        border-bottom: 1px dashed @border;
-        padding: 0.1em 0.5em;
-    }
-
-    th {
-        color: #950;
-        font-weight: normal;
-        text-align: left;
-    }
-
-    hr {
-        color: #999999;
-        background: #999999;
-        border: 0;
-        height: 1px;
-    }
-}
-
-#fieldset_page {
     legend {
-        font-size: 10pt;
+        font-size: 12pt;
         font-weight: bold;
         margin-bottom: 0;
     }
@@ -563,10 +498,6 @@ div.footer-buttons {
 
 .shadow {
     box-shadow: 3px 3px 6px 0 #A9A9A9;
-}
-
-div.hierarchy-list i.jstree-ocl {
-    display: none;
 }
 
 div.prewikka-view-help {
