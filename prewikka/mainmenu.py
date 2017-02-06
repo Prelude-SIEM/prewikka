@@ -21,8 +21,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import calendar
 import datetime
-import itertools
-import time
 
 from dateutil.relativedelta import relativedelta
 from prewikka import hookmanager, localization, template, utils, view
@@ -30,10 +28,11 @@ from prewikka.dataprovider import Criterion
 
 _MAINMENU_TEMPLATE = template.PrewikkaTemplate(__name__, "templates/mainmenu.mak")
 
+
 class MainMenuParameters(view.Parameters):
     allow_extra_parameters = False
     _INTERNAL_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_absolute",
-                            "order_by", "timezone", "auto_apply_value", "auto_apply_enable"]
+                            "order_by", "timezone", "auto_apply_value"]
 
     def __init__(self, *args, **kwargs):
         # This will trigger register which in turn call a hook, do last
@@ -49,7 +48,6 @@ class MainMenuParameters(view.Parameters):
         self.optional("timeline_start", int, save=True, general=True)
         self.optional("orderby", text_type, "time_desc")
         self.optional("auto_apply_value", int, default=0, save=True, general=True)
-        self.optional("auto_apply_enable", text_type, default="false", save=True, general=True)
 
         for i in hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_REGISTER", self):
             self._INTERNAL_PARAMETERS = self._INTERNAL_PARAMETERS + i
@@ -298,7 +296,6 @@ class MainMenu(object):
         self.dataset["timeline"].quick_custom = True
         self.dataset["timeline"].refresh_selected = _("Inactive")
         self.dataset["auto_apply_value"] = env.request.parameters["auto_apply_value"]
-        self.dataset["auto_apply_enable"] = env.request.parameters["auto_apply_enable"]
         self.dataset["timeline"].time_format = localization.get_calendar_format()
 
         for label, value in self.dataset["timeline"].refresh:
