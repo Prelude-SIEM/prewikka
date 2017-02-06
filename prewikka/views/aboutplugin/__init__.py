@@ -69,6 +69,10 @@ class AboutPlugin(view.View):
                 yield catname, plugin
 
     def _get_plugin_infos(self):
+        # FIXME: for some reason, the cache gets desynchronized at initialization.
+        # This is a temporary fix.
+        env.db.modinfos_cache.clear()
+
         data = utils.AttrObj(installed={}, maintenance={}, maintenance_total=0)
         for catname, plugin in self._iter_plugin():
             self._add_plugin_info(data, catname, plugin)
@@ -108,6 +112,9 @@ class AboutPlugin(view.View):
 
         for mod, fromversion, uplist in itertools.chain.from_iterable(data.maintenance.values()):
             for upscript in uplist:
+                if isinstance(upscript, Exception):
+                    continue
+
                 label = _("Applying %(module)s %(script)s...") % {'module': mod.full_module_name, 'script': text_type(upscript)}
                 env.request.web.send_stream(json.dumps({"label": html.escape(label), 'module': html.escape(mod.full_module_name), 'script': html.escape(text_type(upscript))}), sync=True)
 

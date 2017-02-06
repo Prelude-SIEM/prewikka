@@ -27,7 +27,7 @@
     $("input[type=checkbox]:not(:disabled)").shiftcheckbox();
 
     function update_log(data, nb_plugin) {
-            if ( ! data["logs"] ) {
+            if ( data["logs"] === undefined ) {
                 var curval = parseFloat($('.progress-bar').attr('aria-valuenow'));
                 var newval = curval + slice;
                 $('.progress-bar').css('width', newval + '%').attr('aria-valuenow', newval).text(Math.round(newval) + '%');
