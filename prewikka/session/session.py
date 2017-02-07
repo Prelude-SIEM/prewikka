@@ -39,9 +39,10 @@ class SessionInvalid(_SessionError):
     name = N_("Invalid session")
     message = N_("The session cookie carried by your browser is invalid")
 
+
 class SessionExpired(_SessionError):
     name = N_("Session expired")
-    message = N_("Your session has expired: please sign in again to continue using Prewikka")
+    message = N_("Your session has expired: please sign in again to continue using Prelude")
 
 
 class SessionUserInfo(object):
