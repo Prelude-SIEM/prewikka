@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import mainmenu, template, usergroup, utils, view
+from prewikka import mainmenu, template
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -47,7 +47,7 @@ class ListedHeartbeat(ListedMessage):
         self["node.name"] = self.createInlineFilteredField("heartbeat.analyzer(-1).node.name",
                                                            message["heartbeat.analyzer(-1).node.name"])
 
-        self["node.address(*).address"] = [ ]
+        self["node.address(*).address"] = []
 
         for address in message["heartbeat.analyzer(-1).node.address"]:
             hfield = self.createHostField("heartbeat.analyzer(-1).node.address.address", address["address"], address["category"])
@@ -56,16 +56,15 @@ class ListedHeartbeat(ListedMessage):
         self["time"] = self.createTimeField(message["heartbeat.create_time"])
 
 
-
 class HeartbeatListing(MessageListing):
     view_menu = (N_("Agents"), N_("Heartbeats"))
     view_parameters = HeartbeatListingParameters
-    view_permissions = [ N_("IDMEF_VIEW") ]
+    view_permissions = [N_("IDMEF_VIEW")]
     view_template = template.PrewikkaTemplate(__name__, "templates/heartbeatlisting.mak")
     view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
 
     root = "heartbeat"
-    filters = { }
+    filters = {}
     listed_heartbeat = ListedHeartbeat
 
     def _setMessage(self, message, ident):
@@ -75,24 +74,20 @@ class HeartbeatListing(MessageListing):
         return msg
 
     def _applyInlineFilters(self, criteria):
-        filter_found = False
         for column, path in (("analyzerid", "heartbeat.analyzer(-1).analyzerid"),
                              ("name", "heartbeat.analyzer(-1).name"),
                              ("model", "heartbeat.analyzer(-1).model"),
                              ("address", "heartbeat.analyzer(-1).node.address.address"),
                              ("node_name", "heartbeat.analyzer(-1).node.name")):
             env.request.dataset[column + "_filtered"] = False
-            if not filter_found:
-                if path in env.request.parameters:
-                    criteria += Criterion(path, "=", env.request.parameters[path])
-                    env.request.dataset[column + "_filtered"] = True
-                    filter_found = True
+            if path in env.request.parameters:
+                criteria += Criterion(path, "=", env.request.parameters[path])
+                env.request.dataset[column + "_filtered"] = True
 
     def render(self):
         MessageListing.render(self)
 
         criteria = env.request.menu.get_criteria()
-        start = end = None
 
         self._applyInlineFilters(criteria)
         self._adjustCriteria(criteria)
