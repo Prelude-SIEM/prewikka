@@ -23,9 +23,10 @@ import sys
 import prelude
 
 if sys.version_info >= (3,0):
-    from urllib.parse import urlencode as _urlencode
+    from urllib.parse import quote, unquote, urlsplit, urlunsplit, urlencode as _urlencode
 else:
-    from urllib import urlencode as __urlencode
+    from urllib import quote, unquote, urlencode as __urlencode
+    from urlparse import urlsplit, urlunsplit
 
     def _convert(d):
         if isinstance(d, (list, tuple)):
@@ -42,6 +43,24 @@ else:
             parameters = parameters.items()
 
         return __urlencode([(k.encode("utf8"), _convert(v)) for k, v in parameters], doseq)
+
+
+def iri2uri(iri, encoding="utf8"):
+    # Character list compiled from RFC 3986, section 2.2
+    safe = b":/?#[]@!$&'()*+,;="
+    scheme, authority, path, query, frag = urlsplit(iri)
+
+    tpl = authority.split(":", 1)
+    if len(tpl) == 1:
+        authority = authority.encode('idna')
+    else:
+        authority = tpl[0].encode('idna') + ":%s" % tpl[1]
+
+    return urlunsplit((scheme.encode(encoding), authority,
+                       quote(path.encode(encoding), safe),
+                       quote(query.encode(encoding), safe),
+                       quote(frag.encode(encoding), safe)))
+
 
 def urlencode(parameters, doseq=False):
     return _urlencode(parameters, doseq).replace('&', '&amp;')

@@ -21,12 +21,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import abc
 import sys
-import traceback
 
-import pkg_resources
-from prewikka import log, response, template
+from prewikka import log, response, template, utils
 from prewikka.localization import _DeferredGettext
-from prewikka.utils import AttrObj, json, soundex
 
 
 class PrewikkaException(Exception):
@@ -37,7 +34,6 @@ class PrewikkaException(Exception):
         pass
 
 
-
 class RedirectionError(PrewikkaException):
     def __init__(self, location, code):
         self.location = location
@@ -45,7 +41,6 @@ class RedirectionError(PrewikkaException):
 
     def respond(self):
         return response.PrewikkaRedirectResponse(self.location, code=self.code)
-
 
 
 class PrewikkaError(PrewikkaException):
@@ -87,8 +82,8 @@ class PrewikkaError(PrewikkaException):
             dataset[i] = getattr(self, i)
 
         dataset["is_ajax_error"] = ajax_error
-        dataset["document"] = AttrObj()
-        dataset["document"].base_url = env.request.web.get_baseurl()
+        dataset["document"] = utils.AttrObj()
+        dataset["document"].base_url = utils.iri2uri(env.request.web.get_baseurl())
         dataset["is_error_template"] = True
 
         return dataset
@@ -129,7 +124,6 @@ class PrewikkaError(PrewikkaException):
         return { "content": dset.render() }
 
 
-
 class PrewikkaUserError(PrewikkaError):
     display_traceback = False
 
@@ -145,7 +139,7 @@ class PrewikkaUserError(PrewikkaError):
 
             msg.extend(text_type(s).split())
 
-        return hash("".join(soundex(x) for x in msg)) & 65535
+        return hash("".join(utils.soundex(x) for x in msg)) & 65535
 
 
 class NotImplementedError(PrewikkaError):

@@ -377,8 +377,8 @@ class _ViewDescriptor(object):
 
     def _setup_dataset_default(self):
         env.request.dataset["document"] = utils.AttrObj()
-        env.request.dataset["document"].base_url = env.request.web.get_baseurl()
-        env.request.dataset["document"].href = env.request.web.get_uri()
+        env.request.dataset["document"].base_url = utils.iri2uri(env.request.web.get_baseurl())
+        env.request.dataset["document"].href = utils.iri2uri(env.request.web.get_uri())
 
     def _render(self, dataset):
         env.request.parameters = {}
