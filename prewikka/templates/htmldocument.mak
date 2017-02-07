@@ -1,7 +1,3 @@
-<%!
-from prewikka import env
-%>
-
 <!DOCTYPE html>
 
 <html xmlns="http://www.w3.org/1999/xhtml">
@@ -9,7 +5,7 @@ from prewikka import env
         <title>${ env.config.interface.get("browser_title", "Prelude OSS") }</title>
         <base href="${document.base_url}" />
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-        <link rel="Shortcut Icon" href="${env.config.interface.get('favicon', 'prewikka/images/favicon.ico')}" />
+        <link rel="icon" type="image/png" sizes="32x32" href="${env.config.interface.get('favicon', 'prewikka/images/favicon.png')}" />
 
         <!--[if IE]>
 
