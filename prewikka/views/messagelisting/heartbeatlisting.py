@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import mainmenu, template
+from prewikka import mainmenu, template, localization
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -98,9 +98,9 @@ class HeartbeatListing(MessageListing):
 
         count = self._setMessages(criteria)
 
-        env.request.dataset["nav"]["from"] = env.request.parameters["offset"] + 1
-        env.request.dataset["nav"]["to"] = env.request.parameters["offset"] + len(env.request.dataset["messages"])
-        env.request.dataset["limit"] = env.request.parameters["limit"]
-        env.request.dataset["total"] = count
+        env.request.dataset["nav"]["from"] = localization.format_number(env.request.parameters["offset"] + 1)
+        env.request.dataset["nav"]["to"] = localization.format_number(env.request.parameters["offset"] + len(env.request.dataset["messages"]))
+        env.request.dataset["limit"] = localization.format_number(env.request.parameters["limit"])
+        env.request.dataset["total"] = localization.format_number(count)
 
         self._setNavNext(env.request.parameters["offset"], count)

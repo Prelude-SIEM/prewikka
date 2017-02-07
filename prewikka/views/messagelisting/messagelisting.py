@@ -181,7 +181,7 @@ class MessageListing(view.View):
         # count_asc and count_desc methods are not valid for message enumeration
         order_by = "time_asc" if env.request.parameters["orderby"] in ("count_asc", "count_desc") else env.request.parameters["orderby"]
 
-        results = env.dataprovider.get(criteria=criteria, offset=offset, limit=offset+limit, order_by=order_by, type=self.root)
+        results = env.dataprovider.get(criteria=criteria, offset=offset, limit=limit, order_by=order_by, type=self.root)
         for obj in results:
             dataset = self._setMessage(obj, obj["%s.messageid" % self.root])
             env.request.dataset["messages"].append(dataset)
