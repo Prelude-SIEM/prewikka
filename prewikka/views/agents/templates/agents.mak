@@ -53,7 +53,7 @@ from prewikka.utils import json
         groupingView: {
             groupField: ["location", "label"],
             groupColumnShow: [false, false],
-            groupText: ['<b>{0}</b> ({1} agents)', '<b>{0}</b> ({1} agents)'],
+            groupText: ['<b>{0}</b> ({1} agent(s))', '<b>{0}</b> ({1} agent(s))'],
             groupCollapse: false,
             groupOrder: ['asc', 'asc'],
             groupSummary: [false, false]
