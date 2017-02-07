@@ -34,9 +34,13 @@ class PermissionDeniedError(error.PrewikkaUserError):
         if isinstance(permissions, compat.STRING_TYPES):
             permissions = [permissions]
 
-        if view:
+        if view and permissions:
             msg = N_("Access to view '%(view)s' forbidden. Required permissions: %(permissions)s",
                      {"view": view, "permissions": ", ".join(permissions)})
+
+        elif view:
+            msg = N_("Access to view '%s' forbidden", view)
+
         else:
             msg = N_("Required permissions: %s", ", ".join(permissions))
 

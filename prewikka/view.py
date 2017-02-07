@@ -65,6 +65,12 @@ class MissingParameterError(error.PrewikkaUserError):
                                          N_("Required parameter '%s' is missing", name),
                                          log_priority=log.WARNING)
 
+
+class InvalidMethodError(error.PrewikkaUserError):
+    def __init__(self, message, log_priority=None, **kwargs):
+        error.PrewikkaUserError.__init__(self, N_("Invalid method"), message, log_priority=log.ERROR, **kwargs)
+
+
 class InvalidViewError(error.PrewikkaUserError):
     code = 404
 
@@ -494,7 +500,11 @@ class ViewManager(object):
             view = self._views_endpoint[endpoint]
 
         except werkzeug.exceptions.MethodNotAllowed:
-            raise
+            raise InvalidMethodError(N_("Method '%(method)s' is not allowed for view '%(view)s'",
+                                        {"method": request.method, "view": request.path}))
+
+        except werkzeug.exceptions.NotFound:
+            raise InvalidViewError(N_("View '%s' does not exist", request.path))
 
         if view:
             view_layout = view.view_layout
