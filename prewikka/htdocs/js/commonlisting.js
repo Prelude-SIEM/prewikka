@@ -59,7 +59,7 @@ function CommonListing(elem, text, options) {
         refresh: false
     })
     .jqGrid('navButtonAdd', {
-        buttonicon: "ui-icon-gear",
+        buttonicon: "fa-cog",
         caption: "",
         title: "Edit columns",
         onClickButton: function() {

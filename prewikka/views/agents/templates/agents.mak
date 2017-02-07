@@ -25,7 +25,7 @@ from prewikka.utils import json
         return div.html();
     };
 
-    var text = {'title': '<button type="button" class="btn btn-default global_toggle">${ _("Show/Hide all") }</button>', 'search': "${ _('Search:') }"};
+    var text = {'title': '<label class="label label-primary checkbox-inline global_toggle">${ _("Show/Hide all") }</label>', 'search': "${ _('Search:') }"};
 
     var grid = CommonListing('table#agents', text, {
         deleteLink: "${url_for('.delete')}",
@@ -61,12 +61,12 @@ from prewikka.utils import json
     });
 
     $(".global_toggle").on("click", function() {
-        if ( $("#agents .ui-icon-circlesmall-plus").length > 0 ) {
-            $("#agents .ui-icon-circlesmall-plus").trigger("click");
-            $("#agents .ui-icon-circlesmall-plus").trigger("click");
+        if ( $("#agents .fa-plus-square-o").length > 0 ) {
+            $("#agents .fa-plus-square-o").trigger("click");
+            $("#agents .fa-plus-square-o").trigger("click");
         }
         else {
-            $("#agents .ui-icon-circlesmall-minus").trigger("click");
+            $("#agents .fa-minus-square-o").trigger("click");
         }
     });
 

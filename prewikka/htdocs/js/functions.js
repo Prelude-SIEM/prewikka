@@ -297,6 +297,8 @@ function prewikka_grid(table, settings) {
         autowidth: true,
         forceFit: true,
         shrinkToFit: true,
+        guiStyle: "bootstrap",
+        iconSet: "fontAwesome",
         prmNames: {sort: "sort_index", order: "sort_order", search: null, nd: null}
     }, settings);
 
