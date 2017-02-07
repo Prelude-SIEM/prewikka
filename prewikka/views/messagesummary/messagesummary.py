@@ -628,6 +628,10 @@ class MessageSummary(Table, view.View):
         #data.register("ASCII Payload", "payload", html.escape)
         return data
 
+    def render(self):
+        self._current_table = None
+        self._current_section = None
+
 
 class AlertSummary(TcpIpOptions, MessageSummary):
     def __init__(self):
@@ -1019,6 +1023,8 @@ class AlertSummary(TcpIpOptions, MessageSummary):
     @view.route("/alerts/summary/<analyzerid>:<messageid>")
     @view.route("/alerts/summary/<messageid>")
     def render(self, analyzerid=None, messageid=None):
+        MessageSummary.render(self)
+
         alert = env.dataprovider.get(getUriCriteria("alert", analyzerid, messageid))[0]["alert"]
 
         env.request.dataset["sections"] = [ ]
@@ -1107,6 +1113,8 @@ class HeartbeatSummary(MessageSummary):
     @view.route("/heartbeats/summary/<analyzerid>:<messageid>")
     @view.route("/heartbeats/summary/<messageid>")
     def render(self, analyzerid=None, messageid=None):
+        MessageSummary.render(self)
+
         heartbeat = env.dataprovider.get(getUriCriteria("heartbeat", analyzerid, messageid))[0]["heartbeat"]
 
         env.request.dataset["sections"] = [ ]
