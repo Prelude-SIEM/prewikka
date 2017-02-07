@@ -448,7 +448,7 @@ class MessageSummary(Table, view.View):
         self.newTableEntry(_("Node address"), addr_list)
 
     def buildAnalyzer(self, analyzer):
-        self.beginTable(cl="")
+        self.beginTable(cl="table-borderless")
 
         self.beginTable()
         self.newTableEntry(_("Model"), analyzer["model"], cl="section_alert_entry_value_emphasis")
@@ -485,7 +485,7 @@ class MessageSummary(Table, view.View):
 
         self.beginSection(_("Analyzer Path (%d not shown)") % len(l), display="none")
 
-        self.beginTable(cl="message_summary_no_border")
+        self.beginTable(cl="table-borderless")
 
         i = 1
         index = len(l) - 1
@@ -1083,7 +1083,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
             self.beginSection(_("Network centric information"))
 
-            self.beginTable(cl="message_summary_no_border")
+            self.beginTable(cl="table-borderless")
             ip.render_table(self, "IP", ignored_value)
             self.ipOptionRender(ip_options)
 
