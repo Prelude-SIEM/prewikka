@@ -929,15 +929,6 @@ body .tooltip {
     background-color: #fff;
 }
 
-/*
- * Users and Groups listing grids
- */
-
-#gbox_user_list_table.ui-jqgrid .ui-jqgrid-htable .ui-jqgrid-labels th div {
-    white-space: normal;
-}
-
-
 #prewikka-notification {
     position: fixed;
     z-index: 50;
@@ -948,7 +939,6 @@ body .tooltip {
       margin-right: 20px;
     }
 }
-
 
 .modal-dialog .traceback > div {
     max-height: 300px;
@@ -968,4 +958,54 @@ body .tooltip {
 
 .panel-background {
     background-color: @fieldset-background;
+}
+
+/*
+ * Bootstrap labels and inputs
+ */
+
+label.disabled a {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+.list-bootstrap-label {
+    cursor: pointer;
+    font-weight: inherit;
+}
+
+.list-bootstrap-label:hover {
+    cursor: pointer;
+    font-weight: inherit;
+    color: @active-text;
+    background-color: @active-background;
+}
+
+.list-bootstrap-label-all {
+    float: right;
+    width: 20em;
+}
+
+.checkbox-inputgroup {
+    display: none;
+}
+
+.checkbox-inputgroup:checked + .list-bootstrap-label > span > a:after {
+    content: "\2714";
+}
+
+.checkbox-inputgroup:checked + .list-bootstrap-label > span {
+    background-color: #5CB85C;
+}
+
+.checkbox-inputgroup + .list-bootstrap-label > span > a:after {
+    content: "\2717";
+}
+
+.checkbox-inputgroup + .list-bootstrap-label > span {
+    background-color: #D9534F;
+}
+
+.list-bootstrap-label > span > a:after {
+    color: @primary-color;
 }
