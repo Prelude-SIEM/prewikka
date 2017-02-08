@@ -40,6 +40,9 @@ class _IDMEFProvider(DataProviderBase):
     plugin_copyright = version.__copyright__
     normalizer = IDMEFNormalizer('create_time')
 
+    def get_path_type(self, path):
+        return prelude.IDMEFClass(path).getValueType()
+
     def _get_paths(self, rootcl):
         for node in rootcl:
             if node.getValueType() == prelude.IDMEFValue.TYPE_CLASS:
@@ -52,6 +55,7 @@ class _IDMEFProvider(DataProviderBase):
 class IDMEFAlertProvider(_IDMEFProvider):
     plugin_name = "IDMEF Alert provider"
     plugin_description = N_("Provides an API to fetch IDMEF alerts")
+    label = N_("Alerts")
 
     def get_paths(self):
         return self._get_paths(prelude.IDMEFClass("alert"))
@@ -70,6 +74,7 @@ class IDMEFAlertProvider(_IDMEFProvider):
 class IDMEFHeartbeatProvider(_IDMEFProvider):
     plugin_name = "IDMEF Heartbeat provider"
     plugin_description = N_("Provides an API to fetch IDMEF heartbeats")
+    label = N_("Heartbeats")
 
     def get_paths(self):
         return self._get_paths(prelude.IDMEFClass("heartbeat"))

@@ -46,6 +46,12 @@ class _IDMEFPlugin(DataProviderBackend):
     plugin_license = version.__license__
     plugin_copyright = version.__copyright__
 
+    TYPE_OPERATOR_MAPPING = {
+        prelude.IDMEFValue.TYPE_STRING: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*"),
+        prelude.IDMEFValue.TYPE_DATA: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*", "<", ">"),
+        None: ("=", "!=", "<", ">", "<=", ">=")
+    }
+
     def _iterate_object(self, results):
         for ident in results:
             res = IDMEFResultObject(self._get_object(ident))
@@ -69,21 +75,13 @@ class _IDMEFPlugin(DataProviderBackend):
     def delete(self, criteria, paths):
         env.idmef_db.remove(criteria)
 
-    def get_path_info(self, path):
+    def _get_path_values(self, path):
         klass = prelude.IDMEFClass(path)
-        typ = klass.getValueType()
-        return AttrObj(
-            operators=self._get_operators(typ),
-            value_accept=klass.getEnumValues() if typ == prelude.IDMEFValue.TYPE_ENUM else None
-        )
 
-    def _get_operators(self, typ):
-        if typ == prelude.IDMEFValue.TYPE_STRING:
-            return ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*")
-        elif typ == prelude.IDMEFValue.TYPE_DATA:
-            return ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*", "<", ">")
+        if klass.getValueType() == prelude.IDMEFValue.TYPE_ENUM:
+            return klass.getEnumValues()
         else:
-            return ("=", "!=", "<", ">", "<=", ">=")
+            return None
 
 
 class IDMEFAlertPlugin(_IDMEFPlugin):

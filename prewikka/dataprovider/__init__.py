@@ -24,8 +24,8 @@ import time
 import types
 from datetime import datetime
 
-from prewikka import error, hookmanager, pluginmanager, utils
-from prewikka.utils import CachingIterator, compat, json
+from prewikka import error, hookmanager, pluginmanager
+from prewikka.utils import AttrObj, CachingIterator, compat, json
 from prewikka.utils.timeutil import parser
 
 
@@ -150,6 +150,7 @@ class ResultObject(object):
 
 class DataProviderBackend(pluginmanager.PluginBase):
     type = None
+    TYPE_OPERATOR_MAPPING = {}
 
     def get_values(self, paths, criteria, distinct, limit, offset):
         """
@@ -192,10 +193,23 @@ class DataProviderBackend(pluginmanager.PluginBase):
         raise error.NotImplementedError
 
     def get_path_info(self, path):
-        raise error.NotImplementedError
+        typ = env.dataprovider.get_path_type(path)
+        operators = self.TYPE_OPERATOR_MAPPING.get(typ)
+
+        if operators is None:
+            operators = self.TYPE_OPERATOR_MAPPING.get(None, [])
+
+        return AttrObj(
+            operators=operators,
+            value_accept=self._get_path_values(path)
+        )
+
+    def _get_path_values(self, path):
+        return None
 
 
 class DataProviderBase(pluginmanager.PluginBase):
+    label = None
     normalizer = None
 
     def get_paths(self):
@@ -203,6 +217,9 @@ class DataProviderBase(pluginmanager.PluginBase):
 
     def get_common_paths(self, index=False):
         return []
+
+    def get_path_type(self, path):
+        raise error.NotImplementedError
 
 
 class DataProviderNormalizer(object):
@@ -400,7 +417,7 @@ class DataProviderManager(pluginmanager.PluginManager):
         if tmp != '{backend}':
             return tmp
 
-    def _guess_data_type(self, paths, criteria=None):
+    def _guess_data_type(self, paths, criteria=Criterion()):
         res = set()
 
         for path in set(paths) | criteria.get_paths():
@@ -486,12 +503,19 @@ class DataProviderManager(pluginmanager.PluginManager):
     def has_type(self, wanted_type):
         return wanted_type in self._backends
 
+    def get_label(self, type):
+        return self._type_handlers[type].label
+
     def get_paths(self, type):
         return self._type_handlers[type].get_paths()
 
     def get_common_paths(self, type, index=False):
         return self._type_handlers[type].get_common_paths(index)
 
-    def get_path_info(self, path):
-        type = self._normalize(None, [path])[0]
+    def get_path_info(self, path, type=None):
+        type = self._check_data_type(type, [path])
         return self._backends[type].get_path_info(path)
+
+    def get_path_type(self, path, type=None):
+        type = self._check_data_type(type, [path])
+        return self._type_handlers[type].get_path_type(path)

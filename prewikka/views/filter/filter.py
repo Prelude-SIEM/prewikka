@@ -30,7 +30,7 @@ from prewikka.utils import AttrObj, OrderedDict, json
 from . import FilterPlugin
 
 
-_TYPES = [("alert", N_("Alerts")), ("heartbeat", N_("Heartbeats")), ("log", N_("Logs")), ("ticket", N_("Tickets"))]
+_TYPES = ["alert", "heartbeat", "log", "ticket"]
 
 
 def _flatten(criterion):
@@ -119,9 +119,9 @@ class FilterView(FilterPlugin, view.View):
         self._db = FilterDatabase()
 
     def _get_types(self):
-        for typ, label in _TYPES:
+        for typ in _TYPES:
             if env.dataprovider.has_type(typ):
-                yield typ, _(label)
+                yield typ, env.dataprovider.get_label(typ)
 
     @view.route("/settings/filters", menu=(N_("Settings"), N_("Filters")))
     def listing(self):
