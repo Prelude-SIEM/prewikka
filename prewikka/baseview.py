@@ -20,9 +20,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import copy
-import itertools
 
-import pkg_resources
 from prewikka import hookmanager, resource, template, utils, view
 
 _CSS_FILES = utils.OrderedDict((resource.CSSLink(link), True) for link in (
@@ -67,7 +65,7 @@ class BaseView(view._View):
         _HEAD.update(_JS_FILES)
 
         # The jqgrid locale files use only two characters for identifying the language (e.g. pt_BR -> pt)
-        _HEAD[resource.JSLink("prewikka/js/locales/grid.locale-%s.js" % lang[:2])] = True
+        _HEAD[resource.JSLink("prewikka/js/locales/grid.locale-%s.min.js" % lang[:2])] = True
 
         for contents in filter(None, hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT")):
             _HEAD.update((i, True) for i in contents)
