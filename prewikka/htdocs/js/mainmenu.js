@@ -109,7 +109,9 @@ function PageReloader(callback, second) {
 
         else if ( this.elapsed == this.second_reload ) {
             this.elapsed = 0;
-            this.callback();
+
+            if ( $.active == 0 )
+                this.callback();
         }
     };
 
@@ -141,8 +143,3 @@ function PageReloader(callback, second) {
 
 window.mainmenu = new PageReloader(function() { $("#main form").submit() },
                                    parseInt($("#hidden_auto_apply_value").val()));
-
-$(document).on("click", "a[href]", function() {
-    window.mainmenu.stop();
-});
-
