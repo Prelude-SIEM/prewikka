@@ -88,7 +88,7 @@
           <div class="form-group">
             <label for="filter_description" class="col-sm-2 control-label">${ _("Description:") }</label>
             <div class="col-sm-10">
-              <textarea class="form-control" id="filter_description" name="filter_description" rows="4">${fltr.description}</textarea>
+              <input type="text" class="form-control" id="filter_description" name="filter_description" value="${fltr.description}">
             </div>
           </div>
         </div>
