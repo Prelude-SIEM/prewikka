@@ -1,3 +1,29 @@
+* 2017-02-12, prewikka-4.0.0rc3:
+
+Author: Camille Gardet
+
+- Update favicon
+- Fix MessageListing pagination
+- Fix columns ordering in jqGrid tables
+- Minor display fixes
+
+Author: Antoine Luong
+
+- CSS tweaks in Apps and MessageSummary
+- Use the Bootstrap/FontAwesome theme for free-jqGrid
+- Improve error messages when loading views
+
+Author: Yoann Vandoorselaere
+
+- Correctly escape document.(base_url|href)
+- Prevent soundex() algorithm error with unicode
+
+Author: Thomas Andrejak
+
+- Fix browser title to display section
+
+
+
 * 2017-02-03, prewikka-4.0.0rc2:
 
 Author: Song Tran
