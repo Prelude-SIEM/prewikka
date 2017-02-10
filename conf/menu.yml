@@ -5,21 +5,29 @@
 
 - name: ALERT
   icon: exclamation-triangle
-  sections:
-      - name: Alerts
-        tabs:
-            - Alerts
-            - Threats
-      - name: Agents
-        tabs:
-            - Agents
-            - Heartbeats
+  categories:
+      - sections:
+            - name: Alerts
+              default_tab: Alerts
+              tabs:
+                  - Alerts
+                  - Threats
+            - name: Agents
+              tabs:
+                  - Agents
+                  - Heartbeats
 - name: ADMIN
   icon: sliders
+  categories:
+      - sections:
+            - name: Settings
+              tabs:
+                  - My account
+                  - Filters
+- icon: question
   default: true
-  sections:
-      - name: Settings
-        tabs:
-            - My account
-            - Filters
-            - Apps
+  categories:
+      - sections:
+            - name: Apps
+              tabs:
+                  - Apps

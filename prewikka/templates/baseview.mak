@@ -209,6 +209,22 @@ def _get_view_url(section, tabs):
     </li>
 </%def>
 
+<%def name="write_menu_expand(obj, sections)">
+    <li class="dropdown dropdown-submenu">
+        <a class="dropdown-toggle" data-toggle="dropdown">
+            % if "icon" in obj:
+            <i class="fa fa-${obj['icon']}"></i>
+            % endif
+            ${ _(obj["name"]) }
+        </a>
+        <ul class="dropdown-menu">
+            % for section, tabs, name in sections:
+            ${write_menu({"name": name}, section, tabs)}
+            % endfor
+        </ul>
+    </li>
+</%def>
+
 % if env.request.user:
     <ul id="top_view_navbar_menu" class="nav navbar-nav navbar-primary">
     % for menu in menus:
@@ -217,27 +233,20 @@ def _get_view_url(section, tabs):
                 % if "icon" in menu:
                 <i class="fa fa-${ menu['icon'] }"></i>
                 % endif
-                ${ _(menu["name"]) }
-                <span class="caret"></span>
+                ${ menu.get("name", "") }
             </a>
             <ul class="dropdown-menu" role="menu">
-            % for section in menu.get("sections", []):
-                % if not section.get("expand"):
-                ${write_menu(section, section["name"], section.get("tabs", []))}
+            % for category in menu.get("categories", []):
+                % if "name" in category:
+                    ${write_menu_expand(category, [(section["name"], section.get("tabs", []), section["name"]) for section in category.get("sections", [])])}
                 % else:
-                <li class="dropdown dropdown-submenu">
-                    <a class="dropdown-toggle" data-toggle="dropdown">
-                        % if "icon" in section:
-                        <i class="fa fa-${section['icon']}"></i>
+                    % for section in category.get("sections", []):
+                        % if not section.get("expand"):
+                            ${write_menu(section, section["name"], section.get("tabs", []))}
+                        % else:
+                            ${write_menu_expand(section, [(section["name"], [tab], tab) for tab in section.get("tabs", [])])}
                         % endif
-                        ${ _(section["name"]) }
-                    </a>
-                    <ul class="dropdown-menu">
-                        % for tab in section.get("tabs", []):
-                        ${write_menu({"name": tab}, section["name"], [tab])}
-                        % endfor
-                    </ul>
-                </li>
+                    % endfor
                 % endif
             % endfor
             % if menu.get("default"):

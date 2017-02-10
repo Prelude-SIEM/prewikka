@@ -228,13 +228,15 @@ class Core:
         env.viewmanager.set_url_adapter(env.request, cache=False)
 
     def _redirect_default(self, request):
-        default_view = env.config.general.get("default_view", "alerts/alerts")
-        if not default_view in env.viewmanager:
+        default_view = env.menumanager.get_default_view()
+        if default_view:
+            url = url_for(default_view.view_endpoint)
+        else:
             # The configured view does not exist. Fall back to "settings/my_account"
             # which does not require any specific permission.
-            default_view = "settings/my_account"
+            url = request.get_baseurl() + "settings/my_account"
 
-        return response.PrewikkaRedirectResponse(request.get_baseurl() + default_view, code=302)
+        return response.PrewikkaRedirectResponse(url, code=302)
 
     def _process_static(self, webreq):
         pathkey = webreq.path_elements[0]

@@ -36,6 +36,9 @@ class MenuManager(object):
         self._declared_sections = {}
         self._loaded_sections = {}
         self._sorted = False
+        self._default_view = None
+        self._default_section = None
+        self._default_tab = None
 
         filename = env.config.interface.get("menu_order", "menu.yml")
         if not os.path.isabs(filename):
@@ -47,25 +50,32 @@ class MenuManager(object):
         if not self._menus:
             raise error.PrewikkaUserError(N_("Menu error"), N_("Empty menu"))
 
-        default = False
+        default_menu = False
 
         for menu in self._menus:
-            if "name" not in menu:
+            if "name" not in menu and "icon" not in menu:
                 raise error.PrewikkaUserError(N_("Menu error"), N_("Menu without a name in %s", filename))
 
             if menu.get("default"):
-                if default:
+                if default_menu:
                     raise error.PrewikkaUserError(N_("Menu error"), N_("Multiple default menus"))
 
-                default = True
+                default_menu = True
 
-            for section in menu.get("sections", []):
-                if "name" not in section:
-                    raise error.PrewikkaUserError(N_("Menu error"), N_("Section without a name in %s", filename))
+            for category in menu.get("categories", []):
 
-                self._declared_sections[section["name"]] = section.get("tabs", [])
+                for section in category.get("sections", []):
+                    if "name" not in section:
+                        raise error.PrewikkaUserError(N_("Menu error"), N_("Section without a name in %s", filename))
 
-        if not default:
+                    if "default_tab" in section:
+                        if self._default_section:
+                            raise error.PrewikkaUserError(N_("Menu error"), N_("Multiple default views"))
+                        self._default_section, self._default_tab = (section["name"], section["default_tab"])
+
+                    self._declared_sections[section["name"]] = section.get("tabs", [])
+
+        if not default_menu:
             self._menus[-1]["default"] = True
 
     def get_sections(self):
@@ -78,6 +88,9 @@ class MenuManager(object):
     def get_declared_sections(self):
         return self._declared_sections
 
+    def get_default_view(self):
+        return self._default_view
+
     def add_section(self, name):
         self._all_sections.add(name)
 
@@ -86,6 +99,9 @@ class MenuManager(object):
 
         self._loaded_sections.setdefault(view.view_menu[0], OrderedDict()) \
                              .setdefault(view.view_menu[1], OrderedDict())[view.view_id] = view
+
+        if view.view_menu[:2] == (self._default_section, self._default_tab):
+            self._default_view = view
 
     def _tab_index(self, section, tab):
         try:
