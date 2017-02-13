@@ -22,6 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import abc
 import collections
 import fcntl
+import functools
 import operator
 import pkgutil
 import re
@@ -31,7 +32,7 @@ from datetime import datetime
 
 import pkg_resources
 import preludedb
-from prewikka import compat, env, error, log, usergroup, utils, version
+from prewikka import compat, error, log, utils, version
 from prewikka.utils import cache, json
 
 ModuleInfo = collections.namedtuple("ModuleInfo", ["branch", "version", "enabled"])
@@ -78,6 +79,7 @@ def _use_flock(func):
 
 
 def use_transaction(func):
+    @functools.wraps(func)
     def inner(self, *args, **kwargs):
         if env.db._transaction_state:
             return func(self, *args, **kwargs)
