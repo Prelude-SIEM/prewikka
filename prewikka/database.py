@@ -662,18 +662,18 @@ class Database(preludedb.SQL):
 
     def _pgsql_upsert_cte(self, table, pkey, fields, values_rows, returning=[], merge={}):
         fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge, lambda x: "nv.%s" % x)
-        if not vlfmt:
-            return []
 
         self._lock_table(table)
         try:
-            ret = self._pgsql_upsert_cte_query(table, pkey, upfmt, fieldfmt, vlfmt, retfmt)
+            if vlfmt:
+                ret = self._pgsql_upsert_cte_query(table, pkey, upfmt, fieldfmt, vlfmt, retfmt)
+
             if delfmt:
                 self.query("DELETE FROM %s WHERE %s" % (table, delfmt))
         finally:
             self._unlock_table(table)
 
-        if retfmt:
+        if vlfmt and retfmt:
             return ret
 
     def _pgsql_upsert(self, table, pkey, fields, values_rows, returning=[], merge={}):
