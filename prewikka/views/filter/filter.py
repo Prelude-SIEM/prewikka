@@ -123,7 +123,7 @@ class FilterView(FilterPlugin, view.View):
             if env.dataprovider.has_type(typ):
                 yield typ, env.dataprovider.get_label(typ)
 
-    @view.route("/settings/filters", menu=(N_("Settings"), N_("Filters")))
+    @view.route("/settings/filters", menu=(N_("Preferences"), N_("Filters")))
     def listing(self):
         dataset = {}
         data = []

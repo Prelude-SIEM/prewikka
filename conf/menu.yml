@@ -20,7 +20,7 @@
   icon: sliders
   categories:
       - sections:
-            - name: Settings
+            - name: Preferences
               tabs:
                   - My account
                   - Filters
