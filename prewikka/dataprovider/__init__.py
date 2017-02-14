@@ -99,7 +99,7 @@ class QueryResultsRow(CachingIterator):
             value = self._cast(value)
 
         cont = [self._get_current_path(), value]
-        list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE", cont))
+        list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE_READ", cont))
 
         return cont[1]
 
@@ -137,7 +137,7 @@ class ResultObject(object):
         curpath = self._curpath + [key]
 
         cont = [ ".".join(curpath), self.preprocess_value(value) ]
-        list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE", cont))
+        list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE_READ", cont))
 
         return self._wrapobj(cont[1], curpath)
 
@@ -296,7 +296,9 @@ class Criterion(json.JSONObject):
         return res
 
     def _resolve(self, type):
-        list(hookmanager.trigger("HOOK_CRITERION_LOAD", self))
+        tpl = [self.left, self.right]
+        list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE_WRITE", tpl))
+        self.right = tpl[1]
 
         if not type:
             return " ".join(text_type(i) for i in [self.left, self.operator, self.right])
@@ -490,15 +492,22 @@ class DataProviderManager(pluginmanager.PluginManager):
         type, paths, _, criteria = self._normalize(type, paths, criteria)
         return self._backends[type].delete(criteria, paths)
 
+    @staticmethod
+    def _resolve_values(paths, values):
+        for tpl in zip(paths, values):
+            tpl = list(tpl)
+            list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE_WRITE", tpl))
+            yield tpl
+
     def insert(self, data, criteria=None, type=None):
-        paths, values = zip(*data.items())
+        paths = data.keys()
         type, paths, _, criteria = self._normalize(type, paths, criteria)
-        return self._backends[type].insert(zip(paths, values), criteria)
+        return self._backends[type].insert(self._resolve_values(paths, data.values()), criteria)
 
     def update(self, data, criteria=None, type=None):
-        paths, values = zip(*data.items())
+        paths = data.keys()
         type, paths, _, criteria = self._normalize(type, paths, criteria)
-        return self._backends[type].update(zip(paths, values), criteria)
+        return self._backends[type].update(self._resolve_values(paths, data.values()), criteria)
 
     def has_type(self, wanted_type):
         return wanted_type in self._backends
