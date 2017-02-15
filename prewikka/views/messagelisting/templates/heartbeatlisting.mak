@@ -89,16 +89,16 @@
 </%def>
 
 <%block name="message_extra_footer">
-    % if env.request.user.has("IDMEF_ALTER"):
-    <div class="pull-right">
-      <div class="input-group">
+  % if env.request.user.has("IDMEF_ALTER"):
+  <div class="pull-right">
+    <div class="form-inline">
+      <input type="submit" class="btn btn-primary" name="listing_apply" value="${ _("Apply") }" data-confirm="${ _("Delete the selected heartbeats?") }" />
+      <div class="form-group">
         <select class="form-control" name="action" id="action">
           <option value="delete_message">${ _('Delete') }</option>
         </select>
-        <span class="input-group-btn">
-          <input type="submit" class="btn btn-primary"name="listing_apply" value="${ _("Apply") }" />
-        </span>
       </div>
     </div>
-    % endif
+  </div>
+  % endif
 </%block>
