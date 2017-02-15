@@ -23,7 +23,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pkg_resources
 
 import prelude
-from prewikka import database, error, hookmanager, resource, template, view
+from prewikka import database, error, hookmanager, resource, response, template, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import AttrObj, OrderedDict, json
 
@@ -232,3 +232,5 @@ class FilterView(FilterPlugin, view.View):
 
         description = env.request.parameters.get("filter_description", "")
         self._db.upsert_filter(env.request.user, Filter(fname, description, criteria))
+
+        return response.PrewikkaDirectResponse({"type": "ajax-reload"})
