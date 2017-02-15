@@ -239,6 +239,9 @@ class DataProviderNormalizer(object):
 
         return "'%s'" % value.replace("\\", "\\\\").replace("'", "\\'")
 
+    def format_paths(self, paths, type):
+        return [path.format(backend=type, time_field=self._time_field) for path in paths]
+
     def parse_paths(self, paths, type):
         """
         Parse paths and turn them into a structure that can be used by the backend.
@@ -249,7 +252,7 @@ class DataProviderNormalizer(object):
         @type type: string
         @return: The paths as a structure that can easily be used by the backend.
         """
-        return [p.format(backend=type, time_field=self._time_field) for p in paths], []
+        return paths, []
 
     def parse_criteria(self, criteria, type):
         """
@@ -452,7 +455,8 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         type = self._check_data_type(type, paths, criteria)
 
-        compcrit = None
+        parsed_paths = paths
+        parsed_criteria = None
         paths_types = []
         normalizer = self._type_handlers[type].normalizer
 
@@ -460,21 +464,22 @@ class DataProviderManager(pluginmanager.PluginManager):
             criteria += c
 
         if normalizer:
-            paths, paths_types = normalizer.parse_paths(paths, type)
+            paths = normalizer.format_paths(paths, type)
+            parsed_paths, paths_types = normalizer.parse_paths(paths, type)
             if criteria:
-                compcrit = normalizer.parse_criteria(criteria, type)
+                parsed_criteria = normalizer.parse_criteria(criteria, type)
 
-        return type, paths, paths_types, compcrit
+        return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, parsed_criteria=parsed_criteria)
 
     def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None):
-        type, parsed_paths, paths_types, criteria = self._normalize(type, paths, criteria)
+        o = self._normalize(type, paths, criteria)
 
         start = time.time()
-        results = self._backends[type].get_values(parsed_paths, criteria, distinct, limit, offset)
+        results = self._backends[o.type].get_values(o.parsed_paths, o.parsed_criteria, distinct, limit, offset)
         results.duration = time.time() - start
 
-        results._paths = paths
-        results._paths_types = paths_types
+        results._paths = o.paths
+        results._paths_types = o.paths_types
 
         return results
 
@@ -485,12 +490,12 @@ class DataProviderManager(pluginmanager.PluginManager):
         if order_by not in ("time_asc", "time_desc"):
             raise DataProviderError("Invalid value for parameter 'order_by'")
 
-        type, _, _, criteria = self._normalize(type, criteria=criteria)
-        return self._backends[type].get(criteria, order_by, limit, offset)
+        o = self._normalize(type, criteria=criteria)
+        return self._backends[o.type].get(o.parsed_criteria, order_by, limit, offset)
 
     def delete(self, criteria=None, paths=None, type=None):
-        type, paths, _, criteria = self._normalize(type, paths, criteria)
-        return self._backends[type].delete(criteria, paths)
+        o = self._normalize(type, paths, criteria)
+        return self._backends[o.type].delete(o.parsed_criteria, o.parsed_paths)
 
     @staticmethod
     def _resolve_values(paths, values):
@@ -501,13 +506,13 @@ class DataProviderManager(pluginmanager.PluginManager):
 
     def insert(self, data, criteria=None, type=None):
         paths = data.keys()
-        type, paths, _, criteria = self._normalize(type, paths, criteria)
-        return self._backends[type].insert(self._resolve_values(paths, data.values()), criteria)
+        o = self._normalize(type, paths, criteria)
+        return self._backends[o.type].insert(self._resolve_values(o.parsed_paths, data.values()), o.parsed_criteria)
 
     def update(self, data, criteria=None, type=None):
         paths = data.keys()
-        type, paths, _, criteria = self._normalize(type, paths, criteria)
-        return self._backends[type].update(self._resolve_values(paths, data.values()), criteria)
+        o = self._normalize(type, paths, criteria)
+        return self._backends[o.type].update(self._resolve_values(o.parsed_paths, data.values()), o.parsed_criteria)
 
     def has_type(self, wanted_type):
         return wanted_type in self._backends
