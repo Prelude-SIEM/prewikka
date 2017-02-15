@@ -1,3 +1,31 @@
+* 2017-02-16, prewikka-4.0.0:
+
+Author: Antoine Luong
+
+- Fix input order in Heartbeats
+- Fix menu for MyAccount page
+- Refresh the page after saving a filter
+- Format paths for use in QueryResultsRow
+- Menu update
+- Add new methods for dataproviders
+- Normalize None values at link creation
+
+Author: Yoann Vandoorselaere
+
+- Resolve data in dataprovider write operations
+- Fix upsert (CTE version) with empty values rows
+
+Author: Camille Gardet
+
+- @use_transaction uses the name of the original function
+
+Author: Thomas Andrejak
+
+- Add mainmenu to messagesummary
+- Update INSTALL file
+
+
+
 * 2017-02-12, prewikka-4.0.0rc3:
 
 Author: Camille Gardet
