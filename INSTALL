@@ -15,16 +15,18 @@ Dependencies
 Build requires:
 
 - python >= 2.6 (not python 3.x)
+- python-argparse
 - python-babel
 - python-lesscpy
-- python-argparse
 - python-setuptools
 
 Run requires:
 
 - python >= 2.6 (not python 3.x)
 - python-babel
+- python-dateutil
 - python-mako >= 0.8.1
+- python-tz / pytz
 - python-werkzeug
 - python-yaml / PyYAML
 - libprelude with python bindings
