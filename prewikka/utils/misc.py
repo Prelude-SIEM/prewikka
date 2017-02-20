@@ -20,12 +20,12 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import datetime
 import os.path
 import re
 import struct
 import sys
 import time
+import unicodedata
 
 from prewikka import compat
 
@@ -166,6 +166,8 @@ def soundex(name):
     digits = '01230120022455012623010202'
     sndx = ''
     fc = ''
+
+    name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore")
 
     # translate alpha chars in name to soundex digits
     for i, c in enumerate(name):
