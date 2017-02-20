@@ -19,9 +19,10 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import base64
 import copy
+from prewikka import hookmanager, resource, template, utils, view, error, response
 
-from prewikka import hookmanager, resource, template, utils, view
 
 _CSS_FILES = utils.OrderedDict((resource.CSSLink(link), True) for link in (
     "prewikka/css/jquery-ui.min.css",
@@ -49,9 +50,31 @@ _JS_FILES = utils.OrderedDict((resource.JSLink(link), True) for link in (
 
 
 class BaseView(view._View):
+    view_layout = None
     view_template = template.PrewikkaTemplate(__name__, 'templates/baseview.mak')
 
-    def render(self):
+    @view.route("/download/<int:id>/<filename>")
+    @view.route("/download/<int:id>/<filename>/inline", defaults={ "inline": True })
+    @view.route("/download/<user>/<int:id>/<filename>")
+    @view.route("/download/<user>/<int:id>/<filename>/inline", defaults={ "inline": True })
+    def download(self, user=None, id=None, filename=None, inline=False):
+        if user and user != env.request.user.name:
+            raise error.PrewikkaUserError(_("Permission Denied"), message=_("Missing permission to access the specified file"), code=403)
+
+        fd = open(utils.mkdownload.get_filename(id, filename, user), "r")
+        return response.PrewikkaDownloadResponse(fd, filename=base64.urlsafe_b64decode(str(filename)), inline=inline)
+
+    @view.route("/logout")
+    def logout(self):
+        try:
+            env.session.logout(env.request.web)
+        except:
+            # logout always generate an exception to render the logout template
+            pass
+
+        return response.PrewikkaRedirectResponse(env.request.parameters.get("redirect", env.request.web.get_baseurl()), code=302)
+
+    def render(self, *args, **kwargs):
         # FIXME: move theme management to a plugin !
         if env.request.user:
             theme = env.request.user.get_property("theme", default=env.config.general.default_theme)

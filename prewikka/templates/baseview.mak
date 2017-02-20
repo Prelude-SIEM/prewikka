@@ -32,7 +32,7 @@ function check_same_origin(url) {
 
 $(document).ready(function() {
         % if not(context.get("is_error_template")):
-           prewikka_loadTab({url: window.location.pathname, data: "${env.request.web.get_query_string() | n}", type: "${env.request.web.method}"});
+           prewikka_ajax({url: window.location.pathname, data: "${env.request.web.get_query_string() | n}", type: "${env.request.web.method}", context: "tab" });
         % endif
 
         /*
@@ -42,7 +42,7 @@ $(document).ready(function() {
                 if ( e.originalEvent.state == null )
                         return;
 
-                prewikka_loadTab({url: e.originalEvent.state, history:false});
+                prewikka_ajax({url: e.originalEvent.state, history:false, context:"tab"});
         });
 
         $(document).on("click", "a:not(.ajax-bypass), area:not(.ajax-bypass)", function(event) {
@@ -59,27 +59,11 @@ $(document).ready(function() {
                         return false;
                 }
 
-                if ( ! $(this).hasClass("widget-link") )
-                        prewikka_loadTab({ url: url });
-                else
-                        prewikka_widget({ url: url, dialog: { title: $(this).attr('title') }});
-
-                return false;
-        });
-
-        $(document).on("click", ":input.widget-link", function() {
-                prewikka_widget({
-                        url: $(this).closest("form").attr("action"),
-                        data: $(this).closest("form").serialize(),
-                        dialog: { title: $(this).attr("title") }
-                });
-
+                prewikka_ajax({ url: url, context: ! $(this).hasClass("widget-link") ? "tab": null });
                 return false;
         });
 
         $(document).on("submit", "body form", function() {
-                $(this).find("input[name=_download]").remove();
-
                 var form = this;
                 var data = $(this).serialize();
 
@@ -88,18 +72,11 @@ $(document).ready(function() {
                         $(this).removeData("clicked");
                 }
 
-                if ( $(this).data("enable-download") ) {
-                        $(this).removeData("enable-download");
-                        $(this).append('<input type="hidden" name="_download" value="true" />');
-
-                        /* No AJAX for download */
-                        return true;
-                }
-
-                prewikka_loadTab({
+                prewikka_ajax({
                         url: $(this).attr("action"),
                         type: $(this).attr("method"),
                         data: data,
+                        context: "tab",
                         success: function() {
                               /* Close the modal potentially containing the form. */
                               $(form).closest(".modal").modal('hide');
@@ -235,6 +212,7 @@ def _get_view_url(section, tabs):
                 % endif
                 ${ menu.get("name", "") }
             </a>
+
             <ul class="dropdown-menu" role="menu">
             % for category in menu.get("categories", []):
                 % if "name" in category:
@@ -262,7 +240,7 @@ def _get_view_url(section, tabs):
                 <li><a class="widget-link" title="${ _("About") }" href="${ url }">${ _("About") }</a></li>
                 % endif
                 % if env.session.can_logout():
-                <li><a id="logout" title="${ _("Logout") }" class="ajax-bypass" href="${ url_for('Logout.render') }" data-confirm="${ _("Are you sure you want to log out?") }">${ _("Logout") }</a></li>
+                <li><a id="logout" title="${ _("Logout") }" class="ajax-bypass" href="${ url_for('BaseView.logout') }" data-confirm="${ _("Are you sure you want to log out?") }">${ _("Logout") }</a></li>
                 % endif
             % endif
             </ul>

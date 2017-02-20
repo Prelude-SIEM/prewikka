@@ -35,21 +35,6 @@ except ImportError:
 
 
 
-
-
-class Logout(view._View):
-    view_layout = None
-    view_path = "/logout"
-
-    def render(self):
-        try:
-            env.session.logout(env.request.web)
-        except:
-            # logout always generate an exception to render the logout template
-            pass
-
-        return response.PrewikkaRedirectResponse(env.request.parameters.get("redirect", env.request.web.get_baseurl()), code=302)
-
 _core_cache = {}
 _core_cache_lock = Lock()
 
@@ -208,9 +193,6 @@ class Core:
             env.auth = env.session
 
         env.viewmanager.addView(viewhelpers.AjaxHostURL())
-        if env.session.can_logout():
-                env.viewmanager.addView(Logout())
-
         env.renderer = renderer.RendererPluginManager()
         list(hookmanager.trigger("HOOK_PLUGINS_LOAD"))
 

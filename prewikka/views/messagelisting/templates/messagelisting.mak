@@ -10,10 +10,6 @@ from prewikka import usergroup
 $LAB.script("messagelisting/js/messagelisting.js").wait();
 
 $(document).ready(function() {
-  $(document).on("click", "#main form :input[name=pdfgen], #main form :input[name=csvgen]", function(event) {
-        $("#main form").data("enable-download", true);
-  });
-
   $("#allbox").click(function(){
     $('input[name=selection]').check($(this).prop('checked'));
   });

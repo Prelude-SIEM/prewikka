@@ -111,23 +111,12 @@ function CommonListing(elem, text, options) {
     }
 
     $(".button-add").on("click", function() {
-        prewikka_widget({
-            url: options.editLink,
-            dialog: {
-                title: text['new']
-            }
-        });
+        prewikka_ajax({ url: options.editLink });
     });
     $(".button-duplicate").on("click", function() {
         var row = grid.getGridParam("selrow");
         if ( ! row ) return;
-        prewikka_widget({
-            url: options.editLink,
-            data: {duplicate: row},
-            dialog: {
-                title: text['new']
-            }
-        });
+        prewikka_ajax({ url: options.editLink, data: {duplicate: row} });
     });
     $(".button-delete").on("click", function() {
         if ( ! $(this).data("confirm") )

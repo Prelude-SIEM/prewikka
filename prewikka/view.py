@@ -148,7 +148,6 @@ class Parameters(dict):
 
         self.register()
         self.optional("_save", text_type)
-        self.optional("_download", text_type)
 
         list(hookmanager.trigger("HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper(), self))
 
@@ -501,7 +500,7 @@ class ViewManager(object):
         if view:
             view_layout = view.view_layout
 
-        if not request.is_xhr and not request.is_stream and view_layout and "_download" not in request.arguments:
+        if not (request.is_xhr or request.is_stream) and view_layout:
             view = self._views.get(view_layout.lower())
 
         elif view_kwargs:
