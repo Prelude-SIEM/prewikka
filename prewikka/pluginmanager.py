@@ -70,6 +70,7 @@ class PluginManager:
 
         dh = database.DatabaseUpdateHelper(plugin_class.full_module_name, plugin_class.plugin_database_version, plugin_class.plugin_database_branch)
         if autoupdate or plugin_class.plugin_database_autoupdate:
+            dh.modinfos_cache.clear()
             dh.apply()
         else:
             dh.check()
