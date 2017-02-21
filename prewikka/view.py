@@ -466,15 +466,7 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
-class _Route(object):
-    def __init__(self, path, methods=["GET"], permissions=[], menu=None):
-        self.permissions = permissions
-        self.path = path
-        self.methods = methods
-        self.menu = menu
-
-
-def route(route, methods=["GET"], permissions=[], menu=None):
+def route(path, methods=["GET"], permissions=[], menu=None, defaults={}):
     usergroup.ALL_PERMISSIONS.declare(permissions)
 
     def decorator(func):
@@ -482,7 +474,7 @@ def route(route, methods=["GET"], permissions=[], menu=None):
         if not r:
             func.__prewikka_route__ = []
 
-        func.__prewikka_route__.append(_Route(route, methods, permissions, menu))
+        func.__prewikka_route__.append(utils.AttrObj(path=path, methods=methods, permissions=permissions, menu=menu, defaults=defaults))
         return func
 
     return decorator
@@ -557,7 +549,7 @@ class ViewManager(object):
                 vd = self._route2viewdesc(view, ref, route)
 
                 self._views_endpoint[vd.view_endpoint] = vd
-                self._rule_map.add(Rule(route.path, methods=route.methods, endpoint=vd.view_endpoint))
+                self._rule_map.add(Rule(route.path, methods=route.methods, endpoint=vd.view_endpoint, defaults=route.defaults))
 
         rdfunc = getattr(view, "render")
         if rdfunc and not getattr(rdfunc, "__prewikka_route__", []):
