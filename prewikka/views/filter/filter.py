@@ -121,7 +121,7 @@ class FilterView(FilterPlugin, view.View):
     def _get_types(self):
         for typ in _TYPES:
             if env.dataprovider.has_type(typ):
-                yield typ, env.dataprovider.get_label(typ)
+                yield typ, _(env.dataprovider.get_label(typ))
 
     @view.route("/settings/filters", menu=(N_("Preferences"), N_("Filters")))
     def listing(self):
