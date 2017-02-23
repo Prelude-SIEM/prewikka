@@ -36,13 +36,14 @@ else:
 
 
 defined_status = {
-    200: 'OK',
-    400: 'BAD REQUEST',
-    401: 'UNAUTHORIZED',
-    403: 'FORBIDDEN',
-    404: 'NOT FOUND',
-    405: 'METHOD NOT ALLOWED',
-    500: 'INTERNAL SERVER ERROR',
+    200: 'Ok',
+    304: 'Not Modified',
+    400: 'Bad Request',
+    401: 'Unauthorized',
+    403: 'Forbidden',
+    404: 'Not Found',
+    405: 'Method Not Allowed',
+    500: 'Internal Server Error',
 }
 
 

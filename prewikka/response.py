@@ -23,6 +23,8 @@ from __future__ import absolute_import, division, print_function
 import mimetypes
 import os
 import time
+import datetime
+import dateutil.parser
 
 from prewikka import compat, template, utils
 from prewikka.utils import json
@@ -136,23 +138,48 @@ class PrewikkaDownloadResponse(PrewikkaResponse):
 
         Use this class for download response (pdf, csv, ...).
 
-        :param str data: The inner content of the file
-        :param str filename: Filename of the file
-        :param str type: Type of the file as mime type
-        :param int size: Size of the data (default to len(data))
+        :param str data: The inner content of the file, or a file object
+        :param str filename: Name for the file to be downloaded
+        :param str type: Type of the file as mime type (will try to guess if None)
+        :param int size: Size of the data (will be computed automatically if None)
+        :param bool inline: Whether to display the downloaded file inline
     """
-
-    def __init__(self, data, filename, type="application/force-download", size=None):
+    def __init__(self, data, filename=None, type=None, size=None, inline=False):
         PrewikkaResponse.__init__(self, data)
+
+        if filename and not type:
+            type = mimetypes.guess_type(filename)[0]
+
+        if not type:
+            type = "application/octet-stream"
+
+        disposition = "inline" if inline else "attachment"
+        if filename:
+            disposition += "; filename=\"%s\"" % filename
+
+        self._is_file = not(isinstance(self.data, text_type))
+        if not size:
+            if self._is_file:
+                size = os.fstat(self.data.fileno()).st_size
+            else:
+                size = len(data)
+
         self.headers.update((
             ("Content-Type", type),
-            ("Content-Disposition", "attachment; filename=\"%s\"" % filename),
+            ("Content-Length", str(size)),
+            ("Content-Disposition", disposition),
             ("Pragma", "public"),
             ("Cache-Control", "max-age=0")
         ))
 
-    def content(self):
-        return self.data
+    def write(self, request):
+        request.send_headers(self.headers.items(), self.code, self.status_text)
+
+        if not self._is_file:
+            request.write(self.data)
+        else:
+            for i in iter(lambda: self.data.read(8192), b''):
+                request.write(i)
 
 
 class PrewikkaDirectResponse(PrewikkaResponse):
@@ -172,25 +199,33 @@ class PrewikkaFileResponse(PrewikkaResponse):
     """
     def __init__(self, path):
         PrewikkaResponse.__init__(self)
+        self._path = path
 
-        self.fd = open(path, "rb")
-        stat = os.fstat(self.fd.fileno())
+        stat = os.stat(path)
+        content_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
+        mtime = datetime.datetime.utcfromtimestamp(stat.st_mtime).replace(tzinfo=utils.timeutil.tzutc())
 
-        content_type = mimetypes.guess_type(env.request.web.path)[0] or "application/octet-stream"
+        ims = env.request.web.headers.get("if-modified-since")
+        if ims is not None:
+            ims = dateutil.parser.parse(ims)
+            if mtime <= ims:
+                self.code = 304
 
-        self.headers = utils.OrderedDict((('Content-Type', content_type),
-                                          ('Content-Length', str(stat[6])),
-                                          ('Last-Modified', time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime(stat[8])))
-                                        ))
+        self.headers = utils.OrderedDict((('Content-Type', content_type),))
+
+        if self.code != 304:
+            self.headers["Content-Length"] = str(stat.st_size)
+            self.headers["Expires"] = (mtime + datetime.timedelta(days=30)).strftime("%a, %d %b %Y %H:%M:%S GMT")
+            self.headers["Last-Modified"] = mtime.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
     def write(self, request):
         request.send_headers(self.headers.items(), self.code, self.status_text)
+        if self.code == 304:
+            return
 
-        for i in iter(lambda: self.fd.read(8192), b''):
-            request.write(i)
-
-        self.fd.close()
-
+        with open(self._path, 'rb') as fd:
+            for i in iter(lambda: fd.read(8192), b''):
+                request.write(i)
 
 
 class PrewikkaRedirectResponse(PrewikkaResponse):
