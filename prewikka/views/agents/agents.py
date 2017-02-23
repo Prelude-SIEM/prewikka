@@ -21,19 +21,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import pkg_resources
 import time
-from dateutil.relativedelta import relativedelta
 
 from prewikka import hookmanager, localization, mainmenu, template, utils, view, response
 from prewikka.dataprovider import Criterion
-from prewikka.utils import html, json
-
-
-class AgentsParameters(mainmenu.MainMenuParameters):
-    allow_extra_parameters = True
 
 
 class Agents(view.View):
-    view_parameters = AgentsParameters
+    view_parameters = mainmenu.MainMenuParameters
     view_menu = (N_("Agents"), N_("Agents"))
     view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
@@ -90,10 +84,10 @@ class Agents(view.View):
                         "class": "widget-link", "title": _("Heartbeat analysis")},
                    ]}
 
-    @view.route("/agents/agents/<list:status>", permissions=[N_("IDMEF_VIEW")])
     @view.route("/agents/agents", permissions=[N_("IDMEF_VIEW")])
-    def agents(self, status=[]):
-        analyzer_data = list(self._get_analyzers(status))
+    def agents(self):
+
+        analyzer_data = list(self._get_analyzers(env.request.parameters.getlist("status")))
         list(hookmanager.trigger("HOOK_AGENTS_EXTRA_CONTENT", analyzer_data))
         extra_columns = filter(None, hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN"))
 
@@ -162,7 +156,6 @@ class Agents(view.View):
                 if delta > self._heartbeat_error_margin:
                     delta = localization.format_timedelta(delta, granularity="second")
                     event = utils.AttrObj(time=cur_time_str, value=_("Unexpected heartbeat interval: %(delta)s") % {'delta': delta}, type="abnormal_heartbeat_interval")
-
 
             elif cur_status == "exiting":
                 event = utils.AttrObj(time=cur_time_str, value=_("Normal sensor stop"), type="normal_stop")

@@ -30,7 +30,6 @@ _MAINMENU_TEMPLATE = template.PrewikkaTemplate(__name__, "templates/mainmenu.mak
 
 
 class MainMenuParameters(view.Parameters):
-    allow_extra_parameters = False
     _INTERNAL_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_absolute",
                             "order_by", "timezone", "auto_apply_value"]
 
