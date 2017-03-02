@@ -212,20 +212,11 @@ class TcpIpOptions(Table):
 
     def _decodeOptionTimestamp(self, data):
         x = struct.unpack(b">LL", data)
-        return "TS Value (%d)<br/>TS Echo Reply (%d)" % (x[0], x[1])
+        return resource.HTMLSource("TS Value (%d)<br/>TS Echo Reply (%d)") % (x[0], x[1])
 
     def _decodeOptionSack(self, data):
         x = struct.unpack(b">" + "L" * (len(data) / 4), data)
-
-        s = ""
-        for i in x:
-            if len(s):
-                s += "<br/>"
-
-            s += text_type(i)
-
-        return s
-
+        return resource.HTMLSource("<br/>").join(text_type(i) for i in x)
 
     def _decodeOptionMd5(self, data):
         md = hashlib.md5(struct.unpack(b">B" * 16, data)[0])
@@ -422,7 +413,7 @@ class MessageSummary(Table, view.View):
 
         self.newTableEntry(_("Node location"), node["location"])
 
-        addr_list = None
+        addr_list = []
         node_name = None
         for addr in node["address"]:
             address = addr["address"]
@@ -431,15 +422,10 @@ class MessageSummary(Table, view.View):
 
             node_name = resolve.AddressResolve(address)
 
-            if addr_list:
-                addr_list += "<br/>"
-            else:
-                addr_list = ""
-
             if addr["category"] in ("ipv4-addr", "ipv6-addr", "ipv4-net", "ipv6-net") and env.enable_details:
-                addr_list += self.getUrlLink(address, "%s?host=%s" %(env.host_details_url, address))
+                addr_list.append(self.getUrlLink(address, "%s?host=%s" % (env.host_details_url, address)))
             else:
-                addr_list += address
+                addr_list.append(address)
 
         if node["name"]:
             self.newTableEntry(_("Node name"), node["name"])
@@ -447,7 +433,8 @@ class MessageSummary(Table, view.View):
         elif node_name is not None and node_name.resolveSucceed():
             self.newTableEntry(_("Node name (resolved)"), node_name)
 
-        self.newTableEntry(_("Node address"), addr_list)
+        if addr_list:
+            self.newTableEntry(_("Node address"), resource.HTMLSource("<br/>").join(addr_list))
 
     def buildAnalyzer(self, analyzer):
         self.beginTable(cl="table-borderless")
