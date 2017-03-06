@@ -956,3 +956,49 @@ label.disabled a {
 .list-bootstrap-label > span > a:after {
     color: @primary-color;
 }
+
+@label_critical_bg: #b03030;
+@table_critical_bg: #f2c0c0;
+
+.label-critical {
+    background-color: @label_critical_bg;
+}
+
+.label-critical[href]:focus, .label-critical[href]:hover {
+    background-color: darken(@label_critical_bg, 5%);
+}
+
+.table > thead > tr, .table > tbody > tr, .table > tfoot > tr {
+    > td.critical, > th.critical, &.critical > td, &.critical > th {
+        background-color: @table_critical_bg;
+    }
+}
+
+.table-hover > tbody > tr {
+    > td.critical:hover, > th.critical:hover, &.critical:hover > td, &:hover > .critical, &.critical:hover > th {
+        background-color: darken(@table_critical_bg, 5%);
+    }
+}
+
+@label_panic_bg: #800000;
+@table_panic_bg: #f2a0a0;
+
+.label-panic {
+    background-color: @label_panic_bg;
+}
+
+.label-panic[href]:focus, .label-panic[href]:hover {
+    background-color: darken(@label_panic_bg, 5%);
+}
+
+.table > thead > tr, .table > tbody > tr, .table > tfoot > tr {
+    > td.panic, > th.panic, &.panic > td, &.panic > th {
+        background-color: @table_panic_bg;
+    }
+}
+
+.table-hover > tbody > tr {
+    > td.panic:hover, > th.panic:hover, &.panic:hover > td, &:hover > .panic, &.panic:hover > th {
+        background-color: darken(@table_panic_bg, 5%);
+    }
+}
