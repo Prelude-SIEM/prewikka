@@ -69,6 +69,10 @@ class NoBackendError(DataProviderError):
     pass
 
 
+class ItemNotFoundError(error.PrewikkaUserError):
+    pass
+
+
 class QueryResultsRow(CachingIterator):
     __slots__ = ("_parent")
 
