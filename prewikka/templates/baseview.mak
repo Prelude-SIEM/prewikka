@@ -79,15 +79,16 @@ $(document).ready(function() {
                         data: data,
                         context: "tab",
                         success: function() {
+                              $("form").trigger("submit-success", [form, data]);
+
                               /* Close the modal potentially containing the form. */
                               $(form).closest(".modal").modal('hide');
-                              $("#main form").trigger("submit-success");
                         },
                         error: function() {
-                              $("#main form").trigger("submit-error");
+                              $("form").trigger("submit-error", [form, data]);
                         },
                         complete: function() {
-                              $("#main form").trigger("submit-complete");
+                              $("form").trigger("submit-complete", [form, data]);
                         },
 
                 });

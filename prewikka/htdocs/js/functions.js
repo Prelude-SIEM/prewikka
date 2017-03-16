@@ -123,7 +123,7 @@ $(document).ready(function(){
    * Make sure bootstrap modal appear in the order they are drawn (as opposed to html order).
    */
   $(document).on('show.bs.modal', '.modal', function () {
-    var zIndex = 1050 + $('.modal-backdrop:visible').length;
+    var zIndex = 1050 + $('.modal:visible').length;
     $(this).css('z-index', zIndex);
   });
 
