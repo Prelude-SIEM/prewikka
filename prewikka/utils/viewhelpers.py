@@ -33,10 +33,20 @@ class GridAjaxParameters(view.Parameters):
         self.optional("sort_index", text_type)  # sorting column
         self.optional("sort_order", text_type)  # sort order (asc or desc)
 
+    @utils.deprecated
     def get_response(self, total_results):
         # Ceil division (use // instead of / for Python3 compatibility):
         nb_pages = (total_results - 1) // self["rows"] + 1
         return {"total": nb_pages, "page": self["page"], "rows": [], "records": total_results}
+
+
+class GridAjaxResponse(response.PrewikkaDirectResponse):
+    def __init__(self, rows, total_results):
+        response.PrewikkaDirectResponse.__init__(self)
+
+        # Ceil division (use // instead of / for Python3 compatibility):
+        nb_pages = (total_results - 1) // int(env.request.parameters.get("rows", 10)) + 1
+        self.data = {"total": nb_pages, "rows": rows, "records": total_results}
 
 
 class AjaxHostURL(view.View):
