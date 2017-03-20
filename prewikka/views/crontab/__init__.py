@@ -26,12 +26,12 @@ from prewikka import crontab, error, localization, response, template, utils, ve
 
 
 class CrontabView(view.View):
-    plugin_name = N_("Crontab management")
+    plugin_name = N_("Scheduling management")
     plugin_author = version.__author__
     plugin_license = version.__license__
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
-    plugin_description = N_("Manage crontab jobs")
+    plugin_description = N_("Scheduled jobs management page")
     plugin_htdocs = (("crontab", pkg_resources.resource_filename(__name__, 'htdocs')),)
     view_permissions = [ N_("USER_MANAGEMENT") ]
 
@@ -78,7 +78,7 @@ class CrontabView(view.View):
             if i.runcnt > 0:
                 last = localization.format_timedelta(i.base - now, add_direction=True)
             else:
-                last = _("N/A")
+                last = _("n/a")
 
             if i.error:
                 last = resource.HTMLNode("a", _("Error"), _class="cronjob-error")

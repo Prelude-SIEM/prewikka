@@ -10,7 +10,7 @@ from prewikka.utils import json
 
     var erridx = 0;
     var grid = CommonListing('table#cronjobs', {'title': "${_('Scheduled Jobs')}" }, {
-        colNames: ["${ _('Name') }", "${ _('Schedule') }", "${ _('User') }", "${ _('Last') }", "${ _('Next') }" ],
+        colNames: ["${ _('Name') }", "${ _('Schedule') }", "${ _('User') }", "${ _('Last execution') }", "${ _('Next execution') }" ],
         colModel: [
             {name: 'name', width: 10},
             {name: 'schedule', width: 8},
