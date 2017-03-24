@@ -25,6 +25,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import functools
 from prewikka.utils import html
 
 
@@ -70,3 +71,52 @@ class JSSource(HTMLSource):
     """
     def __new__(cls, src):
         return HTMLSource.__new__(cls, html.Markup('<script type="text/javascript">%s</script>') % src)
+
+
+@functools.total_ordering
+class HTMLNode(object):
+    def __init__(self, tag, *childs, **attrs):
+        self.tag = tag
+        self.childs = childs
+
+        self._icon = attrs.pop("_icon", None)
+        self._sortkey = attrs.pop("_sortkey", None)
+
+        tmp = attrs.pop("_class", None)
+        if tmp:
+            attrs["class"] = tmp
+
+        self.attrs = attrs
+
+    def to_string(self, _class=""):
+        attr_s = HTMLSource()
+        for k, v in self.attrs.items():
+            if k == "class":
+                _class += " %s" % v
+                continue
+
+            attr_s += HTMLSource(" %s=\"%s\"") % (k, v)
+
+        if _class:
+            attr_s = HTMLSource(" class=\"%s\"") % (_class) + attr_s
+
+        childs = HTMLSource()
+        if self._icon:
+            childs += HTMLSource('<i class="fa %s" /> ') % self._icon
+
+        for x in self.childs:
+            childs += text_type(x)
+
+        return HTMLSource("<%s%s>%s</%s>" % (self.tag, attr_s, childs, self.tag))
+
+    def __json__(self):
+        return { "tag": self.tag, "childs": self.childs, "attrs": self.attrs }
+
+    def __str__(self):
+        return self.to_string()
+
+    def __eq__(self, other):
+        return (self._sortkey, self.childs) == (other._sortkey, other.childs)
+
+    def __lt__(self, other):
+        return (self._sortkey, self.childs) < (other._sortkey, other.childs)
