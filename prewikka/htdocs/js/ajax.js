@@ -66,15 +66,9 @@ function prewikka_drawTab(data)
 
     handle_notifications(data);
 
-    if ( ! data.content ) {
-        if ( ! data.menu )
-            return;
+    if ( ! data.content )
+        return;
 
-        /*
-         * If we have a menu, but no content, preserve previous content.
-         */
-        content = $("#main").html();
-    }
 
     /*
      * Check self and descendant
@@ -128,9 +122,14 @@ function _url_update(settings)
 
         if ( settings['history'] && (settings['type'] || "").toUpperCase() != "POST" ) {
                 var url = settings['url'];
+                var params = settings['data'];
 
-                if ( settings['data'] )
-                        url += "?" + settings['data'];
+                if ( params ) {
+                        if ( typeof(params) != 'string' )
+                                params = $.param(params);
+
+                        url += "?" + params;
+                }
 
                 history.pushState(url, '', url);
         }

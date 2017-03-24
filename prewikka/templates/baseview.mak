@@ -65,10 +65,11 @@ $(document).ready(function() {
 
         $(document).on("submit", "body form", function() {
                 var form = this;
-                var data = $(this).serialize();
+                var data = $(this).serializeArray();
+                var orig = $($(this).data("clicked"));
 
-                if ( $(this).data("clicked") ) {
-                        data += "&" + $(this).data("clicked");
+                if ( orig.length ) {
+                        data.push({ name: orig.attr("name"), value: orig.val() });
                         $(this).removeData("clicked");
                 }
 
@@ -94,12 +95,9 @@ $(document).ready(function() {
                 return false;
         });
 
-        $(document).on("click", "#main form :input[type=submit]", function() {
-                var name = $(this).attr("name");
-                var value = $(this).attr("value");
-
-                if ( name && value )
-                        $(this).closest("form").data("clicked", encodeURIComponent(name) + "=" + encodeURIComponent(value));
+        $(document).on("click", "#main form :input[type=submit]", function(e) {
+                if ( $(this).attr("name") && $(this).val() )
+                        $(this).closest("form").data("clicked", $(e.target));
         });
 });
 </script>
