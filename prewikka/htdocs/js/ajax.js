@@ -79,7 +79,7 @@ function prewikka_drawTab(data)
     /*
      * Check self and descendant
      */
-    form = $(content).find("form").addBack("form");
+    form = $(content).find("form").addBack("form").first();
     if ( ! form.length )
         form = content = content.wrapAll('<form method="get" action="' + prewikka_location().pathname + '"></form>').parent();
 

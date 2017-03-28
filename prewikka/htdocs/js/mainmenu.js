@@ -81,7 +81,7 @@ function MainMenuInit (date_format) {
             trigger_custom_date(true);
         } else {
             trigger_custom_date(false);
-            $("#main form").submit();
+            $(this).closest("form").submit();
         }
      });
 }
@@ -141,5 +141,5 @@ function PageReloader(callback, second) {
 };
 
 
-window.mainmenu = new PageReloader(function() { $("#main form").submit() },
+window.mainmenu = new PageReloader(function() { $("#main_menu_ng").closest("form").submit() },
                                    parseInt($("#hidden_auto_apply_value").val()));
