@@ -827,6 +827,10 @@ div.ui-jqgrid-titlebar {
     background-color: @fieldset-background;
 }
 
+.default-background {
+    background-color: @active-background;
+}
+
 /*
  * Bootstrap labels and inputs
  */
@@ -920,5 +924,17 @@ label.disabled a {
 .table-hover > tbody > tr {
     > td.panic:hover, > th.panic:hover, &.panic:hover > td, &:hover > .panic, &.panic:hover > th {
         background-color: darken(@table_panic_bg, 5%);
+    }
+}
+
+.table > thead > tr, .table > tbody > tr, .table > tfoot > tr {
+    > td.active, > th.active, &.active > td, &.active > th,
+    > td.info, > th.info, &.info > td, &.info > th,
+    > td.success, > th.success, &.success > td, &.success > th,
+    > td.warning, > th.warning, &.warning > td, &.warning > th,
+    > td.danger, > th.danger, &.danger > td, &.danger > th,
+    > td.critical, > th.critical, &.critical > td, &.critical > th,
+    > td.panic, > th.panic, &.panic > td, &.panic > th {
+        color: #444;
     }
 }
