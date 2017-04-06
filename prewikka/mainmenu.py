@@ -231,13 +231,13 @@ class MainMenu(object):
         delta = relativedelta(**{self._timeunit + "s" if self._timeunit != "unlimited" else "years": self._timevalue})
 
         if self.start and not self.end:
-            self.end = datetime.datetime.now(env.request.user.timezone).replace(second=0, microsecond=0)
+            self.end = datetime.datetime.now(env.request.user.timezone).replace(second=0, microsecond=0) + datetime.timedelta(minutes=1)
 
         elif self.end and not self.start:
             self.start = self.end - delta
 
         elif self.start is None and self.end is None:
-            self.start = self.end = datetime.datetime.now(env.request.user.timezone).replace(second=0, microsecond=0)
+            self.start = self.end = datetime.datetime.now(env.request.user.timezone).replace(second=0, microsecond=0) + datetime.timedelta(minutes=1)
             if not env.request.parameters["timeline_absolute"]: #relative
                 self.start = self.end - delta
 
