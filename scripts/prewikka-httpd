@@ -40,7 +40,7 @@ class WSGIRequest(WSGIRequestHandler):
 class MyWSGIServer(WSGIServer):
     def serve_forever(self):
         # Preload Prewikka server
-        main.get_core_from_config(options.config)
+        main.Core.from_config(options.config)
 
         try:
             WSGIServer.serve_forever(self)

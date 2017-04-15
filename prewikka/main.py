@@ -39,19 +39,6 @@ _core_cache = {}
 _core_cache_lock = Lock()
 
 
-def get_core_from_config(path, threaded=False):
-    global _core_cache
-    global _core_cache_lock
-
-    if not path:
-        path = siteconfig.conf_dir + "/prewikka.conf"
-
-    with _core_cache_lock:
-        if not path in _core_cache:
-            _core_cache[path] = Core(path)
-
-    return _core_cache[path]
-
 
 class Core:
     def _checkVersion(self):
@@ -65,6 +52,21 @@ class Core:
             raise error.PrewikkaUserError(error_type,
                                           N_("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher",
                                              {'vPre': version.__version__, 'vLib': siteconfig.libpreludedb_required_version}))
+
+
+    @staticmethod
+    def from_config(path=None, threaded=False):
+        global _core_cache
+        global _core_cache_lock
+
+        if not path:
+            path = siteconfig.conf_dir + "/prewikka.conf"
+
+        with _core_cache_lock:
+            if path not in _core_cache:
+                _core_cache[path] = Core(path)
+
+        return _core_cache[path]
 
     def __init__(self, filename=None):
         env.auth = None # In case of database error

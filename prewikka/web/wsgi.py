@@ -152,7 +152,7 @@ class WSGIRequest(request.Request):
 
 
 def application(environ, start_response):
-        core = main.get_core_from_config(environ.get("PREWIKKA_CONFIG", None))
+        core = main.Core.from_config(environ.get("PREWIKKA_CONFIG", None))
         core.process(WSGIRequest(environ, start_response))
 
         return []
