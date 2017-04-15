@@ -98,8 +98,8 @@ class Core:
 
         resolve.init()
 
-        env.viewmanager = None
         env.menumanager = None
+        env.viewmanager = view.ViewManager()
         env.htdocs_mapping.update((("prewikka", pkg_resources.resource_filename(__name__, 'htdocs')),))
 
         custom_theme = env.config.interface.get("custom_theme", None)
@@ -158,7 +158,6 @@ class Core:
         env.menumanager = menu.MenuManager()
         env.dataprovider = dataprovider.DataProviderManager()
         env.dataprovider.load()
-        env.viewmanager = view.ViewManager()
 
         env.plugins = {}
         for i in pluginmanager.PluginManager("prewikka.plugins"):

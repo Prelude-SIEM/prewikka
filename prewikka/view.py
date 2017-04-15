@@ -24,7 +24,7 @@ import sys
 import operator
 
 from copy import copy
-from prewikka import database, env, error, hookmanager, log, pluginmanager, template, usergroup, utils
+from prewikka import database, env, error, hookmanager, log, pluginmanager, registrar, template, usergroup, utils
 from prewikka.response import PrewikkaResponse
 
 import werkzeug.exceptions
@@ -434,7 +434,7 @@ class _ViewDescriptor(object):
         return not(self.view_users or self.view_groups or self.view_permissions)
 
 
-class _View(_ViewDescriptor):
+class _View(_ViewDescriptor, registrar.DelayedRegistrar):
     view_id = None
     view_path = None
     view_menu = []
@@ -443,13 +443,17 @@ class _View(_ViewDescriptor):
         pass
 
     def __init__(self):
+        if not self.view_id:
+            self.view_id = self.__class__.__name__.lower()
+
+        # Avoid initializing DelayedRegistrar twice in case we're a View.
+        if not isinstance(self, View):
+            registrar.DelayedRegistrar.__init__(self)
+
         _ViewDescriptor.__init__(self)
 
         if self.view_template and not isinstance(self.view_template, template.PrewikkaTemplate):
             self.view_template = template.PrewikkaTemplate(self.view_template)
-
-        if not self.view_id:
-            self.view_id = self.__class__.__name__.lower()
 
         if not self.view_path:
             if self.view_menu:
@@ -467,19 +471,11 @@ class View(_View, pluginmanager.PluginBase):
 
 def route(path, methods=["GET"], permissions=[], menu=None, defaults={}):
     usergroup.ALL_PERMISSIONS.declare(permissions)
-
-    def decorator(func):
-        r = getattr(func, "__prewikka_route__", None)
-        if not r:
-            func.__prewikka_route__ = []
-
-        func.__prewikka_route__.append(utils.AttrObj(path=path, methods=methods, permissions=permissions, menu=menu, defaults=defaults))
-        return func
-
-    return decorator
+    return registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route,
+                                                     route=utils.AttrObj(path=path, methods=methods, permissions=permissions, menu=menu, defaults=defaults))
 
 
-class ViewManager(object):
+class ViewManager(registrar.DelayedRegistrar):
     def getView(self, view_id):
         return self._views.get(view_id.lower())
 
@@ -538,20 +534,17 @@ class ViewManager(object):
 
         return v
 
+    def _add_route(self, method, route=None):
+        vd = self._route2viewdesc(method.__self__, method, route)
+        self._views_endpoint[vd.view_endpoint] = vd
+        self._rule_map.add(Rule(route.path, methods=route.methods, endpoint=vd.view_endpoint, defaults=route.defaults))
+
+
     def addView(self, view):
-        for name in dir(view):
-            if isinstance(getattr(type(view), name, None), property):
-                continue
-
-            ref = getattr(view, name)
-            for route in getattr(ref, "__prewikka_route__", []):
-                vd = self._route2viewdesc(view, ref, route)
-
-                self._views_endpoint[vd.view_endpoint] = vd
-                self._rule_map.add(Rule(route.path, methods=route.methods, endpoint=vd.view_endpoint, defaults=route.defaults))
-
         rdfunc = getattr(view, "render")
-        if rdfunc and not getattr(rdfunc, "__prewikka_route__", []):
+        route = getattr(rdfunc, registrar._ATTRIBUTE, {}).get("route")
+
+        if rdfunc and not route:
             if not view.view_path:
                 view.view_path = "/views/%s" % (view.view_id)
 
@@ -591,6 +584,8 @@ class ViewManager(object):
         request.url_adapter = ad
 
     def __init__(self):
+        registrar.DelayedRegistrar.__init__(self)
+
         self._views = {}
         self._routes = Map()
 

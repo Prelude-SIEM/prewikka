@@ -19,31 +19,14 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from prewikka import registrar
+
 _sentinel = object()
 
 
-def _register_decorator(hook):
-    def decorator(func):
-        lst = getattr(func, "__prewikka_hook__", [])
-        if not lst:
-            setattr(func, "__prewikka_hook__", lst)
-
-        lst.append(hook)
-        return func
-
-    return decorator
-
-
-class HookRegistrar(object):
-    def __init__(self, *args, **kwargs):
-        for name, ref in self.__class__.__dict__.items():
-            for hook in getattr(ref, "__prewikka_hook__", []):
-                hookmgr.register(hook, getattr(self, name))
-
-
-class HookManager:
+class HookManager(object):
     def __init__(self):
-        self._hooks = { }
+        self._hooks = {}
 
     def __contains__(self, hook):
         return hook in self._hooks
@@ -59,7 +42,7 @@ class HookManager:
         if method is not _sentinel:
             self._hooks.setdefault(hook, []).append(method)
         else:
-            return _register_decorator(hook)
+            return registrar.DelayedRegistrar.make_decorator("hook", self.register, hook)
 
     def trigger(self, hook, *args, **kwargs):
         wtype = kwargs.pop("type", None)
@@ -77,7 +60,6 @@ class HookManager:
 
 
 hookmgr = HookManager()
-
 trigger = hookmgr.trigger
 register = hookmgr.register
 unregister = hookmgr.unregister

@@ -19,18 +19,16 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import os
-import sys
-import traceback
 
 import pkg_resources
-from prewikka import database, env, error, hookmanager, log, usergroup, utils
+from prewikka import database, env, error, log, registrar, usergroup, utils
 from prewikka.localization import translation
 
 logger = log.getLogger(__name__)
 
 
-class PluginBase(hookmanager.HookRegistrar):
+
+class PluginBase(registrar.DelayedRegistrar):
     plugin_name = None
     plugin_version = None
     plugin_author = None
