@@ -426,7 +426,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
         return self._from_version
 
 
-class Database(preludedb.SQL):
+class DatabaseCommon(preludedb.SQL):
     required_branch = version.__branch__
     required_version = "0"
 
@@ -463,12 +463,14 @@ class Database(preludedb.SQL):
         env.db = self
 
         self.__ESCAPE_PREFILTER = {
-                datetime: lambda date: self.escape(date.strftime("%Y-%m-%d %H:%M:%S")),
+                datetime: lambda dt: self.escape(self.datetime(dt)),
                 set: self._prefilter_iterate,
                 list: self._prefilter_iterate,
                 tuple: self._prefilter_iterate,
                 types.GeneratorType: self._prefilter_iterate
         }
+
+        self._transaction_state = self.__TRANSACTION_STATE_NONE
 
         settings = { "host": "localhost", "name": "prewikka", "user": "prewikka", "type": "mysql" }
         stpl = tuple((k, v) for k, v in config.items())
@@ -478,12 +480,30 @@ class Database(preludedb.SQL):
 
         self._dbhash = hash(stpl)
         self._dbtype = settings["type"]
-        self._transaction_state = self.__TRANSACTION_STATE_NONE
 
         dh = DatabaseUpdateHelper("prewikka", self.required_version, self.required_branch)
         dh.apply()
 
         self._last_plugin_activation_change = self._get_last_plugin_changed()
+
+    @staticmethod
+    def parse_datetime(date):
+        if "." in date:
+            fmt = "%Y-%m-%d %H:%M:%S.%f"
+        else:
+            fmt = "%Y-%m-%d %H:%M:%S"
+
+        return datetime.strptime(date, fmt).replace(tzinfo=utils.timeutil.timezone("UTC"))
+
+    @staticmethod
+    def datetime(t):
+        if t is None:
+            return None
+
+        if isinstance(t, datetime):
+            return t.strftime("%Y-%m-%d %H:%M:%S.%f")
+        else:
+            return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
 
     def query(self, sql, *args, **kwargs):
         if self._transaction_state == self.__TRANSACTION_STATE_BEGIN:
@@ -519,10 +539,6 @@ class Database(preludedb.SQL):
     def getType(self):
         return self._dbtype
 
-    @staticmethod
-    def parse_datetime(date):
-        return datetime.strptime(date, '%Y-%m-%d %H:%M:%S').replace(tzinfo=utils.timeutil.timezone("UTC"))
-
     def escape(self, data):
         prefilter = self.__ESCAPE_PREFILTER.get(type(data))
         if prefilter:
@@ -532,13 +548,6 @@ class Database(preludedb.SQL):
             return data if data is not None else "NULL"
 
         return preludedb.SQL.escape(self, data)
-
-    @staticmethod
-    def datetime(t):
-        if t is None:
-            return None
-
-        return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
 
     def is_plugin_active(self, plugin):
         plugin = self.modinfos.get(plugin)
@@ -606,7 +615,6 @@ class Database(preludedb.SQL):
 
         return value[rownum]
 
-
     def _upsert_prepare(self, pkey, fields, values_rows, returning=[], merge={}, func=None):
         up = []
         if func:
@@ -639,6 +647,67 @@ class Database(preludedb.SQL):
 
         return ", ".join(fields), ", ".join(vl), ", ".join(up), ", ".join(returning), " AND ".join(delq)
 
+    def _unlock_table(self, table):
+        pass
+
+    def transaction_start(self):
+        # The actual transaction will be started on the first query
+        self._transaction_state = self.__TRANSACTION_STATE_BEGIN
+
+    def transaction_end(self):
+        if self._transaction_state == self.__TRANSACTION_STATE_QUERY:
+            self.transactionEnd()
+
+        self._transaction_state = self.__TRANSACTION_STATE_NONE
+
+    def transaction_abort(self):
+        if self._transaction_state == self.__TRANSACTION_STATE_QUERY:
+            self.transactionAbort()
+
+        self._transaction_state = self.__TRANSACTION_STATE_NONE
+
+    def __hash__(self):
+        return self._dbhash
+
+
+class MySQLDatabase(DatabaseCommon):
+    def _lock_table(self, table):
+        self.query("LOCK TABLES %s" % ", ".join(t + " WRITE" for t in self._mklist(table)))
+
+    def _unlock_table(self, table):
+        self.query("UNLOCK TABLES;")
+
+    def _mysql_upsert(self, table, pkey, fields, values_rows, returning=[], merge={}):
+        if returning:
+            values_rows = list(values_rows)
+
+        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge, lambda x: "VALUES(%s)" % x)
+
+        if vlfmt:
+            self.query("INSERT INTO %s (%s) VALUES %s ON DUPLICATE KEY UPDATE %s" % (table, fieldfmt, vlfmt, upfmt))
+
+        if delfmt:
+            self.query("DELETE FROM %s WHERE %s" % (table, delfmt))
+
+        if retfmt:
+            wh = []
+            for row in values_rows:
+                vl = " AND ".join([ "%s = %s" % (field, self.escape(row[i])) for i, field in enumerate(pkey) ])
+                wh.append("(%s)" % (vl))
+
+            return self.query("SELECT %s FROM %s WHERE %s" % (retfmt, table, " OR ".join(wh)))
+
+    @use_transaction
+    def upsert(self, table, fields, values_rows, pkey=[], returning=[], merge={}):
+        if not pkey:
+            pkey = fields
+
+        return self._mysql_upsert(table, pkey, fields, values_rows, returning, merge)
+
+
+class PgSQLDatabase(DatabaseCommon):
+    def _lock_table(self, table):
+        self.query("LOCK TABLE %s IN EXCLUSIVE MODE" % ", ".join(self._mklist(table)))
 
     def _pgsql_upsert_cte_query(self, table, pkey, upfmt, fieldfmt, vlfmt, retfmt):
         up_pkfmt = []
@@ -733,73 +802,40 @@ class Database(preludedb.SQL):
 
         return returning
 
-    def _mysql_upsert(self, table, pkey, fields, values_rows, returning=[], merge={}):
-        if returning:
-            values_rows = list(values_rows)
-
-        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge, lambda x: "VALUES(%s)" % x)
-
-        if vlfmt:
-            self.query("INSERT INTO %s (%s) VALUES %s ON DUPLICATE KEY UPDATE %s" % (table, fieldfmt, vlfmt, upfmt))
-
-        if delfmt:
-            self.query("DELETE FROM %s WHERE %s" % (table, delfmt))
-
-        if retfmt:
-            wh = []
-            for row in values_rows:
-                vl = " AND ".join([ "%s = %s" % (field, self.escape(row[i])) for i, field in enumerate(pkey) ])
-                wh.append("(%s)" % (vl))
-
-            return self.query("SELECT %s FROM %s WHERE %s" % (retfmt, table, " OR ".join(wh)))
-
     @use_transaction
     def upsert(self, table, fields, values_rows, pkey=[], returning=[], merge={}):
         if not pkey:
             pkey = fields
 
-        if self._dbtype == "pgsql":
-            version = self.getServerVersion()
-            if version >= 90500:
-                ret = self._pgsql_upsert(table, pkey, fields, values_rows, returning, merge)
+        version = self.getServerVersion()
+        if version >= 90500:
+            ret = self._pgsql_upsert(table, pkey, fields, values_rows, returning, merge)
 
-            elif version >= 90100:
-                ret = self._pgsql_upsert_cte(table, pkey, fields, values_rows, returning, merge)
+        elif version >= 90100:
+            ret = self._pgsql_upsert_cte(table, pkey, fields, values_rows, returning, merge)
 
-            else:
-                ret = self._pgsql_upsert_emulate(table, pkey, fields, values_rows, returning, merge)
-
-        elif self._dbtype == "mysql":
-            ret = self._mysql_upsert(table, pkey, fields, values_rows, returning, merge)
+        else:
+            ret = self._pgsql_upsert_emulate(table, pkey, fields, values_rows, returning, merge)
 
         return ret
 
-    def _lock_table(self, table):
-        if self._dbtype == "pgsql":
-            self.query("LOCK TABLE %s IN EXCLUSIVE MODE" % ", ".join(self._mklist(table)))
 
-        elif self._dbtype == "mysql":
-            self.query("LOCK TABLES %s" % ", ".join(t + " WRITE" for t in self._mklist(table)))
+class NoDatabase(DatabaseCommon):
+    def __init__(self, *args, **kwargs):
+        DatabaseCommon.__init__(self, *args, **kwargs)
 
-    def _unlock_table(self, table):
-        if self._dbtype == "mysql":
-            self.query("UNLOCK TABLES;")
+    def query(self, *args, **kwargs):
+        raise error.PrewikkaUserError(N_("Database configuration error"), N_("Only MySQL and PostgreSQL databases are supported at the moment"))
 
-    def transaction_start(self):
-        # The actual transaction will be started on the first query
-        self._transaction_state = self.__TRANSACTION_STATE_BEGIN
 
-    def transaction_end(self):
-        if self._transaction_state == self.__TRANSACTION_STATE_QUERY:
-            self.transactionEnd()
+class Database(object):
+    def __new__(cls, config):
+        type = config.get("type")
+        if type == "pgsql":
+            return PgSQLDatabase(config)
 
-        self._transaction_state = self.__TRANSACTION_STATE_NONE
+        elif type == "mysql":
+            return MySQLDatabase(config)
 
-    def transaction_abort(self):
-        if self._transaction_state == self.__TRANSACTION_STATE_QUERY:
-            self.transactionAbort()
-
-        self._transaction_state = self.__TRANSACTION_STATE_NONE
-
-    def __hash__(self):
-        return self._dbhash
+        else:
+            return NoDatabase(config)
