@@ -662,7 +662,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                 else:
                     alert = results[0]["alert"]
                     link = url_for(".", analyzerid=analyzerid, messageid=ident)
-                    content += '<li><a class="widget-link" title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, html.escape(alert["classification.text"]))
+                    content += '<li><a title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, html.escape(alert["classification.text"]))
 
             if missing > 0:
                 content += "<li>" + (_("%d linked alerts missing (probably deleted)") % missing) + "</li>"

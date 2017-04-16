@@ -350,7 +350,7 @@ $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
 % if info.count == 1:
 % for linkname, link, widget in info.links:
 % if widget:
-<a href="${ link }" class="widget-link" title="${ linkname }">${ linkname }</a>
+<a href="${ link }" title="${ linkname }">${ linkname }</a>
 % else:
 <a href="${ link}" target="_${ linkname }">${ linkname }</a>
 % endif
@@ -463,7 +463,7 @@ ${ text }
          % endif
          % for linkname, link, widget in address.host_links:
           % if widget:
-          <a href="${ link }" class="widget-link" title="${ linkname }">${ linkname }</a>
+          <a href="${ link }" title="${ linkname }">${ linkname }</a>
           % else:
           <a href="${ link }" target="_${ linkname }">${ linkname }</a>
           % endif

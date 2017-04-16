@@ -47,7 +47,7 @@
   <a class="popup_menu_toggle">${ message['agent']['value'] }</a>
   <span class="popup_menu">
    % if message['summary']:
-    <a href="${ message['summary'] }" title="${ _('Heartbeat details') }" class="widget-link">${ _("See heartbeat details") }</a>
+    <a href="${ message['summary'] }" title="${ _('Heartbeat details') }">${ _("See heartbeat details") }</a>
    % endif
    <a href="${ message['agent']['inline_filter'] }">${ _("Filter on agent") }</a>
   </span>
@@ -64,7 +64,7 @@
       % endif
       % for name, link, widget in address['host_links']:
       % if widget:
-       <a href="${ link }" class="widget-link" title="${ name }">${ name }</a>
+       <a href="${ link }" title="${ name }">${ name }</a>
       % else:
        <a href="${ link }" target="_${ name }">${ name }</a>
       % endif

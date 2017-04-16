@@ -168,7 +168,13 @@ function _process_ajax_response(settings, data)
             return prewikka_json_dialog({"content": widget });
         }
 
+        if ( settings['history'] == undefined ) {
+                settings['history'] = true;
+                $("#top_view_navbar .dropdown").removeClass("open"); /* FIXME this should be automated through event */
+        }
+
         _url_update(settings);
+
         return prewikka_drawTab(data);
     }
 }
@@ -188,11 +194,6 @@ function prewikka_ajax(settings)
 {
         if ( settings['dataType'] == undefined )
                 settings['dataType'] = "json";
-
-        if ( settings['history'] == undefined && settings['context'] == 'tab' ) {
-                settings['history'] = true;
-                $("#top_view_navbar .dropdown").removeClass("open"); /* FIXME this should be automated through event */
-        }
 
         settings['beforeSend'] = function(xhr) {
                 if ( window._prewikka_current_xhr != null)

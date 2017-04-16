@@ -59,7 +59,7 @@ $(document).ready(function() {
                         return false;
                 }
 
-                prewikka_ajax({ url: url, context: ! $(this).hasClass("widget-link") ? "tab": null });
+                prewikka_ajax({ url: url, context: $(this).hasClass("no-widget") ? "tab" : null });
                 return false;
         });
 
@@ -136,7 +136,7 @@ $(document).ready(function() {
                 <% class_ = 'active' %>
             % endif
 
-            <li role="presentation" class="${class_} topmenu_item"><a href="${ url_for(firstview.view_endpoint) }" class="topmenu_links">${_(name)}</a></li>
+            <li role="presentation" class="${class_} topmenu_item"><a href="${ url_for(firstview.view_endpoint) }" class="topmenu_links no-widget">${_(name)}</a></li>
         % endfor
         </ul>
     % endfor
@@ -173,7 +173,7 @@ def _get_view_url(section, tabs):
 
     % if url:
     <li>
-        <a href="${ url }">
+        <a href="${ url }" class="no-widget">
     % else:
     <li class="disabled" title="${ _('This app has been disabled or failed to load.') }">
         <a>
@@ -237,7 +237,7 @@ def _get_view_url(section, tabs):
                 <li role="separator" class="divider"></li>
                 <% url = url_for('About.render', _default=None) %>
                 % if url:
-                <li><a class="widget-link" title="${ _("About") }" href="${ url }">${ _("About") }</a></li>
+                <li><a title="${ _("About") }" href="${ url }">${ _("About") }</a></li>
                 % endif
                 % if env.session.can_logout():
                 <li><a id="logout" title="${ _("Logout") }" class="ajax-bypass" href="${ url_for('BaseView.logout') }" data-confirm="${ _("Are you sure you want to log out?") }">${ _("Logout") }</a></li>

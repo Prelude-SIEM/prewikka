@@ -81,7 +81,7 @@ class Agents(view.View):
                        {"text": _("Alert listing"), "link": alert_listing},
                        {"text": _("Heartbeat listing"), "link": heartbeat_listing},
                        {"text": _("Heartbeat analysis"), "link": heartbeat_analyze,
-                        "class": "widget-link", "title": _("Heartbeat analysis")},
+                        "title": _("Heartbeat analysis")},
                    ]}
 
     @view.route("/agents/agents", permissions=[N_("IDMEF_VIEW")])
