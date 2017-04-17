@@ -45,4 +45,18 @@ CREATE TABLE Prewikka_User_Configuration (
     value VARCHAR(255) NULL,
     PRIMARY KEY(userid, view, name)
 ) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS Prewikka_Crontab;
+CREATE TABLE Prewikka_Crontab (
+    id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(255) NOT NULL,
+    userid VARCHAR(32) NULL,
+    schedule VARCHAR(32) NULL,
+    ext_type VARCHAR(255) NULL,
+    ext_id INTEGER NULL,
+    base DATETIME NOT NULL,
+    enabled TINYINT DEFAULT 1,
+    runcnt  INTEGER DEFAULT 0,
+    error TEXT NULL
+) ENGINE=InnoDB;
 """)

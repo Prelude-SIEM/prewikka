@@ -199,9 +199,11 @@ function prewikka_notification(data)
 }
 
 
-function _dialog_common(dialog)
+function _dialog_common(dialog, opts)
 {
-    $(dialog).modal();
+    if ( typeof(opts) == 'undefined' || opts.show )
+        $(dialog).modal();
+
     setup_position(dialog);
 
     if ( $(dialog).attr("data-draggable") )
@@ -211,15 +213,22 @@ function _dialog_common(dialog)
 }
 
 
-function prewikka_json_dialog(data)
+function prewikka_json_dialog(data, opts)
 {
     var dialog;
+
+    if ( typeof(opts) == 'undefined' )
+        opts = { class: "ajax-modal", show: true }
 
     $("#prewikka-dialog-container").append(data.content);
     dialog = $("#prewikka-dialog-container > :last-child");
 
-    $(dialog).addClass("modal ajax-modal fade");
-    _dialog_common(dialog);
+    $(dialog).addClass("modal fade");
+    if ( opts.class )
+        $(dialog).addClass(opts.class);
+
+    _dialog_common(dialog, opts);
+    return dialog;
 }
 
 

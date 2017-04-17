@@ -82,8 +82,6 @@ class PrewikkaError(PrewikkaException):
             dataset[i] = getattr(self, i)
 
         dataset["is_ajax_error"] = ajax_error
-        dataset["document"] = utils.AttrObj()
-        dataset["document"].base_url = utils.iri2uri(env.request.web.get_baseurl())
         dataset["is_error_template"] = True
 
         return dataset

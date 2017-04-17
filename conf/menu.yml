@@ -20,6 +20,10 @@
   icon: sliders
   categories:
       - sections:
+            - name: Configuration
+              expand: true
+              tabs:
+                  - Scheduling
             - name: Preferences
               tabs:
                   - My account

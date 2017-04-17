@@ -1,0 +1,96 @@
+#!/usr/bin/env python
+
+# Copyright (C) 2017 CS-SI. All Rights Reserved.
+# Author: Yoann Vandoorselaere <yoannv@gmail.com>
+#
+# This file is part of the Prewikka program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import base64
+import fcntl
+import os
+import signal
+import sys
+
+from optparse import OptionParser
+from prewikka import crontab, main, siteconfig
+
+
+_LOCKFD = None
+_LOCKFILE = None
+
+
+def _get_lock_filename(options):
+    return "/tmp/prewikka-crontab-%s.lock" % base64.urlsafe_b64encode(options.config)
+
+
+def _handle_signal(signum, frame):
+    env.log.info("received signal %d: terminating" % (signum))
+
+    if _LOCKFILE:
+        os.unlink(_LOCKFILE)
+
+    sys.exit(0)
+
+
+def _daemonize(options):
+    global _LOCKFD, _LOCKFILE
+
+    _LOCKFILE = _get_lock_filename(options)
+    _LOCKFD = open(_LOCKFILE, 'w')
+    try:
+        fcntl.flock(_LOCKFD, fcntl.LOCK_EX | fcntl.LOCK_NB)
+
+    except Exception:
+        env.log.error("%s is already locked, is prewikka-crontab already running ?" % _LOCKFILE)
+        raise
+
+    ret = os.fork()
+    if ret != 0:
+        sys.exit(0)
+
+    os.setsid()
+
+    nd = open(os.devnull, 'rw')
+    for i in ("stdin", "stdout", "stderr"):
+        getattr(sys, i).close()
+        setattr(sys, i, nd)
+
+    os.umask(027)
+    os.chdir('/')
+
+    _LOCKFD.write('%s\n' % (os.getpid()))
+
+
+if __name__ == "__main__":
+    parser = OptionParser(epilog=" ")
+
+    parser.add_option("-c", "--config", action="store", type="string", dest="config", default="%s/prewikka.conf" % siteconfig.conf_dir, help="configuration file to use (default: %default)")
+    parser.add_option("-d", "--daemon", action="store_true", dest="daemonize", default=False, help="Run as a system daemon")
+
+    (options, args) = parser.parse_args()
+
+    if options.daemonize:
+        _daemonize(options)
+
+    signal.signal(signal.SIGINT, _handle_signal)
+    signal.signal(signal.SIGTERM, _handle_signal)
+
+    # Setup the environment
+    main.Core.from_config(options.config)
+    crontab.run()

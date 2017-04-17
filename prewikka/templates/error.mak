@@ -1,6 +1,7 @@
 <%!
 from traceback import format_exception
 
+from prewikka import utils
 from prewikka.utils import html
 from mako.exceptions import RichTraceback
 
@@ -179,7 +180,7 @@ def inherit(context):
         <div class="pull-right">
           <input class="btn btn-primary" type="submit" value="${ _("Retry") }" onclick="location.reload()"/>
           % if code >= 400 and code <= 500:
-           <a class="btn btn-primary ajax-bypass" href="${document.base_url}"><i class="fa fa-home"></i> ${ _("Redirect to main page") }</a>
+           <a class="btn btn-primary ajax-bypass" href="${ utils.iri2uri(env.request.web.get_baseurl()) }"><i class="fa fa-home"></i> ${ _("Redirect to main page") }</a>
           % endif
         </div>
 % endif

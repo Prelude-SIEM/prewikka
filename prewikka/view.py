@@ -334,13 +334,15 @@ class Parameters(dict):
 
         return new
 
-    def getlist(self, key):
+    def getlist(self, key, type=lambda x: x):
         ret = self.get(key, [])
         if not ret:
             return ret
 
         if not isinstance(ret, list):
-            ret = [ ret ]
+            ret = [ type(ret) ]
+        else:
+            ret = [ type(i) for i in ret ]
 
         return ret
 

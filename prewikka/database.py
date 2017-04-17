@@ -35,6 +35,8 @@ import preludedb
 from prewikka import compat, error, log, utils, version
 from prewikka.utils import cache, json
 
+
+NotNone = object
 ModuleInfo = collections.namedtuple("ModuleInfo", ["branch", "version", "enabled"])
 
 
@@ -430,6 +432,7 @@ class DatabaseCommon(preludedb.SQL):
     required_branch = version.__branch__
     required_version = "0"
 
+    NotNone = NotNone
     __sentinel = object()
     __ALL_PROPERTIES = object()
 
@@ -504,6 +507,27 @@ class DatabaseCommon(preludedb.SQL):
             return t.strftime("%Y-%m-%d %H:%M:%S.%f")
         else:
             return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
+
+    def kwargs2query(self, kwargs, prefix=""):
+        if not kwargs:
+            return ""
+
+        qs = []
+        for field, val in kwargs.items():
+            if not val:
+                qs.append("%s IS NULL" % (field))
+
+            elif val is NotNone:
+                qs.append("%s IS NOT NULL" % (field))
+
+            else:
+                op = "="
+                if isinstance(val, (list, tuple)):
+                    op = "IN"
+
+                qs.append("%s %s %s" % (field, op, self.escape(val)))
+
+        return prefix + " AND ".join(qs)
 
     def query(self, sql, *args, **kwargs):
         if self._transaction_state == self.__TRANSACTION_STATE_BEGIN:
