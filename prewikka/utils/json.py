@@ -61,7 +61,7 @@ class PrewikkaJSONEncoder(json.JSONEncoder):
 def _object_hook(obj):
     cls = obj.get("__prewikka_class__")
     if cls:
-        return _TYPES[cls[0]](*cls[1])
+        return _TYPES[cls[0]](**cls[1])
 
     return obj
 

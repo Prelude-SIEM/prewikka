@@ -23,6 +23,7 @@ function _get_condition_criterion(selector) {
     var values = $.map(selector.find(":input.input-value"), function(input) {
         return $(input).val();
     });
+
     return new Criterion(values[0], values[1], values[2]);
 }
 
@@ -33,13 +34,15 @@ function Criterion(left, operator, right) {
 
     this.json = function() {
         var left = this.left;
-        var right = this.right;
-        if ( this.operator == "||" || this.operator == "&&" ) {
+        if ( typeof(left) == "object" )
             left = left.json();
+
+        var right = this.right;
+        if ( typeof(right) == "object" )
             right = right.json();
-        }
+
         return {
-            "__prewikka_class__": ["Criterion", [left, this.operator, right]]
+            "__prewikka_class__": ["Criterion", {"left": left, "operator": this.operator, "right": right}]
         };
     }
 }

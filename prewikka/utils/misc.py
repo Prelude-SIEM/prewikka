@@ -28,6 +28,8 @@ import time
 import unicodedata
 
 from prewikka import compat
+from prewikka.utils import json
+
 
 port_dict = {}
 read_done = False
@@ -38,7 +40,7 @@ else:
     text_type = unicode
 
 
-class AttrObj(object):
+class AttrObj(json.JSONObject):
     def __init__(self, **kwargs):
         self._kwargs = kwargs
         self.__dict__.update(kwargs)

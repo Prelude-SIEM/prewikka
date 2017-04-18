@@ -22,10 +22,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import pkg_resources
 
-import prelude
 from prewikka import database, error, hookmanager, resource, response, template, view
-from prewikka.dataprovider import Criterion
-from prewikka.utils import AttrObj, OrderedDict, json
+from prewikka.utils import AttrObj, json
 
 from . import FilterPlugin
 

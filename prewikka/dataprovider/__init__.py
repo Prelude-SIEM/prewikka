@@ -353,7 +353,7 @@ class Criterion(json.JSONObject):
         return Criterion(self.left, self.operator, self.right)
 
     def __json__(self):
-        return [self.left, self.operator, self.right]
+        return {"left": self.left, "operator": self.operator, "right": self.right}
 
     def __iadd__(self, other):
         return self._apply_self("&&", other)
