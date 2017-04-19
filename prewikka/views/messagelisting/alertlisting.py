@@ -28,7 +28,7 @@ import re
 import sys
 import prelude
 
-from prewikka import compat, hookmanager, localization, mainmenu, template, utils, view
+from prewikka import compat, hookmanager, localization, mainmenu, resource, template, utils, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -544,10 +544,8 @@ class ListedAlert(ListedMessage):
     def _setClassificationInfos(self, dataset, message, ident):
         dataset["count"] = 1
         dataset["severity"] = AttrDict(value=message["alert.assessment.impact.severity"])
-        dataset["links"] = [(_("Alert details"), url_for("AlertSummary", messageid=ident), True)]
-        for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", ident):
-            if typ == "ident":
-                dataset["links"].append((linkname, link, widget))
+        dataset["links"] = [ resource.HTMLNode("a", _("Alert details"), href=url_for("AlertSummary", messageid=ident)) ]
+        dataset["links"] += list(hookmanager.trigger("HOOK_MESSAGEID_LINK", ident))
 
         dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"])
         dataset["description"] = message["alert.assessment.impact.description"]
@@ -918,10 +916,8 @@ class AlertListing(MessageListing):
                     res = env.dataprovider.get(Criterion("alert.messageid", "=", messageid))[0]
                     message.setMessage(res, messageid, extra_link=False)
                 else:
-                    infos["links"] = [(_("Alert details"), url_for("AlertSummary", messageid=messageid), True)]
-                    for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", messageid):
-                        if typ == "messageid":
-                            infos["links"].append((linkname, link, widget))
+                    infos["links"] = [resource.HTMLNode("a", _("Alert details"), href=url_for("AlertSummary", messageid=messageid))]
+                    infos["links"] += list(hookmanager.trigger("HOOK_MESSAGEID_LINK", messageid))
             else:
                 entry_param = {}
 

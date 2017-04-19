@@ -109,7 +109,6 @@ class ListedMessage(AttrDict):
 
     def createHostField(self, object, value, category=None, direction=None, dns=True):
         field = self.createInlineFilteredField(object, value, direction)
-        field["host_links"] = [ ]
         field["category"] = category
 
         field["url_infos"] = url_for("HostInfoAjax", host=value) if value and "HOOK_HOST_TOOLTIP" in hookmanager.hookmgr else None
@@ -123,9 +122,7 @@ class ListedMessage(AttrDict):
         if not value:
             return field
 
-        for typ, linkname, link, widget in hookmanager.trigger("HOOK_LINK", value):
-            if typ == "host":
-                field["host_links"].append((linkname, link, widget))
+        field["host_links"] = list(hookmanager.trigger("HOOK_HOST_LINK", value))
 
         return field
 

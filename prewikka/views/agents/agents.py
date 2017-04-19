@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pkg_resources
 import time
 
-from prewikka import hookmanager, localization, mainmenu, template, utils, view, response
+from prewikka import hookmanager, localization, mainmenu, resource, template, utils, view, response
 from prewikka.dataprovider import Criterion
 
 
@@ -78,10 +78,9 @@ class Agents(view.View):
                    "status": status,
                    "status_text": status_text,
                    "links": [
-                       {"text": _("Alert listing"), "link": alert_listing},
-                       {"text": _("Heartbeat listing"), "link": heartbeat_listing},
-                       {"text": _("Heartbeat analysis"), "link": heartbeat_analyze,
-                        "title": _("Heartbeat analysis")},
+                        resource.HTMLNode("a", _("Alert listing"), href=alert_listing),
+                        resource.HTMLNode("a", _("Heartbeat listing"), href=heartbeat_listing),
+                        resource.HTMLNode("a", _("Heartbeat analysis"), href=heartbeat_analyze)
                    ]}
 
     @view.route("/agents/agents", permissions=[N_("IDMEF_VIEW")])

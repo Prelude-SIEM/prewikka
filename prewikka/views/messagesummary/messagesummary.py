@@ -528,15 +528,12 @@ class MessageSummary(Table, view.View):
                     ignored[meaning] = value
                     break
 
-            links = []
-            for url, text in hookmanager.trigger("HOOK_ALERTSUMMARY_MEANING_LINK", alert, meaning, value):
-                if url:
-                    links.append("<a target='%s' href='%s'>%s</a>" % \
-                                 (env.external_link_target, html.escape(url), html.escape(text)))
+            links = resource.HTMLSource()
+            for obj in filter(None, hookmanager.trigger("HOOK_ALERTSUMMARY_MEANING_LINK", alert, meaning, value)):
+                links += obj.to_string()
 
             if links:
-                meaning = "<a class='popup_menu_toggle'>%s</a><span class='popup_menu'>%s</span>" % \
-                          (html.escape(meaning), "".join(links))
+                meaning = resource.HTMLSource("<a class='popup_menu_toggle'>%s</a><span class='popup_menu'>%s</span>") % (meaning, links)
 
             if not meaning in ignored:
                 self.newTableCol(index, resource.HTMLSource(meaning or "Data content"))

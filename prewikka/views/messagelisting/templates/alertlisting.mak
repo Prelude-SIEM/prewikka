@@ -348,12 +348,8 @@ $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
 <%def name="classificationWrite(info, text)">
 <a class="impact_severity_${ info.severity.value } popup_menu_toggle" title="${ info.description }" data-toggle="tooltip" data-placement="top" data-container="#main">${ text }</a><span class="popup_menu">
 % if info.count == 1:
-% for linkname, link, widget in info.links:
-% if widget:
-<a href="${ link }" title="${ linkname }">${ linkname }</a>
-% else:
-<a href="${ link}" target="_${ linkname }">${ linkname }</a>
-% endif
+% for obj in info.links:
+${ obj.to_string() }
 % endfor
 % endif
 % if not info.classification.already_filtered:
@@ -461,12 +457,8 @@ ${ text }
          % if env.enable_details:
          <a target="${ env.external_link_target }" href="${ env.host_details_url }?host=${ address.value }">${ (_("%s information") % (name)).capitalize() }</a>
          % endif
-         % for linkname, link, widget in address.host_links:
-          % if widget:
-          <a href="${ link }" title="${ linkname }">${ linkname }</a>
-          % else:
-          <a href="${ link }" target="_${ linkname }">${ linkname }</a>
-          % endif
+         % for obj in address.host_links:
+          ${ obj.to_string() }
          % endfor
        % endif
        </span>

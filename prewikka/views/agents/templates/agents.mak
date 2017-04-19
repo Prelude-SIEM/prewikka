@@ -16,11 +16,7 @@ from prewikka.utils import json
         $("<a>", {"class": "popup_menu_toggle"}).text(cellValue).appendTo(div);
         var span = $("<span>", {"class": "popup_menu"}).appendTo(div);
         $.each(rowObj.links, function(index, elem) {
-            $("<a>", {
-                href: elem.link,
-                class: elem.class,
-                title: elem.title
-            }).text(elem.text).appendTo(span);
+            $(span).append(prewikka_html_node(elem));
         });
         return div.html();
     };

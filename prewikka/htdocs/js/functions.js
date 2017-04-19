@@ -306,6 +306,16 @@ function prewikka_grid(table, settings) {
 }
 
 
+function prewikka_html_node(obj)
+{
+    if ( typeof(obj.tag) == 'undefined' || typeof(obj.attrs) == 'undefined' || typeof(obj.childs) == 'undefined' )
+        return obj;
+
+    var nobj = $("<" + obj.tag + ">", obj.attrs).html(obj.childs);
+    return nobj.wrap("<div>").parent().html();
+}
+
+
 function prewikka_autocomplete(field, url, submit) {
     field.autocomplete({
         minLength: 0,

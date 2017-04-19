@@ -62,12 +62,8 @@
       % if env.enable_details:
       <a target="${ env.external_link_target }" href="${ env.host_details_url }?host=${ address['value'] }">Address information</a>
       % endif
-      % for name, link, widget in address['host_links']:
-      % if widget:
-       <a href="${ link }" title="${ name }">${ name }</a>
-      % else:
-       <a href="${ link }" target="_${ name }">${ name }</a>
-      % endif
+      % for obj in address['host_links']:
+        ${ obj.to_string() }
       % endfor
     </span>
     <br />
