@@ -1,16 +1,29 @@
 function CommonListing(elem, text, options) {
+    function genericFormatter(value, opts, rowObj) {
+        return (value) ? prewikka_html_node(value) : "";
+    }
 
-    $(elem).addClass("commonlisting table table-striped");
+    function _backwardCompatibleFormatter(cellValue, opts, rowObj) {
+        if ( rowObj._class || rowObj._title || rowObj._link ) {
+            console.log("WARNING: OLD API IN USE. FIX THE CODE.");
 
-    if ( ! options['colModel'][0].formatter ) {
-        options['colModel'][0].formatter = function(cellValue, opts, rowObj) {
             var link = $('<a>', {
                 class: rowObj._class || "widget-link",
                 title: rowObj._title,
                 href: rowObj._link
             }).text(cellValue);
+
             return link.wrap("<div>").parent().html();
-        };
+        }
+
+        return genericFormatter(cellValue, opts, rowObj);
+    }
+
+    $(elem).addClass("commonlisting table table-striped");
+
+    for ( i in options['colModel'] ) {
+        if (! options['colModel'][i].formatter )
+            options['colModel'][i].formatter = (i == 0) ? _backwardCompatibleFormatter : genericFormatter;
     }
 
     options = _mergedict({
