@@ -94,14 +94,17 @@ class Agents(view.View):
 
     @view.route("/agents/delete", methods=["POST"], permissions=[N_("IDMEF_ALTER")])
     def delete(self):
-        c = Criterion()
+        for i in env.request.parameters.getlist("types[]"):
+            if i not in ("alert", "heartbeat"):
+                continue
 
-        for analyzerid in env.request.parameters.getlist("id[]"):
-            for i in env.request.parameters.getlist("types[]"):
-                if i in ("alert", "heartbeat"):
-                    c |= Criterion("%s.analyzer.analyzerid" % i, "=", analyzerid)
+            c = Criterion()
 
-        env.dataprovider.delete(c)
+            for analyzerid in env.request.parameters.getlist("id[]"):
+                c |= Criterion("%s.analyzer.analyzerid" % i, "=", analyzerid)
+
+            env.dataprovider.delete(c)
+
         return response.PrewikkaRedirectResponse(url_for(".agents"))
 
     @view.route("/agents/analyze/<analyzerid>", permissions=[N_("IDMEF_VIEW")])
