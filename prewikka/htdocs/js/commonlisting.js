@@ -1,12 +1,15 @@
 function CommonListing(elem, text, options) {
+    var dfd = $.Deferred();
+
     function genericFormatter(value, opts, rowObj) {
         return (value) ? prewikka_html_node(value) : "";
     }
 
     function _backwardCompatibleFormatter(cellValue, opts, rowObj) {
         if ( rowObj._class || rowObj._title || rowObj._link ) {
-            console.log("WARNING: OLD API IN USE. FIX THE CODE.");
-
+            /*
+             * FIXME: OLD API, DO NOT USE, REMOVE ME.
+             */
             var link = $('<a>', {
                 class: rowObj._class || "widget-link",
                 title: rowObj._title,
@@ -38,16 +41,24 @@ function CommonListing(elem, text, options) {
         hidegrid: false,
         viewrecords: true,
         globalSearch: false,
-        gridComplete: grid_buttons_state,
-        onSelectAll: grid_buttons_state,
-        onSelectRow: grid_buttons_state,
+        gridComplete: function() {
+            update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
+            dfd.resolve();
+        },
+
+        onSelectAll: function (rowsids, status) {
+            if ( status )
+                $(elem + " tr.nocheck > td > input.cbox").prop("checked", false);
+
+            update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
+        },
+
+        onSelectRow: function() {
+            update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
+        },
         loadComplete: resizeGrid,
         loadError: null  // This prevents an error row to appear in the grid
     }, options);
-
-    function grid_buttons_state() {
-        update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
-   }
 
     function update_buttons_state(rows_count) {
         if ( rows_count == 0 ) {
@@ -106,34 +117,60 @@ function CommonListing(elem, text, options) {
         });
     }
 
-    grid.delete_rows = function(data) {
-        var rows = grid.getGridParam("selarrrow");
-        if ( rows.length == 0 ) return;
-        $.ajax({
-            url: options.deleteLink,
-            method: "POST",
-            data: _mergedict(data, {id: rows}),
-            success: function() {
-                // Iterate upwards because 'rows' gets modified
-                for ( var i = rows.length - 1; i >= 0; i-- )
-                    grid.delRowData(rows[i]);
+    grid.delete_rows = function(rows) {
+        // Iterate upwards because 'rows' gets modified
+        for ( var i = rows.length - 1; i >= 0; i-- )
+            grid.delRowData(rows[i]);
 
-                update_buttons_state(0);
-            }
-        });
+        update_buttons_state(0);
     }
 
+    grid.ajax = function(data) {
+        var rows = grid.getGridParam("selarrrow");
+        if ( rows.length == 0 )
+            return;
+
+        data["data"] = _mergedict(data['data'], {id: rows});
+        var s_cb = data['success'];
+        if ( s_cb ) {
+            data["success"] = function() { s_cb(rows) };
+        }
+
+        prewikka_ajax(_mergedict(data, {type: "POST"}));
+    }
+
+    grid.done = function done(cb) {
+        dfd.done(cb);
+        return this;
+    }
+
+    /*
+     * The following events are deprecated and should be removed !
+     */
     $(".button-add").on("click", function() {
+        /*
+         * FIXME: OLD API, DO NOT USE, REMOVE ME.
+         */
         prewikka_ajax({ url: options.editLink });
     });
+
     $(".button-duplicate").on("click", function() {
+        /*
+         * FIXME: OLD API, DO NOT USE, REMOVE ME.
+         */
         var row = grid.getGridParam("selrow");
         if ( ! row ) return;
         prewikka_ajax({ url: options.editLink, data: {duplicate: row} });
     });
+
     $(".button-delete").on("click", function() {
-        if ( ! $(this).data("confirm") )
-            grid.delete_rows({});
+        /*
+         * FIXME: OLD API, DO NOT USE, REMOVE ME.
+         */
+        if ( $(this).data("confirm") )
+            return;
+
+        grid.ajax({ url: options.deleteLink, method: 'POST', success: this.delete_rows });
     });
 
     resizeGrid();

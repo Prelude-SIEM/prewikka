@@ -67,13 +67,15 @@ from prewikka.utils import json
     });
 
     $(".agent-delete").on("click", function() {
-        if ( ! $(this).data("confirm") ) {
-            var types = $.map($("input[name=types]:checked"), function(input) {
-                return $(input).val();
-            });
-            if ( types.length > 0 )
-                grid.delete_rows({"types": types});
-        }
+        if ( $(this).data("confirm") )
+            return;
+
+        var seltypes = $.map($("input[name=types]:checked"), function(input) {
+            return $(input).val();
+        });
+
+        if ( seltypes.length > 0 )
+            grid.ajax({ url: "${url_for('.delete')}", data: { types: seltypes }});
     });
 
 </script>
