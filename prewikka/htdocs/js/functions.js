@@ -311,7 +311,12 @@ function prewikka_html_node(obj)
     if ( typeof(obj.tag) == 'undefined' || typeof(obj.attrs) == 'undefined' || typeof(obj.childs) == 'undefined' )
         return obj;
 
-    var nobj = $("<" + obj.tag + ">", obj.attrs).html(obj.childs);
+    var childs = [];
+
+    for ( var i in obj.childs )
+      childs.push(prewikka_html_node(obj.childs[i]));
+
+    var nobj = $("<" + obj.tag + ">", obj.attrs).html(childs);
     return nobj.wrap("<div>").parent().html();
 }
 
