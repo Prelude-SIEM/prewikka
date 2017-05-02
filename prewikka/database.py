@@ -615,7 +615,10 @@ class DatabaseCommon(preludedb.SQL):
 
         return value[rownum]
 
-    def _upsert_prepare(self, pkey, fields, values_rows, returning=[], merge={}, func=None):
+    def _upsert_prepare_row(self, table, fields, row):
+        return text_type(self.escape(row))
+
+    def _upsert_prepare(self, table, pkey, fields, values_rows, returning=[], merge={}, func=None):
         up = []
         if func:
             up = ["%s=%s" % (f, func(f)) for f in fields]
@@ -626,7 +629,7 @@ class DatabaseCommon(preludedb.SQL):
         delq = []
 
         for idx, row in enumerate(values_rows):
-            vl.append(text_type(self.escape(row)))
+            vl.append(self._upsert_prepare_row(table, fields, row))
 
             if not merge:
                 continue
@@ -681,7 +684,7 @@ class MySQLDatabase(DatabaseCommon):
         if returning:
             values_rows = list(values_rows)
 
-        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge, lambda x: "VALUES(%s)" % x)
+        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(table, pkey, fields, values_rows, returning, merge, lambda x: "VALUES(%s)" % x)
 
         if vlfmt:
             self.query("INSERT INTO %s (%s) VALUES %s ON DUPLICATE KEY UPDATE %s" % (table, fieldfmt, vlfmt, upfmt))
@@ -709,15 +712,40 @@ class PgSQLDatabase(DatabaseCommon):
     def _lock_table(self, table):
         self.query("LOCK TABLE %s IN EXCLUSIVE MODE" % ", ".join(self._mklist(table)))
 
-    def _pgsql_upsert_cte_query(self, table, pkey, upfmt, fieldfmt, vlfmt, retfmt):
+    @cache.memoize("table_info")
+    def _get_table_info(self, table):
+        out = {}
+
+        for field, _type, defval in env.db.query("SELECT column_name, data_type, column_default FROM information_schema.columns WHERE table_name = %s", table.lower()):
+            out[field] = utils.AttrObj(type=_type, default=defval, auto_increment="nextval" in (defval or ""))
+
+        return out
+
+    def _upsert_prepare_row(self, table, fields, row):
+        out = []
+        dtype = self._get_table_info(table)
+
+        for f, v in zip(fields, row):
+            cast = ""
+            if dtype[f].type == "integer":
+                cast = "::integer"
+
+            out.append(text_type(self.escape(v)) + cast)
+
+        return "(" + text_type(", ".join(out)) + ")"
+
+    def _pgsql_upsert_cte_query(self, table, pkey, upfmt, fields, fieldfmt, vlfmt, retfmt):
         up_pkfmt = []
         in_pkfmt = []
         for v in pkey:
             up_pkfmt.append("%s.%s = nv.%s" % (table, v, v))
             in_pkfmt.append("updated.%s = nv.%s" % (v, v))
 
+        dtype = self._get_table_info(table)
+        insfmt = ", ".join(filter(lambda x: not(dtype[x].auto_increment), fields))
+
         update = "UPDATE %s SET %s FROM nv WHERE %s RETURNING %s.*" % (table, upfmt, " AND ".join(up_pkfmt), table)
-        insert = "INSERT INTO %s (%s) SELECT %s FROM nv WHERE NOT EXISTS (SELECT 1 FROM updated WHERE %s)" % (table, fieldfmt, fieldfmt, " AND ".join(in_pkfmt))
+        insert = "INSERT INTO %s (%s) SELECT %s FROM nv WHERE NOT EXISTS (SELECT 1 FROM updated WHERE %s)" % (table, insfmt, insfmt, " AND ".join(in_pkfmt))
         if retfmt:
             insert = "%s RETURNING %s" % (insert, retfmt)
 
@@ -730,12 +758,12 @@ class PgSQLDatabase(DatabaseCommon):
         return self.query(query)
 
     def _pgsql_upsert_cte(self, table, pkey, fields, values_rows, returning=[], merge={}):
-        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge, lambda x: "nv.%s" % x)
+        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(table, pkey, fields, values_rows, returning, merge, lambda x: "nv.%s" % x)
 
         self._lock_table(table)
         try:
             if vlfmt:
-                ret = self._pgsql_upsert_cte_query(table, pkey, upfmt, fieldfmt, vlfmt, retfmt)
+                ret = self._pgsql_upsert_cte_query(table, pkey, upfmt, fields, fieldfmt, vlfmt, retfmt)
 
             if delfmt:
                 self.query("DELETE FROM %s WHERE %s" % (table, delfmt))
@@ -746,7 +774,7 @@ class PgSQLDatabase(DatabaseCommon):
             return ret
 
     def _pgsql_upsert(self, table, pkey, fields, values_rows, returning=[], merge={}):
-        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge, lambda x: "EXCLUDED.%s" % (x))
+        fieldfmt, vlfmt, upfmt, retfmt, delfmt = self._upsert_prepare(table, pkey, fields, values_rows, returning, merge, lambda x: "EXCLUDED.%s" % (x))
         if vlfmt:
             if retfmt:
                 retfmt = " RETURNING %s" % retfmt
@@ -781,7 +809,7 @@ class PgSQLDatabase(DatabaseCommon):
     def _pgsql_upsert_emulate(self, table, pkey, fields, values_rows, returning=[], merge={}):
         values_rows = list(values_rows)
 
-        fieldfmt, _, _, retfmt, delfmt = self._upsert_prepare(pkey, fields, values_rows, returning, merge)
+        fieldfmt, _, _, retfmt, delfmt = self._upsert_prepare(table, pkey, fields, values_rows, returning, merge)
         if retfmt:
             retfmt = " RETURNING %s" % retfmt
 
