@@ -1,8 +1,17 @@
+* 2017-05-02, prewikka-4.0.3:
+
+Author: Antoine Luong
+
+- Fix delete queries in agents
+- Reload grids after deleting rows
+
+
+
 * 2017-03-09, prewikka-4.0.2:
 
 Author: Thomas Andrejak
 
-- Mainmenu should alway select the current minute
+- Mainmenu should always select the current minute
 
 
 
