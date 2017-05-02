@@ -24,9 +24,11 @@ import io
 import os
 import stat
 import subprocess
+import sys
 import tempfile
 
 from setuptools import Command, setup, find_packages
+from setuptools.command.test import test as TestCommand
 from distutils.dist import Distribution
 from distutils.command.install import install
 from distutils.dep_util import newer
@@ -35,6 +37,26 @@ from distutils.command.build import build as _build
 
 LIBPRELUDE_REQUIRED_VERSION = "4.1.0"
 LIBPRELUDEDB_REQUIRED_VERSION = "4.1.0"
+
+
+def init_siteconfig(conf_prefix, data_prefix):
+    """
+    Initialize configuration file (prewikka/siteconfig.py).
+
+    :param str conf_prefix: configuration path
+    :param str data_prefix: data path
+    """
+    configuration = (
+        ('tmp_dir', os.path.join(tempfile.gettempdir(), 'prewikka')),
+        ('conf_dir', os.path.abspath(conf_prefix)),
+        ('data_dir', os.path.abspath(data_prefix)),
+        ('libprelude_required_version', LIBPRELUDE_REQUIRED_VERSION),
+        ('libpreludedb_required_version', LIBPRELUDEDB_REQUIRED_VERSION),
+    )
+
+    with open('prewikka/siteconfig.py', 'w') as config_file:
+        for option, value in configuration:
+            config_file.write("%s = '%s'\n" % (option, value))
 
 
 class MyDistribution(Distribution):
@@ -76,15 +98,6 @@ class my_install(install):
     def create_datadir(self):
         self.mkpath((self.root or "") + self.data_prefix)
 
-    def init_siteconfig(self):
-        config = open("prewikka/siteconfig.py", "w")
-        config.write("tmp_dir = '%s'\n" % (os.path.join(tempfile.gettempdir(), "prewikka")))
-        config.write("conf_dir = '%s'\n" % (os.path.abspath(self.conf_prefix)))
-        config.write("data_dir = '%s'\n" % (os.path.abspath(self.data_prefix)))
-        config.write("libprelude_required_version = '%s'\n" % LIBPRELUDE_REQUIRED_VERSION)
-        config.write("libpreludedb_required_version = '%s'\n" % LIBPRELUDEDB_REQUIRED_VERSION)
-        config.close()
-
     def install_wsgi(self):
         share_dir = os.path.join(self.install_data, 'share', 'prewikka')
         if not os.path.exists(share_dir):
@@ -97,7 +110,7 @@ class my_install(install):
         self.install_conf()
         self.install_wsgi()
         self.create_datadir()
-        self.init_siteconfig()
+        init_siteconfig(self.conf_prefix, self.data_prefix)
         install.run(self)
 
         os.chmod((self.root or "") + self.conf_prefix, 0o755)
@@ -146,13 +159,70 @@ class build_custom(Command):
                 io.open(css, "wb").write(subprocess.check_output(["lesscpy", "-I", less, style]))
 
 
+class PrewikkaTest(TestCommand):
+    """
+    Custom command for Prewikka test suite with pytest.
+
+    Based on
+    https://docs.pytest.org/en/2.7.3/goodpractises.html#integration-with-setuptools-test-commands
+    """
+    user_options = [
+        ('pytest-args=', 'a', 'Arguments to pass to pytest')
+    ]
+
+    def initialize_options(self):
+        TestCommand.initialize_options(self)
+        self.pytest_args = []
+
+    def finalize_options(self):
+        TestCommand.finalize_options(self)
+        self.test_args = []
+        self.test_suite = True
+
+    def run_tests(self):
+        init_siteconfig('conf', 'tests/downloads')
+
+        import pytest  # import here, cause outside the eggs aren't loaded
+
+        if not isinstance(self.pytest_args, list):
+            self.pytest_args = self.pytest_args.split()
+
+        errno = pytest.main(self.pytest_args + ['tests'])
+        sys.exit(errno)
+
+
+class PrewikkaCoverage(Command):
+    """
+    Coverage command.
+    """
+    user_options = [
+        ('run-args=', None, 'Arguments to pass to coverage during run'),
+        ('report-args=', None, 'Arguments to pass to coverage for report')
+    ]
+    description = 'Run tests with coverage.'
+
+    def initialize_options(self):
+        self.run_args = []
+        self.report_args = []
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        subprocess.call(['coverage', 'run', 'setup.py', 'test'] + self.run_args)
+        subprocess.call(['coverage', 'report'] + self.report_args)
+
+
 setup(
     name="prewikka",
     version="5.0.0rc1",
     maintainer="Prelude Team",
     maintainer_email="support.prelude@c-s.fr",
     url="http://www.prelude-siem.com",
-    packages=find_packages(),
+    packages=find_packages(exclude=[
+        'tests',
+        'tests.*'
+    ]),
     setup_requires=[
         'Babel'
     ],
@@ -239,8 +309,13 @@ setup(
     cmdclass={
         'build': build,
         'build_custom': build_custom,
-        'install': my_install
+        'coverage': PrewikkaCoverage,
+        'install': my_install,
+        'test': PrewikkaTest,
     },
+    tests_require=[
+        'pytest'
+    ],
     distclass=MyDistribution,
     message_extractors={
         'scripts': [

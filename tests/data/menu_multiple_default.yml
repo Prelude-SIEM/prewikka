@@ -1,0 +1,14 @@
+- icon: question
+  default: true
+  categories:
+      - sections:
+            - name: Apps
+              tabs:
+                  - Apps
+- icon: question
+  default: true
+  categories:
+      - sections:
+            - name: Apps
+              tabs:
+                  - Apps

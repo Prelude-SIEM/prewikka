@@ -5,3 +5,6 @@ prewikka.egg-info
 prewikka/htdocs/css/themes/*.css
 prewikka/locale/*/LC_MESSAGES/*.mo
 prewikka/siteconfig.py
+
+# tests
+.coverage

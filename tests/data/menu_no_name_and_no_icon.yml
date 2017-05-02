@@ -1,0 +1,12 @@
+- foo: bar
+  categories:
+      - sections:
+            - name: Alerts
+              default_tab: Alerts
+              tabs:
+                  - Alerts
+                  - Threats
+            - name: Agents
+              tabs:
+                  - Agents
+                  - Heartbeats

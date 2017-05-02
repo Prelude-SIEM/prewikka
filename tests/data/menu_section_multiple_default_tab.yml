@@ -1,0 +1,18 @@
+- name: ALERT
+  icon: exclamation-triangle
+  categories:
+      - sections:
+            - name: Alerts
+              default_tab: Alerts
+              tabs:
+                  - Alerts
+                  - Threats
+            - name: Alerts 2
+              default_tab: Alerts
+              tabs:
+                  - Alerts
+                  - Threats
+            - name: Agents
+              tabs:
+                  - Agents
+                  - Heartbeats

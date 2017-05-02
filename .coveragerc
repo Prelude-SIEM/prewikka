@@ -1,0 +1,18 @@
+[run]
+branch = True
+source =
+    prewikka
+omit =
+    prewikka/siteconfig.py
+    prewikka/web/wsgi.py
+
+[report]
+show_missing = True
+exclude_lines =
+    pragma: no cover
+    def __repr__
+    raise AssertionError
+    raise NotImplementedError
+    if 0:
+    if __name__ == .__main__.:
+    pass

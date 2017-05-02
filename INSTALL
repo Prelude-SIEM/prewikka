@@ -40,6 +40,13 @@ Lint uses:
 
 - python-flake8
 
+Testing requires:
+
+- All run requires
+- python-pytest / pytest >= 2.7.0
+- python-coverage (optional)
+
+
 Basic Installation
 ==================
 
