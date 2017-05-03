@@ -85,11 +85,11 @@ from prewikka.utils import json
   <div class="footer-buttons form-inline">
     <div class="checkbox">
       <input id="agent_delete_alerts" class="checkbox" type="checkbox" name="types" value="alert" />
-      <label for="agent_delete_alerts">${ _("Alerts") }</label>
+      <label for="agent_delete_alerts" data-toggle="tooltip" title="${ _("Delete the alerts of the selected agent(s)") }" data-container="#main">${ _("Alerts") }</label>
     </div>
     <div class="checkbox">
       <input id="agent_delete_heartbeats" class="checkbox" type="checkbox" name="types" value="heartbeat" />
-      <label for="agent_delete_heartbeats">${ _("Heartbeats") }</label>
+      <label for="agent_delete_heartbeats" data-toggle="tooltip" title="${ _("Delete the heartbeats of the selected agent(s)") }" data-container="#main">${ _("Heartbeats") }</label>
     </div>
     &nbsp;<button type="button" class="btn btn-danger needone agent-delete" data-confirm="${ _("Delete the selected IDMEF messages?") }"><i class="fa fa-trash"></i> ${ _("Delete") }</button>
   </div>

@@ -153,20 +153,20 @@ class MessageListing(view.View):
         env.request.dataset["nav"] = {}
 
     def _setNavPrev(self, offset):
+        env.request.dataset["nav"]["first"] = None
+        env.request.dataset["nav"]["prev"] = None
         if offset:
             env.request.dataset["nav"]["first"] = url_for(".", **(env.request.parameters - [ "offset" ]))
             env.request.dataset["nav"]["prev"] = url_for(".", **(env.request.parameters + { "offset": offset - env.request.parameters["limit"] }))
-        else:
-            env.request.dataset["nav"]["prev"] = None
 
     def _setNavNext(self, offset, count):
+        env.request.dataset["nav"]["next"] = None
+        env.request.dataset["nav"]["last"] = None
         if count > offset + env.request.parameters["limit"]:
             offset = offset + env.request.parameters["limit"]
             env.request.dataset["nav"]["next"] = url_for(".", **(env.request.parameters + { "offset": offset }))
             offset = count - ((count % env.request.parameters["limit"]) or env.request.parameters["limit"])
             env.request.dataset["nav"]["last"] = url_for(".", **(env.request.parameters + { "offset": offset }))
-        else:
-            env.request.dataset["nav"]["next"] = None
 
     def _getInlineFilter(self, name):
         return name, env.request.parameters.get(name)

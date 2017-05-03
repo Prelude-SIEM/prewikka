@@ -53,7 +53,7 @@
 
       <table class="table table-striped table-bordered table-condensed">
         <thead>
-          <tr><td>${ _("Events") }</td></tr>
+          <tr><th colspan="2">${ _("Events") }</th></tr>
         </thead>
 
         <tbody>

@@ -15,7 +15,7 @@ $(".sortable_${ field }").on("click", function() {
 });
 </script>
 
-<a class="sortable_${ field }">${ link }</a>
+<a class="sortable_${ field }" data-toggle="tooltip" title="${ _("Order column") }" data-container="#main">${ link }</a>
     % if current_order == field + "_desc":
 <span class="caret"></span>
     % elif current_order == field + "_asc":

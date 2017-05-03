@@ -142,7 +142,7 @@ $(document).ready(function() {
     </div>
   </div>
 </div>
-<a type="button" id="config-button" data-toggle="collapse" data-target=".prewikka-view-config"><i class="fa fa-cog"></i></a>
+<a type="button" id="config-button" title="${ _('View options') }" data-toggle="collapse" data-target=".prewikka-view-config"><i class="fa fa-cog"></i></a>
 </%block>
 
 <%block name="toplayout_menu">

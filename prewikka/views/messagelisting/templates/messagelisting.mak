@@ -89,30 +89,29 @@ $(document).ready(function() {
 
    <tfoot>
 %if messages:
-     <tr><table id="message_list_nav" style="width:100%;">
+     <tr>
+       <table id="message_list_nav" style="width:100%;">
          <tr>
-            % if nav['prev']:
-              <td class="message_list_nav_button"><a href="${ nav['first'] }">&lt;&lt;</a></td>
-              <td class="message_list_nav_button"><a href="${ nav['prev'] }">&lt;</a></td>
-            % else:
-              <td class="message_list_nav_button_empty">&lt;&lt;</td>
-              <td class="message_list_nav_button_empty">&lt;</td>
-            % endif
-            % if nav['next']:
-              <td class="message_list_nav_button"><a href="${ nav['next'] }">&gt;</a></td>
-              <td class="message_list_nav_button"><a href="${ nav['last'] }">&gt;&gt;</a></td>
-            % else:
-              <td class="message_list_nav_button_empty">&gt;</td>
-              <td class="message_list_nav_button_empty">&gt;&gt;</td>
-            % endif
-          </tr>
-          <tr>
-            <td class="message_list_nav_infos" colspan="4">
-              ${ nav['from'] } ... ${ nav['to'] } (${ _("total") }:${ total })
-            </td>
-          </tr>
-        </table>
-       </tr>
+           <td class="message_list_nav_button" data-toggle="tooltip" title="${ _("First page") }" data-container="#main">
+             <a class="btn ${ disabled(nav['first'] is None) }" href="${ nav['first'] }">&lt;&lt;</a>
+           </td>
+           <td class="message_list_nav_button" data-toggle="tooltip" title="${ _("Previous page") }" data-container="#main">
+             <a class="btn ${ disabled(nav['prev'] is None) }" href="${ nav['prev'] }">&lt;</a>
+           </td>
+           <td class="message_list_nav_button" data-toggle="tooltip" title="${ _("Next page") }" data-container="#main">
+             <a class="btn ${ disabled(nav['next'] is None) }" href="${ nav['next'] }">&gt;</a>
+           </td>
+           <td class="message_list_nav_button" data-toggle="tooltip" title="${ _("Last page") }" data-container="#main">
+             <a class="btn ${ disabled(nav['last'] is None) }" href="${ nav['last'] }">&gt;&gt;</a>
+           </td>
+         </tr>
+         <tr>
+           <td class="message_list_nav_infos" colspan="4">
+             ${ nav['from'] } ... ${ nav['to'] } (${ _("total") }:${ total })
+           </td>
+         </tr>
+       </table>
+     </tr>
      <tr>
        <%block name="message_extra_footer"></%block>
      </tr>
