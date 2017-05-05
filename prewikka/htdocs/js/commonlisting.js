@@ -122,7 +122,7 @@ function CommonListing(elem, text, options) {
         for ( var i = rows.length - 1; i >= 0; i-- )
             grid.delRowData(rows[i]);
 
-        update_buttons_state(0);
+        grid.trigger("reloadGrid", [{current: true}]);
     }
 
     grid.ajax = function(data) {
