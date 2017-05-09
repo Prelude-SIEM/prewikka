@@ -399,8 +399,6 @@ class _ViewDescriptor(object):
             obj = classobj()
             setattr(env.request, name, obj)
 
-            obj.render()
-
         return env.request.dataset
 
     def respond(self, dataset=None, code=None):

@@ -21,6 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import calendar
 import datetime
+import functools
 
 from dateutil.relativedelta import relativedelta
 from prewikka import hookmanager, localization, template, utils, view
@@ -117,13 +118,13 @@ class MainMenuStep(object):
         self.timedelta, self.unit_format, self.dbunit = d[self.unit]
 
 
-
 class MainMenu(object):
-    _criteria_type = None
-
-    def __init__(self):
+    def __init__(self, criteria_type=None, **kwargs):
         env.request.menu = self
-        self.dataset = _MAINMENU_TEMPLATE.dataset()
+
+        self._criteria_type = criteria_type
+        self.dataset = _MAINMENU_TEMPLATE.dataset(inline=True, period=True, refresh=True)
+        self.dataset.update(kwargs)
 
         self.dataset["timeline"] = utils.AttrObj()
         self.dataset["timeline"].quick = [
@@ -143,6 +144,8 @@ class MainMenu(object):
             (ngettext("%d minute", "%d minutes", 1) % 1, 60),
             (ngettext("%d minute", "%d minutes", 5) % 5, 60*5),
             (ngettext("%d minute", "%d minutes", 10) % 10, 60*10)]
+
+        self._render()
 
     def _set_timeline(self, start, end):
         for unit in "minute", "hour", "day", "month", "year", "unlimited":
@@ -286,7 +289,7 @@ class MainMenu(object):
     def get_parameters(self):
         return dict(((key, env.request.parameters[key]) for key in env.request.parameters._INTERNAL_PARAMETERS if key in env.request.parameters))
 
-    def render(self):
+    def _render(self):
         self.dataset["timeline"].order_by = env.request.parameters["orderby"]
         self.dataset["timeline"].value = env.request.parameters["timeline_value"]
         self.dataset["timeline"].unit = env.request.parameters["timeline_unit"]
@@ -314,12 +317,5 @@ class MainMenu(object):
         self.dataset["menu_extra"] = filter(None, hookmanager.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type))
 
 
-class MainMenuAlert(MainMenu):
-    def __init__(self):
-        MainMenu.__init__(self)
-        self._criteria_type = "alert"
-
-class MainMenuHeartbeat(MainMenu):
-    def __init__(self):
-        MainMenu.__init__(self)
-        self._criteria_type = "heartbeat"
+MainMenuAlert = functools.partial(MainMenu, criteria_type="alert")
+MainMenuHeartbeat = functools.partial(MainMenu, criteria_type="heartbeat")

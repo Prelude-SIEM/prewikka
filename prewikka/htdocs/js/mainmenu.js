@@ -13,6 +13,11 @@ function trigger_custom_date(enabled)
         $("#timeline_quick_selected").html($("#timeline_quick_select_custom").text());
         update_date();
     }
+
+    /*
+     * This will trigger a collapse only in non-inline mode.
+     */
+    $(".form-group.collapse").collapse((enabled) ? "show" : "hide");
 }
 
 
@@ -45,7 +50,7 @@ function update_date() {
     }
 }
 
-function MainMenuInit (date_format) {
+function MainMenuInit (date_format, inline) {
     $(".input-timeline-datetime").datetimepicker({
         "dateFormat": date_format,
         "onSelect": function() { trigger_custom_date(true); },
@@ -81,7 +86,8 @@ function MainMenuInit (date_format) {
             trigger_custom_date(true);
         } else {
             trigger_custom_date(false);
-            $(this).closest("form").submit();
+            if ( inline )
+                $(this).closest("form").submit();
         }
      });
 }
