@@ -206,11 +206,12 @@ class Config(MyConfigParser):
     def __init__(self, filename=None):
         MyConfigParser.__init__(self)
 
-        self.read(filename or siteconfig.conf_dir + "/prewikka.conf")
+        conf_filename = filename or siteconfig.conf_dir + "/prewikka.conf"
+        self.read(conf_filename)
 
         for fpattern in self.include.keys():
             if not os.path.isabs(fpattern):
-                fpattern = os.path.join(siteconfig.conf_dir, fpattern)
+                fpattern = os.path.join(os.path.dirname(conf_filename), fpattern)
 
             # Files are loaded in alphabetical order
             for fname in sorted(glob.glob(fpattern)):
