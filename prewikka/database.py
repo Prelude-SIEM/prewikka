@@ -504,7 +504,8 @@ class DatabaseCommon(preludedb.SQL):
             return None
 
         if isinstance(t, datetime):
-            return t.strftime("%Y-%m-%d %H:%M:%S.%f")
+            # Only timezone-aware datetimes are accepted
+            return t.astimezone(utils.timeutil.timezone("UTC")).strftime("%Y-%m-%d %H:%M:%S.%f")
         else:
             return time.strftime("%Y-%m-%d %H:%M:%S", time.gmtime(t))
 
