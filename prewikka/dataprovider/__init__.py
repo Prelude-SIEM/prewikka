@@ -26,7 +26,7 @@ from datetime import datetime
 
 from prewikka import error, hookmanager, pluginmanager
 from prewikka.utils import AttrObj, CachingIterator, compat, json
-from prewikka.utils.timeutil import parser
+from prewikka.utils.timeutil import parser, tzutc
 
 
 def _str_to_datetime(date):
@@ -45,11 +45,17 @@ CONVERTERS = {
 
 def to_datetime(date):
     try:
-        return CONVERTERS[type(date)](date)
+        dt = CONVERTERS[type(date)](date)
     except KeyError:
         raise error.PrewikkaUserError(N_("Conversion error"),
                                       N_("Value %(value)r cannot be converted to %(type)s",
                                          {"value": date, "type": "datetime"}))
+    if dt is not None and dt.tzinfo is None:
+        # Make the datetime timezone-aware
+        return dt.replace(tzinfo=tzutc())
+
+    return dt
+
 TYPES_FUNC_MAP = {
     "int": int,
     "float": float,
