@@ -1,3 +1,11 @@
+* 2017-05-11, prewikka-3.0.2:
+
+Author: Thomas Andrejak
+
+- Fix User and Group for getting name from id
+
+
+
 * 2016-11-22, prewikka-3.0.1:
 
 Author: Antoine Luong
