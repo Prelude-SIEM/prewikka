@@ -19,11 +19,11 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+from glob import glob
 import io
 import os
-import stat, sys
+import stat
 import subprocess
-from glob import glob
 
 from ez_setup import use_setuptools
 use_setuptools()
@@ -39,21 +39,6 @@ LIBPRELUDE_REQUIRED_VERSION = "4.0.0"
 LIBPRELUDEDB_REQUIRED_VERSION = "4.0.0"
 
 
-if sys.version_info >= (2,7):
-    from subprocess import check_output
-else:
-    def check_output(*args, **kwargs):
-        process = subprocess.Popen(stdout=subprocess.PIPE, *args, **kwargs)
-        out, err = process.communicate()
-
-        ret = process.wait()
-        if ret == 0:
-            return out
-
-        error = subprocess.CalledProcessError(ret, args[0])
-        error.output = out
-
-        raise error
 
 
 class MyDistribution(Distribution):
@@ -162,7 +147,7 @@ class build_custom(Command):
         for less in glob("themes/*.less"):
             css = os.path.join("prewikka", "htdocs", "css", "themes", "%s.css" % os.path.basename(less[:-5]))
             if self._need_compile([less, style], css):
-                io.open(css, "wb").write(check_output(["lesscpy", "-I", less, style]))
+                io.open(css, "wb").write(subprocess.check_output(["lesscpy", "-I", less, style]))
 
 
 
