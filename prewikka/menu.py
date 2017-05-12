@@ -19,12 +19,12 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import collections
 import os
 import yaml
 from copy import copy
 
 from prewikka import error, hookmanager, siteconfig
-from prewikka.utils import OrderedDict
 
 
 class MenuManager(object):
@@ -97,8 +97,8 @@ class MenuManager(object):
     def add_section_info(self, view):
         self.add_section(view.view_menu[0])
 
-        self._loaded_sections.setdefault(view.view_menu[0], OrderedDict()) \
-                             .setdefault(view.view_menu[1], OrderedDict())[view.view_id] = view
+        self._loaded_sections.setdefault(view.view_menu[0], collections.OrderedDict()) \
+                             .setdefault(view.view_menu[1], collections.OrderedDict())[view.view_id] = view
 
         if view.view_menu[:2] == (self._default_section, self._default_tab):
             self._default_view = view
@@ -120,7 +120,7 @@ class MenuManager(object):
             if section not in self._declared_sections:
                 ret[section] = views
             else:
-                ret[section] = OrderedDict()
+                ret[section] = collections.OrderedDict()
                 for name in sorted(views.keys(), key=lambda tab: self._tab_index(section, tab)):
                     ret[section][name] = views[name]
 

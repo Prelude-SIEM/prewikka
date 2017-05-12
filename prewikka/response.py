@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import, division, print_function
 
+import collections
 import mimetypes
 import os
 import time
@@ -69,12 +70,16 @@ class PrewikkaResponse(object):
         if headers is not _sentinel:
             self.headers = headers
         else:
-            self.headers = utils.OrderedDict((("Content-Type", "text/html"),
-                                              ("Last-Modified", time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())),
-                                              ("Expires", "Fri, 01 Jan 1999 00:00:00 GMT"),
-                                              ("Cache-control", "no-store, no-cache, must-revalidate"),
-                                              ("Cache-control", "post-check=0, pre-check=0"),
-                                              ("Pragma", "no-cache")))
+            self.headers = collections.OrderedDict(
+                (
+                    ("Content-Type", "text/html"),
+                    ("Last-Modified", time.strftime("%a, %d %b %Y %H:%M:%S GMT", time.gmtime())),
+                    ("Expires", "Fri, 01 Jan 1999 00:00:00 GMT"),
+                    ("Cache-control", "no-store, no-cache, must-revalidate"),
+                    ("Cache-control", "post-check=0, pre-check=0"),
+                    ("Pragma", "no-cache"),
+                )
+            )
 
     def add_ext_content(self, key, value):
         """Add an extra content to the response (add in XHR request)."""
@@ -219,7 +224,7 @@ class PrewikkaFileResponse(PrewikkaResponse):
             if mtime <= ims:
                 self.code = 304
 
-        self.headers = utils.OrderedDict((('Content-Type', content_type),))
+        self.headers = collections.OrderedDict((('Content-Type', content_type),))
 
         if self.code != 304:
             self.headers["Content-Length"] = str(stat.st_size)
@@ -242,4 +247,4 @@ class PrewikkaRedirectResponse(PrewikkaResponse):
     """
     def __init__(self, location, code=302, status_text=None):
         PrewikkaResponse.__init__(self, code=code, status_text=status_text or "%d Redirect" % code)
-        self.headers = utils.OrderedDict((('Location', location),))
+        self.headers = collections.OrderedDict((('Location', location),))

@@ -1,4 +1,4 @@
-<%! from prewikka.utils import OrderedDict %>
+<%! from collections import OrderedDict %>
 
 <%namespace file="/prewikka/views/filter/templates/widget.mak" import="init, condition, group"/>
 

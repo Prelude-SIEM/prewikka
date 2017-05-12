@@ -52,7 +52,7 @@ class ConfigParserOption(text_type):
 class ConfigParserSection(collections.Mapping):
     def __init__(self, name):
         object.__setattr__(self, "_instance_name", name)
-        object.__setattr__(self, "_od", utils.OrderedDict())
+        object.__setattr__(self, "_od", collections.OrderedDict())
 
     def __repr__(self):
         return "ConfigParserSection<%s,%s>" % (self._instance_name, self._od.items())
@@ -131,7 +131,7 @@ class MyConfigParser(object):
     OPTION_REGEXP = re.compile("^\s*(?P<name>[^:=]+)([:=]\s*(?P<value>.+))?$")
 
     def __init__(self):
-        self._sections = utils.OrderedDict()
+        self._sections = collections.OrderedDict()
 
     def _create_section(self, name, instance):
         if instance:

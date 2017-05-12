@@ -20,11 +20,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import base64
+import collections
 import copy
 from prewikka import hookmanager, resource, template, utils, view, error, response
 
 
-_CSS_FILES = utils.OrderedDict((resource.CSSLink(link), True) for link in (
+_CSS_FILES = collections.OrderedDict((resource.CSSLink(link), True) for link in (
     "prewikka/css/jquery-ui.min.css",
     "prewikka/css/bootstrap.min.css",
     "prewikka/css/jquery-ui-timepicker-addon.min.css",
@@ -35,7 +36,7 @@ _CSS_FILES = utils.OrderedDict((resource.CSSLink(link), True) for link in (
 )
 
 
-_JS_FILES = utils.OrderedDict((resource.JSLink(link), True) for link in (
+_JS_FILES = collections.OrderedDict((resource.JSLink(link), True) for link in (
     "prewikka/js/jquery.js",
     "prewikka/js/jquery-ui.min.js",
     "prewikka/js/bootstrap.min.js",
@@ -95,7 +96,7 @@ class BaseView(view._View):
         for contents in filter(None, hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT")):
             _HEAD.update((i, True) for i in contents)
 
-        _BODY = utils.OrderedDict()
+        _BODY = collections.OrderedDict()
         for contents in filter(None, hookmanager.trigger("HOOK_LOAD_BODY_CONTENT")):
             _BODY.update((i, True) for i in contents)
 

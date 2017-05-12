@@ -264,9 +264,3 @@ class CachingIterator(object):
             raise IndexError
 
         return self._cache[key]
-
-
-if sys.hexversion >= 0x02070000:
-        from collections import OrderedDict
-else:
-        from prewikka.compat import OrderedDict

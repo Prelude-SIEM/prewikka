@@ -3,12 +3,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sys
 
 if sys.version_info[0] >= 3:
-    import collections
-
     STRING_TYPES = str,
-    OrderedDict = collections.OrderedDict
 else:
-    from .ordereddict import OrderedDict
     STRING_TYPES = basestring,
 
 

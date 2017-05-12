@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import collections
 import datetime
 import gettext
 import locale
@@ -56,7 +57,7 @@ class TranslationProxy(object):
         self._catalogs_lock = Lock()
 
         self._domains_lock = Lock()
-        self._domains = utils.OrderedDict([("prewikka", pkg_resources.resource_filename(__name__, "locale"))])
+        self._domains = collections.OrderedDict([("prewikka", pkg_resources.resource_filename(__name__, "locale"))])
 
     def addDomain(self, domain, locale_dir):
         with self._domains_lock:
