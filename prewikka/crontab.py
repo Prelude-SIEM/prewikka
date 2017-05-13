@@ -25,6 +25,7 @@ import datetime
 import time
 import traceback
 
+from prewikka.utils import timeutil
 from prewikka import database, error, log, usergroup, utils, registrar
 
 
@@ -42,9 +43,11 @@ DEFAULT_SCHEDULE = collections.OrderedDict((("0 * * * *", N_("Hourly")),
                                             ("custom", N_("Custom")),
                                             ("disabled", N_("Disabled"))))
 
-
-def _now():
-    return datetime.datetime.now(utils.timeutil.timezone("UTC"))
+_SCHEDULE_PARAMS = dict((("0 * * * *", "hour"),
+                         ("0 0 * * *", "day"),
+                         ("0 0 * * 1", "week"),
+                         ("0 0 1 * *", "month"),
+                         ("0 0 1 1 *", "year")))
 
 
 class CronJob(object):
@@ -61,7 +64,7 @@ class CronJob(object):
         self.base = base
         self.runcnt = runcnt
 
-        self._timedelta = self._next_schedule = None
+        self._timedelta = self._prev_schedule = self._next_schedule = None
 
     def _timeinit_once(self):
         if self._timedelta:
@@ -106,7 +109,7 @@ class CronJob(object):
             logger.exception("[%d/%s]: cronjob failed: %s", self.id, self.name, err)
             err = utils.json.dumps(error.PrewikkaError(err, N_("Scheduled job execution failed")))
 
-        env.db.query("UPDATE Prewikka_Crontab SET base=%s, runcnt=runcnt+1, error=%s WHERE id=%d", _now(), err, self.id)
+        env.db.query("UPDATE Prewikka_Crontab SET base=%s, runcnt=runcnt+1, error=%s WHERE id=%d", timeutil.utcnow(), err, self.id)
 
 
 class Crontab(object):
@@ -147,11 +150,11 @@ class Crontab(object):
             self.add(name, schedule, ext_type=ext_type, enabled=enabled)
 
     def _run_jobs(self):
-        first = now = _now()
+        first = now = timeutil.utcnow()
 
-        for job in self.list():
+        for job in self.list(enabled=True):
             job.run(now)
-            now = _now()
+            now = timeutil.utcnow()
 
         return (self._REFRESH - (now - first)).total_seconds()
 
@@ -198,7 +201,7 @@ class Crontab(object):
                 data.append(value)
 
         if not id:
-            env.db.query("INSERT INTO Prewikka_Crontab (%s) VALUES %%s" % (", ".join(cols + ["base"])), data + [_now()])
+            env.db.query("INSERT INTO Prewikka_Crontab (%s) VALUES %%s" % (", ".join(cols + ["base"])), data + [timeutil.utcnow()])
             return env.db.getLastInsertIdent()
         else:
             env.db.query("UPDATE Prewikka_Crontab SET %s WHERE id IN %%s" % (", ".join(data)), env.db._mklist(id))
@@ -249,6 +252,20 @@ def format_schedule(x):
         return _(val)
     else:
         return _("Custom (%s)") % x
+
+
+def schedule_to_menuparams(x):
+    params = {}
+
+    val = _SCHEDULE_PARAMS.get(x)
+    if val:
+        params["timeline_unit"] = val
+    else:
+        now = timeutil.now()
+        params["timeline_start"] = timeutil.get_timestamp_from_datetime(croniter.croniter(x, now).get_prev(datetime.datetime))
+        params["timeline_end"] = timeutil.get_timestamp_from_datetime(now)
+
+    return params
 
 
 crontab = Crontab()

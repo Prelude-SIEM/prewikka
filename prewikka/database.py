@@ -526,6 +526,9 @@ class DatabaseCommon(preludedb.SQL):
                 if isinstance(val, (list, tuple)):
                     op = "IN"
 
+                elif isinstance(val, bool):
+                    val = int(val)
+
                 qs.append("%s %s %s" % (field, op, self.escape(val)))
 
         return prefix + " AND ".join(qs)
