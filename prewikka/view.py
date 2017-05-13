@@ -471,10 +471,10 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
-def route(path, methods=["GET"], permissions=[], menu=None, defaults={}):
+def route(path, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None):
     usergroup.ALL_PERMISSIONS.declare(permissions)
     return registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route,
-                                                     route=utils.AttrObj(path=path, methods=methods, permissions=permissions, menu=menu, defaults=defaults))
+                                                     route=utils.AttrObj(path=path, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint))
 
 
 class ViewManager(registrar.DelayedRegistrar):
@@ -528,7 +528,7 @@ class ViewManager(registrar.DelayedRegistrar):
         v.view_extensions = baseview.view_extensions
         v.view_parameters = baseview.view_parameters
         v.view_menu = route.menu or baseview.view_menu
-        v.view_endpoint = "%s.%s" % (baseview.view_id, function.__name__)
+        v.view_endpoint = "%s.%s" % (baseview.view_id, route.endpoint or function.__name__)
         v.render = function
 
         if v.view_menu:
