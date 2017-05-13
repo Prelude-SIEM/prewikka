@@ -73,8 +73,8 @@ class _Dataset(collections.MutableMapping):
 
 
 class _PrewikkaTemplate(object):
-    def dataset(self):
-        return _Dataset(self)
+    def dataset(self, *args, **kwargs):
+        return _Dataset(self, *args, **kwargs)
 
     def __init__(self, *args):
         if len(args) == 2:
