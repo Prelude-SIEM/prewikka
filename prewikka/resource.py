@@ -79,7 +79,10 @@ class HTMLNode(object):
         self.tag = tag
         self.childs = childs
 
-        self._icon = attrs.pop("_icon", None)
+        icon = attrs.pop("_icon", None)
+        if icon:
+            self.childs = (HTMLNode("i", _class="fa %s" % icon), " ") + self.childs
+
         self._sortkey = attrs.pop("_sortkey", None)
 
         tmp = attrs.pop("_class", None)
@@ -101,9 +104,6 @@ class HTMLNode(object):
             attr_s = HTMLSource(" class=\"%s\"") % (_class) + attr_s
 
         childs = HTMLSource()
-        if self._icon:
-            childs += HTMLSource('<i class="fa %s" /> ') % self._icon
-
         for x in self.childs:
             childs += text_type(x)
 
