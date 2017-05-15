@@ -100,18 +100,6 @@ class ConfigParserSection(collections.Mapping):
     def setdefault(self, key, default):
         return self._od.setdefault(key, default)
 
-    @utils.deprecated
-    def getOptions(self):
-        return self._od.values()
-
-    @utils.deprecated
-    def getOption(self, name):
-        return self._od[name]
-
-    @utils.deprecated
-    def getOptionValue(self, key, value=None):
-        return self._od.get(key, value)
-
 
 class SectionRoot(list):
     def __contains__(self, key):
@@ -139,7 +127,7 @@ class MyConfigParser(object):
     """
 
     EMPTY_LINE_REGEXP = re.compile("^\s*(\#.*)?$")
-    SECTION_REGEXP = re.compile("^\s*\[\s*(?P<name>[^\s]+)\s*(?P<instance>.+)?]")
+    SECTION_REGEXP = re.compile("^\s*\[\s*(?P<name>[^\s]+)\s*(?P<instance>.+)?]\s*$")
     OPTION_REGEXP = re.compile("^\s*(?P<name>[^:=]+)([:=]\s*(?P<value>.+))?$")
 
     def __init__(self):
@@ -149,7 +137,7 @@ class MyConfigParser(object):
         if instance:
             instance = instance.strip()
 
-        if not name in self._sections:
+        if name not in self._sections:
             self._sections[name] = SectionRoot()
 
         for section in self._sections[name]:
@@ -200,6 +188,9 @@ class MyConfigParser(object):
 
     def __getattr__(self, key):
         return self._sections.get(key, SectionRoot())
+
+    def __len__(self):
+        return len(self._sections)
 
 
 class Config(MyConfigParser):
