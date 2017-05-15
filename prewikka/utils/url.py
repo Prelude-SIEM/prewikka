@@ -64,9 +64,9 @@ class mkdownload(object):
         :param bool inline: Whether to display the downloaded file inline
     """
     def __init__(self, filename, mode="wb", user=True, inline=False):
-        id = random.randint(0, 9999999)
-        dlname = base64.urlsafe_b64encode(filename)
-        filename = self.get_filename(id, dlname, user)
+        self._id = random.randint(0, 9999999)
+        self._dlname = base64.urlsafe_b64encode(filename)
+        filename = self.get_filename(self._id, self._dlname, user)
 
         try:
             os.makedirs(os.path.dirname(filename), mode=0o700)
@@ -76,8 +76,13 @@ class mkdownload(object):
 
         self.fd = open(filename, mode)
 
-        user = self._get_user(user)
-        self.href = "%sdownload%s/%d/%s%s" % (env.request.web.get_baseurl(), "/" + user if user else "", id, dlname, "/inline" if inline else "")
+        self._user = user
+        self._inline = inline
+
+    @property
+    def href(self):
+        user = self._get_user(self._user)
+        return "%sdownload%s/%d/%s%s" % (env.request.web.get_baseurl(), "/" + user if user else "", self._id, self._dlname, "/inline" if self._inline else "")
 
     @classmethod
     def get_filename(cls, id, filename, user=True):
