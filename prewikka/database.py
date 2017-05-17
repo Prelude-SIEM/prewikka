@@ -481,6 +481,7 @@ class DatabaseCommon(preludedb.SQL):
 
         preludedb.SQL.__init__(self, settings)
 
+        self._version = self.getServerVersion()
         self._dbhash = hash(stpl)
         self._dbtype = settings["type"]
 
@@ -737,15 +738,19 @@ class MySQLDatabase(DatabaseCommon):
 
 
 class PgSQLDatabase(DatabaseCommon):
+    def __init__(self, *args, **kwargs):
+        DatabaseCommon.__init__(self, *args, **kwargs)
+
     def _lock_table(self, table):
         self.query("LOCK TABLE %s IN EXCLUSIVE MODE" % ", ".join(self._mklist(table)))
 
     @cache.memoize("table_info")
     def _get_table_info(self, table):
         out = {}
+        typemap = {"bigint": "integer", "smallint": "integer", "character varying": "text"}
 
         for field, _type, defval in env.db.query("SELECT column_name, data_type, column_default FROM information_schema.columns WHERE table_name = %s", table.lower()):
-            out[field] = utils.AttrObj(type=_type, default=defval, auto_increment="nextval" in (defval or ""))
+            out[field] = utils.AttrObj(type=_type, generic_type=typemap.get(_type, _type), default=defval, auto_increment="nextval" in (defval or ""))
 
         return out
 
@@ -755,10 +760,16 @@ class PgSQLDatabase(DatabaseCommon):
 
         for f, v in zip(fields, row):
             cast = ""
-            if dtype[f].type == "integer":
-                cast = "::integer"
 
-            out.append(text_type(self.escape(v)) + cast)
+            if self._version >= 90500 and dtype[f].auto_increment and v is None:
+                v = "DEFAULT"
+            else:
+                if dtype[f].generic_type == "integer":
+                    cast = "::%s" % dtype[f].type
+
+                v = text_type(self.escape(v)) + cast
+
+            out.append(v)
 
         return "(" + text_type(", ".join(out)) + ")"
 
@@ -863,11 +874,10 @@ class PgSQLDatabase(DatabaseCommon):
         if not pkey:
             pkey = fields
 
-        version = self.getServerVersion()
-        if version >= 90500:
+        if self._version >= 90500:
             ret = self._pgsql_upsert(table, pkey, fields, values_rows, returning, merge)
 
-        elif version >= 90100:
+        elif self._version >= 90100:
             ret = self._pgsql_upsert_cte(table, pkey, fields, values_rows, returning, merge)
 
         else:
