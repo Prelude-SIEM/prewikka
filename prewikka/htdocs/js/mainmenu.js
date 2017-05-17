@@ -1,61 +1,51 @@
-function trigger_custom_date(enabled)
-{
-    $("#hidden_timeline_start").prop("disabled", !enabled);
-    $("#hidden_timeline_end").prop("disabled", !enabled);
-    $("#hidden_timeline_value").prop("disabled", enabled);
-    $("#hidden_timeline_unit").prop("disabled", enabled);
-    $("#hidden_timeline_absolute").prop("disabled", enabled);
+function MainMenuInit(inline, start, end, date_format) {
 
-    $("#main_menu_ng .form-group-date input").toggleClass("disabled", !enabled);
+    var that = this;
 
-    if ( enabled ) {
-        $("#main_menu_form_submit").removeClass("disabled");
-        $("#timeline_quick_selected").html($("#timeline_quick_select_custom").text());
-        update_date();
-    }
+    this._init = function(start, end, date_format) {
+        var options = {
+            "dateFormat": date_format,
+            "onSelect": function() { that.trigger_custom_date(true); },
+            "onClose": function() { that.trigger_custom_date(true); },
+        };
 
-    /*
-     * This will trigger a collapse only in non-inline mode.
-     */
-    $(".form-group.collapse").collapse((enabled) ? "show" : "hide");
-}
+        that.start_picker = new DatetimePicker("timeline_start", start, options);
+        that.end_picker = new DatetimePicker("timeline_end", end, options);
+    };
 
+    this.trigger_custom_date = function(enabled) {
+        $("#hidden_timeline_start").prop("disabled", !enabled);
+        $("#hidden_timeline_end").prop("disabled", !enabled);
+        $("#hidden_timeline_value").prop("disabled", enabled);
+        $("#hidden_timeline_unit").prop("disabled", enabled);
+        $("#hidden_timeline_absolute").prop("disabled", enabled);
 
-function get_time(dt)
-{
-        return (dt.getTime() - (dt.getTimezoneOffset() * 60000)) / 1000;
-}
+        $("#main_menu_ng .form-group-date input").toggleClass("disabled", !enabled);
 
+        if ( enabled ) {
+            $("#main_menu_form_submit").removeClass("disabled");
+            $("#timeline_quick_selected").html($("#timeline_quick_select_custom").text());
+            that.update_date();
+        }
 
-function update_date_input() {
-    var start = $("#timeline_start").datetimepicker("getDate");
-    $("#hidden_timeline_start").val(start ? get_time(start) : "");
+        /*
+         * This will trigger a collapse only in non-inline mode.
+         */
+        $(".form-group.collapse").collapse((enabled) ? "show" : "hide");
+    };
 
-    var end = $("#timeline_end").datetimepicker("getDate");
-    $("#hidden_timeline_end").val(end ? get_time(end) : "");
+    this.update_date = function() {
+        var start = that.start_picker.update_input();
+        var end = that.end_picker.update_input();
 
-    return [start, end];
-}
-
-function update_date() {
-    var ret = update_date_input();
-    var start = ret[0], end = ret[1];
-
-    if ( start > end ) {
-        $(".input-timeline-datetime").closest(".form-group").addClass('has-error');
-        $("#main_menu_form_submit").prop('disabled', true).addClass('error-date');
-    } else {
-        $(".input-timeline-datetime").closest(".form-group").removeClass('has-error');
-        $("#main_menu_form_submit").prop('disabled', false).removeClass('error-date');
-    }
-}
-
-function MainMenuInit (date_format, inline) {
-    $(".input-timeline-datetime").datetimepicker({
-        "dateFormat": date_format,
-        "onSelect": function() { trigger_custom_date(true); },
-        "onClose": function() { trigger_custom_date(true); },
-    });
+        if ( start > end ) {
+            $(".input-timeline-datetime").closest(".form-group").addClass('has-error');
+            $("#main_menu_form_submit").prop('disabled', true).addClass('error-date');
+        } else {
+            $(".input-timeline-datetime").closest(".form-group").removeClass('has-error');
+            $("#main_menu_form_submit").prop('disabled', false).removeClass('error-date');
+        }
+    };
 
     $(".main_menu_extra :input").on("change", function() {
         $("#main_menu_form_submit").removeClass("disabled");
@@ -83,14 +73,18 @@ function MainMenuInit (date_format, inline) {
         $("#timeline_quick_selected").text($(this).text());
 
         if ( $(this).data("value") === "" ){
-            trigger_custom_date(true);
+            that.trigger_custom_date(true);
         } else {
-            trigger_custom_date(false);
+            that.trigger_custom_date(false);
             if ( inline )
                 $(this).closest("form").submit();
         }
-     });
+    });
+
+    this._init(start, end, date_format);
+
 }
+
 
 function PageReloader(callback, second) {
     this.second_reload = second;

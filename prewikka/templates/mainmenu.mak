@@ -18,16 +18,12 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
     window.mainmenu.start();
   % endif
 
-    MainMenuInit("${timeline.time_format}", ${ int(inline) });
-
-    $('#timeline_end').datetimepicker("setDate", new Date(moment("${timeline.end}")));
-    $('#timeline_start').datetimepicker("setDate", new Date(moment("${timeline.start}")));
-    update_date_input();
+    var menu = new MainMenuInit(${ int(inline) }, "${timeline.start}", "${timeline.end}", "${timeline.time_format}");
 
   % if timeline.quick_custom:
-    trigger_custom_date(true);
+    menu.trigger_custom_date(true);
   % else:
-    trigger_custom_date(false);
+    menu.trigger_custom_date(false);
   % endif
 
     $('#main_menu_ng').trigger('mainmenu_ready');

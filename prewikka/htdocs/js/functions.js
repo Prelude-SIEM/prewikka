@@ -367,3 +367,35 @@ function prewikka_autocomplete(field, url, submit) {
         $(this).autocomplete("search");
     });
 }
+
+
+function DatetimePicker(input_id, date, options)
+{
+    var that = this;
+
+    this._init = function(input_id, date, options) {
+        var options = _mergedict({
+            "onSelect": that.update_input,
+            "onClose": that.update_input
+        }, options);
+
+        that.input = $("#" + input_id);
+        that.hidden_input = $("#hidden_" + input_id);
+
+        that.input.datetimepicker(options);
+        that.input.datetimepicker("setDate", new Date(moment(date)));
+        that.update_input();
+    };
+
+    this._timestamp = function(dt) {
+        return (dt.getTime() - (dt.getTimezoneOffset() * 60000)) / 1000;
+    };
+
+    this.update_input = function() {
+        var dt = that.input.datetimepicker("getDate");
+        that.hidden_input.val(dt ? that._timestamp(dt) : "");
+        return dt;
+    };
+
+    this._init(input_id, date, options || {});
+}
