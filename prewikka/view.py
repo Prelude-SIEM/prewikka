@@ -575,7 +575,7 @@ class ViewManager(registrar.DelayedRegistrar):
             self.addView(vi)
 
     def set_url_adapter(self, request, cache=True):
-        scname = request.web.get_script_name()
+        scname = request.web.get_script_name() if request.web else None
 
         ad = _URL_ADAPTER_CACHE.get(scname) if cache else None
         if not ad:

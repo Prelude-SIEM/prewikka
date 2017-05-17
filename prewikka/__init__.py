@@ -25,7 +25,7 @@ class _cache(object):
 
 
 class Request(local):
-    def init(self, request):
+    def _init(self, request):
         self.web = request
         self.user = None
         self.view = None
@@ -35,13 +35,16 @@ class Request(local):
         self.cache = _cache()
         self.view_kwargs = {}
 
+    def init(self, request):
+        self._init(request)
+
         # env.viewmanager might be empty in case of early error (database)
-        if request and env.viewmanager:
+        if env.viewmanager:
             env.viewmanager.set_url_adapter(self)
 
     def __init__(self):
         local.__init__(self)
-        self.init(None)
+        self._init(None)
 
 
 class Env:
