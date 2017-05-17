@@ -62,7 +62,9 @@ class BaseView(view._View):
             raise error.PrewikkaUserError(_("Permission Denied"), message=_("Missing permission to access the specified file"), code=403)
 
         fd = open(utils.mkdownload.get_filename(id, filename, user), "r")
-        return response.PrewikkaDownloadResponse(fd, filename=base64.urlsafe_b64decode(str(filename)), inline=inline)
+        filename = base64.urlsafe_b64decode(str(filename)).decode("utf8")
+
+        return response.PrewikkaDownloadResponse(fd, filename=filename, inline=inline)
 
     @view.route("/logout")
     def logout(self):

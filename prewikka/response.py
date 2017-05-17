@@ -25,6 +25,8 @@ import os
 import time
 import datetime
 import dateutil.parser
+import string
+import unicodedata
 
 from prewikka import compat, template, utils
 from prewikka.utils import json
@@ -144,6 +146,11 @@ class PrewikkaDownloadResponse(PrewikkaResponse):
         :param int size: Size of the data (will be computed automatically if None)
         :param bool inline: Whether to display the downloaded file inline
     """
+    @staticmethod
+    def _filename_to_ascii(filename):
+        filename = unicodedata.normalize('NFKC', filename)
+        return ''.join((i if i in string.printable else '-' for i in filename))
+
     def __init__(self, data, filename=None, type=None, size=None, inline=False):
         PrewikkaResponse.__init__(self, data)
 
@@ -155,7 +162,8 @@ class PrewikkaDownloadResponse(PrewikkaResponse):
 
         disposition = "inline" if inline else "attachment"
         if filename:
-            disposition += "; filename=\"%s\"" % filename
+            # As specified in RFC 6266
+            disposition += "; filename=\"%s\"; filename*=utf-8''%s" % (self._filename_to_ascii(filename), utils.url.quote(filename.encode("utf8")))
 
         self._is_file = not(isinstance(self.data, text_type))
         if not size:

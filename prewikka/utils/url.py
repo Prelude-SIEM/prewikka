@@ -65,7 +65,7 @@ class mkdownload(object):
     """
     def __init__(self, filename, mode="wb", user=True, inline=False):
         self._id = random.randint(0, 9999999)
-        self._dlname = base64.urlsafe_b64encode(filename)
+        self._dlname = base64.urlsafe_b64encode(filename.encode("utf8"))
         filename = self.get_filename(self._id, self._dlname, user)
 
         try:
@@ -88,7 +88,7 @@ class mkdownload(object):
     def get_filename(cls, id, filename, user=True):
         user = cls._get_user(user)
         if user:
-            user = base64.urlsafe_b64encode(user)
+            user = base64.urlsafe_b64encode(user.encode("utf8"))
 
         return os.path.join(cls.DOWNLOAD_DIRECTORY, user or "", "%d-%s" % (id, filename))
 
