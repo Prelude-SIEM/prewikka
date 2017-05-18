@@ -69,7 +69,6 @@ function prewikka_drawTab(data)
     if ( ! data.content )
         return;
 
-
     /*
      * Check self and descendant
      */
@@ -82,22 +81,7 @@ function prewikka_drawTab(data)
     $("#main").html(content);
 
     prewikka_resizeTopMenu();
-
-    $("#topmenu #help-button").hide();
-    $("#timeline #view-settings #main_menu_form").hide();
-
     $("#config-button").toggle($("#main .prewikka-view-config").length > 0);
-
-    var vh = $("#main .prewikka-view-help");
-    if ( vh.length )  {
-        $("#topmenu #help-button").show();
-        $("#topmenu #help-button").click(function() {
-            prewikka_dialog({
-                name: "Prelude Help",
-                message: $("#main .prewikka-view-help").html()
-            });
-        });
-    }
 
     _initialize_components("#main");
     window.scrollTo(0, 0);
