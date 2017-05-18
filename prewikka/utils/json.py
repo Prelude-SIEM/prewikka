@@ -75,7 +75,8 @@ def loads(*args, **kwargs):
 
 
 def dump(*args, **kwargs):
-    return html.escapejson(json.dump(cls=PrewikkaJSONEncoder, *args, **kwargs))
+    json.dump(cls=PrewikkaJSONEncoder, *args, **kwargs)
+
 
 def dumps(*args, **kwargs):
     return html.escapejson(json.dumps(cls=PrewikkaJSONEncoder, *args, **kwargs))
