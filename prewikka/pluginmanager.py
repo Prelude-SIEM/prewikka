@@ -51,7 +51,7 @@ class PluginPreload(PluginBase):
     plugin_classes = []
 
 
-class PluginManager:
+class PluginManager(object):
     @staticmethod
     def _handle_attributes(plugin_class, autoupdate):
         if plugin_class.plugin_htdocs:

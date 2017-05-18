@@ -127,7 +127,7 @@ class SectionRoot(list):
         return getattr(self[0] if self else ConfigParserSection(""), attr)
 
 
-class MyConfigParser:
+class MyConfigParser(object):
     """
     A config parser class ala ConfigParser.ConfigParser (only read operations
     are (will be) supported).

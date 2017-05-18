@@ -47,7 +47,7 @@ class Request(local):
         self._init(None)
 
 
-class Env:
+class Env(object):
     htdocs_mapping = {}
     request = Request()
 

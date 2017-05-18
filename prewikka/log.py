@@ -31,7 +31,8 @@ ERROR = logging.ERROR
 WARNING = logging.WARNING
 CRITICAL = logging.CRITICAL
 
-class Log:
+
+class Log(object):
     def __init__(self, conf):
         self._logger = None
 

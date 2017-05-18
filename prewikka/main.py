@@ -34,13 +34,11 @@ except ImportError:
     from dummy_threading import Lock, local
 
 
-
 _core_cache = {}
 _core_cache_lock = Lock()
 
 
-
-class Core:
+class Core(object):
     def _checkVersion(self):
         error_type = _("Version Requirement error")
         if not prelude.checkVersion(siteconfig.libprelude_required_version):

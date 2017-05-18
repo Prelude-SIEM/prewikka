@@ -32,7 +32,7 @@ else:
     import Cookie as cookies
 
 
-class BufferedWriter:
+class BufferedWriter(object):
         def __init__(self, wcb, buffersize=8192):
                 self._wcb = wcb
                 self._dlist = []

@@ -38,7 +38,8 @@ try:
 except ImportError:
     from dummy_threading import Lock
 
-class DNSResolver:
+
+class DNSResolver(object):
     def __init__(self):
         self._query = 0
         self._lock = Lock()
@@ -116,7 +117,7 @@ class DNSResolver:
         self.process()
 
 
-class AddressResolve:
+class AddressResolve(object):
     def _resolve_cb(self, value):
         if self._formater:
             value = self._formater(self._addr, value)
