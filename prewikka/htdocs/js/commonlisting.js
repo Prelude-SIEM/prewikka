@@ -170,7 +170,7 @@ function CommonListing(elem, text, options) {
         if ( $(this).data("confirm") )
             return;
 
-        grid.ajax({ url: options.deleteLink, method: 'POST', success: this.delete_rows });
+        grid.ajax({ url: options.deleteLink, method: 'POST', success: grid.delete_rows });
     });
 
     resizeGrid();
