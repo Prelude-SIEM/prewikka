@@ -100,27 +100,12 @@ def protocol_number_to_name(num):
 
      return None
 
+
 def nameToPath(name):
     if not isinstance(name, compat.STRING_TYPES):
         name = text_type(name)
 
     return name.lower().replace(" ", "_")
-
-
-def property(type, name, parameter, value=None):
-    return { "type": type, "name": name, "parameter": parameter, "value": value }
-
-
-def text_property(name, parameter, value=None):
-    return property("text", name, parameter, value)
-
-
-def password_property(name, parameter):
-    return property("password", name, parameter)
-
-
-def boolean_property(name, parameter, value=False):
-    return property("checkbox", name, parameter, value)
 
 
 def find_unescaped_characters(value, characters=None):
