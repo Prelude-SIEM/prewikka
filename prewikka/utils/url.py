@@ -59,11 +59,12 @@ class mkdownload(object):
         Create a file to be downloaded
 
         :param str filename: Name of the file as downloaded by the user
-        :param str mode: Mode for opening the file (default is 'wb')
+        :param str mode: Mode for opening the file (default is 'wb+')
         :param bool user: User who can download the file (default to current user, False or a specific user can be provided).
         :param bool inline: Whether to display the downloaded file inline
     """
-    def __init__(self, filename, mode="wb", user=True, inline=False):
+    def __init__(self, filename, mode="wb+", user=True, inline=False):
+        self.name = filename
         self._id = random.randint(0, 9999999)
         self._dlname = base64.urlsafe_b64encode(filename.encode("utf8"))
         filename = self.get_filename(self._id, self._dlname, user)
