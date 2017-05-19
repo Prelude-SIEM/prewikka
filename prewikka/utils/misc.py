@@ -74,7 +74,7 @@ def _load_protocol():
         return port_dict
 
     read_done = True
-    sreg = re.compile("^\s*(?P<name>[^#]\w+)\s*(?P<number>\d+)\s*(?P<alias>\w+)")
+    sreg = re.compile("^\s*(?P<name>[^#]\S+)\s*(?P<number>\d+)\s*(?P<alias>\S+)")
 
     try: fd = open("/etc/protocols", "r")
     except IOError:
