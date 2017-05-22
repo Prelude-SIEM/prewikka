@@ -101,6 +101,9 @@ class CronJob(object):
         env.request.init(None)
         env.request.user = self.user
 
+        if self.user:
+            self.user.set_locale()
+
         # run
         err = None
         try:
