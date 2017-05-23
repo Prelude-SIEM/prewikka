@@ -64,7 +64,7 @@ class MainMenuParameters(view.Parameters):
 
 class TimeUnit(object):
     _unit = ("year", "month", "day", "hour", "minute", "second")
-    _dbunit = { "year": "year", "month": "month", "day": "mday", "hour": "hour", "minute": "min", "second": "sec" }
+    _dbunit = {"year": "year", "month": "month", "day": "mday", "hour": "hour", "minute": "min", "second": "sec"}
 
     @property
     def dbunit(self):
@@ -72,9 +72,10 @@ class TimeUnit(object):
 
     def __init__(self, unit):
         if isinstance(unit, int):
-            assert(unit >= 0)
+            assert 0 <= unit < len(self._unit)
             self._idx = unit
         else:
+            assert unit in self._unit
             self._idx = self._unit.index(unit)
 
     def __add__(self, x):
