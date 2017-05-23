@@ -51,6 +51,9 @@ class AttrObj(json.JSONObject):
     def __repr__(self):
         return self._kwargs.__repr__()
 
+    def __eq__(self, other):
+        return self.__dict__ == other.__dict__
+
 
 # FIXME: Need appropriate implementation
 def get_analyzer_status_from_latest_heartbeat(heartbeat, error_margin):
