@@ -2,75 +2,80 @@ function MainMenuInit(inline, start, end, date_format) {
 
     var that = this;
 
+    that._root = $((inline) ? "#main_menu_ng" : "#main_menu_ng_block");
+    that._start_picker = that._root.find(".timeline_start");
+    that._end_picker = that._root.find(".timeline_end");
+
     this._init = function(start, end, date_format) {
+
         var options = {
             "dateFormat": date_format,
             "onSelect": function() { that.trigger_custom_date(true); },
             "onClose": function() { that.trigger_custom_date(true); },
         };
 
-        that.start_picker = new DatetimePicker("timeline_start", start, options);
-        that.end_picker = new DatetimePicker("timeline_end", end, options);
+        that._start_picker = new DatetimePicker(that._start_picker, start, options);
+        that._end_picker = new DatetimePicker(that._end_picker, end, options);
     };
 
     this.trigger_custom_date = function(enabled) {
-        $("#hidden_timeline_start").prop("disabled", !enabled);
-        $("#hidden_timeline_end").prop("disabled", !enabled);
-        $("#hidden_timeline_value").prop("disabled", enabled);
-        $("#hidden_timeline_unit").prop("disabled", enabled);
-        $("#hidden_timeline_absolute").prop("disabled", enabled);
+        that._root.find("[name=timeline_start]").prop("disabled", !enabled);
+        that._root.find("[name=timeline_end]").prop("disabled", !enabled);
+        that._root.find("[name=timeline_value]").prop("disabled", enabled);
+        that._root.find("[name=timeline_unit]").prop("disabled", enabled);
+        that._root.find("[name=timeline_absolute]").prop("disabled", enabled);
 
-        $("#main_menu_ng .form-group-date input").toggleClass("disabled", !enabled);
+        that._root.find(".form-group-date input").toggleClass("disabled", !enabled);
 
         if ( enabled ) {
-            $("#main_menu_form_submit").removeClass("disabled");
-            $("#timeline_quick_selected").html($("#timeline_quick_select_custom").text());
+            that._root.find(".main_menu_form_submit").removeClass("disabled");
+            that._root.find(".timeline_quick_selected").html($(that._root.find(".timeline_quick_select_custom")).text());
             that.update_date();
         }
 
         /*
          * This will trigger a collapse only in non-inline mode.
          */
-        $(".form-group.collapse").collapse((enabled) ? "show" : "hide");
+        that._root.find(".form-group.collapse").collapse((enabled) ? "show" : "hide");
     };
 
     this.update_date = function() {
-        var start = that.start_picker.update_input();
-        var end = that.end_picker.update_input();
+        var start = that._start_picker.get_value();
+        var end = that._end_picker.get_value();
 
         if ( start > end ) {
-            $(".input-timeline-datetime").closest(".form-group").addClass('has-error');
-            $("#main_menu_form_submit").prop('disabled', true).addClass('error-date');
+            that._root.find(".input-timeline-datetime").closest(".form-group").addClass('has-error');
+            that._root.find(".main_menu_form_submit").prop('disabled', true).addClass('error-date');
         } else {
-            $(".input-timeline-datetime").closest(".form-group").removeClass('has-error');
-            $("#main_menu_form_submit").prop('disabled', false).removeClass('error-date');
+            that._root.find(".input-timeline-datetime").closest(".form-group").removeClass('has-error');
+            that._root.find(".main_menu_form_submit").prop('disabled', false).removeClass('error-date');
         }
     };
 
-    $(".main_menu_extra :input").on("change", function() {
-        $("#main_menu_form_submit").removeClass("disabled");
+    that._root.find(".main_menu_extra :input").on("change", function() {
+        that._root.find(".main_menu_form_submit").removeClass("disabled");
     });
 
-    $("#refresh-select a").on("click", function() {
-        $("#refresh-value").text($(this).text());
-        $("#main_menu_form_submit").removeClass("disabled");
+    that._root.find(".refresh-select a").on("click", function() {
+        that._root.find(".refresh-value").text($(this).text());
+        that._root.find(".main_menu_form_submit").removeClass("disabled");
 
         var second_reload = parseInt($(this).data("value"));
         if ( second_reload > 0 ) {
-            $("#hidden_auto_apply_value").val(second_reload);
+            that._root.find("[name=auto_apply_value]").val(second_reload);
             window.mainmenu.setTimeout(second_reload);
             window.mainmenu.start();
         } else {
-            $("#hidden_auto_apply_value").val("");
+            that._root.find("[name=auto_apply_value]").val("");
             window.mainmenu.stop();
         }
     });
 
-    $("#timeline_quick_select a").on("click", function() {
-        $("#hidden_timeline_value").val($(this).data("value"));
-        $("#hidden_timeline_unit").val($(this).data("unit"));
-        $("#hidden_timeline_absolute").val($(this).data("absolute"));
-        $("#timeline_quick_selected").text($(this).text());
+    that._root.find(".timeline_quick_select a").on("click", function() {
+        that._root.find("[name=timeline_value]").val($(this).data("value"));
+        that._root.find("[name=timeline_unit]").val($(this).data("unit"));
+        that._root.find("[name=timeline_absolute]").val($(this).data("absolute"));
+        that._root.find(".timeline_quick_selected").text($(this).text());
 
         if ( $(this).data("value") === "" ){
             that.trigger_custom_date(true);
@@ -142,4 +147,4 @@ function PageReloader(callback, second) {
 
 
 window.mainmenu = new PageReloader(function() { $("#main_menu_ng").closest("form").submit() },
-                                   parseInt($("#hidden_auto_apply_value").val()));
+                                   parseInt($("#main_menu_ng [name=auto_apply_value]").val()));
