@@ -17,22 +17,20 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import functools
 
-_REGISTER = {}
 _ATTRIBUTE = "__delayreg__"
 
 
 class DelayedRegistrar(object):
     @staticmethod
     def make_decorator(type, regfunc, *args, **kwargs):
-        _REGISTER[type] = regfunc
-
         def indecorator(func):
             d = getattr(func, _ATTRIBUTE, {})
             if not d:
                 setattr(func, _ATTRIBUTE, d)
 
-            d.setdefault(type, []).append((args, kwargs))
+            d.setdefault(type, []).append(functools.partial(regfunc, *args, **kwargs))
             return func
 
         return indecorator
@@ -43,6 +41,6 @@ class DelayedRegistrar(object):
                 continue
 
             ref = getattr(self, name)
-            for typ, vals in getattr(ref, _ATTRIBUTE, {}).items():
-                for args, kwargs in vals:
-                    _REGISTER[typ](*args, method=ref, **kwargs)
+            for flist in getattr(ref, _ATTRIBUTE, {}).values():
+                for i in flist:
+                    i(method=ref)
