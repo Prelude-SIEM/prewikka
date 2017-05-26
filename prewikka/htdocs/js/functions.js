@@ -315,7 +315,7 @@ function prewikka_grid(table, settings) {
 }
 
 
-function prewikka_html_node(obj)
+function _prewikka_html_node(obj)
 {
     if ( typeof(obj.tag) == 'undefined' || typeof(obj.attrs) == 'undefined' || typeof(obj.childs) == 'undefined' )
         return obj;
@@ -327,6 +327,22 @@ function prewikka_html_node(obj)
 
     var nobj = $("<" + obj.tag + ">", obj.attrs).html(childs);
     return nobj.wrap("<div>").parent().html();
+}
+
+
+function prewikka_html_node(obj)
+{
+    var ret = "";
+
+    if ( ! $.isArray(obj) )
+        ret = _prewikka_html_node(obj);
+
+    else {
+        for ( var i in obj )
+            ret += prewikka_html_node(obj[i]);
+    }
+
+    return ret;
 }
 
 
