@@ -334,6 +334,9 @@ function prewikka_html_node(obj)
 {
     var ret = "";
 
+    if ( ! obj )
+        return obj;
+
     if ( ! $.isArray(obj) )
         ret = _prewikka_html_node(obj);
 
