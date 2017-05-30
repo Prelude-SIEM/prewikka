@@ -349,7 +349,7 @@ function prewikka_html_node(obj)
 }
 
 
-function prewikka_autocomplete(field, url, submit) {
+function prewikka_autocomplete(field, url, submit, allow_empty=false) {
     field.autocomplete({
         minLength: 0,
         autoFocus: true,
@@ -384,6 +384,13 @@ function prewikka_autocomplete(field, url, submit) {
     })
     .focus(function() {
         $(this).autocomplete("search");
+    })
+    .blur(function() {
+        if ( allow_empty && $(this).val() == "" ) {
+            field.parent("div").removeClass("has-error");
+            field.next().removeClass("fa-close");
+            if ( submit ) submit.prop("disabled", $(".has-error").length);
+        }
     });
 }
 
