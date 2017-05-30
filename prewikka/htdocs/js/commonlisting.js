@@ -87,7 +87,23 @@ function CommonListing(elem, text, options) {
         caption: "",
         title: "Edit columns",
         onClickButton: function() {
-            $(elem).jqGrid('columnChooser');
+            /*
+             * This part of the code should not exist.
+             * We need to call resizeGrid() after the columnChooser
+             * validation and there is no way to do it outside the
+             * done() method.
+             *
+             * The content of the done() method must be synchronized
+             * with jQuery
+             */
+            $(elem).jqGrid('columnChooser', {
+                done: function(perm) {
+                    if (perm) {
+                        $(elem).jqGrid("remapColumns", perm, true);
+                        resizeGrid();
+                    }
+                }
+            });
         }
     });
 
@@ -123,7 +139,7 @@ function CommonListing(elem, text, options) {
             grid.delRowData(rows[i]);
 
         grid.trigger("reloadGrid", [{current: true}]);
-    }
+    };
 
     grid.ajax = function(data) {
         var rows = grid.getGridParam("selarrrow");
@@ -133,16 +149,16 @@ function CommonListing(elem, text, options) {
         data["data"] = _mergedict(data['data'], {id: rows});
         var s_cb = data['success'];
         if ( s_cb ) {
-            data["success"] = function() { s_cb(rows) };
+            data["success"] = function() { s_cb(rows); };
         }
 
         prewikka_ajax(_mergedict(data, {type: "POST"}));
-    }
+    };
 
     grid.done = function done(cb) {
         dfd.done(cb);
         return this;
-    }
+    };
 
     /*
      * The following events are deprecated and should be removed !
@@ -177,36 +193,38 @@ function CommonListing(elem, text, options) {
     return grid;
 }
 
-
-$(window).on("resize", function() {
-    resizeGrid();
-    resizeGrids();
-});
+$(window).on("resize", resizeGrid);
 
 function resizeGrid() {
-    var grid = $(".commonlisting");
-    if ( grid.length != 1 ) return;
-
-    var titleHeight = $(".ui-jqgrid-titlebar").outerHeight() || 0;
-    var headerHeight = $(".ui-jqgrid-hdiv").outerHeight() || 0;
-    var pagerHeight = $(".ui-jqgrid-pager").outerHeight() || 0;
-    var footerHeight = $(".footer-buttons").outerHeight() || 0;
-    var margin = 5;
-
-    var delta = titleHeight + headerHeight + pagerHeight + footerHeight + 3 * margin;
-
-    var position = $("div#_main").position();
-    var newHeight = window.innerHeight - position.top - delta;
-    var newWidth = window.innerWidth - position.left - 2 * margin;
-    $(grid).jqGrid("setGridHeight", newHeight, true);
-    $(grid).jqGrid("setGridWidth", newWidth, true);
+    $(".commonlisting").each(function(i, grid) {
+        _resizeGrid(grid);
+    });
 }
 
-function resizeGrids() {
-    $(".htmlgrid").each(function() {
-        var newWidth = $(this).closest(".ui-jqgrid").parent().width();
-        $(this).jqGrid("setGridWidth", newWidth, true);
-    });
+function _resizeGrid(grid) {
+    var titleHeight = $(".ui-jqgrid-titlebar").outerHeight() || 0,
+        headerHeight = $(".ui-jqgrid-hdiv").outerHeight() || 0,
+        pagerHeight = $(".ui-jqgrid-pager").outerHeight() || 0,
+        margin = 5,
+        height = 0,
+        parent = $(grid).closest('.ui-jqgrid').parents('.modal-body, #_main');
+
+    var delta = titleHeight + headerHeight + pagerHeight + margin;
+
+    if ( parent.attr('id') == '_main' ) {
+        parent = parent.siblings('#_main_viewport');
+        height = parent.height() - $(grid).closest('.ui-jqgrid').offset().top;
+
+        if ( $('.footer-buttons').is(':visible') )
+            height = $('.footer-buttons').offset().top - $(grid).closest('.ui-jqgrid').offset().top - delta;
+    }
+
+    if ( height ) {
+        $(grid).jqGrid("setGridHeight", height, true);
+    }
+
+    var newWidth = parent.width() - 2 * margin;
+    $(grid).jqGrid("setGridWidth", newWidth, true);
 }
 
 function getCellValue(cellvalue, options, cell) {
