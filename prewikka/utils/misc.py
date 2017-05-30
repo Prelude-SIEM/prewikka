@@ -42,14 +42,13 @@ else:
 
 class AttrObj(json.JSONObject):
     def __init__(self, **kwargs):
-        self._kwargs = kwargs
         self.__dict__.update(kwargs)
 
     def __json__(self):
-        return self._kwargs
+        return self.__dict__
 
     def __repr__(self):
-        return self._kwargs.__repr__()
+        return self.__dict__.__repr__()
 
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
