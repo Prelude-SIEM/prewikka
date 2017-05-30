@@ -469,11 +469,16 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
-def route(path, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None):
+def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None):
     usergroup.ALL_PERMISSIONS.declare(permissions)
-    return registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route,
-                                                     route=utils.AttrObj(path=path, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint))
 
+    if method is not _SENTINEL:
+        ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint)
+    else:
+        ret = registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route,
+                                                        path, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint)
+
+        return ret
 
 class ViewManager(registrar.DelayedRegistrar):
     def getView(self, view_id):
@@ -511,34 +516,31 @@ class ViewManager(registrar.DelayedRegistrar):
         env.request.view = view
         return view
 
-    def _route2viewdesc(self, baseview, function, route):
-        v = _ViewDescriptor()
+    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None):
+        baseview = method.__self__
 
+        v = _ViewDescriptor()
+        v.render = method
+
+        v.view_id = baseview.view_id
         v.view_template = baseview.view_template
         v.view_users = baseview.view_users
         v.view_groups = baseview.view_groups
-        v.view_permissions = set(route.permissions) | set(baseview.view_permissions)
-
-        v.view_id = baseview.view_id
-        v.view_path = route.path[1:]
-        v.view_require_session = baseview.view_require_session
         v.view_layout = baseview.view_layout
         v.view_extensions = baseview.view_extensions
         v.view_parameters = baseview.view_parameters
-        v.view_menu = route.menu or baseview.view_menu
-        v.view_endpoint = "%s.%s" % (baseview.view_id, route.endpoint or function.__name__)
-        v.render = function
+        v.view_require_session = baseview.view_require_session
+
+        v.view_path = path[1:]
+        v.view_menu = menu or baseview.view_menu
+        v.view_permissions = set(permissions) | set(baseview.view_permissions)
+        v.view_endpoint = "%s.%s" % (v.view_id, endpoint or method.__name__)
 
         if v.view_menu:
             env.menumanager.add_section_info(v)
 
-        return v
-
-    def _add_route(self, method, route=None):
-        vd = self._route2viewdesc(method.__self__, method, route)
-        self._views_endpoint[vd.view_endpoint] = vd
-        self._rule_map.add(Rule(route.path, methods=route.methods, endpoint=vd.view_endpoint, defaults=route.defaults))
-
+        self._views_endpoint[v.view_endpoint] = v
+        self._rule_map.add(Rule(path, endpoint=v.view_endpoint, methods=methods, defaults=defaults))
 
     def addView(self, view):
         rdfunc = getattr(view, "render")
