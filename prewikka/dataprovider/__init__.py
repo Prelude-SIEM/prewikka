@@ -162,6 +162,9 @@ class DataProviderBackend(pluginmanager.PluginBase):
     type = None
     TYPE_OPERATOR_MAPPING = {}
 
+    def post_load(self):
+        pass
+
     def get_values(self, paths, criteria, distinct, limit, offset):
         """
         Retrieves data corresponding to the given paths. If criteria are given,
@@ -222,14 +225,20 @@ class DataProviderBase(pluginmanager.PluginBase):
     label = None
     normalizer = None
 
+    def post_load(self):
+        pass
+
     def get_paths(self):
-        raise error.NotImplementedError
+        return self.normalizer.get_paths()
 
     def get_common_paths(self, index=False):
         return []
 
     def get_path_type(self, path):
-        raise error.NotImplementedError
+        return self.normalizer.get_path_type(path)
+
+    def register_path(self, path, type):
+        return self.normalizer.register_path(path, type)
 
 
 class DataProviderNormalizer(object):
@@ -276,7 +285,6 @@ class DataProviderNormalizer(object):
         """
         return criteria.to_string(type)
 
-
     def parse_criterion(self, path, operator, value, type):
         path = path.format(backend=type, time_field=self._time_field)
 
@@ -288,6 +296,14 @@ class DataProviderNormalizer(object):
 
         return "%s %s %s" % (path, operator, self._value_escape(value))
 
+    def get_paths(self):
+        raise error.NotImplementedError
+
+    def get_path_type(self, path):
+        raise error.NotImplementedError
+
+    def register_path(self, path, type):
+        raise error.NotImplementedError
 
 
 class Criterion(json.JSONObject):
@@ -390,9 +406,21 @@ class DataProviderManager(pluginmanager.PluginManager):
         self._backends = {}
 
     def load(self):
+        for k in self.keys():
+            try:
+                p = self[k]()
+            except error.PrewikkaUserError as err:
+                env.log.warning("%s: plugin failed to load: %s" % (self[k].__name__, err))
+                continue
+
+            if not isinstance(p.normalizer, DataProviderNormalizer):
+                raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
+
+            self._type_handlers[k] = p
+
         for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend"):
 
-            if plugin.type not in self.keys():
+            if plugin.type not in self._type_handlers:
                 env.log.warning("%s: plugin failed to load: %s" % (plugin.__name__,
                                 _("No handler configured for '%s' datatype" % plugin.type)))
                 continue
@@ -409,17 +437,12 @@ class DataProviderManager(pluginmanager.PluginManager):
 
             self._backends[p.type] = p
 
-        for k in self.keys():
-            try:
-                p = self[k]()
-            except error.PrewikkaUserError as err:
-                env.log.warning("%s: plugin failed to load: %s" % (self[k].__name__, err))
-                continue
+            for p in self._type_handlers.values():
+                p.post_load()
 
-            if not isinstance(p.normalizer, (type(None), DataProviderNormalizer)):
-                raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
+            for p in self._backends.values():
+                p.post_load()
 
-            self._type_handlers[k] = p
 
     @staticmethod
     def _parse_path(path):
@@ -473,11 +496,10 @@ class DataProviderManager(pluginmanager.PluginManager):
         for c in filter(None, hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", type)):
             criteria += c
 
-        if normalizer:
-            paths = normalizer.format_paths(paths, type)
-            parsed_paths, paths_types = normalizer.parse_paths(paths, type)
-            if criteria:
-                parsed_criteria = normalizer.parse_criteria(criteria, type)
+        paths = normalizer.format_paths(paths, type)
+        parsed_paths, paths_types = normalizer.parse_paths(paths, type)
+        if criteria:
+            parsed_criteria = normalizer.parse_criteria(criteria, type)
 
         return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, parsed_criteria=parsed_criteria)
 
@@ -529,6 +551,12 @@ class DataProviderManager(pluginmanager.PluginManager):
 
     def get_label(self, type):
         return self._type_handlers[type].label
+
+    def register_path(self, path, path_type, type=None):
+        if not type:
+            type = self._guess_data_type([path])
+
+        return self._type_handlers[type].register_path(path, path_type)
 
     def get_paths(self, type):
         return self._type_handlers[type].get_paths()
