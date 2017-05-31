@@ -38,9 +38,9 @@ class HookManager(object):
             for i in self._hooks:
                 self._hooks[i] = []
 
-    def register(self, hook, method=_sentinel):
-        if method is not _sentinel:
-            self._hooks.setdefault(hook, []).append(method)
+    def register(self, hook, _regfunc=_sentinel):
+        if _regfunc is not _sentinel:
+            self._hooks.setdefault(hook, []).append(_regfunc)
         else:
             return registrar.DelayedRegistrar.make_decorator("hook", self.register, hook)
 

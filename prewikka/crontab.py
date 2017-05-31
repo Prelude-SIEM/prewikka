@@ -234,16 +234,16 @@ class Crontab(object):
 
         crontab.update(id, name=parameters["name"], enabled=int(schedule != "disabled"), **kwargs)
 
-    def schedule(self, ext_type, name, schedule, enabled=True, method=None):
-        if method:
-            self._init_system_job(ext_type, name, schedule, enabled, method)
+    def schedule(self, ext_type, name, schedule, _regfunc=None, enabled=True):
+        if _regfunc:
+            self._init_system_job(ext_type, name, schedule, enabled, _regfunc)
         else:
-            return registrar.DelayedRegistrar.make_decorator("crontab", self.schedule, ext_type, name, schedule, enabled)
+            return registrar.DelayedRegistrar.make_decorator("crontab", self.schedule, ext_type, name, schedule, enabled=enabled)
 
-    def setup(self, ext_type, method=None):
-        if method:
+    def setup(self, ext_type, _regfunc=None):
+        if _regfunc:
             assert not(ext_type in self._plugin_callback)
-            self._plugin_callback[ext_type] = method
+            self._plugin_callback[ext_type] = _regfunc
         else:
             return registrar.DelayedRegistrar.make_decorator("crontab", self.setup, ext_type)
 

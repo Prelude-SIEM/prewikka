@@ -43,4 +43,4 @@ class DelayedRegistrar(object):
             ref = getattr(self, name)
             for flist in getattr(ref, _ATTRIBUTE, {}).values():
                 for i in flist:
-                    i(method=ref)
+                    i(ref)
