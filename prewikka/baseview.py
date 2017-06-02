@@ -24,7 +24,7 @@ import collections
 import copy
 import string
 
-from prewikka import hookmanager, resource, template, utils, view, error, response
+from prewikka import error, history, hookmanager, resource, response, template, utils, view
 
 
 _CSS_FILES = collections.OrderedDict((resource.CSSLink(link), True) for link in (
@@ -101,6 +101,25 @@ class BaseView(view._View):
             pass
 
         return response.PrewikkaRedirectResponse(env.request.parameters.get("redirect", env.request.web.get_baseurl()), code=302)
+
+    @view.route("/history/<form>/save", methods=["POST"])
+    def history_save(self, form):
+        if "query" in env.request.parameters:
+            history.save(env.request.user, form, env.request.parameters["query"])
+
+        return response.PrewikkaDirectResponse()
+
+    @view.route("/history/<form>/get", methods=["POST"])
+    def history_get(self, form):
+        queries = history.get(env.request.user, form)
+        return response.PrewikkaDirectResponse(queries)
+
+    @view.route("/history/<form>/delete", methods=["POST"])
+    def history_delete(self, form):
+        query = env.request.parameters["query"] if "query" in env.request.parameters else None
+        history.delete(env.request.user, form, query)
+
+        return response.PrewikkaDirectResponse()
 
     def render(self, *args, **kwargs):
         # FIXME: move theme management to a plugin !

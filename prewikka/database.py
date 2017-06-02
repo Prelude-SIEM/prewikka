@@ -764,7 +764,7 @@ class PgSQLDatabase(DatabaseCommon):
             if self._version >= 90500 and dtype[f].auto_increment and v is None:
                 v = "DEFAULT"
             else:
-                if dtype[f].generic_type == "integer":
+                if dtype[f].generic_type != "text":
                     cast = "::%s" % dtype[f].type
 
                 v = text_type(self.escape(v)) + cast

@@ -59,4 +59,13 @@ CREATE TABLE Prewikka_Crontab (
     runcnt  INTEGER DEFAULT 0,
     error TEXT NULL
 ) ENGINE=InnoDB;
+
+DROP TABLE IF EXISTS Prewikka_History_Query;
+CREATE TABLE Prewikka_History_Query (
+    userid VARCHAR(32) NOT NULL,
+    formid VARCHAR(255) NOT NULL,
+    query TEXT NOT NULL,
+    timestamp DATETIME NOT NULL,
+    PRIMARY KEY(userid, formid, query)
+) ENGINE=InnoDB;
 """)
