@@ -124,7 +124,7 @@
         <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> ${ _("Save") }</button>
       </div>
 
-      <input type="hidden" name="filter_id" value="${fltr.name}">
+      <input type="hidden" name="filter_old_name" value="${fltr.name}">
     </form>
 
 
