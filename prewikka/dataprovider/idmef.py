@@ -5,10 +5,28 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import prelude
 from prewikka import utils, version
-from prewikka.dataprovider import DataProviderNormalizer, DataProviderBase
+from prewikka.dataprovider import DataProviderBase
 
 
-class IDMEFNormalizer(DataProviderNormalizer):
+class _IDMEFProvider(DataProviderBase):
+    plugin_version = version.__version__
+    plugin_author = version.__author__
+    plugin_license = version.__license__
+    plugin_copyright = version.__copyright__
+
+    def __init__(self):
+        DataProviderBase.__init__(self, "create_time")
+
+    def get_path_type(self, path):
+        return prelude.IDMEFClass(path).getValueType()
+
+    def _get_paths(self, rootcl):
+        for node in rootcl:
+            if node.getValueType() == prelude.IDMEFValue.TYPE_CLASS:
+                for subnode in self._get_paths(node):
+                    yield subnode
+            else:
+                yield node.getPath()
 
     @staticmethod
     def _value_adjust(operator, value):
@@ -30,26 +48,7 @@ class IDMEFNormalizer(DataProviderNormalizer):
 
             return "! %s" % (path)
 
-        return DataProviderNormalizer.parse_criterion(self, path, operator, self._value_adjust(operator, value), type)
-
-
-class _IDMEFProvider(DataProviderBase):
-    plugin_version = version.__version__
-    plugin_author = version.__author__
-    plugin_license = version.__license__
-    plugin_copyright = version.__copyright__
-    normalizer = IDMEFNormalizer('create_time')
-
-    def get_path_type(self, path):
-        return prelude.IDMEFClass(path).getValueType()
-
-    def _get_paths(self, rootcl):
-        for node in rootcl:
-            if node.getValueType() == prelude.IDMEFValue.TYPE_CLASS:
-                for subnode in self._get_paths(node):
-                    yield subnode
-            else:
-                yield node.getPath()
+        return DataProviderBase.parse_criterion(self, path, operator, self._value_adjust(operator, value), type)
 
 
 class IDMEFAlertProvider(_IDMEFProvider):

@@ -223,30 +223,19 @@ class DataProviderBackend(pluginmanager.PluginBase):
 
 class DataProviderBase(pluginmanager.PluginBase):
     label = None
-    normalizer = None
 
-    def post_load(self):
-        pass
-
-    def get_paths(self):
-        return self.normalizer.get_paths()
-
-    def get_common_paths(self, index=False):
-        return []
-
-    def get_path_type(self, path):
-        return self.normalizer.get_path_type(path)
-
-    def register_path(self, path, type):
-        return self.normalizer.register_path(path, type)
-
-
-class DataProviderNormalizer(object):
     def __init__(self, time_field=None):
         if time_field is None:
             raise error.PrewikkaUserError(N_("Backend normalization error"), N_("Backend normalization error"))
 
+        pluginmanager.PluginBase.__init__(self)
         self._time_field = time_field
+
+    def post_load(self):
+        pass
+
+    def get_common_paths(self, index=False):
+        return []
 
     @staticmethod
     def _value_escape(value):
@@ -332,7 +321,7 @@ class Criterion(json.JSONObject):
         if not type:
             return " ".join(text_type(i) for i in [self.left, self.operator, self.right])
 
-        return env.dataprovider._type_handlers[type].normalizer.parse_criterion(self.left, self.operator, self.right, type)
+        return env.dataprovider._type_handlers[type].parse_criterion(self.left, self.operator, self.right, type)
 
     def to_string(self, type=None):
         if not self.left:
@@ -413,9 +402,6 @@ class DataProviderManager(pluginmanager.PluginManager):
                 env.log.warning("%s: plugin failed to load: %s" % (self[k].__name__, err))
                 continue
 
-            if not isinstance(p.normalizer, DataProviderNormalizer):
-                raise DataProviderError(_("Invalid normalizer for '%s' datatype") % k)
-
             self._type_handlers[k] = p
 
         for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend"):
@@ -491,15 +477,16 @@ class DataProviderManager(pluginmanager.PluginManager):
         parsed_paths = paths
         parsed_criteria = None
         paths_types = []
-        normalizer = self._type_handlers[type].normalizer
 
         for c in filter(None, hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", type)):
             criteria += c
 
-        paths = normalizer.format_paths(paths, type)
-        parsed_paths, paths_types = normalizer.parse_paths(paths, type)
+        plugin = self._type_handlers[type]
+
+        paths = plugin.format_paths(paths, type)
+        parsed_paths, paths_types = plugin.parse_paths(paths, type)
         if criteria:
-            parsed_criteria = normalizer.parse_criteria(criteria, type)
+            parsed_criteria = plugin.parse_criteria(criteria, type)
 
         return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, parsed_criteria=parsed_criteria)
 
