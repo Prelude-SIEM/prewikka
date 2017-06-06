@@ -75,9 +75,6 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
 
     <script type="text/javascript">
         $LAB.script("messagesummary/js/messagesummary.js");
-        $("div.modal-body").on("click", "a.section-toggle", function() {
-            $(this).closest(".panel-heading").siblings(".panel-body:first").slideToggle();
-        });
     </script>
 
     <div class="modal-header">
