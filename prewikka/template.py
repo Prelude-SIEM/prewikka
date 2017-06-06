@@ -35,7 +35,7 @@ _MAKO_GENERIC_ARGS = { "default_filters": _MAKO_FILTERS,  "buffer_filters": _MAK
                            'from prewikka.utils import html, json',
                            'from prewikka.utils.html import checked, disabled, selected'
                        ],
-                       "future_imports": ["unicode_literals"], "module_directory":"/tmp/mako" }
+                       "future_imports": ["unicode_literals"], "module_directory": "/tmp/prewikka/mako" }
 
 _MODULE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 _MAKO_TEMPLATE_LOOKUP = mako.lookup.TemplateLookup(directories=[_MODULE_PATH], **_MAKO_GENERIC_ARGS)
