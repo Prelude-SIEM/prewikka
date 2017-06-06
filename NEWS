@@ -1,3 +1,12 @@
+* 2017-06-06, prewikka-4.0.4:
+
+Author: Antoine Luong
+
+- Fix creation of filters with undefined fields
+- Fix multiple JS event registration
+
+
+
 * 2017-05-02, prewikka-4.0.3:
 
 Author: Antoine Luong
