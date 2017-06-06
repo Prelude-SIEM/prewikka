@@ -623,6 +623,10 @@ class AlertSummary(TcpIpOptions, MessageSummary):
     def __init__(self):
         MessageSummary.__init__(self)
 
+    @staticmethod
+    def _get_alert_ident_criterion(analyzerid, ident):
+        return Criterion("alert.analyzer.analyzerid", "=", analyzerid) & Criterion("alert.messageid", "=", ident)
+
     def buildAlertIdent(self, alert, parent):
         calist = { }
 
@@ -639,37 +643,29 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                         analyzerid = a["analyzerid"]
                         break
 
-            if not analyzerid in calist:
-                calist[analyzerid] = []
+            calist.setdefault(analyzerid, []).append(alertident["alertident"])
 
-            calist[analyzerid].append(alertident["alertident"])
-
-        idx = 1
-        for analyzerid in calist.keys():
+        for idx, analyzerid in enumerate(calist):
 
             content = ""
-            missing = 0
+            criteria = Criterion()
             for ident in calist[analyzerid]:
-                criteria = Criterion("alert.analyzer.analyzerid", "=", analyzerid) & Criterion("alert.messageid", "=", ident)
+                criteria |= self._get_alert_ident_criterion(analyzerid, ident)
 
-                results = env.dataprovider.get(criteria)
-                if len(results) == 0:
-                    missing += 1
-                    #content += "<li>" + _("Invalid 'analyzerid:messageid' pair, '%(analyzerid):%(messageid)'") % { "analyzerid": analyzerid, "messageid": ident } + "</li>"
-                else:
-                    alert = results[0]["alert"]
-                    link = url_for(".", analyzerid=analyzerid, messageid=ident)
-                    content += '<li><a title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, html.escape(alert["classification.text"]))
+            results = env.dataprovider.query(["alert.messageid", "alert.classification.text"], criteria)
 
+            for ident, classif in results:
+                link = url_for(".", analyzerid=analyzerid, messageid=ident)
+                content += '<li><a title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, html.escape(classif))
+
+            missing = len(calist[analyzerid]) - len(results)
             if missing > 0:
                 content += "<li>" + (_("%d linked alerts missing (probably deleted)") % missing) + "</li>"
 
-            self.newTableCol(idx, resource.HTMLSource("<ul style='padding: 0px; margin: 0px 0px 0px 10px;'>%s</ul>" % content))
-            self.buildAnalyzer(alert["analyzer(-1)"])
+            self.newTableCol(idx + 1, resource.HTMLSource("<ul style='padding: 0px; margin: 0px 0px 0px 10px;'>%s</ul>" % content))
+            last_alert = env.dataprovider.get(self._get_alert_ident_criterion(analyzerid, ident))[0]
+            self.buildAnalyzer(last_alert["alert.analyzer(-1)"])
             self.newTableRow()
-
-            idx += 1
-
 
     def buildCorrelationAlert(self, alert):
         ca = alert.get("correlation_alert")
