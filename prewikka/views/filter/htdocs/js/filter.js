@@ -39,7 +39,7 @@ function Criterion(left, operator, right) {
             right = right.json();
         }
         return {
-            "__prewikka_class__": ["Criterion", [left, this.operator, right]]
+            "__prewikka_class__": ["Criterion", [left, this.operator, right || null]]
         };
     }
 }
