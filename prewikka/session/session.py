@@ -68,9 +68,10 @@ class SessionDatabase(database.DatabaseHelper):
         return login, utils.timeutil.get_timestamp_from_string(t)
 
     def delete_session(self, sessionid=None, user=None):
+        assert not (sessionid and user)
+
         if sessionid:
             self.query("DELETE FROM Prewikka_Session WHERE sessionid = %s", sessionid)
-
         elif user:
             self.query("DELETE FROM Prewikka_Session WHERE userid = %s", user.id)
 
