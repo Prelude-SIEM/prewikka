@@ -699,6 +699,7 @@ class AlertListing(MessageListing):
     view_permissions = [ N_("IDMEF_VIEW") ]
     view_template = template.PrewikkaTemplate(__name__, "templates/alertlisting.mak")
     view_extensions = (("menu", mainmenu.MainMenuAlert),)
+    view_datatype = "alert"
 
     root = "alert"
     listed_alert = ListedAlert
@@ -1197,8 +1198,42 @@ class AlertListing(MessageListing):
 
         self._setNavNext(env.request.parameters["offset"], total)
 
+    def _criteria_to_urlparams(self, criteria):
+        params = {}
+
+        for index, criterion in enumerate(criteria.to_list()):
+            path, operator, value = criterion.left, criterion.operator, criterion.right
+
+            # Special case for classification checkboxes
+            if path in ("alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"):
+                # Operators other than '=' are not supported
+                params.setdefault(path, []).append(value or "n/a")
+                continue
+
+            ctype = prelude.IDMEFPath(path).getName(1)
+            if ctype in ("messageid", "assessment", "correlation_alert", "overflow_alert", "tool_alert", "additional_data"):
+                ctype = "classification"
+
+            if ctype not in ("classification", "source", "target", "analyzer"):
+                raise Exception(_("The path '%s' cannot be mapped to a column") % path)
+
+            if value is None:
+                if operator in ("=", "=="):
+                    operator = "!"
+                    value = ""
+                else:
+                    # Unsupported
+                    continue
+
+            params["%s_object_%d" % (ctype, index)] = path
+            params["%s_operator_%d" % (ctype, index)] = operator
+            params["%s_value_%d" % (ctype, index)] = value
+
+        return params
+
 
 class CorrelationAlertListing(AlertListing, view.View):
     view_menu = (N_("Alerts"), N_("Threats"))
     view_parameters = CorrelationAlertListingParameters
+    view_datatype = None
     alert_type_default = [ "alert.correlation_alert.name" ]

@@ -133,37 +133,3 @@ def iri2uri(iri, encoding="utf8"):
 
 def urlencode(parameters, doseq=False):
     return _urlencode(parameters, doseq).replace('&', '&amp;')
-
-
-def idmef_criteria_to_urlparams(paths, values, operators=None, index=0):
-    # FIXME: This function is alertlisting- and IDMEF-specific.
-    # In the long run, we need to standardize all filtering
-    # parameters handling across views and types.
-
-    params = []
-
-    if not operators:
-        operators = ['='] * len(paths)
-
-    for path, value, operator in zip(paths, values, operators):
-
-        # Special case for classification checkboxes
-        if path in ("alert.type", "alert.assessment.impact.severity", "alert.assessment.impact.completion"):
-            # Operators other than '=' are not supported
-            params.append((path, value or "n/a"))
-            continue
-
-        ctype = prelude.IDMEFPath(path).getName(1)
-        if ctype in ("messageid", "assessment", "correlation_alert", "overflow_alert", "tool_alert", "additional_data"):
-            ctype = "classification"
-
-        if ctype not in ("classification", "source", "target", "analyzer"):
-            raise Exception(_("The path '%s' cannot be mapped to a column") % path)
-
-        params.append(("%s_object_%d" % (ctype, index), path))
-        params.append(("%s_operator_%d" % (ctype, index), operator if value else "!"))
-        params.append(("%s_value_%d" % (ctype, index), value if value else ""))
-
-        index += 1
-
-    return urlencode(params)

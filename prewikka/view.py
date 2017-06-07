@@ -355,6 +355,7 @@ class _ViewDescriptor(object):
     view_extensions = []
     view_layout = "BaseView"
     view_endpoint = None
+    view_datatype = None
 
     view_permissions = []
 
@@ -433,6 +434,18 @@ class _ViewDescriptor(object):
         # Otherwise, if any kind of permission is defined and there was no match, return False.
         return not(self.view_users or self.view_groups or self.view_permissions)
 
+    def _criteria_to_urlparams(self, criteria):
+        return {}
+
+    def make_parameters(self, criteria=None, **kwargs):
+        if criteria:
+            kwargs.update(self._criteria_to_urlparams(criteria))
+
+        return kwargs
+
+    def make_url(self, **kwargs):
+        return url_for(self.view_endpoint, **self.make_parameters(**kwargs))
+
 
 class _View(_ViewDescriptor, registrar.DelayedRegistrar):
     view_id = None
@@ -469,18 +482,22 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
-def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None):
+def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None):
     usergroup.ALL_PERMISSIONS.declare(permissions)
 
     if method is not _SENTINEL:
-        ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint)
+        ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype)
     else:
         ret = registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route,
-                                                        path, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint)
+                                                        path, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype)
 
-        return ret
+    return ret
+
 
 class ViewManager(registrar.DelayedRegistrar):
+    def get(self, datatype=None):
+        return self._references.get(datatype)
+
     def getView(self, view_id):
         return self._views.get(view_id.lower())
 
@@ -516,7 +533,7 @@ class ViewManager(registrar.DelayedRegistrar):
         env.request.view = view
         return view
 
-    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None):
+    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None):
         baseview = method.__self__
 
         v = _ViewDescriptor()
@@ -539,6 +556,9 @@ class ViewManager(registrar.DelayedRegistrar):
         if v.view_menu:
             env.menumanager.add_section_info(v)
 
+        if datatype:
+            self._references.setdefault(datatype, []).append(v)
+
         self._views_endpoint[v.view_endpoint] = v
         self._rule_map.add(Rule(path, endpoint=v.view_endpoint, methods=methods, defaults=defaults))
 
@@ -554,6 +574,9 @@ class ViewManager(registrar.DelayedRegistrar):
                 env.menumanager.add_section_info(view)
 
             view.view_endpoint = "%s.render" % (view.view_id)
+
+            if view.view_datatype:
+                self._references.setdefault(view.view_datatype, []).append(view)
 
             self._views_endpoint[view.view_endpoint] = view
             self._rule_map.add(Rule((view.view_path or "/" + view.view_id), endpoint=view.view_endpoint))
@@ -590,6 +613,7 @@ class ViewManager(registrar.DelayedRegistrar):
 
         self._views = {}
         self._routes = Map()
+        self._references = {}
 
         self._views_endpoint = {}
         self._rule_map = Map(converters={'list': ListConverter})

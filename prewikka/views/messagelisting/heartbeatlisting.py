@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import mainmenu, template, localization
+from prewikka import localization, mainmenu, template, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -62,6 +62,7 @@ class HeartbeatListing(MessageListing):
     view_permissions = [N_("IDMEF_VIEW")]
     view_template = template.PrewikkaTemplate(__name__, "templates/heartbeatlisting.mak")
     view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
+    view_datatype = "heartbeat"
 
     root = "heartbeat"
     filters = {}
@@ -104,3 +105,11 @@ class HeartbeatListing(MessageListing):
         env.request.dataset["total"] = localization.format_number(count)
 
         self._setNavNext(env.request.parameters["offset"], count)
+
+    def _criteria_to_urlparams(self, criteria):
+        params = {}
+
+        for criterion in criteria.to_list():
+            params[criterion.left.replace("analyzer.", "analyzer(-1).")] = criterion.right
+
+        return params

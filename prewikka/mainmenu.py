@@ -318,5 +318,9 @@ class MainMenu(object):
         self.dataset["menu_extra"] = filter(None, hookmanager.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type))
 
 
-MainMenuAlert = functools.partial(MainMenu, criteria_type="alert")
-MainMenuHeartbeat = functools.partial(MainMenu, criteria_type="heartbeat")
+def MainMenuType(criteria_type):
+    return functools.partial(MainMenu, criteria_type=criteria_type)
+
+
+MainMenuAlert = MainMenuType("alert")
+MainMenuHeartbeat = MainMenuType("heartbeat")

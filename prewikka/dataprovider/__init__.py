@@ -334,6 +334,15 @@ class Criterion(json.JSONObject):
 
         return out
 
+    def to_list(self, type=None):
+        if not self.left:
+            return []
+
+        if self.operator in ("&&", "||"):
+            return self.left.to_list(type) + self.right.to_list(type)
+        else:
+            return [self]
+
     def _apply_self(self, operator, other):
         if not other:
             return self
@@ -532,6 +541,9 @@ class DataProviderManager(pluginmanager.PluginManager):
         paths = data.keys()
         o = self._normalize(type, paths, criteria)
         return self._backends[o.type].update(self._resolve_values(o.parsed_paths, data.values()), o.parsed_criteria)
+
+    def get_types(self):
+        return self._backends.keys()
 
     def has_type(self, wanted_type):
         return wanted_type in self._backends
