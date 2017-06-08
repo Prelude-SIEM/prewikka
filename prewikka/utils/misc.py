@@ -40,7 +40,7 @@ else:
     text_type = unicode
 
 
-class AttrObj(json.JSONObject):
+class AttrObj(object):
     def __init__(self, **kwargs):
         self.__dict__.update(kwargs)
 
