@@ -110,7 +110,7 @@ class WSGIRequest(request.Request):
         if not status_text:
             status_text = defined_status.get(code, "Unknown")
 
-        self._write = self._start_response("%d %s" % (code, status_text or ""), headers)
+        self._write = self._start_response("%d %s" % (code, status_text.encode("ISO-8859-1")), headers)
 
     def get_cookie(self):
         return self._wsgi_get_str('HTTP_COOKIE', '')
