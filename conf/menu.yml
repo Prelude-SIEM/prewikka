@@ -1,7 +1,7 @@
 # Specify the section order in the upper menu
 
 # All the icons available are here (v4.5):
-# https://fortawesome.github.io/Font-Awesome/icons/
+# http://fontawesome.io/icons/
 
 - name: ALERT
   icon: exclamation-triangle
