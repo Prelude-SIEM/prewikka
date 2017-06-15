@@ -112,7 +112,7 @@ def inherit(context):
 <%inherit file="${inherit(context)}" />
 <%block name="content">
 
-<div role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="static" data-keyboard="true" tabindex="-1">
+<div class="error-dialog" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="static" data-keyboard="true">
 
 <script type="text/javascript">
   $(document).ready(function() {
