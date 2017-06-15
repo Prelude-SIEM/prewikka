@@ -39,9 +39,18 @@ $(document).ready(function(){
     $(this).data("bs.popover").inState.click = false;
   });
 
-
   $(document).on("click", "#logout", function() {
     this.href = "logout?redirect=" + encodeURIComponent(location.href);
+  });
+
+  $(document).on("click", ".prewikka-help-button", function(event) {
+    /*
+     * Prevent default link event handler execution
+     */
+    event.stopImmediatePropagation();
+
+    window.open($(this).data("href"), "_prewikka_help", "width=600,height=600,location=no,menubar=no,toolbar=no,scrollbars=yes").focus();
+    return false;
   });
 
 // Repeatable entries
@@ -138,7 +147,11 @@ $(document).ready(function(){
 
 function prewikka_resizeTopMenu() {
     var mainmenu = $('#main_menu_ng .main_menu_navbar');
+
+    if ( mainmenu.length == 0 ) return;
+
     var topmenu = $("#topmenu .topmenu_nav");
+    var topright = $("#topmenu_right");
     var main = $("#main");
     var window_width = $(window).width();
 
@@ -148,12 +161,12 @@ function prewikka_resizeTopMenu() {
     topmenu.css("height", "").css("width", "");
 
     if ( window_width > 768 ) {
-        topmenu.css("width", window_width - mainmenu.innerWidth());
+        topmenu.css("width", window_width - mainmenu.innerWidth() - topright.innerWidth());
 
         if ( Math.max(mainmenu.innerHeight(), topmenu.innerHeight()) > 60 ) { // check if the topmenu or mainmenu is split across two lines
             mainmenu.addClass('collapsed');
 
-            topmenu.css("width", window_width - mainmenu.innerWidth());
+            topmenu.css("width", window_width - mainmenu.innerWidth() - topright.innerWidth());
 
             var height = Math.max(mainmenu.innerHeight(), topmenu.innerHeight());
 
@@ -165,7 +178,7 @@ function prewikka_resizeTopMenu() {
     }
     else {
         mainmenu.css("margin-top", topmenu.innerHeight());
-        main.css("margin-top", mainmenu.innerHeight());
+        main.css("margin-top", Math.max(topmenu.innerHeight(), $("#main_menu_ng").innerHeight()));
     }
 }
 

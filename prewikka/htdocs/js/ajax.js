@@ -76,12 +76,15 @@ function prewikka_drawTab(data)
     if ( ! form.length )
         form = content = content.wrapAll('<form method="get" action="' + prewikka_location().pathname + '"></form>').parent();
 
-    $(form).append(data.menu);
+    $(form).prepend(data.menu);
+
     $("#main").off(); /* clear any events bound to this content by the current view */
     $("#main").html(content);
 
+    $("#topmenu_right .prewikka-help-button").data("href", data.help).prop("disabled", data.help ? false : true);
+    $("#topmenu_right .prewikka-config-button").prop("disabled", $("#main .prewikka-view-config").length == 0);
+
     prewikka_resizeTopMenu();
-    $("#config-button").toggle($("#main .prewikka-view-config").length > 0);
 
     _initialize_components("#main");
     window.scrollTo(0, 0);
@@ -147,6 +150,11 @@ function _process_ajax_response(settings, data)
         if ( settings['context'] != "tab" && widget.length > 0 ) {
             widget.attr("tabindex", -1);
             $(widget).wrapInner('<div class="modal-dialog ' + $(widget).attr("data-widget-options") + '"><div class="modal-content"></div></div>');
+
+            if ( data.help ) {
+                var help = $("<button>", { "class": "close prewikka-help-button", "data-href": data.help, "html": '?&nbsp;' });
+                $(widget).find(".modal-header button").after(help);
+            }
 
             return prewikka_json_dialog({"content": widget });
         }

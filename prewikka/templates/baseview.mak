@@ -141,8 +141,17 @@ $(document).ready(function() {
     % endfor
     </div>
   </div>
+
+  <div id="topmenu_right">
+    <button type="button" class="btn btn-info btn-sm prewikka-config-button" title="${ _('View options') }" data-toggle="collapse" data-target=".prewikka-view-config" disabled>
+      <i class="fa fa-cog fa-lg fa-fw"></i>
+    </button>
+    <button type="button" class="btn btn-info btn-sm prewikka-help-button" title="${ _('View help') }" disabled>
+      <i class="fa fa-question fa-lg fa-fw"></i>
+    </button>
+  </div>
+
 </div>
-<a type="button" id="config-button" title="${ _('View options') }" data-toggle="collapse" data-target=".prewikka-view-config"><i class="fa fa-cog"></i></a>
 </%block>
 
 <%block name="toplayout_menu">

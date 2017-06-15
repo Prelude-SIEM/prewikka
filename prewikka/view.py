@@ -357,6 +357,7 @@ class _ViewDescriptor(object):
     view_endpoint = None
     view_datatype = None
 
+    view_help = None
     view_permissions = []
 
     view_users = []
@@ -416,6 +417,9 @@ class _ViewDescriptor(object):
 
         for name, clname in self.view_extensions:
             response.add_ext_content(name, getattr(env.request, name).dataset.render())
+
+        if self.view_help and env.config.general.get("help_location"):
+            response.add_ext_content("help", url_for("baseview.help", path=self.view_help))
 
         return response
 
@@ -482,14 +486,14 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
-def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None):
+def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, help=None):
     usergroup.ALL_PERMISSIONS.declare(permissions)
 
     if method is not _SENTINEL:
-        ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype)
+        ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype, help=help)
     else:
         ret = registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route,
-                                                        path, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype)
+                                                        path, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype, help=help)
 
     return ret
 
@@ -533,7 +537,7 @@ class ViewManager(registrar.DelayedRegistrar):
         env.request.view = view
         return view
 
-    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None):
+    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, help=None):
         baseview = method.__self__
 
         v = _ViewDescriptor()
@@ -548,6 +552,7 @@ class ViewManager(registrar.DelayedRegistrar):
         v.view_parameters = baseview.view_parameters
         v.view_require_session = baseview.view_require_session
 
+        v.view_help = help or baseview.view_help
         v.view_path = path[1:]
         v.view_menu = menu or baseview.view_menu
         v.view_permissions = set(permissions) | set(baseview.view_permissions)

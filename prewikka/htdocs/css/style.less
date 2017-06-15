@@ -127,6 +127,7 @@ p {
         a {
           color: #686868;
         }
+        float: left;
         padding-top: 9px;
         font-weight: bold;
         .nav-tabs {
@@ -138,28 +139,31 @@ p {
     }
 }
 
-#config-button {
-  position: fixed;
-  right: 5px;
-  top: 56px;
-  font-size: 20pt;
-  z-index: 5;
-  display: none;
+#topmenu_right {
+    float: right;
+    margin-right: 4px;
+
+    .prewikka-config-button, .prewikka-help-button {
+        position: relative;  /* make sure buttons are clickable */
+        padding: 5px;
+        margin-top: 18px;
+    }
 }
+
 
 /*
  * menu
  */
-
 #main_menu_ng {
     position: fixed;
     top: 41px;
+    right: 73px;
     z-index: 4;
     max-width: 60%;
-    right: 0;
+
     .main_menu_navbar {
         margin-bottom: 0px;
-        padding: 2px 35px 3px;
+        padding: 2px 4px 3px;
         color: @active-text;
     }
 
@@ -495,10 +499,6 @@ div.footer-buttons {
 
 .shadow {
     box-shadow: 3px 3px 6px 0 #A9A9A9;
-}
-
-div.prewikka-view-help {
-    display: none;
 }
 
 div.prewikka-view-config {

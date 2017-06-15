@@ -22,6 +22,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import base64
 import collections
 import copy
+import string
+
 from prewikka import hookmanager, resource, template, utils, view, error, response
 
 
@@ -66,6 +68,29 @@ class BaseView(view._View):
         filename = base64.urlsafe_b64decode(str(filename)).decode("utf8")
 
         return response.PrewikkaDownloadResponse(fd, filename=filename, inline=inline)
+
+    @staticmethod
+    def _get_help_language(lang, default=None):
+        for i in ("en", "fr"):
+            if i in lang.lower():
+                return i
+
+        return default
+
+    @view.route("/help/<path:path>")
+    def help(self, path=None):
+        server = string.Template(env.config.general.get("help_location"))
+
+        lang = None
+        if env.request.user:
+            userl = env.request.user.get_property("language")
+            if userl:
+                lang = self._get_help_language(userl)
+
+        if not lang:
+            lang = self._get_help_language(env.config.general.default_locale, "en")
+
+        return response.PrewikkaRedirectResponse(server.substitute(lang=lang, path=path))
 
     @view.route("/logout")
     def logout(self):
