@@ -490,7 +490,7 @@ class ListedAlert(ListedMessage):
         if message["alert.correlation_alert.name"]:
             self["aggregated_target_expand"] = self["sub_alert_display"]
         else:
-            self["aggregated_source_expand"] = url_for("AlertSummary", messageid=ident)
+            self["aggregated_target_expand"] = url_for("AlertSummary", messageid=ident)
 
 
     def _setMessageClassificationReferences(self, dataset, message):
