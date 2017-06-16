@@ -1,3 +1,61 @@
+* 2017-06-16, prewikka-4.1.0beta1:
+
+Author: Camille Gardet
+
+- Various fixes
+
+    - Resizing fixes in commonlisting.js
+    - Fix FontAwesome link in menu.yml
+    - Add HTML tooltips
+
+Author: Yoann Vandoorselaere
+
+- Core evolutions
+
+    - CommonListing API improvement
+    - Dataprovider API improvement
+    - Route API improvements
+    - Prewikka AJAX framework improvement, new download system
+    - Implement a Crontab system
+    - Implement a generic delayed registration system
+    - Implement resource.HTMLNode helper class
+    - MainMenu is now embeddable in configuration forms
+
+- Bugfixes
+
+    - HTTP reason should be encoded as ISO-8859-1
+    - Updated values in AttrObj() were not available in the generated json
+    - Minor upsert fixes
+    - Properly handle datetime with milliseconds
+    - JSON object serialization fixes
+    - Normalize data before soundex()
+
+Author: Antoine Luong
+
+- Bugfixes
+
+    - Various timezone-related bugfixes
+    - MessageSummary optimization and fixes
+    - Split delete queries in agents
+
+- Other
+
+    - Drop Python 2.6 support
+    - Add DatetimePicker function
+    - Allow communication between multiple modals
+    - Reload grids after deleting rows
+    - Wrap grid content instead of truncating it
+
+Author: Thomas Andrejak
+
+- Bugfixes
+
+    - Fix prewikka_autocomplete and empty input
+    - Fix main_menu using id instead of class
+    - Add "eq" operator for AttrObj
+
+
+
 * 2017-02-16, prewikka-4.0.0:
 
 Author: Antoine Luong
