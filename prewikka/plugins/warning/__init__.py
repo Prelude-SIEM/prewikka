@@ -18,8 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
-
-from prewikka import hookmanager, pluginmanager, resource, template, version, view
+from prewikka import hookmanager, resource, template, version, view
 
 
 # FIXME: this really is a plugin and not a view. Implement dependencies subsystem
@@ -36,5 +35,6 @@ class Warning(view.View):
 
     @hookmanager.register("HOOK_LOAD_BODY_CONTENT")
     def _toplayout_extra_content(self):
-        if not env.request.web.input_cookie.get("sessionid"):
+        if not env.request.web.input_cookie.get("warning"):
+            env.request.web.add_cookie("warning", "warning", 365 * 24 * 60 * 60)
             return [ resource.HTMLSource(self._template.render()) ]
