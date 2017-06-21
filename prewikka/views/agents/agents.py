@@ -83,7 +83,7 @@ class Agents(view.View):
                         resource.HTMLNode("a", _("Heartbeat analysis"), href=heartbeat_analyze)
                    ]}
 
-    @view.route("/agents/agents", permissions=[N_("IDMEF_VIEW")])
+    @view.route("/agents/agents", permissions=[N_("IDMEF_VIEW")], help="#agents")
     def agents(self):
 
         analyzer_data = list(self._get_analyzers(env.request.parameters.getlist("status")))
@@ -107,7 +107,7 @@ class Agents(view.View):
 
         return response.PrewikkaRedirectResponse(url_for(".agents"))
 
-    @view.route("/agents/analyze/<analyzerid>", permissions=[N_("IDMEF_VIEW")])
+    @view.route("/agents/analyze/<analyzerid>", permissions=[N_("IDMEF_VIEW")], help="#heartbeatanalyze")
     def analyze(self, analyzerid):
         analyzer, heartbeat = self._get_analyzer(analyzerid)
         delta = float(heartbeat["create_time"]) - time.time()

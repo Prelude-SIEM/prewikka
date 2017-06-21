@@ -121,7 +121,7 @@ class FilterView(FilterPlugin, view.View):
             if env.dataprovider.has_type(typ):
                 yield typ, _(env.dataprovider.get_label(typ))
 
-    @view.route("/settings/filters", menu=(N_("Preferences"), N_("Filters")))
+    @view.route("/settings/filters", menu=(N_("Preferences"), N_("Filters")), help="#filters")
     def listing(self):
         dataset = {}
         data = []
@@ -180,8 +180,8 @@ class FilterView(FilterPlugin, view.View):
 
         return resource.HTMLSource(dset.render())
 
-    @view.route("/settings/filters/new")
-    @view.route("/settings/filters/<name>/edit")
+    @view.route("/settings/filters/new", help="#filteredition")
+    @view.route("/settings/filters/<name>/edit", help="#filteredition")
     def edit(self, name=None):
         if "duplicate" in env.request.parameters:
             name = env.request.parameters["duplicate"]

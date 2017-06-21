@@ -14,3 +14,4 @@ class About(view.View):
     plugin_htdocs = (("about", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     view_template = pkg_resources.resource_filename(__name__, 'templates/about.mak')
+    view_help = "#about"

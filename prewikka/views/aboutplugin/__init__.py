@@ -79,7 +79,7 @@ class AboutPlugin(view.View):
 
         return data
 
-    @view.route("/settings/apps", methods=["GET"], menu=(N_("Apps"), N_("Apps")))
+    @view.route("/settings/apps", methods=["GET"], menu=(N_("Apps"), N_("Apps")), help="#apps")
     def render_get(self):
         dset = template.PrewikkaTemplate(__name__, "templates/aboutplugin.mak").dataset()
         data = self._get_plugin_infos()

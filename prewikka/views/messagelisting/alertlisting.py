@@ -700,6 +700,7 @@ class AlertListing(MessageListing):
     view_template = template.PrewikkaTemplate(__name__, "templates/alertlisting.mak")
     view_extensions = (("menu", mainmenu.MainMenuAlert),)
     view_datatype = "alert"
+    view_help = "#alerts"
 
     root = "alert"
     listed_alert = ListedAlert
@@ -1236,4 +1237,5 @@ class CorrelationAlertListing(AlertListing, view.View):
     view_menu = (N_("Alerts"), N_("Threats"))
     view_parameters = CorrelationAlertListingParameters
     view_datatype = None
+    view_help = "#threats"
     alert_type_default = [ "alert.correlation_alert.name" ]

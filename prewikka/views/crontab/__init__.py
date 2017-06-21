@@ -58,7 +58,7 @@ class CrontabView(view.View):
 
         return dataset.render()
 
-    @view.route("/settings/scheduler", menu=(N_("Configuration"), N_("Scheduling")))
+    @view.route("/settings/scheduler", menu=(N_("Configuration"), N_("Scheduling")), help="#scheduling")
     def list(self):
         dataset = template.PrewikkaTemplate(__name__, "templates/crontab.mak").dataset()
 

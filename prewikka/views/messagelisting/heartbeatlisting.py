@@ -63,6 +63,7 @@ class HeartbeatListing(MessageListing):
     view_template = template.PrewikkaTemplate(__name__, "templates/heartbeatlisting.mak")
     view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
     view_datatype = "heartbeat"
+    view_help = "#heartbeats"
 
     root = "heartbeat"
     filters = {}
