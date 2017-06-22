@@ -35,6 +35,7 @@ def _str_to_datetime(date):
 
     return parser.parse(date)
 
+
 CONVERTERS = {
     int: datetime.utcfromtimestamp,
     float: datetime.utcfromtimestamp,
@@ -42,6 +43,10 @@ CONVERTERS = {
     datetime: lambda x:x,
     type(None): lambda x:x
 }
+
+
+_sentinel = object()
+
 
 def to_datetime(date):
     try:
@@ -450,7 +455,7 @@ class DataProviderManager(pluginmanager.PluginManager):
         if tmp != '{backend}':
             return tmp
 
-    def _guess_data_type(self, paths, criteria=Criterion()):
+    def guess_datatype(self, paths, criteria=Criterion(), default=_sentinel):
         res = set()
 
         for path in set(paths) | criteria.get_paths():
@@ -459,13 +464,16 @@ class DataProviderManager(pluginmanager.PluginManager):
                 res.add(path)
 
         if len(res) != 1:
+            if default is not _sentinel:
+                return default
+
             raise DataProviderError("Unable to guess data type: incompatible paths")
 
         return list(res)[0]
 
     def _check_data_type(self, type, *args):
         if not type:
-            type = self._guess_data_type(*args)
+            type = self.guess_datatype(*args)
 
         if type not in self._type_handlers or type not in self._backends:
             raise NoBackendError("No backend available for '%s' datatype" % type)
@@ -553,7 +561,7 @@ class DataProviderManager(pluginmanager.PluginManager):
 
     def register_path(self, path, path_type, type=None):
         if not type:
-            type = self._guess_data_type([path])
+            type = self.guess_datatype([path])
 
         return self._type_handlers[type].register_path(path, path_type)
 
