@@ -136,6 +136,22 @@ class ParameterDesc(object):
         return value
 
 
+#
+# FIXME: ideally, we should stop using @use_transaction around view parameters
+# processing. In the meantime, use this decorator to prevent problem.
+#
+def _safe_use_transaction(func):
+    f = database.use_transaction(func)
+
+    def inner(self, *args, **kwargs):
+        if not getattr(env, "db", None):
+            return func(self, *args, **kwargs)
+
+        return f(self, *args, **kwargs)
+
+    return inner
+
+
 class Parameters(dict):
     allow_extra_parameters = True
 
@@ -163,7 +179,7 @@ class Parameters(dict):
 
         self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save, general=general)
 
-    @database.use_transaction
+    @_safe_use_transaction
     def process(self, view_id):
         # In the future, the following should be handled directly in normalize()
         if env.request.user:
