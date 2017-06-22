@@ -23,16 +23,12 @@ import collections
 import croniter
 import datetime
 import time
-import traceback
 
 from prewikka.utils import timeutil
-from prewikka import database, error, log, usergroup, utils, registrar
+from prewikka import database, error, hookmanager, log, usergroup, utils, registrar
 
 
 logger = log.getLogger(__name__)
-
-_sentinel = object()
-_TASK_BASETIME = {}
 
 
 DEFAULT_SCHEDULE = collections.OrderedDict((("0 * * * *", N_("Hourly")),
@@ -118,8 +114,12 @@ class CronJob(object):
 class Crontab(object):
     _REFRESH = datetime.timedelta(minutes=1)
 
-    def __init__(self):
+    def _reinit(self):
         self._plugin_callback = {}
+
+    def __init__(self):
+        self._reinit()
+        hookmanager.register("HOOK_PLUGINS_RELOAD", self._reinit)
 
     def _make_job(self, res):
         err = func = None
