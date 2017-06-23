@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Prewikka 4.1.0beta1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-13 21:57+0200\n"
-"PO-Revision-Date: 2017-06-16 17:29+0200\n"
+"PO-Revision-Date: 2017-06-23 19:39+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: prewikka/baseview.py:63 prewikka/usergroup.py:47
+#: prewikka/baseview.py:65 prewikka/usergroup.py:47
 msgid "Permission Denied"
 msgstr "Accesso negato"
 
-#: prewikka/baseview.py:63
+#: prewikka/baseview.py:65
 msgid "Missing permission to access the specified file"
 msgstr ""
 
@@ -30,29 +30,24 @@ msgid "parse error in \"%(txt)s\" at %(file)s line %(line)d"
 msgstr "errore di parsing in \"%(txt)s\" alla linea %(line)d di %(file)s"
 
 #: prewikka/crontab.py:38
-#, fuzzy
 msgid "Hourly"
-msgstr "%d ora"
+msgstr "Ogni ora"
 
 #: prewikka/crontab.py:39
-#, fuzzy
 msgid "Daily"
-msgstr "Oggi"
+msgstr "Quotidiano"
 
 #: prewikka/crontab.py:40
-#, fuzzy
 msgid "Weekly"
-msgstr "%d settimana"
+msgstr "Settimanale"
 
 #: prewikka/crontab.py:41
-#, fuzzy
 msgid "Monthly"
-msgstr "%d mese"
+msgstr "Mensile"
 
 #: prewikka/crontab.py:42
-#, fuzzy
 msgid "Yearly"
-msgstr "%d anno"
+msgstr "Annuale"
 
 #: prewikka/crontab.py:43 prewikka/mainmenu.py:298
 #: prewikka/templates/mainmenu.mak:88
@@ -61,35 +56,33 @@ msgstr "Personalizzato"
 
 #: prewikka/crontab.py:44 prewikka/views/crontab/__init__.py:70
 msgid "Disabled"
-msgstr ""
+msgstr "Disabilitato"
 
 #: prewikka/crontab.py:113
 msgid "Scheduled job execution failed"
-msgstr ""
+msgstr "Esecuzione dell'operazione pianificata fallita"
 
 #: prewikka/crontab.py:130
-#, fuzzy
 msgid "Invalid job extension"
-msgstr "Sessione invalida"
+msgstr "Estensione di operazione invalida"
 
 #: prewikka/crontab.py:130
 #, python-format
 msgid "Scheduled job with invalid extension type '%s'"
-msgstr ""
+msgstr "Operazione pianificata con tipo di estensione invalido '%s'"
 
 #: prewikka/crontab.py:230
-#, fuzzy
 msgid "Invalid schedule"
-msgstr "Utente non valido"
+msgstr "Pianificazione non valida"
 
 #: prewikka/crontab.py:230
 msgid "The specified job schedule is invalid"
-msgstr ""
+msgstr "L'operazione pianificata è invalida"
 
 #: prewikka/crontab.py:257
 #, python-format
 msgid "Custom (%s)"
-msgstr ""
+msgstr "Personalizzato (%s)"
 
 #: prewikka/database.py:44
 msgid "Database error"
@@ -147,13 +140,12 @@ msgid ""
 msgstr ""
 
 #: prewikka/database.py:894
-#, fuzzy
 msgid "Database configuration error"
-msgstr "Errore di migrazione del database"
+msgstr "Errore di configurazione del database"
 
 #: prewikka/database.py:894
 msgid "Only MySQL and PostgreSQL databases are supported at the moment"
-msgstr ""
+msgstr "Solamente MySQL e PostgreSQL sono supportati in questo momento"
 
 #: prewikka/error.py:48 prewikka/templates/error.mak:141
 msgid "An unexpected condition happened"
@@ -319,7 +311,7 @@ msgstr "Errore di menu"
 
 #: prewikka/menu.py:51
 msgid "Empty menu"
-msgstr ""
+msgstr "Menu vuoto"
 
 #: prewikka/menu.py:57
 #, python-format
@@ -328,7 +320,7 @@ msgstr "Menu senza nome in %s"
 
 #: prewikka/menu.py:61
 msgid "Multiple default menus"
-msgstr ""
+msgstr "Menu predefiniti multipli"
 
 #: prewikka/menu.py:69
 #, python-format
@@ -337,7 +329,7 @@ msgstr "Sezione senza nome in %s"
 
 #: prewikka/menu.py:73
 msgid "Multiple default views"
-msgstr ""
+msgstr "Viste predefinite multiple"
 
 #: prewikka/resolve.py:170
 #, python-format
@@ -358,7 +350,7 @@ msgstr ""
 #: prewikka/usergroup.py:42
 #, python-format
 msgid "Access to view '%s' forbidden"
-msgstr ""
+msgstr "Accesso vietato alla vista '%s'"
 
 #: prewikka/usergroup.py:45
 #, python-format
@@ -392,12 +384,12 @@ msgstr "Metodo non valido"
 msgid "Invalid view"
 msgstr "Vista invalida"
 
-#: prewikka/view.py:495
+#: prewikka/view.py:516
 #, python-format
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
-msgstr ""
+msgstr "Il metodo '%(method)s' non è permesso per la vista '%(view)s'"
 
-#: prewikka/view.py:499 prewikka/view.py:511
+#: prewikka/view.py:520 prewikka/view.py:532
 #, python-format
 msgid "View '%s' does not exist"
 msgstr "La vista '%s' non esiste"
@@ -406,30 +398,29 @@ msgstr "La vista '%s' non esiste"
 msgid "Authentication failed"
 msgstr "Autenticazione fallita"
 
-#: prewikka/dataprovider/__init__.py:50 prewikka/dataprovider/__init__.py:101
+#: prewikka/dataprovider/__init__.py:55 prewikka/dataprovider/__init__.py:106
 msgid "Conversion error"
 msgstr "Errore di conversione"
 
-#: prewikka/dataprovider/__init__.py:51 prewikka/dataprovider/__init__.py:102
+#: prewikka/dataprovider/__init__.py:56 prewikka/dataprovider/__init__.py:107
 #, python-format
 msgid "Value %(value)r cannot be converted to %(type)s"
 msgstr "Valore %(value)r non può essere convertito in %(type)s"
 
-#: prewikka/dataprovider/__init__.py:229
-#, fuzzy
+#: prewikka/dataprovider/__init__.py:234
 msgid "Backend normalization error"
-msgstr "Gli argomenti d'inizializzazione non sono supportati"
+msgstr "Errore di normalizzazione del backend"
 
-#: prewikka/dataprovider/__init__.py:411
+#: prewikka/dataprovider/__init__.py:425
 #, python-format
 msgid "No handler configured for '%s' datatype"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:421
+#: prewikka/dataprovider/__init__.py:435
 msgid "Configuration error"
 msgstr "Errore di configurazione"
 
-#: prewikka/dataprovider/__init__.py:422
+#: prewikka/dataprovider/__init__.py:436
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
 msgstr ""
@@ -441,7 +432,7 @@ msgstr ""
 #: prewikka/dataprovider/idmef.py:57
 #: prewikka/views/agents/templates/agents.mak:88
 #: prewikka/views/messagelisting/alertlisting.py:697
-#: prewikka/views/messagelisting/alertlisting.py:1202
+#: prewikka/views/messagelisting/alertlisting.py:1237
 msgid "Alerts"
 msgstr "Allerte"
 
@@ -492,7 +483,7 @@ msgstr ""
 msgid "Plugin for fetching IDMEF heartbeats from the Prelude database"
 msgstr ""
 
-#: prewikka/plugins/warning/__init__.py:33
+#: prewikka/plugins/warning/__init__.py:32
 msgid "Prelude Warning message"
 msgstr ""
 
@@ -554,7 +545,7 @@ msgstr "Informativo"
 
 #: prewikka/renderer/__init__.py:52
 msgid "No data to display."
-msgstr ""
+msgstr "Nessun dato da visualizzare."
 
 #: prewikka/renderer/__init__.py:71 prewikka/views/crontab/__init__.py:81
 #: prewikka/views/messagelisting/messagelisting.py:120
@@ -564,9 +555,8 @@ msgstr ""
 
 #: prewikka/renderer/__init__.py:150 prewikka/renderer/__init__.py:154
 #: prewikka/renderer/__init__.py:158
-#, fuzzy
 msgid "Renderer error"
-msgstr "Errore interno Prelude"
+msgstr "Errore di rendering"
 
 #: prewikka/renderer/__init__.py:151
 #, python-format
@@ -598,6 +588,8 @@ msgstr "Sessione scaduta"
 #: prewikka/session/session.py:45
 msgid "Your session has expired: please sign in again to continue using Prelude"
 msgstr ""
+"La tua sessione è scaduta: accedi nuovamente per continuare ad usare "
+"Prelude"
 
 #: prewikka/session/session.py:176
 msgid "Logged out"
@@ -607,32 +599,35 @@ msgstr "Sessione finita"
 msgid "Anonymous authentication"
 msgstr "Autenticazione anonima"
 
-#: prewikka/templates/baseview.mak:145
+#: prewikka/templates/baseview.mak:146
 msgid "View options"
+msgstr "Opzioni di vista"
+
+#: prewikka/templates/baseview.mak:149
+msgid "View help"
 msgstr ""
 
-#: prewikka/templates/baseview.mak:177
+#: prewikka/templates/baseview.mak:186
 msgid "This app has been disabled or failed to load."
-msgstr ""
+msgstr "Questo app è stato disabilitato o non è riuscito a caricare."
 
-#: prewikka/templates/baseview.mak:183 prewikka/templates/baseview.mak:194
-#, fuzzy
+#: prewikka/templates/baseview.mak:192 prewikka/templates/baseview.mak:203
 msgid "name"
-msgstr "Nome"
+msgstr "nome"
 
-#: prewikka/templates/baseview.mak:239
+#: prewikka/templates/baseview.mak:248
 msgid "About"
 msgstr "Circa"
 
-#: prewikka/templates/baseview.mak:242
+#: prewikka/templates/baseview.mak:251
 msgid "Logout"
 msgstr "Sconnessione"
 
-#: prewikka/templates/baseview.mak:242
+#: prewikka/templates/baseview.mak:251
 msgid "Are you sure you want to log out?"
 msgstr "È sicuro di voler disconnettersi?"
 
-#: prewikka/templates/baseview.mak:254
+#: prewikka/templates/baseview.mak:263
 msgid "Loading"
 msgstr "Caricamento in corso"
 
@@ -642,7 +637,7 @@ msgstr "Dettaglio"
 
 #: prewikka/templates/error.mak:67
 msgid "Copy to clipboard"
-msgstr ""
+msgstr "Copiare negli appunti"
 
 #: prewikka/templates/error.mak:139
 msgid "Error: {0}"
@@ -681,7 +676,7 @@ msgstr "Riprovare"
 
 #: prewikka/templates/error.mak:183
 msgid "Redirect to main page"
-msgstr ""
+msgstr "Reindirizzare alla pagina principale"
 
 #: prewikka/templates/mainmenu.mak:46
 msgid "Refresh:"
@@ -689,7 +684,7 @@ msgstr "Rinfrescare:"
 
 #: prewikka/templates/mainmenu.mak:51
 msgid "Update frequency of the current page"
-msgstr "Frequenza di aggiornamento della pagine attuale"
+msgstr "Frequenza di aggiornamento della pagina attuale"
 
 #: prewikka/templates/mainmenu.mak:77
 msgid "Period:"
@@ -760,11 +755,6 @@ msgstr "Mancante"
 #: prewikka/utils/misc.py:68
 msgid "Online"
 msgstr "Online"
-
-#: prewikka/utils/url.py:161
-#, python-format
-msgid "The path '%s' cannot be mapped to a column"
-msgstr ""
 
 #: prewikka/views/about/__init__.py:13
 msgid "Prelude About page"
@@ -1137,14 +1127,12 @@ msgid "Status"
 msgstr "Stato"
 
 #: prewikka/views/agents/templates/agents.mak:88
-#, fuzzy
 msgid "Delete the alerts of the selected agent(s)"
-msgstr "Rimovuere le allerte selezionate?"
+msgstr "Rimovuere le allerte degli agenti selezionati?"
 
 #: prewikka/views/agents/templates/agents.mak:92
-#, fuzzy
 msgid "Delete the heartbeats of the selected agent(s)"
-msgstr "Rimovuere le allerte selezionate?"
+msgstr "Rimovuere le pulsazioni degli agenti selezionati?"
 
 #: prewikka/views/agents/templates/agents.mak:94
 msgid "Delete the selected IDMEF messages?"
@@ -1196,68 +1184,60 @@ msgid "Scheduled jobs management page"
 msgstr "Filtrare sull'agente"
 
 #: prewikka/views/crontab/__init__.py:61
-#, fuzzy
 msgid "Configuration"
-msgstr "Errore di configurazione"
+msgstr "Configurazione"
 
 #: prewikka/views/crontab/__init__.py:61
 msgid "Scheduling"
-msgstr ""
+msgstr "Pianificazione"
 
 #: prewikka/views/crontab/__init__.py:74
-#, fuzzy
 msgid "Pending"
-msgstr "Significato"
+msgstr "In attesa"
 
 #: prewikka/views/crontab/__init__.py:84
-#, fuzzy
 msgid "Error"
-msgstr "Errore di menu"
+msgstr "Errore"
 
 #: prewikka/views/crontab/__init__.py:90
 msgid "SYSTEM"
-msgstr ""
+msgstr "SISTEMA"
 
 #: prewikka/views/crontab/templates/cronjob.mak:58
 msgid "Schedule:"
-msgstr ""
+msgstr "Pianificazione:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:73
-#, fuzzy
 msgid "custom"
-msgstr "Personalizzato"
+msgstr "personalizzato"
 
 #: prewikka/views/crontab/templates/cronjob.mak:74
 msgid "disabled"
-msgstr ""
+msgstr "disabilitato"
 
 #: prewikka/views/crontab/templates/cronjob.mak:83
-#, fuzzy
 msgid "Minute:"
-msgstr "%d minuto"
+msgstr "Minuto:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:87
-#, fuzzy
 msgid "Hour:"
-msgstr "%d ora"
+msgstr "Ora:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:91
-#, fuzzy
 msgid "Day:"
-msgstr "Oggi"
+msgstr "Giorno:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:95
-#, fuzzy
 msgid "Month:"
-msgstr "%d mese"
+msgstr "Mese:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:99
 msgid "Weekday:"
-msgstr ""
+msgstr "Giorno della settimana:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:111
 msgid "Edit Job"
-msgstr ""
+msgstr "Modificare l'operazione"
 
 #: prewikka/views/crontab/templates/cronjob.mak:116
 #: prewikka/views/filter/templates/filteredition.mak:82
@@ -1273,33 +1253,31 @@ msgstr "Salvare"
 
 #: prewikka/views/crontab/templates/crontab.mak:12
 msgid "Scheduled Jobs"
-msgstr ""
+msgstr "Operazioni pianificate"
 
 #: prewikka/views/crontab/templates/crontab.mak:13
 msgid "Schedule"
-msgstr ""
+msgstr "Pianificazione"
 
 #: prewikka/views/crontab/templates/crontab.mak:13
-#, fuzzy
 msgid "User"
-msgstr "Numero"
+msgstr "Utente"
 
 #: prewikka/views/crontab/templates/crontab.mak:13
 msgid "Last execution"
-msgstr ""
+msgstr "Esecuzione scorsa"
 
 #: prewikka/views/crontab/templates/crontab.mak:13
 msgid "Next execution"
-msgstr ""
+msgstr "Esecuzione prossima"
 
 #: prewikka/views/crontab/templates/crontab.mak:59
 msgid "Disable"
-msgstr ""
+msgstr "Disattivare"
 
 #: prewikka/views/crontab/templates/crontab.mak:60
-#, fuzzy
 msgid "Enable"
-msgstr "Nome"
+msgstr "Attivare"
 
 #: prewikka/views/filter/__init__.py:11
 #, fuzzy
@@ -1488,7 +1466,7 @@ msgid "Alert and Heartbeat listing page"
 msgstr "Elenco delle pulsazioni"
 
 #: prewikka/views/messagelisting/alertlisting.py:547
-#: prewikka/views/messagelisting/alertlisting.py:919
+#: prewikka/views/messagelisting/alertlisting.py:921
 #: prewikka/views/messagesummary/messagesummary.py:659
 msgid "Alert details"
 msgstr "Dettaglio dell'allerta"
@@ -1505,13 +1483,18 @@ msgstr "Allerta di Correlazione"
 msgid "Tool Alert"
 msgstr "Allerta di Strumento"
 
-#: prewikka/views/messagelisting/alertlisting.py:1202
+#: prewikka/views/messagelisting/alertlisting.py:1219
+#, python-format
+msgid "The path '%s' cannot be mapped to a column"
+msgstr ""
+
+#: prewikka/views/messagelisting/alertlisting.py:1237
 msgid "Threats"
 msgstr "Minacce"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:18
 msgid "Order column"
-msgstr ""
+msgstr "Ordinare sulla colonna"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:37
 msgid "Not defined"
@@ -1707,19 +1690,19 @@ msgstr "Limite"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:95
 msgid "First page"
-msgstr ""
+msgstr "Prima pagina"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:98
 msgid "Previous page"
-msgstr ""
+msgstr "Pagina precendente"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:101
 msgid "Next page"
-msgstr ""
+msgstr "Pagina successiva"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:104
 msgid "Last page"
-msgstr ""
+msgstr "Ultima pagina"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:110
 msgid "total"

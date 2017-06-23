@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Prewikka 4.1.0beta1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-13 21:57+0200\n"
-"PO-Revision-Date: 2017-06-16 17:29+0200\n"
+"PO-Revision-Date: 2017-06-23 19:39+0200\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: prewikka/baseview.py:63 prewikka/usergroup.py:47
+#: prewikka/baseview.py:65 prewikka/usergroup.py:47
 msgid "Permission Denied"
 msgstr "Accès refusé"
 
-#: prewikka/baseview.py:63
+#: prewikka/baseview.py:65
 msgid "Missing permission to access the specified file"
 msgstr "Permission manquante pour accéder au fichier spécifié"
 
@@ -396,12 +396,12 @@ msgstr "Méthode invalide"
 msgid "Invalid view"
 msgstr "Vue invalide"
 
-#: prewikka/view.py:495
+#: prewikka/view.py:516
 #, python-format
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
 msgstr "La méthode '%(method)s' n'est pas autorisée pour la vue '%(view)s'"
 
-#: prewikka/view.py:499 prewikka/view.py:511
+#: prewikka/view.py:520 prewikka/view.py:532
 #, python-format
 msgid "View '%s' does not exist"
 msgstr "La vue '%s' n'existe pas"
@@ -410,29 +410,29 @@ msgstr "La vue '%s' n'existe pas"
 msgid "Authentication failed"
 msgstr "Échec de l'authentification"
 
-#: prewikka/dataprovider/__init__.py:50 prewikka/dataprovider/__init__.py:101
+#: prewikka/dataprovider/__init__.py:55 prewikka/dataprovider/__init__.py:106
 msgid "Conversion error"
 msgstr "Erreur de conversion"
 
-#: prewikka/dataprovider/__init__.py:51 prewikka/dataprovider/__init__.py:102
+#: prewikka/dataprovider/__init__.py:56 prewikka/dataprovider/__init__.py:107
 #, python-format
 msgid "Value %(value)r cannot be converted to %(type)s"
 msgstr "La valeur %(value)r ne peut pas être convertie en %(type)s"
 
-#: prewikka/dataprovider/__init__.py:229
+#: prewikka/dataprovider/__init__.py:234
 msgid "Backend normalization error"
 msgstr "Erreur lors de l'appel à la normalisation par le backend"
 
-#: prewikka/dataprovider/__init__.py:411
+#: prewikka/dataprovider/__init__.py:425
 #, python-format
 msgid "No handler configured for '%s' datatype"
 msgstr "Aucun gestionnaire configuré pour le type de données '%s'"
 
-#: prewikka/dataprovider/__init__.py:421
+#: prewikka/dataprovider/__init__.py:435
 msgid "Configuration error"
 msgstr "Erreur de configuration"
 
-#: prewikka/dataprovider/__init__.py:422
+#: prewikka/dataprovider/__init__.py:436
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
 msgstr "Seulement un manager doit être configuré pour le backend '%s'"
@@ -444,7 +444,7 @@ msgstr "Fournit une API pour accéder aux alertes IDMEF"
 #: prewikka/dataprovider/idmef.py:57
 #: prewikka/views/agents/templates/agents.mak:88
 #: prewikka/views/messagelisting/alertlisting.py:697
-#: prewikka/views/messagelisting/alertlisting.py:1202
+#: prewikka/views/messagelisting/alertlisting.py:1237
 msgid "Alerts"
 msgstr "Alertes"
 
@@ -495,7 +495,7 @@ msgstr "Plugin pour accéder aux alertes IDMEF de la base de données Prelude"
 msgid "Plugin for fetching IDMEF heartbeats from the Prelude database"
 msgstr "Plugin pour accéder aux pulsations IDMEF de la base de données Prelude"
 
-#: prewikka/plugins/warning/__init__.py:33
+#: prewikka/plugins/warning/__init__.py:32
 msgid "Prelude Warning message"
 msgstr "Message d'avertissement de Prelude"
 
@@ -619,31 +619,35 @@ msgstr "Session terminée"
 msgid "Anonymous authentication"
 msgstr "Authentification anonyme"
 
-#: prewikka/templates/baseview.mak:145
+#: prewikka/templates/baseview.mak:146
 msgid "View options"
 msgstr "Options de la vue"
 
-#: prewikka/templates/baseview.mak:177
+#: prewikka/templates/baseview.mak:149
+msgid "View help"
+msgstr "Aide de la vue"
+
+#: prewikka/templates/baseview.mak:186
 msgid "This app has been disabled or failed to load."
 msgstr "Cette app a été désactivée ou est impossible à charger"
 
-#: prewikka/templates/baseview.mak:183 prewikka/templates/baseview.mak:194
+#: prewikka/templates/baseview.mak:192 prewikka/templates/baseview.mak:203
 msgid "name"
 msgstr "nom"
 
-#: prewikka/templates/baseview.mak:239
+#: prewikka/templates/baseview.mak:248
 msgid "About"
 msgstr "À propos"
 
-#: prewikka/templates/baseview.mak:242
+#: prewikka/templates/baseview.mak:251
 msgid "Logout"
 msgstr "Déconnexion"
 
-#: prewikka/templates/baseview.mak:242
+#: prewikka/templates/baseview.mak:251
 msgid "Are you sure you want to log out?"
 msgstr "Êtes-vous sûr de vouloir vous déconnecter ?"
 
-#: prewikka/templates/baseview.mak:254
+#: prewikka/templates/baseview.mak:263
 msgid "Loading"
 msgstr "Chargement"
 
@@ -775,11 +779,6 @@ msgstr "Manquant"
 #: prewikka/utils/misc.py:68
 msgid "Online"
 msgstr "Connecté"
-
-#: prewikka/utils/url.py:161
-#, python-format
-msgid "The path '%s' cannot be mapped to a column"
-msgstr "Le chemin '%s' ne peut pas être mis en correspondance avec une colonne"
 
 #: prewikka/views/about/__init__.py:13
 msgid "Prelude About page"
@@ -1489,7 +1488,7 @@ msgid "Alert and Heartbeat listing page"
 msgstr "Page des alertes et pulsations"
 
 #: prewikka/views/messagelisting/alertlisting.py:547
-#: prewikka/views/messagelisting/alertlisting.py:919
+#: prewikka/views/messagelisting/alertlisting.py:921
 #: prewikka/views/messagesummary/messagesummary.py:659
 msgid "Alert details"
 msgstr "Détails de l'alerte"
@@ -1506,7 +1505,12 @@ msgstr "Alerte de Corrélation"
 msgid "Tool Alert"
 msgstr "Alerte d'Outil"
 
-#: prewikka/views/messagelisting/alertlisting.py:1202
+#: prewikka/views/messagelisting/alertlisting.py:1219
+#, python-format
+msgid "The path '%s' cannot be mapped to a column"
+msgstr "Le chemin '%s' ne peut pas être mis en correspondance avec une colonne"
+
+#: prewikka/views/messagelisting/alertlisting.py:1237
 msgid "Threats"
 msgstr "Menaces"
 

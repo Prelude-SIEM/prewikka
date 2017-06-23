@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Prewikka 4.1.0beta1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-13 21:57+0200\n"
-"PO-Revision-Date: 2017-06-16 17:29+0200\n"
+"PO-Revision-Date: 2017-06-23 19:39+0200\n"
 "Last-Translator: Konrad Kosmowski <konrad@kosmosik.net>\n"
 "Language-Team: Polish\n"
 "Plural-Forms: nplurals=3; plural=(n==1 ? 0 : n%10>=2 && n%10<=4 && "
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: prewikka/baseview.py:63 prewikka/usergroup.py:47
+#: prewikka/baseview.py:65 prewikka/usergroup.py:47
 msgid "Permission Denied"
 msgstr "Odmowa dostępu"
 
-#: prewikka/baseview.py:63
+#: prewikka/baseview.py:65
 msgid "Missing permission to access the specified file"
 msgstr ""
 
@@ -261,7 +261,7 @@ msgid "This month"
 msgstr "Ten miesiąc"
 
 #: prewikka/mainmenu.py:134 prewikka/mainmenu.py:135
-#, fuzzy, python-format
+#, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d godzina"
@@ -269,7 +269,7 @@ msgstr[1] "%d godziny"
 msgstr[2] "%d godzin"
 
 #: prewikka/mainmenu.py:136 prewikka/mainmenu.py:137
-#, fuzzy, python-format
+#, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d dzień"
@@ -277,7 +277,7 @@ msgstr[1] "%d dni"
 msgstr[2] "%d dni"
 
 #: prewikka/mainmenu.py:138
-#, fuzzy, python-format
+#, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d tydzień"
@@ -285,7 +285,7 @@ msgstr[1] "%d tygodnie"
 msgstr[2] "%d tygodni"
 
 #: prewikka/mainmenu.py:139 prewikka/mainmenu.py:140
-#, fuzzy, python-format
+#, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d miesiąc"
@@ -293,7 +293,7 @@ msgstr[1] "%d miesiące"
 msgstr[2] "%d miesięcy"
 
 #: prewikka/mainmenu.py:141
-#, fuzzy, python-format
+#, python-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d rok"
@@ -301,7 +301,7 @@ msgstr[1] "%d lata"
 msgstr[2] "%d lat"
 
 #: prewikka/mainmenu.py:144
-#, fuzzy, python-format
+#, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d sekunda"
@@ -309,7 +309,7 @@ msgstr[1] "%d sekundy"
 msgstr[2] "%d sekund"
 
 #: prewikka/mainmenu.py:145 prewikka/mainmenu.py:146 prewikka/mainmenu.py:147
-#, fuzzy, python-format
+#, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minuta"
@@ -399,12 +399,12 @@ msgstr "Nieprawidłowa sesja"
 msgid "Invalid view"
 msgstr "Nieprawidłowa sesja"
 
-#: prewikka/view.py:495
+#: prewikka/view.py:516
 #, python-format
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
 msgstr ""
 
-#: prewikka/view.py:499 prewikka/view.py:511
+#: prewikka/view.py:520 prewikka/view.py:532
 #, python-format
 msgid "View '%s' does not exist"
 msgstr ""
@@ -413,31 +413,31 @@ msgstr ""
 msgid "Authentication failed"
 msgstr "Błąd uwierzytelniania"
 
-#: prewikka/dataprovider/__init__.py:50 prewikka/dataprovider/__init__.py:101
+#: prewikka/dataprovider/__init__.py:55 prewikka/dataprovider/__init__.py:106
 #, fuzzy
 msgid "Conversion error"
 msgstr "Alert korelacji"
 
-#: prewikka/dataprovider/__init__.py:51 prewikka/dataprovider/__init__.py:102
+#: prewikka/dataprovider/__init__.py:56 prewikka/dataprovider/__init__.py:107
 #, python-format
 msgid "Value %(value)r cannot be converted to %(type)s"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:229
+#: prewikka/dataprovider/__init__.py:234
 msgid "Backend normalization error"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:411
+#: prewikka/dataprovider/__init__.py:425
 #, python-format
 msgid "No handler configured for '%s' datatype"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:421
+#: prewikka/dataprovider/__init__.py:435
 #, fuzzy
 msgid "Configuration error"
 msgstr "Alert korelacji"
 
-#: prewikka/dataprovider/__init__.py:422
+#: prewikka/dataprovider/__init__.py:436
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
 msgstr ""
@@ -449,7 +449,7 @@ msgstr ""
 #: prewikka/dataprovider/idmef.py:57
 #: prewikka/views/agents/templates/agents.mak:88
 #: prewikka/views/messagelisting/alertlisting.py:697
-#: prewikka/views/messagelisting/alertlisting.py:1202
+#: prewikka/views/messagelisting/alertlisting.py:1237
 msgid "Alerts"
 msgstr "Alerty"
 
@@ -503,7 +503,7 @@ msgstr ""
 msgid "Plugin for fetching IDMEF heartbeats from the Prelude database"
 msgstr ""
 
-#: prewikka/plugins/warning/__init__.py:33
+#: prewikka/plugins/warning/__init__.py:32
 msgid "Prelude Warning message"
 msgstr ""
 
@@ -620,32 +620,36 @@ msgstr "Wylogowany"
 msgid "Anonymous authentication"
 msgstr "Błąd uwierzytelniania"
 
-#: prewikka/templates/baseview.mak:145
+#: prewikka/templates/baseview.mak:146
 msgid "View options"
 msgstr ""
 
-#: prewikka/templates/baseview.mak:177
+#: prewikka/templates/baseview.mak:149
+msgid "View help"
+msgstr ""
+
+#: prewikka/templates/baseview.mak:186
 msgid "This app has been disabled or failed to load."
 msgstr ""
 
-#: prewikka/templates/baseview.mak:183 prewikka/templates/baseview.mak:194
+#: prewikka/templates/baseview.mak:192 prewikka/templates/baseview.mak:203
 #, fuzzy
 msgid "name"
 msgstr "Nazwa"
 
-#: prewikka/templates/baseview.mak:239
+#: prewikka/templates/baseview.mak:248
 msgid "About"
 msgstr "O systemie"
 
-#: prewikka/templates/baseview.mak:242
+#: prewikka/templates/baseview.mak:251
 msgid "Logout"
 msgstr "Wyloguj"
 
-#: prewikka/templates/baseview.mak:242
+#: prewikka/templates/baseview.mak:251
 msgid "Are you sure you want to log out?"
 msgstr ""
 
-#: prewikka/templates/baseview.mak:254
+#: prewikka/templates/baseview.mak:263
 #, fuzzy
 msgid "Loading"
 msgstr "Wczytaj"
@@ -777,11 +781,6 @@ msgstr "Brakujący"
 #: prewikka/utils/misc.py:68
 msgid "Online"
 msgstr "Dostępny"
-
-#: prewikka/utils/url.py:161
-#, python-format
-msgid "The path '%s' cannot be mapped to a column"
-msgstr ""
 
 #: prewikka/views/about/__init__.py:13
 msgid "Prelude About page"
@@ -1505,7 +1504,7 @@ msgid "Alert and Heartbeat listing page"
 msgstr "Lista informacji tętna"
 
 #: prewikka/views/messagelisting/alertlisting.py:547
-#: prewikka/views/messagelisting/alertlisting.py:919
+#: prewikka/views/messagelisting/alertlisting.py:921
 #: prewikka/views/messagesummary/messagesummary.py:659
 #, fuzzy
 msgid "Alert details"
@@ -1523,7 +1522,12 @@ msgstr "Alert korelacji"
 msgid "Tool Alert"
 msgstr "Alert narzędzia"
 
-#: prewikka/views/messagelisting/alertlisting.py:1202
+#: prewikka/views/messagelisting/alertlisting.py:1219
+#, python-format
+msgid "The path '%s' cannot be mapped to a column"
+msgstr ""
+
+#: prewikka/views/messagelisting/alertlisting.py:1237
 msgid "Threats"
 msgstr "Zagrożenia"
 
@@ -1672,7 +1676,6 @@ msgid "expand"
 msgstr "rozwiń"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:419
-#, fuzzy
 msgid "alert"
 msgid_plural "alerts"
 msgstr[0] "Alert"

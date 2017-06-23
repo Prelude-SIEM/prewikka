@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Prewikka 4.1.0beta1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-13 21:57+0200\n"
-"PO-Revision-Date: 2017-06-16 17:29+0200\n"
+"PO-Revision-Date: 2017-06-23 19:39+0200\n"
 "Last-Translator: Edelberto Franco Silva <edeunix@edeunix.com>\n"
 "Language-Team: Portuguese\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: prewikka/baseview.py:63 prewikka/usergroup.py:47
+#: prewikka/baseview.py:65 prewikka/usergroup.py:47
 msgid "Permission Denied"
 msgstr "Permissão Negada"
 
-#: prewikka/baseview.py:63
+#: prewikka/baseview.py:65
 msgid "Missing permission to access the specified file"
 msgstr ""
 
@@ -31,29 +31,24 @@ msgid "parse error in \"%(txt)s\" at %(file)s line %(line)d"
 msgstr ""
 
 #: prewikka/crontab.py:38
-#, fuzzy
 msgid "Hourly"
-msgstr "%d hora"
+msgstr "Por hora"
 
 #: prewikka/crontab.py:39
-#, fuzzy
 msgid "Daily"
-msgstr "Hoje"
+msgstr "Diário"
 
 #: prewikka/crontab.py:40
-#, fuzzy
 msgid "Weekly"
-msgstr "%d semana"
+msgstr "Semanal"
 
 #: prewikka/crontab.py:41
-#, fuzzy
 msgid "Monthly"
-msgstr "%d mês"
+msgstr "Mensal"
 
 #: prewikka/crontab.py:42
-#, fuzzy
 msgid "Yearly"
-msgstr "%d ano"
+msgstr "Anual"
 
 #: prewikka/crontab.py:43 prewikka/mainmenu.py:298
 #: prewikka/templates/mainmenu.mak:88
@@ -62,7 +57,7 @@ msgstr "Personalizado"
 
 #: prewikka/crontab.py:44 prewikka/views/crontab/__init__.py:70
 msgid "Disabled"
-msgstr ""
+msgstr "Desativado"
 
 #: prewikka/crontab.py:113
 msgid "Scheduled job execution failed"
@@ -90,7 +85,7 @@ msgstr ""
 #: prewikka/crontab.py:257
 #, python-format
 msgid "Custom (%s)"
-msgstr ""
+msgstr "Personalizado (%s)"
 
 #: prewikka/database.py:44
 msgid "Database error"
@@ -388,12 +383,12 @@ msgstr "Método inválido"
 msgid "Invalid view"
 msgstr "Visão inválida"
 
-#: prewikka/view.py:495
+#: prewikka/view.py:516
 #, python-format
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
 msgstr ""
 
-#: prewikka/view.py:499 prewikka/view.py:511
+#: prewikka/view.py:520 prewikka/view.py:532
 #, python-format
 msgid "View '%s' does not exist"
 msgstr ""
@@ -402,29 +397,29 @@ msgstr ""
 msgid "Authentication failed"
 msgstr "A auntenticação falhou"
 
-#: prewikka/dataprovider/__init__.py:50 prewikka/dataprovider/__init__.py:101
+#: prewikka/dataprovider/__init__.py:55 prewikka/dataprovider/__init__.py:106
 msgid "Conversion error"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:51 prewikka/dataprovider/__init__.py:102
+#: prewikka/dataprovider/__init__.py:56 prewikka/dataprovider/__init__.py:107
 #, python-format
 msgid "Value %(value)r cannot be converted to %(type)s"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:229
+#: prewikka/dataprovider/__init__.py:234
 msgid "Backend normalization error"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:411
+#: prewikka/dataprovider/__init__.py:425
 #, python-format
 msgid "No handler configured for '%s' datatype"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:421
+#: prewikka/dataprovider/__init__.py:435
 msgid "Configuration error"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:422
+#: prewikka/dataprovider/__init__.py:436
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
 msgstr ""
@@ -436,7 +431,7 @@ msgstr ""
 #: prewikka/dataprovider/idmef.py:57
 #: prewikka/views/agents/templates/agents.mak:88
 #: prewikka/views/messagelisting/alertlisting.py:697
-#: prewikka/views/messagelisting/alertlisting.py:1202
+#: prewikka/views/messagelisting/alertlisting.py:1237
 msgid "Alerts"
 msgstr "Alertas"
 
@@ -488,7 +483,7 @@ msgstr ""
 msgid "Plugin for fetching IDMEF heartbeats from the Prelude database"
 msgstr ""
 
-#: prewikka/plugins/warning/__init__.py:33
+#: prewikka/plugins/warning/__init__.py:32
 msgid "Prelude Warning message"
 msgstr ""
 
@@ -603,32 +598,36 @@ msgstr "Deslogado"
 msgid "Anonymous authentication"
 msgstr "A auntenticação falhou"
 
-#: prewikka/templates/baseview.mak:145
+#: prewikka/templates/baseview.mak:146
 msgid "View options"
 msgstr ""
 
-#: prewikka/templates/baseview.mak:177
+#: prewikka/templates/baseview.mak:149
+msgid "View help"
+msgstr ""
+
+#: prewikka/templates/baseview.mak:186
 msgid "This app has been disabled or failed to load."
 msgstr ""
 
-#: prewikka/templates/baseview.mak:183 prewikka/templates/baseview.mak:194
+#: prewikka/templates/baseview.mak:192 prewikka/templates/baseview.mak:203
 #, fuzzy
 msgid "name"
 msgstr "Nome"
 
-#: prewikka/templates/baseview.mak:239
+#: prewikka/templates/baseview.mak:248
 msgid "About"
 msgstr "Sobre"
 
-#: prewikka/templates/baseview.mak:242
+#: prewikka/templates/baseview.mak:251
 msgid "Logout"
 msgstr "Sair"
 
-#: prewikka/templates/baseview.mak:242
+#: prewikka/templates/baseview.mak:251
 msgid "Are you sure you want to log out?"
 msgstr ""
 
-#: prewikka/templates/baseview.mak:254
+#: prewikka/templates/baseview.mak:263
 #, fuzzy
 msgid "Loading"
 msgstr "Carregar"
@@ -759,11 +758,6 @@ msgstr "Perdido"
 #: prewikka/utils/misc.py:68
 msgid "Online"
 msgstr "Conectado"
-
-#: prewikka/utils/url.py:161
-#, python-format
-msgid "The path '%s' cannot be mapped to a column"
-msgstr ""
 
 #: prewikka/views/about/__init__.py:13
 msgid "Prelude About page"
@@ -1212,37 +1206,32 @@ msgid "Schedule:"
 msgstr ""
 
 #: prewikka/views/crontab/templates/cronjob.mak:73
-#, fuzzy
 msgid "custom"
-msgstr "Personalizado"
+msgstr "personalizado"
 
 #: prewikka/views/crontab/templates/cronjob.mak:74
 msgid "disabled"
-msgstr ""
+msgstr "desativado"
 
 #: prewikka/views/crontab/templates/cronjob.mak:83
-#, fuzzy
 msgid "Minute:"
-msgstr "%d minuto"
+msgstr "Minuto:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:87
-#, fuzzy
 msgid "Hour:"
-msgstr "%d hora"
+msgstr "Hora:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:91
-#, fuzzy
 msgid "Day:"
-msgstr "Hoje"
+msgstr "Dia:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:95
-#, fuzzy
 msgid "Month:"
-msgstr "%d mês"
+msgstr "Mês:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:99
 msgid "Weekday:"
-msgstr ""
+msgstr "Dia da semana:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:111
 msgid "Edit Job"
@@ -1269,9 +1258,8 @@ msgid "Schedule"
 msgstr ""
 
 #: prewikka/views/crontab/templates/crontab.mak:13
-#, fuzzy
 msgid "User"
-msgstr "Novembro"
+msgstr "Usuário"
 
 #: prewikka/views/crontab/templates/crontab.mak:13
 msgid "Last execution"
@@ -1479,7 +1467,7 @@ msgid "Alert and Heartbeat listing page"
 msgstr "Lista de Heartbeats"
 
 #: prewikka/views/messagelisting/alertlisting.py:547
-#: prewikka/views/messagelisting/alertlisting.py:919
+#: prewikka/views/messagelisting/alertlisting.py:921
 #: prewikka/views/messagesummary/messagesummary.py:659
 #, fuzzy
 msgid "Alert details"
@@ -1497,7 +1485,12 @@ msgstr "Alerta de Correlação"
 msgid "Tool Alert"
 msgstr "Alerta das Ferramentas"
 
-#: prewikka/views/messagelisting/alertlisting.py:1202
+#: prewikka/views/messagelisting/alertlisting.py:1219
+#, python-format
+msgid "The path '%s' cannot be mapped to a column"
+msgstr ""
+
+#: prewikka/views/messagelisting/alertlisting.py:1237
 msgid "Threats"
 msgstr "Ameaças"
 
@@ -1709,20 +1702,19 @@ msgstr "Limite"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:95
 msgid "First page"
-msgstr ""
+msgstr "Primeira página"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:98
 msgid "Previous page"
-msgstr ""
+msgstr "Página anterior"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:101
-#, fuzzy
 msgid "Next page"
-msgstr "Nome do nó"
+msgstr "Próxima página"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:104
 msgid "Last page"
-msgstr ""
+msgstr "Última página"
 
 #: prewikka/views/messagelisting/templates/messagelisting.mak:110
 msgid "total"
@@ -1980,9 +1972,8 @@ msgstr "Categoria do usuário"
 
 #: prewikka/views/messagesummary/messagesummary.py:779
 #: prewikka/views/messagesummary/messagesummary.py:798
-#, fuzzy
 msgid "Number"
-msgstr "Novembro"
+msgstr "Número"
 
 #: prewikka/views/messagesummary/messagesummary.py:780
 msgid "Tty"
