@@ -1,3 +1,17 @@
+* 2017-06-23, prewikka-4.1.0beta2:
+
+Author: Yoann Vandoorselaere
+
+- Implement Prewikka help framework
+- Fix Prewikka OSS warning
+
+Author: Antoine Luong
+
+- Improve link generation, add datatype argument to @route
+- Fix typo with AlertListing expand link
+
+
+
 * 2017-06-16, prewikka-4.1.0beta1:
 
 Author: Camille Gardet
