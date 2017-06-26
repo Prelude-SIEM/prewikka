@@ -77,7 +77,7 @@ class Log(object):
             hdlr = logging.StreamHandler(sys.stderr)
 
         else:
-            raise _("Unknown logtype specified: '%s'") % logtype
+            raise ValueError(_("Unknown logtype specified: '%s'") % logtype)
 
         format = 'prewikka (pid:%(process)d) %(name)s %(levelname)s: %(message)s'
         if logtype in ['file', 'stderr']:
