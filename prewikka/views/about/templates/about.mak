@@ -54,7 +54,7 @@ from prewikka import version
     </div>
 
     <div class="modal-footer">
-      <a class="btn btn-default widget-only" aria-hidden="true" data-dismiss="modal">${ _('Close') }</a>
+      <button class="btn btn-default widget-only" aria-hidden="true" data-dismiss="modal">${ _('Close') }</button>
     </div>
   </div>
 </div>

@@ -87,7 +87,7 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
     </div>
 
     <div class="modal-footer">
-      <a class="btn btn-default widget-only" aria-hidden="true" data-dismiss="modal">${ _('Close') }</a>
+      <button class="btn btn-default widget-only" aria-hidden="true" data-dismiss="modal">${ _('Close') }</button>
     </div>
   </div>
 </div>
