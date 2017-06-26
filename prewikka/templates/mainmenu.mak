@@ -5,8 +5,9 @@ $(document).ready(function() {
     $('#main_menu_ng input, #main_menu_ng select').addClass("form-control input-sm");
     $('#main_menu_ng button').addClass("btn-sm");
   % else:
-    $('#main_menu_ng_block div.form-group > div:first-child').addClass("control-label col-sm-2")
-    $('#main_menu_ng_block div.form-group > div:last-child').addClass("col-sm-10")
+    $('#main_menu_ng_block div.form-group > div:first-child').addClass("control-label col-sm-${label_width} input-${input_size}");
+    $('#main_menu_ng_block div.form-group > div:last-child').addClass("col-sm-${12 - label_width}");
+    $('#main_menu_ng_block input, #main_menu_ng_block select').addClass("form-control input-${input_size}");
     $('#main_menu_ng_block button').addClass("btn-block");
   % endif
 });
@@ -98,8 +99,8 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
 
       % if not(inline):
       <div class="form-group collapse" style="margin-top: -15px;">
-        <div class="col-sm-2">&nbsp;</div>
-        <div class="col-sm-10">
+        <div class="col-sm-${label_width}">&nbsp;</div>
+        <div class="col-sm-${12 - label_width}">
       % endif
 
           <div class="form-group-date ${ 'form-group' if inline else 'col-sm-6' }">

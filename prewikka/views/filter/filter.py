@@ -166,6 +166,10 @@ class FilterView(FilterPlugin, view.View):
         if not fname:
             return
 
+        return self._filter_get_criteria_by_name(fname, ctype)
+
+    @hookmanager.register("HOOK_FILTER_GET_CRITERIA")
+    def _filter_get_criteria_by_name(self, fname, ctype):
         f = self._db.get_filter(env.request.user, fname)
         if not f:
             return
@@ -176,7 +180,7 @@ class FilterView(FilterPlugin, view.View):
     def _filter_html_menu(self, ctype):
         dset = self._filter_menu_tmpl.dataset()
         dset["current_filter"] = env.request.parameters.get("filter", "")
-        dset["filter_list"] = (f.name for f in self._db.get_filters(env.request.user, ctype))
+        dset["filter_list"] = self._db.get_filters(env.request.user, ctype)
 
         return resource.HTMLSource(dset.render())
 

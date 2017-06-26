@@ -121,10 +121,11 @@ class MainMenuStep(object):
 
 class MainMenu(object):
     def __init__(self, criteria_type=None, **kwargs):
-        env.request.menu = self
+        if kwargs.get("inline", True):
+            env.request.menu = self
 
         self._criteria_type = criteria_type
-        self.dataset = _MAINMENU_TEMPLATE.dataset(inline=True, period=True, refresh=True)
+        self.dataset = _MAINMENU_TEMPLATE.dataset(inline=True, period=True, refresh=True, label_width=2, input_size="md")
         self.dataset.update(kwargs)
 
         self.dataset["timeline"] = utils.AttrObj()
