@@ -563,6 +563,7 @@ class ViewManager(registrar.DelayedRegistrar):
 
         if datatype:
             self._references.setdefault(datatype, []).append(v)
+            v._criteria_to_urlparams = baseview._criteria_to_urlparams
 
         self._views_endpoint[v.view_endpoint] = v
         self._rule_map.add(Rule(path, endpoint=v.view_endpoint, methods=methods, defaults=defaults))
