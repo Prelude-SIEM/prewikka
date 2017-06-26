@@ -114,58 +114,50 @@ class Agents(view.View):
         analyzer.last_heartbeat_time = localization.format_timedelta(delta, add_direction=True)
 
         analyzer.status = None
-        analyzer.events = [ ]
+        analyzer.events = []
 
         res = env.dataprovider.get(Criterion("heartbeat.analyzer(-1).analyzerid", "=", analyzerid), limit=self._heartbeat_count)
 
         prev = None
-        latest = True
         total_interval = 0
 
-        for idx, cur in enumerate(res):
-            cur = cur["heartbeat"]
-            cur_status, cur_interval, cur_time = cur.get("additional_data('Analyzer status').data")[0], cur["heartbeat_interval"], cur["create_time"]
-            cur_time_str = localization.format_datetime(float(cur_time))
+        # Iterate from oldest heartbeat to newest
+        for obj in reversed(res):
+            cur = HeartbeatObject(obj["heartbeat"])
 
-            try:
-                prev = res[idx + 1]["heartbeat"]
-                prev_status, prev_time = prev.get("additional_data('Analyzer status').data")[0], prev["create_time"]
-            except:
-                break
-
-            if not cur_status or not cur_interval:
+            if not (prev and cur.status and cur.interval):
+                prev = cur
                 continue
 
-            total_interval += int(cur_interval)
-
-            if latest:
-                latest = False
-                analyzer.status, analyzer.status_meaning = \
-                    utils.get_analyzer_status_from_latest_heartbeat(cur, self._heartbeat_error_margin)
-                if analyzer.status == "missing":
-                    delta = time.time() - float(cur_time)
-                    analyzer.events.append(utils.AttrObj(time=cur_time_str, value=_("Sensor is down since %s") % localization.format_timedelta(delta), type="down"))
+            total_interval += cur.interval
 
             event = None
-            if cur_status == "starting":
-                if prev_status == "exiting":
-                    event = utils.AttrObj(time=cur_time_str, value=_("Normal sensor start"), type="start")
+            if cur.status == "starting":
+                if prev.status == "exiting":
+                    event = utils.AttrObj(time=cur.time_str, value=_("Normal sensor start"), type="start")
                 else:
-                    event = utils.AttrObj(time=cur_time_str, value=_("Unexpected sensor restart"), type="unexpected_restart")
+                    event = utils.AttrObj(time=cur.time_str, value=_("Unexpected sensor restart"), type="unexpected_restart")
 
-            elif cur_status == "running":
-                delta = abs(int(cur_time) - int(prev_time) - int(cur_interval))
-                if delta > self._heartbeat_error_margin:
+            elif cur.status == "running":
+                delta = int(cur.time) - int(prev.time)
+                if abs(delta - cur.interval) > self._heartbeat_error_margin:
                     delta = localization.format_timedelta(delta, granularity="second")
-                    event = utils.AttrObj(time=cur_time_str, value=_("Unexpected heartbeat interval: %(delta)s") % {'delta': delta}, type="abnormal_heartbeat_interval")
+                    event = utils.AttrObj(time=cur.time_str, value=_("Unexpected heartbeat interval: %(delta)s") % {'delta': delta}, type="abnormal_heartbeat_interval")
 
-            elif cur_status == "exiting":
-                event = utils.AttrObj(time=cur_time_str, value=_("Normal sensor stop"), type="normal_stop")
-
+            elif cur.status == "exiting":
+                event = utils.AttrObj(time=cur.time_str, value=_("Normal sensor stop"), type="normal_stop")
 
             if event:
                 analyzer.events.append(event)
 
+            prev = cur
+
+        if prev:
+            analyzer.status, analyzer.status_meaning = \
+                utils.get_analyzer_status_from_latest_heartbeat(obj["heartbeat"], self._heartbeat_error_margin)
+            if analyzer.status == "missing":
+                delta = time.time() - float(prev.time)
+                analyzer.events.append(utils.AttrObj(time=prev.time_str, value=_("Sensor is down since %s") % localization.format_timedelta(delta), type="down"))
 
         if not analyzer.status:
             analyzer.status, analyzer.status_meaning = "unknown", _("Unknown")
@@ -179,3 +171,11 @@ class Agents(view.View):
             ))
 
         return template.PrewikkaTemplate(__name__, "templates/heartbeatanalyze.mak").render(analyzer=analyzer)
+
+
+class HeartbeatObject(object):
+    def __init__(self, heartbeat):
+        self.status = heartbeat.get("additional_data('Analyzer status').data")[0]
+        self.interval = heartbeat["heartbeat_interval"]
+        self.time = heartbeat["create_time"]
+        self.time_str = localization.format_datetime(float(self.time))

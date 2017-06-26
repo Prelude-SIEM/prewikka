@@ -57,7 +57,7 @@
         </thead>
 
         <tbody>
-          % for event in analyzer.events:
+          % for event in reversed(analyzer.events):
             <tr>
               <td class="heartbeat_analyzer_event_${ event.type }">${ event.time }</td>
               <td class="heartbeat_analyzer_event_${ event.type }">${ event.value }</td>
