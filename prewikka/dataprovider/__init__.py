@@ -437,12 +437,11 @@ class DataProviderManager(pluginmanager.PluginManager):
 
             self._backends[p.type] = p
 
-            for p in self._type_handlers.values():
-                p.post_load()
+        for p in self._type_handlers.values():
+            p.post_load()
 
-            for p in self._backends.values():
-                p.post_load()
-
+        for p in self._backends.values():
+            p.post_load()
 
     @staticmethod
     def _parse_path(path):
