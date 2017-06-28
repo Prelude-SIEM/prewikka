@@ -525,8 +525,8 @@ class ViewManager(registrar.DelayedRegistrar):
         view = view_kwargs = view_layout = None
 
         try:
-            endpoint, view_kwargs = env.request.url_adapter.match(request.path, method=request.method)
-            view = self._views_endpoint[endpoint]
+            rule, view_kwargs = env.request.url_adapter.match(request.path, method=request.method, return_rule=True)
+            view = self._views_rules[rule]
 
         except werkzeug.exceptions.MethodNotAllowed:
             raise InvalidMethodError(N_("Method '%(method)s' is not allowed for view '%(view)s'",
@@ -581,8 +581,10 @@ class ViewManager(registrar.DelayedRegistrar):
             self._references.setdefault(datatype, []).append(v)
             v._criteria_to_urlparams = baseview._criteria_to_urlparams
 
-        self._views_endpoint[v.view_endpoint] = v
-        self._rule_map.add(Rule(path, endpoint=v.view_endpoint, methods=methods, defaults=defaults))
+        rule = Rule(path, endpoint=v.view_endpoint, methods=methods, defaults=defaults)
+
+        self._views_rules[rule] = v
+        self._rule_map.add(rule)
 
     def addView(self, view):
         rdfunc = getattr(view, "render")
@@ -600,8 +602,10 @@ class ViewManager(registrar.DelayedRegistrar):
             if view.view_datatype:
                 self._references.setdefault(view.view_datatype, []).append(view)
 
-            self._views_endpoint[view.view_endpoint] = view
-            self._rule_map.add(Rule((view.view_path or "/" + view.view_id), endpoint=view.view_endpoint))
+            rule = Rule((view.view_path or "/" + view.view_id), endpoint=view.view_endpoint)
+
+            self._views_rules[rule] = view
+            self._rule_map.add(rule)
             self._views[view.view_id] = view
 
     def loadViews(self):
@@ -637,7 +641,7 @@ class ViewManager(registrar.DelayedRegistrar):
         self._routes = Map()
         self._references = {}
 
-        self._views_endpoint = {}
+        self._views_rules = {}
         self._rule_map = Map(converters={'list': ListConverter})
 
         builtins.url_for = self.url_for
@@ -652,10 +656,14 @@ class ViewManager(registrar.DelayedRegistrar):
             endpoint += ".render"
 
         default = kwargs.pop("_default", _SENTINEL)
-        if default is not _SENTINEL and endpoint not in self._views_endpoint:
-            return default
 
-        return env.request.url_adapter.build(endpoint, values=kwargs)
+        try:
+            return env.request.url_adapter.build(endpoint, values=kwargs)
+        except Exception as exc:
+            if default is not _SENTINEL:
+                return default
+
+            raise exc
 
     def __contains__(self, view_id):
         return view_id in self._views
