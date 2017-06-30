@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Prewikka 4.1.0beta2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-13 21:57+0200\n"
-"PO-Revision-Date: 2017-06-23 19:39+0200\n"
+"PO-Revision-Date: 2017-06-30 17:51+0200\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
 "Plural-Forms: nplurals=2; plural=(n > 1)\n"
@@ -29,36 +29,36 @@ msgstr "Permission manquante pour accéder au fichier spécifié"
 msgid "parse error in \"%(txt)s\" at %(file)s line %(line)d"
 msgstr "erreur de parsing dans \"%(txt)s\" à la ligne %(line)d de %(file)s"
 
-#: prewikka/crontab.py:38
+#: prewikka/crontab.py:34
 msgid "Hourly"
 msgstr "Toutes les heures"
 
-#: prewikka/crontab.py:39
+#: prewikka/crontab.py:35
 msgid "Daily"
 msgstr "Quotidien"
 
-#: prewikka/crontab.py:40
+#: prewikka/crontab.py:36
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
-#: prewikka/crontab.py:41
+#: prewikka/crontab.py:37
 msgid "Monthly"
 msgstr "Mensuel"
 
-#: prewikka/crontab.py:42
+#: prewikka/crontab.py:38
 msgid "Yearly"
 msgstr "Annuel"
 
-#: prewikka/crontab.py:43 prewikka/mainmenu.py:298
-#: prewikka/templates/mainmenu.mak:88
+#: prewikka/crontab.py:39 prewikka/mainmenu.py:299
+#: prewikka/templates/mainmenu.mak:89
 msgid "Custom"
 msgstr "Personnalisé"
 
-#: prewikka/crontab.py:44 prewikka/views/crontab/__init__.py:70
+#: prewikka/crontab.py:40 prewikka/views/crontab/__init__.py:70
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: prewikka/crontab.py:113
+#: prewikka/crontab.py:109
 msgid "Scheduled job execution failed"
 msgstr "Échec de l'exécution de la tâche planifiée"
 
@@ -252,69 +252,69 @@ msgstr ""
 msgid "Session '%s' does not accept any authentication module"
 msgstr "La session '%s' n'accepte pas de module d'authentification"
 
-#: prewikka/main.py:286
+#: prewikka/main.py:287
 #, python-format
 msgid "An unexpected condition happened while trying to load %s"
 msgstr "Une erreur inattendue s'est produite au chargement de %s"
 
-#: prewikka/mainmenu.py:132
+#: prewikka/mainmenu.py:133
 msgid "Today"
 msgstr "Aujourd'hui"
 
-#: prewikka/mainmenu.py:133
+#: prewikka/mainmenu.py:134
 msgid "This month"
 msgstr "Ce mois"
 
-#: prewikka/mainmenu.py:134 prewikka/mainmenu.py:135
+#: prewikka/mainmenu.py:135 prewikka/mainmenu.py:136
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d heure"
 msgstr[1] "%d heures"
 
-#: prewikka/mainmenu.py:136 prewikka/mainmenu.py:137
+#: prewikka/mainmenu.py:137 prewikka/mainmenu.py:138
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d jour"
 msgstr[1] "%d jours"
 
-#: prewikka/mainmenu.py:138
+#: prewikka/mainmenu.py:139
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d semaine"
 msgstr[1] "%d semaines"
 
-#: prewikka/mainmenu.py:139 prewikka/mainmenu.py:140
+#: prewikka/mainmenu.py:140 prewikka/mainmenu.py:141
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mois"
 msgstr[1] "%d mois"
 
-#: prewikka/mainmenu.py:141
+#: prewikka/mainmenu.py:142
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d an"
 msgstr[1] "%d ans"
 
-#: prewikka/mainmenu.py:144
+#: prewikka/mainmenu.py:145
 #, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d seconde"
 msgstr[1] "%d secondes"
 
-#: prewikka/mainmenu.py:145 prewikka/mainmenu.py:146 prewikka/mainmenu.py:147
+#: prewikka/mainmenu.py:146 prewikka/mainmenu.py:147 prewikka/mainmenu.py:148
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minute"
 msgstr[1] "%d minutes"
 
-#: prewikka/mainmenu.py:300 prewikka/templates/mainmenu.mak:63
+#: prewikka/mainmenu.py:301 prewikka/templates/mainmenu.mak:64
 msgid "Inactive"
 msgstr "Inactif"
 
@@ -396,12 +396,12 @@ msgstr "Méthode invalide"
 msgid "Invalid view"
 msgstr "Vue invalide"
 
-#: prewikka/view.py:516
+#: prewikka/view.py:532
 #, python-format
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
 msgstr "La méthode '%(method)s' n'est pas autorisée pour la vue '%(view)s'"
 
-#: prewikka/view.py:520 prewikka/view.py:532
+#: prewikka/view.py:536 prewikka/view.py:548
 #, python-format
 msgid "View '%s' does not exist"
 msgstr "La vue '%s' n'existe pas"
@@ -700,47 +700,47 @@ msgstr "Réessayer"
 msgid "Redirect to main page"
 msgstr "Page principale"
 
-#: prewikka/templates/mainmenu.mak:46
+#: prewikka/templates/mainmenu.mak:47
 msgid "Refresh:"
 msgstr "Rafraîchir :"
 
-#: prewikka/templates/mainmenu.mak:51
+#: prewikka/templates/mainmenu.mak:52
 msgid "Update frequency of the current page"
 msgstr "Fréquence de rafraîchissement de la page"
 
-#: prewikka/templates/mainmenu.mak:77
+#: prewikka/templates/mainmenu.mak:78
 msgid "Period:"
 msgstr "Période :"
 
-#: prewikka/templates/mainmenu.mak:82
+#: prewikka/templates/mainmenu.mak:83
 msgid "Period to visualize"
 msgstr "Période à visualiser"
 
-#: prewikka/templates/mainmenu.mak:107
+#: prewikka/templates/mainmenu.mak:108
 msgid "Start:"
 msgstr "Début :"
 
-#: prewikka/templates/mainmenu.mak:110
+#: prewikka/templates/mainmenu.mak:111
 msgid "start"
 msgstr "début"
 
-#: prewikka/templates/mainmenu.mak:110
+#: prewikka/templates/mainmenu.mak:111
 msgid "Start date"
 msgstr "Date de début"
 
-#: prewikka/templates/mainmenu.mak:116
+#: prewikka/templates/mainmenu.mak:117
 msgid "End:"
 msgstr "Fin :"
 
-#: prewikka/templates/mainmenu.mak:120
+#: prewikka/templates/mainmenu.mak:121
 msgid "end"
 msgstr "fin"
 
-#: prewikka/templates/mainmenu.mak:120
+#: prewikka/templates/mainmenu.mak:121
 msgid "End date"
 msgstr "Date de fin"
 
-#: prewikka/templates/mainmenu.mak:131
+#: prewikka/templates/mainmenu.mak:132
 msgid "Go!"
 msgstr "Go !"
 
@@ -768,7 +768,7 @@ msgstr ""
 msgid "Offline"
 msgstr "Déconnecté"
 
-#: prewikka/utils/misc.py:63 prewikka/views/agents/agents.py:171
+#: prewikka/utils/misc.py:63 prewikka/views/agents/agents.py:163
 msgid "Unknown"
 msgstr "Inconnu"
 
@@ -1083,29 +1083,29 @@ msgstr "IDMEF VIEW"
 msgid "IDMEF_ALTER"
 msgstr "IDMEF ALTER"
 
-#: prewikka/views/agents/agents.py:147
-#, python-format
-msgid "Sensor is down since %s"
-msgstr "Sonde déconnectée depuis %s"
-
-#: prewikka/views/agents/agents.py:152
+#: prewikka/views/agents/agents.py:137
 msgid "Normal sensor start"
 msgstr "Démarrage normal de la sonde"
 
-#: prewikka/views/agents/agents.py:154
+#: prewikka/views/agents/agents.py:139
 msgid "Unexpected sensor restart"
 msgstr "Redémarrage inopiné de la sonde"
 
-#: prewikka/views/agents/agents.py:160
+#: prewikka/views/agents/agents.py:145
 #, python-format
 msgid "Unexpected heartbeat interval: %(delta)s"
 msgstr "Intervalle de pulsation inopiné : %(delta)s"
 
-#: prewikka/views/agents/agents.py:163
+#: prewikka/views/agents/agents.py:148
 msgid "Normal sensor stop"
 msgstr "Arrêt normal de la sonde"
 
-#: prewikka/views/agents/agents.py:177
+#: prewikka/views/agents/agents.py:160
+#, python-format
+msgid "Sensor is down since %s"
+msgstr "Sonde déconnectée depuis %s"
+
+#: prewikka/views/agents/agents.py:169
 #, python-format
 msgid ""
 "No anomaly in the last %(count)d heartbeats (one heartbeat every "
@@ -1323,15 +1323,15 @@ msgstr "Filtres"
 msgid "Filter %s"
 msgstr "Filtre %s"
 
-#: prewikka/views/filter/filter.py:212 prewikka/views/filter/filter.py:222
+#: prewikka/views/filter/filter.py:216 prewikka/views/filter/filter.py:226
 msgid "Could not save filter"
 msgstr "Impossible de sauvegarder le filtre"
 
-#: prewikka/views/filter/filter.py:212
+#: prewikka/views/filter/filter.py:216
 msgid "No name for this filter was provided"
 msgstr "Nom du filtre non renseigné"
 
-#: prewikka/views/filter/filter.py:222
+#: prewikka/views/filter/filter.py:226
 msgid "The filter name is already used by another filter"
 msgstr "Le nom du filtre est déjà utilisé par un autre filtre"
 
