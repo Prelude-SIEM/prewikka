@@ -1,3 +1,20 @@
+* 2017-06-30, prewikka-4.1.0rc1:
+
+Author: Antoine Luong
+
+- Fix wrong diagnostic in HeartbeatAnalyze
+- Make mainmenu more customizable in non-inline mode
+- Better handle return key in modals
+- Fix post_load multiple calls
+
+Author: Yoann Vandoorselaere
+
+- Fix rule -> view mapping
+- Fix exception when database object is unavailable
+- Implement HOOK_PLUGINS_RELOAD
+
+
+
 * 2017-06-23, prewikka-4.1.0beta2:
 
 Author: Yoann Vandoorselaere
