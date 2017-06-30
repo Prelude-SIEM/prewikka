@@ -54,7 +54,7 @@ class _IDMEFProvider(DataProviderBase):
 class IDMEFAlertProvider(_IDMEFProvider):
     plugin_name = "IDMEF Alert provider"
     plugin_description = N_("Provides an API to fetch IDMEF alerts")
-    label = N_("Alerts")
+    dataprovider_label = N_("Alerts")
 
     def get_paths(self):
         return self._get_paths(prelude.IDMEFClass("alert"))
@@ -73,7 +73,7 @@ class IDMEFAlertProvider(_IDMEFProvider):
 class IDMEFHeartbeatProvider(_IDMEFProvider):
     plugin_name = "IDMEF Heartbeat provider"
     plugin_description = N_("Provides an API to fetch IDMEF heartbeats")
-    label = N_("Heartbeats")
+    dataprovider_label = N_("Heartbeats")
 
     def get_paths(self):
         return self._get_paths(prelude.IDMEFClass("heartbeat"))

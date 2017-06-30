@@ -227,7 +227,7 @@ class DataProviderBackend(pluginmanager.PluginBase):
 
 
 class DataProviderBase(pluginmanager.PluginBase):
-    label = None
+    dataprovider_label = None
 
     def __init__(self, time_field=None):
         if time_field is None:
@@ -556,7 +556,7 @@ class DataProviderManager(pluginmanager.PluginManager):
         return wanted_type in self._backends
 
     def get_label(self, type):
-        return self._type_handlers[type].label
+        return self._type_handlers[type].dataprovider_label
 
     def register_path(self, path, path_type, type=None):
         if not type:
