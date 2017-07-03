@@ -26,7 +26,7 @@ import time
 import urllib
 
 import pkg_resources
-from prewikka import hookmanager, localization, mainmenu, resolve, usergroup, utils, view
+from prewikka import hookmanager, localization, mainmenu, resolve, usergroup, utils, view, response
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -139,7 +139,7 @@ class HostInfoAjax(view.View):
         for info in hookmanager.trigger("HOOK_HOST_TOOLTIP", env.request.parameters["host"]):
             infos.extend(info)
 
-        return infos
+        return response.PrewikkaDirectResponse(infos)
 
 class MessageListing(view.View):
     plugin_htdocs = (("messagelisting", pkg_resources.resource_filename(__name__, 'htdocs')),)

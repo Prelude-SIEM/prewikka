@@ -121,7 +121,8 @@ $(document).ready(function(){
         "text": "Loading..."
       }));
 
-      $.ajax({
+      prewikka_ajax({
+          spinner: false,
           type: "GET",
           url: $(this).data("popup-url"),
           success: function(data) {

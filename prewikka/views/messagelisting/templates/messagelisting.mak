@@ -34,12 +34,12 @@ $(document).ready(function() {
         title: function() {
             var title = $(this).data("title");
             if ( ! title && $(this).data("title-url") ) {
-                $.ajax({
+                prewikka_ajax({
+                    spinner: false,
                     async: false,
                     type: "GET",
                     url: $(this).data("title-url"),
-                    success: function(data) {
-                        title = data.content;
+                    success: function(title) {
                         if ( title instanceof Array ) {
                             title = title.map(function(v, i) {
                                 return $("<div>").text(v).html();

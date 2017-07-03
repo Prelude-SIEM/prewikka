@@ -186,6 +186,9 @@ function prewikka_process_ajax_response(settings, data)
 
 function prewikka_ajax(settings)
 {
+        if ( settings['spinner'] != undefined && ! settings["spinner"] )
+                settings["global"] = false;
+
         if ( settings['dataType'] == undefined )
                 settings['dataType'] = "json";
 
