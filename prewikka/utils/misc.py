@@ -56,7 +56,8 @@ class AttrObj(object):
 
 # FIXME: Need appropriate implementation
 def get_analyzer_status_from_latest_heartbeat(heartbeat, error_margin):
-    if heartbeat.get("additional_data('Analyzer status').data") == ("exiting",):
+    res = heartbeat.get("additional_data('Analyzer status').data")
+    if res and res[0] == "exiting":
         return "offline", _("Offline")
 
     if heartbeat.get("heartbeat_interval") is None:
