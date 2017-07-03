@@ -24,6 +24,7 @@ import io
 import os
 import stat
 import subprocess
+import tempfile
 
 from ez_setup import use_setuptools
 use_setuptools()
@@ -83,10 +84,11 @@ class my_install(install):
 
     def init_siteconfig(self):
         config = open("prewikka/siteconfig.py", "w")
-        config.write("conf_dir = '%s'\n" % os.path.abspath((self.conf_prefix)))
-        config.write("data_dir = '%s'\n" % os.path.abspath(self.data_prefix))
-        config.write("libprelude_required_version = '%s'\n" % LIBPRELUDE_REQUIRED_VERSION)
-        config.write("libpreludedb_required_version = '%s'\n" % LIBPRELUDEDB_REQUIRED_VERSION)
+        config.write("tmp_dir = '%s'\n" % (os.path.join(tempfile.gettempdir(), "prewikka")))
+        config.write("conf_dir = '%s'\n" % (os.path.abspath(self.conf_prefix)))
+        config.write("data_dir = '%s'\n" % (os.path.abspath(self.data_prefix)))
+        config.write("libprelude_required_version = '%s'\n" % (LIBPRELUDE_REQUIRED_VERSION))
+        config.write("libpreludedb_required_version = '%s'\n" % (LIBPRELUDEDB_REQUIRED_VERSION))
         config.close()
 
     def install_wsgi(self):

@@ -1,8 +1,13 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import errno
+import os
+import stat
 import sys
 import prelude
 import preludedb
+
+from prewikka import siteconfig
 
 if sys.version_info >= (3, 0):
     import builtins
@@ -18,6 +23,22 @@ try:
     from threading import local
 except ImportError:
     from dummy_threading import local
+
+
+# Set default umask and create temporary directory
+os.umask(0o027)
+
+try:
+    os.mkdir(siteconfig.tmp_dir, 0o700)
+except OSError as e:
+    if e.errno != errno.EEXIST:
+        raise
+
+    if not os.access(siteconfig.tmp_dir, os.R_OK | os.W_OK | os.X_OK):
+        raise Exception("Prewikka temporary directory '%s' lack u+rwx permissions" % siteconfig.tmp_dir)
+
+    if stat.S_IMODE(os.stat(siteconfig.tmp_dir).st_mode) & stat.S_IRWXO:
+        raise Exception("Prewikka temporary directory '%s' is world accessible" % siteconfig.tmp_dir)
 
 
 class _cache(object):
