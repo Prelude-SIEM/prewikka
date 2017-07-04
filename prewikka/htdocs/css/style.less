@@ -142,12 +142,12 @@ p {
 #topmenu_right {
     float: right;
     margin-right: 4px;
+    margin-top: 13px;
+}
 
-    .prewikka-config-button, .prewikka-help-button {
-        position: relative;  /* make sure buttons are clickable */
-        padding: 5px;
-        margin-top: 18px;
-    }
+.main_menu_form_submit, .prewikka-config-button, .prewikka-help-button {
+    position: relative;  /* make sure buttons are clickable */
+    padding: 5px;
 }
 
 
@@ -156,7 +156,7 @@ p {
  */
 #main_menu_ng {
     position: fixed;
-    top: 41px;
+    top: 57px;
     right: 73px;
     z-index: 4;
     max-width: 60%;
@@ -209,10 +209,13 @@ p {
         &.disabled {
           cursor: initial;
         }
-        margin-top: 19px;
     }
     .form-control {
         width: 100%;
+    }
+
+    label {
+        display: none;
     }
 }
 

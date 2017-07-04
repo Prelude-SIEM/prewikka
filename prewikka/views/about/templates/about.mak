@@ -13,16 +13,26 @@ from prewikka import version
 
     <div class="modal-body about">
       <h4>${ _("Prelude is a SIEM (Security Information and Event Management)") }</h4>
-      <p>
-        ${ _("{prelude} is a security management solution that collects, filters, normalizes, correlates, stores and archives data from various sources of your information system. Based on all this information Prelude can provide a global vision of your system's security level and thus prevent attacks, intrusions as well as viral infections.").format(prelude="<a href='http://www.prelude-siem.com'>Prelude</a>") | n }
-      </p>
+      <div class="software">
+        <div class="col-sm-3">
+          <img src="about/images/prelude-logo-400.png"/>
+        </div>
+        <p class="col-sm-9">
+          ${ _("{prelude} is a security management solution that collects, filters, normalizes, correlates, stores and archives data from various sources of your information system. Based on all this information Prelude can provide a global vision of your system's security level and thus prevent attacks, intrusions as well as viral infections.").format(prelude="<a href='http://www.prelude-siem.com'>Prelude</a>") | n }
+        </p>
+      </div>
       <p style="margin-top: 15px"><u>${ _("Prelude Team:")}</u> Gilles Lehmann, Thomas Andrejak, Fran&ccedil;ois Poirotte, Yoann Vandoorselaere, Antoine Luong, Song Tran, Camille Gardet, Abdel Elmili, Cl&eacute;mentine Bourdin, Enguerrand de Mauduit, Avinash Pardessy, Jean-Charles Rogez, S&eacute;lim Menouar, Louis-David Gabet.</p>
       <p style="margin-top: 15px">${ _("Prelude OSS is an open-source project originally created by Yoann Vandoorselaere in 1998.") }</p>
 
       <h4>${ _("Vigilo is a NMS (Network Management System)") }</h4>
-      <p>
-        ${ _("{vigilo} is a complete monitoring and performance management solution capable of handling medium and large-scale systems (network - servers - applications) due to its distributed and modular architecture. Vigilo offers all the features required for performance supervision: states and alarms management, metrology, cartography, event correlation and reporting.").format(vigilo="<a href='http://www.vigilo-nms.com'>Vigilo</a>") | n}
-      </p>
+      <div class="software">
+        <div class="col-sm-3">
+          <img src="about/images/vigilo-logo-400.png"/>
+        </div>
+        <p class="col-sm-9">
+          ${ _("{vigilo} is a complete monitoring and performance management solution capable of handling medium and large-scale systems (network - servers - applications) due to its distributed and modular architecture. Vigilo offers all the features required for performance supervision: states and alarms management, metrology, cartography, event correlation and reporting.").format(vigilo="<a href='http://www.vigilo-nms.com'>Vigilo</a>") | n}
+        </p>
+      </div>
 
       <br/>
       <p>

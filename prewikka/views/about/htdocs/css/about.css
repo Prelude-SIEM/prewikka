@@ -31,3 +31,12 @@
     margin-top: 1em;
     text-align: center;
 }
+
+.about .software {
+    display: flex;
+    align-items: center;
+}
+
+.about .software img {
+    width: 100%;
+}

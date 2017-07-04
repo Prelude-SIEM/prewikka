@@ -1,7 +1,6 @@
 <script type="text/javascript">
 $(document).ready(function() {
   % if inline:
-    $('#main_menu_ng label').addClass("label-xs");
     $('#main_menu_ng input, #main_menu_ng select').addClass("form-control input-sm");
     $('#main_menu_ng button').addClass("btn-sm");
   % else:
@@ -105,7 +104,7 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
 
           <div class="form-group-date ${ 'form-group' if inline else 'col-sm-6' }">
             <div>
-              <label class="label-xs">${ _("Start:") }</label>
+              <label>${ _("Start:") }</label>
             </div>
             <div>
               <input class="form-control input-timeline-datetime timeline_start" type="text" placeholder="${ _("start") }" data-toggle="tooltip" title="${ _("Start date") }" data-trigger="hover" data-container="#main" data-name="timeline_start">
@@ -114,7 +113,7 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
 
           <div class="form-group-date ${ 'form-group' if inline else 'col-sm-6' }">
             <div>
-              <label class="label-xs">${ _("End:") }</label>
+              <label>${ _("End:") }</label>
             </div>
 
             <div>
@@ -129,7 +128,9 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
     % endif
 
     % if inline:
-      <button class="btn btn-primary btn-submit disabled main_menu_form_submit" type="submit">${ _("Go!") }</button>
+      <button class="btn btn-primary btn-submit disabled main_menu_form_submit" type="submit">
+        <i class="fa fa-search fa-lg fa-fw"></i>
+      </button>
     % endif
   </div>
 </div>
