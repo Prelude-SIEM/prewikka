@@ -8,9 +8,8 @@ from datetime import datetime
 import prelude
 import preludedb
 from prelude import IDMEFTime, IDMEFValue
-from prewikka import env, pluginmanager, usergroup, utils, version
+from prewikka import env, usergroup, utils, version
 from prewikka.dataprovider import DataProviderBackend, QueryResults, QueryResultsRow, ResultObject
-from prewikka.utils import AttrObj
 
 _ORDER_MAP = { "time_asc": preludedb.DB.ORDER_BY_CREATE_TIME_ASC, "time_desc": preludedb.DB.ORDER_BY_CREATE_TIME_DESC }
 
@@ -69,6 +68,14 @@ class _IDMEFPlugin(DataProviderBackend):
 
     @usergroup.permissions_required(["IDMEF_VIEW"])
     def get_values(self, paths, criteria, distinct, limit, offset):
+
+        # FIXME: update libpreludedb to perform this automatically?
+        #
+        # This allow get_values() without explicit path or criteria, like
+        # env.dataprovider.query(["count(1)"], type="alert"), to work:
+        if not criteria and not env.dataprovider.guess_datatype(paths, default=None):
+            criteria = "%s.messageid" % self.type
+
         return IDMEFQueryResults(env.idmef_db.getValues(paths, criteria, bool(distinct), limit, offset))
 
     @usergroup.permissions_required(["IDMEF_ALTER"])
