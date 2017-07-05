@@ -338,7 +338,7 @@ function prewikka_grid(table, settings) {
 function _prewikka_html_node(obj)
 {
     if ( typeof(obj.tag) == 'undefined' || typeof(obj.attrs) == 'undefined' || typeof(obj.childs) == 'undefined' )
-        return obj;
+        return _.escape(obj);
 
     var childs = [];
 
