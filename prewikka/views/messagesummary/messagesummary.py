@@ -663,8 +663,13 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                 content += "<li>" + (_("%d linked alerts missing (probably deleted)") % missing) + "</li>"
 
             self.newTableCol(idx + 1, resource.HTMLSource("<ul style='padding: 0px; margin: 0px 0px 0px 10px;'>%s</ul>" % content))
-            last_alert = env.dataprovider.get(self._get_alert_ident_criterion(analyzerid, ident))[0]
-            self.buildAnalyzer(last_alert["alert.analyzer(-1)"])
+
+            linked_alerts = env.dataprovider.get(self._get_alert_ident_criterion(analyzerid, ident))
+            if linked_alerts:
+                self.buildAnalyzer(linked_alerts[0]["alert.analyzer(-1)"])
+            else:
+                self.newTableCol(1, None)
+
             self.newTableRow()
 
     def buildCorrelationAlert(self, alert):
