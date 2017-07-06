@@ -6,6 +6,10 @@
     padding: 0.2em 0.5em;
 }
 
+#message_list_result thead tr th {
+    vertical-align: middle;
+}
+
 .filter_popup_link {
     float: left;
 }

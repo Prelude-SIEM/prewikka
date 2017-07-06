@@ -233,7 +233,7 @@ $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
 <%block name="message_fields_header">
 <thead>
  <tr style="height: 20px;">
-  <td style="text-align: right; min-width: 3.0em;">${ sortable("#", "count", order_by) }</td>
+  <th style="text-align: right; min-width: 3.0em;">${ sortable("#", "count", order_by) }</th>
   <th class="filter_popup">
    <a class="filter_popup_link">${ _("Classification") }</a>
     % if classification_filtered:
@@ -314,14 +314,14 @@ $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
    </div>
   </th>
 
-  <td>${ sortable(_("Date"), "time", order_by) }</td>
+  <th>${ sortable(_("Date"), "time", order_by) }</th>
 
   % for column in extra_column:
-  <td>${ column }</td>
+  <th>${ column }</th>
   % endfor
 
   % if messages and env.request.user.has("IDMEF_ALTER"):
-  <td><input class="checkbox" type="checkbox" id="allbox" /></td>
+  <th><input class="checkbox" type="checkbox" id="allbox" /></th>
   % endif
 
 </tr>
