@@ -83,12 +83,14 @@ class RendererUtils(object):
 
         return label
 
-    def get_color(self, label):
+    def get_color(self, label, onecolor=False):
         if isinstance(self._color_map, dict):
             return self._color_map.get(label, self._nexist_color)[1]
 
         color = self._color_map[self._color_map_idx % len(self._color_map)]
-        self._color_map_idx += 1
+
+        if not onecolor:
+            self._color_map_idx += 1
 
         return color
 
