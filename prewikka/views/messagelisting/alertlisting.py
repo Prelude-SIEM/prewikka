@@ -628,7 +628,7 @@ class ListedAlert(ListedMessage):
                 'time_min': ctime,
                 'time_max': ctime
             }
-            self["extra_link"] = filter(None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
+            self["extra_link"] = filter(lambda x: x is not None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
 
     def setMessageDirectionGeneric(self, direction, object, value, allow_empty_value=True):
         self._initDirectionIfNeeded(direction)
@@ -900,7 +900,7 @@ class AlertListing(MessageListing):
             'time_min': time_min,
             'time_max': time_max
         }
-        message.extra_link = filter(None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
+        message.extra_link = filter(lambda x: x is not None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
 
         result_count = 0
         for classification, severity, completion, count, messageid in res:
