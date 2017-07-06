@@ -506,11 +506,11 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, parsed_criteria=parsed_criteria)
 
-    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None):
+    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None, **kwargs):
         o = self._normalize(type, paths, criteria)
 
         start = time.time()
-        results = self._backends[o.type].get_values(o.parsed_paths, o.parsed_criteria, distinct, limit, offset)
+        results = self._backends[o.type].get_values(o.parsed_paths, o.parsed_criteria, distinct, limit, offset, **kwargs)
         results.duration = time.time() - start
 
         results._paths = o.paths
