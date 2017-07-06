@@ -173,6 +173,9 @@ function _process_ajax_response(settings, data)
 
 function prewikka_process_ajax_response(settings, data)
 {
+    if ( ! data )
+        return;
+
     if ( data.constructor == Object )
         return _process_ajax_response(settings, data);
 
