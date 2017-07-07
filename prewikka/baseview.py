@@ -33,8 +33,7 @@ _CSS_FILES = collections.OrderedDict((resource.CSSLink(link), True) for link in 
     "prewikka/css/jquery-ui-timepicker-addon.min.css",
     "prewikka/css/font-awesome.min.css",
     "prewikka/css/ui.jqgrid.min.css",
-    "prewikka/css/ui.multiselect.min.css",
-    "prewikka/css/loader.css")
+    "prewikka/css/ui.multiselect.min.css")
 )
 
 

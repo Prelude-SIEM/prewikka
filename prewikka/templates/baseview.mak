@@ -259,8 +259,8 @@ def _get_view_url(section, tabs):
 </%block>
 
 <%block name="main_content">
-    <div id="ajax-spinner" class="ajax-spinner" style="display:none;">
-        <div class="loader">${ _("Loading") }</div>
+    <div id="ajax-spinner" class="ajax-spinner main-spinner" style="display:none;">
+        <i class="fa fa-circle-o-notch fa-5x fa-spin"></i>
     </div>
     <div id="main" class="content">
      <%block name="content"></%block>

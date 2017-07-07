@@ -523,13 +523,20 @@ div.prewikka-view-config {
 
 
 .ajax-spinner {
-    position: fixed;
-    left: 0;
-    right: 0;
-    margin: auto;
+    position: relative;
+    text-align: center;
     top: 50%;
-    margin-top: -5em; /* half the height of the spinner */
-    z-index: 1234;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    i.fa-spin {
+        color: gray;
+    }
+
+    &.main-spinner {
+        position: fixed;
+        z-index: 1234;
+    }
 }
 
 .widget-only {
