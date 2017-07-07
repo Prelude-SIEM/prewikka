@@ -19,7 +19,9 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import localization, mainmenu, template, view
+import datetime
+
+from prewikka import crontab, localization, mainmenu, template, utils, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -114,3 +116,16 @@ class HeartbeatListing(MessageListing):
             params[criterion.left.replace("analyzer.", "analyzer(-1).")] = criterion.right
 
         return params
+
+    @crontab.schedule("heartbeat", N_("Heartbeat deletion"), "0 0 * * *", enabled=False)
+    def _heartbeat_cron(self, job):
+        config = env.config.cron.get_instance_by_name("heartbeat")
+        if config is None:
+            return
+
+        days = int(config.get("age", 0))
+        if days < 1:
+            return
+
+        criteria = Criterion("heartbeat.create_time", "<", utils.timeutil.utcnow() - datetime.timedelta(days=days))
+        env.dataprovider.delete(criteria, type="heartbeat")

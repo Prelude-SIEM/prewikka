@@ -19,7 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import database, log, utils, hookmanager
+from prewikka import crontab, database, log, utils, hookmanager
 
 logger = log.getLogger(__name__)
 
@@ -71,6 +71,22 @@ class HistoryDatabase(database.DatabaseHelper):
     def _clear_on_delete(self, user):
         self.query("DELETE FROM Prewikka_History_Query " + self._where(query=False, form=False), user=user.id)
 
+    def _history_cron(self, job):
+        config = env.config.cron.get_instance_by_name("search_history")
+        if config is None:
+            return
+
+        size = int(config.get("size", 10))
+        query = "SELECT userid, formid, COUNT(query) FROM Prewikka_History_Query GROUP BY userid, formid"
+        for userid, formid, count in self.query(query):
+            if int(count) <= size:
+                continue
+
+            rows = self.query("SELECT query FROM Prewikka_History_Query WHERE userid = %s AND formid = %s "
+                              "ORDER BY timestamp DESC LIMIT %s", userid, formid, size)
+            self.query("DELETE FROM Prewikka_History_Query WHERE userid = %s AND formid = %s AND query NOT IN %s",
+                       userid, formid, [row[0] for row in rows])
+
 
 history = HistoryDatabase()
 
@@ -78,3 +94,5 @@ create = history.create
 delete = history.delete
 get = history.get_queries
 save = history.save
+
+crontab.schedule("search_history", N_("Search history deletion"), "0 * * * *", _regfunc=history._history_cron, enabled=True)

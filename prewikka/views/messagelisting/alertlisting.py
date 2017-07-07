@@ -28,7 +28,7 @@ import re
 import sys
 import prelude
 
-from prewikka import compat, hookmanager, localization, mainmenu, resource, template, utils, view
+from prewikka import compat, crontab, hookmanager, localization, mainmenu, resource, template, utils, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -1231,6 +1231,28 @@ class AlertListing(MessageListing):
             params["%s_value_%d" % (ctype, index)] = value
 
         return params
+
+    @crontab.schedule("alert", N_("Alert deletion"), "0 0 * * *", enabled=False)
+    def _alert_cron(self, job):
+        config = env.config.cron.get_instance_by_name("alert")
+        if config is None:
+            return
+
+        criteria = Criterion()
+        age = int(config.get("age", 0))
+        now = utils.timeutil.utcnow()
+        for severity in ("info", "low", "medium", "high"):
+            days = int(config.get(severity, age))
+            if days < 1:
+                continue
+
+            criteria |= (Criterion("alert.assessment.impact.severity", "==", severity) &
+                         Criterion("alert.create_time", "<", now - datetime.timedelta(days=days)))
+
+        if not criteria:
+            return
+
+        env.dataprovider.delete(criteria, type="alert")
 
 
 class CorrelationAlertListing(AlertListing, view.View):
