@@ -218,6 +218,7 @@ class DataProviderBackend(pluginmanager.PluginBase):
             operators = self.TYPE_OPERATOR_MAPPING.get(None, [])
 
         return AttrObj(
+            type=typ,
             operators=operators,
             value_accept=self._get_path_values(path)
         )
