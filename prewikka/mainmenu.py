@@ -257,6 +257,7 @@ class _MainMenu(TimePeriod):
         self.dataset["timeline"] = utils.AttrObj()
         self.dataset["timeline"].quick = collections.OrderedDict((
             ((1, "day", True), _("Today")),
+            ((1, "week", True), _("This week")),
             ((1, "month", True), _("This month")),
             ((1, "hour", False), ngettext("%d hour", "%d hours", 1) % 1),
             ((2, "hour", False), ngettext("%d hour", "%d hours", 2) % 2),

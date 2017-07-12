@@ -271,3 +271,13 @@ def get_system_timezone():
         return babel.dates.LOCALTZ.zone
     except:
         return "UTC"
+
+
+def get_first_week_day():
+    """
+    Get the first day of the week based on locale.
+
+    :return: first day of week, from 0 (monday) to 6 (sunday)
+    :rtype: int
+    """
+    return babel.Locale.parse(translation.get_locale()).first_week_day

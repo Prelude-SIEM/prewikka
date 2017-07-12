@@ -2,7 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import calendar
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil import parser
 from dateutil.tz import tzlocal, tzoffset, tzutc  # noqa: imported but unused
 from pytz import timezone
@@ -20,6 +20,11 @@ def utcnow():
 
 
 def truncate(dtime, timeunit):
+    if timeunit == 'week':
+        from prewikka import localization  # avoid circular imports
+        days_to_remove = (dtime.weekday() - localization.get_first_week_day()) % 7
+        return dtime.replace(hour=0, minute=0, second=0, microsecond=0) - timedelta(days=days_to_remove)
+
     d = {}
 
     idx = _TRUNCATE_VALUES.index(timeunit) + 1
