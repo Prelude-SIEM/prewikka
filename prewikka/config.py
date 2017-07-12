@@ -37,6 +37,14 @@ class ParseError(Exception):
         return self._message
 
 
+class ConfigValueError(Exception):
+    def __init__(self, value, key):
+        self._message = _('Invalid value "%s" for parameter "%s"' % (value, key))
+
+    def __str__(self):
+        return self._message
+
+
 class ConfigParserOption(text_type):
     def __new__(cls, *args, **kw):
         return text_type.__new__(cls, args[1])
@@ -87,6 +95,44 @@ class ConfigParserSection(collections.Mapping):
 
     def get(self, name, default=None):
         return self._od.get(name, default)
+
+    def get_int(self, name, default=0):
+        assert isinstance(default, int)
+
+        value = self.get(name)
+        if value is None:
+            return default
+
+        try:
+            return int(value)
+        except (TypeError, ValueError):
+            raise ConfigValueError(value, name)
+
+    def get_float(self, name, default=0.):
+        assert isinstance(default, float)
+
+        value = self.get(name)
+        if value is None:
+            return default
+
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            raise ConfigValueError(value, name)
+
+    def get_bool(self, name, default=False):
+        assert isinstance(default, bool)
+
+        value = self.get(name)
+        if value is None:
+            return default
+
+        if value.value is None or value.lower() in ['true', 'yes']:
+            return True
+        elif value.lower() in ['false', 'no']:
+            return False
+
+        raise ConfigValueError(value, name)
 
     def keys(self):
         return self._od.keys()

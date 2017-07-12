@@ -33,8 +33,8 @@ class Agents(view.View):
 
     def __init__(self):
         view.View.__init__(self)
-        self._heartbeat_count = int(env.config.general.get("heartbeat_count", 30))
-        self._heartbeat_error_margin = int(env.config.general.get("heartbeat_error_margin", 3))
+        self._heartbeat_count = env.config.general.get_int("heartbeat_count", 30)
+        self._heartbeat_error_margin = env.config.general.get_int("heartbeat_error_margin", 3)
 
     def _get_analyzer(self, analyzerid):
         res = env.dataprovider.get(Criterion("heartbeat.analyzer(-1).analyzerid", "=", analyzerid), limit=1)

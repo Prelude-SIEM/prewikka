@@ -302,8 +302,8 @@ class ListedAlert(ListedMessage):
         ListedMessage.__init__(self, *args, **kwargs)
         self.reset()
 
-        self._max_aggregated_source = int(env.config.general.get("max_aggregated_source", 3))
-        self._max_aggregated_target = int(env.config.general.get("max_aggregated_target", 3))
+        self._max_aggregated_source = env.config.general.get_int("max_aggregated_source", 3)
+        self._max_aggregated_target = env.config.general.get_int("max_aggregated_target", 3)
 
     def _getKnownValue(self, direction, key):
         return {
@@ -740,7 +740,7 @@ class AlertListing(MessageListing):
 
     def __init__(self):
         MessageListing.__init__(self)
-        self._max_aggregated_classification = int(env.config.general.get("max_aggregated_classification", 10))
+        self._max_aggregated_classification = env.config.general.get_int("max_aggregated_classification", 10)
 
     def _setMessage(self, message, ident):
         msg = self.listed_alert(self.view_path, env.request.parameters)

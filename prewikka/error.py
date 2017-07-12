@@ -91,7 +91,7 @@ class PrewikkaError(PrewikkaException):
         return baseview.BaseView().respond(self._setup_template(self.template, False), self.code)
 
     def _get_traceback(self):
-        if self.display_traceback and env.config.general.get("enable_error_traceback") not in ('no', 'false'):
+        if self.display_traceback and env.config.general.get_bool("enable_error_traceback", True):
             return sys.exc_info()
 
     def respond(self):

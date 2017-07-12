@@ -78,16 +78,14 @@ class Core(object):
         env.log = log.Log(env.config)
         env.log.info("Starting Prewikka")
 
-        env.dns_max_delay = float(env.config.general.get("dns_max_delay", 0))
+        env.dns_max_delay = env.config.general.get_float("dns_max_delay", 0.)
 
-        val = env.config.general.get("external_link_new_window", "true")
-        if val is None or val.lower() in ["true", "yes"]:
+        if env.config.general.get_bool("external_link_new_window", True):
             env.external_link_target = "_blank"
         else:
             env.external_link_target = "_self"
 
-        details = env.config.general.get("enable_details", "false")
-        env.enable_details = details is None or details.lower() in ["true", "yes"]
+        env.enable_details = env.config.general.get_bool("enable_details", False)
 
         env.host_details_url = env.config.general.get("host_details_url", "https://www.prelude-siem.com/host_details.php")
         env.port_details_url = env.config.general.get("port_details_url", "https://www.prelude-siem.com/port_details.php")

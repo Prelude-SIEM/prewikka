@@ -88,7 +88,7 @@ class Session(pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
         self._db = SessionDatabase()
-        self._expiration = int(config.get("expiration", 60)) * 60
+        self._expiration = config.get_int('expiration', 60) * 60
 
         hookmanager.register("HOOK_USER_DELETE", lambda user: self._db.delete_session(user=user))
 
