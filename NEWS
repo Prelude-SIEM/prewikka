@@ -1,3 +1,31 @@
+* 2017-07-13, prewikka-4.1.0rc2:
+
+Author: Yoann Vandoorselaere
+
+- Handle deferred errors
+- Spinner option for prewikka_ajax(), disable spinner on tooltip / hostinfos
+- Add type attribute to returned PathInfo object
+- Make IDMEF dataprovider.query() work without path or criterion
+- Dataprovider is now able to pass backend specific options
+- Make sure we escape non HTMLNode element
+- Fix invalid return for sensor with "exiting" status
+- Set default umask, and create temporary directory on initialization
+
+Author: Antoine Luong
+
+- Minor graphical changes
+- Allow empty value in HOOK_MESSAGE_EXTRA_LINK
+- Fix potential IndexError in CorrelationAlert detail
+
+Author: Camille Gardet
+
+- Add query history
+- Fix color rotation when a color map exists
+- Change wrong HTML tag in the alert table header
+- Ajax call does not always return a value
+
+
+
 * 2017-06-30, prewikka-4.1.0rc1:
 
 Author: Antoine Luong
