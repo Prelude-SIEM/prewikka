@@ -108,16 +108,24 @@ class Request(object):
     def send_response(self, response, code=200, status_text=None):
         """Send a PrewikkaResponse response."""
 
-        if not isinstance(response, PrewikkaResponse):
-            response = PrewikkaDirectResponse(response, code=code, status_text=status_text)
-
         if self.is_stream:
             if isinstance(response.data, error.PrewikkaError):
                 self.send_stream(response.content(), event="error")
 
-            self._buffer.flush()
-        else:
+            return self._buffer.flush()
+
+        try:
             response.write(self)
+
+        except Exception as err:
+            if self.headers_sent:
+                raise  # No way we can do it again
+
+            error.make(err).respond().write(self)
+
+    @abc.abstractmethod
+    def headers_sent(self):
+        pass
 
     @abc.abstractmethod
     def send_headers(self, headers=[], code=200, status_text=None):

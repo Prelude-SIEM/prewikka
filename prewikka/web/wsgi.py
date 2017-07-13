@@ -65,6 +65,7 @@ class WSGIRequest(request.Request):
         return value.decode("utf8") if Py3 else value
 
     def __init__(self, environ, start_response):
+        self._write = None
         self._environ = environ
         self._headers = None
         self._start_response = start_response
@@ -97,6 +98,10 @@ class WSGIRequest(request.Request):
 
     def write(self, data):
         self._write(data)
+
+    @property
+    def headers_sent(self):
+        return bool(self._write)
 
     def send_headers(self, headers=None, code=200, status_text=None):
         if sys.version_info[0] >= 3:

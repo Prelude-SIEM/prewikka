@@ -256,9 +256,6 @@ class Core(object):
         except error.PrewikkaError as autherr:
             pass
 
-        if not all(hookmanager.trigger("HOOK_PROCESS_REQUEST", webreq, env.request.user)):
-            return
-
         if webreq.path == "/":
             return self._redirect_default(webreq)
 

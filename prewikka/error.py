@@ -145,3 +145,10 @@ class NotImplementedError(PrewikkaError):
 
     def __init__(self, message=N_("Backend does not implement this operation")):
         PrewikkaError.__init__(self, message, log_priority=log.ERROR)
+
+
+def make(exc):
+    if not isinstance(exc, PrewikkaError):
+        return PrewikkaError(exc)
+
+    return exc
