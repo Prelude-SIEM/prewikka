@@ -28,7 +28,6 @@ from prewikka.dataprovider import Criterion
 
 class Agents(view.View):
     view_parameters = mainmenu.MainMenuParameters
-    view_menu = (N_("Agents"), N_("Agents"))
     view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
@@ -83,7 +82,7 @@ class Agents(view.View):
                         resource.HTMLNode("a", _("Heartbeat analysis"), href=heartbeat_analyze)
                    ]}
 
-    @view.route("/agents/agents", permissions=[N_("IDMEF_VIEW")], help="#agents")
+    @view.route("/agents/agents", permissions=[N_("IDMEF_VIEW")], help="#agents", menu=(N_("Agents"), N_("Agents")))
     def agents(self):
 
         analyzer_data = list(self._get_analyzers(env.request.parameters.getlist("status")))
