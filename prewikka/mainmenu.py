@@ -85,16 +85,28 @@ class TimeUnit(object):
         return TimeUnit(self._idx - x)
 
     def __lt__(self, x):
-        return int(self) > int(x)
+        if isinstance(x, TimeUnit):
+            return int(self) > int(x)
+        else:
+            return int(self) < x
 
     def __gt__(self, x):
-        return int(self) < int(x)
+        if isinstance(x, TimeUnit):
+            return int(self) < int(x)
+        else:
+            return int(self) > x
 
     def __ge__(self, x):
-        return int(self) <= int(x)
+        if isinstance(x, TimeUnit):
+            return int(self) <= int(x)
+        else:
+            return int(self) >= x
 
     def __le__(self, x):
-        return int(self) >= int(x)
+        if isinstance(x, TimeUnit):
+            return int(self) >= int(x)
+        else:
+            return int(self) <= x
 
     def __eq__(self, x):
         return int(self) == int(x)
@@ -257,9 +269,10 @@ class MainMenu(object):
         tpl = list(dt.timetuple())
 
         if precision is not None:
+            assert(precision > 0)
             for i in range(precision, len(tpl)):
-                # calendar.timegm() won't accept 0 as a valid year/month
-                tpl[i] = 1 if i <= 1 else 0
+                # month/day must at least be 1
+                tpl[i] = 1 if i <= 2 else 0
 
         return int(calendar.timegm(tpl))
 
