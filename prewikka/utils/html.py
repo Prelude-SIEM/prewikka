@@ -37,6 +37,8 @@ def escape(value):
 def escapejson(value):
     return value.replace("</", "<\\/")
 
+def js_string(value):
+    return Markup(repr(str(escapejson(value))))
 
 def selected(condition):
     return "selected" if condition else ""

@@ -26,7 +26,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
-from prewikka.utils import html
+from prewikka.utils import html, json
 
 
 class Link(html.Markup):
@@ -74,7 +74,7 @@ class JSSource(HTMLSource):
 
 
 @functools.total_ordering
-class HTMLNode(object):
+class HTMLNode(json.JSONObject):
     def __init__(self, tag, *childs, **attrs):
         self.tag = tag
         self.childs = childs

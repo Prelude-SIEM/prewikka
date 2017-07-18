@@ -39,6 +39,7 @@ _CSS_FILES = collections.OrderedDict((resource.CSSLink(link), True) for link in 
 
 
 _JS_FILES = collections.OrderedDict((resource.JSLink(link), True) for link in (
+    "prewikka/js/json.js",
     "prewikka/js/jquery.js",
     "prewikka/js/jquery-ui.min.js",
     "prewikka/js/bootstrap.min.js",

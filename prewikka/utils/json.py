@@ -75,8 +75,9 @@ def loads(*args, **kwargs):
 
 
 def dump(*args, **kwargs):
-    json.dump(cls=PrewikkaJSONEncoder, *args, **kwargs)
+    return json.dump(cls=PrewikkaJSONEncoder, *args, **kwargs)
 
 
 def dumps(*args, **kwargs):
+    # FIXME: html.escapejson should be removed
     return html.escapejson(json.dumps(cls=PrewikkaJSONEncoder, *args, **kwargs))

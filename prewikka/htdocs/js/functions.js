@@ -336,40 +336,6 @@ function prewikka_grid(table, settings) {
 }
 
 
-function _prewikka_html_node(obj)
-{
-    if ( typeof(obj.tag) == 'undefined' || typeof(obj.attrs) == 'undefined' || typeof(obj.childs) == 'undefined' )
-        return _.escape(obj);
-
-    var childs = [];
-
-    for ( var i in obj.childs )
-      childs.push(prewikka_html_node(obj.childs[i]));
-
-    var nobj = $("<" + obj.tag + ">", obj.attrs).html(childs);
-    return nobj.wrap("<div>").parent().html();
-}
-
-
-function prewikka_html_node(obj)
-{
-    var ret = "";
-
-    if ( ! obj )
-        return obj;
-
-    if ( ! $.isArray(obj) )
-        ret = _prewikka_html_node(obj);
-
-    else {
-        for ( var i in obj )
-            ret += prewikka_html_node(obj[i]);
-    }
-
-    return ret;
-}
-
-
 function prewikka_autocomplete(field, url, submit, allow_empty=false) {
     field.autocomplete({
         minLength: 0,
@@ -414,6 +380,27 @@ function prewikka_autocomplete(field, url, submit, allow_empty=false) {
         }
     });
 }
+
+
+function HTMLNode(obj) {
+    var inner = "";
+    $.each(obj.childs, function(i, child) {
+        inner += child.toHTML ? child.toHTML() : _.escape(child);
+    });
+
+    this.element = $("<" + obj.tag + ">", obj.attrs).html(inner);
+
+    this.toHTML = function() {
+        return this.element.wrap("<div>").parent().html();
+    };
+
+    this.toString = function() {
+        /* Used for client-side grid searches */
+        return this.element.text();
+    };
+}
+
+window.json_registry.register(HTMLNode);
 
 
 function DatetimePicker(input, date, options)

@@ -2,7 +2,10 @@ function CommonListing(elem, text, options) {
     var dfd = $.Deferred();
 
     function genericFormatter(value, opts, rowObj) {
-        return (value) ? prewikka_html_node(value) : "";
+        if ( value )
+            return value.toHTML ? value.toHTML() : value;
+        else
+            return "";
     }
 
     function _backwardCompatibleFormatter(cellValue, opts, rowObj) {

@@ -1,5 +1,5 @@
 <%!
-from prewikka.utils import json
+from prewikka.utils import html, json
 %>
 
 <script type="text/javascript">
@@ -19,7 +19,7 @@ from prewikka.utils import json
             {name: 'next', width: 10, search: false, sorttype: function(value, row) {return row.next_date;} },
         ],
         multiselect: true,
-        data: ${ data | n,json.dumps },
+        data: JSON.parse(${ html.js_string(json.dumps(data)) }),
         globalSearch: false,
 
         rowattr: function(rd, cur, rowid) {

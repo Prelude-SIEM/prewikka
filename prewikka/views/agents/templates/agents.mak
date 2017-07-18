@@ -1,5 +1,5 @@
 <%!
-from prewikka.utils import json
+from prewikka.utils import html, json
 %>
 
 <link rel="stylesheet" type="text/css" href="agents/css/agents.css">
@@ -16,7 +16,7 @@ from prewikka.utils import json
         $("<a>", {"class": "popup_menu_toggle"}).text(cellValue).appendTo(div);
         var span = $("<span>", {"class": "popup_menu"}).appendTo(div);
         $.each(rowObj.links, function(index, elem) {
-            $(span).append(prewikka_html_node(elem));
+            $(span).append(elem.toHTML());
         });
         return div.html();
     };
@@ -43,7 +43,7 @@ from prewikka.utils import json
             {name: 'latest_heartbeat', width: 10, sortable: false},
             {name: 'status_text', width: 5, sortable: false, align: 'center', classes: 'heartbeat_analyze', cellattr: statusAttr}
         ],
-        data: ${ data | n,json.dumps },
+        data: JSON.parse(${ html.js_string(json.dumps(data)) }),
         globalSearch: true,
         grouping: true,
         groupingView: {
