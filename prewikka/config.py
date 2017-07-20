@@ -114,6 +114,13 @@ class SectionRoot(list):
     def __getattr__(self, attr):
         return getattr(self[0] if self else ConfigParserSection(""), attr)
 
+    def get_instance_by_name(self, name):
+        for section in self:
+            if section.get_instance_name() == name:
+                return section
+
+        return None
+
 
 class MyConfigParser(object):
     """
