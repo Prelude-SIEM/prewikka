@@ -219,18 +219,6 @@ class MainMenu(object):
 
         return TimeUnit(gtable[nearest])
 
-    @staticmethod
-    def _round_datetime(dtime, timeunit):
-        d = {}
-
-        tvaluelist = [ "year", "month", "day", "hour", "minute", "second", "microsecond" ]
-
-        idx = tvaluelist.index(timeunit) + 1
-        for i, unit in enumerate(tvaluelist[idx:]):
-            d[unit] = 1 if idx + i <= 2 else 0 #months and days start from 1, hour/min/sec start from 0
-
-        return dtime.replace(**d) + relativedelta(**{timeunit + "s": 1})
-
     def _setup_timeline_range(self):
         self.start = self.end = None
         if "timeline_start" in env.request.parameters:
@@ -258,7 +246,7 @@ class MainMenu(object):
                 self.start = self.end - delta
 
             else: # absolute
-                self.end = self._round_datetime(self.end, self._timeunit)
+                self.end = utils.timeutil.truncate(self.end, self._timeunit) + relativedelta(**{self._timeunit + "s": 1})
                 if env.request.parameters["timeline_unit"] == "unlimited":
                     self.start = datetime.datetime.fromtimestamp(0).replace(tzinfo=env.request.user.timezone)
                 else:
