@@ -224,7 +224,6 @@ class MainMenu(object):
         if "timeline_start" in env.request.parameters:
             self.start = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(env.request.parameters["timeline_start"]))
 
-
         if "timeline_end" in env.request.parameters:
             self.end = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(env.request.parameters["timeline_end"]))
 
@@ -235,22 +234,24 @@ class MainMenu(object):
         delta = relativedelta(**{self._timeunit + "s" if self._timeunit != "unlimited" else "years": self._timevalue})
 
         if self.start and not self.end:
-            self.end = datetime.datetime.now(env.request.user.timezone).replace(second=0, microsecond=0)
+            self.end = datetime.datetime.now(env.request.user.timezone).replace(microsecond=0)
 
         elif self.end and not self.start:
             self.start = self.end - delta
 
         elif self.start is None and self.end is None:
-            self.start = self.end = datetime.datetime.now(env.request.user.timezone).replace(second=0, microsecond=0)
-            if not env.request.parameters["timeline_absolute"]: #relative
+            self.start = self.end = datetime.datetime.now(env.request.user.timezone).replace(microsecond=0)
+            if not env.request.parameters["timeline_absolute"]:  # relative
                 self.start = self.end - delta
 
-            else: # absolute
+            else:  # absolute
                 self.end = utils.timeutil.truncate(self.end, self._timeunit) + relativedelta(**{self._timeunit + "s": 1})
                 if env.request.parameters["timeline_unit"] == "unlimited":
                     self.start = datetime.datetime.fromtimestamp(0).replace(tzinfo=env.request.user.timezone)
                 else:
                     self.start = self.end - delta
+
+                self.end += relativedelta(seconds=-1)
 
     @staticmethod
     def mktime_param(dt, precision=None):
@@ -272,12 +273,8 @@ class MainMenu(object):
             criteria += Criterion("{backend}.{time_field}", ">=", start)
 
         if self.end:
-            end = self.end
-            if not env.request.parameters["timeline_absolute"]:
-                end = self.end + relativedelta(minutes=1)
-
             end = self.end.astimezone(utils.timeutil.timezone("UTC"))
-            criteria += Criterion("{backend}.{time_field}", "<", end)
+            criteria += Criterion("{backend}.{time_field}", "<=", end)
 
         return criteria
 

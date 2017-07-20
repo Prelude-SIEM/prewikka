@@ -41,7 +41,7 @@ function MainMenuInit(inline, start, end, date_format) {
 
     this.update_date = function() {
         var start = that._start_picker.get_value();
-        var end = that._end_picker.get_value();
+        var end = that._end_picker.get_value() + 59 /* up to the end of the minute*/;
 
         if ( start > end ) {
             that._root.find(".input-timeline-datetime").closest(".form-group").addClass('has-error');
