@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: Prewikka 4.1.0rc2\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-13 21:57+0200\n"
-"PO-Revision-Date: 2017-07-13 19:10+0200\n"
+"PO-Revision-Date: 2017-07-24 16:56+0200\n"
 "Last-Translator: Carlo Anez <carlo.anez@siscotec.com>\n"
 "Language-Team: Spanish\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: prewikka/baseview.py:65 prewikka/usergroup.py:47
+#: prewikka/baseview.py:66 prewikka/usergroup.py:47
 msgid "Permission Denied"
 msgstr "Permiso Denegado"
 
-#: prewikka/baseview.py:65
+#: prewikka/baseview.py:66
 msgid "Missing permission to access the specified file"
 msgstr ""
 
@@ -50,7 +50,7 @@ msgstr "Mensual"
 msgid "Yearly"
 msgstr "Anual"
 
-#: prewikka/crontab.py:39 prewikka/mainmenu.py:299
+#: prewikka/crontab.py:39 prewikka/mainmenu.py:297
 #: prewikka/templates/mainmenu.mak:88
 msgid "Custom"
 msgstr "Personalizado"
@@ -162,6 +162,10 @@ msgstr ""
 msgid "Backend does not implement this operation"
 msgstr ""
 
+#: prewikka/history.py:98
+msgid "Search history deletion"
+msgstr ""
+
 #: prewikka/idmefbrowser.py:60 prewikka/views/filter/templates/widget.mak:13
 msgid "All paths"
 msgstr ""
@@ -246,64 +250,64 @@ msgstr ""
 msgid "An unexpected condition happened while trying to load %s"
 msgstr ""
 
-#: prewikka/mainmenu.py:133
+#: prewikka/mainmenu.py:145
 msgid "Today"
 msgstr "Hoy"
 
-#: prewikka/mainmenu.py:134
+#: prewikka/mainmenu.py:146
 msgid "This month"
 msgstr "Este mes"
 
-#: prewikka/mainmenu.py:135 prewikka/mainmenu.py:136
+#: prewikka/mainmenu.py:147 prewikka/mainmenu.py:148
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
 msgstr[0] "%d hora"
 msgstr[1] "%d horas"
 
-#: prewikka/mainmenu.py:137 prewikka/mainmenu.py:138
+#: prewikka/mainmenu.py:149 prewikka/mainmenu.py:150
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
 msgstr[0] "%d día"
 msgstr[1] "%d días"
 
-#: prewikka/mainmenu.py:139
+#: prewikka/mainmenu.py:151
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
 msgstr[0] "%d semana"
 msgstr[1] "%d semanas"
 
-#: prewikka/mainmenu.py:140 prewikka/mainmenu.py:141
+#: prewikka/mainmenu.py:152 prewikka/mainmenu.py:153
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
 msgstr[0] "%d mes"
 msgstr[1] "%d meses"
 
-#: prewikka/mainmenu.py:142
+#: prewikka/mainmenu.py:154
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
 msgstr[0] "%d año"
 msgstr[1] "%d años"
 
-#: prewikka/mainmenu.py:145
+#: prewikka/mainmenu.py:157
 #, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
 msgstr[0] "%d segundo"
 msgstr[1] "%d segundos"
 
-#: prewikka/mainmenu.py:146 prewikka/mainmenu.py:147 prewikka/mainmenu.py:148
+#: prewikka/mainmenu.py:158 prewikka/mainmenu.py:159 prewikka/mainmenu.py:160
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
 msgstr[0] "%d minuto"
 msgstr[1] "%d minutos"
 
-#: prewikka/mainmenu.py:301 prewikka/templates/mainmenu.mak:63
+#: prewikka/mainmenu.py:299 prewikka/templates/mainmenu.mak:63
 msgid "Inactive"
 msgstr "Inactivo"
 
@@ -436,7 +440,7 @@ msgstr ""
 #: prewikka/dataprovider/idmef.py:57
 #: prewikka/views/agents/templates/agents.mak:88
 #: prewikka/views/messagelisting/alertlisting.py:697
-#: prewikka/views/messagelisting/alertlisting.py:1237
+#: prewikka/views/messagelisting/alertlisting.py:1259
 msgid "Alerts"
 msgstr "Alertas"
 
@@ -480,7 +484,7 @@ msgstr ""
 
 #: prewikka/dataprovider/idmef.py:76
 #: prewikka/views/agents/templates/agents.mak:92
-#: prewikka/views/messagelisting/heartbeatlisting.py:60
+#: prewikka/views/messagelisting/heartbeatlisting.py:62
 msgid "Heartbeats"
 msgstr "Pulsos"
 
@@ -752,7 +756,7 @@ msgstr ""
 msgid "Offline"
 msgstr "Desconectado"
 
-#: prewikka/utils/misc.py:64 prewikka/views/agents/agents.py:163
+#: prewikka/utils/misc.py:64 prewikka/views/agents/agents.py:162
 msgid "Unknown"
 msgstr "Desconocido"
 
@@ -1009,76 +1013,76 @@ msgstr "Actualizar"
 msgid "Agents status information page"
 msgstr "Información de la dirección"
 
-#: prewikka/views/agents/agents.py:31
-#: prewikka/views/messagelisting/heartbeatlisting.py:60
-msgid "Agents"
-msgstr "Agentes"
-
-#: prewikka/views/agents/agents.py:65
+#: prewikka/views/agents/agents.py:64
 msgid "Node name n/a"
 msgstr "Nombre del nodo n/a"
 
-#: prewikka/views/agents/agents.py:66
+#: prewikka/views/agents/agents.py:65
 #, fuzzy
 msgid "OS version n/a"
 msgstr "Sesión invalida"
 
-#: prewikka/views/agents/agents.py:67
+#: prewikka/views/agents/agents.py:66
 msgid "OS type n/a"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:71
+#: prewikka/views/agents/agents.py:70
 msgid "Node location n/a"
 msgstr "Lugar del nodo n/a"
 
-#: prewikka/views/agents/agents.py:81
+#: prewikka/views/agents/agents.py:80
 msgid "Alert listing"
 msgstr "Lista de alertas"
 
-#: prewikka/views/agents/agents.py:82
+#: prewikka/views/agents/agents.py:81
 msgid "Heartbeat listing"
 msgstr "Lista de pulsos"
 
-#: prewikka/views/agents/agents.py:83
+#: prewikka/views/agents/agents.py:82
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:12
 msgid "Heartbeat analysis"
 msgstr "Análisis de pulsos"
 
-#: prewikka/views/agents/agents.py:86 prewikka/views/agents/agents.py:110
+#: prewikka/views/agents/agents.py:85 prewikka/views/agents/agents.py:109
 #: prewikka/views/filter/filter.py:111
 #: prewikka/views/messagelisting/alertlisting.py:699
-#: prewikka/views/messagelisting/heartbeatlisting.py:62
+#: prewikka/views/messagelisting/heartbeatlisting.py:64
 #: prewikka/views/messagesummary/messagesummary.py:349
 msgid "IDMEF_VIEW"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:95
+#: prewikka/views/agents/agents.py:85
+#: prewikka/views/messagelisting/heartbeatlisting.py:62
+msgid "Agents"
+msgstr "Agentes"
+
+#: prewikka/views/agents/agents.py:94
 msgid "IDMEF_ALTER"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:137
+#: prewikka/views/agents/agents.py:136
 msgid "Normal sensor start"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:139
+#: prewikka/views/agents/agents.py:138
 msgid "Unexpected sensor restart"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:145
+#: prewikka/views/agents/agents.py:144
 #, python-format
 msgid "Unexpected heartbeat interval: %(delta)s"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:148
+#: prewikka/views/agents/agents.py:147
 msgid "Normal sensor stop"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:160
+#: prewikka/views/agents/agents.py:159
 #, python-format
 msgid "Sensor is down since %s"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:169
+#: prewikka/views/agents/agents.py:168
 #, python-format
 msgid ""
 "No anomaly in the last %(count)d heartbeats (one heartbeat every "
@@ -1487,9 +1491,19 @@ msgstr "Alerta de herramienta"
 msgid "The path '%s' cannot be mapped to a column"
 msgstr ""
 
-#: prewikka/views/messagelisting/alertlisting.py:1237
+#: prewikka/views/messagelisting/alertlisting.py:1235
+#, fuzzy
+msgid "Alert deletion"
+msgstr "Lista de alertas"
+
+#: prewikka/views/messagelisting/alertlisting.py:1259
 msgid "Threats"
 msgstr "Amenazas"
+
+#: prewikka/views/messagelisting/heartbeatlisting.py:120
+#, fuzzy
+msgid "Heartbeat deletion"
+msgstr "Lista de pulsos"
 
 #: prewikka/views/messagelisting/templates/alertlisting.mak:18
 msgid "Order column"
