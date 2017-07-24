@@ -40,10 +40,8 @@ CREATE TABLE Prewikka_Session (
 DROP TABLE IF EXISTS Prewikka_User_Configuration;
 CREATE TABLE Prewikka_User_Configuration (
     userid VARCHAR(255) NOT NULL,
-    view VARCHAR(32) NULL,
-    name VARCHAR(255) NOT NULL,
-    value VARCHAR(255) NULL,
-    PRIMARY KEY(userid, view, name)
+    config TEXT NULL,
+    PRIMARY KEY(userid)
 ) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS Prewikka_Crontab;

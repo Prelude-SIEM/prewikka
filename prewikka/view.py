@@ -136,18 +136,16 @@ class ParameterDesc(object):
         return value
 
 
-#
-# FIXME: ideally, we should stop using @use_transaction around view parameters
-# processing. In the meantime, use this decorator to prevent problem.
-#
-def _safe_use_transaction(func):
-    f = database.use_transaction(func)
-
+def _user_properties_change(func):
     def inner(self, *args, **kwargs):
-        if not getattr(env, "db", None):
-            return func(self, *args, **kwargs)
+        if env.request.user:
+            env.request.user.begin_properties_change()
 
-        return f(self, *args, **kwargs)
+        ret = func(self, *args, **kwargs)
+        if env.request.user:
+            env.request.user.commit_properties_change()
+
+        return ret
 
     return inner
 
@@ -179,9 +177,7 @@ class Parameters(dict):
 
         self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save, general=general)
 
-    @_safe_use_transaction
     def process(self, view_id):
-        # In the future, the following should be handled directly in normalize()
         if env.request.user:
             env.request.user.begin_properties_change()
 
@@ -191,6 +187,7 @@ class Parameters(dict):
         if env.request.user:
             env.request.user.commit_properties_change()
 
+    @_user_properties_change
     def normalize(self, view, user):
         do_load = True
         do_save = "_save" in self
@@ -230,7 +227,7 @@ class Parameters(dict):
                 continue
 
             if param.general:
-                save_view = None
+                save_view = ""
             else:
                 save_view = view
 
