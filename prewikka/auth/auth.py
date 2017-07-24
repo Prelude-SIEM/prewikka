@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import abc
 
-from prewikka import env, hookmanager, log, pluginmanager, usergroup
+from prewikka import hookmanager, log, pluginmanager
 from prewikka.error import NotImplementedError, PrewikkaUserError
 
 
@@ -49,7 +49,7 @@ class _AuthUser(object):
 
     def deleteUser(self, user):
         list(hookmanager.trigger("HOOK_USER_DELETE", user))
-        env.db.del_properties(user)
+        user.delete()
 
     @abc.abstractmethod
     def getUserList(self, search=None):

@@ -428,7 +428,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
 class Database(preludedb.SQL):
     required_branch = version.__branch__
-    required_version = "0"
+    required_version = "1"
 
     __sentinel = object()
     __ALL_PROPERTIES = object()
@@ -564,37 +564,6 @@ class Database(preludedb.SQL):
 
     def trigger_plugin_change(self):
         self.query("UPDATE Prewikka_Module_Changed SET time=current_timestamp")
-
-    def get_property_fail(self, user, key, view=None, default=__sentinel):
-        config = {}
-        view = view or ""
-
-        rows = self.query("SELECT view, name, value FROM Prewikka_User_Configuration WHERE userid = %s%s%s" % (self.escape(user.id), self._chk("view", view), self._chk("name", key)))
-        for vname, name, val in rows:
-            viewd = config.setdefault(vname or None, {})
-            viewd[name] = json.loads(val)
-
-        if view is self.__ALL_PROPERTIES:
-            return config
-
-        view = config.get(view or None, {})
-        return view.get(key, default) if default is not self.__sentinel else view[key]
-
-    def get_properties(self, user):
-        return self.get_property_fail(user, None, view=self.__ALL_PROPERTIES)
-
-    def set_properties(self, user, values):
-        rows = [(view or "", user.id, key, json.dumps(value)) for view, key, value in values]
-        self.upsert("Prewikka_User_Configuration", ("view", "userid", "name", "value"), rows, pkey=("view", "userid", "name"))
-
-    def has_property(self, user, key):
-        return bool(self.query("SELECT value FROM Prewikka_User_Configuration WHERE userid = %s AND view = '' AND name = %s AND value IS NOT NULL", user.id, key))
-
-    def del_property(self, user, key, view=None):
-        self.query("DELETE FROM Prewikka_User_Configuration WHERE userid = %s%s%s" %  (self.escape(user.id), self._chk("view", view or ""), self._chk("name", key)))
-
-    def del_properties(self, user, view=__ALL_PROPERTIES):
-        return self.del_property(user, None, view=view)
 
     def _get_merge_value(self, merged, field, rownum):
         value = merged[field]
