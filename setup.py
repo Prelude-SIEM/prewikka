@@ -36,8 +36,8 @@ from distutils.dep_util import newer
 from distutils.command.build import build as _build
 
 
-LIBPRELUDE_REQUIRED_VERSION = "4.0.0"
-LIBPRELUDEDB_REQUIRED_VERSION = "4.0.0"
+LIBPRELUDE_REQUIRED_VERSION = "4.1.0"
+LIBPRELUDEDB_REQUIRED_VERSION = "4.1.0"
 
 
 
@@ -154,7 +154,7 @@ class build_custom(Command):
 
 
 setup(name="prewikka",
-      version="4.1.0rc2",
+      version="4.1.0",
       maintainer = "Prelude Team",
       maintainer_email = "support.prelude@c-s.fr",
       url = "http://www.prelude-siem.com",

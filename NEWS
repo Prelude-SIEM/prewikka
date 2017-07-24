@@ -1,3 +1,25 @@
+* 2017-07-24, prewikka-4.1.0:
+
+Author: Thomas Andrejak
+
+- Change default max_aggregated_* for better display
+- Update mailing list archives link in README
+- Crontab: Active button is a success button
+
+Author: Yoann Vandoorselaere
+
+- Rework mainmenu start/end time handling
+- Proper datetime truncate function
+- Invalid timeline link generated
+
+Author: Antoine Luong
+
+- Implement a custom JSON conversion
+- Add automatic deletion cron tasks
+- Add a method to get named config sections
+
+
+
 * 2017-07-13, prewikka-4.1.0rc2:
 
 Author: Yoann Vandoorselaere
