@@ -277,8 +277,8 @@ class ListedAlert(ListedMessage):
         ListedMessage.__init__(self, *args, **kwargs)
         self.reset()
 
-        self._max_aggregated_source = int(env.config.general.get("max_aggregated_source", 10))
-        self._max_aggregated_target = int(env.config.general.get("max_aggregated_target", 10))
+        self._max_aggregated_source = int(env.config.general.get("max_aggregated_source", 3))
+        self._max_aggregated_target = int(env.config.general.get("max_aggregated_target", 3))
 
     def _getKnownValue(self, direction, key):
         return { "alert.%s.service.port" % direction: ("service", None),
