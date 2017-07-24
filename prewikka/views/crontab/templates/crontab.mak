@@ -57,5 +57,5 @@ from prewikka.utils import html, json
 
 <div class="footer-buttons form-inline">
     <button type="button" class="btn btn-danger needone cronjob-disable"><i class="fa fa-times"></i> ${ _("Disable") }</button>
-    <button type="button" class="btn btn-alert needone cronjob-enable"><i class="fa fa-check"></i> ${ _("Enable") }</button>
+    <button type="button" class="btn btn-success needone cronjob-enable"><i class="fa fa-check"></i> ${ _("Enable") }</button>
 </div>
