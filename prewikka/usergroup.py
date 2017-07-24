@@ -23,7 +23,7 @@ import abc
 import hashlib
 
 from prewikka import compat, error, localization, log, utils
-from prewikka.utils import cache
+from prewikka.utils import cache, json
 
 ADMIN_LOGIN = "admin"
 _NAMEID_TBL = {}
@@ -132,12 +132,30 @@ class Group(NameID):
         return env.auth.getGroupByID(id).name
 
 
+def _sync_if_needed(func):
+    def inner(self, *args, **kwargs):
+        if self._properties_state:
+            return func(self, *args, **kwargs)
+
+        self.begin_properties_change()
+        ret = func(self, *args, **kwargs)
+        self.commit_properties_change()
+
+        return ret
+
+    return inner
+
+
+
 class User(NameID):
     __sentinel = object()
+    __PROPERTIES_STATE_NONE  = 0x00
+    __PROPERTIES_STATE_BEGIN = 0x01
+    __PROPERTIES_STATE_DIRTY = 0x02
 
     def __init__(self, login=None, userid=None):
         NameID.__init__(self, login, userid)
-        self._properties = None
+        self._properties_state = self.__PROPERTIES_STATE_NONE
 
     def _id2name(self, id):
         return env.auth.getUserByID(id).name
@@ -159,7 +177,11 @@ class User(NameID):
 
     @cache.request_memoize_property("user_configuration")
     def configuration(self):
-        return env.db.get_properties(self)
+        rows = env.db.query("SELECT config FROM Prewikka_User_Configuration WHERE userid = %s", self.id)
+        if rows:
+            return json.loads(rows[0][0])
+
+        return {}
 
     @cache.request_memoize_property("user_timezone")
     def timezone(self):
@@ -170,19 +192,29 @@ class User(NameID):
         if lang:
             localization.setLocale(lang)
 
+    @_sync_if_needed
     def del_property(self, key, view=None):
+        view = view or ""
+
         if not key:
-            self.configuration.pop(view, None)
+            r = self.configuration.pop(view, None)
         else:
-            self.configuration.get(view, {}).pop(key, None)
+            r = self.configuration.get(view, {}).pop(key, None)
 
-        env.db.del_property(self, key, view=view)
+        if r:
+            self._properties_state |= self.__PROPERTIES_STATE_DIRTY
 
+    def delete(self):
+        env.db.query("DELETE FROM Prewikka_User_Configuration WHERE userid = %s", self.id)
+
+    @_sync_if_needed
     def del_properties(self, view):
-        self.configuration.pop(view, None)
-        env.db.del_properties(self, view=view)
+        r = self.configuration.pop(view, None)
+        if r:
+            self._properties_state |= self.__PROPERTIES_STATE_DIRTY
 
     def del_property_match(self, key, view=None):
+        view = view or ""
         viewlist = [view] if view else self.configuration.keys()
 
         for v in viewlist:
@@ -194,30 +226,35 @@ class User(NameID):
                     self.del_property(k, view=v)
 
     def get_property_fail(self, key, view=None, default=__sentinel):
-        view = self.configuration.get(view, {})
+        view = self.configuration.get(view or "", {})
 
         if default is not self.__sentinel:
             return view.get(key, default)
 
         return view[key]
 
+    def has_property(self, key, view=None):
+        return key in self.configuration.get(view or "", {})
+
     def get_property(self, key, view=None, default=None):
-        return self.get_property_fail(key, view, default)
+        return self.get_property_fail(key, view or "", default)
 
+    @_sync_if_needed
     def set_property(self, key, value, view=None):
-        self.configuration.setdefault(view, {})[key] = value
+        old = self.configuration.get(view or "", {}).get(key)
+        if old != value:
+            self._properties_state |= self.__PROPERTIES_STATE_DIRTY
 
-        if self._properties is None:
-            env.db.set_properties(self, [(view, key, value)])
-        else:
-            self._properties.append((view, key, value))
+        self.configuration.setdefault(view or "", {})[key] = value
 
     def begin_properties_change(self):
-        self._properties = []
+        self._properties_state = self.__PROPERTIES_STATE_BEGIN
 
     def commit_properties_change(self):
-        env.db.set_properties(self, self._properties)
-        self._properties = None
+        if self._properties_state & self.__PROPERTIES_STATE_DIRTY:
+            env.db.upsert("Prewikka_User_Configuration", ["userid", "config"], [[self.id, json.dumps(self.configuration)]], pkey=("userid",))
+
+        self._properties_state = self.__PROPERTIES_STATE_NONE
 
     def has(self, perm):
         if type(perm) in (list, tuple, set):
