@@ -93,11 +93,11 @@ DEFAULT_OPTION = "0 * * * *"
         </div>
         <div class="col-sm-2">
           <label for="month">${ _('Month:') }</label>
-          <input type="text" class="schedule form-control" name="month" value="${custom_val[2]}" />
+          <input type="text" class="schedule form-control" name="month" value="${custom_val[3]}" />
         </div>
         <div class="col-sm-2">
           <label for="weekday">${ _('Weekday:') }</label>
-          <input type="text" class="schedule form-control" name="weekday" value="${custom_val[3]}" />
+          <input type="text" class="schedule form-control" name="weekday" value="${custom_val[4]}" />
         </div>
       </div>
 
