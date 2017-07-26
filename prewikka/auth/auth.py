@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import abc
 
-from prewikka import hookmanager, log, pluginmanager
+from prewikka import log, pluginmanager
 from prewikka.error import NotImplementedError, PrewikkaUserError
 
 
@@ -44,12 +44,13 @@ class _AuthUser(object):
     def canManagePermissions(self):
         return self.__class__.setUserPermissions != _AuthUser.setUserPermissions
 
+    @abc.abstractmethod
     def createUser(self, user):
-        list(hookmanager.trigger("HOOK_USER_CREATE", user))
+        raise NotImplementedError
 
+    @abc.abstractmethod
     def deleteUser(self, user):
-        list(hookmanager.trigger("HOOK_USER_DELETE", user))
-        user.delete()
+        raise NotImplementedError
 
     @abc.abstractmethod
     def getUserList(self, search=None):
@@ -95,11 +96,13 @@ class _AuthGroup(object):
     def getGroupByID(self, id_):
         raise NotImplementedError
 
+    @abc.abstractmethod
     def createGroup(self, group):
-        list(hookmanager.trigger("HOOK_GROUP_CREATE", group))
+        raise NotImplementedError
 
+    @abc.abstractmethod
     def deleteGroup(self, group):
-        list(hookmanager.trigger("HOOK_GROUP_DELETE", group))
+        raise NotImplementedError
 
     def setGroupPermissions(self, group, permissions):
         raise NotImplementedError

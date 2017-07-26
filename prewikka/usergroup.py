@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import abc
 import hashlib
 
-from prewikka import compat, error, localization, log, utils
+from prewikka import compat, error, hookmanager, localization, log, utils
 from prewikka.utils import cache, json
 
 ADMIN_LOGIN = "admin"
@@ -131,6 +131,14 @@ class Group(NameID):
     def _id2name(self, id):
         return env.auth.getGroupByID(id).name
 
+    def create(self):
+        env.auth.createGroup(self)
+        list(hookmanager.trigger("HOOK_GROUP_CREATE", self))
+
+    def delete(self):
+        list(hookmanager.trigger("HOOK_GROUP_DELETE", self))
+        env.auth.deleteGroup(self)
+
 
 def _sync_if_needed(func):
     def inner(self, *args, **kwargs):
@@ -203,9 +211,6 @@ class User(NameID):
         if r:
             self._properties_state |= self.__PROPERTIES_STATE_DIRTY
 
-    def delete(self):
-        env.db.query("DELETE FROM Prewikka_User_Configuration WHERE userid = %s", self.id)
-
     @_sync_if_needed
     def del_properties(self, view):
         r = self.configuration.pop(view, None)
@@ -264,3 +269,12 @@ class User(NameID):
     def check(self, perm, view=None):
         if not self.has(perm):
             raise PermissionDeniedError(perm, view)
+
+    def create(self):
+        env.auth.createUser(self)
+        list(hookmanager.trigger("HOOK_USER_CREATE", self))
+
+    def delete(self):
+        list(hookmanager.trigger("HOOK_USER_DELETE", self))
+        env.db.query("DELETE FROM Prewikka_User_Configuration WHERE userid = %s", self.id)
+        env.auth.deleteUser(self)
