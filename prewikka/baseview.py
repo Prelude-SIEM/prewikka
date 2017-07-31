@@ -21,23 +21,21 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import base64
 import collections
-import copy
 import string
 
 from prewikka import error, history, hookmanager, resource, response, template, utils, view
 
 
-_CSS_FILES = collections.OrderedDict((resource.CSSLink(link), True) for link in (
+CSS_FILES = (
     "prewikka/css/jquery-ui.min.css",
     "prewikka/css/bootstrap.min.css",
     "prewikka/css/jquery-ui-timepicker-addon.min.css",
     "prewikka/css/font-awesome.min.css",
     "prewikka/css/ui.jqgrid.min.css",
-    "prewikka/css/ui.multiselect.min.css")
+    "prewikka/css/ui.multiselect.min.css"
 )
 
-
-_JS_FILES = collections.OrderedDict((resource.JSLink(link), True) for link in (
+JS_FILES = (
     "prewikka/js/json.js",
     "prewikka/js/jquery.js",
     "prewikka/js/jquery-ui.min.js",
@@ -48,7 +46,7 @@ _JS_FILES = collections.OrderedDict((resource.JSLink(link), True) for link in (
     "prewikka/js/jquery-ui-timepicker-addon.min.js",
     "prewikka/js/ui.multiselect.min.js",
     "prewikka/js/jquery.jqgrid.min.js",
-    "prewikka/js/commonlisting.js")
+    "prewikka/js/commonlisting.js"
 )
 
 
@@ -130,9 +128,9 @@ class BaseView(view._View):
             theme = env.config.general.default_theme
             lang = env.config.general.default_locale
 
-        _HEAD = copy.copy(_CSS_FILES)
+        _HEAD = collections.OrderedDict((resource.CSSLink(link), True) for link in CSS_FILES)
         _HEAD[resource.CSSLink("prewikka/css/themes/%s.css" % theme)] = True
-        _HEAD.update(_JS_FILES)
+        _HEAD.update((resource.JSLink(link), True) for link in JS_FILES)
 
         # The jqgrid locale files use only two characters for identifying the language (e.g. pt_BR -> pt)
         _HEAD[resource.JSLink("prewikka/js/locales/grid.locale-%s.min.js" % lang[:2])] = True
