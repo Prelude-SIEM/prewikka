@@ -35,7 +35,7 @@ def _str_to_datetime(date):
     return parser.parse(date)
 
 
-CONVERTERS = {
+_DATETIME_CONVERTERS = {
     int: datetime.utcfromtimestamp,
     float: datetime.utcfromtimestamp,
     text_type: _str_to_datetime,
@@ -48,7 +48,7 @@ _sentinel = object()
 
 def to_datetime(date):
     try:
-        dt = CONVERTERS[type(date)](date)
+        dt = _DATETIME_CONVERTERS[type(date)](date)
     except KeyError:
         raise error.PrewikkaUserError(N_("Conversion error"),
                                       N_("Value %(value)r cannot be converted to %(type)s",
@@ -58,17 +58,6 @@ def to_datetime(date):
         return dt.replace(tzinfo=tzutc())
 
     return dt
-
-
-TYPES_FUNC_MAP = {
-    "int": int,
-    "float": float,
-    "long": int,
-    "datetime": to_datetime,
-    "enum": text_type,
-    "str": text_type,
-    "text": text_type
-}
 
 
 class DataProviderError(Exception):
@@ -98,9 +87,14 @@ class QueryResultsRow(CachingIterator):
 
     def _cast(self, value):
         type = self._get_current_path_type()
-
         try:
-            return TYPES_FUNC_MAP[type](value)
+            if type is datetime:
+                return to_datetime(value)
+
+            elif type is object:
+                return value
+
+            return type(value)
         except (KeyError, ValueError):
             raise error.PrewikkaUserError(N_("Conversion error"),
                                           N_("Value %(value)r cannot be converted to %(type)s", {"value": value, "type": type}))

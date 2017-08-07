@@ -3,7 +3,9 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
 import prelude
+
 from prewikka import utils, version
 from prewikka.dataprovider import DataProviderBase
 
@@ -18,7 +20,25 @@ class _IDMEFProvider(DataProviderBase):
         DataProviderBase.__init__(self, "create_time")
 
     def get_path_type(self, path):
-        return prelude.IDMEFClass(path).getValueType()
+        _typemap = {
+            prelude.IDMEFValue.TYPE_DATA: bytes,
+            prelude.IDMEFValue.TYPE_STRING: text_type,
+            prelude.IDMEFValue.TYPE_TIME: datetime.datetime,
+            prelude.IDMEFValue.TYPE_FLOAT: float,
+            prelude.IDMEFValue.TYPE_DOUBLE: float,
+            prelude.IDMEFValue.TYPE_ENUM: text_type,
+            prelude.IDMEFValue.TYPE_INT8: int,
+            prelude.IDMEFValue.TYPE_UINT8: int,
+            prelude.IDMEFValue.TYPE_INT16: int,
+            prelude.IDMEFValue.TYPE_UINT16: int,
+            prelude.IDMEFValue.TYPE_INT32: int,
+            prelude.IDMEFValue.TYPE_UINT32: int,
+            prelude.IDMEFValue.TYPE_INT64: int,
+            prelude.IDMEFValue.TYPE_UINT64: int,
+            prelude.IDMEFValue.TYPE_CLASS: object,
+        }
+
+        return _typemap[prelude.IDMEFClass(path).getValueType()]
 
     def _get_paths(self, rootcl):
         for node in rootcl:
