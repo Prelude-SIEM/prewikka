@@ -36,19 +36,19 @@ class AnonymousSession(auth.Auth, session.Session):
         auth.Auth.__init__(self, config)
         session.Session.__init__(self, config)
 
-    def getUserPermissions(self, user, ignore_group=False):
+    def get_user_permissions(self, user, ignore_group=False):
         return usergroup.ALL_PERMISSIONS
 
     def get_user_info(self, request):
         return session.SessionUserInfo("anonymous", None)
 
-    def getUserList(self, search=None):
+    def get_user_list(self, search=None):
         return [usergroup.User("anonymous")]
 
-    def getUserByID(self, id_):
+    def get_user_by_id(self, id_):
         return usergroup.User("anonymous")
 
-    def hasUser(self, other):
+    def has_user(self, other):
         return usergroup.User("anonymous")
 
     def authenticate(self, login, password="", no_password_check=False):

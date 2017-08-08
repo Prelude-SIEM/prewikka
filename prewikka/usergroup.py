@@ -129,15 +129,15 @@ class Group(NameID):
         NameID.__init__(self, name, groupid)
 
     def _id2name(self, id):
-        return env.auth.getGroupByID(id).name
+        return env.auth.get_group_by_id(id).name
 
     def create(self):
-        env.auth.createGroup(self)
+        env.auth.create_group(self)
         list(hookmanager.trigger("HOOK_GROUP_CREATE", self))
 
     def delete(self):
         list(hookmanager.trigger("HOOK_GROUP_DELETE", self))
-        env.auth.deleteGroup(self)
+        env.auth.delete_group(self)
 
 
 def _sync_if_needed(func):
@@ -165,15 +165,15 @@ class User(NameID):
         self._properties_state = self.__PROPERTIES_STATE_NONE
 
     def _id2name(self, id):
-        return env.auth.getUserByID(id).name
+        return env.auth.get_user_by_id(id).name
 
     @cache.request_memoize_property("user_permissions")
     def permissions(self):
-        return set(env.auth.getUserPermissions(self))
+        return set(env.auth.get_user_permissions(self))
 
     @permissions.setter
     def permissions(self, permissions):
-        env.auth.setUserPermissions(self, permissions)
+        env.auth.set_user_permissions(self, permissions)
 
     def _permissions(self, permissions):
         self.permissions  # make sure the cache has been created
@@ -271,10 +271,10 @@ class User(NameID):
             raise PermissionDeniedError(perm, view)
 
     def create(self):
-        env.auth.createUser(self)
+        env.auth.create_user(self)
         list(hookmanager.trigger("HOOK_USER_CREATE", self))
 
     def delete(self):
         list(hookmanager.trigger("HOOK_USER_DELETE", self))
         env.db.query("DELETE FROM Prewikka_User_Configuration WHERE userid = %s", self.id)
-        env.auth.deleteUser(self)
+        env.auth.delete_user(self)

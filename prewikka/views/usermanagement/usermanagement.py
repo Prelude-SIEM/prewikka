@@ -14,7 +14,7 @@ class UserSettings(view.View):
     def display(self):
         self._object = env.request.user
 
-        if not env.auth.hasUser(self._object):
+        if not env.auth.has_user(self._object):
             raise error.PrewikkaUserError(N_("Invalid User"), N_("Requested user '%s' does not exist", self._object))
 
         dataset = {}

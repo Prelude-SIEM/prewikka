@@ -124,7 +124,7 @@ class Session(pluginmanager.PluginBase):
 
         # And that the user it carry still exist in the current authentication
         # backend (which might have changed)
-        if not(env.auth.hasUser(usergroup.User(login))):
+        if not(env.auth.has_user(usergroup.User(login))):
             self.__delete_session(request)
             raise SessionInvalid(login, template=self.template)
 

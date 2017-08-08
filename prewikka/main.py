@@ -184,7 +184,7 @@ class Core(object):
         elif cfg.auth:
             # No session module defined, we load the auth module first
             self._load_auth_or_session("auth", _AUTH_PLUGINS, cfg.auth.get_instance_name(), cfg.auth)
-            self._load_auth_or_session("session", _SESSION_PLUGINS, env.auth.getDefaultSession())
+            self._load_auth_or_session("session", _SESSION_PLUGINS, env.auth.get_default_session())
         else:
             # Nothing defined, we use the anonymous module
             self._load_auth_or_session("session", _SESSION_PLUGINS, "anonymous")

@@ -32,100 +32,107 @@ class AuthError(PrewikkaUserError):
 
 
 class _AuthUser(object):
-    def canCreateUser(self):
-        return "createUser" in self.__class__.__dict__
+    def can_create_user(self):
+        return self.__class__.create_user != _AuthUser.create_user
 
-    def canDeleteUser(self):
-        return "deleteUser" in self.__class__.__dict__
+    def can_delete_user(self):
+        return self.__class__.delete_user != _AuthUser.delete_user
 
-    def canSetPassword(self):
-        return "setPassword" in self.__class__.__dict__
+    def can_set_password(self):
+        return self.__class__.set_password != _AuthUser.set_password
 
-    def canManagePermissions(self):
-        return self.__class__.setUserPermissions != _AuthUser.setUserPermissions
+    def can_manage_permissions(self):
+        return self.__class__.set_user_permissions != _AuthUser.set_user_permissions
 
     @abc.abstractmethod
-    def createUser(self, user):
+    def create_user(self, user):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def deleteUser(self, user):
+    def delete_user(self, user):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def getUserList(self, search=None):
+    def get_user_list(self, search=None):
         return []
 
     @abc.abstractmethod
-    def getUserByID(self, id_):
+    def get_user_by_id(self, id_):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def hasUser(self, user):
+    def has_user(self, user):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def getUserPermissions(self, login, ignore_group=False):
+    def get_user_permissions(self, user, ignore_group=False):
         return []
 
     @abc.abstractmethod
-    def getUserPermissionsFromGroups(self, login):
+    def get_user_permissions_from_groups(self, user):
         return []
 
     @abc.abstractmethod
-    def setUserPermissions(self, login, permissions):
+    def set_user_permissions(self, user, permissions):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def set_password(self, user, password):
         raise NotImplementedError
 
 
 class _AuthGroup(object):
-    def canCreateGroup(self):
-        return "createGroup" in self.__class__.__dict__
+    def can_handle_groups(self):
+        return self.__class__.get_group_by_id != _AuthGroup.get_group_by_id
 
-    def canDeleteGroup(self):
-        return "deleteGroup" in self.__class__.__dict__
+    def can_create_group(self):
+        return self.__class__.create_group != _AuthGroup.create_group
 
-    def canManageGroupMembers(self):
-        return self.__class__.setGroupMembers != _AuthGroup.setGroupMembers
+    def can_delete_group(self):
+        return self.__class__.delete_group != _AuthGroup.delete_group
 
-    def canManageGroupPermissions(self):
-        return self.__class__.setGroupPermissions != _AuthGroup.setGroupPermissions
+    def can_manage_group_members(self):
+        return self.__class__.set_group_members != _AuthGroup.set_group_members
 
-    def getGroupList(self, search=None):
+    def can_manage_group_permissions(self):
+        return self.__class__.set_group_permissions != _AuthGroup.set_group_permissions
+
+    def get_group_list(self, search=None):
         return []
 
-    def getGroupByID(self, id_):
+    def get_group_by_id(self, id_):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def createGroup(self, group):
+    def create_group(self, group):
         raise NotImplementedError
 
     @abc.abstractmethod
-    def deleteGroup(self, group):
+    def delete_group(self, group):
         raise NotImplementedError
 
-    def setGroupPermissions(self, group, permissions):
+    def set_group_permissions(self, group, permissions):
         raise NotImplementedError
 
-    def getGroupPermissions(self, group):
+    def get_group_permissions(self, group):
         return []
 
-    def setGroupMembers(self, group, logins):
+    def set_group_members(self, group, users):
         raise NotImplementedError
 
-    def getGroupMembers(self, group):
+    def get_group_members(self, group):
         return []
 
-    def setMemberOf(self, login, groups):
+    def set_member_of(self, user, groups):
         raise NotImplementedError
 
-    def getMemberOf(self, login):
+    def get_member_of(self, user):
         return []
 
-    def isMemberOf(self, group, login):
+    def is_member_of(self, group, user):
         raise NotImplementedError
 
-    def hasGroup(self, group):
+    def has_group(self, group):
         raise NotImplementedError
 
 
@@ -144,5 +151,5 @@ class Auth(pluginmanager.PluginBase, _AuthUser, _AuthGroup):
     def authenticate(self, login, password="", no_password_check=False):
         raise NotImplementedError
 
-    def getDefaultSession(self):
+    def get_default_session(self):
         raise NotImplementedError

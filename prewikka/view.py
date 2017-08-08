@@ -439,7 +439,7 @@ class _ViewDescriptor(object):
             if user in self.view_users:
                 return user.has(self.view_users_permissions)
 
-            if self.view_groups and set(env.auth.getMemberOf(user)) & self.view_groups:
+            if self.view_groups and set(env.auth.get_member_of(user)) & self.view_groups:
                 return user.has(self.view_groups_permissions)
 
             if self.view_permissions:
