@@ -39,9 +39,9 @@ $(document).ready(function() {
                     async: false,
                     type: "GET",
                     url: $(this).data("title-url"),
-                    success: function(title) {
-                        if ( title instanceof Array ) {
-                            title = title.map(function(v, i) {
+                    success: function(data) {
+                        if ( data instanceof Array ) {
+                            title = data.map(function(v, i) {
                                 return $("<div>").text(v).html();
                             }).join("<br>");
                         }
