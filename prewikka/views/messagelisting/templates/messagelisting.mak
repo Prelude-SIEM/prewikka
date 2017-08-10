@@ -9,7 +9,7 @@ from prewikka import usergroup
 <script type="text/javascript">
 $LAB.script("messagelisting/js/messagelisting.js").wait();
 
-$(document).ready(function() {
+$(function() {
   $("#allbox").click(function(){
     $('input[name=selection]').check($(this).prop('checked'));
   });

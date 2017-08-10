@@ -1,5 +1,5 @@
 <script type="text/javascript">
-$(document).ready(function() {
+$(function() {
   % if inline:
     $('#main_menu_ng input, #main_menu_ng select').addClass("form-control input-sm");
     $('#main_menu_ng button').addClass("btn-sm");

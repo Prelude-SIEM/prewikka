@@ -1,4 +1,4 @@
-$(document).ready(function() {
+$(function() {
   $(document).on("click", "#top_view", function() {
     $(".filter_popup_link + div").hide();
   });

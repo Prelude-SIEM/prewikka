@@ -1,7 +1,7 @@
 <%! from prewikka.utils.html import Markup %>
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(function() {
 		$('#prewikka-warning').modal();
     });
 </script>

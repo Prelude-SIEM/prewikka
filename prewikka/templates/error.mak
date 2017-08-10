@@ -115,7 +115,7 @@ def inherit(context):
 <div class="error-dialog" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="static" data-keyboard="true">
 
 <script type="text/javascript">
-  $(document).ready(function() {
+  $(function() {
     $("div.traceback").accordion({collapsible: true, active: false, heightStyle: "content"});
 
     $(".traceback-copy").on("click", function() {

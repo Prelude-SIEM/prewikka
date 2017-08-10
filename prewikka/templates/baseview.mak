@@ -30,7 +30,7 @@ function check_same_origin(url) {
     return url.protocol == location.protocol && url.hostname == location.hostname && (url.port || default_port[url.protocol]) == (location.port || default_port[location.protocol]);
 }
 
-$(document).ready(function() {
+$(function() {
         % if not(context.get("is_error_template")):
            prewikka_ajax({url: window.location.pathname, data: "${env.request.web.get_query_string() | n}", type: "${env.request.web.method}", context: "tab" });
         % endif

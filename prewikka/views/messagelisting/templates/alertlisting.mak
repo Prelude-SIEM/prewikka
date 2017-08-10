@@ -62,7 +62,7 @@ $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
 
         var messagelisting = MessageListing();
 
-        $(document).ready(function() {
+        $(function() {
                 var stateText = {"null":"${ _("Reset to null") }", "default":"${ _("Reset to default") }", "saved":"${ _("Reset to saved") }", "current":"${ _("Reset to current") }"}
 
                 $(saved_state).each(function(idx, type) {

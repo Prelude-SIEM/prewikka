@@ -1,10 +1,10 @@
-$(document).ready(function(){
+$(function() {
 
   $(document).ajaxStart(function() {
         $("#ajax-spinner").show();
-    }).bind("ajaxStop", function() {
+    }).on("ajaxStop", function() {
         $("#ajax-spinner").hide();
-    }).bind("ajaxError", function() {
+    }).on("ajaxError", function() {
         $("#ajax-spinner").hide();
     });
 
@@ -16,7 +16,7 @@ $(document).ready(function(){
            return;
 
        if ( xhr.responseText )
-           prewikka_json_dialog($.parseJSON(xhr.responseText));
+           prewikka_json_dialog(JSON.parse(xhr.responseText));
        else
            $("#prewikka-dialog-connection-error").modal();
   });
@@ -218,7 +218,7 @@ function prewikka_EventSource(config)
     if ( config['error'] == undefined ) {
         config['error'] = function(e) {
             if ( e.data )
-                prewikka_json_dialog($.parseJSON(e.data));
+                prewikka_json_dialog(JSON.parse(e.data));
             else
                 $("#prewikka-dialog-connection-error").modal();
 
@@ -237,7 +237,7 @@ function prewikka_EventSource(config)
         jsonStream.close();
     });
 
-    var decode_json = function(e) { return $.parseJSON(e.data) };
+    var decode_json = function(e) { return JSON.parse(e.data) };
     if ( config['type'] != undefined && config['type'] != 'json' ) {
         decode_json = function(e) { return e };
     }

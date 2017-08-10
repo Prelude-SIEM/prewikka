@@ -23,7 +23,7 @@ DEFAULT_OPTION = "0 * * * *"
 
   <script type="text/javascript">
 
-    $(document).ready(function() {
+    $(function() {
       $("#cronjob_setup input.schedule").change(function(e) {
           $("#quick-schedule").val(
               $("#cronjob_setup input.schedule").map(function() {

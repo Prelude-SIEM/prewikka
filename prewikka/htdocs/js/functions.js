@@ -3,7 +3,7 @@ String.prototype.capitalize = function() {
 };
 
 
-$(document).ready(function(){
+$(function() {
   var $cache = null;
   var $cachef = null;
 
@@ -191,22 +191,9 @@ function prewikka_resizeTopMenu() {
 }
 
 
-function setup_position(obj)
-{
-    $(obj).css({top:0, left:0}).position({
-        my: "center top",
-        at: "center top",
-        of: $(window),
-        collision: "none"
-    });
-}
-
-
 function prewikka_notification(data)
 {
     var notification = $("#prewikka-notification");
-
-    setup_position(notification);
 
     $(notification).find(".title").text(data.name || "");
     $(notification).find(".content").text(data.message);
@@ -224,8 +211,6 @@ function _dialog_common(dialog, opts)
 {
     if ( typeof(opts) == 'undefined' || opts.show )
         $(dialog).modal();
-
-    setup_position(dialog);
 
     if ( $(dialog).attr("data-draggable") )
         $(dialog).draggable({ handle: ".modal-header" });
@@ -359,7 +344,7 @@ function prewikka_autocomplete(field, url, submit, allow_empty=false) {
                     field.parent("div").addClass("has-error");
                     field.next().addClass("fa-close");
                     if ( submit ) submit.prop("disabled", true);
-                    var message = xhr.responseText ? $.parseJSON(xhr.responseText).details : error || "Connection error";
+                    var message = xhr.responseText ? JSON.parse(xhr.responseText).details : error || "Connection error";
                     field.prop("title", message);
                     response([]);
                 }
