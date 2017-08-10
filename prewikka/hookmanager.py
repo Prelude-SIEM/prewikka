@@ -31,11 +31,13 @@ class HookManager(object):
     def __contains__(self, hook):
         return hook in self._hooks
 
-    def unregister(self, hook=None, method=None):
+    def unregister(self, hook=None, method=None, exclude=[]):
         if hook and method:
             self._hooks[hook].remove(method)
+        elif hook:
+            self._hooks[hook] = []
         else:
-            for i in self._hooks:
+            for i in set(self._hooks) - set(exclude):
                 self._hooks[i] = []
 
     def register(self, hook, _regfunc=_sentinel):

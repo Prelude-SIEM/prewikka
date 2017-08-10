@@ -204,7 +204,7 @@ class Core(object):
         env.log.warning("plugins were activated: triggering reload")
 
         list(hookmanager.trigger("HOOK_PLUGINS_RELOAD"))
-        hookmanager.unregister()
+        hookmanager.unregister(exclude=["HOOK_PLUGINS_RELOAD"])
         self._loadPlugins()
 
         env.viewmanager.set_url_adapter(env.request, cache=False)
