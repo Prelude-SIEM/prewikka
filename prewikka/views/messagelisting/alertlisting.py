@@ -28,7 +28,7 @@ import re
 import sys
 import prelude
 
-from prewikka import compat, crontab, hookmanager, localization, mainmenu, resource, template, utils, view
+from prewikka import crontab, hookmanager, localization, mainmenu, resource, template, utils, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -555,7 +555,7 @@ class ListedAlert(ListedMessage):
 
         if "time" in env.url and t:
             epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=utils.timeutil.tzutc())
-            t = text_type(int(compat.timedelta_total_seconds(t - epoch) * 1000))
+            t = text_type(int((t - epoch).total_seconds() * 1000))
 
             for urlname, url in env.url["time"].items():
                 url = url.replace("$time", t)
@@ -569,7 +569,7 @@ class ListedAlert(ListedMessage):
         self["time"] = self.createTimeField(message["alert.create_time"])
         self["time"]["time_url"] = self._setMessageTimeURL(message["alert.analyzer_time"], message["alert.analyzer(-1).node.name"])
         if (message["alert.analyzer_time"] is not None and
-            abs(compat.timedelta_total_seconds(message["alert.create_time"] - message["alert.analyzer_time"])) > 60):
+            abs((message["alert.create_time"] - message["alert.analyzer_time"]).total_seconds()) > 60):
             self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"])
         else:
             self["analyzer_time"] = AttrDict(value=None)
