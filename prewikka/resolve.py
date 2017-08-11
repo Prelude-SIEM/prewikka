@@ -29,7 +29,7 @@ import_fail = None
 
 try:
     from twisted.internet import reactor
-    from twisted.names import client, dns, hosts, cache, resolve
+    from twisted.names import client, dns, cache, resolve
 except Exception as err:
     import_fail = err
 
@@ -45,7 +45,7 @@ class DNSResolver(object):
         self._lock = Lock()
 
         self._cache = cache.CacheResolver()
-        rlist = [ self._cache, client.Resolver('/etc/resolv.conf') ]
+        rlist = [self._cache, client.Resolver('/etc/resolv.conf')]
         self._resolve = resolve.ResolverChain(rlist)
 
     def _error_cb(self, failure):
@@ -87,7 +87,7 @@ class DNSResolver(object):
                 self._lock.release()
                 break
 
-            reactor.runUntilCurrent();
+            reactor.runUntilCurrent()
             reactor.doIteration(timeout)
 
             self._lock.release()
@@ -96,7 +96,7 @@ class DNSResolver(object):
             if end >= final:
                 break
 
-        #print "max=%f elapsed:%f" % (timeout, end-now)
+        # print "max=%f elapsed:%f" % (timeout, end-now)
 
     def doQuery(self, addr, resolve_cb):
         self._lock.acquire()
@@ -167,7 +167,7 @@ def init():
         return
 
     if import_fail:
-       env.log.warning(_("Asynchronous DNS resolution disabled: twisted.names and twisted.internet required: %s") % import_fail)
-       return
+        env.log.warning(_("Asynchronous DNS resolution disabled: twisted.names and twisted.internet required: %s") % import_fail)
+        return
 
     resolver = DNSResolver()

@@ -65,22 +65,24 @@ class Agents(view.View):
             osversion = analyzer["osversion"] or _("OS version n/a")
             ostype = analyzer["ostype"] or _("OS type n/a")
 
-            yield {"id": analyzerid,
-                   "label": "%s - %s %s" % (node_name, ostype, osversion),
-                   "location": analyzer["node.location"] or _("Node location n/a"),
-                   "node": node_name,
-                   "name": analyzer["name"],
-                   "model": analyzer["model"],
-                   "class": analyzer["class"],
-                   "version": analyzer["version"],
-                   "latest_heartbeat": localization.format_timedelta(delta, add_direction=True),
-                   "status": status,
-                   "status_text": status_text,
-                   "links": [
-                        resource.HTMLNode("a", _("Alert listing"), href=alert_listing),
-                        resource.HTMLNode("a", _("Heartbeat listing"), href=heartbeat_listing),
-                        resource.HTMLNode("a", _("Heartbeat analysis"), href=heartbeat_analyze)
-                   ]}
+            yield {
+                "id": analyzerid,
+                "label": "%s - %s %s" % (node_name, ostype, osversion),
+                "location": analyzer["node.location"] or _("Node location n/a"),
+                "node": node_name,
+                "name": analyzer["name"],
+                "model": analyzer["model"],
+                "class": analyzer["class"],
+                "version": analyzer["version"],
+                "latest_heartbeat": localization.format_timedelta(delta, add_direction=True),
+                "status": status,
+                "status_text": status_text,
+                "links": [
+                    resource.HTMLNode("a", _("Alert listing"), href=alert_listing),
+                    resource.HTMLNode("a", _("Heartbeat listing"), href=heartbeat_listing),
+                    resource.HTMLNode("a", _("Heartbeat analysis"), href=heartbeat_analyze)
+                ]
+            }
 
     @view.route("/agents/agents", permissions=[N_("IDMEF_VIEW")], help="#agents", menu=(N_("Agents"), N_("Agents")))
     def agents(self):

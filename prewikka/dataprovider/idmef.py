@@ -44,7 +44,7 @@ class _IDMEFProvider(DataProviderBase):
     def parse_criterion(self, path, operator, value, type):
         if not(value) and operator in ("=", "==", "!"):
             if prelude.IDMEFPath(path).getValueType() == prelude.IDMEFValue.TYPE_STRING:
-                 return "(! %s || %s == '')" % (path, path)
+                return "(! %s || %s == '')" % (path, path)
 
             return "! %s" % (path)
 

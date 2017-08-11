@@ -1,6 +1,6 @@
 <%!
 import sys
-from prewikka import env, utils
+from prewikka import utils
 from prewikka.utils import nameToPath
 
 if sys.version_info >= (3,0):

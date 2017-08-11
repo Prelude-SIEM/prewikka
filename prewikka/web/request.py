@@ -24,7 +24,6 @@ import abc
 import sys
 
 from prewikka import error
-from prewikka.response import PrewikkaDirectResponse, PrewikkaResponse
 
 if sys.version_info >= (3, 0):
     from http import cookies

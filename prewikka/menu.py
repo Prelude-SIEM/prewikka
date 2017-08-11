@@ -22,9 +22,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import collections
 import os
 import yaml
-from copy import copy
 
-from prewikka import error, hookmanager, siteconfig
+from prewikka import error, siteconfig
 
 
 class MenuManager(object):

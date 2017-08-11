@@ -179,15 +179,19 @@ class Crontab(object):
     def delete(self, **kwargs):
         user = kwargs.pop("user", None)
         if user:
-            kwargs["userid"] = getattr(user, "id", user) # Can be None / NotNone
+            kwargs["userid"] = getattr(user, "id", user)  # Can be None / NotNone
 
         qs = env.db.kwargs2query(kwargs, " WHERE ")
         env.db.query("DELETE FROM Prewikka_Crontab%s" % qs)
 
     def update(self, id, **kwargs):
-        accept = { "name": None, "schedule": None,
-                   "user": lambda x: ("userid", getattr(x, "id", None)),
-                   "ext_type": None, "ext_id": None, "enabled": lambda x: ("enabled", int(x))
+        accept = {
+            "name": None,
+            "schedule": None,
+            "user": lambda x: ("userid", getattr(x, "id", None)),
+            "ext_type": None,
+            "ext_id": None,
+            "enabled": lambda x: ("enabled", int(x))
         }
 
         cols = []
@@ -211,8 +215,8 @@ class Crontab(object):
             return id
 
         # FIXME: there is an issue with upsert() when using PostgreSQL CTE (serial problem + cast problem)
-        #id = int(env.db.upsert("Prewikka_Crontab", cols, [data], pkey=("id",), returning=["id"])[0])
-        #return id
+        # id = int(env.db.upsert("Prewikka_Crontab", cols, [data], pkey=("id",), returning=["id"])[0])
+        # return id
 
     def add(self, name, schedule, user=None, ext_type=None, ext_id=None, enabled=True):
         return self.update(None, name=name, schedule=schedule, user=user, ext_type=ext_type, ext_id=ext_id, enabled=enabled)
@@ -226,7 +230,7 @@ class Crontab(object):
             kwargs["schedule"] = schedule
             try:
                 croniter.croniter(schedule)
-            except Exception as err:
+            except Exception:
                 raise error.PrewikkaUserError(N_("Invalid schedule"), N_("The specified job schedule is invalid"))
 
         elif delete_disabled:
@@ -246,7 +250,6 @@ class Crontab(object):
             self._plugin_callback[ext_type] = _regfunc
         else:
             return registrar.DelayedRegistrar.make_decorator("crontab", self.setup, ext_type)
-
 
 
 def format_schedule(x):

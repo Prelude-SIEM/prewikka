@@ -23,16 +23,15 @@ import base64
 import errno
 import os.path
 import sys
-import prelude
 import random
 
 from prewikka import siteconfig
 
 
-if sys.version_info >= (3,0):
-    from urllib.parse import quote, unquote, urlsplit, urlunsplit, urlencode as _urlencode
+if sys.version_info >= (3, 0):
+    from urllib.parse import quote, urlsplit, urlunsplit, urlencode as _urlencode
 else:
-    from urllib import quote, unquote, urlencode as __urlencode
+    from urllib import quote, urlencode as __urlencode
     from urlparse import urlsplit, urlunsplit
 
     def _convert(d):
@@ -111,7 +110,7 @@ class mkdownload(object):
         return getattr(self.fd, attr)
 
     def __json__(self):
-        return { "type": "download", "href": self.href }
+        return {"type": "download", "href": self.href}
 
 
 def iri2uri(iri, encoding="utf8"):

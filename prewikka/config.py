@@ -26,7 +26,7 @@ import glob
 import os
 import re
 
-from prewikka import siteconfig, utils
+from prewikka import siteconfig
 
 
 class ParseError(Exception):

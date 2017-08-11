@@ -4,11 +4,11 @@ import calendar
 
 from datetime import datetime
 from dateutil import parser
-from dateutil.tz import tzlocal, tzoffset, tzutc
+from dateutil.tz import tzlocal, tzoffset, tzutc  # noqa: imported but unused
 from pytz import timezone
 
 
-_TRUNCATE_VALUES = [ "year", "month", "day", "hour", "minute", "second", "microsecond" ]
+_TRUNCATE_VALUES = ["year", "month", "day", "hour", "minute", "second", "microsecond"]
 
 
 def now():

@@ -21,11 +21,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import copy
 import time
-import types
 from datetime import datetime
 
-from prewikka import error, hookmanager, pluginmanager
-from prewikka.utils import AttrObj, CachingIterator, compat, json
+from prewikka import compat, error, hookmanager, pluginmanager
+from prewikka.utils import AttrObj, CachingIterator, json
 from prewikka.utils.timeutil import parser, tzutc
 
 
@@ -40,10 +39,9 @@ CONVERTERS = {
     int: datetime.utcfromtimestamp,
     float: datetime.utcfromtimestamp,
     text_type: _str_to_datetime,
-    datetime: lambda x:x,
-    type(None): lambda x:x
+    datetime: lambda x: x,
+    type(None): lambda x: x
 }
-
 
 _sentinel = object()
 
@@ -60,6 +58,7 @@ def to_datetime(date):
         return dt.replace(tzinfo=tzutc())
 
     return dt
+
 
 TYPES_FUNC_MAP = {
     "int": int,
@@ -126,7 +125,6 @@ class QueryResults(CachingIterator):
         return QueryResultsRow(self, value)
 
 
-
 class ResultObject(object):
     def __init__(self, obj, curpath=None):
         self._obj = obj
@@ -140,7 +138,7 @@ class ResultObject(object):
         return ".".join(self._curpath)
 
     def _wrapobj(self, obj, curpath):
-        if type(obj) == type(self._obj):
+        if isinstance(obj, type(self._obj)):
             return ResultObject(obj, curpath)
 
         elif isinstance(obj, tuple):
@@ -155,7 +153,7 @@ class ResultObject(object):
 
         curpath = self._curpath + [key]
 
-        cont = [ ".".join(curpath), self.preprocess_value(value) ]
+        cont = [".".join(curpath), self.preprocess_value(value)]
         list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE_READ", cont))
 
         return self._wrapobj(cont[1], curpath)
@@ -402,8 +400,6 @@ class Criterion(json.JSONObject):
 
     __and__ = __add__
     __nonzero__ = __bool__
-
-
 
 
 class DataProviderManager(pluginmanager.PluginManager):

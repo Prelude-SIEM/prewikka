@@ -43,7 +43,7 @@ class AnonymousSession(auth.Auth, session.Session):
         return session.SessionUserInfo("anonymous", None)
 
     def getUserList(self, search=None):
-        return [ usergroup.User("anonymous") ]
+        return [usergroup.User("anonymous")]
 
     def getUserByID(self, id_):
         return usergroup.User("anonymous")

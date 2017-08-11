@@ -33,7 +33,7 @@ from datetime import datetime
 import pkg_resources
 import preludedb
 from prewikka import compat, error, log, utils, version
-from prewikka.utils import cache, json
+from prewikka.utils import cache
 
 
 NotNone = object
@@ -49,7 +49,6 @@ class DatabaseError(error.PrewikkaUserError):
 
 class DatabaseSchemaError(DatabaseError):
     name = N_("Database schema error")
-
 
 
 # Internal workaround since SWIG generated exception use class RuntimeError
@@ -135,7 +134,7 @@ class SQLScript(object):
     """
 
     __metaclass__ = abc.ABCMeta
-    __all__ = [ "type", "branch", "version", "from_branch" ]
+    __all__ = ["type", "branch", "version", "from_branch"]
 
     type = "update"
     branch = None
@@ -147,10 +146,12 @@ class SQLScript(object):
         self.query_logs = []
         self._module_name = dbup._module_name
         self._full_module_name = dbup._full_module_name
-        self._query_filter = { "sqlite3": self._mysql2sqlite, "pgsql": self._mysql2pgsql, "mysql": self._mysqlhandler }[self.db.getType()]
+        self._query_filter = {"sqlite3": self._mysql2sqlite,
+                              "pgsql": self._mysql2pgsql,
+                              "mysql": self._mysqlhandler}[self.db.getType()]
 
         if self.type in ("install", "update"):
-           if not self.version:
+            if not self.version:
                 raise Exception("SQL %s script require 'version' attribute" % self.type)
 
         elif self.type == "branch":
@@ -165,38 +166,42 @@ class SQLScript(object):
         return input
 
     def _mysql2pgsql(self, input):
-        _stbl = [ ("#.*", ""),
-                  (" INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT", " SERIAL PRIMARY KEY"),
-                  ("BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT", "BIGSERIAL PRIMARY KEY"),
-                  ("BLOB", "BYTEA"),
-                  (" TINYINT UNSIGNED ", " INT4 "),
-                  (" TINYINT ", " INT2 "),
-                  (" SMALLINT UNSIGNED ", " INT8 "),
-                  (" SMALLINT ", " INT4 "),
-                  (" BIGINT UNSIGNED ", " INT8 "),
-                  (" BIGINT ", " INT8 "),
-                  (" INT(EGER)? UNSIGNED ", " INT8 "),
-                  (" INT(EGER)? ", " INT4 "),
-                  ("DATETIME", "TIMESTAMP"),
-                  ("ENGINE=InnoDB", ""),
-                  ("\"([^\"]*)\"", "'\\1'"),
-                  ("\"\([^\"]*\)\"", "'\1'"),
-                  ("(\S*) ENUM\((.*)\)", "\\1 TEXT CHECK (\\1 IN (\\2))"),
-                  ("VARCHAR[ ]*[^)]+\)", "TEXT"),
-                  ("(DROP INDEX [^ ]*) ON [^;]*", "\\1")]
+        _stbl = [
+            ("#.*", ""),
+            (" INT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT", " SERIAL PRIMARY KEY"),
+            ("BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT", "BIGSERIAL PRIMARY KEY"),
+            ("BLOB", "BYTEA"),
+            (" TINYINT UNSIGNED ", " INT4 "),
+            (" TINYINT ", " INT2 "),
+            (" SMALLINT UNSIGNED ", " INT8 "),
+            (" SMALLINT ", " INT4 "),
+            (" BIGINT UNSIGNED ", " INT8 "),
+            (" BIGINT ", " INT8 "),
+            (" INT(EGER)? UNSIGNED ", " INT8 "),
+            (" INT(EGER)? ", " INT4 "),
+            ("DATETIME", "TIMESTAMP"),
+            ("ENGINE=InnoDB", ""),
+            ("\"([^\"]*)\"", "'\\1'"),
+            ("\"\([^\"]*\)\"", "'\1'"),
+            ("(\S*) ENUM\((.*)\)", "\\1 TEXT CHECK (\\1 IN (\\2))"),
+            ("VARCHAR[ ]*[^)]+\)", "TEXT"),
+            ("(DROP INDEX [^ ]*) ON [^;]*", "\\1")
+        ]
 
         return self._sub(_stbl, input)
 
     def _mysql2sqlite(self, input):
-        _stbl = [ ("#.*", ""),
-                  ("[a-zA-Z]*INT ", "INTEGER "),
-                  ("UNSIGNED ", ""),
-                  ("ENUM[ ]*[^)]+\)", "TEXT"),
-                  ("VARCHAR[ ]*[^)]+\)", "TEXT"),
-                  ("AUTO_INCREMENT", "AUTOINCREMENT"),
-                  ("ENGINE=InnoDB", ""),
-                  ("ALTER TABLE [^ ]* DROP.*", ""),
-                  ("(DROP INDEX [^ ]*) ON [^;]*", "\\1")]
+        _stbl = [
+            ("#.*", ""),
+            ("[a-zA-Z]*INT ", "INTEGER "),
+            ("UNSIGNED ", ""),
+            ("ENUM[ ]*[^)]+\)", "TEXT"),
+            ("VARCHAR[ ]*[^)]+\)", "TEXT"),
+            ("AUTO_INCREMENT", "AUTOINCREMENT"),
+            ("ENGINE=InnoDB", ""),
+            ("ALTER TABLE [^ ]* DROP.*", ""),
+            ("(DROP INDEX [^ ]*) ON [^;]*", "\\1")
+        ]
 
         return self._sub(_stbl, input)
 
@@ -207,7 +212,7 @@ class SQLScript(object):
         for q in self._query_filter(input).split(";"):
             q = q.strip()
             if q:
-                self.query_logs.append(q);
+                self.query_logs.append(q)
                 self.db.query(q)
 
     @abc.abstractmethod
@@ -221,10 +226,18 @@ class SQLScript(object):
         self.run()
 
         if self.type == "install":
-            env.db.upsert("Prewikka_Module_Registry", ("module", "branch", "version"), ((self._full_module_name, self.branch, self.version),), pkey=("module",))
+            env.db.upsert(
+                "Prewikka_Module_Registry",
+                ("module", "branch", "version"),
+                ((self._full_module_name, self.branch, self.version),),
+                pkey=("module",)
+            )
 
         elif self.type == "update":
-            self.db.query("UPDATE Prewikka_Module_Registry SET version=%s WHERE module=%s%s" % (self.db.escape(self.version), self.db.escape(self._full_module_name), self.db._chknull("branch", self.branch)))
+            self.db.query("UPDATE Prewikka_Module_Registry SET version=%s WHERE module=%s%s" %
+                          (self.db.escape(self.version),
+                           self.db.escape(self._full_module_name),
+                           self.db._chknull("branch", self.branch)))
 
         elif self.type == "branch":
             self.db.query("UPDATE Prewikka_Module_Registry SET branch=%s, version=%s, enabled=1 WHERE module=%s",
@@ -250,7 +263,6 @@ class DatabaseHelper(object):
         return self.__dict__.get(x, getattr(env.db, x))
 
 
-
 class DatabaseUpdateHelper(DatabaseHelper):
     _default_modinfo = ModuleInfo(None, None, True)
 
@@ -266,7 +278,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
         self._initialized = True
 
     def __init__(self, module_name, reqversion, reqbranch=None):
-        DatabaseHelper.__init__(self) #for use_transaction
+        DatabaseHelper.__init__(self)  # for use_transaction
 
         self._reqbranch = reqbranch
         self._reqversion = reqversion
@@ -318,7 +330,8 @@ class DatabaseUpdateHelper(DatabaseHelper):
             try:
                 mod = importer.find_module(package_name).load_module(package_name).SQLUpdate(self)
             except Exception as e:
-                log.getLogger().exception("[%s]: error loading SQL update '%s' : %s" % (self._full_module_name, package_name, e))
+                log.getLogger().exception("[%s]: error loading SQL update '%s' : %s" %
+                                          (self._full_module_name, package_name, e))
                 continue
 
             if any(kwargs[k] != getattr(mod, k) for k in kwargs.keys()):
@@ -327,7 +340,6 @@ class DatabaseUpdateHelper(DatabaseHelper):
             version = pkg_resources.parse_version(mod.version)
             if (not from_version or (version >= from_version)) and (not to_version or (version <= to_version)):
                     yield mod
-
 
     def _resolve_branch_switch(self, curbranch, curversion, outstack=[]):
 
@@ -387,7 +399,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
         from_version, prev = self._from_version, []
 
         if not from_version:
-            prev = [ self._get_install_schema() ]
+            prev = [self._get_install_schema()]
 
         elif self._from_branch != self._reqbranch:
             prev = self._get_branch_update()
@@ -412,7 +424,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
     @use_transaction
     def _apply(self):
-        [ update.apply() for update in self.list() ]
+        [update.apply() for update in self.list()]
         self.check()
 
     @_use_flock
@@ -436,7 +448,7 @@ class DatabaseCommon(preludedb.SQL):
     __sentinel = object()
     __ALL_PROPERTIES = object()
 
-    __TRANSACTION_STATE_NONE  = 0
+    __TRANSACTION_STATE_NONE = 0
     __TRANSACTION_STATE_BEGIN = 1
     __TRANSACTION_STATE_QUERY = 2
 
@@ -466,16 +478,16 @@ class DatabaseCommon(preludedb.SQL):
         env.db = self
 
         self.__ESCAPE_PREFILTER = {
-                datetime: lambda dt: self.escape(self.datetime(dt)),
-                set: self._prefilter_iterate,
-                list: self._prefilter_iterate,
-                tuple: self._prefilter_iterate,
-                types.GeneratorType: self._prefilter_iterate
+            datetime: lambda dt: self.escape(self.datetime(dt)),
+            set: self._prefilter_iterate,
+            list: self._prefilter_iterate,
+            tuple: self._prefilter_iterate,
+            types.GeneratorType: self._prefilter_iterate
         }
 
         self._transaction_state = self.__TRANSACTION_STATE_NONE
 
-        settings = { "host": "localhost", "name": "prewikka", "user": "prewikka", "type": "mysql" }
+        settings = {"host": "localhost", "name": "prewikka", "user": "prewikka", "type": "mysql"}
         stpl = tuple((k, v) for k, v in config.items())
         settings.update(stpl)
 
@@ -693,8 +705,8 @@ class MySQLDatabase(DatabaseCommon):
         if retfmt:
             wh = []
             for row in values_rows:
-                vl = " AND ".join([ "%s = %s" % (field, self.escape(row[i])) for i, field in enumerate(pkey) ])
-                wh.append("(%s)" % (vl))
+                vl = " AND ".join(["%s = %s" % (field, self.escape(row[i])) for i, field in enumerate(pkey)])
+                wh.append("(%s)" % vl)
 
             return self.query("SELECT %s FROM %s WHERE %s" % (retfmt, table, " OR ".join(wh)))
 

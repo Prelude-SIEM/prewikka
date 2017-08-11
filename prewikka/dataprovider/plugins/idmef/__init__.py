@@ -8,10 +8,14 @@ from datetime import datetime
 import prelude
 import preludedb
 from prelude import IDMEFTime, IDMEFValue
-from prewikka import env, usergroup, utils, version
+from prewikka import usergroup, utils, version
 from prewikka.dataprovider import DataProviderBackend, QueryResults, QueryResultsRow, ResultObject
 
-_ORDER_MAP = { "time_asc": preludedb.DB.ORDER_BY_CREATE_TIME_ASC, "time_desc": preludedb.DB.ORDER_BY_CREATE_TIME_DESC }
+
+_ORDER_MAP = {
+    "time_asc": preludedb.DB.ORDER_BY_CREATE_TIME_ASC,
+    "time_desc": preludedb.DB.ORDER_BY_CREATE_TIME_DESC
+}
 
 
 class IDMEFResultObject(ResultObject, utils.json.JSONObject):
@@ -26,7 +30,7 @@ class IDMEFResultObject(ResultObject, utils.json.JSONObject):
         return cls(prelude.IDMEF(data["idmef_json"]))
 
     def __json__(self):
-        return { "idmef_json": self._obj.toJSON() }
+        return {"idmef_json": self._obj.toJSON()}
 
 
 class IDMEFQueryResultsRow(QueryResultsRow):

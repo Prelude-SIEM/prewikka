@@ -21,11 +21,10 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 import pkg_resources
-from prewikka import database, env, error, log, registrar, usergroup, utils
+from prewikka import database, error, log, registrar, usergroup
 from prewikka.localization import translation
 
 logger = log.getLogger(__name__)
-
 
 
 class PluginBase(registrar.DelayedRegistrar):

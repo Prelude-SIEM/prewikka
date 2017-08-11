@@ -168,7 +168,10 @@ class PrewikkaDownloadResponse(PrewikkaResponse):
         disposition = "inline" if inline else "attachment"
         if filename:
             # As specified in RFC 6266
-            disposition += "; filename=\"%s\"; filename*=utf-8''%s" % (self._filename_to_ascii(filename), utils.url.quote(filename.encode("utf8")))
+            disposition += "; filename=\"%s\"; filename*=utf-8''%s" % (
+                self._filename_to_ascii(filename),
+                utils.url.quote(filename.encode("utf8"))
+            )
 
         self._is_file = not(isinstance(self.data, text_type))
         if not size:

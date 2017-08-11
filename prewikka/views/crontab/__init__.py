@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import datetime
 import pkg_resources
 
-from prewikka import crontab, error, localization, response, template, utils, version, resource, view
+from prewikka import crontab, localization, response, template, utils, version, resource, view
 
 
 class CrontabView(view.View):
@@ -33,7 +33,7 @@ class CrontabView(view.View):
     plugin_copyright = version.__copyright__
     plugin_description = N_("Scheduled jobs management page")
     plugin_htdocs = (("crontab", pkg_resources.resource_filename(__name__, 'htdocs')),)
-    view_permissions = [ N_("USER_MANAGEMENT") ]
+    view_permissions = [N_("USER_MANAGEMENT")]
 
     @view.route("/settings/scheduler/disable", methods=["POST"])
     def disable(self):
@@ -84,15 +84,15 @@ class CrontabView(view.View):
                 last = resource.HTMLNode("a", _("Error"), _class="cronjob-error")
 
             dataset["data"].append({
-                        "id": i.id,
-                        "name": resource.HTMLNode("a", _(i.name), href=url_for(".edit", id=i.id)),
-                        "schedule": crontab.format_schedule(i.schedule),
-                        "user": text_type(i.user) if i.user else _("SYSTEM"),
-                        "last": last,
-                        "last_date": i.base,
-                        "next": next,
-                        "next_date": i.next_schedule,
-                        "error": i.error
+                "id": i.id,
+                "name": resource.HTMLNode("a", _(i.name), href=url_for(".edit", id=i.id)),
+                "schedule": crontab.format_schedule(i.schedule),
+                "user": text_type(i.user) if i.user else _("SYSTEM"),
+                "last": last,
+                "last_date": i.base,
+                "next": next,
+                "next_date": i.next_schedule,
+                "error": i.error
             })
 
         return dataset.render()

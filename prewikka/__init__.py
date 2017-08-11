@@ -77,4 +77,4 @@ env = Env()
 builtins.env = env
 
 # import after env creation
-from . import localization
+from . import localization  # noqa: imported but unused

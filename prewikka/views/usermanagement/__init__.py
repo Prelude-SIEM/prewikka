@@ -12,4 +12,4 @@ class UserManagement(pluginmanager.PluginPreload):
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
     plugin_description = N_("User settings page")
-    plugin_classes = [ usermanagement.UserSettings ]
+    plugin_classes = [usermanagement.UserSettings]

@@ -37,7 +37,7 @@ class AboutPlugin(view.View):
     plugin_mandatory = True
     plugin_htdocs = (("aboutplugin", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
-    view_permissions = [ N_("USER_MANAGEMENT") ]
+    view_permissions = [N_("USER_MANAGEMENT")]
 
     _all_plugins = ((_("Apps: View"), "prewikka.views"),
                     (_("Apps: API"), "prewikka.plugins"),

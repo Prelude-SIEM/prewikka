@@ -80,7 +80,6 @@ class _memoize(object):
         return functools.partial(self.__call__, obj)
 
 
-
 class _memoize_property(_memoize):
     def __init__(self, func, name):
         self._set_func = None
@@ -108,7 +107,6 @@ class _request_memoize(_memoize):
 
 class _request_memoize_property(_request_memoize, _memoize_property):
     pass
-
 
 
 class memoize(object):

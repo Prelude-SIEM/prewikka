@@ -21,10 +21,9 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import sys
-import operator
 
 from copy import copy
-from prewikka import database, env, error, hookmanager, log, pluginmanager, registrar, template, usergroup, utils
+from prewikka import error, hookmanager, log, pluginmanager, registrar, template, usergroup, utils
 from prewikka.response import PrewikkaResponse
 
 import werkzeug.exceptions
@@ -105,7 +104,7 @@ class ParameterDesc(object):
         self.mandatory = mandatory
 
         if type is list:
-            self.type = [ text_type ]
+            self.type = [text_type]
         else:
             self.type = type
 
@@ -117,7 +116,7 @@ class ParameterDesc(object):
         """ Return the value as a list """
 
         if not isinstance(value, list):
-            return [ value ]
+            return [value]
 
         return value
 
@@ -126,7 +125,7 @@ class ParameterDesc(object):
 
         try:
             if isinstance(self.type, list):
-                value = [ self.type[0](i) for i in self._mklist(value) ]
+                value = [self.type[0](i) for i in self._mklist(value)]
             else:
                 value = self.type(value)
 
@@ -234,7 +233,7 @@ class Parameters(dict):
             if do_save:
                 user.del_property(name, view=save_view)
             else:
-                if not name in user.configuration.get(save_view, {}):
+                if name not in user.configuration.get(save_view, {}):
                     continue
 
                 value = param.parse(user.get_property(name, view=save_view))
@@ -353,12 +352,11 @@ class Parameters(dict):
             return ret
 
         if not isinstance(ret, list):
-            ret = [ type(ret) ]
+            ret = [type(ret)]
         else:
-            ret = [ type(i) for i in ret ]
+            ret = [type(i) for i in ret]
 
         return ret
-
 
 
 class _ViewDescriptor(object):

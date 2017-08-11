@@ -120,11 +120,12 @@ class TimeUnit(object):
 
 class MainMenuStep(object):
     def __init__(self, unit, value):
-        d = { "year": (relativedelta(years=value), "%Y", "year"),
-              "month": (relativedelta(months=value), _(localization.DATE_YM_FMT), "month"),
-              "day": (relativedelta(days=value), _(localization.DATE_YMD_FMT), "mday"),
-              "hour": (relativedelta(hours=value), _(localization.DATE_YMDH_FMT), "hour"),
-              "minute": (relativedelta(minutes=value), _(localization.TIME_HM_FMT), "min"),
+        d = {
+            "year": (relativedelta(years=value), "%Y", "year"),
+            "month": (relativedelta(months=value), _(localization.DATE_YM_FMT), "month"),
+            "day": (relativedelta(days=value), _(localization.DATE_YMD_FMT), "mday"),
+            "hour": (relativedelta(hours=value), _(localization.DATE_YMDH_FMT), "hour"),
+            "minute": (relativedelta(minutes=value), _(localization.TIME_HM_FMT), "min"),
         }
 
         self.unit = text_type(unit)
@@ -163,7 +164,7 @@ class MainMenu(object):
 
     def _set_timeline(self, start, end):
         for unit in "minute", "hour", "day", "month", "year", "unlimited":
-             setattr(self.dataset["timeline"], "%s_selected" % unit, "")
+            setattr(self.dataset["timeline"], "%s_selected" % unit, "")
 
         setattr(self.dataset["timeline"], "%s_selected" % env.request.parameters["timeline_unit"], "selected='selected'")
 
@@ -186,16 +187,16 @@ class MainMenu(object):
             unit = TimeUnit("year")
 
         elif totsec > 30 * 24 * 60 * 60:
-            unit = TimeUnit("month") # step = month
+            unit = TimeUnit("month")  # step = month
 
         elif totsec > 24 * 60 * 60:
-            unit = TimeUnit("day") # step = days
+            unit = TimeUnit("day")  # step = days
 
         elif totsec > 60 * 60:
-            unit = TimeUnit("hour") # step = hours
+            unit = TimeUnit("hour")  # step = hours
 
         elif totsec > 60:
-            unit = TimeUnit("minute") # step = minutes
+            unit = TimeUnit("minute")  # step = minutes
 
         else:
             unit = TimeUnit("minute")
@@ -209,13 +210,15 @@ class MainMenu(object):
         if totsec < 60:
             return TimeUnit("minute")
 
-        gtable = { 365 * 24 * 60 * 60: "year",
-                   31 * 24 * 60 * 60: "month",
-                   24 * 60 * 60: "day",
-                   60 * 60: "hour",
-                   60: "minute" }
+        gtable = {
+            365 * 24 * 60 * 60: "year",
+            31 * 24 * 60 * 60: "month",
+            24 * 60 * 60: "day",
+            60 * 60: "hour",
+            60: "minute"
+        }
 
-        nearest = min(gtable, key=lambda x:abs((totsec / x) - stepno))
+        nearest = min(gtable, key=lambda x: abs((totsec / x) - stepno))
 
         return TimeUnit(gtable[nearest])
 

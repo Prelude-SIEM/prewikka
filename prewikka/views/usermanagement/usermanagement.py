@@ -30,7 +30,6 @@ class UserSettings(view.View):
 
         return template.PrewikkaTemplate(__name__, 'templates/usersettings.mak').render(**dataset)
 
-
     @view.route("/settings/my_account", methods=["POST"])
     def modify(self):
         self._object = user = usergroup.User(env.request.parameters.get("name", env.request.user.name))

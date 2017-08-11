@@ -29,9 +29,9 @@ from prewikka import (auth, config, database, dataprovider, env, error, hookmana
 from prewikka.utils import viewhelpers
 
 try:
-    from threading import Lock, local
+    from threading import Lock
 except ImportError:
-    from dummy_threading import Lock, local
+    from dummy_threading import Lock
 
 
 _core_cache = {}
@@ -51,7 +51,6 @@ class Core(object):
                                           N_("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher",
                                              {'vPre': version.__version__, 'vLib': siteconfig.libpreludedb_required_version}))
 
-
     @staticmethod
     def from_config(path=None, threaded=False):
         global _core_cache
@@ -67,7 +66,7 @@ class Core(object):
         return _core_cache[path]
 
     def __init__(self, filename=None):
-        env.auth = None # In case of database error
+        env.auth = None  # In case of database error
         env.config = config.Config(filename)
 
         env.config.general.setdefault("default_theme", "cs")
@@ -195,7 +194,6 @@ class Core(object):
         env.renderer = renderer.RendererPluginManager()
         list(hookmanager.trigger("HOOK_PLUGINS_LOAD"))
 
-
     def _reload_plugin_if_needed(self):
         if not env.db.has_plugin_changed():
             return
@@ -237,7 +235,7 @@ class Core(object):
 
         try:
             return response.PrewikkaFileResponse(path)
-        except Exception as e:
+        except Exception:
             return response.PrewikkaDirectResponse(code=404, status_text="File not found")
 
     def _process_dynamic(self, webreq):

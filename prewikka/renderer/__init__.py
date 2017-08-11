@@ -32,15 +32,14 @@ BLUE_STD = "93B9DD"
 GRAY_STD = "5C5C5C"
 
 SEVERITY_COLOR_MAP = {
-        "high": (_("High"), RED_STD),
-        "medium": (_("Medium"), ORANGE_STD),
-        "low": (_("Low"), GREEN_STD),
-        "info": (_("Informational"), BLUE_STD)
+    "high": (_("High"), RED_STD),
+    "medium": (_("Medium"), ORANGE_STD),
+    "low": (_("Low"), GREEN_STD),
+    "info": (_("Informational"), BLUE_STD)
 }
 
 COLOR_MAP = "93B9DD", "B1E55D", "D4C608", "F5B365", "E78D90", "C6A0CF", "5256D3", \
             "A7DE65", "F2A97B", "F6818A", "B087C6", "66DC92"
-
 
 
 class RendererException(Exception):
@@ -52,9 +51,8 @@ class RendererNoDataException(RendererException):
         return _("No data to display.")
 
 
-
 class RendererItem(object):
-        __slots__ = [ "values", "labels", "links", "_tuple" ]
+        __slots__ = ["values", "labels", "links", "_tuple"]
 
         def __init__(self, values=0, labels=None, links=None):
                 self._tuple = values, labels, links
@@ -95,7 +93,6 @@ class RendererUtils(object):
         return color
 
 
-
 class RendererBackend(pluginmanager.PluginBase):
     pass
 
@@ -117,7 +114,7 @@ class RendererPluginManager(pluginmanager.PluginManager):
             except Exception as e:
                 env.log.error("%s: %s" % (i.__module__, e))
 
-            if not i.renderer_type in self._default_backends:
+            if i.renderer_type not in self._default_backends:
                 self._default_backends[i.renderer_type] = i.renderer_backend
 
     def get_types(self):
@@ -161,7 +158,7 @@ class RendererPluginManager(pluginmanager.PluginManager):
                                           N_("Backend '%(backend)s' does not support render type '%(type)s'",
                                              {'backend': renderer, 'type': type}))
 
-        if not "names_and_colors" in kwargs:
+        if "names_and_colors" not in kwargs:
             kwargs["names_and_colors"] = COLOR_MAP
 
         classname = kwargs["class"] = "-".join((renderer, type))
@@ -169,11 +166,13 @@ class RendererPluginManager(pluginmanager.PluginManager):
 
         try:
             data = self._renderer[renderer][type].render(data, **kwargs)
-            html = resource.HTMLSource("""<div id="%s" class="renderer-elem %s">%s</div>""" % (cssid, classname, data.get("html", "")))
+            html = resource.HTMLSource('<div id="%s" class="renderer-elem %s">%s</div>'
+                                       % (cssid, classname, data.get("html", "")))
 
-            return {"html": html, "script": resource.HTMLSource(data.get("script", "")) }
+            return {"html": html, "script": resource.HTMLSource(data.get("script", ""))}
         except RendererNoDataException as e:
-            html = resource.HTMLSource("""<div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>""" % (cssid, classname, text_type(e)))
+            html = resource.HTMLSource('<div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>'
+                                       % (cssid, classname, text_type(e)))
             script = resource.HTMLSource("""
                  var size = prewikka_getRenderSize("#%s", %s);
 

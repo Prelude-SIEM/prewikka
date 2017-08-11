@@ -11,4 +11,4 @@ class MessageSummary(pluginmanager.PluginPreload):
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
     plugin_description = N_("Detailed alert and heartbeat page")
-    plugin_classes = [ AlertSummary, HeartbeatSummary ]
+    plugin_classes = [AlertSummary, HeartbeatSummary]

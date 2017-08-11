@@ -30,13 +30,17 @@ from prewikka import siteconfig
 from prewikka.utils import cache
 
 
-_MAKO_FILTERS = [ "html.escape" ]
-_MAKO_GENERIC_ARGS = { "default_filters": _MAKO_FILTERS,  "buffer_filters": _MAKO_FILTERS,
-                       "input_encoding": 'utf8', "imports": [
-                           'from prewikka.utils import html, json',
-                           'from prewikka.utils.html import checked, disabled, selected'
-                       ],
-                       "future_imports": ["unicode_literals"], "module_directory": os.path.join(siteconfig.tmp_dir, "mako") }
+_MAKO_FILTERS = ["html.escape"]
+_MAKO_GENERIC_ARGS = {
+    "default_filters": _MAKO_FILTERS,
+    "buffer_filters": _MAKO_FILTERS,
+    "input_encoding": 'utf8', "imports": [
+        'from prewikka.utils import html, json',
+        'from prewikka.utils.html import checked, disabled, selected'
+    ],
+    "future_imports": ["unicode_literals"],
+    "module_directory": os.path.join(siteconfig.tmp_dir, "mako")
+}
 
 _MODULE_PATH = os.path.abspath(os.path.join(os.path.dirname(__file__), os.pardir))
 _MAKO_TEMPLATE_LOOKUP = mako.lookup.TemplateLookup(directories=[_MODULE_PATH], **_MAKO_GENERIC_ARGS)
@@ -72,7 +76,6 @@ class _Dataset(collections.MutableMapping):
         return self._d.__iter__()
 
 
-
 class _PrewikkaTemplate(object):
     def dataset(self, *args, **kwargs):
         return _Dataset(self, *args, **kwargs)
@@ -95,7 +98,6 @@ class _PrewikkaTemplate(object):
             raise self._error
 
         return self._template.render(**kwargs)
-
 
 
 class _PrewikkaTemplateProxy(object):

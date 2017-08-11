@@ -34,17 +34,22 @@ class Markup(markupsafe.Markup):
 def escape(value):
     return Markup.escape(value)
 
+
 def escapejson(value):
     return value.replace("</", "<\\/")
+
 
 def js_string(value):
     return Markup(repr(str(escapejson(value))))
 
+
 def selected(condition):
     return "selected" if condition else ""
 
+
 def checked(condition):
     return "checked" if condition else ""
+
 
 def disabled(condition):
     return "disabled" if condition else ""

@@ -146,10 +146,9 @@ def _sync_if_needed(func):
     return inner
 
 
-
 class User(NameID):
     __sentinel = object()
-    __PROPERTIES_STATE_NONE  = 0x00
+    __PROPERTIES_STATE_NONE = 0x00
     __PROPERTIES_STATE_BEGIN = 0x01
     __PROPERTIES_STATE_DIRTY = 0x02
 

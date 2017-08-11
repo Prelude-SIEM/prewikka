@@ -33,6 +33,10 @@ Run requires:
 - libprelude with python bindings
 - libpreludedb with python bindings
 
+Lint uses:
+
+- python-flake8
+
 Basic Installation
 ==================
 

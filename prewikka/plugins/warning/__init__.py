@@ -18,6 +18,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 from __future__ import absolute_import, division, print_function, unicode_literals
+
 from prewikka import hookmanager, resource, template, version, view
 
 
@@ -37,4 +38,4 @@ class Warning(view.View):
     def _toplayout_extra_content(self):
         if not env.request.web.input_cookie.get("warning"):
             env.request.web.add_cookie("warning", "warning", 365 * 24 * 60 * 60)
-            return [ resource.HTMLSource(self._template.render()) ]
+            return [resource.HTMLSource(self._template.render())]

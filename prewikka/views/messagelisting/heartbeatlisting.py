@@ -21,7 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import datetime
 
-from prewikka import crontab, localization, mainmenu, template, utils, view
+from prewikka import crontab, localization, mainmenu, template, utils
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 

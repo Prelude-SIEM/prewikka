@@ -44,8 +44,7 @@ class JSONObject(object):
         return cls(**data)
 
     def __jsonobj__(self):
-        return { "__prewikka_class__": (self.__class__.__name__, self.__json__()) }
-
+        return {"__prewikka_class__": (self.__class__.__name__, self.__json__())}
 
 
 class PrewikkaJSONEncoder(json.JSONEncoder):

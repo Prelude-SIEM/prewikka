@@ -1,2 +1,3 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
-from .auth import Auth, AuthError
+
+from .auth import Auth, AuthError  # noqa: imported but unused

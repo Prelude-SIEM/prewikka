@@ -35,9 +35,9 @@ from prewikka.utils import html
 def getUriCriteria(ptype, analyzerid, messageid):
     criteria = Criterion()
     if analyzerid:
-        criteria += Criterion("%s.analyzer.analyzerid" % (ptype), "=", analyzerid)
+        criteria += Criterion("%s.analyzer.analyzerid" % ptype, "=", analyzerid)
 
-    return criteria + Criterion("%s.messageid" % (ptype), "=", messageid)
+    return criteria + Criterion("%s.messageid" % ptype, "=", messageid)
 
 
 class Table(object):
@@ -49,10 +49,10 @@ class Table(object):
         return self._current_section
 
     def beginSection(self, title, display="block"):
-        _current_section = { }
+        _current_section = {}
         _current_section["title"] = title
-        _current_section["entries"] = [ ]
-        _current_section["tables"] = [ ]
+        _current_section["entries"] = []
+        _current_section["tables"] = []
         _current_section["display"] = display
         _current_section["sections"] = []
         _current_section["parent"] = self._current_section
@@ -79,9 +79,9 @@ class Table(object):
         if value is None or value == "":
             return
 
-        self._current_section["entries"].append({ "name": name,
-                                                  "value": value,
-                                                  "emphase": emphase })
+        self._current_section["entries"].append({"name": name,
+                                                 "value": value,
+                                                 "emphase": emphase})
 
     def beginTable(self, cl="table-striped table-bordered", style="", odd_even=False):
         table = {}
@@ -92,13 +92,11 @@ class Table(object):
         table["parent"] = self._current_table or self._current_section
         self._current_table = table
 
-
     def endTable(self):
         parent = self._current_table["parent"]
-        has_data = False
 
-        if len(self._current_table["rows"]) <= 1 :
-            if not parent or not "rows" in parent:
+        if len(self._current_table["rows"]) <= 1:
+            if not parent or "rows" not in parent:
                 self._current_table = None
             else:
                 self._current_table = parent
@@ -109,7 +107,7 @@ class Table(object):
             self._current_table = None
         else:
             if "rows" in parent:
-                col = { "name": None, "header": None, "emphase": None, "tables": [ self._current_table ] }
+                col = {"name": None, "header": None, "emphase": None, "tables": [self._current_table]}
                 if len(parent["rows"]):
                     parent["rows"][-1] += [col]
                 else:
@@ -126,7 +124,7 @@ class Table(object):
         return len(self._current_table["rows"])
 
     def newTableCol(self, row_index, name, cl="", header=False, emphase=None):
-        col = { "name": name, "header": header, "class": cl, "tables": [], "emphase": None }
+        col = {"name": name, "header": header, "class": cl, "tables": [], "emphase": None}
 
         if row_index == -1:
             self._current_table["rows"].append([col])
@@ -138,17 +136,16 @@ class Table(object):
             self._current_table["rows"][row_index] += [col]
 
     def newTableEntry(self, name, value, cl="", emphase=False):
-        if value == None:
+        if value is None:
             return
 
         self.newTableCol(0, name, cl=cl, header=True)
         self.newTableCol(1, value, cl=cl, header=False, emphase=emphase)
 
 
-
 class HeaderTable(Table):
     def __init__(self):
-        self.field_list = [ ]
+        self.field_list = []
 
     def register_static(self, name, static):
         self.field_list.append((None, name, static, None, None))
@@ -223,7 +220,6 @@ class TcpIpOptions(Table):
         return md.hexdigest()
 
     def _decodeOptionPartialOrderProfile(self, data):
-        x = struct.unpack(b">B", data)
         return "Start_Flags=%d End_Flags=%d" % (data & 0x80, data & 0x40)
 
     def _decodeOptionTcpAltChecksumRequest(self, data):
@@ -239,7 +235,6 @@ class TcpIpOptions(Table):
 
         else:
             return "%d (Invalid)" % x
-
 
     def _tcpOptionToName(self, opt):
         h = {}
@@ -272,7 +267,6 @@ class TcpIpOptions(Table):
         h[26] = ("TCP Compression Filter",)
 
         return h.get(opt, ("Unknown",))
-
 
     def _ipOptionToName(self, opt):
         h = {}
@@ -324,7 +318,6 @@ class TcpIpOptions(Table):
 
         self._optionRender(ip_options, self._ipOptionToName)
 
-
     def tcpOptionRender(self, tcp_options):
         if not tcp_options:
             return
@@ -333,7 +326,6 @@ class TcpIpOptions(Table):
         self.newTableCol(-1, "TCP options", header=True)
 
         self._optionRender(tcp_options, self._tcpOptionToName)
-
 
 
 class MessageParameters(mainmenu.MainMenuParameters):
@@ -346,7 +338,7 @@ class MessageParameters(mainmenu.MainMenuParameters):
 
 class MessageSummary(Table, view.View):
     view_parameters = MessageParameters
-    view_permissions = [ N_("IDMEF_VIEW") ]
+    view_permissions = [N_("IDMEF_VIEW")]
     view_template = template.PrewikkaTemplate(__name__, 'templates/messagesummary.mak')
     view_extensions = (("menu", mainmenu.MainMenu),)
     plugin_htdocs = (("messagesummary", pkg_resources.resource_filename(__name__, 'htdocs')),)
@@ -405,7 +397,6 @@ class MessageSummary(Table, view.View):
         self.newTableEntry(_("Process Path"), process["path"])
         self.newTableEntry(_("Process PID"), process["pid"])
         self.endTable()
-
 
     def buildNode(self, node):
         if not node:
@@ -518,13 +509,13 @@ class MessageSummary(Table, view.View):
                 tcp_options[-1] = (tcp_options[-1][0], len(data), data)
                 ignored[meaning] = ""
 
-            if ad["data"] != None:
+            if ad["data"] is not None:
                 value = ad["data"]
                 if ad["type"] == "byte-string" and meaning != "payload":
                     value = utils.hexdump(value)
 
             for field in ignore:
-                if meaning != None and meaning == field[0]:
+                if meaning is not None and meaning == field[0]:
                     ignored[meaning] = value
                     break
 
@@ -535,7 +526,7 @@ class MessageSummary(Table, view.View):
             if links:
                 meaning = resource.HTMLSource("<a class='popup_menu_toggle'>%s</a><span class='popup_menu'>%s</span>") % (meaning, links)
 
-            if not meaning in ignored:
+            if meaning not in ignored:
                 self.newTableCol(index, resource.HTMLSource(meaning or "Data content"))
                 self.newTableCol(index, html.escape(value) if value else None)
                 index += 1
@@ -597,7 +588,7 @@ class MessageSummary(Table, view.View):
         icmp.register(_("Checksum"), "icmp_sum")
         icmp.register(_("Id"), "icmp_id")
         icmp.register(_("Seq #"), "icmp_seq")
-        icmp.register(_("Mask"), "icmp_mask");
+        icmp.register(_("Mask"), "icmp_mask")
         icmp.register(_("Gateway Address"), "icmp_gwaddr")
         icmp.register(_("Num address"), "icmp_num_addrs")
         icmp.register(_("Wpa"), "icmp_wpa")
@@ -611,7 +602,7 @@ class MessageSummary(Table, view.View):
     def buildPayloadTable(self, alert):
         data = HeaderTable()
         data.register(_("Payload"), "payload")
-        #data.register("ASCII Payload", "payload", html.escape)
+        # data.register("ASCII Payload", "payload", html.escape)
         return data
 
     def render(self):
@@ -628,7 +619,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
         return Criterion("alert.analyzer.analyzerid", "=", analyzerid) & Criterion("alert.messageid", "=", ident)
 
     def buildAlertIdent(self, alert, parent):
-        calist = { }
+        calist = {}
 
         for alertident in parent["alertident"]:
 
@@ -728,10 +719,11 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
             if env.enable_details:
                 if reference["origin"] in ("user-specific", "vendor-specific"):
-                    urlstr="&url=" + urllib.quote(reference["url"], safe="")
+                    urlstr = "&url=" + urllib.quote(reference["url"], safe="")
                 else:
-                    urlstr=""
-                self.newTableCol(index, self.getUrlLink(reference["name"], "%s?origin=%s&name=%s%s" % (env.reference_details_url, urllib.quote(reference["origin"]), urllib.quote(reference["name"]), urlstr)))
+                    urlstr = ""
+                url = "%s?origin=%s&name=%s%s" % (env.reference_details_url, urllib.quote(reference["origin"]), urllib.quote(reference["name"]), urlstr)
+                self.newTableCol(index, self.getUrlLink(reference["name"], url))
             else:
                 self.newTableCol(index, reference["name"])
             self.newTableCol(index, reference["meaning"])
@@ -763,7 +755,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
     def _joinUserInfos(self, user, number, tty=None):
         user_str = user or ""
-        if user != None and number != None:
+        if user is not None and number is not None:
             user_str += "(%d)" % number
 
         elif number:
@@ -786,7 +778,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
         index = 1
         for user_id in user["user_id"]:
-            #user_str = self._joinUserInfos(user_id["name"], user_id["number"], user_id["tty"])
+            # user_str = self._joinUserInfos(user_id["name"], user_id["number"], user_id["tty"])
             self.newTableCol(index, user_id["type"])
             self.newTableCol(index, user_id["name"])
             self.newTableCol(index, user_id["number"])
@@ -892,7 +884,6 @@ class AlertSummary(TcpIpOptions, MessageSummary):
         self.endTable()
         self.endSection()
 
-
     def buildService(self, service):
         if not service:
             return
@@ -928,11 +919,11 @@ class AlertSummary(TcpIpOptions, MessageSummary):
             self.newTableEntry(_("ip_version"), service["ip_version"])
 
         ipn = service["iana_protocol_number"]
-        if ipn and utils.protocol_number_to_name(ipn) != None:
+        if ipn and utils.protocol_number_to_name(ipn) is not None:
             self.newTableEntry(_("Protocol"), utils.protocol_number_to_name(ipn))
 
         elif service["iana_protocol_name"]:
-             self.newTableEntry(_("Protocol"), service["iana_protocol_name"])
+            self.newTableEntry(_("Protocol"), service["iana_protocol_name"])
 
         elif service["protocol"]:
             self.newTableEntry(_("Protocol"), service["protocol"])
@@ -1014,7 +1005,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
         alert = env.dataprovider.get(getUriCriteria("alert", analyzerid, messageid))[0]["alert"]
 
-        env.request.dataset["sections"] = [ ]
+        env.request.dataset["sections"] = []
 
         self.beginSection(self.getSectionName(alert))
 
@@ -1104,7 +1095,7 @@ class HeartbeatSummary(MessageSummary):
 
         heartbeat = env.dataprovider.get(getUriCriteria("heartbeat", analyzerid, messageid))[0]["heartbeat"]
 
-        env.request.dataset["sections"] = [ ]
+        env.request.dataset["sections"] = []
 
         self.beginSection(_("Heartbeat"))
         self.buildTime(heartbeat)

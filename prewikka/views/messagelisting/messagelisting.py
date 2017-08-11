@@ -20,13 +20,10 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import copy
 import functools
-import time
-import urllib
 
 import pkg_resources
-from prewikka import hookmanager, localization, mainmenu, resolve, usergroup, utils, view, response
+from prewikka import hookmanager, localization, mainmenu, resolve, usergroup, view, response
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -43,7 +40,7 @@ class MessageListingParameters(mainmenu.MainMenuParameters):
 
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50, save=True)
-        self.optional("selection", [ json.loads ], Criterion())
+        self.optional("selection", [json.loads], Criterion())
         self.optional("listing_apply", text_type)
         self.optional("action", text_type)
 
@@ -62,7 +59,7 @@ class ListedMessage(AttrDict):
 
     def createInlineFilteredField(self, path, value, direction=None, real_value=None):
         if type(path) is not list and type(path) is not tuple:
-            path = [ path ]
+            path = [path]
         else:
             if not path:
                 return AttrDict(value=None, inline_filter=None, already_filtered=False)
@@ -70,9 +67,9 @@ class ListedMessage(AttrDict):
         if type(value) is not list and type(value) is not tuple:
             if not real_value:
                 real_value = value
-            value = [ value ]
+            value = [value]
 
-        extra = { }
+        extra = {}
         alreadyf = None
 
         for p, v in zip(path, value):
@@ -98,12 +95,12 @@ class ListedMessage(AttrDict):
 
                 extra[p] = v or ""
 
-        link = url_for(".", **(env.request.parameters + extra - [ "offset" ]))
+        link = url_for(".", **(env.request.parameters + extra - ["offset"]))
         return AttrDict(value=real_value, inline_filter=link, already_filtered=alreadyf)
 
     def createTimeField(self, timeobj):
         if not timeobj:
-            return { "value": "n/a" }
+            return {"value": "n/a"}
 
         return AttrDict(value=localization.format_datetime(timeobj, format="short"))
 
@@ -141,6 +138,7 @@ class HostInfoAjax(view.View):
 
         return response.PrewikkaDirectResponse(infos)
 
+
 class MessageListing(view.View):
     plugin_htdocs = (("messagelisting", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
@@ -156,23 +154,23 @@ class MessageListing(view.View):
         env.request.dataset["nav"]["first"] = None
         env.request.dataset["nav"]["prev"] = None
         if offset:
-            env.request.dataset["nav"]["first"] = url_for(".", **(env.request.parameters - [ "offset" ]))
-            env.request.dataset["nav"]["prev"] = url_for(".", **(env.request.parameters + { "offset": offset - env.request.parameters["limit"] }))
+            env.request.dataset["nav"]["first"] = url_for(".", **(env.request.parameters - ["offset"]))
+            env.request.dataset["nav"]["prev"] = url_for(".", **(env.request.parameters + {"offset": offset - env.request.parameters["limit"]}))
 
     def _setNavNext(self, offset, count):
         env.request.dataset["nav"]["next"] = None
         env.request.dataset["nav"]["last"] = None
         if count > offset + env.request.parameters["limit"]:
             offset = offset + env.request.parameters["limit"]
-            env.request.dataset["nav"]["next"] = url_for(".", **(env.request.parameters + { "offset": offset }))
+            env.request.dataset["nav"]["next"] = url_for(".", **(env.request.parameters + {"offset": offset}))
             offset = count - ((count % env.request.parameters["limit"]) or env.request.parameters["limit"])
-            env.request.dataset["nav"]["last"] = url_for(".", **(env.request.parameters + { "offset": offset }))
+            env.request.dataset["nav"]["last"] = url_for(".", **(env.request.parameters + {"offset": offset}))
 
     def _getInlineFilter(self, name):
         return name, env.request.parameters.get(name)
 
     def _setMessages(self, criteria):
-        env.request.dataset["messages"] = [ ]
+        env.request.dataset["messages"] = []
         offset, limit = env.request.parameters["offset"], env.request.parameters["limit"]
 
         # count_asc and count_desc methods are not valid for message enumeration
@@ -192,5 +190,5 @@ class MessageListing(view.View):
         if not env.request.user.has("IDMEF_ALTER"):
             raise usergroup.PermissionDeniedError(["IDMEF_ALTER"], self.current_view)
 
-        action(functools.reduce(lambda x,y: x | y, env.request.parameters["selection"]))
+        action(functools.reduce(lambda x, y: x | y, env.request.parameters["selection"]))
         del env.request.parameters["selection"]

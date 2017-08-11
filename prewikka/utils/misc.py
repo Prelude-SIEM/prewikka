@@ -28,13 +28,12 @@ import time
 import unicodedata
 
 from prewikka import compat
-from prewikka.utils import json
 
 
 port_dict = {}
 read_done = False
 
-if sys.version_info >= (3,0):
+if sys.version_info >= (3, 0):
     text_type = str
 else:
     text_type = unicode
@@ -79,7 +78,8 @@ def _load_protocol():
     read_done = True
     sreg = re.compile("^\s*(?P<name>[^#]\S+)\s*(?P<number>\d+)\s*(?P<alias>\S+)")
 
-    try: fd = open("/etc/protocols", "r")
+    try:
+        fd = open("/etc/protocols", "r")
     except IOError:
         return port_dict
 
@@ -96,12 +96,12 @@ def _load_protocol():
 
 
 def protocol_number_to_name(num):
-     port_dict = _load_protocol()
+    port_dict = _load_protocol()
 
-     if num in port_dict:
-         return port_dict[num][0]
+    if num in port_dict:
+        return port_dict[num][0]
 
-     return None
+    return None
 
 
 def nameToPath(name):
@@ -162,7 +162,8 @@ def soundex(name):
     # translate alpha chars in name to soundex digits
     for i, c in enumerate(name):
         if c.isalpha():
-            if not fc: fc = c   # remember first letter
+            if not fc:
+                fc = c   # remember first letter
 
             idx = ord(c.upper()) - ord('A')
             if idx >= len(digits):
@@ -253,7 +254,7 @@ class CachingIterator(object):
         self._items = iter([])
 
     def __getitem__(self, key):
-        if isinstance(key, slice) :
+        if isinstance(key, slice):
             return [self[i] for i in range(*key.indices(len(self)))]
 
         elif isinstance(key, int):

@@ -52,7 +52,6 @@ class JSLink(Link):
         return Link.__new__(cls, html.Markup('<script type="text/javascript" src="%s"></script>') % link)
 
 
-
 class HTMLSource(html.Markup):
     pass
 
@@ -110,7 +109,7 @@ class HTMLNode(json.JSONObject):
         return HTMLSource("<%s%s>%s</%s>" % (self.tag, attr_s, childs, self.tag))
 
     def __json__(self):
-        return { "tag": self.tag, "childs": self.childs, "attrs": self.attrs }
+        return {"tag": self.tag, "childs": self.childs, "attrs": self.attrs}
 
     def __str__(self):
         return self.to_string()

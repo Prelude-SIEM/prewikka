@@ -19,6 +19,8 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+# flake8: noqa: E402 (ignore "module level import not at top of file" because of ez_setup)
+
 from glob import glob
 import io
 import os
@@ -27,6 +29,7 @@ import subprocess
 import tempfile
 
 from ez_setup import use_setuptools
+
 use_setuptools()
 
 from setuptools import Command, setup, find_packages
@@ -40,8 +43,6 @@ LIBPRELUDE_REQUIRED_VERSION = "4.1.0"
 LIBPRELUDEDB_REQUIRED_VERSION = "4.1.0"
 
 
-
-
 class MyDistribution(Distribution):
     def __init__(self, attrs):
         try:
@@ -49,15 +50,14 @@ class MyDistribution(Distribution):
         except:
             pass
 
-        self.conf_files = [ ]
+        self.conf_files = []
         self.closed_source = os.path.exists("PKG-INFO")
         Distribution.__init__(self, attrs)
 
 
-
 class my_install(install):
     def finalize_options(self):
-        ### if no prefix is given, configuration should go to /etc or in {prefix}/etc otherwise
+        # if no prefix is given, configuration should go to /etc or in {prefix}/etc otherwise
         if self.prefix:
             self.conf_prefix = self.prefix + "/etc/prewikka"
             self.data_prefix = self.prefix + "/var/lib/prewikka"
@@ -68,7 +68,7 @@ class my_install(install):
         install.finalize_options(self)
 
     def get_outputs(self):
-        tmp = [ self.conf_prefix + "/prewikka.conf" ] + install.get_outputs(self)
+        tmp = [self.conf_prefix + "/prewikka.conf"] + install.get_outputs(self)
         return tmp
 
     def install_conf(self):
@@ -87,8 +87,8 @@ class my_install(install):
         config.write("tmp_dir = '%s'\n" % (os.path.join(tempfile.gettempdir(), "prewikka")))
         config.write("conf_dir = '%s'\n" % (os.path.abspath(self.conf_prefix)))
         config.write("data_dir = '%s'\n" % (os.path.abspath(self.data_prefix)))
-        config.write("libprelude_required_version = '%s'\n" % (LIBPRELUDE_REQUIRED_VERSION))
-        config.write("libpreludedb_required_version = '%s'\n" % (LIBPRELUDEDB_REQUIRED_VERSION))
+        config.write("libprelude_required_version = '%s'\n" % LIBPRELUDE_REQUIRED_VERSION)
+        config.write("libpreludedb_required_version = '%s'\n" % LIBPRELUDEDB_REQUIRED_VERSION)
         config.close()
 
     def install_wsgi(self):
@@ -152,80 +152,97 @@ class build_custom(Command):
                 io.open(css, "wb").write(subprocess.check_output(["lesscpy", "-I", less, style]))
 
 
-
-setup(name="prewikka",
-      version="4.1.0",
-      maintainer = "Prelude Team",
-      maintainer_email = "support.prelude@c-s.fr",
-      url = "http://www.prelude-siem.com",
-      packages = find_packages(),
-      setup_requires=['Babel'],
-      entry_points = {
-                'prewikka.renderer.backend': [
-                ],
-
-                'prewikka.renderer.type': [
-                ],
-
-                'prewikka.dataprovider.backend': [
-                        'IDMEFAlert = prewikka.dataprovider.plugins.idmef:IDMEFAlertPlugin',
-                        'IDMEFHeartbeat = prewikka.dataprovider.plugins.idmef:IDMEFHeartbeatPlugin',
-                ],
-
-                'prewikka.dataprovider.type': [
-                        'alert = prewikka.dataprovider.idmef:IDMEFAlertProvider',
-                        'heartbeat = prewikka.dataprovider.idmef:IDMEFHeartbeatProvider',
-                ],
-
-                'prewikka.plugins': [
-                ],
-
-                'prewikka.session': [
-                        'Anonymous = prewikka.session.anonymous:AnonymousSession',
-                ],
-
-                'prewikka.auth': [
-                ],
-
-                'prewikka.views': [
-                        'About = prewikka.views.about:About',
-                        'AboutPlugin = prewikka.views.aboutplugin:AboutPlugin',
-                        'CrontabView = prewikka.views.crontab:CrontabView',
-                        'MessageSummary = prewikka.views.messagesummary:MessageSummary',
-                        'MessageListing = prewikka.views.messagelisting:MessageListing',
-                        'AgentPlugin = prewikka.views.agents:AgentPlugin',
-                        'FilterView = prewikka.views.filter.filter:FilterView',
-                        'UserManagement = prewikka.views.usermanagement:UserManagement',
-                        'Warning = prewikka.plugins.warning:Warning',
-                ],
-
-                'prewikka.updatedb': [
-                        'prewikka = prewikka.sql',
-                        'prewikka.views.filter.filter = prewikka.views.filter.sql'
-                ]
-
-      },
-
-      package_data= { '': ["htdocs/images/*.*",
-                           "htdocs/js/*.js", "htdocs/js/locales/*.js", "htdocs/js/*.map", "htdocs/js/locales/*.map",
-                           "htdocs/css/*.*", "htdocs/css/themes/*.css",
-                           "htdocs/css/images/*.*", "htdocs/css/images/*.*",
-                           "htdocs/fonts/*.*",
-                           "locale/*.pot", "locale/*/LC_MESSAGES/*.mo",
-                           "sql/*.py",
-                           "*.mak", "templates/*.mak"],
-                      'prewikka.views.about': ["htdocs/css/*.css", "htdocs/images/*.png"],
-                      'prewikka.views.aboutplugin': ["htdocs/css/*.css"],
-                      'prewikka.views.messagelisting': [ "htdocs/css/*.css", "htdocs/js/*.js" ],
-                      'prewikka.views.messagesummary': [ "htdocs/js/*.js" ],
-      },
-
-      scripts=[ "scripts/prewikka-crontab", "scripts/prewikka-httpd" ],
-      conf_files=[ "conf/prewikka.conf", "conf/menu.yml" ],
-      cmdclass={ 'build': build,
-                 'build_custom': build_custom,
-                 'install': my_install },
-      distclass=MyDistribution,
-      message_extractors={
-          'prewikka': [('**.py', 'python', None), ('**/templates/*.mak', 'mako', None)]
-      })
+setup(
+    name="prewikka",
+    version="4.1.0",
+    maintainer="Prelude Team",
+    maintainer_email="support.prelude@c-s.fr",
+    url="http://www.prelude-siem.com",
+    packages=find_packages(),
+    setup_requires=[
+        'Babel'
+    ],
+    entry_points={
+        'prewikka.renderer.backend': [],
+        'prewikka.renderer.type': [],
+        'prewikka.dataprovider.backend': [
+            'IDMEFAlert = prewikka.dataprovider.plugins.idmef:IDMEFAlertPlugin',
+            'IDMEFHeartbeat = prewikka.dataprovider.plugins.idmef:IDMEFHeartbeatPlugin',
+        ],
+        'prewikka.dataprovider.type': [
+            'alert = prewikka.dataprovider.idmef:IDMEFAlertProvider',
+            'heartbeat = prewikka.dataprovider.idmef:IDMEFHeartbeatProvider',
+        ],
+        'prewikka.plugins': [],
+        'prewikka.session': [
+            'Anonymous = prewikka.session.anonymous:AnonymousSession',
+        ],
+        'prewikka.auth': [],
+        'prewikka.views': [
+            'About = prewikka.views.about:About',
+            'AboutPlugin = prewikka.views.aboutplugin:AboutPlugin',
+            'CrontabView = prewikka.views.crontab:CrontabView',
+            'MessageSummary = prewikka.views.messagesummary:MessageSummary',
+            'MessageListing = prewikka.views.messagelisting:MessageListing',
+            'AgentPlugin = prewikka.views.agents:AgentPlugin',
+            'FilterView = prewikka.views.filter.filter:FilterView',
+            'UserManagement = prewikka.views.usermanagement:UserManagement',
+            'Warning = prewikka.plugins.warning:Warning',
+        ],
+        'prewikka.updatedb': [
+            'prewikka = prewikka.sql',
+            'prewikka.views.filter.filter = prewikka.views.filter.sql'
+        ]
+    },
+    package_data={
+        '': [
+            "htdocs/css/*.*",
+            "htdocs/css/themes/*.css",
+            "htdocs/css/images/*.*",
+            "htdocs/fonts/*.*",
+            "htdocs/images/*.*",
+            "htdocs/js/*.js",
+            "htdocs/js/locales/*.js",
+            "htdocs/js/*.map",
+            "htdocs/js/locales/*.map",
+            "locale/*.pot",
+            "locale/*/LC_MESSAGES/*.mo",
+            "sql/*.py",
+            "templates/*.mak"
+        ],
+        'prewikka.views.about': [
+            "htdocs/css/*.css",
+            "htdocs/images/*.png"
+        ],
+        'prewikka.views.aboutplugin': [
+            "htdocs/css/*.css"
+        ],
+        'prewikka.views.messagelisting': [
+            "htdocs/css/*.css",
+            "htdocs/js/*.js"
+        ],
+        'prewikka.views.messagesummary': [
+            "htdocs/js/*.js"
+        ],
+    },
+    scripts=[
+        "scripts/prewikka-crontab",
+        "scripts/prewikka-httpd"
+    ],
+    conf_files=[
+        "conf/prewikka.conf",
+        "conf/menu.yml"
+    ],
+    cmdclass={
+        'build': build,
+        'build_custom': build_custom,
+        'install': my_install
+    },
+    distclass=MyDistribution,
+    message_extractors={
+        'prewikka': [
+            ('**.py', 'python', None),
+            ('**/templates/*.mak', 'mako', None)
+        ]
+    }
+)

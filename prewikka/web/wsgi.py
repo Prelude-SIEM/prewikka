@@ -107,7 +107,7 @@ class WSGIRequest(request.Request):
         if sys.version_info[0] >= 3:
             headers = list(headers)
         else:
-            headers = [ (k.encode("ISO-8859-1"), v.encode("ISO-8859-1")) for k, v in headers ]
+            headers = [(k.encode("ISO-8859-1"), v.encode("ISO-8859-1")) for k, v in headers]
 
         if self._output_cookie:
             headers += [("Set-Cookie", c.OutputString()) for c in self._output_cookie.values()]

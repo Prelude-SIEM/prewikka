@@ -27,13 +27,13 @@ from prewikka.utils import json
 
 def getOperatorList(type):
     if type == prelude.IDMEFValue.TYPE_STRING:
-        return ["<>*", "<>", "=", "~*", "~", "!" ]
+        return ["<>*", "<>", "=", "~*", "~", "!"]
 
     elif type == prelude.IDMEFValue.TYPE_DATA:
-        return ["<>*", "<>", "~", "~*", "=", "<", ">", "!" ]
+        return ["<>*", "<>", "~", "~*", "=", "<", ">", "!"]
 
     else:
-        return ["=", "<", ">", "<=", ">=" ]
+        return ["=", "<", ">", "<=", ">="]
 
 
 def _gen_option_list(iterator, selected):
@@ -46,6 +46,7 @@ def _gen_option_list(iterator, selected):
             out += resource.HTMLSource("<option value='{0}'>{1}</option>").format(path, name)
 
     return out
+
 
 def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max_paths=0):
     if default_paths is None:

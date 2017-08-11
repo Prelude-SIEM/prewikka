@@ -38,7 +38,7 @@ class Log(object):
 
         for logconfig in getattr(conf, "log", ()):
 
-            config = { }
+            config = {}
             for key, value in logconfig.items():
                 config[key] = text_type(value)
 
@@ -54,8 +54,7 @@ class Log(object):
             except:
                 pass
 
-        return ("localhost", 514)
-
+        return "localhost", 514
 
     def _getHandler(self, config, logtype='syslog'):
         logtype = logtype.lower()
@@ -104,7 +103,6 @@ class Log(object):
 
         return hdlr
 
-
     def _format_header(self):
         if not env.request.web:
             return ""
@@ -119,16 +117,15 @@ class Log(object):
 
         flags = ""
         if env.request.web.is_xhr:
-           flags = " (xhr)"
+            flags = " (xhr)"
         elif env.request.web.is_stream:
-           flags = " (sse)"
+            flags = " (sse)"
 
         return "".join((hdr, env.request.web.path, flags, "]"))
 
-
     def _get_log(self, details):
         hdr = self._format_header()
-        hdr = [ hdr ] if hdr else []
+        hdr = [hdr] if hdr else []
 
         if isinstance(details, Exception):
             details = " ".join([text_type(getattr(details, "code", 500)), text_type(details)])
@@ -156,11 +153,14 @@ class Log(object):
             self._logger.critical(self._get_log(message))
 
     def log(self, priority, message):
-        return { DEBUG: self.debug,
-                 INFO: self.info,
-                 WARNING: self.warning,
-                 ERROR: self.error,
-                 CRITICAL: self.critical }[priority](message)
+        return {
+            DEBUG: self.debug,
+            INFO: self.info,
+            WARNING: self.warning,
+            ERROR: self.error,
+            CRITICAL: self.critical
+        }[priority](message)
+
 
 def getLogger(name=__name__):
         return logging.getLogger(name)

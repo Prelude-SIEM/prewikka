@@ -23,7 +23,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import collections
 import datetime
 import gettext
-import locale
 import sys
 from threading import Lock, local
 
@@ -33,10 +32,9 @@ import babel.dates
 import babel.numbers
 import pkg_resources
 import prelude
-import pytz
 from prewikka import log, utils
 
-if sys.version_info >= (3,0):
+if sys.version_info >= (3, 0):
     import builtins
 else:
     import __builtin__ as builtins
@@ -65,10 +63,10 @@ class TranslationProxy(object):
 
     def _getCatalog(self, domain, lang):
         with self._catalogs_lock:
-            if not domain in self._catalogs:
+            if domain not in self._catalogs:
                 self._catalogs[domain] = {}
 
-            if not lang in self._catalogs[domain]:
+            if lang not in self._catalogs[domain]:
                 logger.info("loading '%s' translation for domain '%s'", lang, domain)
                 self._catalogs[domain][lang] = gettext.translation(domain, self._domains[domain], languages=[lang])
 
@@ -76,9 +74,9 @@ class TranslationProxy(object):
 
     def getCharset(self):
         try:
-           return self._data.catalog.charset()
+            return self._data.catalog.charset()
         except:
-           return env.config.general.encoding
+            return env.config.general.encoding
 
     def getLocale(self):
         try:
@@ -91,15 +89,15 @@ class TranslationProxy(object):
         for domain, locale_dir in self._domains.items():
                 t = self._getCatalog(domain, lang)
                 if not first:
-                        first = t
+                    first = t
                 else:
-                        first._catalog.update(t._catalog)
+                    first._catalog.update(t._catalog)
 
         self._data.lang = lang
         self._data.catalog = first
 
     def gettext(self, s):
-        if sys.version_info < (3,0):
+        if sys.version_info < (3, 0):
             return self._data.catalog.ugettext(s) if hasattr(self._data, "catalog") else s
         else:
             return self._data.catalog.gettext(s) if hasattr(self._data, "catalog") else s
@@ -108,10 +106,11 @@ class TranslationProxy(object):
         if not hasattr(self._data, "catalog"):
             return singular if num <= 1 else plural
 
-        if sys.version_info < (3,0):
+        if sys.version_info < (3, 0):
             return self._data.catalog.ungettext(singular, plural, num)
         else:
             return self._data.catalog.ngettext(singular, plural, num)
+
 
 translation = TranslationProxy()
 
@@ -135,6 +134,7 @@ def _translate(s):
     else:
         return translation.gettext(s)
 
+
 builtins._ = _translate
 builtins.N_ = _DeferredGettext
 builtins.ngettext = translation.ngettext
@@ -149,17 +149,16 @@ TIME_HM_FMT = N_("%H:%M")
 TIME_HMS_FMT = N_("%H:%M:%S")
 
 
-
 _LANGUAGES = {
-               "Deutsch": "de_DE",
-               "Español": "es_ES",
-               "English": "en_GB",
-               "Français": "fr_FR",
-               "Italiano": "it_IT",
-               "Polski": "pl_PL",
-               "Português (Brasileiro)": "pt_BR",
-               "Русский": "ru_RU"
-             }
+    "Deutsch": "de_DE",
+    "Español": "es_ES",
+    "English": "en_GB",
+    "Français": "fr_FR",
+    "Italiano": "it_IT",
+    "Polski": "pl_PL",
+    "Português (Brasileiro)": "pt_BR",
+    "Русский": "ru_RU"
+}
 
 
 def setLocale(lang):
@@ -172,16 +171,18 @@ def setLocale(lang):
 def getLanguages():
     return sorted(_LANGUAGES)
 
+
 def getLanguagesIdentifiers():
     return _LANGUAGES.values()
 
 
 def getLanguagesAndIdentifiers():
-    return [ (_(x), _LANGUAGES[x]) for x in sorted(_LANGUAGES) ]
+    return [(_(x), _LANGUAGES[x]) for x in sorted(_LANGUAGES)]
 
 
 def getCurrentCharset():
     return translation.getCharset()
+
 
 def format_date(date=None, tzinfo=None, **kwargs):
     if isinstance(date, (float, int)):
@@ -193,6 +194,7 @@ def format_date(date=None, tzinfo=None, **kwargs):
 
     return babel.dates.format_date(date, locale=translation.getLocale(), **kwargs)
 
+
 def format_time(dt=None, tzinfo=None, **kwargs):
     if isinstance(dt, (float, int, prelude.IDMEFTime)):
         dt = datetime.datetime.fromtimestamp(dt, utils.timeutil.tzutc())
@@ -201,6 +203,7 @@ def format_time(dt=None, tzinfo=None, **kwargs):
         tzinfo = env.request.user.timezone
 
     return babel.dates.format_time(dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs)
+
 
 def format_datetime(dt=None, tzinfo=None, **kwargs):
     if isinstance(dt, (float, int, prelude.IDMEFTime)):
@@ -211,8 +214,10 @@ def format_datetime(dt=None, tzinfo=None, **kwargs):
 
     return babel.dates.format_datetime(datetime=dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs)
 
+
 def format_timedelta(*args, **kwargs):
     return _format_timedelta(*args, locale=translation.getLocale(), **kwargs)
+
 
 def format_number(*args, **kwargs):
     return babel.numbers.format_number(*args, locale=translation.getLocale(), **kwargs)
@@ -221,17 +226,22 @@ def format_number(*args, **kwargs):
 def get_period_names(*args, **kwargs):
     return babel.dates.get_period_names(*args, locale=translation.getLocale(), **kwargs)
 
+
 def get_day_names(*args, **kwargs):
     return babel.dates.get_day_names(*args, locale=translation.getLocale(), **kwargs)
+
 
 def get_month_names(*args, **kwargs):
     return babel.dates.get_month_names(*args, locale=translation.getLocale(), **kwargs)
 
+
 def get_quarter_names(*args, **kwargs):
     return babel.dates.get_quarter_names(*args, locale=translation.getLocale(), **kwargs)
 
+
 def get_era_names(*args, **kwargs):
     return babel.dates.get_era_names(*args, locale=translation.getLocale(), **kwargs)
+
 
 def get_calendar_format():
     """ Return a date format for use by jquery's datetime picker """
@@ -245,8 +255,10 @@ def get_calendar_format():
     # 2-digits year: "yy" in Babel, "y" in jQuery.
     return calendar_format.replace("yy", "y").replace("MM", "mm")
 
+
 def get_timezones():
     return sorted(zone for zone in list(babel.core.get_global('zone_territories').keys()) + ["UTC"] if not zone.startswith('Etc/'))
+
 
 def get_system_timezone():
     try:
