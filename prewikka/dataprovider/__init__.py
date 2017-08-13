@@ -135,12 +135,16 @@ class ResultObject(object):
     def preprocess_value(self, value):
         return value
 
+    @property
+    def path(self):
+        return ".".join(self._curpath)
+
     def _wrapobj(self, obj, curpath):
         if type(obj) == type(self._obj):
             return ResultObject(obj, curpath)
 
         elif isinstance(obj, tuple):
-            return CachingIterator((self._wrapobj(i, curpath) for i in obj))
+            return CachingIterator((self._wrapobj(v, curpath[:-1] + ["%s(%d)" % (curpath[-1], i)]) for i, v in enumerate(obj)))
 
         return obj
 
