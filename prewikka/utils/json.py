@@ -39,6 +39,10 @@ class _JSONMetaClass(type):
 class JSONObject(object):
     __metaclass__ = _JSONMetaClass
 
+    @classmethod
+    def from_json(cls, data):
+        return cls(**data)
+
     def __jsonobj__(self):
         return { "__prewikka_class__": (self.__class__.__name__, self.__json__()) }
 
@@ -61,7 +65,7 @@ class PrewikkaJSONEncoder(json.JSONEncoder):
 def _object_hook(obj):
     cls = obj.get("__prewikka_class__")
     if cls:
-        return _TYPES[cls[0]](**cls[1])
+        return _TYPES[cls[0]].from_json(cls[1])
 
     return obj
 

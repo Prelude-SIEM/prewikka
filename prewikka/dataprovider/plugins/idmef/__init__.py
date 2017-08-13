@@ -14,12 +14,19 @@ from prewikka.dataprovider import DataProviderBackend, QueryResults, QueryResult
 _ORDER_MAP = { "time_asc": preludedb.DB.ORDER_BY_CREATE_TIME_ASC, "time_desc": preludedb.DB.ORDER_BY_CREATE_TIME_DESC }
 
 
-class IDMEFResultObject(ResultObject):
+class IDMEFResultObject(ResultObject, utils.json.JSONObject):
     def preprocess_value(self, value):
         if isinstance(value, IDMEFTime):
             return datetime.fromtimestamp(value, utils.timeutil.tzoffset(None, value.getGmtOffset()))
 
         return ResultObject.preprocess_value(self, value)
+
+    @classmethod
+    def from_json(cls, data):
+        return cls(prelude.IDMEF(data["idmef_json"]))
+
+    def __json__(self):
+        return { "idmef_json": self._obj.toJSON() }
 
 
 class IDMEFQueryResultsRow(QueryResultsRow):
