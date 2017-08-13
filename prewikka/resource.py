@@ -106,6 +106,9 @@ class HTMLNode(json.JSONObject):
         for x in self.childs:
             childs += text_type(x)
 
+        if not self.tag:
+            return HTMLSource("%s" % childs)
+
         return HTMLSource("<%s%s>%s</%s>" % (self.tag, attr_s, childs, self.tag))
 
     def __json__(self):
@@ -113,6 +116,9 @@ class HTMLNode(json.JSONObject):
 
     def __str__(self):
         return self.to_string()
+
+    def __add__(self, other):
+        return HTMLNode(None, self, other)
 
     def __eq__(self, other):
         return (self._sortkey, self.childs) == (other._sortkey, other.childs)
