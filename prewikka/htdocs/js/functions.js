@@ -153,6 +153,11 @@ $(function() {
     $(this).data('bs.modal', null);
     $(this).remove();
   });
+
+  $(window).on("resize", function(e) {
+    if ( e.target == window ) // avoid infinite event loop
+        $("#main").trigger("resize");
+  });
 });
 
 function prewikka_resizeTopMenu() {
