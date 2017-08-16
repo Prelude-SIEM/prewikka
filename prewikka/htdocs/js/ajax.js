@@ -1,3 +1,5 @@
+"use strict";
+
 $(function() {
 
   $(document).ajaxStart(function() {

@@ -1,4 +1,6 @@
 <script type="text/javascript">
+"use strict";
+
 $(function() {
   % if inline:
     $('#main_menu_ng input, #main_menu_ng select').addClass("form-control input-sm");

@@ -13,6 +13,7 @@ else:
 
 <%block name="toplayout_content">
 <script type="text/javascript">
+"use strict";
 
 function check_same_origin(url) {
     /*
@@ -26,7 +27,7 @@ function check_same_origin(url) {
      * When the default port is used in IE,
      * location.port is empty but url.port is not
      */
-    default_port = {"http:": "80", "https:": "443"};
+    var default_port = {"http:": "80", "https:": "443"};
     return url.protocol == location.protocol && url.hostname == location.hostname && (url.port || default_port[url.protocol]) == (location.port || default_port[location.protocol]);
 }
 

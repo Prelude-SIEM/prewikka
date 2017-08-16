@@ -1,3 +1,5 @@
+"use strict";
+
 function MainMenuInit(inline, start, end, date_format) {
 
     var that = this;
@@ -14,8 +16,8 @@ function MainMenuInit(inline, start, end, date_format) {
             "onClose": function() { that.trigger_custom_date(true); },
         };
 
-        that._start_picker = new DatetimePicker(that._start_picker, start, options);
-        that._end_picker = new DatetimePicker(that._end_picker, end, options);
+        that._start_picker = DatetimePicker(that._start_picker, start, options);
+        that._end_picker = DatetimePicker(that._end_picker, end, options);
     };
 
     this.trigger_custom_date = function(enabled) {

@@ -1,3 +1,5 @@
+"use strict";
+
 function CommonListing(elem, text, options) {
     var dfd = $.Deferred();
 
@@ -27,7 +29,7 @@ function CommonListing(elem, text, options) {
 
     $(elem).addClass("commonlisting table table-striped");
 
-    for ( i in options['colModel'] ) {
+    for ( var i in options['colModel'] ) {
         if (! options['colModel'][i].formatter )
             options['colModel'][i].formatter = (i == 0) ? _backwardCompatibleFormatter : genericFormatter;
     }

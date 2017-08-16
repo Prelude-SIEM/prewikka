@@ -1,3 +1,5 @@
+"use strict";
+
 String.prototype.capitalize = function() {
     return this.charAt(0).toUpperCase() + this.slice(1);
 };
@@ -390,48 +392,43 @@ window.json_registry.register(HTMLNode);
 
 function DatetimePicker(input, date, options)
 {
-    var that = this;
+    var that = {};
+    var hidden_input = $('<input/>').attr({ type: 'hidden',
+                                            name: input.data('name'),
+                                            class: 'form-control input-sm hidden_' + input.data('name'),
+                                            value: date });
 
-    this._init = function(input, date, opts) {
-        var options = _mergedict(opts, {
-            "onSelect": function() {
-                            that._update_input();
-                            if ( "onSelect" in opts )
-                                opts["onSelect"]();
-                        },
-            "onClose": function() {
-                            that._update_input();
-                            if ( "onClose" in opts )
-                                opts["onClose"]();
-                        }
-                       });
+    hidden_input.appendTo(input.parent());
 
-        that.input = input;
-        hidden_input_attrs = {type: 'hidden',
-                              name: input.data('name'),
-                              class: 'form-control input-sm hidden_' + input.data('name'),
-                              value: date};
-
-        that.hidden_input = $('<input/>').attr(hidden_input_attrs);
-        that.hidden_input.appendTo(input.parent());
-
-        input.datetimepicker(options);
-        input.datetimepicker("setDate", new Date(moment(date)));
-        that._update_input();
+    that.get_value = function() {
+        return input.datetimepicker("getDate");
     };
 
-    this._timestamp = function(dt) {
+    function _timestamp(dt) {
         return (dt.getTime() - (dt.getTimezoneOffset() * 60000)) / 1000;
-    };
-
-    this._update_input = function() {
-        var dt = that.get_value();
-        that.hidden_input.val(dt ? that._timestamp(dt) : "");
-    };
-
-    this.get_value = function() {
-        return that.input.datetimepicker("getDate");
     }
 
-    this._init(input, date, options || {});
+    function _update_input() {
+        var dt = that.get_value();
+        hidden_input.val(dt ? _timestamp(dt) : "");
+    }
+
+    input.datetimepicker(_mergedict(options, {
+            "onSelect": function() {
+                            _update_input();
+                            if ( "onSelect" in options )
+                                options["onSelect"]();
+                        },
+            "onClose": function() {
+                            _update_input();
+                            if ( "onClose" in options )
+                                options["onClose"]();
+                        }
+        })
+    );
+
+    input.datetimepicker("setDate", new Date(moment(date)));
+    _update_input();
+
+    return that;
 }
