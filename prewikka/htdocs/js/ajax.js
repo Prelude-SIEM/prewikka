@@ -80,8 +80,8 @@ function prewikka_drawTab(data)
 
     $(form).prepend(data.menu);
 
-    $("#main").off(); /* clear any events bound to this content by the current view */
-    $("#main").html(content);
+    prewikka_resource_destroy($("#main"));
+    $("#main").off().html(content);
 
     $("#topmenu_right .prewikka-help-button").data("href", data.help).prop("disabled", data.help ? false : true);
     $("#topmenu_right .prewikka-config-button").prop("disabled", $("#main .prewikka-view-config").length == 0);
@@ -158,7 +158,10 @@ function _process_ajax_response(settings, data)
                 $(widget).find(".modal-header button").after(help);
             }
 
-            return prewikka_json_dialog({"content": widget });
+            $(widget).addClass("prewikka-resources-container");
+            var ret = prewikka_json_dialog({"content": widget });
+
+            return ret;
         }
 
         if ( settings['history'] == undefined ) {

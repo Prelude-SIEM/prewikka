@@ -45,7 +45,6 @@ DEFAULT_OPTION = "0 * * * *"
         $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
       });
   });
-
   </script>
 
     % if job:

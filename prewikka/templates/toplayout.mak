@@ -16,6 +16,37 @@ software = env.config.interface.get("software", "<img src='prewikka/images/prelu
     </div>
 </div>
 
+<div id="top_view">
+    <nav class="navbar navbar-fixed-top navbar-primary" id="top_view_navbar">
+        <div class="navbar-header">
+            <div class="navbar-brand visible-xs-block">${software | n}</div>
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main_navbar_collapse" aria-expanded="false">
+                <i class=" fa fa-bars fa-2x"></i>
+            </button>
+        </div>
+
+        <div class="collapse navbar-collapse" id="main_navbar_collapse">
+            <%block name="toplayout_menu" />
+            <ul class="nav navbar-nav navbar-right" id="nav_top_view_header">
+                <li class="visible-lg-inline">
+                    <div class="navbar-brand">${software | n}</div>
+                </li>
+                % for content in toplayout_extra_content:
+                  ${content}
+                % endfor
+            </ul>
+        </div>
+    </nav>
+
+    <%block name="toplayout_content" />
+
+    <div id="_main_viewport"></div>
+    <div id="_main">
+      <%block name="main_content" />
+    </div>
+
+</div>
+
 <div id="prewikka-dialog-container" class="container">
   <div id="prewikka-dialog-confirm" class="modal fade" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="true" data-keyboard="true" tabindex="-1">
     <div class="modal-dialog">
@@ -64,35 +95,4 @@ software = env.config.interface.get("software", "<img src='prewikka/images/prelu
       </div>
     </div>
   </div>
-</div>
-
-<div id="top_view">
-    <nav class="navbar navbar-fixed-top navbar-primary" id="top_view_navbar">
-        <div class="navbar-header">
-            <div class="navbar-brand visible-xs-block">${software | n}</div>
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#main_navbar_collapse" aria-expanded="false">
-                <i class=" fa fa-bars fa-2x"></i>
-            </button>
-        </div>
-
-        <div class="collapse navbar-collapse" id="main_navbar_collapse">
-            <%block name="toplayout_menu" />
-            <ul class="nav navbar-nav navbar-right" id="nav_top_view_header">
-                <li class="visible-lg-inline">
-                    <div class="navbar-brand">${software | n}</div>
-                </li>
-                % for content in toplayout_extra_content:
-                  ${content}
-                % endfor
-            </ul>
-        </div>
-    </nav>
-
-    <%block name="toplayout_content" />
-
-    <div id="_main_viewport"></div>
-    <div id="_main">
-      <%block name="main_content" />
-    </div>
-
 </div>

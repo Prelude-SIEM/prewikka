@@ -263,7 +263,7 @@ def _get_view_url(section, tabs):
     <div id="ajax-spinner" class="ajax-spinner main-spinner" style="display:none;">
         <i class="fa fa-circle-o-notch fa-5x fa-spin"></i>
     </div>
-    <div id="main" class="content">
+    <div id="main" class="content prewikka-resources-container">
      <%block name="content"></%block>
     </div>
 </%block>

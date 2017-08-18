@@ -150,6 +150,7 @@ $(function() {
    * Destroy AJAX modal completly when they are removed.
    */
   $(document).on('hidden.bs.modal', '.ajax-modal', function () {
+    prewikka_resource_destroy($(this));
     $(this).data('bs.modal', null);
     $(this).remove();
   });
@@ -440,4 +441,66 @@ function DatetimePicker(input, date, options)
     _update_input();
 
     return that;
+}
+
+
+
+function _resource_register(obj, target)
+{
+    var mlist;
+
+    mlist = target.data("prewikka-resources");
+    if ( ! mlist ) {
+        mlist = [];
+        target.data("prewikka-resources", mlist);
+    }
+
+    mlist.push(obj);
+}
+
+
+
+function prewikka_resource_register(obj)
+{
+    var target;
+    var base = obj.container;
+
+    if ( ! base )
+        base = $('script').last();
+
+    target = $(base).closest(".prewikka-resources-container");
+    if ( target.length > 0 )
+        _resource_register(obj, target);
+
+    if ( ! $(target).is($("#main")) )
+        _resource_register(obj, $("#main"));
+}
+
+
+
+function prewikka_resource_destroy(target)
+{
+    var mlist = target.data("prewikka-resources");
+
+    /*
+     * removeData() only remove data from the JQuery cache. The data
+     * are still present and can still be fetched.
+     */
+    target.data("prewikka-resources", "");
+    if ( ! mlist )
+        return;
+
+    /*
+     * LIFO order
+     */
+    for ( var i = mlist.length; i--; ) {
+        if ( ! mlist[i].destroy )
+            continue;
+
+        try {
+            mlist[i].destroy();
+        } finally {
+            mlist[i].destroy = null; /* in case the module is registered in multiple places */
+        }
+    }
 }
