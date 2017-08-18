@@ -20,7 +20,7 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
     window.mainmenu.start();
   % endif
 
-    var menu = new MainMenuInit(${ int(inline) }, "${timeline.start}", "${timeline.end}", "${timeline.time_format}");
+    var menu = MainMenuInit(${ int(inline) }, "${timeline.start}", "${timeline.end}", "${timeline.time_format}");
 
   % if timeline.quick_custom:
     menu.trigger_custom_date(true);

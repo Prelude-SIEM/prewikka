@@ -375,21 +375,25 @@ function prewikka_autocomplete(field, url, submit, allow_empty=false) {
 
 
 function HTMLNode(obj) {
+    var ret = {};
     var inner = "";
+
     $.each(obj.childs, function(i, child) {
         inner += child.toHTML ? child.toHTML() : _.escape(child);
     });
 
-    this.element = $("<" + obj.tag + ">", obj.attrs).html(inner);
+    var element = $("<" + obj.tag + ">", obj.attrs).html(inner);
 
-    this.toHTML = function() {
-        return this.element.wrap("<div>").parent().html();
+    ret.toHTML = function() {
+        return element.wrap("<div>").parent().html();
     };
 
-    this.toString = function() {
+    ret.toString = function() {
         /* Used for client-side grid searches */
-        return this.element.text();
+        return element.text();
     };
+
+    return ret;
 }
 
 window.json_registry.register(HTMLNode);

@@ -157,7 +157,7 @@ function CommonListing(elem, text, options) {
             data["success"] = function() { s_cb(rows); };
         }
 
-        prewikka_ajax(_mergedict(data, {type: "POST"}));
+        return prewikka_ajax(_mergedict(data, {type: "POST"}));
     };
 
     grid.done = function done(cb) {

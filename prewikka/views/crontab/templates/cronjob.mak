@@ -32,7 +32,7 @@ DEFAULT_OPTION = "0 * * * *"
           );
       });
 
-      $(".dropdown-menu li a").click(function(){
+      $("#cronjob_setup .dropdown-menu li a").click(function(){
         var is_custom = $(this).hasClass("custom");
 
         $("#cronjob_setup div.collapse").collapse((is_custom) ? "show" : "hide");

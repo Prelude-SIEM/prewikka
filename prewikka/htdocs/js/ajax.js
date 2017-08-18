@@ -244,7 +244,7 @@ function prewikka_EventSource(config)
         decode_json = function(e) { return e };
     }
 
-    for ( ev in config['events'] ) {
+    for ( var ev in config['events'] ) {
         (function(_ev) {
             jsonStream.addEventListener(_ev, function(e) { config['events'][_ev](decode_json(e)) });
         })(ev);

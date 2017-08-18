@@ -1,26 +1,30 @@
 "use strict";
 
 function JSONRegistry() {
-    this.prototypes = {};
+    var ret = {};
 
-    this.register = function(proto) {
-        this.prototypes[proto.name] = proto;
-    };
+    ret._prototypes = {};
+
+    ret["register"] = function(proto) {
+        ret._prototypes[proto.name] = proto;
+    }
+
+    return ret;
 }
 
-window.json_registry = new JSONRegistry();
+window.json_registry = JSONRegistry();
 
 
 function _reviver_func(name, value) {
     if ( value !== null && typeof value === "object" && value["__prewikka_class__"] ) {
         var type = value["__prewikka_class__"][0];
         var kwargs = value["__prewikka_class__"][1];
-        var proto = window.json_registry.prototypes[type];
+        var proto = window.json_registry._prototypes[type];
 
         if ( ! proto )
             throw new TypeError("Class " + type + " not found.");
 
-        return new proto(kwargs);
+        return proto(kwargs);
     }
 
     return value;

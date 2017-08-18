@@ -3,9 +3,9 @@ from prewikka.utils import html, json
 %>
 
 <script type="text/javascript">
-   "use strict";
+"use strict";
 
-   (function() {
+$(function() {
     /*
      * Remove any previously loaded error.
      */
@@ -53,8 +53,8 @@ from prewikka.utils import html, json
 
     $(".cronjob-error").click(function(e) {
         $(".cronjob-error-dialog-" + $(".cronjob-error").index(this)).modal('show');
-    })
-}());
+    });
+});
 
 </script>
 
