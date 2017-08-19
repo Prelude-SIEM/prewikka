@@ -22,8 +22,6 @@ DEFAULT_OPTION = "0 * * * *"
   %>
 
   <script type="text/javascript">
-
-    $(function() {
       $("#cronjob_setup input.schedule").change(function(e) {
           $("#quick-schedule").val(
               $("#cronjob_setup input.schedule").map(function() {
@@ -44,7 +42,6 @@ DEFAULT_OPTION = "0 * * * *"
         $(this).parents(".dropdown").find('.btn').html($(this).text() + ' <span class="caret"></span>');
         $(this).parents(".dropdown").find('.btn').val($(this).data('value'));
       });
-  });
   </script>
 
     % if job:

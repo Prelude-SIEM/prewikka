@@ -1,9 +1,7 @@
-$(function() {
-  $(document).on("click", "#top_view", function() {
+$("#main").click(function() {
     $(".filter_popup_link + div").hide();
-  });
+});
 
-  $(document).on("click", ".filter_popup_link + div", function(evt) {
+$(".filter_popup_link + div").click(function(evt) {
     evt.stopPropagation();
-  });
 });

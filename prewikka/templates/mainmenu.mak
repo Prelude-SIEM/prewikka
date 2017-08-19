@@ -1,19 +1,17 @@
 <script type="text/javascript">
 "use strict";
 
-$(function() {
-  % if inline:
-    $('#main_menu_ng input, #main_menu_ng select').addClass("form-control input-sm");
-    $('#main_menu_ng button').addClass("btn-sm");
-  % else:
-    $('#main_menu_ng_block div.form-group > div:first-child').addClass("control-label col-sm-${label_width} input-${input_size}");
-    $('#main_menu_ng_block div.form-group > div:last-child').addClass("col-sm-${12 - label_width}");
-    $('#main_menu_ng_block input, #main_menu_ng_block select').addClass("form-control input-${input_size}");
-    $('#main_menu_ng_block button').addClass("btn-block");
-  % endif
-});
+% if inline:
+  $('#main_menu_ng input, #main_menu_ng select').addClass("form-control input-sm");
+  $('#main_menu_ng button').addClass("btn-sm");
+% else:
+  $('#main_menu_ng_block div.form-group > div:first-child').addClass("control-label col-sm-${label_width} input-${input_size}");
+  $('#main_menu_ng_block div.form-group > div:last-child').addClass("col-sm-${12 - label_width}");
+  $('#main_menu_ng_block input, #main_menu_ng_block select').addClass("form-control input-${input_size}");
+  $('#main_menu_ng_block button').addClass("btn-block");
+% endif
 
-$LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(function() {
+$LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(function() {
     window.mainmenu.reset();
 
   % if auto_apply_value > 0:

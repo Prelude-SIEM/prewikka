@@ -5,11 +5,9 @@ from prewikka import usergroup
 <%block name="messagelisting_scripts"></%block>
 
 <link rel="stylesheet" type="text/css" href="messagelisting/css/messagelisting.css">
+<script type="text/javascript" src="messagelisting/js/messagelisting.js"></script>
 
 <script type="text/javascript">
-$LAB.script("messagelisting/js/messagelisting.js").wait();
-
-$(function() {
   $("#allbox").click(function(){
     $('input[name=selection]').check($(this).prop('checked'));
   });
@@ -17,7 +15,7 @@ $(function() {
   if ( navigator.userAgent.indexOf("Konqueror") != -1 ) {
         $("th.filter_popup > div").css("display", "block");
         $("th.filter_popup > div").hide();
-   }
+  }
 
   $(".filter_popup_link").click(function(){
         var div =  $(this).nextAll("div");
@@ -52,8 +50,7 @@ $(function() {
             }
             return title;
         }
-    });
-});
+  });
 </script>
 
 <%block name="message_listing_header"></%block>
