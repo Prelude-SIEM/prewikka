@@ -158,7 +158,10 @@ class SectionRoot(list):
             return self[0][key]
 
     def __getattr__(self, attr):
-        return getattr(self[0] if self else ConfigParserSection(""), attr)
+        if not self:
+            self.append(ConfigParserSection(""))
+
+        return getattr(self[0], attr)
 
     def get_instance_by_name(self, name):
         for section in self:
@@ -240,7 +243,7 @@ class MyConfigParser(object):
         return self._sections.get(name, default)
 
     def __getattr__(self, key):
-        return self._sections.get(key, SectionRoot())
+        return self._sections.setdefault(key, SectionRoot())
 
     def __len__(self):
         return len(self._sections)
