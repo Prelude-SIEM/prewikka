@@ -400,6 +400,31 @@ function HTMLNode(obj) {
 window.json_registry.register(HTMLNode);
 
 
+function Criterion(left, operator, right) {
+    var ret = {
+        left: left,
+        operator: operator,
+        right: right
+    };
+
+    ret.toJSON = function() {
+        if ( typeof(left) == "object" )
+            left = left.toJSON();
+
+        if ( typeof(right) == "object" )
+            right = right.toJSON();
+
+        return {
+            "__prewikka_class__": ["Criterion", {"left": left, "operator": operator, "right": right}]
+        };
+    };
+
+    return ret;
+}
+
+window.json_registry.register(Criterion);
+
+
 function DatetimePicker(input, date, options)
 {
     var that = {};

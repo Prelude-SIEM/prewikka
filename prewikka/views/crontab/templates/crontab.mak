@@ -22,7 +22,7 @@ from prewikka.utils import html, json
             {name: 'next', width: 10, search: false, sorttype: function(value, row) {return row.next_date;} },
         ],
         multiselect: true,
-        data: JSON.parse(${ html.js_string(json.dumps(data)) }),
+        data: ${ html.escapejs(data) },
         globalSearch: false,
 
         rowattr: function(rd, cur, rowid) {

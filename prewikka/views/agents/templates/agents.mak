@@ -43,7 +43,7 @@ from prewikka.utils import html, json
             {name: 'latest_heartbeat', width: 10, sortable: false},
             {name: 'status_text', width: 5, sortable: false, align: 'center', classes: 'heartbeat_analyze', cellattr: statusAttr}
         ],
-        data: JSON.parse(${ html.js_string(json.dumps(data)) }),
+        data: ${ html.escapejs(data) },
         globalSearch: true,
         grouping: true,
         groupingView: {

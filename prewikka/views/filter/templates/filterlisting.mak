@@ -24,7 +24,7 @@ $LAB.wait(function() {
     CommonListing('table#filters', text, {
         editLink: "${url_for('FilterView.edit')}",
         deleteLink: "${url_for('FilterView.delete')}",
-        colNames: ["${_('Name')}"].concat(${col_names | n,json.dumps}).concat(["${_('Description')}"]),
+        colNames: ["${_('Name')}"].concat(${html.escapejs(col_names)}).concat(["${_('Description')}"]),
         colModel: [
             {name: 'name', width: 20},
             % for typ in col_idents:
@@ -32,7 +32,7 @@ $LAB.wait(function() {
             % endfor
             {name: 'description', width: 50, sortable: false}
         ],
-        data: ${data | n,json.dumps}
+        data: ${html.escapejs(data)}
     });
 
 });

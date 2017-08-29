@@ -53,7 +53,7 @@ if ( window._messagelisting_title_array == undefined ) {
 $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
         var stateArray = [ "default", "saved", "current" ];
         var saved_forms = Array();
-        var columns_data = ${ columns_data | n,json.dumps };
+        var columns_data = ${ html.escapejs(columns_data) };
 
         var saved_state = columns_data["column_names"];
         $(saved_state).each(function() {
@@ -126,10 +126,10 @@ $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
            % if is_enum or oplist:
            <script type="text/javascript">
             % if is_enum:
-            window._messagelisting_value_array["${ rootcl.getPath() }"] = ${ list(rootcl.getEnumValues()) | n,json.dumps };
+            window._messagelisting_value_array["${ rootcl.getPath() }"] = ${ html.escapejs(list(rootcl.getEnumValues())) };
             % endif
             % if oplist:
-            window._messagelisting_operator_array["${ rootcl.getPath() }"] = ${ oplist | n,json.dumps };
+            window._messagelisting_operator_array["${ rootcl.getPath() }"] = ${ html.escapejs(oplist) };
             % endif
            </script>
            % endif

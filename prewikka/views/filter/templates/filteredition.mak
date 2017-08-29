@@ -63,11 +63,11 @@
         });
 
         new FilterEdition("form.filter-form",
-                          ${default_paths | n,json.dumps},
-                          ${all_paths | n,json.dumps},
-                          ${operators | n,json.dumps},
-                          ${enums | n,json.dumps},
-                          ${tooltips | n,json.dumps}).init();
+                          ${html.escapejs(default_paths)},
+                          ${html.escapejs(all_paths)},
+                          ${html.escapejs(operators)},
+                          ${html.escapejs(enums)},
+                          ${html.escapejs(tooltips)}).init();
 
     });
     </script>

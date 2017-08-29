@@ -21,6 +21,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import markupsafe
 
+from prewikka.utils import json
+
 
 class Markup(markupsafe.Markup):
     @classmethod
@@ -35,12 +37,13 @@ def escape(value):
     return Markup.escape(value)
 
 
-def escapejson(value):
-    return value.replace("</", "<\\/")
+def escapejs(value):
+    value = json.dumps(value, cls=json.PrewikkaHTMLJSONEncoder)
 
+    if "__prewikka_class__" in value:
+        value = "_prewikka_revive(%s)" % value
 
-def js_string(value):
-    return Markup(repr(str(escapejson(value))))
+    return Markup(value)
 
 
 def selected(condition):

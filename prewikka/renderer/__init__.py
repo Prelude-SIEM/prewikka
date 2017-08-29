@@ -19,10 +19,10 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import json
 import uuid
 
 from prewikka import error, pluginmanager, resource
+from prewikka.utils import html
 
 RED_STD = "E78D90"
 ORANGE_STD = "F5B365"
@@ -166,17 +166,17 @@ class RendererPluginManager(pluginmanager.PluginManager):
 
         try:
             data = self._renderer[renderer][type].render(data, **kwargs)
-            html = resource.HTMLSource('<div id="%s" class="renderer-elem %s">%s</div>'
-                                       % (cssid, classname, data.get("html", "")))
+            htmls = resource.HTMLSource('<div id="%s" class="renderer-elem %s">%s</div>'
+                                        % (cssid, classname, data.get("html", "")))
 
-            return {"html": html, "script": resource.HTMLSource(data.get("script", ""))}
+            return {"html": htmls, "script": resource.HTMLSource(data.get("script", ""))}
         except RendererNoDataException as e:
-            html = resource.HTMLSource('<div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>'
-                                       % (cssid, classname, text_type(e)))
+            htmls = resource.HTMLSource('<div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>'
+                                        % (cssid, classname, text_type(e)))
             script = resource.HTMLSource("""
                  var size = prewikka_getRenderSize("#%s", %s);
 
                  $("#%s").width(size[0]).css("height", size[1] + 'px').css("line-height", size[1] + 'px');
-                """ % (cssid, json.dumps(kwargs), cssid))
+                """ % (cssid, html.escapejs(kwargs), cssid))
 
-            return {"html": html, "script": script}
+            return {"html": htmls, "script": script}

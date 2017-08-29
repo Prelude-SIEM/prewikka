@@ -14,7 +14,7 @@ function _get_group_criterion(selector) {
         if ( ret == null )
             ret = get_criterion(this);
         else
-            ret = new Criterion(ret, operator, get_criterion(this));
+            ret = Criterion(ret, operator, get_criterion(this));
     });
     return ret;
 }
@@ -24,27 +24,7 @@ function _get_condition_criterion(selector) {
         return $(input).val();
     });
 
-    return new Criterion(values[0], values[1], values[2]);
-}
-
-function Criterion(left, operator, right) {
-    this.left = left;
-    this.operator = operator;
-    this.right = right;
-
-    this.json = function() {
-        var left = this.left;
-        if ( typeof(left) == "object" )
-            left = left.json();
-
-        var right = this.right;
-        if ( typeof(right) == "object" )
-            right = right.json();
-
-        return {
-            "__prewikka_class__": ["Criterion", {"left": left, "operator": this.operator, "right": right}]
-        };
-    }
+    return Criterion(values[0], values[1], values[2]);
 }
 
 function FilterEdition(selector, default_paths, all_paths, operators, enums, tooltips) {
@@ -149,7 +129,7 @@ function FilterEdition(selector, default_paths, all_paths, operators, enums, too
         $(this).find(".filter-edition").each(function() {
             var value = null;
             if ( $(this).parent().siblings(".panel-heading").find(".type-checkbox").is(":checked") )
-                value = get_criterion($(this).children(".filter-group")).json();
+                value = get_criterion($(this).children(".filter-group"));
 
             $(this).children("input[name=filter_criteria]").val(JSON.stringify(value));
         });

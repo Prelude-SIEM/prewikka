@@ -21,8 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import prelude
 from prewikka import resource
-from prewikka.utils.html import Markup
-from prewikka.utils import json
+from prewikka.utils import html
 
 
 def getOperatorList(type):
@@ -60,7 +59,7 @@ def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max
         _html_all_value = _gen_option_list(((i, i) for i in env.dataprovider.get_paths("alert") if i not in zip(default_paths)[1]), selected_paths)
         all_paths = resource.HTMLSource('<optgroup label="%s">%s</optgroup>') % (_("All paths"), _html_all_value)
 
-    html = resource.HTMLSource("""
+    htm = resource.HTMLSource("""
 <link rel="stylesheet" type="text/css" href="prewikka/css/chosen.min.css">
 <link rel="stylesheet" type="text/css" href="prewikka/css/bootstrap-chosen.css">
 
@@ -85,6 +84,6 @@ def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max
          });
 </script>
 """) % (resource.HTMLSource('multiple') if max_paths != 1 else "", _("Select paths..."),
-        _("Default paths"), _html_default_value, all_paths or "", max_paths, Markup(json.dumps(selected_paths)))
+        _("Default paths"), _html_default_value, all_paths or "", max_paths, html.escapejs(selected_paths))
 
-    return html
+    return htm

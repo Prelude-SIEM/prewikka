@@ -22,8 +22,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import datetime
 import json
 
-from prewikka.utils import html
-
 _TYPES = {}
 
 
@@ -61,6 +59,34 @@ class PrewikkaJSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
+# The following class has been adapted from simplejson
+#
+class PrewikkaHTMLJSONEncoder(PrewikkaJSONEncoder):
+    """An encoder that produces JSON safe to embed in HTML.
+    To embed JSON content in, say, a script tag on a web page, the
+    characters &, < and > should be escaped. They cannot be escaped
+    with the usual entities (e.g. &amp;) because they are not expanded
+    within <script> tags.
+    """
+
+    def encode(self, o):
+        # Override JSONEncoder.encode because it has hacks for
+        # performance that make things more complicated.
+        chunks = self.iterencode(o, True)
+        if self.ensure_ascii:
+            return ''.join(chunks)
+        else:
+            return u''.join(chunks)
+
+    def iterencode(self, o, _one_shot=False):
+        chunks = super(PrewikkaHTMLJSONEncoder, self).iterencode(o, _one_shot)
+        for chunk in chunks:
+            chunk = chunk.replace('&', '\\u0026')
+            chunk = chunk.replace('<', '\\u003c')
+            chunk = chunk.replace('>', '\\u003e')
+            yield chunk
+
+
 def _object_hook(obj):
     cls = obj.get("__prewikka_class__")
     if cls:
@@ -78,9 +104,14 @@ def loads(*args, **kwargs):
 
 
 def dump(*args, **kwargs):
-    return json.dump(cls=PrewikkaJSONEncoder, *args, **kwargs)
+    if "cls" not in kwargs:
+        kwargs["cls"] = PrewikkaJSONEncoder
+
+    return json.dump(*args, **kwargs)
 
 
 def dumps(*args, **kwargs):
-    # FIXME: html.escapejson should be removed
-    return html.escapejson(json.dumps(cls=PrewikkaJSONEncoder, *args, **kwargs))
+    if "cls" not in kwargs:
+        kwargs["cls"] = PrewikkaJSONEncoder
+
+    return json.dumps(*args, **kwargs)
