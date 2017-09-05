@@ -1,3 +1,5 @@
+<% root_id = 'main_menu_ng' if inline else 'main_menu_ng_block' %>
+
 <script type="text/javascript">
 "use strict";
 
@@ -5,10 +7,11 @@
   $('#main_menu_ng input, #main_menu_ng select').addClass("form-control input-sm");
   $('#main_menu_ng button').addClass("btn-sm");
 % else:
+  $('#main_menu_ng_block div.form-group-date > div:first-child').addClass("control-label col-sm-${label_width} input-${input_size}");
   $('#main_menu_ng_block div.form-group > div:first-child').addClass("control-label col-sm-${label_width} input-${input_size}");
   $('#main_menu_ng_block div.form-group > div:last-child').addClass("col-sm-${12 - label_width}");
   $('#main_menu_ng_block input, #main_menu_ng_block select').addClass("form-control input-${input_size}");
-  $('#main_menu_ng_block button').addClass("btn-block");
+  $('#main_menu_ng_block button').addClass("btn-block btn-${input_size}");
 % endif
 
 $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(function() {
@@ -30,7 +33,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
 });
 </script>
 
-<div id="${ 'main_menu_ng' if inline else 'main_menu_ng_block'}">
+<div id="${ root_id }">
   <input type="hidden" name="_save" value="1" />
   <div class="main_menu_navbar${ ' form-inline pull-right' if inline else ''}">
     % for i in menu_extra:
@@ -49,7 +52,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
         <div>
           <div class="dropdown dropdown-fixed dropdown-refresh">
             <div data-toggle="tooltip" title="${ _("Update frequency of the current page") }" data-trigger="hover" data-container="#main">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target=".dropdown-refresh">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#${root_id} .dropdown-refresh">
                    <span class="reload-icon">&#8634;</span><span class="refresh-value">${timeline.refresh_selected}</span><span class="caret"></span>
               </button>
             </div>
@@ -80,7 +83,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
         <div>
           <div class="dropdown dropdown-fixed dropdown-period">
             <div data-toggle="tooltip" title="${ _("Period to visualize") }" data-trigger="hover" data-container="#main">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target=".dropdown-period">
+              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#${root_id} .dropdown-period">
                  <span class="timeline_quick_selected">${timeline.quick_selected}</span> <span class="caret" />
               </button>
             </div>
