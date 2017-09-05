@@ -501,7 +501,7 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, parsed_criteria=parsed_criteria)
 
-    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=-1, type=None, **kwargs):
+    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=0, type=None, **kwargs):
         o = self._normalize(type, paths, criteria)
 
         start = time.time()
@@ -516,7 +516,7 @@ class DataProviderManager(pluginmanager.PluginManager):
     def get_by_id(self, type, id_):
         return self._backends[type].get_by_id(id_)
 
-    def get(self, criteria=None, order_by="time_desc", limit=-1, offset=-1, type=None):
+    def get(self, criteria=None, order_by="time_desc", limit=-1, offset=0, type=None):
         if order_by not in ("time_asc", "time_desc"):
             raise DataProviderError("Invalid value for parameter 'order_by'")
 
