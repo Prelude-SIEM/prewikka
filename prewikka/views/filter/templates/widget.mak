@@ -18,7 +18,7 @@
                     </optgroup>
                 </select>
             </div>
-            <div class="input-group-addon dropdown operator">
+            <div class="input-group-addon dropdown dropdown-fixed operator">
                 <input type="hidden" class="input-value" value="${operator}"/>
                 <div data-toggle="dropdown" title="${_('Change operator')}"><span>${operator}</span></div>
                 <ul class="dropdown-menu">
@@ -39,7 +39,7 @@
 <%def name="group(operator='&&', operands=None, root=False, **kwargs)">
     <% OPERATORS = {"&&": _("AND"), "||": _("OR")} %>
     <div class="filter-group">
-        <span class="dropdown">
+        <span class="dropdown dropdown-fixed">
             <input type="hidden" class="input-value" value="${operator}"/>
             <button type="button" class="btn btn-xs btn-primary" data-toggle="dropdown" title="${_('Change operator')}">
                 <span>${OPERATORS[operator]}</span>

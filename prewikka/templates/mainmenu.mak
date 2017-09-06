@@ -47,7 +47,7 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
         </div>
 
         <div>
-          <div class="dropdown dropdown-refresh">
+          <div class="dropdown dropdown-fixed dropdown-refresh">
             <div data-toggle="tooltip" title="${ _("Update frequency of the current page") }" data-trigger="hover" data-container="#main">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target=".dropdown-refresh">
                    <span class="reload-icon">&#8634;</span><span class="refresh-value">${timeline.refresh_selected}</span><span class="caret"></span>
@@ -78,7 +78,7 @@ $LAB.script("prewikka/js/mainmenu.js", "prewikka/js/moment.min.js").wait(functio
         </div>
 
         <div>
-          <div class="dropdown dropdown-period">
+          <div class="dropdown dropdown-fixed dropdown-period">
             <div data-toggle="tooltip" title="${ _("Period to visualize") }" data-trigger="hover" data-container="#main">
               <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target=".dropdown-period">
                  <span class="timeline_quick_selected">${timeline.quick_selected}</span> <span class="caret" />
