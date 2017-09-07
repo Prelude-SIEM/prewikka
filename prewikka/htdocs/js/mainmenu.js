@@ -36,7 +36,7 @@ function MainMenuInit(inline, start, end, date_format) {
 
     that.update_date = function() {
         var start = start_picker.get_value();
-        var end = end_picker.get_value() + 59 /* up to the end of the minute*/;
+        var end = end_picker.get_value();
 
         if ( start > end ) {
             root.find(".input-timeline-datetime").closest(".form-group").addClass('has-error');
