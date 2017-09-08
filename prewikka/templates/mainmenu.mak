@@ -86,7 +86,12 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
                  <span class="timeline_quick_selected">${timeline.quick_selected}</span> <span class="caret" />
               </button>
             </div>
-            <ul class="dropdown-menu timeline_quick_select">
+            <ul class="dropdown-menu dropdown-fixed timeline_quick_select">
+
+              % if period_optional:
+              <li><a data-value="none" data-unit="" data-absolute="">${ _("None") }</a></li>
+              % endif
+
               <li><a data-value="" data-unit="" data-absolute="" class="timeline_quick_select_custom">${ _("Custom") }</a></li>
               <li role="separator" class="divider"></li>
 
