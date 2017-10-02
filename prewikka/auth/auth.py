@@ -77,6 +77,9 @@ class _AuthUser(object):
 
 
 class _AuthGroup(object):
+    def canHandleGroups(self):
+        return self.__class__.getGroupByID != _AuthGroup.getGroupByID
+
     def canCreateGroup(self):
         return "createGroup" in self.__class__.__dict__
 
