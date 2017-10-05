@@ -19,6 +19,8 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+from hashlib import md5
+
 from prewikka import crontab, database, log, utils, hookmanager
 
 logger = log.getLogger(__name__)
@@ -38,38 +40,40 @@ class HistoryDatabase(database.DatabaseHelper):
             }
         )
 
-    def _where(self, user=True, form=True, query=True):
+    def _where(self, user=True, form=True, query_hash=True):
         where = []
 
         if user:
             where.append("userid = %(user)s")
         if form:
             where.append("formid = %(form)s")
-        if query:
-            where.append("query = %(query)s")
+        if query_hash:
+            where.append("query_hash = %(query_hash)s")
 
         return "" if not where else " WHERE %s" % " AND ".join(where)
 
     def get_queries(self, user, form):
         query = ("SELECT query FROM Prewikka_History_Query %s ORDER BY timestamp DESC" %
-                 self._where(query=False))
+                 self._where(query_hash=False))
 
         return [row[0] for row in self.query(query, user=user.id, form=form)]
 
     def save(self, user, form, query):
-        rows = [(user.id, form, query, utils.timeutil.utcnow())]
-        self.upsert("Prewikka_History_Query", ("userid", "formid", "query", "timestamp"), rows, pkey=("userid", "formid", "query"))
+        query_hash = md5(query).hexdigest()
+        rows = [(user.id, form, query, query_hash, utils.timeutil.utcnow())]
+        self.upsert("Prewikka_History_Query", ("userid", "formid", "query", "query_hash", "timestamp"), rows, pkey=("userid", "formid", "query_hash"))
 
         logger.info("Query saved: %s by %s on form %s", query, user.name, form)
 
     def delete(self, user, form, query=False):
-        self.query("DELETE FROM Prewikka_History_Query" + self._where(query=query), user=user.id, query=query, form=form)
+        query_hash = md5(query).hexdigest() if query else False
+        self.query("DELETE FROM Prewikka_History_Query" + self._where(query_hash=query_hash), user=user.id, query_hash=query_hash, form=form)
 
         logger.info("Query deleted: %s by %s on form %s", query or "all queries", user.name, form)
 
     @hookmanager.register("HOOK_USER_DELETE")
     def _clear_on_delete(self, user):
-        self.query("DELETE FROM Prewikka_History_Query " + self._where(query=False, form=False), user=user.id)
+        self.query("DELETE FROM Prewikka_History_Query " + self._where(query_hash=False, form=False), user=user.id)
 
     def _history_cron(self, job):
         config = env.config.cron.get_instance_by_name("search_history")

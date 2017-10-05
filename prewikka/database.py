@@ -430,7 +430,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
 class DatabaseCommon(preludedb.SQL):
     required_branch = version.__branch__
-    required_version = "1"
+    required_version = "2"
 
     NotNone = NotNone
     __sentinel = object()
