@@ -63,7 +63,8 @@ CREATE TABLE Prewikka_History_Query (
     userid VARCHAR(32) NOT NULL,
     formid VARCHAR(255) NOT NULL,
     query TEXT NOT NULL,
+    query_hash VARCHAR(32) NOT NULL,
     timestamp DATETIME NOT NULL,
-    PRIMARY KEY(userid, formid, query)
+    PRIMARY KEY(userid, formid, query_hash)
 ) ENGINE=InnoDB;
 """)
