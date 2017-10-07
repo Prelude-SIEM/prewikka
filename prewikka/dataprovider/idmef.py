@@ -61,14 +61,18 @@ class _IDMEFProvider(DataProviderBase):
 
         return "*%s*" % value
 
-    def parse_criterion(self, path, operator, value, type):
-        if not(value) and operator in ("=", "==", "!"):
+    def criterion_to_string(self, path, operator, value):
+        if not(value) and operator == "==":
             if prelude.IDMEFPath(path).getValueType() == prelude.IDMEFValue.TYPE_STRING:
                 return "(! %s || %s == '')" % (path, path)
 
             return "! %s" % (path)
 
-        return DataProviderBase.parse_criterion(self, path, operator, self._value_adjust(operator, value), type)
+        return DataProviderBase.criterion_to_string(self, path, operator, self._value_adjust(operator, value))
+
+    def compile_criteria(self, criteria):
+        if criteria:
+            return prelude.IDMEFCriteria(criteria.to_string(self.dataprovider_type))
 
 
 class IDMEFAlertProvider(_IDMEFProvider):

@@ -136,7 +136,7 @@ class AlertListingParameters(MessageListingParameters):
         self.optional("alert.type", list, ["alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"], save=True)
 
     def _checkOperator(self, operator):
-        if operator not in ("=", "<", ">", "<=", ">=", "~", "~*", "<>", "<>*", "!"):
+        if operator not in ("=", "==", "<", ">", "<=", ">=", "~", "~*", "<>", "<>*", "!"):
             raise view.InvalidParameterValueError("operator", operator)
 
     def _check_value(self, obj, operator, value):
@@ -1244,7 +1244,7 @@ class AlertListing(MessageListing):
                 raise Exception(_("The path '%s' cannot be mapped to a column") % path)
 
             if value is None:
-                if operator in ("=", "=="):
+                if operator == "==":
                     operator = "!"
                     value = ""
                 else:

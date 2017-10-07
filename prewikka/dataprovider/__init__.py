@@ -224,6 +224,7 @@ class DataProviderBackend(pluginmanager.PluginBase):
 
 
 class DataProviderBase(pluginmanager.PluginBase):
+    dataprovider_type = None
     dataprovider_label = None
 
     def __init__(self, time_field=None):
@@ -249,10 +250,13 @@ class DataProviderBase(pluginmanager.PluginBase):
 
         return "'%s'" % value.replace("\\", "\\\\").replace("'", "\\'")
 
-    def format_paths(self, paths, type):
-        return [path.format(backend=type, time_field=self._time_field) for path in paths]
+    def format_path(self, path):
+        return path.format(backend=self.dataprovider_type, time_field=self._time_field)
 
-    def parse_paths(self, paths, type):
+    def format_paths(self, paths):
+        return [self.format_path(path) for path in paths]
+
+    def parse_paths(self, paths):
         """
         Parse paths and turn them into a structure that can be used by the backend.
 
@@ -264,22 +268,14 @@ class DataProviderBase(pluginmanager.PluginBase):
         """
         return paths, []
 
-    def parse_criteria(self, criteria, type):
-        """
-        Parse criteria and turn them into a structure that can be used by the backend.
+    def compile_criterion(self, criterion):
+        return criterion
 
-        @param criteria: Criterion object (eg. Criterion("foo.bar", "==", 42))
-        @type criteria: Criterion
-        @param type: type of backend
-        @type type: string
-        @return: The criteria as a structure that can easily be used by the backend.
-        """
-        return criteria.to_string(type)
+    def compile_criteria(self, criteria):
+        return criteria
 
-    def parse_criterion(self, path, operator, value, type):
-        path = path.format(backend=type, time_field=self._time_field)
-
-        if operator in ("=", "==") and value is None:
+    def criterion_to_string(self, path, operator, value):
+        if operator == "==" and value is None:
             return "!%s" % (path)
 
         if operator in ("!=", None) and value is None:
@@ -303,6 +299,11 @@ class Criterion(json.JSONObject):
 
     def __init__(self, left=None, operator=None, right=None):
         json.JSONObject.__init__(self)
+
+        # Normalize equality test
+        if operator == "=":
+            operator = "=="
+
         self._init(left, operator, right)
 
     def get_paths(self):
@@ -315,26 +316,30 @@ class Criterion(json.JSONObject):
 
         return res
 
-    def _resolve(self, type):
-        tpl = [self.left, self.right]
+    def _compile(self, base):
+        if not self.left:
+            return copy.copy(self)
+
+        if self.operator in ("&&", "||"):
+            return Criterion(self.left._compile(base), self.operator, self.right._compile(base))
+
+        tpl = [base.format_path(self.left), self.right]
         list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE_WRITE", tpl))
-        self.right = tpl[1]
 
-        if not type:
-            return " ".join(text_type(i) for i in [self.left, self.operator, self.right])
-
-        return env.dataprovider._type_handlers[type].parse_criterion(self.left, self.operator, self.right, type)
+        return base.compile_criterion(Criterion(tpl[0], self.operator, tpl[1]))
 
     def to_string(self, type=None):
         if not self.left:
             return ""
 
         if self.operator in ("&&", "||"):
-            out = "(" + " ".join((self.left.to_string(type), self.operator, self.right.to_string(type))) + ")"
-        else:
-            out = self._resolve(type)
+            return "(" + " ".join((self.left.to_string(type), self.operator, self.right.to_string(type))) + ")"
 
-        return out
+        if not type:
+            return " ".join(text_type(i) for i in [self.left, self.operator, self.right])
+
+        base = env.dataprovider._type_handlers[type]
+        return base.criterion_to_string(base.format_path(self.left), self.operator, self.right)
 
     def to_list(self, type=None):
         if not self.left:
@@ -344,6 +349,15 @@ class Criterion(json.JSONObject):
             return self.left.to_list(type) + self.right.to_list(type)
         else:
             return [self]
+
+    def compile(self, type):
+        self = copy.copy(self)
+
+        for c in filter(None, hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", type)):
+            self += c
+
+        base = env.dataprovider._type_handlers[type]
+        return base.compile_criteria(self._compile(base))
 
     def _apply_self(self, operator, other):
         if not other:
@@ -407,6 +421,7 @@ class DataProviderManager(pluginmanager.PluginManager):
         for k in self.keys():
             try:
                 p = self[k]()
+                p.dataprovider_type = k
             except error.PrewikkaUserError as err:
                 env.log.warning("%s: plugin failed to load: %s" % (self[k].__name__, err))
                 continue
@@ -480,32 +495,24 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         if criteria is None:
             criteria = Criterion()
-        else:
-            criteria = copy.copy(criteria)
 
         type = self._check_data_type(type, paths, criteria)
 
         parsed_paths = paths
-        parsed_criteria = None
         paths_types = []
-
-        for c in filter(None, hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", type)):
-            criteria += c
 
         plugin = self._type_handlers[type]
 
-        paths = plugin.format_paths(paths, type)
-        parsed_paths, paths_types = plugin.parse_paths(paths, type)
-        if criteria:
-            parsed_criteria = plugin.parse_criteria(criteria, type)
+        paths = plugin.format_paths(paths)
+        parsed_paths, paths_types = plugin.parse_paths(paths)
 
-        return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, parsed_criteria=parsed_criteria)
+        return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, criteria=criteria.compile(type))
 
     def query(self, paths, criteria=None, distinct=0, limit=-1, offset=0, type=None, **kwargs):
         o = self._normalize(type, paths, criteria)
 
         start = time.time()
-        results = self._backends[o.type].get_values(o.parsed_paths, o.parsed_criteria, distinct, limit, offset, **kwargs)
+        results = self._backends[o.type].get_values(o.parsed_paths, o.criteria, distinct, limit, offset, **kwargs)
         results.duration = time.time() - start
 
         results._paths = o.paths
@@ -521,11 +528,11 @@ class DataProviderManager(pluginmanager.PluginManager):
             raise DataProviderError("Invalid value for parameter 'order_by'")
 
         o = self._normalize(type, criteria=criteria)
-        return self._backends[o.type].get(o.parsed_criteria, order_by, limit, offset)
+        return self._backends[o.type].get(o.criteria, order_by, limit, offset)
 
     def delete(self, criteria=None, paths=None, type=None):
         o = self._normalize(type, paths, criteria)
-        return self._backends[o.type].delete(o.parsed_criteria, o.parsed_paths)
+        return self._backends[o.type].delete(o.criteria, o.parsed_paths)
 
     @staticmethod
     def _resolve_values(paths, values):
@@ -537,12 +544,12 @@ class DataProviderManager(pluginmanager.PluginManager):
     def insert(self, data, criteria=None, type=None):
         paths = data.keys()
         o = self._normalize(type, paths, criteria)
-        return self._backends[o.type].insert(self._resolve_values(o.parsed_paths, data.values()), o.parsed_criteria)
+        return self._backends[o.type].insert(self._resolve_values(o.parsed_paths, data.values()), o.criteria)
 
     def update(self, data, criteria=None, type=None):
         paths = data.keys()
         o = self._normalize(type, paths, criteria)
-        return self._backends[o.type].update(self._resolve_values(o.parsed_paths, data.values()), o.parsed_criteria)
+        return self._backends[o.type].update(self._resolve_values(o.parsed_paths, data.values()), o.criteria)
 
     def get_types(self):
         return self._backends.keys()
