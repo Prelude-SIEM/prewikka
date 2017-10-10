@@ -5,8 +5,8 @@ function JSONRegistry() {
 
     ret._prototypes = {};
 
-    ret["register"] = function(proto) {
-        ret._prototypes[proto.name] = proto;
+    ret["register"] = function(name, proto) {
+        ret._prototypes[name] = proto;
     }
 
     return ret;

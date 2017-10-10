@@ -397,7 +397,7 @@ function HTMLNode(obj) {
     return ret;
 }
 
-window.json_registry.register(HTMLNode);
+window.json_registry.register("HTMLNode", HTMLNode);
 
 
 function Criterion(left, operator, right) {
@@ -408,10 +408,10 @@ function Criterion(left, operator, right) {
     };
 
     ret.toJSON = function() {
-        if ( typeof(left) == "object" )
+        if ( left && typeof(left) == "object" )
             left = left.toJSON();
 
-        if ( typeof(right) == "object" )
+        if ( right && typeof(right) == "object" )
             right = right.toJSON();
 
         return {
@@ -422,7 +422,9 @@ function Criterion(left, operator, right) {
     return ret;
 }
 
-window.json_registry.register(Criterion);
+window.json_registry.register("Criterion", function(obj) {
+    return Criterion(obj.left, obj.operator, obj.right);
+});
 
 
 function DatetimePicker(input, date, options)
