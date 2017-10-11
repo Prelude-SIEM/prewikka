@@ -26,14 +26,11 @@ $(".sortable_${ field }").on("click", function() {
 
 <%block name="messagelisting_scripts">
 
-<script type="text/javascript">
-<!--
+<script type="text/javascript" src="messagelisting/js/alertlisting.js"></script>
 
-/*
- * FIXME: move this to a pre-compiled JS file.
- */
-if ( window._messagelisting_title_array == undefined ) {
-    window._messagelisting_title_array = {
+<script type="text/javascript">
+
+var operators = {
         "!": "${ _("Not defined") }",
         "=": "${ _("Equal") }",
         "!=": "${ _("Not equal") }",
@@ -45,64 +42,64 @@ if ( window._messagelisting_title_array == undefined ) {
         "<>*": "${ _("Substring (case-insensitive)") }",
         "~": "${ _("Regular expression") }",
         "~*": "${ _("Regular expression (case-insensitive)") }"
-    };
-    window._messagelisting_operator_array = Array();
-    window._messagelisting_value_array = Array();
-}
+};
 
-$LAB.script("messagelisting/js/alertlisting.js").wait(function() {
-        var stateArray = [ "default", "saved", "current" ];
-        var saved_forms = Array();
-        var columns_data = ${ html.escapejs(columns_data) };
+var stateArray = [ "default", "saved", "current" ];
+var saved_forms = Array();
+var columns_data = ${ html.escapejs(columns_data) };
 
-        var saved_state = columns_data["column_names"];
-        $(saved_state).each(function() {
-                saved_forms[this] = [ "default", "saved", "current" ];
-        });
-
-        var messagelisting = MessageListing();
-
-        var stateText = {"null":"${ _("Reset to null") }", "default":"${ _("Reset to default") }", "saved":"${ _("Reset to saved") }", "current":"${ _("Reset to current") }"}
-
-        $(saved_state).each(function(idx, type) {
-                $(stateArray).each(function(idx, state) {
-                        messagelisting.set(type, state, columns_data);
-                        saved_forms[type][state] = messagelisting._cloneForm($("#" + type + " :input"));
-                });
-
-                var form = $("#" + type + " :input");
-                saved_forms[type]["current"] = messagelisting._cloneForm(form);
-
-                if ( messagelisting._equals(saved_forms[type]["default"], saved_forms[type]["saved"]) )
-                        saved_forms[type]["saved"] = null;
-
-                if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["default"]) )
-                        saved_forms[type]["current"] = null;
-
-                if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["saved"]) )
-                        saved_forms[type]["current"] = null;
-
-                ## Set the current state
-                $(stateArray).each(function(idx, state) {
-                        if ( messagelisting._equals(form, saved_forms[type][state]) )
-                                saved_state[type] = state;
-                });
-
-                $("#" + type + " input.reset_filter").val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
-        });
-
-
-        $("input.reset_filter").click(function() {
-                var type = $(this).closest(".filter_popup").find("div").prop("id");
-
-                saved_state[type] = messagelisting.get_next_state(saved_forms, type, saved_state[type]);
-
-                messagelisting.set(type, saved_state[type], columns_data);
-                $(this).val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
-        });
+var saved_state = columns_data["column_names"];
+$(saved_state).each(function() {
+        saved_forms[this] = [ "default", "saved", "current" ];
 });
 
-//--></script>
+var messagelisting = new MessageListing(operators);
+
+var stateText = {
+        "null": "${ _("Reset to null") }",
+        "default": "${ _("Reset to default") }",
+        "saved": "${ _("Reset to saved") }",
+        "current": "${ _("Reset to current") }"
+};
+
+$(saved_state).each(function(idx, type) {
+        $(stateArray).each(function(idx, state) {
+                messagelisting.set(type, state, columns_data);
+                saved_forms[type][state] = messagelisting._cloneForm($("#" + type + " :input"));
+        });
+
+        var form = $("#" + type + " :input");
+        saved_forms[type]["current"] = messagelisting._cloneForm(form);
+
+        if ( messagelisting._equals(saved_forms[type]["default"], saved_forms[type]["saved"]) )
+                saved_forms[type]["saved"] = null;
+
+        if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["default"]) )
+                saved_forms[type]["current"] = null;
+
+        if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["saved"]) )
+                saved_forms[type]["current"] = null;
+
+        ## Set the current state
+        $(stateArray).each(function(idx, state) {
+                if ( messagelisting._equals(form, saved_forms[type][state]) )
+                        saved_state[type] = state;
+        });
+
+        $("#" + type + " input.reset_filter").val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
+});
+
+
+$("input.reset_filter").click(function() {
+        var type = $(this).closest(".filter_popup").find("div").prop("id");
+
+        saved_state[type] = messagelisting.get_next_state(saved_forms, type, saved_state[type]);
+
+        messagelisting.set(type, saved_state[type], columns_data);
+        $(this).val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
+});
+
+</script>
 </%block>
 
 <%def name="define_inline_filter_options(rootcl, preselect, depth)">
@@ -126,10 +123,10 @@ $LAB.script("messagelisting/js/alertlisting.js").wait(function() {
            % if is_enum or oplist:
            <script type="text/javascript">
             % if is_enum:
-            window._messagelisting_value_array["${ rootcl.getPath() }"] = ${ html.escapejs(list(rootcl.getEnumValues())) };
+            messagelisting.value_array["${ rootcl.getPath() }"] = ${ html.escapejs(list(rootcl.getEnumValues())) };
             % endif
             % if oplist:
-            window._messagelisting_operator_array["${ rootcl.getPath() }"] = ${ html.escapejs(oplist) };
+            messagelisting.operator_array["${ rootcl.getPath() }"] = ${ html.escapejs(oplist) };
             % endif
            </script>
            % endif

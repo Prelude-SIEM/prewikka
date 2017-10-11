@@ -1,8 +1,12 @@
-var global_id = 0;
+function MessageListing(operators) {
 
-function _MessageListing() {
+        var that = this;
+        this.global_id = 0;
+        this.title_array = operators;
+        this.value_array = Array();
+        this.operator_array = Array();
 
-     this.set = function(type, state, columns_data) {
+        this.set = function(type, state, columns_data) {
                 if ( state == "default" )
                         return this.setDefault(type, columns_data);
 
@@ -199,8 +203,8 @@ function _MessageListing() {
                 $(varray).each(function() {
                         var option = $("<option>").attr("value", this).text(this);
 
-                        if ( _messagelisting_title_array[this] )
-                                option.attr("title", _messagelisting_title_array[this]);
+                        if ( that.title_array[this] )
+                                option.attr("title", that.title_array[this]);
 
                         select.append(option);
                 });
@@ -208,113 +212,105 @@ function _MessageListing() {
                 select.val(selected);
                 return select;
         };
+
+
+        $("#main").on("click", ".remove_entry", function() {
+                $(this).parent().parent().remove();
+        });
+
+        $("#main").on("click", ".append_entry", function() {
+                var tr = that._cloneForm($(this).parent().parent());
+                var select = $(tr).children("td.td_container_path").children();
+                var div_id = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().prop("id");
+
+                if ( $(this).parent().parent().parent().parent().is("table.aggregation_table") )
+                        $(select).prop("name", "aggregated_" + div_id);
+
+                else {
+                        that.global_id += 1;
+
+                        var input = $(tr).children("td.td_container_value").children();
+                        $(tr).children("td.td_container_operator").children().prop("name", div_id + "_operator_" + that.global_id);
+                        $(input).prop("name", div_id + "_value_" + that.global_id);
+                        $(input).prop("value", "");
+                        $(input).find("option[value='none']").prop("selected", true);
+                        $(select).prop("name", div_id + "_object_" + that.global_id);
+                }
+
+                $(this).parents(".inline_filter").after(tr);
+                $(select).trigger("change");
+                $(tr).children("td.td_container_remove").html("<a class=\"remove_entry fa fa-minus\"></a>");
+        });
+
+        $("#main").on("change", ".popup_select_field", function() {
+                var td = $(this).parent();
+                var str = $(this, "> option:selected").prop("value");
+                var input = $(td).siblings(".td_container_value").children();
+
+                // do not use visible here, this is called before the parent element is visible
+                var advanced_mode = $(this).css("display") != "none";
+
+                if ( that.operator_array[str] && advanced_mode ) {
+                        var old_select = $(td).siblings(".td_container_operator").children();
+                        var old_value = $(old_select).children(":selected").prop("value");
+
+                        var select = that.createSelectFromArray(that.operator_array[str], "popup_operator_select form-control input-sm", $(old_select).prop("name"), old_value);
+                        $(old_select).replaceWith(select);
+                }
+
+                if ( that.value_array[str] && advanced_mode ) {
+                        var select = that.createSelectFromArray(that.value_array[str], "popup_input_field form-control input-sm", $(input).prop("name"), $(input).prop("value"));
+                        $(input).replaceWith(select);
+                }
+
+                else {
+                        var n = $("<input>", {
+                                type: "text",
+                                name: $(input).prop("name"),
+                                class: "popup_input_field form-control input-sm"
+                        });
+
+                        if ( $(input).prop("type") != "select-one" )
+                                n.attr("value", $(input).prop("value"));
+
+                        if ( old_value == '!' )
+                                n.attr("disabled", "disabled");
+
+                        $(input).replaceWith(n);
+                }
+        });
+
+        $("#main").on("click", ".expert_mode", function() {
+                var tr = $(this).parent().parent();
+                var td_container_path = $(tr).children(".td_container_path");
+                var td_container_operator = $(tr).children(".td_container_operator");
+
+                if ( ! $(td_container_path).children().is(":visible") ) {
+                        $(this).text("simple");
+                        $(this).parent().parent().children(".td_container_operator").children().show()
+                        $(td_container_path).children("select").show()
+                        $(td_container_path).children("input").prop("disabled", true)
+                        $(td_container_path).children("select").prop("disabled", false)
+                        $(td_container_operator).children("select").prop("disabled", false);
+                } else {
+                        $(this).text("advanced");
+                        $(td_container_path).children().hide()
+                        $(this).parent().parent().children(".td_container_operator").children().hide()
+                        $(td_container_path).children("input").prop("disabled", false)
+                        $(td_container_path).children("select").prop("disabled", true)
+                        $(td_container_operator).children("select").prop("disabled", true);
+                }
+
+                // This is required so that the input is changed (from/to enum) when required.
+                $(td_container_path).children("select").trigger("change");
+        });
+
+        $("#main").on("change", ".popup_operator_select", function() {
+                var str = $(this, "> option:selected").prop("value");
+                if ( str == "!" )
+                        $(this).parent().next().children(".popup_input_field").prop("disabled", true);
+                else
+                        $(this).parent().next().children(".popup_input_field").prop("disabled", false);
+        });
+
 }
-
-
-function MessageListing() {
-        if ( ! window._messagelisting )
-                window._messagelisting = new _MessageListing();
-
-        return window._messagelisting;
-}
-
-
- $(document).on("click", ".remove_entry", function() {
-        $(this).parent().parent().remove();
- });
-
- $(document).on("click", ".append_entry", function() {
-   var tr = _messagelisting._cloneForm($(this).parent().parent());
-   var select = $(tr).children("td.td_container_path").children();
-   var div_id = $(this).parent().parent().parent().parent().parent().parent().parent().parent().parent().prop("id");
-
-   if ( $(this).parent().parent().parent().parent().is("table.aggregation_table") )
-        $(select).prop("name", "aggregated_" + div_id);
-
-   else {
-        global_id += 1;
-
-        var input = $(tr).children("td.td_container_value").children();
-        $(tr).children("td.td_container_operator").children().prop("name", div_id + "_operator_" + global_id);
-        $(input).prop("name", div_id + "_value_" + global_id);
-        $(input).prop("value", "");
-        $(input).find("option[value='none']").prop("selected", true);
-        $(select).prop("name", div_id + "_object_" + global_id);
-   }
-
-   $(this).parents(".inline_filter").after(tr);
-   $(select).trigger("change");
-   $(tr).children("td.td_container_remove").html("<a class=\"remove_entry fa fa-minus\"></a>");
- });
-
-  $(document).on("change", ".popup_select_field", function() {
-          var td = $(this).parent();
-          var str = $(this, "> option:selected").prop("value");
-          var input = $(td).siblings(".td_container_value").children();
-
-          // do not use visible here, this is called before the parent element is visible
-          var advanced_mode = $(this).css("display") != "none";
-
-          if ( _messagelisting_operator_array[str] && advanced_mode ) {
-                var old_select = $(td).siblings(".td_container_operator").children();
-                var old_value = $(old_select).children(":selected").prop("value");
-
-                select = _messagelisting.createSelectFromArray(_messagelisting_operator_array[str], "popup_operator_select form-control input-sm", $(old_select).prop("name"), old_value);
-                $(old_select).replaceWith(select);
-          }
-
-          if ( _messagelisting_value_array[str] && advanced_mode ) {
-                  select = _messagelisting.createSelectFromArray(_messagelisting_value_array[str], "popup_input_field form-control input-sm", $(input).prop("name"), $(input).prop("value"));
-                  $(input).replaceWith(select);
-          }
-
-          else {
-                var n = $("<input>", {
-                    type: "text",
-                    name: $(input).prop("name"),
-                    class: "popup_input_field form-control input-sm"
-                });
-
-                if ( $(input).prop("type") != "select-one" )
-                        n.attr("value", $(input).prop("value"));
-
-                if ( old_value == '!' )
-                        n.attr("disabled", "disabled");
-
-                $(input).replaceWith(n);
-          }
- });
-
-
- $(document).on("click", ".expert_mode", function() {
-        var tr = $(this).parent().parent();
-        var td_container_path = $(tr).children(".td_container_path");
-        var td_container_operator = $(tr).children(".td_container_operator");
-
-        if ( ! $(td_container_path).children().is(":visible") ) {
-                $(this).text("simple");
-                $(this).parent().parent().children(".td_container_operator").children().show()
-                $(td_container_path).children("select").show()
-                $(td_container_path).children("input").prop("disabled", true)
-                $(td_container_path).children("select").prop("disabled", false)
-                $(td_container_operator).children("select").prop("disabled", false);
-        } else {
-                $(this).text("advanced");
-                $(td_container_path).children().hide()
-                $(this).parent().parent().children(".td_container_operator").children().hide()
-                $(td_container_path).children("input").prop("disabled", false)
-                $(td_container_path).children("select").prop("disabled", true)
-                $(td_container_operator).children("select").prop("disabled", true);
-        }
-
-        // This is required so that the input is changed (from/to enum) when required.
-        $(td_container_path).children("select").trigger("change");
-});
-
-$(document).on("change", ".popup_operator_select", function() {
-        var str = $(this, "> option:selected").prop("value");
-        if ( str == "!" )
-                $(this).parent().next().children(".popup_input_field").prop("disabled", true);
-        else
-                $(this).parent().next().children(".popup_input_field").prop("disabled", false);
-});
