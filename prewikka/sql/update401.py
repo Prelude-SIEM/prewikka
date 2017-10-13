@@ -1,5 +1,4 @@
 import json
-import pkg_resources
 
 from prewikka.database import SQLScript
 
@@ -16,8 +15,6 @@ class SQLUpdate(SQLScript):
 
         self.query("""
 DROP TABLE IF EXISTS Prewikka_User_Configuration;
-
-DROP TABLE IF EXISTS Prewikka_User_Configuration;
 CREATE TABLE Prewikka_User_Configuration (
     userid VARCHAR(255) NOT NULL,
     config TEXT NULL,
@@ -25,5 +22,6 @@ CREATE TABLE Prewikka_User_Configuration (
 ) ENGINE=InnoDB;
         """)
 
-        self.db.query("INSERT INTO Prewikka_User_Configuration (userid, config) "
-                      "VALUES %s", [(key, json.dumps(value)) for key, value in all_values.items()])
+        if all_values:
+            self.db.query("INSERT INTO Prewikka_User_Configuration (userid, config) "
+                          "VALUES %s", [(key, json.dumps(value)) for key, value in all_values.items()])
