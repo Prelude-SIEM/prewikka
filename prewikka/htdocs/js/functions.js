@@ -380,13 +380,18 @@ function HTMLNode(obj) {
     var inner = "";
 
     $.each(obj.childs, function(i, child) {
-        inner += child.toHTML ? child.toHTML() : _.escape(child);
+        inner += (child && child.toHTML) ? child.toHTML() : _.escape(child);
     });
 
-    var element = $("<" + obj.tag + ">", obj.attrs).html(inner);
+    var element;
+
+    if ( obj.tag )
+        element = $("<div>").append($("<" + obj.tag + ">", obj.attrs).html(inner));
+    else
+        element = $("<div>").html(inner);
 
     ret.toHTML = function() {
-        return element.wrap("<div>").parent().html();
+        return element.html();
     };
 
     ret.toString = function() {

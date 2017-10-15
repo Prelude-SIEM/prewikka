@@ -111,6 +111,17 @@ class HTMLNode(json.JSONObject):
 
         return HTMLSource("<%s%s>%s</%s>" % (self.tag, attr_s, childs, self.tag))
 
+    def join(self, l):
+        ret = HTMLNode("")
+
+        for i, elem in enumerate(l):
+            if i > 0:
+                ret += self
+
+            ret += elem
+
+        return ret
+
     def __json__(self):
         return {"tag": self.tag, "childs": self.childs, "attrs": self.attrs}
 
