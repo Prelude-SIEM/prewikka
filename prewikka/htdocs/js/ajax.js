@@ -258,3 +258,29 @@ function prewikka_EventSource(config)
 
     return jsonStream;
 }
+
+
+
+function _update_parameters(data, location, method)
+{
+    if ( ! location )
+        location = prewikka_location().href;
+
+    return prewikka_ajax({ method: method,
+             url: location + "/ajax_parameters_update",
+             spinner: false,
+             data: data
+    });
+}
+
+
+function prewikka_update_parameters(data, location)
+{
+    return _update_parameters(data, location, "PATCH");
+}
+
+
+function prewikka_save_parameters(data, location)
+{
+    return _update_parameters(data, location, "PUT");
+}

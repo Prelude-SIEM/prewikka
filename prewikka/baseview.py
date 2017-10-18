@@ -23,7 +23,7 @@ import base64
 import collections
 import string
 
-from prewikka import error, history, hookmanager, resource, response, template, utils, view
+from prewikka import error, history, hookmanager, resource, response, template, utils, view, usergroup
 
 
 CSS_FILES = (
@@ -50,9 +50,21 @@ JS_FILES = (
 )
 
 
+_BASEVIEW_TEMPLATE = template.PrewikkaTemplate(__name__, 'templates/baseview.mak')
+
+
 class BaseView(view._View):
     view_layout = None
-    view_template = template.PrewikkaTemplate(__name__, 'templates/baseview.mak')
+
+    @view.route("/<path:path>/ajax_parameters_update", methods=["PUT", "PATCH"])
+    def ajax_parameters_update(self, path):
+        view = env.viewmanager.getViewByPath(path)
+        if not view.check_permissions(env.request.user):
+            raise usergroup.PermissionDeniedError(view.view_permissions, path)
+
+        view.process_parameters()
+
+        return response.PrewikkaDirectResponse(code=204)
 
     @view.route("/download/<int:id>/<filename>")
     @view.route("/download/<int:id>/<filename>/inline", defaults={"inline": True})
@@ -142,6 +154,14 @@ class BaseView(view._View):
         for contents in filter(None, hookmanager.trigger("HOOK_LOAD_BODY_CONTENT")):
             _BODY.update((i, True) for i in contents)
 
-        env.request.dataset["document"].head_content = _HEAD
-        env.request.dataset["document"].body_content = _BODY
-        env.request.dataset["toplayout_extra_content"] = filter(None, hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT"))
+        if env.request.dataset:  # In case of error, we use the exception dataset
+            dataset = env.request.dataset
+        else:
+            dataset = _BASEVIEW_TEMPLATE.dataset()
+
+        self._setup_dataset_default(dataset)
+        dataset["document"].head_content = _HEAD
+        dataset["document"].body_content = _BODY
+        dataset["toplayout_extra_content"] = filter(None, hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT"))
+
+        return dataset.render()

@@ -189,7 +189,8 @@ class Parameters(dict):
     @_user_properties_change
     def normalize(self, view, user):
         do_load = True
-        do_save = "_save" in self
+        do_update = env.request.web.method == "PATCH"
+        do_save = env.request.web.method in ("POST", "PUT", "PATCH")
 
         for name, value in self.items():
             param = self._parameters.get(name)
@@ -215,7 +216,6 @@ class Parameters(dict):
 
         for name in set(self._parameters.keys()) - set(self.keys()):
             param = self._parameters[name]
-
             if param.mandatory:
                 raise MissingParameterError(name)
 
@@ -230,21 +230,20 @@ class Parameters(dict):
             else:
                 save_view = view
 
-            if do_save:
+            if not(param.general) and do_save and not do_update:
                 user.del_property(name, view=save_view)
-            else:
-                if name not in user.configuration.get(save_view, {}):
-                    continue
 
-                value = param.parse(user.get_property(name, view=save_view))
-                self._default[name] = value
-                if do_load:
-                    self[name] = value
+            if name not in user.configuration.get(save_view, {}):
+                continue
+
+            value = user.get_property(name, view=save_view)
+            self._default[name] = value
+            if do_load:
+                self[name] = value
 
         # In case the view was dynamically added through HOOK_VIEW_LOAD, the hook isn't available
         list(hookmanager.trigger("HOOK_%s_PARAMETERS_NORMALIZE" % view.upper(), self))
 
-        self.pop("_save", None)
         return do_load
 
     def handleLists(self):
@@ -389,16 +388,13 @@ class _ViewDescriptor(object):
         self.view_users = set(self.view_users)
         self.view_groups = set(self.view_groups)
 
-    def _setup_dataset_default(self):
-        env.request.dataset["document"] = utils.AttrObj()
-        env.request.dataset["document"].base_url = utils.iri2uri(env.request.web.get_baseurl())
-        env.request.dataset["document"].href = utils.iri2uri(env.request.web.get_uri())
+    def _setup_dataset_default(self, dataset):
+        dataset["document"] = utils.AttrObj()
+        dataset["document"].base_url = utils.iri2uri(env.request.web.get_baseurl())
+        dataset["document"].href = utils.iri2uri(env.request.web.get_uri())
 
     def _render(self, dataset):
-        env.request.parameters = {}
-        if self.view_parameters:
-            env.request.parameters = self.view_parameters(self, env.request.web.arguments)
-            env.request.parameters.process(self.view_id)
+        self.process_parameters()
 
         if self.view_template and dataset is None:
             env.request.dataset = self.view_template.dataset()
@@ -406,13 +402,19 @@ class _ViewDescriptor(object):
             env.request.dataset = dataset
 
         if env.request.dataset is not None:
-            self._setup_dataset_default()
+            self._setup_dataset_default(env.request.dataset)
 
         for name, classobj in self.view_extensions:
             obj = classobj()
             setattr(env.request, name, obj)
 
         return env.request.dataset
+
+    def process_parameters(self):
+        env.request.parameters = {}
+        if self.view_parameters:
+            env.request.parameters = self.view_parameters(self, env.request.web.arguments)
+            env.request.parameters.process(self.view_id)
 
     def respond(self, dataset=None, code=None):
         env.log.info("Loading view %s, endpoint %s" % (self.__class__.__name__, self.view_endpoint))
@@ -516,20 +518,26 @@ class ViewManager(registrar.DelayedRegistrar):
     def getView(self, view_id):
         return self._views.get(view_id.lower())
 
-    def loadView(self, request, userl):
-        view = view_kwargs = view_layout = None
-
+    def _getViewByPath(self, path, method=None):
         try:
-            rule, view_kwargs = env.request.url_adapter.match(request.path, method=request.method, return_rule=True)
-            view = self._views_rules[rule]
+            rule, view_kwargs = env.request.url_adapter.match(path, method=method, return_rule=True)
 
         except werkzeug.exceptions.MethodNotAllowed:
             raise InvalidMethodError(N_("Method '%(method)s' is not allowed for view '%(view)s'",
-                                        {"method": request.method, "view": request.path}))
+                                        {"method": method, "view": path}))
 
         except werkzeug.exceptions.NotFound:
-            raise InvalidViewError(N_("View '%s' does not exist", request.path))
+            raise InvalidViewError(N_("View '%s' does not exist", path))
 
+        return self._views_rules[rule], view_kwargs
+
+    def getViewByPath(self, path, method=None):
+        return self._getViewByPath(path, method)[0]
+
+    def loadView(self, request, userl):
+        view_layout = None
+
+        view, view_kwargs = self._getViewByPath(request.path, method=request.method)
         if view:
             view_layout = view.view_layout
 

@@ -73,7 +73,7 @@ class WSGIRequest(request.Request):
 
         request.Request.__init__(self, self._wsgi_get_unicode("PATH_INFO"))
 
-        if self.method != 'POST':
+        if self.method not in ('POST', 'PUT', 'PATCH'):
             qs = self._wsgi_get_str("QUERY_STRING")
         else:
             qs = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
