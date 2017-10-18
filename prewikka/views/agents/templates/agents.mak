@@ -49,7 +49,7 @@ from prewikka.utils import html, json
             groupOrder: ['asc', 'asc'],
             groupSummary: [false, false]
         }
-    });
+    }, ${html.escapejs(env.request.parameters["jqgrid_params_agents"])});
 
     $(".global_toggle").on("click", function() {
         if ( $("#agents .fa-plus-square-o").length > 0 ) {

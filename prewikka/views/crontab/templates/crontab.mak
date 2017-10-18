@@ -38,7 +38,7 @@ from prewikka.utils import html, json
             if ( cl )
                 return { "class": cl };
         }
-    }).done(function() {
+    }, ${html.escapejs(env.request.parameters["jqgrid_params_cronjobs"])}).done(function() {
         $('[data-toggle="popover"]').popover();
     });
 

@@ -109,8 +109,14 @@ class FilterDatabase(database.DatabaseHelper):
         return rows
 
 
+class FilterParameters(view.Parameters):
+    def register(self):
+        self.optional("jqgrid_params_filters", json.loads, {}, save=True)
+
+
 class FilterView(FilterPlugin, view.View):
     view_permissions = [N_("IDMEF_VIEW")]
+    view_parameters = FilterParameters
     plugin_htdocs = (("filter", pkg_resources.resource_filename(__name__, 'htdocs')),)
     _filter_menu_tmpl = template.PrewikkaTemplate(__name__, "templates/menu.mak")
 

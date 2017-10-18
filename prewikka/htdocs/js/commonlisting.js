@@ -1,6 +1,6 @@
 "use strict";
 
-function CommonListing(elem, text, options) {
+function CommonListing(elem, text, options, restored_parameters) {
     var dfd = $.Deferred();
 
     function genericFormatter(value, opts, rowObj) {
@@ -8,6 +8,26 @@ function CommonListing(elem, text, options) {
             return value.toHTML ? value.toHTML() : _.escape(value);
         else
             return "";
+    }
+
+    function adaptColumns(options, saved_data) {
+        var colModel = [];
+        var columns = {};
+        $.each(options.colModel, function(i, col) {
+            columns[col.name] = col;
+        });
+
+        $.each(saved_data, function(i, col) {
+            if ( col.name in columns ) {
+                colModel.push($.extend(columns[col.name], col));
+                delete columns[col.name];
+            }
+        });
+        $.each(columns, function(name, col) {
+            colModel.push(col);
+        });
+
+        options.colModel = colModel;
     }
 
     $(elem).addClass("commonlisting table table-striped");
@@ -33,20 +53,24 @@ function CommonListing(elem, text, options) {
             update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
             dfd.resolve();
         },
-
         onSelectAll: function (rowsids, status) {
             if ( status )
                 $(elem + " tr.nocheck > td > input.cbox").prop("checked", false);
 
             update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
         },
-
         onSelectRow: function() {
             update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
+        },
+        resizeStop: function() {
+            saveGridColumns($(this));
         },
         loadComplete: resizeGrid,
         loadError: null  // This prevents an error row to appear in the grid
     }, options);
+
+    if ( restored_parameters )
+        adaptColumns(options, restored_parameters);
 
     function update_buttons_state(rows_count) {
         if ( rows_count == 0 ) {
@@ -89,6 +113,7 @@ function CommonListing(elem, text, options) {
                     if (perm) {
                         $(elem).jqGrid("remapColumns", perm, true);
                         resizeGrid();
+                        saveGridColumns($(elem));
                     }
                 }
             });
@@ -248,4 +273,23 @@ function disableButtons(elem, title) {
 
 function enableButtons(elem, title) {
     $(elem).prop("disabled", false).prop("title", "");
+}
+
+function saveGridColumns(grid) {
+    var columns = [];
+    var colModel = grid.jqGrid("getGridParam", "colModel");
+
+    $.each(colModel, function(i, col) {
+        // Ignore dynamically-added columns
+        if ( ! col.hidedlg )
+            columns.push({
+                name: col.name,
+                width: col.width,
+                hidden: col.hidden
+            });
+    });
+
+    prewikka_update_parameters({
+        ["jqgrid_params_" + grid.attr("id")]: JSON.stringify(columns)
+    });
 }

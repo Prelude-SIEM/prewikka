@@ -32,7 +32,7 @@ $LAB.wait(function() {
             {name: 'description', label: "${_('Description')}", width: 50, sortable: false}
         ],
         data: ${html.escapejs(data)}
-    });
+    }, ${html.escapejs(env.request.parameters["jqgrid_params_filters"])});
 
 });
 

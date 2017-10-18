@@ -26,8 +26,14 @@ from prewikka import hookmanager, localization, mainmenu, resource, template, ut
 from prewikka.dataprovider import Criterion
 
 
+class AgentsParameters(mainmenu.MainMenuParameters):
+    def register(self):
+        mainmenu.MainMenuParameters.register(self)
+        self.optional("jqgrid_params_agents", utils.json.loads, {}, save=True)
+
+
 class Agents(view.View):
-    view_parameters = mainmenu.MainMenuParameters
+    view_parameters = AgentsParameters
     view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
