@@ -385,7 +385,7 @@ function prewikka_autocomplete(field, url, submit, allow_empty=false) {
 function HTMLNode(obj) {
     var inner = "";
     $.each(obj.childs, function(i, child) {
-        inner += child.toHTML ? child.toHTML() : _.escape(child);
+        inner += child && child.toHTML ? child.toHTML() : _.escape(child);
     });
 
     this.element = $("<" + obj.tag + ">", obj.attrs).html(inner);
