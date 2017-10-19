@@ -1,3 +1,21 @@
+* 2017-10-19, prewikka-4.1.2:
+
+Author: Antoine Luong
+
+- Avoid error when HTMLNode has a null child
+- Hide dropdown menus when scrolling in a modal
+- Add canHandleGroups method
+
+Author: Camille Gardet
+
+- Fix the SQL mapping of the queries history
+
+Author: Yoann Vandoorselaere
+
+- Rework user configuration storage
+
+
+
 * 2017-08-01, prewikka-4.1.1:
 
 Author: Antoine Luong
