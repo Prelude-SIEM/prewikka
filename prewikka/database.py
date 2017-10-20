@@ -325,7 +325,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
                 continue
 
             version = pkg_resources.parse_version(mod.version)
-            if (not from_version or (version >= from_version)) and (not to_version or (version <= to_version)):
+            if (not from_version or (version > from_version)) and (not to_version or (version <= to_version)):
                     yield mod
 
 
