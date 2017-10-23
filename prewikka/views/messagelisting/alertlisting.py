@@ -30,7 +30,6 @@ import prelude
 
 from prewikka import crontab, hookmanager, localization, mainmenu, resource, template, utils, view
 from prewikka.dataprovider import Criterion
-from prewikka.utils import json
 
 from .messagelisting import AttrDict, ListedMessage, MessageListing, MessageListingParameters
 
@@ -614,7 +613,7 @@ class ListedAlert(ListedMessage):
     def setMessage(self, message, ident, extra_link=True):
         self["infos"] = [AttrDict()]
         self["aggregated"] = False
-        self["selection"] = json.dumps(Criterion("alert.messageid", "=", ident))
+        self["selection"] = Criterion("alert.messageid", "=", ident)
 
         self.addSensor(message)
         self._setMessageTime(message)
@@ -699,7 +698,7 @@ class ListedAggregatedAlert(ListedAlert):
         self["time_max"] = self.createTimeField(time_max)
 
     def setCriteriaForSelection(self, select_criteria):
-        self["selection"] = json.dumps(select_criteria)
+        self["selection"] = select_criteria
 
     def setInfos(self, count, classification, severity, completion):
         infos = AttrDict(
@@ -746,7 +745,7 @@ class AlertListing(MessageListing):
         msg = self.listed_alert(self.view_path, env.request.parameters)
         msg.setMessage(message, ident)
         msg["aggregated"] = False
-        msg["selection"] = json.dumps(Criterion("alert.messageid", "=", ident))
+        msg["selection"] = Criterion("alert.messageid", "=", ident)
 
         return msg
 

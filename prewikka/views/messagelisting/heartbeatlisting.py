@@ -23,7 +23,6 @@ import datetime
 
 from prewikka import crontab, localization, mainmenu, template, utils
 from prewikka.dataprovider import Criterion
-from prewikka.utils import json
 
 from .messagelisting import ListedMessage, MessageListing, MessageListingParameters
 
@@ -40,7 +39,7 @@ class HeartbeatListingParameters(MessageListingParameters):
 
 class ListedHeartbeat(ListedMessage):
     def setMessage(self, message, ident):
-        self["selection"] = json.dumps(Criterion("heartbeat.messageid", "=", ident))
+        self["selection"] = Criterion("heartbeat.messageid", "=", ident)
         self["summary"] = url_for("HeartbeatSummary", messageid=ident) if ident else None
         self["agent"] = self.createInlineFilteredField("heartbeat.analyzer(-1).name",
                                                        message["heartbeat.analyzer(-1).name"])
