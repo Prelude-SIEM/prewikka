@@ -167,7 +167,7 @@ class build_custom(Command):
 
 
 setup(name="prewikka",
-      version="4.0.5",
+      version="4.0.6",
       maintainer = "Prelude Team",
       maintainer_email = "support.prelude@c-s.fr",
       url = "http://www.prelude-siem.com",
