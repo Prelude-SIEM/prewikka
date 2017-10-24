@@ -76,7 +76,7 @@ function prewikka_drawTab(data)
      */
     form = $(content).find("form").addBack("form").first();
     if ( ! form.length )
-        form = content = content.wrapAll('<form method="get" action="' + prewikka_location().pathname + '"></form>').parent();
+        form = content = content.wrapAll('<form method="POST" action="' + prewikka_location().pathname + '"></form>').parent();
 
     $(form).prepend(data.menu);
 
