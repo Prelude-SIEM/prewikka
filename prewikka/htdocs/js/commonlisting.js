@@ -214,29 +214,28 @@ function resizeGrid() {
 }
 
 function _resizeGrid(grid) {
-    var titleHeight = $(".ui-jqgrid-titlebar").outerHeight() || 0,
-        headerHeight = $(".ui-jqgrid-hdiv").outerHeight() || 0,
-        pagerHeight = $(".ui-jqgrid-pager").outerHeight() || 0,
-        margin = 5,
-        height = 0,
-        parent = $(grid).closest('.ui-jqgrid').parents('.modal-body, #_main');
+    var titleHeight = $(".ui-jqgrid-titlebar:visible").outerHeight() || 0,
+        headerHeight = $(".ui-jqgrid-hdiv:visible").outerHeight() || 0,
+        pagerHeight = $(".ui-jqgrid-pager:visible").outerHeight() || 0,
+        parent = $(grid).closest('.ui-jqgrid').parents('.modal-body, #main');
 
-    var delta = titleHeight + headerHeight + pagerHeight + margin;
+    var container;
+    var delta = titleHeight + headerHeight + pagerHeight + 10;
 
-    if ( parent.attr('id') == '_main' ) {
-        parent = parent.siblings('#_main_viewport');
-        height = parent.height() - $(grid).closest('.ui-jqgrid').offset().top;
+    if ( parent.attr('id') == 'main' ) {
+        var height = $("#_main_viewport").height() - $(grid).closest('.ui-jqgrid').position().top - delta;
 
         if ( $('.footer-buttons').is(':visible') )
             height = $('.footer-buttons').offset().top - $(grid).closest('.ui-jqgrid').offset().top - delta;
-    }
 
-    if ( height ) {
         $(grid).jqGrid("setGridHeight", height, true);
+        container = $(grid).closest(".container, .container-fluid");
     }
 
-    var newWidth = parent.width() - 2 * margin;
-    $(grid).jqGrid("setGridWidth", newWidth, true);
+    if ( container.length > 0 )
+        parent = container;
+
+    $(grid).jqGrid("setGridWidth", parent.width(), true);
 }
 
 function getCellValue(cellvalue, options, cell) {
