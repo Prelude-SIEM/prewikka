@@ -25,23 +25,18 @@ from prewikka.utils import html, json
 
     var grid = CommonListing('table#agents', text, {
         deleteLink: "${url_for('.delete')}",
-        colNames: ["${ _('Name') }", "${ _('Location') }", "${ _('Node') }", "${ _('Model') }", "${ _('Version') }", "${ _('Class') }",
-                % for column in extra_columns:
-                   "${ column.label }",
-                % endfor
-                   "${ _('Latest heartbeat') }", "${ _('Status') }"],
         colModel: [
-            {name: 'name', width: 15, formatter: nameFormatter},
-            {name: 'location', width: 15},
-            {name: 'label', width: 15},
-            {name: 'model', width: 10, sortable: false},
-            {name: 'version', width: 5, sortable: false},
-            {name: 'class', width: 10, sortable: false},
+            {name: 'name', label: "${ _('Name') }", width: 15, formatter: nameFormatter},
+            {name: 'location', label: "${ _('Location') }", width: 15},
+            {name: 'label', label: "${ _('Node') }", width: 15},
+            {name: 'model', label: "${ _('Model') }", width: 10, sortable: false},
+            {name: 'version', label: "${ _('Version') }", width: 5, sortable: false},
+            {name: 'class', label: "${ _('Class') }", width: 10, sortable: false},
             % for column in extra_columns:
-            {name: '${ column.name }', width: 10, sortable: false},
+            {name: '${ column.name }', label: '${ column.label }', width: 10, sortable: false},
             % endfor
-            {name: 'latest_heartbeat', width: 10, sortable: false},
-            {name: 'status_text', width: 5, sortable: false, align: 'center', classes: 'heartbeat_analyze', cellattr: statusAttr}
+            {name: 'latest_heartbeat', label: "${ _('Latest heartbeat') }", width: 10, sortable: false},
+            {name: 'status_text', label: "${ _('Status') }", width: 5, sortable: false, align: 'center', classes: 'heartbeat_analyze', cellattr: statusAttr}
         ],
         data: ${ html.escapejs(data) },
         globalSearch: true,

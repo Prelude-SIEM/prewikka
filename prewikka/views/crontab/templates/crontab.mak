@@ -13,13 +13,12 @@ from prewikka.utils import html, json
 
     var erridx = 0;
     var grid = CommonListing('table#cronjobs', {'title': "${_('Scheduled Jobs')}" }, {
-        colNames: ["${ _('Name') }", "${ _('Schedule') }", "${ _('User') }", "${ _('Last execution') }", "${ _('Next execution') }" ],
         colModel: [
-            {name: 'name', width: 10},
-            {name: 'schedule', width: 8},
-            {name: 'user', width: 10},
-            {name: 'last', width: 10, search: false, sorttype: function(value, row) {return row.last_date;} },
-            {name: 'next', width: 10, search: false, sorttype: function(value, row) {return row.next_date;} },
+            {name: 'name', label: "${ _('Name') }", width: 10},
+            {name: 'schedule', label: "${ _('Schedule') }", width: 8},
+            {name: 'user', label: "${ _('User') }", width: 10},
+            {name: 'last', label: "${ _('Last execution') }", width: 10, search: false, sorttype: function(value, row) {return row.last_date;} },
+            {name: 'next', label: "${ _('Next execution') }", width: 10, search: false, sorttype: function(value, row) {return row.next_date;} },
         ],
         multiselect: true,
         data: ${ html.escapejs(data) },

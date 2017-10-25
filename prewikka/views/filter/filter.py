@@ -142,7 +142,7 @@ class FilterView(FilterPlugin, view.View):
             data.append(elem)
 
         dataset["data"] = data
-        dataset["col_idents"], dataset["col_names"] = zip(*self._get_types())
+        dataset["columns"] = self._get_types()
 
         return template.PrewikkaTemplate(__name__, "templates/filterlisting.mak").render(**dataset)
 

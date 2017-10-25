@@ -24,13 +24,12 @@ $LAB.wait(function() {
     CommonListing('table#filters', text, {
         editLink: "${url_for('FilterView.edit')}",
         deleteLink: "${url_for('FilterView.delete')}",
-        colNames: ["${_('Name')}"].concat(${html.escapejs(col_names)}).concat(["${_('Description')}"]),
         colModel: [
-            {name: 'name', width: 20},
-            % for typ in col_idents:
-            {name: "${typ}", width: 10, align: "center", formatter: type_formatter},
+            {name: 'name', label: "${_('Name')}", width: 20},
+            % for name, label in columns:
+            {name: "${name}", label: ${html.escapejs(label)}, width: 10, align: "center", formatter: type_formatter},
             % endfor
-            {name: 'description', width: 50, sortable: false}
+            {name: 'description', label: "${_('Description')}", width: 50, sortable: false}
         ],
         data: ${html.escapejs(data)}
     });
