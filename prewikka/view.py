@@ -499,14 +499,15 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
-def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, help=None):
+def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, help=None, parameters=_SENTINEL):
     usergroup.ALL_PERMISSIONS.declare(permissions)
 
     if method is not _SENTINEL:
-        ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype, help=help)
+        ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu,
+                                         defaults=defaults, endpoint=endpoint, datatype=datatype, help=help, parameters=parameters)
     else:
-        ret = registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route,
-                                                        path, methods=methods, permissions=permissions, menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype, help=help)
+        ret = registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route, path, methods=methods, permissions=permissions,
+                                                        menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype, help=help, parameters=parameters)
 
     return ret
 
@@ -556,7 +557,7 @@ class ViewManager(registrar.DelayedRegistrar):
         env.request.view = view
         return view
 
-    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, help=None):
+    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, help=None, parameters=None):
         baseview = method.__self__
 
         v = _ViewDescriptor()
@@ -568,8 +569,12 @@ class ViewManager(registrar.DelayedRegistrar):
         v.view_groups = baseview.view_groups
         v.view_layout = baseview.view_layout
         v.view_extensions = baseview.view_extensions
-        v.view_parameters = baseview.view_parameters
         v.view_require_session = baseview.view_require_session
+
+        if parameters is _SENTINEL:
+            v.view_parameters = baseview.view_parameters
+        else:
+            v.view_parameters = parameters
 
         v.view_help = help or baseview.view_help
         v.view_path = path[1:]
