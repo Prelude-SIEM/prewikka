@@ -32,7 +32,7 @@ _MAINMENU_TEMPLATE = template.PrewikkaTemplate(__name__, "templates/mainmenu.mak
 
 class MainMenuParameters(view.Parameters):
     _INTERNAL_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_absolute",
-                            "order_by", "timezone", "auto_apply_value"]
+                            "auto_apply_value"]
 
     def __init__(self, *args, **kwargs):
         # This will trigger register which in turn call a hook, do last
@@ -46,7 +46,6 @@ class MainMenuParameters(view.Parameters):
         self.optional("timeline_absolute", int, default=0, save=True, general=True)
         self.optional("timeline_end", int, save=True, general=True)
         self.optional("timeline_start", int, save=True, general=True)
-        self.optional("orderby", text_type, "time_desc")
         self.optional("auto_apply_value", int, default=0, save=True, general=True)
 
         for i in hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_REGISTER", self):
@@ -54,9 +53,6 @@ class MainMenuParameters(view.Parameters):
 
     def normalize(self, view_name, user):
         do_load = view.Parameters.normalize(self, view_name, user)
-
-        if self["orderby"] not in ("time_desc", "time_asc", "count_desc", "count_asc"):
-            raise view.InvalidParameterValueError("orderby", self["orderby"])
 
         all(hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_NORMALIZE", self))
         return do_load
@@ -293,7 +289,6 @@ class MainMenu(object):
         return dict(((key, env.request.parameters[key]) for key in env.request.parameters._INTERNAL_PARAMETERS if key in env.request.parameters))
 
     def _render(self):
-        self.dataset["timeline"].order_by = env.request.parameters["orderby"]
         self.dataset["timeline"].value = env.request.parameters["timeline_value"]
         self.dataset["timeline"].unit = env.request.parameters["timeline_unit"]
         self.dataset["timeline"].absolute = env.request.parameters["timeline_absolute"]

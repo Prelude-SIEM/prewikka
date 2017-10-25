@@ -43,6 +43,7 @@ class MessageListingParameters(mainmenu.MainMenuParameters):
         self.optional("selection", [json.loads], Criterion())
         self.optional("listing_apply", text_type)
         self.optional("action", text_type)
+        self.optional("orderby", text_type, default="time_desc")
 
 
 class ListedMessage(AttrDict):
