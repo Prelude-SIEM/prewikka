@@ -1,16 +1,17 @@
 "use strict";
 
 $(function() {
-
-  $(document).ajaxStart(function() {
-        $("#ajax-spinner").show();
-    }).on("ajaxStop", function() {
-        $("#ajax-spinner").hide();
-    }).on("ajaxError", function() {
-        $("#ajax-spinner").hide();
+    $(document).ajaxSend(function(event, xhr, settings) {
+        if ( settings['spinner'] == undefined || settings['spinner'] )
+            $("#ajax-spinner").show();
     });
 
-  $(document).ajaxError(function( event, xhr, settings, error ) {
+    $(document).ajaxComplete(function(event, xhr, settings) {
+        if ( settings['spinner'] == undefined || settings['spinner'] )
+            $("#ajax-spinner").hide();
+    });
+
+    $(document).ajaxError(function( event, xhr, settings, error ) {
        /*
         * If the user aborded the request, this is not an error.
         */
@@ -21,9 +22,9 @@ $(function() {
            prewikka_json_dialog(JSON.parse(xhr.responseText));
        else
            $("#prewikka-dialog-connection-error").modal();
-  });
+    });
 
-  $(window).on('resize', prewikka_resizeTopMenu);
+    $(window).on('resize', prewikka_resizeTopMenu);
 });
 
 
@@ -193,9 +194,6 @@ function prewikka_process_ajax_response(settings, data, xhr)
 
 function prewikka_ajax(settings)
 {
-        if ( settings['spinner'] != undefined && ! settings["spinner"] )
-                settings["global"] = false;
-
         if ( settings['dataType'] == undefined )
                 settings['dataType'] = "json";
 
