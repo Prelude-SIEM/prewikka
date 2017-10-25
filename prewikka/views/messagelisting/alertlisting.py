@@ -218,9 +218,8 @@ class AlertListingParameters(MessageListingParameters):
         return ret
 
     def normalize(self, view_name, user):
-
-        do_save = "_save" in self
-        do_load = MessageListingParameters.normalize(self, view_name, user)
+        MessageListingParameters.normalize(self, view_name, user)
+        do_save = env.request.web.method in ("POST", "PUT", "PATCH")
 
         for severity in self["alert.assessment.impact.severity"]:
             if severity not in ("info", "low", "medium", "high", "n/a"):
@@ -240,7 +239,7 @@ class AlertListingParameters(MessageListingParameters):
             if ret:
                 load_saved = False
 
-        if load_saved and do_load and view_name in user.configuration:
+        if load_saved and view_name in user.configuration:
             for column in "classification", "source", "target", "analyzer":
                 self._loadColumnParam(view_name, user, user.configuration[view_name], column, do_save)
 

@@ -34,7 +34,6 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
 </script>
 
 <div id="${ root_id }">
-  <input type="hidden" name="_save" value="1" />
   <div class="main_menu_navbar${ ' form-inline pull-right' if inline else ''}">
     % for i in menu_extra:
       <div class="form-group main_menu_extra">

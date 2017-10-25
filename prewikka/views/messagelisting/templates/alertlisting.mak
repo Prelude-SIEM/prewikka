@@ -243,7 +243,7 @@ $("input.reset_filter").click(function() {
         <td>&nbsp;</td>
         % for name, path in ((N_("Alert"), "alert.create_time"), (N_("CorrelationAlert"), "alert.correlation_alert.name"), (N_("OverflowAlert"), "alert.overflow_alert.program"), (N_("ToolAlert"), "alert.tool_alert.name")):
         <td>
-          <input id="checkbox-type-${ name }" class="checkbox-label" type="checkbox" name="alert.type" value="${ path }" ${ disabled(correlation_alert_view) }  />
+          <input id="checkbox-type-${ name }" class="checkbox-label" type="checkbox" name="alert.type[]" value="${ path }" ${ disabled(correlation_alert_view) }  />
           <label for="checkbox-type-${ name }" class="btn btn-default btn-xs label-checkbox">${ _(name) }<span class="badge"></span></label>
         </td>
         % endfor
@@ -253,7 +253,7 @@ $("input.reset_filter").click(function() {
         <th>${ _("Severity:") }</th>
         % for item in N_("info"), N_("low"), N_("medium"), N_("high"), N_("n/a"):
         <td>
-          <input id="checkbox-severity-${ item }" class="checkbox-label" type="checkbox" name="alert.assessment.impact.severity" value="${ item }"/>
+          <input id="checkbox-severity-${ item }" class="checkbox-label" type="checkbox" name="alert.assessment.impact.severity[]" value="${ item }"/>
           <label for="checkbox-severity-${ item }" class="btn btn-default btn-xs label-checkbox">${ _(item) }<span class="badge"></span></label>
         </td>
         % endfor

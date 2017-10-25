@@ -52,10 +52,8 @@ class MainMenuParameters(view.Parameters):
             self._INTERNAL_PARAMETERS = self._INTERNAL_PARAMETERS + i
 
     def normalize(self, view_name, user):
-        do_load = view.Parameters.normalize(self, view_name, user)
-
+        view.Parameters.normalize(self, view_name, user)
         all(hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_NORMALIZE", self))
-        return do_load
 
 
 class TimeUnit(object):

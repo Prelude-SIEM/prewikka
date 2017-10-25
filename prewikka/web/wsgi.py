@@ -20,19 +20,19 @@
 from __future__ import absolute_import, division, print_function
 
 import sys
-import urllib
 import wsgiref.headers
 import wsgiref.util
 
 from prewikka import main
 from prewikka.web import request
 
+from prewikka.compat.jquery_unparam import jquery_unparam
+
+
 if sys.version_info >= (3, 0):
     Py3 = True
-    import urllib.parse
 else:
     Py3 = False
-    import urlparse
 
 
 defined_status = {
@@ -79,15 +79,7 @@ class WSGIRequest(request.Request):
             qs = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
             qs = self.body = qs.decode("utf8") if Py3 else qs
 
-        if Py3:
-            self.arguments = urllib.parse.parse_qs(qs)
-        else:
-            self.arguments = {}
-            for k, v in urlparse.parse_qsl(qs):
-                self.arguments.setdefault(k.decode("utf8"), []).append(v.decode("utf8"))
-
-        for name, value in self.arguments.items():
-            self.arguments[name] = (len(value) == 1) and value[0] or value
+        self.arguments = jquery_unparam(qs)
 
         if self._environ.get("HTTP_X_REQUESTED_WITH", "") == "XMLHttpRequest":
             self.is_xhr = True

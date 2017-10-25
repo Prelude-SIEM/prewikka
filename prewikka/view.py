@@ -88,7 +88,7 @@ class ListConverter(BaseConverter):
 class ParameterDesc(object):
     """ Describe a HTTP parameter """
 
-    def __init__(self, name, type, mandatory=False, default=None, save=False, general=False):
+    def __init__(self, name, type, mandatory=False, default=None, save=False, general=False, persist=False):
         """ Args :
         name : Name of the parameter
         type : Type of the parameter (int, str, list, ...)
@@ -98,7 +98,8 @@ class ParameterDesc(object):
         general : True if the parameter is available for all the view """
 
         self.name = name
-        self.save = save
+        self.save = save or persist
+        self.persist = persist
         self.general = general
         self.default = default
         self.mandatory = mandatory
@@ -160,7 +161,6 @@ class Parameters(dict):
         self._parameters = {}
 
         self.register()
-        self.optional("_save", text_type)
 
         list(hookmanager.trigger("HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper(), self))
 
@@ -170,27 +170,26 @@ class Parameters(dict):
     def mandatory(self, name, type):
         self._parameters[name] = ParameterDesc(name, type, mandatory=True, save=True)
 
-    def optional(self, name, type, default=None, save=False, general=False):
+    def optional(self, name, type, default=None, save=False, general=False, persist=False):
         if default is not None:
             self._default[name] = self._hard_default[name] = default
 
-        self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save, general=general)
+        self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save, general=general, persist=persist)
 
     def process(self, view_id):
         if env.request.user:
             env.request.user.begin_properties_change()
 
         self.normalize(view_id, env.request.user)
-        self.handleLists()
 
         if env.request.user:
             env.request.user.commit_properties_change()
 
     @_user_properties_change
     def normalize(self, view, user):
-        do_load = True
         do_update = env.request.web.method == "PATCH"
         do_save = env.request.web.method in ("POST", "PUT", "PATCH")
+        has_general = False
 
         for name, value in self.items():
             param = self._parameters.get(name)
@@ -200,8 +199,8 @@ class Parameters(dict):
 
                 continue
 
-            if name not in self._parameters or param.mandatory is False:
-                do_load = False
+            if param.general:
+                has_general = True
 
             value = param.parse(value)
             if user and param.save and do_save:
@@ -230,7 +229,7 @@ class Parameters(dict):
             else:
                 save_view = view
 
-            if not(param.general) and do_save and not do_update:
+            if do_save and not(param.persist) and not do_update and (not(param.general) or has_general):
                 user.del_property(name, view=save_view)
 
             if name not in user.configuration.get(save_view, {}):
@@ -238,56 +237,22 @@ class Parameters(dict):
 
             value = user.get_property(name, view=save_view)
             self._default[name] = value
-            if do_load:
-                self[name] = value
+            self[name] = value
 
         # In case the view was dynamically added through HOOK_VIEW_LOAD, the hook isn't available
         list(hookmanager.trigger("HOOK_%s_PARAMETERS_NORMALIZE" % view.upper(), self))
 
-        return do_load
+    def handleLists(self, value):
+        if isinstance(value, dict):
+            if all(key.isdigit() for key in value):
+                return [self.handleLists(val) for key, val in sorted(value.items(), key=lambda x: int(x[0]))]
 
-    def handleLists(self):
-        pass
+            return dict((key, self.handleLists(val)) for key, val in value.items())
 
-    def handleList(self, list_name, prefix, separator="_", ordered=False, has_value=True):
-        """
-        Return the object list from POST parameters
-        """
-        obj_list = []
-        obj_dict = {}
-        obj_order = []
-        for key, value in self.items():
-            if not key.startswith('%s%s' % (prefix, separator)):
-                continue
+        elif isinstance(value, list):
+            return [self.handleLists(val) for val in value]
 
-            field = key[len(prefix) + len(separator):]
-            if ordered:
-                l = key[len(prefix) + len(separator):].split(separator, 1)
-                field = l[0]
-                order = len(l) == 2 and int(l[1]) or 0
-            else:
-                field = key[len(prefix) + len(separator):]
-                order = 0
-
-            if order not in obj_dict:
-                obj_dict[order] = {} if has_value else []
-                obj_order.append(order)
-            if has_value:
-                obj_dict[order][field] = value
-            else:
-                obj_dict[order].append(field)
-            self.pop(key)
-
-        obj_order.sort()
-        for obj in obj_order:
-            obj_list.append(obj_dict[obj])
-
-        if ordered or not obj_list:
-            self[list_name] = obj_list
-        elif has_value:
-            self[list_name] = obj_list[0].items()
-        else:
-            self[list_name] = obj_list[0]
+        return value
 
     def getDefault(self, param, usedb=True):
         return self.getDefaultValues(usedb)[param]
@@ -345,17 +310,18 @@ class Parameters(dict):
 
         return new
 
-    def getlist(self, key, type=lambda x: x):
-        ret = self.get(key, [])
-        if not ret:
+    def get(self, key, default=None, type=lambda x: x):
+        ret = dict.get(self, key, default)
+        if ret is None:
             return ret
 
-        if not isinstance(ret, list):
-            ret = [type(ret)]
+        if isinstance(ret, list):
+            return [type(i) for i in ret]
         else:
-            ret = [type(i) for i in ret]
+            return type(ret)
 
-        return ret
+    def getlist(self, key, type=lambda x: x):
+        return self.get(key, default=[], type=type)
 
 
 class _ViewDescriptor(object):
@@ -663,10 +629,15 @@ class ViewManager(registrar.DelayedRegistrar):
         if endpoint[0] != "." and endpoint.find(".") == -1:
             endpoint += ".render"
 
+        values = {}
         default = kwargs.pop("_default", _SENTINEL)
 
+        for k, v in kwargs.items():
+            key = "%s[]" % k if isinstance(v, list) else k
+            values[key] = v
+
         try:
-            return env.request.url_adapter.build(endpoint, values=kwargs)
+            return env.request.url_adapter.build(endpoint, values=values)
         except Exception as exc:
             if default is not _SENTINEL:
                 return default

@@ -216,7 +216,7 @@ class FilterView(FilterPlugin, view.View):
 
     @view.route("/settings/filters/delete", methods=["POST"])
     def delete(self):
-        for name in env.request.parameters.getlist("id[]"):
+        for name in env.request.parameters.getlist("id"):
             self._filter_delete(env.request.user, name)
 
     @view.route("/settings/filters/save", methods=["POST"])

@@ -109,8 +109,8 @@
             </div>
             <div class="panel-body ${'panel-disabled' if not enabled else ''}">
                 <div class="filter-edition form-inline" data-type="${typ}">
-                    <input type="hidden" name="filter_types" value="${typ}"/>
-                    <input type="hidden" name="filter_criteria"/>
+                    <input type="hidden" name="filter_types[]" value="${typ}"/>
+                    <input type="hidden" name="filter_criteria[]"/>
                     ${init(fltr.criteria.get(typ), root=True, default_paths=default_paths[typ], all_paths=all_paths[typ], operators=operators[typ], enums=enums[typ], tooltips=tooltips)}
                 </div>
             </div>

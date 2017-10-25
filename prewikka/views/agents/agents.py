@@ -101,13 +101,13 @@ class Agents(view.View):
 
     @view.route("/agents/delete", methods=["POST"], permissions=[N_("IDMEF_ALTER")])
     def delete(self):
-        for i in env.request.parameters.getlist("types[]"):
+        for i in env.request.parameters.getlist("types"):
             if i not in ("alert", "heartbeat"):
                 continue
 
             c = Criterion()
 
-            for analyzerid in env.request.parameters.getlist("id[]"):
+            for analyzerid in env.request.parameters.getlist("id"):
                 c |= Criterion("%s.analyzer.analyzerid" % i, "=", analyzerid)
 
             env.dataprovider.delete(c)

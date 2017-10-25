@@ -131,7 +131,7 @@ function FilterEdition(selector, default_paths, all_paths, operators, enums, too
             if ( $(this).parent().siblings(".panel-heading").find(".type-checkbox").is(":checked") )
                 value = get_criterion($(this).children(".filter-group"));
 
-            $(this).children("input[name=filter_criteria]").val(JSON.stringify(value));
+            $(this).children("input[name='filter_criteria[]']").val(JSON.stringify(value));
         });
     });
 
