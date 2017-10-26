@@ -194,6 +194,13 @@ function CommonListing(elem, text, options) {
         grid.ajax({ url: options.deleteLink, method: 'POST', success: grid.delete_rows });
     });
 
+    prewikka_resource_register({
+        destroy: function() {
+            grid.jqGrid("clearGridData");
+            grid.jqGrid("GridDestroy");
+        }
+    });
+
     resizeGrid();
     return grid;
 }
