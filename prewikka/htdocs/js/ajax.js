@@ -133,7 +133,7 @@ function _url_update(settings)
 }
 
 
-function _process_ajax_response(settings, data)
+function _process_ajax_response(settings, data, xhr)
 {
     if ( data.type == "reload" )
         location.reload();
@@ -159,15 +159,17 @@ function _process_ajax_response(settings, data)
             }
 
             $(widget).addClass("prewikka-resources-container");
-            var ret = prewikka_json_dialog({"content": widget });
-
-            return ret;
+            return prewikka_json_dialog({"content": widget });
         }
 
         if ( settings['history'] == undefined ) {
                 settings['history'] = true;
                 $("#top_view_navbar .dropdown").removeClass("open"); /* FIXME this should be automated through event */
         }
+
+        var newurl = xhr.getResponseHeader("X-responseURL");
+        if ( newurl && settings.url != newurl )
+            settings.url = newurl;
 
         _url_update(settings);
 
@@ -176,16 +178,16 @@ function _process_ajax_response(settings, data)
 }
 
 
-function prewikka_process_ajax_response(settings, data)
+function prewikka_process_ajax_response(settings, data, xhr)
 {
     if ( ! data )
         return;
 
     if ( data.constructor == Object )
-        return _process_ajax_response(settings, data);
+        return _process_ajax_response(settings, data, xhr);
 
     for ( var i in data )
-        _process_ajax_response(settings, data[i]);
+        _process_ajax_response(settings, data[i], xhr);
 }
 
 
@@ -209,8 +211,8 @@ function prewikka_ajax(settings)
                 window._prewikka_current_xhr = null;
         });
 
-        return $.ajax(settings).done(function(data) {
-                prewikka_process_ajax_response(settings, data);
+        return $.ajax(settings).done(function(data, status, xhr) {
+                prewikka_process_ajax_response(settings, data, xhr);
         });
 }
 

@@ -103,10 +103,10 @@ class WSGIRequest(request.Request):
     def headers_sent(self):
         return bool(self._write)
 
-    def send_headers(self, headers=None, code=200, status_text=None):
-        if sys.version_info[0] >= 3:
-            headers = list(headers)
-        else:
+    def send_headers(self, headers=[], code=200, status_text=None):
+        headers = list(headers) + [("X-responseURL", self.path)]
+
+        if sys.version_info[0] < 3:
             headers = [(k.encode("ISO-8859-1"), v.encode("ISO-8859-1")) for k, v in headers]
 
         if self._output_cookie:
