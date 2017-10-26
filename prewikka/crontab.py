@@ -120,6 +120,7 @@ class Crontab(object):
     def __init__(self):
         self._reinit()
         hookmanager.register("HOOK_PLUGINS_RELOAD", self._reinit)
+        hookmanager.register("HOOK_USER_DELETE", lambda user: self.delete(user=user))
 
     def _make_job(self, res):
         err = func = None
