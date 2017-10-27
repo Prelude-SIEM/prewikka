@@ -104,7 +104,7 @@ class WSGIRequest(request.Request):
         return bool(self._write)
 
     def send_headers(self, headers=[], code=200, status_text=None):
-        headers = list(headers) + [("X-responseURL", self.path)]
+        headers = list(headers) + [("X-responseURL", self.get_uri())]
 
         if sys.version_info[0] < 3:
             headers = [(k.encode("ISO-8859-1"), v.encode("ISO-8859-1")) for k, v in headers]
