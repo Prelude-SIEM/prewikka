@@ -105,12 +105,12 @@ function _update_browser_title(title)
 
 
 /* Update the tab's menu according to the url */
-function _url_update(settings)
+function _url_update(settings, force)
 {
         var url = settings['url'].split("?")[0];
         var tab = $("#topmenu .topmenu_item a[href='" + url + "']");
 
-        if ( settings['history'] && (settings['type'] || "").toUpperCase() != "POST" ) {
+        if ( settings['history'] && (force || (settings['type'] || "").toUpperCase() != "POST") ) {
                 var url = settings['url'];
                 var params = settings['data'];
 
@@ -121,7 +121,7 @@ function _url_update(settings)
                         url += "?" + params;
                 }
 
-                history.pushState(url, '', url);
+                history.pushState(url, document.title, url);
         }
 
         if ( tab.length > 0 ) {
@@ -168,11 +168,14 @@ function _process_ajax_response(settings, data, xhr)
                 $("#top_view_navbar .dropdown").removeClass("open"); /* FIXME this should be automated through event */
         }
 
+        var force = false;
         var newurl = xhr.getResponseHeader("X-responseURL");
-        if ( newurl && settings.url != newurl )
+        if ( newurl && settings.url != newurl ) {
             settings.url = newurl;
+            force = true;
+        }
 
-        _url_update(settings);
+        _url_update(settings, force);
 
         return prewikka_drawTab(data);
     }
