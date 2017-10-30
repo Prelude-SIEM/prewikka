@@ -131,10 +131,12 @@ class FilterView(FilterPlugin, view.View):
         for fltr in self._db.get_filters(env.request.user):
             elem = {
                 "id": fltr.name,
-                "name": fltr.name,
-                "description": fltr.description,
-                "_link": url_for(".edit", name=fltr.name),
-                "_title": _("Filter %s") % fltr.name
+                "name": resource.HTMLNode(
+                    "a", fltr.name,
+                    href=url_for(".edit", name=fltr.name),
+                    title=_("Filter %s") % fltr.name
+                ),
+                "description": fltr.description
             }
             for typ in fltr.criteria:
                 elem[typ] = True

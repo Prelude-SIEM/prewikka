@@ -10,28 +10,11 @@ function CommonListing(elem, text, options) {
             return "";
     }
 
-    function _backwardCompatibleFormatter(cellValue, opts, rowObj) {
-        if ( rowObj._class || rowObj._title || rowObj._link ) {
-            /*
-             * FIXME: OLD API, DO NOT USE, REMOVE ME.
-             */
-            var link = $('<a>', {
-                class: rowObj._class || "widget-link",
-                title: rowObj._title,
-                href: rowObj._link
-            }).text(cellValue);
-
-            return link.wrap("<div>").parent().html();
-        }
-
-        return genericFormatter(cellValue, opts, rowObj);
-    }
-
     $(elem).addClass("commonlisting table table-striped");
 
     for ( var i in options['colModel'] ) {
         if (! options['colModel'][i].formatter )
-            options['colModel'][i].formatter = (i == 0) ? _backwardCompatibleFormatter : genericFormatter;
+            options['colModel'][i].formatter = genericFormatter;
     }
 
     options = _mergedict({
