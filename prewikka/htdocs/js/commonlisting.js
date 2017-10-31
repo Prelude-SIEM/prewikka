@@ -5,7 +5,7 @@ function CommonListing(elem, text, options) {
 
     function genericFormatter(value, opts, rowObj) {
         if ( value )
-            return value.toHTML ? value.toHTML() : value;
+            return value.toHTML ? value.toHTML() : _.escape(value);
         else
             return "";
     }
