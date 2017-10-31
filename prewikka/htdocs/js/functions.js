@@ -157,6 +157,13 @@ $(function() {
   });
 
   /*
+   * Add a flag to the closing modal to avoid race conditions with resource registration
+   */
+  $(document).on('hide.bs.modal', '.ajax-modal', function () {
+    $(this).addClass('closing');
+  });
+
+  /*
    * Destroy AJAX modal completly when they are removed.
    */
   $(document).on('hidden.bs.modal', '.ajax-modal', function () {
@@ -512,9 +519,9 @@ function prewikka_resource_register(obj)
     var base = obj.container;
 
     if ( ! base )
-        base = $('script').last();
+        base = $('.prewikka-resources-container:not(.closing) script').last();
 
-    target = $(base).closest(".prewikka-resources-container");
+    target = $(base).closest(".prewikka-resources-container:not(.closing)");
     if ( target.length > 0 )
         _resource_register(obj, target);
 
