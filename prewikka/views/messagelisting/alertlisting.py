@@ -852,13 +852,14 @@ class AlertListing(MessageListing):
                     if op:
                         newcrit |= Criterion(path, op, obj[2])
             else:
+                c = Criterion(obj[0], "==", None) if obj[1] == "!" else Criterion(*obj)
                 if obj[0] in merge:
-                    merge[obj[0]] += [obj]
+                    merge[obj[0]] += [c]
                 else:
-                    merge[obj[0]] = [obj]
+                    merge[obj[0]] = [c]
 
-        for key in iter(merge):
-            newcrit += functools.reduce(lambda x, y: x | y, (Criterion(*x) for x in merge[key]))
+        for value in merge.values():
+            newcrit += functools.reduce(lambda x, y: x | y, value)
 
         criteria += newcrit
         env.request.dataset[type] = [(path.replace("(0)", "").replace("(-1)", ""), operator, value) for path, operator, value in env.request.parameters[type]]
