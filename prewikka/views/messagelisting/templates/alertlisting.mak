@@ -55,48 +55,49 @@ $(saved_state).each(function() {
 
 var messagelisting = new MessageListing(operators);
 
-var stateText = {
-        "null": "${ _("Reset to null") }",
-        "default": "${ _("Reset to default") }",
-        "saved": "${ _("Reset to saved") }",
-        "current": "${ _("Reset to current") }"
-};
+$(function() {
+    var stateText = {
+            "null": "${ _("Reset to null") }",
+            "default": "${ _("Reset to default") }",
+            "saved": "${ _("Reset to saved") }",
+            "current": "${ _("Reset to current") }"
+    };
 
-$(saved_state).each(function(idx, type) {
-        $(stateArray).each(function(idx, state) {
-                messagelisting.set(type, state, columns_data);
-                saved_forms[type][state] = messagelisting._cloneForm($("#" + type + " :input"));
-        });
+    $(saved_state).each(function(idx, type) {
+            $(stateArray).each(function(idx, state) {
+                    messagelisting.set(type, state, columns_data);
+                    saved_forms[type][state] = messagelisting._cloneForm($("#" + type + " :input"));
+            });
 
-        var form = $("#" + type + " :input");
-        saved_forms[type]["current"] = messagelisting._cloneForm(form);
+            var form = $("#" + type + " :input");
+            saved_forms[type]["current"] = messagelisting._cloneForm(form);
 
-        if ( messagelisting._equals(saved_forms[type]["default"], saved_forms[type]["saved"]) )
-                saved_forms[type]["saved"] = null;
+            if ( messagelisting._equals(saved_forms[type]["default"], saved_forms[type]["saved"]) )
+                    saved_forms[type]["saved"] = null;
 
-        if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["default"]) )
-                saved_forms[type]["current"] = null;
+            if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["default"]) )
+                    saved_forms[type]["current"] = null;
 
-        if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["saved"]) )
-                saved_forms[type]["current"] = null;
+            if ( messagelisting._equals(saved_forms[type]["current"], saved_forms[type]["saved"]) )
+                    saved_forms[type]["current"] = null;
 
-        ## Set the current state
-        $(stateArray).each(function(idx, state) {
-                if ( messagelisting._equals(form, saved_forms[type][state]) )
-                        saved_state[type] = state;
-        });
+            ## Set the current state
+            $(stateArray).each(function(idx, state) {
+                    if ( messagelisting._equals(form, saved_forms[type][state]) )
+                            saved_state[type] = state;
+            });
 
-        $("#" + type + " input.reset_filter").val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
-});
+            $("#" + type + " input.reset_filter").val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
+    });
 
+    $("input.reset_filter").click(function() {
+            var type = $(this).closest(".filter_popup").find("div").prop("id");
 
-$("input.reset_filter").click(function() {
-        var type = $(this).closest(".filter_popup").find("div").prop("id");
+            saved_state[type] = messagelisting.get_next_state(saved_forms, type, saved_state[type]);
 
-        saved_state[type] = messagelisting.get_next_state(saved_forms, type, saved_state[type]);
-
-        messagelisting.set(type, saved_state[type], columns_data);
-        $(this).val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
+            messagelisting.set(type, saved_state[type], columns_data);
+            $(this).val(stateText[messagelisting.get_next_state(saved_forms, type, saved_state[type])]);
+    });
 });
 
 </script>
