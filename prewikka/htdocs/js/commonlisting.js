@@ -292,3 +292,28 @@ function saveGridColumns(grid) {
         ["jqgrid_params_" + grid.attr("id")]: JSON.stringify(columns)
     });
 }
+
+
+var oldSortableRows = $.fn.jqGrid.sortableRows;
+
+$.jgrid.extend({
+    sortableRows: function(opts) {
+        opts = $.extend({
+            helper: function(e, item) {
+                // Close any cell edition to avoid bugs
+                $.fn.jqGrid.editCell.call($(this), 0, 0, false);
+
+                // Clone the row (FIXME: #2746)
+                var ret = item.clone();
+
+                // Make sure cells have the correct width
+                $("td", ret).each(function(i) {
+                    this.style.width = $("td", item).eq(i).css("width");
+                });
+
+                return ret;
+            }
+        }, opts);
+        return oldSortableRows.call($(this), opts);
+    }
+});
