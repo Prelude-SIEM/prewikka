@@ -1,19 +1,7 @@
-<style>
-.check-green {
-    font-size: 18px;
-    color: green;
-    line-height: 1;
-}
-
-.check-green:after {
-    content: "\2713";
-}
-</style>
-
 <script type="text/javascript">
 
 function type_formatter(cellValue, options, rowObject) {
-    var elem = $("<p>", {"class": cellValue ? "check-green" : ""});
+    var elem = $("<i>", {"class": cellValue ? "fa fa-check text-success" : ""});
     return elem[0].outerHTML;
 }
 
