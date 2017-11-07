@@ -227,7 +227,6 @@ function _resizeGrid(grid) {
         pagerHeight = $(".ui-jqgrid-pager:visible").outerHeight() || 0,
         parent = $(grid).closest('.ui-jqgrid').parents('.modal-body, #main');
 
-    var container;
     var delta = titleHeight + headerHeight + pagerHeight + 10;
 
     if ( parent.attr('id') == 'main' ) {
@@ -237,9 +236,9 @@ function _resizeGrid(grid) {
             height = $('.footer-buttons').offset().top - $(grid).closest('.ui-jqgrid').offset().top - delta;
 
         $(grid).jqGrid("setGridHeight", height, true);
-        container = $(grid).closest(".container, .container-fluid");
     }
 
+    var container = $(grid).closest(".container, .container-fluid");
     if ( container.length > 0 )
         parent = container;
 
