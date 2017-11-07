@@ -50,7 +50,7 @@ class _IDMEFProvider(DataProviderBase):
 
     @staticmethod
     def _value_adjust(operator, value):
-        if operator not in ("<>*", "<>"):
+        if operator not in ("<>*", "<>", "!<>", "!<>*"):
             return value
 
         value = value.strip()
