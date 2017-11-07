@@ -63,14 +63,14 @@ class HistoryDatabase(database.DatabaseHelper):
         return [row[0] for row in self.query(query, user=user.id, form=form)]
 
     def save(self, user, form, query):
-        query_hash = md5(query).hexdigest()
+        query_hash = md5(query.encode("utf8")).hexdigest()
         rows = [(user.id, form, query, query_hash, utils.timeutil.utcnow())]
         self.upsert("Prewikka_History_Query", ("userid", "formid", "query", "query_hash", "timestamp"), rows, pkey=("userid", "formid", "query_hash"))
 
         logger.info("Query saved: %s by %s on form %s", query, user.name, form)
 
     def delete(self, user, form, query=False):
-        query_hash = md5(query).hexdigest() if query else False
+        query_hash = md5(query.encode("utf8")).hexdigest() if query else False
         self.query("DELETE FROM Prewikka_History_Query" + self._where(query_hash=query_hash), user=user.id, query_hash=query_hash, form=form)
 
         logger.info("Query deleted: %s by %s on form %s", query or "all queries", user.name, form)
