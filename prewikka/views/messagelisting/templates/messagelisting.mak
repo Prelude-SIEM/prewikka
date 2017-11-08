@@ -9,7 +9,7 @@ from prewikka import usergroup
 
 <script type="text/javascript">
   $("#allbox").click(function(){
-    $('input[name=selection]').check($(this).prop('checked'));
+    $('input[name="selection[]"]').check($(this).prop('checked'));
   });
 
   if ( navigator.userAgent.indexOf("Konqueror") != -1 ) {
@@ -78,7 +78,7 @@ from prewikka import usergroup
         <tr>
           ${ self.message_fields(message) }
           %if env.request.user.has("IDMEF_ALTER"):
-           <td><input class="checkbox" type="checkbox" name="selection" value="${ json.dumps(message['selection']) }" /></td>
+           <td><input class="checkbox" type="checkbox" name="selection[]" value="${ json.dumps(message['selection']) }" /></td>
           %endif
         </tr>
     %endfor

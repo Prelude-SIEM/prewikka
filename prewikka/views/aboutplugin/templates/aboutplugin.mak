@@ -200,7 +200,7 @@
             <td>${ _(mod.plugin_description) }</td>
             <td>${ mod.plugin_version }</td>
             <td class="text-center">${ mod.plugin_database_version or '-' }</td>
-            <td class="text-right"><input type="checkbox" name="enable_plugin" value="${ mod.full_module_name }" ${ checked(enabled) } ${ disabled(mod.plugin_mandatory) } /></td>
+            <td class="text-right"><input type="checkbox" name="enable_plugin[]" value="${ mod.full_module_name }" ${ checked(enabled) } ${ disabled(mod.plugin_mandatory) } /></td>
           </tr>
         % endfor
         </table>
