@@ -442,13 +442,16 @@ window.json_registry.register("Criterion", function(obj) {
 });
 
 
-function DatetimePicker(input, date, options)
+function DatetimePicker(input, date, options, delta)
 {
     var that = {};
     var hidden_input = $('<input/>').attr({ type: 'hidden',
                                             name: input.data('name'),
                                             class: 'form-control input-sm hidden_' + input.data('name'),
                                             value: date });
+
+    if ( ! delta )
+        delta = 0;
 
     hidden_input.appendTo(input.parent());
 
@@ -460,9 +463,8 @@ function DatetimePicker(input, date, options)
         return (dt.getTime() - (dt.getTimezoneOffset() * 60000)) / 1000;
     }
 
-    function _update_input() {
-        var dt = that.get_value();
-        hidden_input.val(dt ? _timestamp(dt) : "");
+    function _update_input(dt) {
+        hidden_input.val((dt) ? _timestamp(dt) : _timestamp(that.get_value()) + delta);
     }
 
     input.datetimepicker(_mergedict(options, {
@@ -479,8 +481,10 @@ function DatetimePicker(input, date, options)
         })
     );
 
-    input.datetimepicker("setDate", new Date(moment(date)));
-    _update_input();
+    var dt = new Date(moment(date));
+
+    input.datetimepicker("setDate", dt);
+    _update_input(dt);
 
     return that;
 }

@@ -11,7 +11,7 @@ function MainMenuInit(inline, start, end, date_format) {
     };
 
     var start_picker = DatetimePicker(root.find(".timeline_start"), start, options);
-    var end_picker = DatetimePicker(root.find(".timeline_end"), end, options);
+    var end_picker = DatetimePicker(root.find(".timeline_end"), end, options, 59);
 
     that.trigger_custom_date = function(enabled) {
         root.find("[name=timeline_start]").prop("disabled", !enabled);
