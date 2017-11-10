@@ -9,6 +9,16 @@ $(function() {
   var $cache = null;
   var $cachef = null;
 
+  $.fn.serializeObject = function() {
+      var data = {};
+
+      $.each($(this).serializeArray(), function(i, input) {
+          data[input.name] = input.value;
+      });
+
+      return data;
+  }
+
   $.fn.popupUnique = function(animshow, animhide) {
         if ( $cache && this.is(':visible') ) {
                 $cachef($cache);
