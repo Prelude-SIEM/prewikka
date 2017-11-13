@@ -116,6 +116,7 @@ class MainMenuStep(object):
             "day": (relativedelta(days=value), _(localization.DATE_YMD_FMT), "mday"),
             "hour": (relativedelta(hours=value), _(localization.DATE_YMDH_FMT), "hour"),
             "minute": (relativedelta(minutes=value), _(localization.TIME_HM_FMT), "min"),
+            "second": (relativedelta(seconds=value), _(localization.TIME_HMS_FMT), "sec")
         }
 
         self.unit = text_type(unit)
@@ -176,12 +177,15 @@ class TimePeriod(object):
         return TimeUnit(gtable[nearest])
 
     def _setup_timeline_range(self):
+        # datetime specified through the mainmenu are precise to the second, we thus increase
+        # end time by 999999 microseconds to account for us/ms.
+
         self.start = self.end = None
         if "timeline_start" in self.parameters:
             self.start = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self.parameters["timeline_start"]))
 
         if "timeline_end" in self.parameters:
-            self.end = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self.parameters["timeline_end"]))
+            self.end = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self.parameters["timeline_end"])) + datetime.timedelta(microseconds=999999)
 
         self._timeunit, self._timevalue = self.parameters["timeline_unit"], self.parameters["timeline_value"]
         if self._timeunit == "unlimited":
@@ -190,7 +194,7 @@ class TimePeriod(object):
         delta = relativedelta(**{self._timeunit + "s" if self._timeunit != "unlimited" else "years": self._timevalue})
 
         if self.start and not self.end:
-            self.end = datetime.datetime.now(env.request.user.timezone).replace(microsecond=0)
+            self.end = datetime.datetime.now(env.request.user.timezone).replace(microsecond=999999)
 
         elif self.end and not self.start:
             self.start = self.end - delta
@@ -199,15 +203,15 @@ class TimePeriod(object):
             self.start = self.end = datetime.datetime.now(env.request.user.timezone).replace(microsecond=0)
             if not self.parameters["timeline_absolute"]:  # relative
                 self.start = self.end - delta
-
+                self.end = self.end.replace(microsecond=999999)
             else:  # absolute
-                self.end = utils.timeutil.truncate(self.end, self._timeunit) + relativedelta(**{self._timeunit + "s": 1})
+                self.end = utils.timeutil.truncate(self.end, self._timeunit)
                 if self.parameters["timeline_unit"] == "unlimited":
                     self.start = datetime.datetime.fromtimestamp(0).replace(tzinfo=env.request.user.timezone)
                 else:
                     self.start = self.end - delta
 
-                self.end += relativedelta(seconds=-1)
+                self.end -= relativedelta(microseconds=1)
 
     @staticmethod
     def mktime_param(dt, precision=None):
@@ -285,8 +289,8 @@ class MainMenu(TimePeriod):
         if not start and not end:
             return
 
-        self.dataset["timeline"].start = start.replace(tzinfo=None).isoformat()
-        self.dataset["timeline"].end = end.replace(tzinfo=None).isoformat()
+        self.dataset["timeline"].start = start.replace(tzinfo=None, microsecond=0).isoformat()
+        self.dataset["timeline"].end = end.replace(tzinfo=None, microsecond=0).isoformat()
 
     def _render(self):
         self.dataset["timeline"].value = env.request.parameters["timeline_value"]
