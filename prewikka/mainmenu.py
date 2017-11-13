@@ -53,8 +53,8 @@ class MainMenuParameters(view.Parameters):
 
 
 class TimeUnit(object):
-    _unit = ("year", "month", "day", "hour", "minute", "second")
-    _dbunit = {"year": "year", "month": "month", "day": "mday", "hour": "hour", "minute": "min", "second": "sec"}
+    _unit = ("year", "month", "day", "hour", "minute", "second", "millisecond", "microsecond")
+    _dbunit = {"year": "year", "month": "month", "day": "mday", "hour": "hour", "minute": "min", "second": "sec", "millisecond": "msec", "microsecond": "usec"}
 
     @property
     def dbunit(self):
@@ -116,7 +116,9 @@ class MainMenuStep(object):
             "day": (relativedelta(days=value), _(localization.DATE_YMD_FMT), "mday"),
             "hour": (relativedelta(hours=value), _(localization.DATE_YMDH_FMT), "hour"),
             "minute": (relativedelta(minutes=value), _(localization.TIME_HM_FMT), "min"),
-            "second": (relativedelta(seconds=value), _(localization.TIME_HMS_FMT), "sec")
+            "second": (relativedelta(seconds=value), _(localization.TIME_HMS_FMT), "sec"),
+            "millisecond": (relativedelta(microseconds=value * 1000), _("%S.%.6f"), "msec"),
+            "microsecond": (relativedelta(microseconds=value), _("%S.%.3f"), "usec")
         }
 
         self.unit = text_type(unit)
@@ -153,7 +155,7 @@ class TimePeriod(object):
             unit = TimeUnit("minute")  # step = minutes
 
         else:
-            unit = TimeUnit("minute")
+            unit = TimeUnit("second")
 
         return unit
 
