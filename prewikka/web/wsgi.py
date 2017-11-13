@@ -72,14 +72,13 @@ class WSGIRequest(request.Request):
         self.method = environ['REQUEST_METHOD']
 
         request.Request.__init__(self, self._wsgi_get_unicode("PATH_INFO"))
-
-        if self.method not in ('POST', 'PUT', 'PATCH'):
-            qs = self._wsgi_get_str("QUERY_STRING")
-        else:
-            qs = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
-            qs = self.body = qs.decode("utf8") if Py3 else qs
-
+        qs = self._wsgi_get_str("QUERY_STRING")
         self.arguments = jquery_unparam(qs)
+
+        if self.method in ('POST', 'PUT', 'PATCH'):
+            qs = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
+            self.body = qs.decode("utf8") if Py3 else qs
+            self.arguments.update(jquery_unparam(self.body))
 
         if self._environ.get("HTTP_X_REQUESTED_WITH", "") == "XMLHttpRequest":
             self.is_xhr = True
