@@ -321,7 +321,11 @@ class Parameters(dict):
             return type(ret)
 
     def getlist(self, key, type=lambda x: x):
-        return self.get(key, default=[], type=type)
+        ret = self.get(key, default=[], type=type)
+        if not isinstance(ret, list):
+            raise InvalidParameterValueError(key, ret)
+
+        return ret
 
 
 class _ViewDescriptor(object):
