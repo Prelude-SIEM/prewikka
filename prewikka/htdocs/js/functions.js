@@ -366,7 +366,8 @@ function prewikka_autocomplete(field, url, submit, allow_empty=false) {
                 global: false, // No prewikka dialog in case of error
                 success: function(data) {
                     var rows = $.map(data.rows, function(row) {
-                        return row.cell.name;
+                        var name = row.cell.name;
+                        return name.toHTML ? $(name.toHTML()).text() : name;
                     });
                     response(rows);
                     field.parent("div").toggleClass("has-error", !rows.length);
