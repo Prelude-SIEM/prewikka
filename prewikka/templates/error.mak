@@ -60,7 +60,7 @@ def inherit(context):
 % endif
 </style>
 
-<textarea style="position: absolute; visibility: hidden; width: 0; height: 0" class="traceback-value">${"".join(format_exception(*traceback))}</textarea>
+<textarea style="position: absolute; top: -999px" class="traceback-value">${"".join(format_exception(*traceback))}</textarea>
 
 <div class="traceback">
   <h3>${ _("Detail") }
@@ -119,12 +119,10 @@ def inherit(context):
     $("div.traceback").accordion({collapsible: true, active: false, heightStyle: "content"});
 
     $(".traceback-copy").on("click", function() {
-        var range = document.createRange();
-        range.selectNodeContents($("textarea.traceback-value")[0]);
-        var selection = window.getSelection();
-        selection.removeAllRanges();
-        selection.addRange(range);
-        document.execCommand("copy", false, null);
+        var elem = $("textarea.traceback-value")[0];
+        elem.select();
+        elem.setSelectionRange(0, elem.value.length);
+        document.execCommand("copy");
         return false;
     });
   });
