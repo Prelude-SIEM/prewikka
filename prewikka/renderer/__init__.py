@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import uuid
 
 from prewikka import error, pluginmanager, resource
-from prewikka.utils import html
+from prewikka.utils import cache, html
 
 RED_STD = "E78D90"
 ORANGE_STD = "F5B365"
@@ -81,6 +81,7 @@ class RendererUtils(object):
 
         return label
 
+    @cache.request_memoize("renderer_color")
     def get_color(self, label, onecolor=False):
         if isinstance(self._color_map, dict):
             return self._color_map.get(label, self._nexist_color)[1]
