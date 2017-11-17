@@ -207,7 +207,7 @@ class TimePeriod(object):
                 self.start = self.end - delta
                 self.end = self.end.replace(microsecond=999999)
             else:  # absolute
-                self.end = utils.timeutil.truncate(self.end, self._timeunit)
+                self.end = utils.timeutil.truncate(self.end, self._timeunit) + relativedelta(**{self._timeunit + "s": 1})
                 if self.parameters["timeline_unit"] == "unlimited":
                     self.start = datetime.datetime.fromtimestamp(0).replace(tzinfo=env.request.user.timezone)
                 else:
