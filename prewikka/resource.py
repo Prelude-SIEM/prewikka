@@ -61,7 +61,7 @@ class CSSSource(HTMLSource):
     An inlined chunk of CSS source code.
     """
     def __new__(cls, src):
-        return HTMLSource.__new__(cls, html.Markup('<style type="text/css">%s</style>') % src)
+        return HTMLSource.__new__(cls, html.Markup('<style type="text/css">%s</style>' % src))
 
 
 class JSSource(HTMLSource):
@@ -69,7 +69,7 @@ class JSSource(HTMLSource):
     An inlined chunk of JS source code.
     """
     def __new__(cls, src):
-        return HTMLSource.__new__(cls, html.Markup('<script type="text/javascript">%s</script>') % src)
+        return HTMLSource.__new__(cls, html.Markup('<script type="text/javascript">%s</script>' % src))
 
 
 @functools.total_ordering
