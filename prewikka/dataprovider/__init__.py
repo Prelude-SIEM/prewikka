@@ -28,6 +28,16 @@ from prewikka.utils import AttrObj, CachingIterator, json
 from prewikka.utils.timeutil import parser, tzutc
 
 
+def PathInfo(path, value_type, operators=[], value_accept=[], type=None):
+    assert(operators or type)
+
+    if not operators:
+        backend = env.dataprovider._backends[type]
+        operators = backend.TYPE_OPERATOR_MAPPING.get(value_type, backend.TYPE_OPERATOR_MAPPING.get(None, []))
+
+    return AttrObj(path=path, field=".".join(path.split(".")[1:]), type=value_type, operators=operators, value_accept=value_accept)
+
+
 def _str_to_datetime(date):
     if date.isdigit():
         return datetime.utcfromtimestamp(int(date))
@@ -207,17 +217,7 @@ class DataProviderBackend(pluginmanager.PluginBase):
         raise error.NotImplementedError
 
     def get_path_info(self, path):
-        typ = env.dataprovider.get_path_type(path)
-        operators = self.TYPE_OPERATOR_MAPPING.get(typ)
-
-        if operators is None:
-            operators = self.TYPE_OPERATOR_MAPPING.get(None, [])
-
-        return AttrObj(
-            type=typ,
-            operators=operators,
-            value_accept=self._get_path_values(path)
-        )
+        return PathInfo(path, env.dataprovider.get_path_type(path), value_accept=self._get_path_values(path), type=self.type)
 
     def _get_path_values(self, path):
         return None
