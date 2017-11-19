@@ -23,8 +23,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sys
 
 from copy import copy
-from prewikka import error, hookmanager, log, pluginmanager, registrar, template, usergroup, utils
-from prewikka.response import PrewikkaResponse
+from prewikka import compat, error, hookmanager, log, pluginmanager, registrar, response, template, usergroup, utils
 
 import werkzeug.exceptions
 from werkzeug.routing import Map, Rule, BaseConverter
@@ -363,13 +362,11 @@ class _ViewDescriptor(object):
         dataset["document"].base_url = utils.iri2uri(env.request.web.get_baseurl())
         dataset["document"].href = utils.iri2uri(env.request.web.get_uri())
 
-    def _render(self, dataset):
+    def _render(self):
         self.process_parameters()
 
-        if self.view_template and dataset is None:
+        if self.view_template:
             env.request.dataset = self.view_template.dataset()
-        else:
-            env.request.dataset = dataset
 
         if env.request.dataset is not None:
             self._setup_dataset_default(env.request.dataset)
@@ -378,7 +375,7 @@ class _ViewDescriptor(object):
             obj = classobj()
             setattr(env.request, name, obj)
 
-        return env.request.dataset
+        return self.render(**env.request.view_kwargs) or env.request.dataset
 
     def process_parameters(self):
         env.request.parameters = {}
@@ -386,25 +383,27 @@ class _ViewDescriptor(object):
             env.request.parameters = self.view_parameters(self, env.request.web.arguments)
             env.request.parameters.process(self.view_id)
 
-    def respond(self, dataset=None, code=None):
+    def respond(self):
         env.log.info("Loading view %s, endpoint %s" % (self.__class__.__name__, self.view_endpoint))
 
-        dataset = self._render(dataset)
-        response = self.render(**env.request.view_kwargs)
+        resp = self._render()
 
-        if response and not issubclass(response.__class__, PrewikkaResponse):
-            response = PrewikkaResponse(response, code=code)
+        if isinstance(resp, (template._Dataset, compat.STRING_TYPES)):
+            resp = response.PrewikkaResponse({"type": "view", "content": resp})
+            for name, clname in self.view_extensions:
+                resp.add_ext_content(name, getattr(env.request, name).dataset.render())
 
-        if not response:
-            response = PrewikkaResponse(dataset.render() if dataset else None, code=code)
+            if self.view_help and env.config.general.get("help_location"):
+                resp.add_ext_content("help", url_for("baseview.help", path=self.view_help))
 
-        for name, clname in self.view_extensions:
-            response.add_ext_content(name, getattr(env.request, name).dataset.render())
+        elif not(resp) or not issubclass(resp.__class__, response.PrewikkaResponse):  # Any other type (eg: dict)
+            resp = response.PrewikkaResponse(resp)
 
-        if self.view_help and env.config.general.get("help_location"):
-            response.add_ext_content("help", url_for("baseview.help", path=self.view_help))
+        if self.view_endpoint:
+            list(hookmanager.trigger("HOOK_VIEW_%s_RESPONSE" % self.view_endpoint.upper(), resp))
 
-        return response
+        resp.add_ext_content("_source", self.view_endpoint)
+        return resp
 
     def check_permissions(self, user):
         if user:

@@ -59,10 +59,6 @@ function prewikka_drawTab(data)
     var form;
     var content = $(data.content);
 
-    $.each(data.notifications, function(_, value) {
-        prewikka_notification(value);
-    });
-
     if ( ! data.content )
         return;
 
@@ -73,7 +69,7 @@ function prewikka_drawTab(data)
     if ( ! form.length )
         form = content = content.wrapAll('<form method="POST" action="' + prewikka_location().pathname + '"></form>').parent();
 
-    $(form).prepend(data.menu);
+    $(form).prepend(data._extensions.menu);
 
     prewikka_resource_destroy($("#main"));
     $("#main").off().html(content);
@@ -159,6 +155,12 @@ function _process_ajax_response(settings, data, xhr)
     if ( event.isDefaultPrevented() )
         return;
 
+    if ( data._extensions ) {
+        $.each(data._extensions.notifications, function(_, value) {
+            prewikka_notification(value);
+        });
+    }
+
     if ( data.type == "reload" )
         location.reload();
 
@@ -170,7 +172,7 @@ function _process_ajax_response(settings, data, xhr)
         result = false;
     }
 
-    else if ( data.type == "html" ) {
+    else if ( data.type == "view" ) {
         var widget = $(data.content).find(".widget").addBack(".widget");
 
         if ( settings['context'] != "tab" && widget.length > 0 ) {
@@ -180,6 +182,9 @@ function _process_ajax_response(settings, data, xhr)
             result = prewikka_drawTab(data);
         }
     }
+
+    if ( data._extensions )
+        $("#main").append(data._extensions.html_content);
 
     return result;
 }

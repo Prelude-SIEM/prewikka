@@ -29,7 +29,7 @@ import dateutil.parser
 import string
 import unicodedata
 
-from prewikka import compat, template, utils
+from prewikka import compat, utils
 from prewikka.utils import json
 
 
@@ -85,6 +85,11 @@ class PrewikkaResponse(object):
         """Add an extra content to the response (add in XHR request)."""
 
         self.ext_content[key] = value
+        return self
+
+    def add_html_content(self, elem):
+        self.ext_content.setdefault("html_content", []).append(elem)
+        return self
 
     def add_notification(self, message, classname="success", name=None, icon=None, duration=None):
         """Add notification to the return value."""
@@ -97,43 +102,24 @@ class PrewikkaResponse(object):
             "duration": duration
         })
 
-    @staticmethod
-    def _is_xhr_embedded_content(obj):
-        is_json = hasattr(obj, '__json__')
-        if is_json and not isinstance(obj, template.PrewikkaTemplate):
-            return False
-
-        return True
+        return self
 
     def content(self):
-        """Retrieve the HTML content of the response."""
-        if env.request.web.is_xhr and self._is_xhr_embedded_content(self.data):
-            res = self._with_xhr_layout(self.data)
-        else:
-            res = self.data
-
-        return self._encode_response(res)
+        return self._encode_response(self.data)
 
     def _encode_response(self, res):
+        encoding = env.config.general.get("encoding", "utf8")
         if res is None:
-            res = ""
+            res = {}
 
         if not isinstance(res, compat.STRING_TYPES):
             self.headers["Content-Type"] = "application/json"
             if isinstance(res, dict):
-                res["source"] = env.request.view.view_endpoint if env.request.view else None
+                res["_extensions"] = self.ext_content
 
-            res = json.dumps(res)
+            return json.dumps(res, encoding=encoding)
 
-        return res.encode(env.config.general.get("encoding", "utf8"), "xmlcharrefreplace")
-
-    def _with_xhr_layout(self, obj):
-        """Position the obj in a dict for XHR response"""
-
-        data = {"type": "html", "content": obj}
-        data.update(self.ext_content)
-
-        return data
+        return res.encode(encoding, "xmlcharrefreplace")
 
     def write(self, request):
         content = self.content()
@@ -207,9 +193,7 @@ class PrewikkaDirectResponse(PrewikkaResponse):
 
         Render the directly the data without wrapping it, even on XHR request.
     """
-
-    def content(self):
-        return self._encode_response(self.data)
+    pass
 
 
 class PrewikkaFileResponse(PrewikkaResponse):
