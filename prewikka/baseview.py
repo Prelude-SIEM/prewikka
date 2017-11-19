@@ -131,7 +131,7 @@ class BaseView(view._View):
 
         return response.PrewikkaDirectResponse()
 
-    def render(self, *args, **kwargs):
+    def _prepare(self, dataset):
         # FIXME: move theme management to a plugin !
         if env.request.user:
             theme = env.request.user.get_property("theme", default=env.config.general.default_theme)
@@ -154,9 +154,7 @@ class BaseView(view._View):
         for contents in filter(None, hookmanager.trigger("HOOK_LOAD_BODY_CONTENT")):
             _BODY.update((i, True) for i in contents)
 
-        if env.request.dataset:  # In case of error, we use the exception dataset
-            dataset = env.request.dataset
-        else:
+        if not dataset:  # In case of error, we use the exception dataset
             dataset = _BASEVIEW_TEMPLATE.dataset()
 
         self._setup_dataset_default(dataset)
@@ -165,3 +163,6 @@ class BaseView(view._View):
         dataset["toplayout_extra_content"] = filter(None, hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT"))
 
         return dataset.render()
+
+    def respond(self, dataset=None, code=None):
+        return response.PrewikkaResponse(self._prepare(dataset), code=code)
