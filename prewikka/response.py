@@ -120,6 +120,9 @@ class PrewikkaResponse(object):
 
         if not isinstance(res, compat.STRING_TYPES):
             self.headers["Content-Type"] = "application/json"
+            if isinstance(res, dict):
+                res["source"] = env.request.view.view_endpoint if env.request.view else None
+
             res = json.dumps(res)
 
         return res.encode(env.config.general.get("encoding", "utf8"), "xmlcharrefreplace")

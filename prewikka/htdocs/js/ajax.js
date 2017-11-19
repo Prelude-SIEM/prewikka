@@ -53,21 +53,15 @@ function _initialize_components(container) {
     $(container).find('[data-toggle="popover"]').popover();
 }
 
-function handle_notifications(data)
-{
-    if ( data.notifications ) {
-        $.each(data.notifications, function(_, value) {
-            prewikka_notification(value);
-        });
-    }
-}
 
 function prewikka_drawTab(data)
 {
     var form;
     var content = $(data.content);
 
-    handle_notifications(data);
+    $.each(data.notifications, function(_, value) {
+        prewikka_notification(value);
+    });
 
     if ( ! data.content )
         return;
@@ -105,16 +99,23 @@ function _update_browser_title(title)
 
 
 /* Update the tab's menu according to the url */
-function _url_update(settings, force)
+function _url_update(xhr, settings)
 {
-        var url = settings['url'].split("?")[0];
-        var tab = $("#topmenu .topmenu_item a[href='" + url + "']");
+        var redirect = false;
+        var url = settings.url;
+        var newurl = xhr.getResponseHeader("X-responseURL");
 
-        if ( settings['history'] && (force || (settings['type'] || "").toUpperCase() != "POST") ) {
-                var url = settings['url'];
+        if ( newurl && newurl != url ) {
+            url = newurl;
+            redirect = true;
+        }
+
+        var tab = $("#topmenu .topmenu_item a[href='" + url.split("?")[0] + "']");
+
+        if ( settings['history'] && (redirect || (settings['type'] || "").toUpperCase() != "POST") ) {
                 var params = settings['data'];
 
-                if ( params ) {
+                if ( params && ! redirect ) {
                         if ( typeof(params) != 'string' )
                                 params = $.param(params);
 
@@ -134,51 +135,53 @@ function _url_update(settings, force)
 }
 
 
+function _process_widget(data, widget)
+{
+        widget.attr("tabindex", -1);
+        $(widget).wrapInner('<div class="modal-dialog ' + $(widget).attr("data-widget-options") + '"><div class="modal-content"></div></div>');
+
+        if ( data.help ) {
+            var help = $("<button>", { "class": "close prewikka-help-button", "data-href": data.help, "html": '?&nbsp;' });
+            $(widget).find(".modal-header button").after(help);
+        }
+
+        $(widget).addClass("prewikka-resources-container");
+        return prewikka_json_dialog({"content": widget });
+}
+
+
 function _process_ajax_response(settings, data, xhr)
 {
+    var result;
+    var event = jQuery.Event("prewikka-ajax-response");
+
+    $("#main").trigger(event, data);
+    if ( event.isDefaultPrevented() )
+        return;
+
     if ( data.type == "reload" )
         location.reload();
 
     else if ( data.type == "ajax-reload" )
-        return prewikka_ajax({ url: prewikka_location().href });
+        result = prewikka_ajax({ url: prewikka_location().href });
 
     else if ( data.type == "download" ) {
         window.location.href = data.href;
-        return false;
+        result = false;
     }
 
     else if ( data.type == "html" ) {
         var widget = $(data.content).find(".widget").addBack(".widget");
 
         if ( settings['context'] != "tab" && widget.length > 0 ) {
-            widget.attr("tabindex", -1);
-            $(widget).wrapInner('<div class="modal-dialog ' + $(widget).attr("data-widget-options") + '"><div class="modal-content"></div></div>');
-
-            if ( data.help ) {
-                var help = $("<button>", { "class": "close prewikka-help-button", "data-href": data.help, "html": '?&nbsp;' });
-                $(widget).find(".modal-header button").after(help);
-            }
-
-            $(widget).addClass("prewikka-resources-container");
-            return prewikka_json_dialog({"content": widget });
+            result = _process_widget(data, widget);
+        } else {
+            _url_update(xhr, settings);
+            result = prewikka_drawTab(data);
         }
-
-        if ( settings['history'] == undefined ) {
-                settings['history'] = true;
-                $("#top_view_navbar .dropdown").removeClass("open"); /* FIXME this should be automated through event */
-        }
-
-        var force = false;
-        var newurl = xhr.getResponseHeader("X-responseURL");
-        if ( newurl && settings.url != newurl ) {
-            settings.url = newurl;
-            force = true;
-        }
-
-        _url_update(settings, force);
-
-        return prewikka_drawTab(data);
     }
+
+    return result;
 }
 
 
@@ -199,6 +202,9 @@ function prewikka_ajax(settings)
 {
         if ( settings['dataType'] == undefined )
                 settings['dataType'] = "json";
+
+        if ( settings['history'] == undefined )
+            settings['history'] = true;
 
         settings['beforeSend'] = function(xhr) {
                 if ( window._prewikka_current_xhr != null)

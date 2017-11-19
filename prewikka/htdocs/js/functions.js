@@ -116,6 +116,10 @@ $(function() {
       return false;
   });
 
+  $("#top_view_navbar .dropdown a").click(function() {
+      $(this).closest(".dropdown-menu").prev().dropdown("toggle");
+  });
+
   $('ul.dropdown-menu [data-toggle=dropdown]').on('click', function() {
       $(this).closest(".dropdown-submenu").toggleClass("open");
       return false;
