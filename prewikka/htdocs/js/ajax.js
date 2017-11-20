@@ -162,13 +162,13 @@ function _process_ajax_response(settings, data, xhr)
     }
 
     if ( data.type == "reload" ) {
-        if ( data.target == "view" )
-            result = prewikka_ajax({ url: prewikka_location().href });
-
-        else if ( data.target == "window" )
+        if ( data.target == "window" )
             location.reload();
 
-        else if ( $(data.target).length )
+        else if ( data.target == "view" )
+            data.target = "#main";
+
+        if ( $(data.target).length )
             $(data.target).trigger("reload", data.options || {});
     }
 

@@ -38,6 +38,10 @@ $(function() {
         return this.each(function() { this.checked = mode; } );
   };
 
+  $(document).on("reload", "#main", function() {
+      return prewikka_ajax({ url: prewikka_location().href });
+  });
+
   $(document).on("click", ".popup_menu_toggle", function(){
     $(this).next().popupUnique(function(data){data.show('fast'); data.css('display','block')}, function(data){data.hide('fast')});
   });
