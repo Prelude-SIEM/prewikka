@@ -161,11 +161,16 @@ function _process_ajax_response(settings, data, xhr)
         });
     }
 
-    if ( data.type == "reload" )
-        location.reload();
+    if ( data.type == "reload" ) {
+        if ( data.target == "view" )
+            result = prewikka_ajax({ url: prewikka_location().href });
 
-    else if ( data.type == "ajax-reload" )
-        result = prewikka_ajax({ url: prewikka_location().href });
+        else if ( data.target == "window" )
+            location.reload();
+
+        else if ( $(data.target).length )
+            $(data.target).trigger("reload", data.options || {});
+    }
 
     else if ( data.type == "download" ) {
         window.location.href = data.href;

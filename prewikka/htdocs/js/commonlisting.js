@@ -173,6 +173,10 @@ function CommonListing(elem, text, options, restored_parameters) {
         return this;
     };
 
+    grid.on("reload", function(options) {
+        grid.trigger("reloadGrid", options);
+    });
+
     /*
      * The following events are deprecated and should be removed !
      */
