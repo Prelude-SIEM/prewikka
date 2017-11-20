@@ -69,16 +69,24 @@ $(function() {
                 var data = $(this).serializeArray();
                 var orig = $($(this).data("clicked"));
 
+                if ( $(form).triggerHandler("submit-prepare", [form, data]) == false )
+                    return false;
+
                 if ( orig.length ) {
+                    $(this).removeData("clicked");
+
+                    /*
+                     * FIXME: is this still in use ?
+                     */
+                    if ( orig.attr("name") && orig.val() )
                         data.push({ name: orig.attr("name"), value: orig.val() });
-                        $(this).removeData("clicked");
                 }
 
                 prewikka_ajax({
-                        url: $(this).attr("action"),
-                        type: $(this).attr("method"),
+                        url: (orig && orig.attr("formAction")) || $(this).attr("action"),
+                        type: (orig && orig.attr("formMethod")) || $(this).attr("method"),
                         data: data,
-                        context: "tab",
+                        context: $(this).hasClass("no-widget") ? "tab" : null,
                         success: function() {
                               $("form").trigger("submit-success", [form, data]);
 
@@ -97,9 +105,8 @@ $(function() {
                 return false;
         });
 
-        $(document).on("click", "#main form :input[type=submit]", function(e) {
-                if ( $(this).attr("name") && $(this).val() )
-                        $(this).closest("form").data("clicked", $(e.target));
+        $(document).on("click", ":input[type=submit]", function(e) {
+                $(this.form).data("clicked", $(e.target));
         });
 });
 </script>
