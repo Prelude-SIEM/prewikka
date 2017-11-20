@@ -26,6 +26,7 @@ Run requires:
 - python-babel
 - python-croniter >= 0.3.6
 - python-dateutil
+- python-enum34
 - python-mako >= 0.8.1
 - python-tz / pytz
 - python-werkzeug

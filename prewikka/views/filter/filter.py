@@ -249,4 +249,4 @@ class FilterView(FilterPlugin, view.View):
         criteria = dict((k, v) for k, v in criteria.items() if v is not None)
         self._db.upsert_filter(env.request.user, Filter(filter_id, filter_name, filter_description, criteria))
 
-        return response.PrewikkaDirectResponse({"type": "ajax-reload"})
+        return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})

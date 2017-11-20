@@ -64,7 +64,7 @@ class BaseView(view._View):
 
         view.process_parameters()
 
-        return response.PrewikkaDirectResponse(code=204)
+        return response.PrewikkaResponse(code=204)
 
     @view.route("/download/<int:id>/<filename>")
     @view.route("/download/<int:id>/<filename>/inline", defaults={"inline": True})
@@ -117,19 +117,19 @@ class BaseView(view._View):
         if "query" in env.request.parameters:
             history.save(env.request.user, form, env.request.parameters["query"])
 
-        return response.PrewikkaDirectResponse()
+        return response.PrewikkaResponse()
 
     @view.route("/history/<form>/get", methods=["POST"])
     def history_get(self, form):
         queries = history.get(env.request.user, form)
-        return response.PrewikkaDirectResponse(queries)
+        return response.PrewikkaResponse(queries)
 
     @view.route("/history/<form>/delete", methods=["POST"])
     def history_delete(self, form):
         query = env.request.parameters["query"] if "query" in env.request.parameters else None
         history.delete(env.request.user, form, query)
 
-        return response.PrewikkaDirectResponse()
+        return response.PrewikkaResponse()
 
     def _prepare(self, dataset):
         # FIXME: move theme management to a plugin !

@@ -40,9 +40,9 @@ class GridAjaxParameters(view.Parameters):
         return {"total": nb_pages, "page": self["page"], "rows": [], "records": total_results}
 
 
-class GridAjaxResponse(response.PrewikkaDirectResponse):
+class GridAjaxResponse(response.PrewikkaResponse):
     def __init__(self, rows, total_results):
-        response.PrewikkaDirectResponse.__init__(self)
+        response.PrewikkaResponse.__init__(self)
 
         # Ceil division (use // instead of / for Python3 compatibility):
         nb_pages = (total_results - 1) // int(env.request.parameters.get("rows", 10)) + 1
@@ -77,4 +77,4 @@ class AjaxHostURL(view.View):
         for info in hookmanager.trigger("HOOK_HOST_INFO", env.request.parameters["host"]):
             infos.update(info)
 
-        return response.PrewikkaDirectResponse(list(self._link_generator(infos)))
+        return response.PrewikkaResponse(list(self._link_generator(infos)))

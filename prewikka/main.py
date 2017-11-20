@@ -225,7 +225,7 @@ class Core(object):
 
         path = os.path.abspath(os.path.join(mapping, webreq.path[len(pathkey) + 2:]))
         if not path.startswith(mapping):
-            return response.PrewikkaDirectResponse(code=403, status_text="Request Forbidden")
+            return response.PrewikkaResponse(code=403, status_text="Request Forbidden")
 
         # If the path doesn't map to a regular file, let prewikka continue the processing
         if not os.path.isfile(path):
@@ -234,7 +234,7 @@ class Core(object):
         try:
             return response.PrewikkaFileResponse(path)
         except Exception:
-            return response.PrewikkaDirectResponse(code=404, status_text="File not found")
+            return response.PrewikkaResponse(code=404, status_text="File not found")
 
     def _process_dynamic(self, webreq):
         self._prewikka_init_if_needed()

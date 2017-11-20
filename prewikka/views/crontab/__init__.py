@@ -44,17 +44,17 @@ class CrontabView(view.View):
     @view.route("/settings/scheduler/disable", methods=["POST"])
     def disable(self):
         crontab.update(env.request.parameters.getlist("id", type=int), enabled=False)
-        return response.PrewikkaDirectResponse({"type": "ajax-reload"})
+        return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})
 
     @view.route("/settings/scheduler/enable", methods=["POST"])
     def enable(self):
         crontab.update(env.request.parameters.getlist("id", type=int), enabled=True)
-        return response.PrewikkaDirectResponse({"type": "ajax-reload"})
+        return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})
 
     @view.route("/settings/scheduler/<int:id>/save", methods=["POST"])
     def save(self, id=None):
         crontab.update_from_parameters(id, env.request.parameters)
-        return response.PrewikkaDirectResponse({"type": "ajax-reload"})
+        return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})
 
     @view.route("/settings/scheduler/<int:id>/edit")
     def edit(self, id=None):

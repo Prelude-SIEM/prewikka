@@ -102,7 +102,7 @@ class AboutPlugin(view.View):
             env.db.upsert("Prewikka_Module_Registry", ["module", "enabled"], upsrt, pkey=["module"])
             env.db.trigger_plugin_change()
 
-        return response.PrewikkaDirectResponse({"type": "reload"})
+        return response.PrewikkaResponse({"type": "reload", "target": "window"})
 
     @view.route("/settings/apps/update", methods=["GET"])
     def update(self):

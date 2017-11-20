@@ -137,7 +137,7 @@ class HostInfoAjax(view.View):
         for info in hookmanager.trigger("HOOK_HOST_TOOLTIP", env.request.parameters["host"]):
             infos.extend(info)
 
-        return response.PrewikkaDirectResponse(infos)
+        return response.PrewikkaResponse(infos)
 
 
 class MessageListing(view.View):
