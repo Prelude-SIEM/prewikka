@@ -27,7 +27,7 @@ import urllib
 from datetime import datetime
 
 import pkg_resources
-from prewikka import hookmanager, localization, resolve, resource, template, utils, view, mainmenu
+from prewikka import hookmanager, localization, resolve, resource, template, utils, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import html
 
@@ -328,19 +328,9 @@ class TcpIpOptions(Table):
         self._optionRender(tcp_options, self._tcpOptionToName)
 
 
-class MessageParameters(mainmenu.MainMenuParameters):
-    def register(self):
-        mainmenu.MainMenuParameters.register(self)
-        view.Parameters.register(self)
-        self.optional("analyzerid", text_type)
-        self.optional("messageid", text_type)
-
-
 class MessageSummary(Table, view.View):
-    view_parameters = MessageParameters
     view_permissions = [N_("IDMEF_VIEW")]
     view_template = template.PrewikkaTemplate(__name__, 'templates/messagesummary.mak')
-    view_extensions = (("menu", mainmenu.MainMenu),)
     plugin_htdocs = (("messagesummary", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     def __init__(self, *args, **kwargs):

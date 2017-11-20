@@ -69,7 +69,7 @@ function prewikka_drawTab(data)
     if ( ! form.length )
         form = content = content.wrapAll('<form method="POST" action="' + prewikka_location().pathname + '"></form>').parent();
 
-    $(form).prepend(data._extensions.menu);
+    form.prepend(data._extensions.menu);
 
     prewikka_resource_destroy($("#main"));
     $("#main").off().html(content);
@@ -149,6 +149,7 @@ function _process_widget(data, widget)
 function _process_ajax_response(settings, data, xhr)
 {
     var result;
+    var default_target = "#main";
     var event = jQuery.Event("prewikka-ajax-response");
 
     $("#main").trigger(event, data);
@@ -166,7 +167,7 @@ function _process_ajax_response(settings, data, xhr)
             location.reload();
 
         else if ( data.target == "view" )
-            data.target = "#main";
+            data.target = default_target;
 
         if ( $(data.target).length )
             $(data.target).trigger("reload", data.options || {});
@@ -187,9 +188,6 @@ function _process_ajax_response(settings, data, xhr)
             result = prewikka_drawTab(data);
         }
     }
-
-    if ( data._extensions )
-        $("#main").append(data._extensions.html_content);
 
     return result;
 }

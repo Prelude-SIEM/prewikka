@@ -23,7 +23,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sys
 
 from copy import copy
-from prewikka import compat, error, hookmanager, log, pluginmanager, registrar, response, template, usergroup, utils
+from prewikka import compat, error, hookmanager, log, mainmenu, pluginmanager, registrar, response, template, usergroup, utils
 
 import werkzeug.exceptions
 from werkzeug.routing import Map, Rule, BaseConverter
@@ -138,7 +138,7 @@ class ParameterDesc(object):
 class Parameters(dict):
     allow_extra_parameters = True
 
-    def __init__(self, view, *args, **kwargs):
+    def __init__(self, *args, **kwargs):
         dict.__init__(self, *args, **kwargs)
 
         self._hard_default = {}
@@ -146,8 +146,6 @@ class Parameters(dict):
         self._parameters = {}
 
         self.register()
-
-        list(hookmanager.trigger("HOOK_%s_PARAMETERS_REGISTER" % view.view_id.upper(), self))
 
     def register(self):
         pass
@@ -161,10 +159,9 @@ class Parameters(dict):
 
         self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save, general=general, persist=persist)
 
-    def normalize(self, view, user):
-        do_update = env.request.web.method == "PATCH"
-        do_save = env.request.web.method in ("POST", "PUT", "PATCH")
-        has_general = False
+    def normalize(self, view, user, save=True):
+        do_update = save and env.request.web.method == "PATCH"
+        do_save = save and env.request.web.method in ("POST", "PUT", "PATCH")
 
         for name, value in self.items():
             param = self._parameters.get(name)
@@ -173,9 +170,6 @@ class Parameters(dict):
                     raise InvalidParameterError(name)
 
                 continue
-
-            if param.general:
-                has_general = True
 
             value = param.parse(value)
             if user and param.save and do_save:
@@ -204,7 +198,7 @@ class Parameters(dict):
             else:
                 save_view = view
 
-            if do_save and not(param.persist) and not do_update and (not(param.general) or has_general):
+            if do_save and not(param.persist) and not do_update:
                 user.del_property(name, view=save_view)
 
             if name not in user.configuration.get(save_view, {}):
@@ -303,14 +297,39 @@ class Parameters(dict):
         return ret
 
 
+class GeneralParameters(Parameters):
+    _INTERNAL_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_absolute", "auto_apply_value"]
+
+    def register(self):
+        Parameters.register(self)
+        mainmenu._register_parameters(self)
+
+    def __init__(self, vobj, kw):
+        Parameters.__init__(self, kw)
+        # Only allow parameters saving if the view is a primary route (has a view_menu entry)
+        self.normalize(vobj.view_endpoint or vobj.view.view_id, env.request.user, save=bool(vobj.view_menu))
+
+
+class ViewResponse(response.PrewikkaResponse):
+    def __init__(self, data, **kwargs):
+        response.PrewikkaResponse.__init__(self, {"type": "view", "content": data})
+
+        menu = kwargs.get("menu", mainmenu.HTMLMainMenu() if env.request.has_menu else None)
+        if menu:
+            self.add_ext_content("menu", menu)
+
+        if env.request.view.view_help and env.config.general.get("help_location"):
+            self.add_ext_content("help", url_for("baseview.help", path=env.request.view.view_help))
+
+
 class _ViewDescriptor(object):
     view_parameters = Parameters
     view_template = None
     view_require_session = True
-    view_extensions = []
     view_layout = "BaseView"
     view_endpoint = None
     view_datatype = None
+    view_keywords = set()
 
     view_help = None
     view_permissions = []
@@ -347,18 +366,13 @@ class _ViewDescriptor(object):
         if env.request.dataset is not None:
             self._setup_dataset_default(env.request.dataset)
 
-        for name, classobj in self.view_extensions:
-            obj = classobj()
-            setattr(env.request, name, obj)
-
         return self.render(**env.request.view_kwargs) or env.request.dataset
 
     def process_parameters(self):
         env.request.parameters = {}
         if self.view_parameters:
-            env.request.parameters = self.view_parameters(self, env.request.web.arguments)
+            env.request.parameters = self.view_parameters(env.request.web.arguments)
             env.request.parameters.normalize(self.view_endpoint or self.view_id, env.request.user)
-            env.request.user.sync_properties()
 
     def respond(self):
         env.log.info("Loading view %s, endpoint %s" % (self.__class__.__name__, self.view_endpoint))
@@ -366,12 +380,7 @@ class _ViewDescriptor(object):
         resp = self._render()
 
         if isinstance(resp, (template._Dataset, compat.STRING_TYPES)):
-            resp = response.PrewikkaResponse({"type": "view", "content": resp})
-            for name, clname in self.view_extensions:
-                resp.add_ext_content(name, getattr(env.request, name).dataset.render())
-
-            if self.view_help and env.config.general.get("help_location"):
-                resp.add_ext_content("help", url_for("baseview.help", path=self.view_help))
+            resp = ViewResponse(resp)
 
         elif not(resp) or not issubclass(resp.__class__, response.PrewikkaResponse):  # Any other type (eg: dict)
             resp = response.PrewikkaResponse(resp)
@@ -445,22 +454,22 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
-def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, help=None, parameters=_SENTINEL):
+def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, keywords=set(), help=None, parameters=_SENTINEL):
     usergroup.ALL_PERMISSIONS.declare(permissions)
 
     if method is not _SENTINEL:
         ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu,
-                                         defaults=defaults, endpoint=endpoint, datatype=datatype, help=help, parameters=parameters)
+                                         defaults=defaults, endpoint=endpoint, datatype=datatype, keywords=keywords, help=help, parameters=parameters)
     else:
         ret = registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route, path, methods=methods, permissions=permissions,
-                                                        menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype, help=help, parameters=parameters)
+                                                        menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype, keywords=keywords, help=help, parameters=parameters)
 
     return ret
 
 
 class ViewManager(registrar.DelayedRegistrar):
-    def get(self, datatype=None):
-        return self._references.get(datatype)
+    def get(self, datatype=None, keywords=set()):
+        return filter(lambda x: keywords.issubset(x.view_keywords), self._references.get(datatype, []))
 
     def getView(self, view_id):
         return self._views.get(view_id.lower())
@@ -503,7 +512,7 @@ class ViewManager(registrar.DelayedRegistrar):
         env.request.view = view
         return view
 
-    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, help=None, parameters=None):
+    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, keywords=set(), help=None, parameters=None):
         baseview = method.__self__
 
         v = _ViewDescriptor()
@@ -514,7 +523,6 @@ class ViewManager(registrar.DelayedRegistrar):
         v.view_users = baseview.view_users
         v.view_groups = baseview.view_groups
         v.view_layout = baseview.view_layout
-        v.view_extensions = baseview.view_extensions
         v.view_require_session = baseview.view_require_session
 
         if parameters is _SENTINEL:
@@ -527,6 +535,8 @@ class ViewManager(registrar.DelayedRegistrar):
         v.view_menu = menu or baseview.view_menu
         v.view_permissions = set(permissions) | set(baseview.view_permissions)
         v.view_endpoint = "%s.%s" % (v.view_id, endpoint or method.__name__)
+        v.view_datatype = datatype
+        v.view_keywords = set(keywords)
 
         if v.view_menu:
             env.menumanager.add_section_info(v)

@@ -21,35 +21,27 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import calendar
 import datetime
-import functools
 
 from dateutil.relativedelta import relativedelta
-from prewikka import hookmanager, localization, template, utils, view
+from prewikka import hookmanager, localization, resource, template, utils
 from prewikka.dataprovider import Criterion
 
+_SENTINEL = object()
 _MAINMENU_TEMPLATE = template.PrewikkaTemplate(__name__, "templates/mainmenu.mak")
+_MAINMENU_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_absolute", "auto_apply_value"]
 
 
-class MainMenuParameters(view.Parameters):
-    _INTERNAL_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_absolute",
-                            "auto_apply_value"]
+def _register_parameters(view_parameters):
+    view_parameters.optional("timeline_value", int, default=1, save=True, general=True)
+    view_parameters.optional("timeline_unit", text_type, default="month", save=True, general=True)
+    view_parameters.optional("timeline_absolute", int, default=0, save=True, general=True)
+    view_parameters.optional("timeline_end", int, save=True, general=True)
+    view_parameters.optional("timeline_start", int, save=True, general=True)
+    view_parameters.optional("auto_apply_value", int, default=0, save=True, general=True)
 
-    def register(self):
-        view.Parameters.register(self)
-
-        self.optional("timeline_value", int, default=1, save=True, general=True)
-        self.optional("timeline_unit", text_type, default="month", save=True, general=True)
-        self.optional("timeline_absolute", int, default=0, save=True, general=True)
-        self.optional("timeline_end", int, save=True, general=True)
-        self.optional("timeline_start", int, save=True, general=True)
-        self.optional("auto_apply_value", int, default=0, save=True, general=True)
-
-        for i in hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_REGISTER", self):
-            self._INTERNAL_PARAMETERS = self._INTERNAL_PARAMETERS + i
-
-    def normalize(self, view_name, user):
-        view.Parameters.normalize(self, view_name, user)
-        all(hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_NORMALIZE", self))
+    view_parameters._INTERNAL_PARAMETERS = _MAINMENU_PARAMETERS[:]
+    for i in hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_REGISTER", view_parameters):
+        view_parameters._INTERNAL_PARAMETERS.extend(i)
 
 
 class TimeUnit(object):
@@ -127,7 +119,7 @@ class MainMenuStep(object):
 
 class TimePeriod(object):
     def __init__(self, parameters):
-        self.parameters = parameters
+        self._parameters = parameters
         self._setup_timeline_range()
 
     def _get_unit(self):
@@ -183,13 +175,13 @@ class TimePeriod(object):
         # end time by 999999 microseconds to account for us/ms.
 
         self.start = self.end = None
-        if "timeline_start" in self.parameters:
-            self.start = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self.parameters["timeline_start"]))
+        if "timeline_start" in self._parameters:
+            self.start = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self._parameters["timeline_start"]))
 
-        if "timeline_end" in self.parameters:
-            self.end = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self.parameters["timeline_end"])) + datetime.timedelta(microseconds=999999)
+        if "timeline_end" in self._parameters:
+            self.end = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self._parameters["timeline_end"])) + datetime.timedelta(microseconds=999999)
 
-        self._timeunit, self._timevalue = self.parameters["timeline_unit"], self.parameters["timeline_value"]
+        self._timeunit, self._timevalue = self._parameters["timeline_unit"], self._parameters["timeline_value"]
         if self._timeunit == "unlimited":
             self._timeunit = "year"
 
@@ -203,12 +195,12 @@ class TimePeriod(object):
 
         elif self.start is None and self.end is None:
             self.start = self.end = datetime.datetime.now(env.request.user.timezone).replace(microsecond=0)
-            if not self.parameters["timeline_absolute"]:  # relative
+            if not self._parameters["timeline_absolute"]:  # relative
                 self.start = self.end - delta
                 self.end = self.end.replace(microsecond=999999)
             else:  # absolute
                 self.end = utils.timeutil.truncate(self.end, self._timeunit) + relativedelta(**{self._timeunit + "s": 1})
-                if self.parameters["timeline_unit"] == "unlimited":
+                if self._parameters["timeline_unit"] == "unlimited":
                     self.start = datetime.datetime.fromtimestamp(0).replace(tzinfo=env.request.user.timezone)
                 else:
                     self.start = self.end - delta
@@ -249,15 +241,17 @@ class TimePeriod(object):
         return MainMenuStep(x, 1)
 
     def get_parameters(self):
-        return dict(((key, value) for key, value in self.parameters.items() if key in env.request.parameters._INTERNAL_PARAMETERS))
+        return dict(((key, value) for key, value in self._parameters.items() if key in env.request.menu_parameters._INTERNAL_PARAMETERS))
 
 
-class MainMenu(TimePeriod):
-    def __init__(self, criteria_type=None, **kwargs):
-        if kwargs.get("inline", True):
-            env.request.menu = self
+class _MainMenu(TimePeriod):
+    def __init__(self, criteria_type=_SENTINEL, parameters=None, **kwargs):
+        if criteria_type is not _SENTINEL:
+            self._criteria_type = criteria_type
+        else:
+            self._criteria_type = env.request.view.view_datatype
 
-        self._criteria_type = criteria_type
+        self._parameters = parameters or env.request.menu_parameters
         self.dataset = _MAINMENU_TEMPLATE.dataset(inline=True, period=True, refresh=True, period_optional=False, label_width=2, input_size="md")
         self.dataset.update(kwargs)
 
@@ -286,7 +280,7 @@ class MainMenu(TimePeriod):
         for unit in "minute", "hour", "day", "month", "year", "unlimited":
             setattr(self.dataset["timeline"], "%s_selected" % unit, "")
 
-        setattr(self.dataset["timeline"], "%s_selected" % env.request.parameters["timeline_unit"], "selected='selected'")
+        setattr(self.dataset["timeline"], "%s_selected" % self._parameters["timeline_unit"], "selected='selected'")
 
         if not start and not end:
             return
@@ -295,36 +289,34 @@ class MainMenu(TimePeriod):
         self.dataset["timeline"].end = end.replace(tzinfo=None, microsecond=0).isoformat()
 
     def _render(self):
-        self.dataset["timeline"].value = env.request.parameters["timeline_value"]
-        self.dataset["timeline"].unit = env.request.parameters["timeline_unit"]
-        self.dataset["timeline"].absolute = env.request.parameters["timeline_absolute"]
-        self.dataset["timeline"].quick_selected = _("Custom")
-        self.dataset["timeline"].quick_custom = True
+        self.dataset["timeline"].value = self._parameters["timeline_value"]
+        self.dataset["timeline"].unit = self._parameters["timeline_unit"]
+        self.dataset["timeline"].absolute = self._parameters["timeline_absolute"]
+        self.dataset["timeline"].quick_selected = _("None") if self._parameters["timeline_value"] == 0 else _("Custom")
+        self.dataset["timeline"].quick_custom = self._parameters["timeline_value"] != 0
         self.dataset["timeline"].refresh_selected = _("Inactive")
-        self.dataset["auto_apply_value"] = env.request.parameters["auto_apply_value"]
+        self.dataset["auto_apply_value"] = self._parameters["auto_apply_value"]
         self.dataset["timeline"].time_format = localization.get_calendar_format()
 
         for label, value in self.dataset["timeline"].refresh:
-            if value == env.request.parameters["auto_apply_value"]:
+            if value == self._parameters["auto_apply_value"]:
                 self.dataset["timeline"].refresh_selected = label
 
-        if "timeline_start" not in env.request.parameters and "timeline_end" not in env.request.parameters:
+        if "timeline_start" not in self._parameters and "timeline_end" not in self._parameters:
             for label, value, unit, absolute in self.dataset["timeline"].quick:
-                if value == env.request.parameters["timeline_value"] and unit == env.request.parameters["timeline_unit"] and absolute == env.request.parameters["timeline_absolute"]:
+                if value == self._parameters["timeline_value"] and unit == self._parameters["timeline_unit"] and absolute == self._parameters["timeline_absolute"]:
                     self.dataset["timeline"].quick_selected = label
                     self.dataset["timeline"].quick_custom = False
                     break
 
-        self.parameters = env.request.parameters
         self._setup_timeline_range()
         self._set_timeline(self.start, self.end)
 
         self.dataset["menu_extra"] = filter(None, hookmanager.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type))
 
+    def render(self):
+        return resource.HTMLSource(self.dataset.render())
 
-def MainMenuType(criteria_type):
-    return functools.partial(MainMenu, criteria_type=criteria_type)
 
-
-MainMenuAlert = MainMenuType("alert")
-MainMenuHeartbeat = MainMenuType("heartbeat")
+def HTMLMainMenu(**kwargs):
+    return resource.HTMLSource(_MainMenu(**kwargs).dataset.render())

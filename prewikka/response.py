@@ -87,8 +87,8 @@ class PrewikkaResponse(object):
         self.ext_content[key] = value
         return self
 
-    def add_html_content(self, elem):
-        self.ext_content.setdefault("html_content", []).append(elem)
+    def add_html_content(self, elem, target=None):
+        self.ext_content.setdefault("html_content", []).append({"target": target, "html": elem})
         return self
 
     def add_notification(self, message, classname="success", name=None, icon=None, duration=None):

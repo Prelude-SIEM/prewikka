@@ -64,10 +64,13 @@ $(function() {
                 return false;
         });
 
-        $(document).on("submit", "body form", function() {
+        $(document).on("submit", "body form", function(event) {
                 var form = this;
                 var data = $(this).serializeArray();
                 var orig = $($(this).data("clicked"));
+
+                if ( event.isDefaultPrevented() )
+                    return;
 
                 if ( $(form).triggerHandler("submit-prepare", [form, data]) == false )
                     return false;

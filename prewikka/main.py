@@ -264,7 +264,11 @@ class Core(object):
             view_object = autherr
 
         resolve.process(env.dns_max_delay)
-        return view_object.respond()
+        ret = view_object.respond()
+        if env.request.user:
+            env.request.user.sync_properties()
+
+        return ret
 
     def process(self, webreq):
         env.request.init(webreq)

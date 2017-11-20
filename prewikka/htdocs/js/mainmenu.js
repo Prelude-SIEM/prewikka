@@ -13,6 +13,9 @@ function MainMenuInit(inline, start, end, date_format) {
     var start_picker = DatetimePicker(root.find(".timeline_start"), start, options);
     var end_picker = DatetimePicker(root.find(".timeline_end"), end, options, 59);
 
+    // Make sure whole mainmenu input have the mainmenu class.
+    $(root).find(":input").addClass("mainmenu");
+
     that.trigger_custom_date = function(enabled) {
         root.find("[name=timeline_start]").prop("disabled", !enabled);
         root.find("[name=timeline_end]").prop("disabled", !enabled);

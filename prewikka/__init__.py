@@ -7,8 +7,6 @@ import sys
 import prelude
 import preludedb
 
-from prewikka import siteconfig
-
 if sys.version_info >= (3, 0):
     import builtins
     builtins.text_type = str
@@ -27,6 +25,10 @@ except ImportError:
 
 # Set default umask and create temporary directory
 os.umask(0o027)
+
+
+from prewikka import mainmenu, siteconfig, utils, view
+
 
 try:
     os.mkdir(siteconfig.tmp_dir, 0o700)
@@ -50,11 +52,20 @@ class Request(local):
         self.web = request
         self.user = None
         self.view = None
-        self.menu = None
+        self.has_menu = False
         self.dataset = None
         self.parameters = None
         self.cache = _cache()
         self.view_kwargs = {}
+
+    @utils.request_memoize_property("menu")
+    def menu(self):
+        self.has_menu = True
+        return mainmenu.TimePeriod(self.menu_parameters)
+
+    @utils.request_memoize_property("menu_parameters")
+    def menu_parameters(self):
+        return view.GeneralParameters(self.view, self.web.arguments)
 
     def init(self, request):
         self._init(request)

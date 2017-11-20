@@ -21,7 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import datetime
 
-from prewikka import crontab, localization, mainmenu, template, utils
+from prewikka import crontab, localization, template, utils
 from prewikka.dataprovider import Criterion
 
 from .messagelisting import ListedMessage, MessageListing, MessageListingParameters
@@ -62,7 +62,6 @@ class HeartbeatListing(MessageListing):
     view_parameters = HeartbeatListingParameters
     view_permissions = [N_("IDMEF_VIEW")]
     view_template = template.PrewikkaTemplate(__name__, "templates/heartbeatlisting.mak")
-    view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
     view_datatype = "heartbeat"
     view_help = "#heartbeats"
 

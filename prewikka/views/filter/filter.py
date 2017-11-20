@@ -169,10 +169,10 @@ class FilterView(FilterPlugin, view.View):
 
     @hookmanager.register("HOOK_DATAPROVIDER_CRITERIA_PREPARE")
     def _filter_get_criteria(self, ctype):
-        if not env.request.menu:
+        if not env.request.has_menu:
             return
 
-        fname = env.request.parameters.get("filter")
+        fname = env.request.menu_parameters.get("filter")
         if not fname:
             return
 
@@ -189,7 +189,7 @@ class FilterView(FilterPlugin, view.View):
     @hookmanager.register("HOOK_MAINMENU_EXTRA_CONTENT")
     def _filter_html_menu(self, ctype):
         dset = self._filter_menu_tmpl.dataset()
-        dset["current_filter"] = env.request.parameters.get("filter", "")
+        dset["current_filter"] = env.request.menu_parameters.get("filter", "")
         dset["filter_list"] = self._db.get_filters(env.request.user, ctype)
 
         return resource.HTMLSource(dset.render())

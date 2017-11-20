@@ -23,7 +23,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import functools
 
 import pkg_resources
-from prewikka import hookmanager, localization, mainmenu, resolve, usergroup, view, response
+from prewikka import hookmanager, localization, resolve, usergroup, view, response
 from prewikka.dataprovider import Criterion
 from prewikka.utils import json
 
@@ -34,10 +34,8 @@ class AttrDict(dict):
         self.__dict__ = self
 
 
-class MessageListingParameters(mainmenu.MainMenuParameters):
+class MessageListingParameters(view.Parameters):
     def register(self):
-        mainmenu.MainMenuParameters.register(self)
-
         self.optional("offset", int, default=0)
         self.optional("limit", int, default=50, save=True)
         self.optional("selection", [json.loads], Criterion())
@@ -141,6 +139,7 @@ class HostInfoAjax(view.View):
 
 
 class MessageListing(view.View):
+    view_keywords = ["listing"]
     plugin_htdocs = (("messagelisting", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     def _adjustCriteria(self, criteria):

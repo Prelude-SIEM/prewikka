@@ -26,15 +26,14 @@ from prewikka import hookmanager, localization, mainmenu, resource, template, ut
 from prewikka.dataprovider import Criterion
 
 
-class AgentsParameters(mainmenu.MainMenuParameters):
+class AgentsParameters(view.Parameters):
     def register(self):
-        mainmenu.MainMenuParameters.register(self)
-        self.optional("jqgrid_params_agents", utils.json.loads, {}, save=True)
+        self.optional("jqgrid_params_agents", utils.json.loads, {}, persist=True)
 
 
 class Agents(view.View):
+    view_datatype = "heartbeat"
     view_parameters = AgentsParameters
-    view_extensions = (("menu", mainmenu.MainMenuHeartbeat),)
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     def __init__(self):
@@ -97,7 +96,7 @@ class Agents(view.View):
         list(hookmanager.trigger("HOOK_AGENTS_EXTRA_CONTENT", analyzer_data))
         extra_columns = filter(None, hookmanager.trigger("HOOK_AGENTS_EXTRA_COLUMN"))
 
-        return template.PrewikkaTemplate(__name__, "templates/agents.mak").render(data=analyzer_data, extra_columns=extra_columns)
+        return view.ViewResponse(template.PrewikkaTemplate(__name__, "templates/agents.mak").render(data=analyzer_data, extra_columns=extra_columns), menu=mainmenu.HTMLMainMenu())
 
     @view.route("/agents/delete", methods=["POST"], permissions=[N_("IDMEF_ALTER")])
     def delete(self):

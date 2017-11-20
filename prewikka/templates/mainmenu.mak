@@ -89,7 +89,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
             <ul class="dropdown-menu dropdown-fixed timeline_quick_select">
 
               % if period_optional:
-              <li><a data-value="none" data-unit="" data-absolute="">${ _("None") }</a></li>
+              <li><a data-value="0" data-unit="" data-absolute="">${ _("None") }</a></li>
               % endif
 
               <li><a data-value="" data-unit="" data-absolute="" class="timeline_quick_select_custom">${ _("Custom") }</a></li>

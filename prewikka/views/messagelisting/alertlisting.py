@@ -28,7 +28,7 @@ import re
 import sys
 import prelude
 
-from prewikka import crontab, hookmanager, localization, mainmenu, resource, template, utils, view
+from prewikka import crontab, hookmanager, localization, resource, template, utils, view
 from prewikka.dataprovider import Criterion
 
 from .messagelisting import AttrDict, ListedMessage, MessageListing, MessageListingParameters
@@ -722,7 +722,6 @@ class AlertListing(MessageListing):
     view_parameters = AlertListingParameters
     view_permissions = [N_("IDMEF_VIEW")]
     view_template = template.PrewikkaTemplate(__name__, "templates/alertlisting.mak")
-    view_extensions = (("menu", mainmenu.MainMenuAlert),)
     view_datatype = "alert"
     view_help = "#alerts"
 
