@@ -57,8 +57,8 @@ class _IDMEFPlugin(DataProviderBackend):
     plugin_copyright = version.__copyright__
 
     TYPE_OPERATOR_MAPPING = {
-        prelude.IDMEFValue.TYPE_STRING: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*"),
-        prelude.IDMEFValue.TYPE_DATA: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*", "<", ">"),
+        text_type: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*"),
+        bytes: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*", "<", ">"),
         None: ("=", "!=", "<", ">", "<=", ">=")
     }
 
