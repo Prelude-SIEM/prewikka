@@ -136,3 +136,21 @@ class HTMLNode(json.JSONObject):
 
     def __lt__(self, other):
         return (self._sortkey, self.childs) < (other._sortkey, other.childs)
+
+
+class HTMLProgressBar(HTMLNode):
+    def __init__(self, color, progress, text):
+        txtspan = HTMLNode('span', text)
+
+        pgdiv = HTMLNode('div', txtspan, **{
+            'class': "progress-bar progress-bar-%s progress-bar-striped" % color,
+            'aria-valuenow': progress,
+            'aria-valuemin': 0,
+            'aria-valuemax': 100,
+            'style': "width: %s%%" % progress
+        })
+
+        HTMLNode.__init__(self, 'div', pgdiv, _class='progress')
+
+    def __jsonobj__(self):
+        return {"__prewikka_class__": ("HTMLNode", self.__json__())}
