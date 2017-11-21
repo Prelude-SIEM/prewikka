@@ -4,7 +4,12 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pkg_resources
-from prewikka import error, hookmanager, localization, log, template, theme, usergroup, view, response
+from enum import IntEnum
+
+from prewikka import error, hookmanager, localization, log, response, template, theme, usergroup, view
+
+
+ReloadEnum = IntEnum("ReloadEnum", "none view window")
 
 
 class UserSettings(view.View):
@@ -41,14 +46,13 @@ class UserSettings(view.View):
         if not env.request.parameters["timezone"] in localization.get_timezones():
             raise error.PrewikkaUserError(N_("Invalid Timezone"), N_("Specified timezone does not exist"), log_priority=log.WARNING)
 
-        need_reload = False
+        reload_type = ReloadEnum["none"]
         user.begin_properties_change()
-
-        for param, reload in (("fullname", False), ("email", False), ("theme", True), ("language", True), ("timezone", False)):
-            if user == env.request.user and reload and env.request.parameters.get(param) != user.get_property(param):
-                need_reload = True
-
-            user.set_property(param, env.request.parameters.get(param))
+        for param, reload in (("fullname", "none"), ("email", "none"), ("timezone", "view"), ("theme", "window"), ("language", "window")):
+            value = env.request.parameters.get(param)
+            if value and value != user.get_property(param):
+                user.set_property(param, value)
+                reload_type = max(reload_type, ReloadEnum[reload])
 
         if user == env.request.user:
             user.set_locale()
@@ -58,7 +62,7 @@ class UserSettings(view.View):
         # Make sure nothing is returned (reset the default dataset)
         env.request.dataset = None
 
-        if need_reload:
-            return response.PrewikkaDirectResponse({"type": "reload"})
+        if reload_type > ReloadEnum["none"]:
+            return response.PrewikkaResponse({"type": "reload", "target": reload_type.name})
 
         return response.PrewikkaRedirectResponse(url_for(".display"), 303)
