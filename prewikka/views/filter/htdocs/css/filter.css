@@ -103,17 +103,6 @@ div.operator > div[data-toggle=dropdown] {
     border-radius: 5px 0 0 5px;
 }
 
-.chosen-container .chosen-drop {
-    /* remove Chosen from the modal flow */
-    position: fixed;
-    display: none;
-    top: auto;
-    left: auto;
-}
-
 .chosen-container.chosen-with-drop .chosen-drop {
-    /* remove Chosen from the modal flow */
-    display: block;
     width: 300px;
-    left: auto;
 }

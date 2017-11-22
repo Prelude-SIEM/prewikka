@@ -129,6 +129,25 @@ $(function() {
       return false;
   });
 
+  function _position_dropdown(elem, selector) {
+      // Allow dropdowns expanding out of the modal
+      // Setting "top: auto; left: auto" works only with Firefox
+      var modal = elem.closest(".modal-content:visible");
+      elem.find(selector).css({
+          position: "fixed",
+          top: elem.offset().top - modal.offset().top + elem.height(),
+          left: elem.offset().left - modal.offset().left
+      });
+  }
+
+  $(document).on('show.bs.dropdown', '.modal-content:visible .dropdown-fixed', function() {
+      _position_dropdown($(this), ".dropdown-menu");
+  });
+
+  $(document).on('chosen:showing_dropdown', '.modal-content:visible select', function() {
+      _position_dropdown($(this).siblings(".chosen-container"), ".chosen-drop");
+  });
+
   $(document).on('click', '.popup_menu_dynamic', function() {
       $(this).removeClass("popup_menu_dynamic");
 
