@@ -210,7 +210,8 @@ function CommonListing(elem, text, options, restored_parameters) {
         destroy: function() {
             grid.jqGrid("clearGridData");
             grid.jqGrid("GridDestroy");
-        }
+        },
+        container: elem
     });
 
     resizeGrid();
