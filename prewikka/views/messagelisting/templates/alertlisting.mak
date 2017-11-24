@@ -344,7 +344,7 @@ $(function() {
 <a class="impact_severity_${ info.severity.value } popup_menu_toggle" title="${ info.description }" data-toggle="tooltip" data-placement="top" data-container="#main">${ text }</a><span class="popup_menu">
 % if info.count == 1:
 % for obj in info.links:
-${ obj.to_string() }
+${ obj }
 % endfor
 % endif
 % if not info.classification.already_filtered:
@@ -453,7 +453,7 @@ ${ text }
          <a target="${ env.external_link_target }" href="${ env.host_details_url }?host=${ address.value }">${ (_("%s information") % (name)).capitalize() }</a>
          % endif
          % for obj in address.host_links:
-          ${ obj.to_string() }
+          ${ obj }
          % endfor
        % endif
        </span>
@@ -504,7 +504,7 @@ ${ writeService(":", direction) }
 % for link in message.extra_link:
  <td>
    <div style="float:left;">
-     ${ link | n }
+     ${ link }
    </div>
  </td>
 % endfor

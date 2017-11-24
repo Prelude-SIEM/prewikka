@@ -521,7 +521,7 @@ class MessageSummary(Table, view.View):
 
             links = resource.HTMLSource()
             for obj in filter(None, hookmanager.trigger("HOOK_ALERTSUMMARY_MEANING_LINK", alert, meaning, value)):
-                links += obj.to_string()
+                links += obj
 
             if links:
                 meaning = resource.HTMLSource("<a class='popup_menu_toggle'>%s</a><span class='popup_menu'>%s</span>") % (meaning, links)

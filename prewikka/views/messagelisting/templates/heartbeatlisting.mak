@@ -63,7 +63,7 @@
       <a target="${ env.external_link_target }" href="${ env.host_details_url }?host=${ address['value'] }">Address information</a>
       % endif
       % for obj in address['host_links']:
-        ${ obj.to_string() }
+        ${ obj }
       % endfor
     </span>
     <br />
