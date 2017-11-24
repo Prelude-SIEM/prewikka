@@ -74,6 +74,8 @@ class JSSource(HTMLSource):
 
 @functools.total_ordering
 class HTMLNode(json.JSONObject):
+    _HTML5_VOID_TAGS = frozenset(["area", "base", "br", "col", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr"])
+
     def __init__(self, tag, *childs, **attrs):
         self.tag = tag
         self.childs = childs
@@ -97,7 +99,10 @@ class HTMLNode(json.JSONObject):
                 _class += " %s" % v
                 continue
 
-            attr_s += HTMLSource(" %s=\"%s\"") % (k, v)
+            if v is True:
+                attr_s += HTMLSource(" %s" % k)
+            elif v is not False:
+                attr_s += HTMLSource(" %s=\"%s\"") % (k, v)
 
         if _class:
             attr_s = HTMLSource(" class=\"%s\"") % (_class) + attr_s
@@ -108,6 +113,12 @@ class HTMLNode(json.JSONObject):
 
         if not self.tag:
             return HTMLSource("%s" % childs)
+
+        if self.tag in self._HTML5_VOID_TAGS:
+            if self.childs:
+                raise Exception(_("HTMLNode with void tag '%s' contains children") % self.tag)
+
+            return HTMLSource("<%s%s />" % (self.tag, attr_s))
 
         return HTMLSource("<%s%s>%s</%s>" % (self.tag, attr_s, childs, self.tag))
 
