@@ -2,6 +2,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 # flake8: noqa
 
+from . import html
 from . import timeutil
 from .cache import memoize, memoize_property, request_memoize, request_memoize_property
 from .misc import (

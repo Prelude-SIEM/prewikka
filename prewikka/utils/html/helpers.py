@@ -19,31 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import markupsafe
-
-from prewikka.utils import json
-
-
-class Markup(markupsafe.Markup):
-    @classmethod
-    def escape(cls, value):
-        if value is None:
-            return Markup()
-
-        return markupsafe.escape(value)
-
-
-def escape(value):
-    return Markup.escape(value)
-
-
-def escapejs(value):
-    value = json.dumps(value, cls=json.PrewikkaHTMLJSONEncoder)
-
-    if "__prewikka_class__" in value:
-        value = "_prewikka_revive(%s)" % value
-
-    return Markup(value)
+from prewikka import resource
 
 
 def selected(condition):
@@ -56,3 +32,21 @@ def checked(condition):
 
 def disabled(condition):
     return "disabled" if condition else ""
+
+
+class HTMLProgressBar(resource.HTMLNode):
+    def __init__(self, color, progress, text):
+        txtspan = resource.HTMLNode('span', text)
+
+        pgdiv = resource.HTMLNode('div', txtspan, **{
+            'class': "progress-bar progress-bar-%s progress-bar-striped" % color,
+            'aria-valuenow': progress,
+            'aria-valuemin': 0,
+            'aria-valuemax': 100,
+            'style': "width: %s%%" % progress
+        })
+
+        resource.HTMLNode.__init__(self, 'div', pgdiv, _class='progress')
+
+    def __jsonobj__(self):
+        return {"__prewikka_class__": ("HTMLNode", self.__json__())}
