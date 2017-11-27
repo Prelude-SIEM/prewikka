@@ -234,9 +234,7 @@ class User(NameID):
         self.configuration.setdefault(view or "", {})[key] = value
 
     def sync_properties(self):
-        print("COMMIT", self._properties_state)
         if self._properties_state & self.__PROPERTIES_STATE_DIRTY:
-            print("UPSERT", self.id, self.configuration)
             env.db.upsert("Prewikka_User_Configuration", ["userid", "config"], [[self.id, json.dumps(self.configuration)]], pkey=("userid",))
 
         self._properties_state = self.__PROPERTIES_STATE_BEGIN
