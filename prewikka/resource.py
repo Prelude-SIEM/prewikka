@@ -133,6 +133,9 @@ class HTMLNode(json.JSONObject):
 
         return ret
 
+    def format(self, *args, **kwargs):
+        return self.to_string().format(*args, **kwargs)
+
     def __json__(self):
         return {"tag": self.tag, "childs": self.childs, "attrs": self.attrs}
 
@@ -141,6 +144,9 @@ class HTMLNode(json.JSONObject):
 
     def __str__(self):
         return self.to_string()
+
+    def __mod__(self, other):
+        return self.to_string() % other
 
     def __add__(self, other):
         return HTMLNode(None, self, other)
