@@ -93,6 +93,9 @@ class _PrewikkaTemplate(object):
         except Exception as e:
             self._error = e
 
+    def __json__(self):
+        return self._template.render()
+
     def render(self, **kwargs):
         if self._error:
             raise self._error
