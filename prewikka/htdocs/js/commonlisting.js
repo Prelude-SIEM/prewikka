@@ -175,6 +175,7 @@ function CommonListing(elem, text, options, restored_parameters) {
 
     grid.on("reload", function(options) {
         grid.trigger("reloadGrid", options);
+        return false;
     });
 
     /*
