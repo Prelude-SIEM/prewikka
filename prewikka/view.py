@@ -135,20 +135,6 @@ class ParameterDesc(object):
         return value
 
 
-def _user_properties_change(func):
-    def inner(self, *args, **kwargs):
-        if env.request.user:
-            env.request.user.begin_properties_change()
-
-        ret = func(self, *args, **kwargs)
-        if env.request.user:
-            env.request.user.commit_properties_change()
-
-        return ret
-
-    return inner
-
-
 class Parameters(dict):
     allow_extra_parameters = True
 
@@ -175,16 +161,6 @@ class Parameters(dict):
 
         self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save, general=general, persist=persist)
 
-    def process(self, view_id):
-        if env.request.user:
-            env.request.user.begin_properties_change()
-
-        self.normalize(view_id, env.request.user)
-
-        if env.request.user:
-            env.request.user.commit_properties_change()
-
-    @_user_properties_change
     def normalize(self, view, user):
         do_update = env.request.web.method == "PATCH"
         do_save = env.request.web.method in ("POST", "PUT", "PATCH")
@@ -381,7 +357,8 @@ class _ViewDescriptor(object):
         env.request.parameters = {}
         if self.view_parameters:
             env.request.parameters = self.view_parameters(self, env.request.web.arguments)
-            env.request.parameters.process(self.view_endpoint or self.view_id)
+            env.request.parameters.normalize(self.view_endpoint or self.view_id, env.request.user)
+            env.request.user.sync_properties()
 
     def respond(self):
         env.log.info("Loading view %s, endpoint %s" % (self.__class__.__name__, self.view_endpoint))

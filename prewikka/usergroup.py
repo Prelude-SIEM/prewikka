@@ -140,29 +140,14 @@ class Group(NameID):
         env.auth.delete_group(self)
 
 
-def _sync_if_needed(func):
-    def inner(self, *args, **kwargs):
-        if self._properties_state:
-            return func(self, *args, **kwargs)
-
-        self.begin_properties_change()
-        ret = func(self, *args, **kwargs)
-        self.commit_properties_change()
-
-        return ret
-
-    return inner
-
-
 class User(NameID):
     __sentinel = object()
-    __PROPERTIES_STATE_NONE = 0x00
     __PROPERTIES_STATE_BEGIN = 0x01
     __PROPERTIES_STATE_DIRTY = 0x02
 
     def __init__(self, login=None, userid=None):
         NameID.__init__(self, login, userid)
-        self._properties_state = self.__PROPERTIES_STATE_NONE
+        self._properties_state = self.__PROPERTIES_STATE_BEGIN
 
     def _id2name(self, id):
         return env.auth.get_user_by_id(id).name
@@ -199,7 +184,6 @@ class User(NameID):
         if lang:
             localization.setLocale(lang)
 
-    @_sync_if_needed
     def del_property(self, key, view=None):
         view = view or ""
 
@@ -211,7 +195,6 @@ class User(NameID):
         if r:
             self._properties_state |= self.__PROPERTIES_STATE_DIRTY
 
-    @_sync_if_needed
     def del_properties(self, view):
         r = self.configuration.pop(view, None)
         if r:
@@ -243,7 +226,6 @@ class User(NameID):
     def get_property(self, key, view=None, default=None):
         return self.get_property_fail(key, view or "", default)
 
-    @_sync_if_needed
     def set_property(self, key, value, view=None):
         old = self.configuration.get(view or "", {}).get(key)
         if old != value:
@@ -251,14 +233,15 @@ class User(NameID):
 
         self.configuration.setdefault(view or "", {})[key] = value
 
-    def begin_properties_change(self):
-        self._properties_state = self.__PROPERTIES_STATE_BEGIN
-
-    def commit_properties_change(self):
+    def sync_properties(self):
+        print("COMMIT", self._properties_state)
         if self._properties_state & self.__PROPERTIES_STATE_DIRTY:
+            print("UPSERT", self.id, self.configuration)
             env.db.upsert("Prewikka_User_Configuration", ["userid", "config"], [[self.id, json.dumps(self.configuration)]], pkey=("userid",))
 
-        self._properties_state = self.__PROPERTIES_STATE_NONE
+        self._properties_state = self.__PROPERTIES_STATE_BEGIN
+        if env.request.user == self:
+            env.request.user = self
 
     def has(self, perm):
         if type(perm) in (list, tuple, set):

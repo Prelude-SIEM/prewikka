@@ -47,7 +47,6 @@ class UserSettings(view.View):
             raise error.PrewikkaUserError(N_("Invalid Timezone"), N_("Specified timezone does not exist"), log_priority=log.WARNING)
 
         reload_type = ReloadEnum["none"]
-        user.begin_properties_change()
         for param, reload in (("fullname", "none"), ("email", "none"), ("timezone", "view"), ("theme", "window"), ("language", "window")):
             value = env.request.parameters.get(param)
             if value and value != user.get_property(param):
@@ -57,7 +56,7 @@ class UserSettings(view.View):
         if user == env.request.user:
             user.set_locale()
 
-        user.commit_properties_change()
+        user.sync_properties()
 
         # Make sure nothing is returned (reset the default dataset)
         env.request.dataset = None
