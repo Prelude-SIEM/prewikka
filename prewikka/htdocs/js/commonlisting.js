@@ -30,14 +30,24 @@ function CommonListing(elem, text, options, restored_parameters) {
         options.colModel = colModel;
     }
 
-    $(elem).addClass("commonlisting table table-striped");
+    $(elem).addClass("commonlisting table table-striped").css("width", detectGridWidth($(elem)));
 
     for ( var i in options['colModel'] ) {
         if (! options['colModel'][i].formatter )
             options['colModel'][i].formatter = genericFormatter;
     }
 
+    /*
+     * In jqGrid, the height attribute is specific to the height of the data, not including header and footer.
+     * This is broken since it prevents a user from specifying the height on initialization, since header and
+     * footer sizes are unknown at that time.
+     *
+     * As a result, we specify a height of 0, and call resizeGrid() in the loadComplete callback.
+     */
     options = _mergedict({
+        autowidth: false,
+        width: detectGridWidth($(elem)),
+        height: 0,
         gridview: true,
         multiselect: true,
         multiSort: true,
@@ -49,6 +59,19 @@ function CommonListing(elem, text, options, restored_parameters) {
         hidegrid: false,
         viewrecords: true,
         globalSearch: false,
+        onInitGrid: function() {
+            if ( options.globalSearch ) {
+                $(".ui-jqgrid-titlebar").css("overflow", "auto")
+                .append($("<label>", {for: "globalSearch", class: "pull-right"}).text(text["search"])
+                .append($("<input>", {id: "globalSearch", type: "text"})));
+
+                $("#globalSearch").on("keypress", function(e) {
+                    if ( e.which === $.ui.keyCode.ENTER ) {
+                        return _searchGrid(elem, $(this).val(), options.datatype == "json");
+                    }
+                });
+            }
+        },
         gridComplete: function() {
             update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
             dfd.resolve();
@@ -65,7 +88,7 @@ function CommonListing(elem, text, options, restored_parameters) {
         resizeStop: function() {
             saveGridColumns($(this));
         },
-        loadComplete: resizeGrid,
+        loadComplete: function() { _resizeGrid($(elem)) },
         loadError: null  // This prevents an error row to appear in the grid
     }, options);
 
@@ -120,38 +143,12 @@ function CommonListing(elem, text, options, restored_parameters) {
         }
     });
 
-    if ( options.globalSearch ) {
-        $(".ui-jqgrid-titlebar").css("overflow", "auto")
-        .append($("<label>", {for: "globalSearch", class: "pull-right"}).text(text["search"])
-        .append($("<input>", {id: "globalSearch", type: "text"})));
-
-        $("#globalSearch").on("keypress", function(e) {
-            if ( e.which === $.ui.keyCode.ENTER ) {
-                var query = $(this).val();
-                var postData = grid.jqGrid("getGridParam", "postData");
-                if ( options.datatype == "json" ) {
-                    postData.query = query;
-                }
-                else {
-                    var rules = $.map(grid.jqGrid("getGridParam", "colModel"), function(column) {
-                        if ( column.search !== false )
-                            return {field: column.name, op: "cn", data: query};
-                    });
-                    postData.filters = {groupOp: "OR", rules: rules};
-                }
-                grid.jqGrid("setGridParam", {search: true});
-                grid.trigger("reloadGrid", [{page: 1, current: true}]);
-                return false;
-            }
-        });
-    }
-
     grid.delete_rows = function(rows) {
         // Iterate upwards because 'rows' gets modified
         for ( var i = rows.length - 1; i >= 0; i-- )
             grid.delRowData(rows[i]);
 
-        grid.trigger("reloadGrid", [{current: true}]);
+        grid.reload([{current: true}]);
     };
 
     grid.ajax = function(data) {
@@ -173,8 +170,12 @@ function CommonListing(elem, text, options, restored_parameters) {
         return this;
     };
 
-    grid.on("reload", function(options) {
+    grid.reload = function(options) {
         grid.trigger("reloadGrid", options);
+    }
+
+    grid.on("reload", function(event, options) {
+        grid.reload($.isEmptyObject(options) ? [{current:true}] : options);
         return false;
     });
 
@@ -209,13 +210,12 @@ function CommonListing(elem, text, options, restored_parameters) {
 
     prewikka_resource_register({
         destroy: function() {
-            grid.jqGrid("clearGridData");
+            grid.jqGrid("clearGridData", true);
             grid.jqGrid("GridDestroy");
         },
         container: elem
     });
 
-    resizeGrid();
     return grid;
 }
 
@@ -223,32 +223,56 @@ $(window).on("resize", resizeGrid);
 
 function resizeGrid() {
     $(".commonlisting").each(function(i, grid) {
-        _resizeGrid(grid);
+        _resizeGrid($(grid));
     });
 }
 
-function _resizeGrid(grid) {
-    var titleHeight = $(".ui-jqgrid-titlebar:visible").outerHeight() || 0,
-        headerHeight = $(".ui-jqgrid-hdiv:visible").outerHeight() || 0,
-        pagerHeight = $(".ui-jqgrid-pager:visible").outerHeight() || 0,
-        parent = $(grid).closest('.ui-jqgrid').parents('.modal-body, #main');
+function detectGridHeight(grid) {
+    var gridtbl = $(grid).closest(".ui-jqgrid"),
+        parent = gridtbl.parents('.modal, #main');
+
+    if ( parent.attr('id') != 'main' )
+        return;
+
+    var titleHeight = gridtbl.find(".ui-jqgrid-titlebar:visible").outerHeight() || 0,
+        headerHeight = gridtbl.find(".ui-jqgrid-hdiv:visible").outerHeight() || 0,
+        pagerHeight = gridtbl.find(".ui-jqgrid-pager:visible").outerHeight() || 0;
 
     var delta = titleHeight + headerHeight + pagerHeight + 10;
+    var footer = $('.footer-buttons');
+    var height = $(footer).is(':visible') ? $(footer).offset().top : $(window).height();
 
-    if ( parent.attr('id') == 'main' ) {
-        var height = $("#_main_viewport").height() - $(grid).closest('.ui-jqgrid').position().top - delta;
+    return height - $(gridtbl).offset().top - delta;
+}
 
-        if ( $('.footer-buttons').is(':visible') )
-            height = $('.footer-buttons').offset().top - $(grid).closest('.ui-jqgrid').offset().top - delta;
+function detectGridWidth(parent) {
+    var container = parent.closest("#main, .modal, .container, .container-fluid, .row, [class*=col-]");
+    return container.width();
+}
 
+function _resizeGrid(grid) {
+    var height = detectGridHeight(grid);
+    if ( height )
         $(grid).jqGrid("setGridHeight", height, true);
+
+    $(grid).jqGrid("setGridWidth", detectGridWidth(grid), true);
+}
+
+function _searchGrid(grid, query, is_remote) {
+    var postData = $(grid).jqGrid("getGridParam", "postData");
+    if ( is_remote ) {
+        postData.query = query;
     }
-
-    var container = $(grid).closest(".container, .container-fluid");
-    if ( container.length > 0 )
-        parent = container;
-
-    $(grid).jqGrid("setGridWidth", parent.width(), true);
+    else {
+        var rules = $.map($(grid).jqGrid("getGridParam", "colModel"), function(column) {
+            if ( column.search !== false )
+                return {field: column.name, op: "cn", data: query};
+        });
+        postData.filters = {groupOp: "OR", rules: rules};
+    }
+    $(grid).jqGrid("setGridParam", {search: true});
+    $(grid).trigger("reloadGrid", [{page: 1, current: true}]);
+    return false;
 }
 
 function getCellValue(cellvalue, options, cell) {
