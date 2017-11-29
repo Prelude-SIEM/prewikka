@@ -356,6 +356,7 @@ function prewikka_grid(table, settings) {
 
 function prewikka_autocomplete(field, url, submit, allow_empty=false) {
     field.autocomplete({
+        appendTo: $(field).closest("#main, .modal"),
         minLength: 0,
         autoFocus: true,
         source: function(request, response) {
