@@ -45,11 +45,10 @@
 <div class="container">
   <div class="widget ui-front" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="false" data-draggable="true" data-widget-options="modal-lg">
 
-    <link rel="stylesheet" type="text/css" href="prewikka/css/chosen.min.css">
     <link rel="stylesheet" type="text/css" href="filter/css/filter.css">
 
     <script type="text/javascript">
-    $LAB.script("filter/js/filter.js").script("prewikka/js/chosen.jquery.min.js").wait(function() {
+    $LAB.script("filter/js/filter.js").wait(function() {
         $(".filter-form .modal-body").on("scroll", function() {
             $(".dropdown-fixed.open").find("[data-toggle=dropdown]").dropdown("toggle");
             $('.data-paths').trigger("chosen:close");

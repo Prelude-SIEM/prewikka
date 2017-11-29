@@ -29,6 +29,7 @@ from prewikka import error, history, hookmanager, resource, response, template, 
 CSS_FILES = (
     "prewikka/css/jquery-ui.min.css",
     "prewikka/css/bootstrap.min.css",
+    "prewikka/css/chosen.min.css",
     "prewikka/css/jquery-ui-timepicker-addon.min.css",
     "prewikka/css/font-awesome.min.css",
     "prewikka/css/ui.jqgrid.min.css",
@@ -46,7 +47,8 @@ JS_FILES = (
     "prewikka/js/jquery-ui-timepicker-addon.min.js",
     "prewikka/js/ui.multiselect.min.js",
     "prewikka/js/jquery.jqgrid.min.js",
-    "prewikka/js/commonlisting.js"
+    "prewikka/js/commonlisting.js",
+    "prewikka/js/chosen.jquery.min.js"
 )
 
 

@@ -60,7 +60,6 @@ def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max
         all_paths = resource.HTMLSource('<optgroup label="%s">%s</optgroup>') % (_("All paths"), _html_all_value)
 
     htm = resource.HTMLSource("""
-<link rel="stylesheet" type="text/css" href="prewikka/css/chosen.min.css">
 <link rel="stylesheet" type="text/css" href="prewikka/css/bootstrap-chosen.css">
 
 <select class="data-paths chosen-sortable form-control" %s name="selected_path[]" data-placeholder="%s">
@@ -72,8 +71,7 @@ def get_html_select(selected_paths=None, default_paths=None, all_paths=True, max
 </select>
 
 <script type="text/javascript">
-    $LAB.script("prewikka/js/chosen.jquery.min.js").wait()
-        .script("prewikka/js/jquery-chosen-sortable.js").wait(function() {
+    $LAB.script("prewikka/js/jquery-chosen-sortable.js").wait(function() {
             $(".data-paths").chosen({
                 max_selected_options: %d,
                 width: "100%%",
