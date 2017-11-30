@@ -388,7 +388,9 @@ class _ViewDescriptor(object):
         if self.view_endpoint:
             list(hookmanager.trigger("HOOK_VIEW_%s_RESPONSE" % self.view_endpoint.upper(), resp))
 
-        resp.add_ext_content("_source", self.view_endpoint)
+        if resp.data:
+            resp.add_ext_content("_source", self.view_endpoint)
+
         return resp
 
     def check_permissions(self, user):

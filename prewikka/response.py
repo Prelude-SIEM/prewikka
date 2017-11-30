@@ -63,7 +63,7 @@ class PrewikkaResponse(object):
 
     def __init__(self, data=None, headers=_sentinel, code=None, status_text=None):
         self.data = data
-        self.code = code or 200
+        self.code = code
         self.status_text = status_text
         self.ext_content = {}
 
@@ -105,12 +105,13 @@ class PrewikkaResponse(object):
         return self
 
     def content(self):
+        if self.data is None and not(self.ext_content):
+            return None
+
         return self._encode_response(self.data)
 
     def _encode_response(self, res):
         encoding = env.config.general.get("encoding", "utf8")
-        if res is None:
-            res = {}
 
         if not isinstance(res, compat.STRING_TYPES):
             self.headers["Content-Type"] = "application/json"
@@ -123,9 +124,12 @@ class PrewikkaResponse(object):
 
     def write(self, request):
         content = self.content()
+        if content is None and self.code is None:
+            self.code = 204
 
-        request.send_headers(self.headers.items(), self.code, self.status_text)
-        request.write(content)
+        request.send_headers(self.headers.items(), self.code or 200, self.status_text)
+        if content is not None:
+            request.write(content)
 
 
 class PrewikkaDownloadResponse(PrewikkaResponse):
@@ -178,22 +182,13 @@ class PrewikkaDownloadResponse(PrewikkaResponse):
         ))
 
     def write(self, request):
-        request.send_headers(self.headers.items(), self.code, self.status_text)
+        request.send_headers(self.headers.items(), self.code or 200, self.status_text)
 
         if not self._is_file:
             request.write(self.data)
         else:
             for i in iter(lambda: self.data.read(8192), b''):
                 request.write(i)
-
-
-class PrewikkaDirectResponse(PrewikkaResponse):
-    """
-        Direct HTML response
-
-        Render the directly the data without wrapping it, even on XHR request.
-    """
-    pass
 
 
 class PrewikkaFileResponse(PrewikkaResponse):
@@ -222,7 +217,7 @@ class PrewikkaFileResponse(PrewikkaResponse):
             self.headers["Last-Modified"] = mtime.strftime("%a, %d %b %Y %H:%M:%S GMT")
 
     def write(self, request):
-        request.send_headers(self.headers.items(), self.code, self.status_text)
+        request.send_headers(self.headers.items(), self.code or 200, self.status_text)
         if self.code == 304:
             return
 
