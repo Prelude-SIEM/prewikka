@@ -41,12 +41,14 @@ class GridAjaxParameters(view.Parameters):
 
 
 class GridAjaxResponse(response.PrewikkaResponse):
-    def __init__(self, rows, total_results):
+    def __init__(self, rows, total_results, **kwargs):
         response.PrewikkaResponse.__init__(self)
 
         # Ceil division (use // instead of / for Python3 compatibility):
-        nb_pages = (total_results - 1) // int(env.request.parameters.get("rows", 10)) + 1
-        self.data = {"total": nb_pages, "rows": rows, "records": total_results}
+        kwargs["total"] = (total_results - 1) // int(env.request.parameters.get("rows", 10)) + 1
+        kwargs["rows"] = rows
+        kwargs["records"] = total_results
+        self.data = kwargs
 
 
 class AjaxHostURL(view.View):
