@@ -487,7 +487,7 @@ class ViewManager(registrar.DelayedRegistrar):
         except werkzeug.exceptions.NotFound:
             raise InvalidViewError(N_("View '%s' does not exist", path))
 
-        return self._views_rules[rule], view_kwargs
+        return rule._prewikka_view, view_kwargs
 
     def getViewByPath(self, path, method=None):
         return self._getViewByPath(path, method)[0]
@@ -548,9 +548,10 @@ class ViewManager(registrar.DelayedRegistrar):
             v._criteria_to_urlparams = baseview._criteria_to_urlparams
 
         rule = Rule(path, endpoint=v.view_endpoint, methods=methods, defaults=defaults)
+        rule._prewikka_view = v
 
-        self._views_rules[rule] = v
         self._rule_map.add(rule)
+        self._views_endpoints[v.view_endpoint] = v
 
     def addView(self, view):
         rdfunc = getattr(view, "render")
@@ -569,10 +570,12 @@ class ViewManager(registrar.DelayedRegistrar):
                 self._references.setdefault(view.view_datatype, []).append(view)
 
             rule = Rule((view.view_path or "/" + view.view_id), endpoint=view.view_endpoint)
+            rule._prewikka_view = view
 
-            self._views_rules[rule] = view
             self._rule_map.add(rule)
+
             self._views[view.view_id] = view
+            self._views_endpoints[view.view_endpoint] = view
 
     def loadViews(self):
         # Import here, because of cyclic dependency
@@ -606,8 +609,8 @@ class ViewManager(registrar.DelayedRegistrar):
         self._views = {}
         self._routes = Map()
         self._references = {}
+        self._views_endpoints = {}
 
-        self._views_rules = {}
         self._rule_map = Map(converters={'list': ListConverter})
 
         builtins.url_for = self.url_for
