@@ -74,7 +74,7 @@ function prewikka_drawTab(data)
     prewikka_resource_destroy($("#main"));
     $("#main").off().html(content);
 
-    $("#topmenu_right .prewikka-help-button").data("href", data.help).prop("disabled", data.help ? false : true);
+    $("#topmenu_right .prewikka-help-button").data("href", data._extensions.help).prop("disabled", data._extensions.help ? false : true);
     $("#topmenu_right .prewikka-config-button").prop("disabled", $("#main .prewikka-view-config").length == 0);
 
     prewikka_resizeTopMenu();
@@ -136,8 +136,8 @@ function _process_widget(data, widget)
         widget.attr("tabindex", -1);
         $(widget).wrapInner('<div class="modal-dialog ' + $(widget).attr("data-widget-options") + '"><div class="modal-content"></div></div>');
 
-        if ( data.help ) {
-            var help = $("<button>", { "class": "close prewikka-help-button", "data-href": data.help, "html": '?&nbsp;' });
+        if ( data._extensions.help ) {
+            var help = $("<button>", { "class": "close prewikka-help-button", "data-href": data._extensions.help, "html": '?&nbsp;' });
             $(widget).find(".modal-header button").after(help);
         }
 
