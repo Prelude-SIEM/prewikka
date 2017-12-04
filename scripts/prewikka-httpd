@@ -19,15 +19,14 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-import ssl
+import locale
 import multiprocessing
-
+import ssl
 from optparse import OptionParser
-from wsgiref.simple_server import WSGIServer, WSGIRequestHandler, make_server
+from wsgiref.simple_server import WSGIRequestHandler, WSGIServer, make_server
 
+from prewikka import localization, main, siteconfig
 from prewikka.web import wsgi
-from prewikka import siteconfig, main
-
 
 global options
 
@@ -62,17 +61,28 @@ def application(environ, start_response):
     return wsgi.application(environ, start_response)
 
 
+def set_locale(lang):
+    if lang[0] not in localization.getLanguagesIdentifiers():
+        lang = "en_GB.utf8"
+    else:
+        lang = ".".join(lang)
+
+    localization.translation.setLocale(lang)
+
+
 if __name__ == "__main__":
+    set_locale(locale.getdefaultlocale())
+
     parser = OptionParser(epilog=" ")
 
-    parser.add_option("-r", "--root", action="store", type="string", dest="root", default="", help="Root where the server is accessible")
-    parser.add_option("-a", "--address", action="store", type="string", dest="addr", default="0.0.0.0", help="IP to bind to (default: %default)")
-    parser.add_option("-p", "--port", action="store", type="int", dest="port", default=8000, help="port number to use (default: %default)")
-    parser.add_option("", "--key", action="store", type="string", dest="key", default=None, help="SSL private key to use (default: no SSL)")
-    parser.add_option("", "--cert", action="store", type="string", dest="cert", default=None, help="SSL certificate to use (default: no SSL)")
-    parser.add_option("-c", "--config", action="store", type="string", dest="config", default="%s/prewikka.conf" % siteconfig.conf_dir, help="configuration file to use (default: %default)")
+    parser.add_option("-r", "--root", action="store", type="string", dest="root", default="", help=_("root where the server is accessible"))
+    parser.add_option("-a", "--address", action="store", type="string", dest="addr", default="0.0.0.0", help=_("IP to bind to (default: %default)"))
+    parser.add_option("-p", "--port", action="store", type="int", dest="port", default=8000, help=_("port number to use (default: %default)"))
+    parser.add_option("", "--key", action="store", type="string", dest="key", default=None, help=_("SSL private key to use (default: no SSL)"))
+    parser.add_option("", "--cert", action="store", type="string", dest="cert", default=None, help=_("SSL certificate to use (default: no SSL)"))
+    parser.add_option("-c", "--config", action="store", type="string", dest="config", default="%s/prewikka.conf" % siteconfig.conf_dir, help=_("configuration file to use (default: %default)"))
     parser.add_option("-m", "--multiprocess", action="store", type="int", dest="num_process", default=multiprocessing.cpu_count(),
-                      help="number of processes to use. Default value matches the number of available CPUs (i.e. %d)" % multiprocessing.cpu_count())
+                      help=_("number of processes to use. Default value matches the number of available CPUs (i.e. %d)") % multiprocessing.cpu_count())
 
     (options, args) = parser.parse_args()
 
@@ -90,4 +100,3 @@ if __name__ == "__main__":
         p.start()
 
     server.serve_forever()
-

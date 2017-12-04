@@ -23,12 +23,13 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import base64
 import fcntl
+import locale
 import os
 import signal
 import sys
 
 from optparse import OptionParser
-from prewikka import crontab, main, siteconfig
+from prewikka import crontab, localization, main, siteconfig
 
 
 _LOCKFD = None
@@ -77,11 +78,22 @@ def _daemonize(options):
     _LOCKFD.write('%s\n' % (os.getpid()))
 
 
+def set_locale(lang):
+    if lang[0] not in localization.getLanguagesIdentifiers():
+        lang = "en_GB.utf8"
+    else:
+        lang = ".".join(lang)
+
+    localization.translation.setLocale(lang)
+
+
 if __name__ == "__main__":
+    set_locale(locale.getdefaultlocale())
+
     parser = OptionParser(epilog=" ")
 
-    parser.add_option("-c", "--config", action="store", type="string", dest="config", default="%s/prewikka.conf" % siteconfig.conf_dir, help="configuration file to use (default: %default)")
-    parser.add_option("-d", "--daemon", action="store_true", dest="daemonize", default=False, help="Run as a system daemon")
+    parser.add_option("-c", "--config", action="store", type="string", dest="config", default="%s/prewikka.conf" % siteconfig.conf_dir, help=_("configuration file to use (default: %default)"))
+    parser.add_option("-d", "--daemon", action="store_true", dest="daemonize", default=False, help=_("run as a system daemon"))
 
     (options, args) = parser.parse_args()
 

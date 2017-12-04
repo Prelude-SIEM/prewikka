@@ -239,6 +239,10 @@ setup(
     },
     distclass=MyDistribution,
     message_extractors={
+        'scripts': [
+            ('prewikka-httpd', 'python', None),
+            ('prewikka-crontab', 'python', None)
+        ],
         'prewikka': [
             ('**.py', 'python', None),
             ('**/templates/*.mak', 'mako', None)
