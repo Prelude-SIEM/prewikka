@@ -27,6 +27,9 @@ function MessageListing(operators) {
                 $(tabletbl).each(function(idx, values) {
                         var path = values[0]; var op = values[1]; var val = values[2];
 
+                        if ( op == "==" )
+                                op = "=";
+
                         if ( cnt++ > 0 ) {
                                 got_append = 1;
                                 table.find("tr:last a.append_entry").trigger('click');
