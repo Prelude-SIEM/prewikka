@@ -470,8 +470,8 @@ def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, de
 
 
 class ViewManager(registrar.DelayedRegistrar):
-    def get(self, datatype=None, keywords=set()):
-        return filter(lambda x: keywords.issubset(x.view_keywords), self._references.get(datatype, []))
+    def get(self, datatype=None, keywords=None):
+        return filter(lambda x: set(keywords or []).issubset(x.view_keywords), self._references.get(datatype, []))
 
     def getView(self, view_id):
         return self._views.get(view_id.lower())
