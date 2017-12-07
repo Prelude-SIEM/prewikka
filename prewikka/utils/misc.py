@@ -52,6 +52,12 @@ class AttrObj(object):
     def __eq__(self, other):
         return self.__dict__ == other.__dict__
 
+    def __iter__(self):
+        if sys.version_info >= (3, 0):
+            return self.__dict__.items()
+        else:
+            return self.__dict__.iteritems()
+
 
 # FIXME: Need appropriate implementation
 def get_analyzer_status_from_latest_heartbeat(heartbeat, error_margin):
