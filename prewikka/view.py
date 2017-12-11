@@ -609,12 +609,12 @@ class ViewManager(registrar.DelayedRegistrar):
             self._views[view.view_id] = view
             self._views_endpoints[view.view_endpoint] = view
 
-    def loadViews(self):
+    def loadViews(self, autoupdate=False):
         # Import here, because of cyclic dependency
         from prewikka.baseview import BaseView
         self.addView(BaseView())
 
-        for view_class in pluginmanager.PluginManager("prewikka.views"):
+        for view_class in pluginmanager.PluginManager("prewikka.views", autoupdate):
             try:
                 vi = view_class()
             except error.PrewikkaUserError as e:

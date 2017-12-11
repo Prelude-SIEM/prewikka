@@ -52,7 +52,7 @@ class Core(object):
                                              {'vPre': version.__version__, 'vLib': siteconfig.libpreludedb_required_version}))
 
     @staticmethod
-    def from_config(path=None, threaded=False):
+    def from_config(path=None, threaded=False, autoupdate=False):
         global _core_cache
         global _core_cache_lock
 
@@ -61,11 +61,12 @@ class Core(object):
 
         with _core_cache_lock:
             if path not in _core_cache:
-                _core_cache[path] = Core(path)
+                _core_cache[path] = Core(path, autoupdate)
 
         return _core_cache[path]
 
-    def __init__(self, filename=None):
+    def __init__(self, filename=None, autoupdate=False):
+        self.autoupdate = autoupdate
         env.auth = None  # In case of database error
         env.config = config.Config(filename)
 
@@ -148,14 +149,14 @@ class Core(object):
         env.dataprovider.load()
 
         env.plugins = {}
-        for i in pluginmanager.PluginManager("prewikka.plugins"):
+        for i in pluginmanager.PluginManager("prewikka.plugins", autoupdate=self.autoupdate):
             try:
                 env.plugins[i.__name__] = i()
             except error.PrewikkaUserError as err:
                 env.log.warning("%s: plugin loading failed: %s" % (i.__name__, err))
 
         # Load views before auth/session to find all permissions
-        env.viewmanager.loadViews()
+        env.viewmanager.loadViews(autoupdate=self.autoupdate)
 
         _AUTH_PLUGINS = pluginmanager.PluginManager("prewikka.auth", autoupdate=True)
         _SESSION_PLUGINS = pluginmanager.PluginManager("prewikka.session", autoupdate=True)
