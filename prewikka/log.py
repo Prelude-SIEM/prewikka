@@ -36,8 +36,7 @@ class Log(object):
     def __init__(self, conf):
         self._logger = None
 
-        for logconfig in getattr(conf, "log", ()):
-
+        for logconfig in conf:
             config = {}
             for key, value in logconfig.items():
                 config[key] = text_type(value)

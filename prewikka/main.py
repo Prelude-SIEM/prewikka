@@ -75,7 +75,7 @@ class Core(object):
         env.config.general.setdefault("default_timezone", localization.get_system_timezone())
         env.config.general.reverse_path = env.config.general.get("reverse_path", "").rstrip("/")
 
-        env.log = log.Log(env.config)
+        env.log = log.Log(env.config.log)
         env.log.info("Starting Prewikka")
 
         env.dns_max_delay = env.config.general.get_float("dns_max_delay", 0.)
