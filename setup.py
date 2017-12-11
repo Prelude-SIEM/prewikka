@@ -221,9 +221,6 @@ setup(
             "htdocs/css/*.css",
             "htdocs/js/*.js"
         ],
-        'prewikka.views.messagesummary': [
-            "htdocs/js/*.js"
-        ],
     },
     scripts=[
         "scripts/prewikka-crontab",
