@@ -144,6 +144,27 @@ function CommonListing(elem, text, options, restored_parameters) {
                 }
             });
         }
+    })
+    .jqGrid('navButtonAdd', {
+        buttonicon: "fa-bolt",
+        caption: "",
+        title: "Reset columns",
+        onClickButton: function() {
+            prewikka_dialog({message: "Reset the column preferences for this grid?", type: "confirm"});
+
+            $('#prewikka-dialog-confirm-OK').off("click").on("click", function() {
+                prewikka_update_parameters({
+                    ["jqgrid_params_" + grid.attr("id")]: "[]"
+                })
+                .done(function() {
+                    prewikka_notification({
+                        message: "Column preferences have been reset to default. Reload the page for the changes to take effect.",
+                        classname: "info",
+                        duration: 5000
+                    });
+                });
+            });
+        }
     });
 
     grid.delete_rows = function(rows) {
