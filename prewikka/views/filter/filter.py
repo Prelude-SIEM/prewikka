@@ -24,6 +24,7 @@ import pkg_resources
 
 from prewikka import database, error, hookmanager, resource, response, template, view
 from prewikka.utils import AttrObj, json
+from prewikka.utils.viewhelpers import GridParameters
 
 from . import FilterPlugin
 
@@ -109,14 +110,8 @@ class FilterDatabase(database.DatabaseHelper):
         return rows
 
 
-class FilterParameters(view.Parameters):
-    def register(self):
-        self.optional("jqgrid_params_filters", json.loads, {}, save=True)
-
-
 class FilterView(FilterPlugin, view.View):
     view_permissions = [N_("IDMEF_VIEW")]
-    view_parameters = FilterParameters
     plugin_htdocs = (("filter", pkg_resources.resource_filename(__name__, 'htdocs')),)
     _filter_menu_tmpl = template.PrewikkaTemplate(__name__, "templates/menu.mak")
 
@@ -129,7 +124,7 @@ class FilterView(FilterPlugin, view.View):
             if env.dataprovider.has_type(typ):
                 yield typ, _(env.dataprovider.get_label(typ))
 
-    @view.route("/settings/filters", menu=(N_("Preferences"), N_("Filters")), help="#filters")
+    @view.route("/settings/filters", menu=(N_("Preferences"), N_("Filters")), help="#filters", parameters=GridParameters("filters"))
     def listing(self):
         dataset = {}
         data = []

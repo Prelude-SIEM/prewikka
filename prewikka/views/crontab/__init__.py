@@ -22,12 +22,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import datetime
 import pkg_resources
 
-from prewikka import crontab, localization, response, template, utils, version, resource, view
-
-
-class CrontabParameters(view.Parameters):
-    def register(self):
-        self.optional("jqgrid_params_cronjobs", utils.json.loads, {}, save=True)
+from prewikka import crontab, localization, resource, response, template, utils, version, view
+from prewikka.utils.viewhelpers import GridParameters
 
 
 class CrontabView(view.View):
@@ -39,7 +35,6 @@ class CrontabView(view.View):
     plugin_description = N_("Scheduled jobs management page")
     plugin_htdocs = (("crontab", pkg_resources.resource_filename(__name__, 'htdocs')),)
     view_permissions = [N_("USER_MANAGEMENT")]
-    view_parameters = CrontabParameters
 
     @view.route("/settings/scheduler/disable", methods=["POST"])
     def disable(self):
@@ -64,7 +59,7 @@ class CrontabView(view.View):
 
         return dataset.render()
 
-    @view.route("/settings/scheduler", menu=(N_("Configuration"), N_("Scheduling")), help="#scheduling")
+    @view.route("/settings/scheduler", menu=(N_("Configuration"), N_("Scheduling")), help="#scheduling", parameters=GridParameters("cronjobs"))
     def list(self):
         dataset = template.PrewikkaTemplate(__name__, "templates/crontab.mak").dataset()
 

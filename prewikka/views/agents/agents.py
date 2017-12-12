@@ -24,16 +24,11 @@ import time
 
 from prewikka import hookmanager, localization, mainmenu, resource, template, utils, view, response
 from prewikka.dataprovider import Criterion
-
-
-class AgentsParameters(view.Parameters):
-    def register(self):
-        self.optional("jqgrid_params_agents", utils.json.loads, {}, persist=True)
+from prewikka.utils.viewhelpers import GridParameters
 
 
 class Agents(view.View):
     view_datatype = "heartbeat"
-    view_parameters = AgentsParameters
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     def __init__(self):
@@ -89,7 +84,7 @@ class Agents(view.View):
                 ]
             }
 
-    @view.route("/agents/agents", methods=["GET", "POST"], permissions=[N_("IDMEF_VIEW")], help="#agents", menu=(N_("Agents"), N_("Agents")))
+    @view.route("/agents/agents", methods=["GET", "POST"], permissions=[N_("IDMEF_VIEW")], help="#agents", menu=(N_("Agents"), N_("Agents")), parameters=GridParameters("agents"))
     def agents(self):
 
         analyzer_data = list(self._get_analyzers(env.request.parameters.getlist("status")))

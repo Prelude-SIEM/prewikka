@@ -24,6 +24,14 @@ from string import Template
 from prewikka import hookmanager, resource, response, utils, view
 
 
+def GridParameters(name):
+    class _GridParameters(view.Parameters):
+        def register(self):
+            self.optional("jqgrid_params_%s" % name, utils.json.loads, {}, persist=True)
+
+    return _GridParameters
+
+
 class GridAjaxParameters(view.Parameters):
     """Handle parameters sent by jqGrid."""
     def register(self):
