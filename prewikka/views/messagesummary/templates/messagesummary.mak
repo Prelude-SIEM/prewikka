@@ -74,7 +74,10 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
   <div class="widget" role="dialog" aria-labelledby="dialogLabel" aria-hidden="true" data-backdrop="false" data-draggable="true" data-widget-options="modal-lg">
 
     <script type="text/javascript">
-        $LAB.script("messagesummary/js/messagesummary.js");
+        $(".modal-body").on("click", "a.section-toggle", function() {
+            $(this).closest(".panel-heading").siblings(".panel-body:first").slideToggle();
+            return false;
+        });
     </script>
 
     <div class="modal-header">

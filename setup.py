@@ -217,7 +217,6 @@ setup(name="prewikka",
                       'prewikka.views.about': ["htdocs/css/*.css", "htdocs/images/*.png"],
                       'prewikka.views.aboutplugin': ["htdocs/css/*.css"],
                       'prewikka.views.messagelisting': [ "htdocs/css/*.css", "htdocs/js/*.js" ],
-                      'prewikka.views.messagesummary': [ "htdocs/js/*.js" ],
       },
 
       scripts=[ "scripts/prewikka-crontab", "scripts/prewikka-httpd" ],
