@@ -44,17 +44,17 @@ class CrontabView(view.View):
     @view.route("/settings/scheduler/disable", methods=["POST"])
     def disable(self):
         crontab.update(env.request.parameters.getlist("id", type=int), enabled=False)
-        return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})
+        return response.PrewikkaResponse({"type": "reload", "target": "view"})
 
     @view.route("/settings/scheduler/enable", methods=["POST"])
     def enable(self):
         crontab.update(env.request.parameters.getlist("id", type=int), enabled=True)
-        return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})
+        return response.PrewikkaResponse({"type": "reload", "target": "view"})
 
     @view.route("/settings/scheduler/<int:id>/save", methods=["POST"])
     def save(self, id=None):
         crontab.update_from_parameters(id, env.request.parameters)
-        return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})
+        return response.PrewikkaResponse({"type": "reload", "target": "view"})
 
     @view.route("/settings/scheduler/<int:id>/edit")
     def edit(self, id=None):
@@ -71,7 +71,7 @@ class CrontabView(view.View):
         now = datetime.datetime.now(utils.timeutil.timezone("UTC"))
 
         dataset["data"] = []
-        for i in crontab.list():
+        for i in sorted(crontab.list(), key=lambda x: _(x.name).lower()):
             if not i.enabled:
                 next = _("Disabled")
             else:

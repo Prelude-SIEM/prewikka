@@ -72,7 +72,7 @@ class FilterDatabase(database.DatabaseHelper):
     @database.use_transaction
     def get_filters(self, user, ftype=None):
         l = self.query("SELECT id, name, description, value FROM Prewikka_Filter "
-                       "WHERE userid = %s", user.id)
+                       "WHERE userid = %s ORDER BY name", user.id)
 
         l = next(hookmanager.trigger("HOOK_FILTER_LISTING", l), l)
 
@@ -249,4 +249,4 @@ class FilterView(FilterPlugin, view.View):
         criteria = dict((k, v) for k, v in criteria.items() if v is not None)
         self._db.upsert_filter(env.request.user, Filter(filter_id, filter_name, filter_description, criteria))
 
-        return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})
+        return response.PrewikkaResponse({"type": "reload", "target": "view"})
