@@ -67,19 +67,14 @@ class AjaxHostURL(view.View):
     view_parameters = AjaxHostURLParameters
 
     @staticmethod
-    def _value_generator(infos):
-        for urlname, url in env.url.get("host", {}).items():
+    def _link_generator(infos):
+        for label, url in hookmanager.trigger("HOOK_AJAX_HOST_URL"):
             try:
                 url = Template(url).substitute(infos)
             except KeyError:
                 continue
 
-            yield _(urlname), url
-
-    @classmethod
-    def _link_generator(cls, infos):
-        for urlname, url in cls._value_generator(infos):
-            yield resource.Link('<a href="{url}" target="{urlname}">{urlname}</a>').format(urlname=urlname, url=url)
+            yield resource.HTMLNode("a", _(label), href=url, target=_(label))
 
     def render(self):
         infos = {"host": env.request.parameters["host"]}

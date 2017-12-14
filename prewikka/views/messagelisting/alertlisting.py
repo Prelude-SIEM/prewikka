@@ -542,10 +542,7 @@ class ListedAlert(ListedMessage):
             dataset["classification_references"].append((urlstr, fstr))
 
     def _setMessageClassificationURL(self, dataset, classification):
-        dataset["classification_url"] = []
-        if "classification" in env.url:
-            for urlname, url in env.url["classification"].items():
-                dataset["classification_url"].append((_(urlname), url.replace("$classification", classification)))
+        dataset["classification_url"] = list(hookmanager.trigger("HOOK_CLASSIFICATION_LINK", classification))
 
     def _setMessageClassification(self, dataset, message):
         self._setMessageClassificationReferences(dataset, message)
@@ -572,24 +569,18 @@ class ListedAlert(ListedMessage):
         dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"])
         dataset["description"] = message["alert.assessment.impact.description"]
 
-    def _setMessageTimeURL(self, t, host):
-        ret = []
+    def _setMessageTimeURL(self, t):
+        if not t:
+            return []
 
-        if "time" in env.url and t:
-            epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=utils.timeutil.tzutc())
-            t = text_type(int((t - epoch).total_seconds() * 1000))
+        epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=utils.timeutil.tzutc())
+        t = text_type(int((t - epoch).total_seconds() * 1000))
 
-            for urlname, url in env.url["time"].items():
-                url = url.replace("$time", t)
-                if host:
-                    url = url.replace("$host", host)
-                ret.append((_(urlname), url))
-
-        return ret
+        return list(hookmanager.trigger("HOOK_TIME_LINK", t))
 
     def _setMessageTime(self, message):
         self["time"] = self.createTimeField(message["alert.create_time"])
-        self["time"]["time_url"] = self._setMessageTimeURL(message["alert.analyzer_time"], message["alert.analyzer(-1).node.name"])
+        self["time"]["time_url"] = self._setMessageTimeURL(message["alert.analyzer_time"])
         if message["alert.analyzer_time"] is not None and abs((message["alert.create_time"] - message["alert.analyzer_time"]).total_seconds()) > 60:
             self["analyzer_time"] = self.createTimeField(message["alert.analyzer_time"])
         else:

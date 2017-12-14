@@ -166,7 +166,9 @@ $(function() {
           url: $(this).data("popup-url"),
           success: function(data) {
               popup_menu.find(".popup_menu_loading").remove();
-              popup_menu.append(data.join(""));
+              $.each(data, function(i, node) {
+                  popup_menu.append(node.toHTML());
+              });
           }
       });
   });

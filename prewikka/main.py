@@ -118,7 +118,6 @@ class Core(object):
             self._checkVersion()
             env.db = database.Database(env.config.database)
             env.idmef_db = idmefdatabase.IDMEFDatabase(env.config.idmef_database)
-            self._initURL()
             self._loadPlugins()
             self._prewikka_initialized = True
         except error.PrewikkaError as e:
@@ -129,13 +128,6 @@ class Core(object):
         if isinstance(self._prewikka_initialized, Exception):
             env.log.log(self._prewikka_initialized.log_priority, text_type(self._prewikka_initialized))
             raise self._prewikka_initialized
-
-    def _initURL(self):
-        env.url = {}
-        for urlconf in env.config.url:
-            env.url[urlconf.get_instance_name()] = {}
-            for label, url in urlconf.items():
-                env.url[urlconf.get_instance_name()][label] = url
 
     def _load_auth_or_session(self, typename, plugins, name, config=config.SectionRoot()):
         if name not in plugins:

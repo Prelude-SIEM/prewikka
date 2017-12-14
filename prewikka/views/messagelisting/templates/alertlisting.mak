@@ -352,8 +352,8 @@ ${ obj }
 % else:
 <span>${ _("Filter on this classification") }</span>
 % endif
-% for name, url in info.classification_url:
-<a href="${ url }">${ name }</a>
+% for url in info.classification_url:
+${ url }
 % endfor
 </span>
 </%def>
@@ -361,8 +361,8 @@ ${ obj }
 <%def name="timeWrite(time_url, text)">
 % if time_url:
 <a class="popup_menu_toggle">${ text }</a><span class="popup_menu">
-% for name, url in time_url:
-<a href="${ url }">${ name }</a>
+% for url in time_url:
+${ url }
 % endfor
 </span>
 % else:
