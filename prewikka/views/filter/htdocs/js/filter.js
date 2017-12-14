@@ -24,7 +24,7 @@ function _get_condition_criterion(selector) {
         return $(input).val();
     });
 
-    return Criterion(values[0], values[1], values[2]);
+    return Criterion(values[0], values[1], values[2] || null);
 }
 
 function FilterEdition(selector, default_paths, all_paths, operators, enums, tooltips) {
