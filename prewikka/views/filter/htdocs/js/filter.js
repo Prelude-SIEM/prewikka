@@ -24,7 +24,7 @@ function _get_condition_criterion(selector) {
         return $(input).val();
     });
 
-    return new Criterion(values[0], values[1], values[2]);
+    return new Criterion(values[0], values[1], values[2] || null);
 }
 
 function Criterion(left, operator, right) {
