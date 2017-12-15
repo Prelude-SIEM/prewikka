@@ -259,6 +259,12 @@ class Parameters(dict):
         else:
             return param in self._default
 
+    def __getitem__(self, key):
+        try:
+            return dict.__getitem__(self, key)
+        except KeyError:
+            raise MissingParameterError(key)
+
     def __add__(self, src):
         dst = copy(self)
         dst.update(src)
@@ -284,10 +290,13 @@ class Parameters(dict):
         if ret is None:
             return ret
 
-        if isinstance(ret, list):
-            return [type(i) for i in ret]
-        else:
-            return type(ret)
+        try:
+            if isinstance(ret, list):
+                return [type(i) for i in ret]
+            else:
+                return type(ret)
+        except ValueError:
+            raise InvalidParameterValueError(key, ret)
 
     def getlist(self, key, type=lambda x: x):
         ret = self.get(key, default=[], type=type)
