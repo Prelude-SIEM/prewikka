@@ -41,12 +41,34 @@ class _IDMEFProvider(DataProviderBase):
 
         return "*%s*" % value
 
+    @staticmethod
+    def _path_adjust(path):
+        """
+        Automatically add indexes to IDMEF listed fields
+        FIXME: to be removed when libpreludedb supports != for listed fields
+        """
+        fields = []
+        for elem in path.split("."):
+            p = ".".join(fields + [elem])
+
+            if elem == "analyzer":
+                fields.append("%s(-1)" % elem)
+            elif prelude.IDMEFPath(p).isAmbiguous():
+                fields.append("%s(0)" % elem)
+            else:
+                fields.append(elem)
+
+        return ".".join(fields)
+
     def parse_criterion(self, path, operator, value, type):
         if not(value) and operator in ("=", "==", "!"):
             if prelude.IDMEFPath(path).getValueType() == prelude.IDMEFValue.TYPE_STRING:
                  return "(! %s || %s == '')" % (path, path)
 
             return "! %s" % (path)
+
+        elif operator.startswith("!") and prelude.IDMEFPath(path).isAmbiguous():
+            path = self._path_adjust(path)
 
         return DataProviderBase.parse_criterion(self, path, operator, self._value_adjust(operator, value), type)
 
