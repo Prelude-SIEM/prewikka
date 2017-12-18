@@ -37,6 +37,15 @@
     align-items: center;
 }
 
+/*
+ * Flex not supported well by IE11, use inline-block instead
+ */
+@media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+    .about .software {
+        display: inline-block;
+    }
+}
+
 .about .software img {
     width: 100%;
 }

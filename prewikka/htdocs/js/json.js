@@ -1,8 +1,8 @@
 function JSONRegistry() {
     this.prototypes = {};
 
-    this.register = function(proto) {
-        this.prototypes[proto.name] = proto;
+    this.register = function(name, proto) {
+        this.prototypes[name] = proto;
     };
 }
 
