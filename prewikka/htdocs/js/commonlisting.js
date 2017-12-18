@@ -153,10 +153,9 @@ function CommonListing(elem, text, options, restored_parameters) {
             prewikka_dialog({message: "Reset the column preferences for this grid?", type: "confirm"});
 
             $('#prewikka-dialog-confirm-OK').off("click").on("click", function() {
-                prewikka_update_parameters({
-                    ["jqgrid_params_" + grid.attr("id")]: "[]"
-                })
-                .done(function() {
+                var params = {};
+                params["jqgrid_params_" + grid.attr("id")] = "[]";
+                prewikka_update_parameters(params).done(function() {
                     prewikka_notification({
                         message: "Column preferences have been reset to default. Reload the page for the changes to take effect.",
                         classname: "info",
@@ -331,6 +330,7 @@ function enableButtons(elem, title) {
 function saveGridColumns(grid) {
     var columns = [];
     var colModel = grid.jqGrid("getGridParam", "colModel");
+    var params = {};
 
     $.each(colModel, function(i, col) {
         // Ignore dynamically-added columns
@@ -342,9 +342,9 @@ function saveGridColumns(grid) {
             });
     });
 
-    prewikka_update_parameters({
-        ["jqgrid_params_" + grid.attr("id")]: JSON.stringify(columns)
-    });
+    // The {[key]: value} syntax is not supported by IE11
+    params["jqgrid_params_" + grid.attr("id")] = JSON.stringify(columns);
+    prewikka_update_parameters(params);
 }
 
 

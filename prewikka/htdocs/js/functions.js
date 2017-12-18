@@ -130,13 +130,31 @@ $(function() {
   });
 
   function _position_dropdown(elem, selector) {
-      // Allow dropdowns expanding out of the modal
-      // Setting "top: auto; left: auto" works only with Firefox
+      /*
+       * Allow dropdowns expanding out of the modal
+       * Setting "top: auto; left: auto" works only with Firefox
+       */
       var modal = elem.closest(".modal-content:visible");
+      var top, left;
+
+      if ( window.navigator.userAgent.indexOf("Trident/") != -1 ) {
+          /*
+           * IE11 positions the element relative to the viewport instead
+           * of the modal (which has a transform property)
+           * See https://bugs.chromium.org/p/chromium/issues/detail?id=20574
+           */
+          top = elem.offset().top + elem.height();
+          left = elem.offset().left;
+      }
+      else {
+          top = elem.offset().top - modal.offset().top + elem.height();
+          left = elem.offset().left - modal.offset().left;
+      }
+
       elem.find(selector).css({
           position: "fixed",
-          top: elem.offset().top - modal.offset().top + elem.height(),
-          left: elem.offset().left - modal.offset().left
+          top: top,
+          left: left
       });
   }
 
@@ -378,7 +396,7 @@ function prewikka_grid(table, settings) {
 }
 
 
-function prewikka_autocomplete(field, url, submit, allow_empty=false) {
+function prewikka_autocomplete(field, url, submit, allow_empty) {
     field.autocomplete({
         appendTo: $(field).closest("#main, .modal"),
         minLength: 0,

@@ -7,23 +7,12 @@
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
         <link rel="icon" type="image/png" sizes="32x32" href="${env.config.interface.get('favicon', 'prewikka/images/favicon.png')}" />
 
-        <!--[if IE]>
-
-        ## EventSource polyfill
+        ## EventSource polyfill for IE/Edge
         <script src="prewikka/js/EventSource.js" type="text/javascript"></script>
-
-        <![endif]-->
 
         % for resource in document.head_content:
                 ${resource}
         % endfor
-
-        <!--[if IE]>
-
-        ## FormAttribute polyfill (need jQuery to be loaded previously)
-        <script src="prewikka/js/formAttribute.js" type="text/javascript"></script>
-
-        <![endif]-->
 
         <%block name="head_extra_content"></%block>
 
