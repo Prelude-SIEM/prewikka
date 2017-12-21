@@ -88,7 +88,10 @@ function CommonListing(elem, text, options, restored_parameters) {
         resizeStop: function() {
             saveGridColumns($(this));
         },
-        loadComplete: function() { _resizeGrid($(elem)) },
+        loadComplete: function() {
+            _resizeGrid($(elem));
+            if ( options.datatype == "json" ) $(elem).find('[data-toggle="tooltip"]').tooltip();
+        },
         loadError: null  // This prevents an error row to appear in the grid
     }, options);
 
