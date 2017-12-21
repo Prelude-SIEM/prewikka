@@ -11,7 +11,7 @@
 	  <div class="modal-content">
 		<div class="modal-header alert-danger">
 		  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-		  <h3 class="modal-title title" id="dialogLabel">${ _('WARNING') }</h3>
+		  <h5 class="modal-title" id="dialogLabel">${ _('WARNING') }</h5>
 		</div>
 		<div class="modal-body content" style="text-align: center; font-size: 1.1em">
 		 	<span style="font-weight: bold; color: red">${ _("Prelude OSS is the open-source version of the Prelude SIEM") }</span>

@@ -35,9 +35,9 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
     % for section in sections:
         <div class="panel panel-theme">
             <div class="panel-heading">
-                <h3 class="panel-title">
+                <h5 class="panel-title">
                     <a class="section-toggle">${section["title"]}</a>
-                </h3>
+                </h5>
             </div>
             <div class="panel-body" style="display: ${section["display"]}; width: 100%;">
             ${ display_table(section, 0) }
@@ -82,7 +82,7 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
 
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">${ _("Summary") }</h4>
+      <h5 class="modal-title">${ _("Summary") }</h5>
     </div>
 
     <div class="modal-body">

@@ -75,7 +75,7 @@
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h4 class="modal-title">${ _("Filter %s") % fltr.name if fltr.name else _("New filter") }</h4>
+        <h5 class="modal-title">${ _("Filter %s") % fltr.name if fltr.name else _("New filter") }</h5>
       </div>
 
       <div class="modal-body">

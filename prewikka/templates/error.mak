@@ -136,7 +136,7 @@ def inherit(context):
           % if errno:
           <span style="float:right; margin-right: 5px" title="${ _('Error: {0}').format(errno)}"><i class="fa fa-question-circle"></i></span>
           % endif
-          <h3 class="modal-title title" id="dialogLabel">${_(name) if name else _('An unexpected condition happened') }</h3>
+          <h5 class="modal-title" id="dialogLabel">${_(name) if name else _('An unexpected condition happened') }</h5>
         </div>
 
         <div class="modal-body">

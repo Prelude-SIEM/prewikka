@@ -9,7 +9,7 @@
 
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">${ _("Heartbeat analysis") }</h4>
+      <h5 class="modal-title">${ _("Heartbeat analysis") }</h5>
     </div>
 
     <div class="modal-body">

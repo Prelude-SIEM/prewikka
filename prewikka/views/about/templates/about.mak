@@ -8,11 +8,11 @@ from prewikka import version
 
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h4 class="modal-title">${ _("Prelude version %s") % version.__version__ }</h4>
+      <h5 class="modal-title">${ _("Prelude version %s") % version.__version__ }</h5>
     </div>
 
     <div class="modal-body about">
-      <h4>${ _("Prelude is a SIEM (Security Information and Event Management)") }</h4>
+      <h5>${ _("Prelude is a SIEM (Security Information and Event Management)") }</h5>
       <div class="software">
         <div class="col-sm-3">
           <img src="about/images/prelude-logo-400.png"/>
@@ -24,7 +24,7 @@ from prewikka import version
       <p style="margin-top: 15px"><u>${ _("Prelude Team:")}</u> Gilles Lehmann, Thomas Andrejak, Fran&ccedil;ois Poirotte, Yoann Vandoorselaere, Antoine Luong, Song Tran, Camille Gardet, Abdel Elmili, Cl&eacute;mentine Bourdin, Enguerrand de Mauduit, Avinash Pardessy, Jean-Charles Rogez, S&eacute;lim Menouar, Louis-David Gabet.</p>
       <p style="margin-top: 15px">${ _("Prelude OSS is an open-source project originally created by Yoann Vandoorselaere in 1998.") }</p>
 
-      <h4>${ _("Vigilo is a NMS (Network Management System)") }</h4>
+      <h5>${ _("Vigilo is a NMS (Network Management System)") }</h5>
       <div class="software">
         <div class="col-sm-3">
           <img src="about/images/vigilo-logo-400.png"/>

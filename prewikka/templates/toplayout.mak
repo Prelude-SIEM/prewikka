@@ -53,7 +53,7 @@ software = env.config.interface.get("software", "<img src='prewikka/images/prelu
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h3 class="modal-title title" id="dialogLabel">${ _('Please Confirm') }</h3>
+          <h5 class="modal-title" id="dialogLabel">${ _('Please Confirm') }</h5>
         </div>
         <div class="modal-body content"></div>
         <div class="modal-footer">
@@ -69,7 +69,7 @@ software = env.config.interface.get("software", "<img src='prewikka/images/prelu
       <div class="modal-content">
         <div class="modal-header">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h3 class="modal-title title" id="dialogLabel">${ _('Prelude Dialog') }</h3>
+          <h5 class="modal-title" id="dialogLabel">${ _('Prelude Dialog') }</h5>
         </div>
         <div class="modal-body content"></div>
         <div class="modal-footer">
@@ -84,7 +84,7 @@ software = env.config.interface.get("software", "<img src='prewikka/images/prelu
       <div class="modal-content">
         <div class="modal-header alert-danger">
           <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-          <h3 class="modal-title title" id="dialogLabel">${ _('Connection error') }</h3>
+          <h5 class="modal-title" id="dialogLabel">${ _('Connection error') }</h5>
         </div>
         <div class="modal-body content">
         ${ _("Connection failed, the server may be down or you may be experiencing network issues.") }

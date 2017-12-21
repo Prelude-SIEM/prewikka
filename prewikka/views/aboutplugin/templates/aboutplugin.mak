@@ -108,7 +108,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
         <div class="modal-header">
-          <h3 class="modal-title title" id="dialogLabel">${ _('Update Dialog') }</h3>
+          <h5 class="modal-title" id="dialogLabel">${ _('Update Dialog') }</h5>
         </div>
         <div class="modal-body content">
           <div class="progress">
@@ -141,7 +141,7 @@
 % if len(maintenance) > 0:
   <div class="panel panel-theme">
     <div class="panel-heading">
-      <h3 class="panel-title">${ _("Plugin Maintenance") }</h3>
+      <h5 class="panel-title">${ _("Plugin Maintenance") }</h5>
     </div>
     <div class="panel-body">
       <div style="text-align: center; font-weight: bold; color:red;">${ _("The following apps need to be updated before they can be loaded into the system") }</div>
@@ -179,7 +179,7 @@
 
   <div class="panel panel-theme">
     <div class="panel-heading">
-      <h3 class="panel-title">${ _("Installed Apps") }</h3>
+      <h5 class="panel-title">${ _("Installed Apps") }</h5>
     </div>
     <div class="panel-body">
       % for name, list in sorted(installed.items()):
