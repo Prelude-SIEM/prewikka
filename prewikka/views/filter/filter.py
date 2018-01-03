@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2017 CS-SI. All Rights Reserved.
+# Copyright (C) 2004-2018 CS-SI. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoannv@gmail.com>
 # Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
 #

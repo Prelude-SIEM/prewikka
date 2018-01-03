@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2017 CS-SI. All Rights Reserved.
+# Copyright (C) 2016-2018 CS-SI. All Rights Reserved.
 # Author: Antoine Luong <antoine.luong@c-s.fr>
 #
 # Inspired by the tw2.core package of ToscaWidgets2 which is Copyright (c)

@@ -1,5 +1,5 @@
 # Spanish translation for Prewikka
-# Copyright (C) 2007-2017 CS-SI
+# Copyright (C) 2007-2018 CS-SI
 # This file is distributed under the same license as the prewikka package.
 # Carlo G. Añez M. <carlo.anez@gmail.com>, 2007.
 #
