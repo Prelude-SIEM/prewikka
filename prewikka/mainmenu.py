@@ -251,7 +251,7 @@ class _MainMenu(TimePeriod):
             self._criteria_type = env.request.view.view_datatype
 
         self._parameters = parameters or env.request.menu_parameters
-        self.dataset = _MAINMENU_TEMPLATE.dataset(inline=True, period=True, refresh=True, period_optional=False, label_width=2, input_size="md")
+        self.dataset = _MAINMENU_TEMPLATE.dataset(inline=True, period=True, refresh=True, period_optional=False, label_width=2, input_size="sm")
         self.dataset.update(kwargs)
 
         self.dataset["timeline"] = utils.AttrObj()
@@ -301,7 +301,7 @@ class _MainMenu(TimePeriod):
         self._setup_timeline_range()
         self._set_timeline(self.start, self.end)
 
-        self.dataset["menu_extra"] = filter(None, hookmanager.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type))
+        self.dataset["menu_extra"] = filter(None, hookmanager.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type, input_size=self.dataset["input_size"]))
 
     def render(self):
         return resource.HTMLSource(self.dataset.render())

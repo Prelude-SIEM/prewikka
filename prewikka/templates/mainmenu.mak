@@ -3,15 +3,11 @@
 <script type="text/javascript">
 "use strict";
 
-% if inline:
-  $('#main_menu_ng input, #main_menu_ng select').addClass("form-control input-sm");
-  $('#main_menu_ng button').addClass("btn-sm");
-% else:
+% if not inline:
   $('#main_menu_ng_block div.form-group-date > div:first-child').addClass("control-label col-sm-${label_width} input-${input_size}");
   $('#main_menu_ng_block div.form-group > div:first-child').addClass("control-label col-sm-${label_width} input-${input_size}");
   $('#main_menu_ng_block div.form-group > div:last-child').addClass("col-sm-${12 - label_width}");
-  $('#main_menu_ng_block input, #main_menu_ng_block select').addClass("form-control input-${input_size}");
-  $('#main_menu_ng_block button').addClass("btn-block btn-${input_size}");
+  $('#main_menu_ng_block button').addClass("btn-block");
 % endif
 
 $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(function() {
@@ -46,7 +42,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
         <div>
           <div class="dropdown dropdown-fixed dropdown-refresh">
             <div data-toggle="tooltip" title="${ _("Update frequency of the current page") }" data-trigger="hover" data-container="#main">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#${root_id} .dropdown-refresh">
+              <button type="button" class="btn btn-default btn-${ input_size } dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#${root_id} .dropdown-refresh">
                    <span class="reload-icon">&#8634;</span><span class="refresh-value">${timeline.refresh_selected}</span><span class="caret"></span>
               </button>
             </div>
@@ -77,7 +73,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
         <div>
           <div class="dropdown dropdown-fixed dropdown-period">
             <div data-toggle="tooltip" title="${ _("Period to visualize") }" data-trigger="hover" data-container="#main">
-              <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#${root_id} .dropdown-period">
+              <button type="button" class="btn btn-default btn-${ input_size } dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" data-target="#${root_id} .dropdown-period">
                  <span class="timeline_quick_selected">${timeline.quick_selected}</span> <span class="caret" />
               </button>
             </div>
@@ -112,7 +108,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
               % if "timeline_start" in env.request.menu_parameters:
                 <input type="hidden" name="timeline_start" value="${env.request.menu_parameters['timeline_start']}" />
               % endif
-              <input class="form-control input-timeline-datetime timeline_start" type="text" placeholder="${ _("start") }" data-toggle="tooltip" title="${ _("Start date") }" data-trigger="hover" data-container="#main" data-name="timeline_start">
+              <input class="form-control input-${input_size} input-timeline-datetime timeline_start" type="text" placeholder="${ _("start") }" data-toggle="tooltip" title="${ _("Start date") }" data-trigger="hover" data-container="#main" data-name="timeline_start">
             </div>
           </div>
 
@@ -125,7 +121,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
               % if "timeline_end" in env.request.menu_parameters:
                <input type="hidden" name="timeline_end" value="${env.request.menu_parameters['timeline_end']}" />
               % endif
-              <input class="form-control input-timeline-datetime timeline_end" type="text" placeholder="${ _("end") }" data-toggle="tooltip" title="${ _("End date") }" data-trigger="hover" data-container="#main" data-name="timeline_end">
+              <input class="form-control input-${input_size} input-timeline-datetime timeline_end" type="text" placeholder="${ _("end") }" data-toggle="tooltip" title="${ _("End date") }" data-trigger="hover" data-container="#main" data-name="timeline_end">
             </div>
           </div>
 
@@ -136,7 +132,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
     % endif
 
     % if inline:
-      <button class="btn btn-primary btn-submit disabled main_menu_form_submit" type="submit">
+      <button class="btn btn-primary btn-${ input_size } btn-submit disabled main_menu_form_submit" type="submit">
         <i class="fa fa-search fa-lg fa-fw"></i>
       </button>
     % endif
