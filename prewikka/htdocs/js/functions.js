@@ -356,6 +356,9 @@ function prewikka_getRenderSize(container, options)
 }
 
 
+var PREWIKKA_GRID_AJAX_PARAMETERS = ["sort_index", "sort_order", "page", "rows"];
+
+
 function prewikka_grid(table, settings) {
     var conf = _mergedict({
         datatype: "local",
