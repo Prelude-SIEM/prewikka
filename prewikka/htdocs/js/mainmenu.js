@@ -17,11 +17,8 @@ function MainMenuInit(inline, start, end, date_format) {
     $(root).find(":input").addClass("mainmenu");
 
     that.trigger_custom_date = function(enabled) {
-        root.find("[name=timeline_start]").prop("disabled", !enabled);
-        root.find("[name=timeline_end]").prop("disabled", !enabled);
-        root.find("[name=timeline_value]").prop("disabled", enabled);
-        root.find("[name=timeline_unit]").prop("disabled", enabled);
-        root.find("[name=timeline_absolute]").prop("disabled", enabled);
+        root.find("[name=timeline_start], [name=timeline_end]").prop("disabled", !enabled);
+        root.find("[name=timeline_value], [name=timeline_unit]").prop("disabled", enabled);
 
         root.find(".form-group-date input").toggleClass("disabled", !enabled);
 
@@ -38,16 +35,9 @@ function MainMenuInit(inline, start, end, date_format) {
     };
 
     that.update_date = function() {
-        var start = start_picker.get_value();
-        var end = end_picker.get_value();
-
-        if ( start > end ) {
-            root.find(".input-timeline-datetime").closest(".form-group").addClass('has-error');
-            root.find(".main_menu_form_submit").prop('disabled', true).addClass('error-date');
-        } else {
-            root.find(".input-timeline-datetime").closest(".form-group").removeClass('has-error');
-            root.find(".main_menu_form_submit").prop('disabled', false).removeClass('error-date');
-        }
+        var error = (start_picker.get_value() > end_picker.get_value());
+        root.find(".input-timeline-datetime").closest(".form-group").toggleClass('has-error', error);
+        root.find(".main_menu_form_submit").prop('disabled', error).toggleClass('error-date', error);
     };
 
     root.find(".main_menu_extra :input").on("change", function() {
@@ -70,15 +60,16 @@ function MainMenuInit(inline, start, end, date_format) {
     });
 
     root.find(".timeline_quick_select a").on("click", function() {
-        root.find("[name=timeline_value]").val($(this).data("value"));
-        root.find("[name=timeline_unit]").val($(this).data("unit"));
-        root.find("[name=timeline_absolute]").val($(this).data("absolute"));
+        var mode = $(this).data("mode");
+
+        root.find("[name=timeline_mode]").val(mode);
         root.find(".timeline_quick_selected").text($(this).text());
 
-        if ( $(this).data("value") === "" ){
-            that.trigger_custom_date(true);
-        } else {
-            that.trigger_custom_date(false);
+        that.trigger_custom_date(mode == "custom");
+        if ( mode != "custom" ) {
+            root.find("[name=timeline_value]").val($(this).data("value"));
+            root.find("[name=timeline_unit]").val($(this).data("unit"));
+
             if ( inline )
                 $(this).closest("form").submit();
         }

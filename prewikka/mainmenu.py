@@ -20,6 +20,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import calendar
+import collections
 import datetime
 
 from dateutil.relativedelta import relativedelta
@@ -28,20 +29,20 @@ from prewikka.dataprovider import Criterion
 
 _SENTINEL = object()
 _MAINMENU_TEMPLATE = template.PrewikkaTemplate(__name__, "templates/mainmenu.mak")
-_MAINMENU_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_absolute", "auto_apply_value"]
+_MAINMENU_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_mode", "auto_apply_value"]
 
 
 def _register_parameters(view_parameters):
+    view_parameters.optional("timeline_mode", text_type, default="relative", save=True, general=True)
     view_parameters.optional("timeline_value", int, default=1, save=True, general=True)
     view_parameters.optional("timeline_unit", text_type, default="month", save=True, general=True)
-    view_parameters.optional("timeline_absolute", int, default=0, save=True, general=True)
     view_parameters.optional("timeline_end", int, save=True, general=True)
     view_parameters.optional("timeline_start", int, save=True, general=True)
     view_parameters.optional("auto_apply_value", int, default=0, save=True, general=True)
 
-    view_parameters._INTERNAL_PARAMETERS = _MAINMENU_PARAMETERS[:]
+    view_parameters.MAINMENU_PARAMETERS = _MAINMENU_PARAMETERS[:]
     for i in hookmanager.trigger("HOOK_MAINMENU_PARAMETERS_REGISTER", view_parameters):
-        view_parameters._INTERNAL_PARAMETERS.extend(i)
+        view_parameters.MAINMENU_PARAMETERS.extend(i)
 
 
 class TimeUnit(object):
@@ -171,35 +172,33 @@ class TimePeriod(object):
         return TimeUnit(gtable[nearest])
 
     def _setup_timeline_range(self):
-        # datetime specified through the mainmenu are precise to the second, we thus increase
-        # end time by 999999 microseconds to account for us/ms.
-
         self.start = self.end = None
-        if "timeline_start" in self._parameters:
-            self.start = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self._parameters["timeline_start"]))
+        mode = self._parameters["timeline_mode"]
 
-        if "timeline_end" in self._parameters:
-            self.end = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self._parameters["timeline_end"])) + datetime.timedelta(microseconds=999999)
+        if mode == "custom":
+            # datetime specified through the mainmenu are precise to the second, we thus increase
+            # end time by 999999 microseconds to account for us/ms.
+            if "timeline_start" in self._parameters:
+                self.start = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self._parameters["timeline_start"]))
 
-        self._timeunit, self._timevalue = self._parameters["timeline_unit"], self._parameters["timeline_value"]
-        if self._timeunit == "unlimited":
-            self._timeunit = "year"
+            if "timeline_end" in self._parameters:
+                self.end = env.request.user.timezone.localize(datetime.datetime.utcfromtimestamp(self._parameters["timeline_end"])) + datetime.timedelta(microseconds=999999)
+            else:
+                self.end = datetime.datetime.now(env.request.user.timezone).replace(microsecond=999999)
 
-        delta = relativedelta(**{self._timeunit + "s" if self._timeunit != "unlimited" else "years": self._timevalue})
+        else:
+            tunit = self._parameters["timeline_unit"]
+            if tunit == "unlimited":
+                tunit = "year"
 
-        if self.start and not self.end:
-            self.end = datetime.datetime.now(env.request.user.timezone).replace(microsecond=999999)
+            delta = relativedelta(**{tunit + "s": self._parameters["timeline_value"]})
 
-        elif self.end and not self.start:
-            self.start = self.end - delta
-
-        elif self.start is None and self.end is None:
             self.start = self.end = datetime.datetime.now(env.request.user.timezone).replace(microsecond=0)
-            if not self._parameters["timeline_absolute"]:  # relative
+            if mode == "relative":  # relative
                 self.start = self.end - delta
                 self.end = self.end.replace(microsecond=999999)
             else:  # absolute
-                self.end = utils.timeutil.truncate(self.end, self._timeunit) + relativedelta(**{self._timeunit + "s": 1})
+                self.end = utils.timeutil.truncate(self.end, tunit) + relativedelta(**{tunit + "s": 1})
                 if self._parameters["timeline_unit"] == "unlimited":
                     self.start = datetime.datetime.fromtimestamp(0).replace(tzinfo=env.request.user.timezone)
                 else:
@@ -241,7 +240,7 @@ class TimePeriod(object):
         return MainMenuStep(x, 1)
 
     def get_parameters(self):
-        return dict(((key, value) for key, value in self._parameters.items() if key in env.request.menu_parameters._INTERNAL_PARAMETERS))
+        return dict(((key, value) for key, value in self._parameters.items() if key in env.request.menu_parameters.MAINMENU_PARAMETERS))
 
 
 class _MainMenu(TimePeriod):
@@ -256,32 +255,29 @@ class _MainMenu(TimePeriod):
         self.dataset.update(kwargs)
 
         self.dataset["timeline"] = utils.AttrObj()
-        self.dataset["timeline"].quick = [
-            (_("Today"), 1, "day", 1),
-            (_("This month"), 1, "month", 1),
-            (ngettext("%d hour", "%d hours", 1) % 1, 1, "hour", 0),
-            (ngettext("%d hour", "%d hours", 2) % 2, 2, "hour", 0),
-            (ngettext("%d day", "%d days", 1) % 1, 1, "day", 0),
-            (ngettext("%d day", "%d days", 2) % 2, 2, "day", 0),
-            (ngettext("%d week", "%d weeks", 1) % 1, 1, "week", 0),
-            (ngettext("%d month", "%d months", 1) % 1, 1, "month", 0),
-            (ngettext("%d month", "%d months", 3) % 3, 3, "month", 0),
-            (ngettext("%d year", "%d years", 1) % 1, 1, "year", 0)]
+        self.dataset["timeline"].quick = collections.OrderedDict((
+            ((1, "day", True), _("Today")),
+            ((1, "month", True), _("This month")),
+            ((1, "hour", False), ngettext("%d hour", "%d hours", 1) % 1),
+            ((2, "hour", False), ngettext("%d hour", "%d hours", 2) % 2),
+            ((1, "day", False), ngettext("%d day", "%d days", 1) % 1),
+            ((2, "day", False), ngettext("%d day", "%d days", 2) % 2),
+            ((1, "week", False), ngettext("%d week", "%d weeks", 1) % 1),
+            ((1, "month", False), ngettext("%d month", "%d months", 1) % 1),
+            ((3, "month", False), ngettext("%d month", "%d months", 3) % 3),
+            ((1, "year", False), ngettext("%d year", "%d years", 1) % 1)
+        ))
 
-        self.dataset["timeline"].refresh = [
-            (ngettext("%d second", "%d seconds", 30) % 30, 30),
-            (ngettext("%d minute", "%d minutes", 1) % 1, 60),
-            (ngettext("%d minute", "%d minutes", 5) % 5, 60*5),
-            (ngettext("%d minute", "%d minutes", 10) % 10, 60*10)]
+        self.dataset["timeline"].refresh = collections.OrderedDict((
+            (30, ngettext("%d second", "%d seconds", 30) % 30),
+            (60, ngettext("%d minute", "%d minutes", 1) % 1),
+            (60 * 5, ngettext("%d minute", "%d minutes", 5) % 5),
+            (60 * 10, ngettext("%d minute", "%d minutes", 10) % 10)
+        ))
 
         self._render()
 
     def _set_timeline(self, start, end):
-        for unit in "minute", "hour", "day", "month", "year", "unlimited":
-            setattr(self.dataset["timeline"], "%s_selected" % unit, "")
-
-        setattr(self.dataset["timeline"], "%s_selected" % self._parameters["timeline_unit"], "selected='selected'")
-
         if not start and not end:
             return
 
@@ -289,25 +285,18 @@ class _MainMenu(TimePeriod):
         self.dataset["timeline"].end = end.replace(tzinfo=None, microsecond=0).isoformat()
 
     def _render(self):
+        mode = self.dataset["timeline"].mode = self._parameters["timeline_mode"]
+        self.dataset["auto_apply_value"] = self._parameters["auto_apply_value"]
         self.dataset["timeline"].value = self._parameters["timeline_value"]
         self.dataset["timeline"].unit = self._parameters["timeline_unit"]
-        self.dataset["timeline"].absolute = self._parameters["timeline_absolute"]
-        self.dataset["timeline"].quick_selected = _("None") if self._parameters["timeline_value"] == 0 else _("Custom")
-        self.dataset["timeline"].quick_custom = self._parameters["timeline_value"] != 0
-        self.dataset["timeline"].refresh_selected = _("Inactive")
-        self.dataset["auto_apply_value"] = self._parameters["auto_apply_value"]
         self.dataset["timeline"].time_format = localization.get_calendar_format()
+        self.dataset["timeline"].refresh_selected = self.dataset["timeline"].refresh.get(self._parameters["auto_apply_value"], _("Inactive"))
 
-        for label, value in self.dataset["timeline"].refresh:
-            if value == self._parameters["auto_apply_value"]:
-                self.dataset["timeline"].refresh_selected = label
-
-        if "timeline_start" not in self._parameters and "timeline_end" not in self._parameters:
-            for label, value, unit, absolute in self.dataset["timeline"].quick:
-                if value == self._parameters["timeline_value"] and unit == self._parameters["timeline_unit"] and absolute == self._parameters["timeline_absolute"]:
-                    self.dataset["timeline"].quick_selected = label
-                    self.dataset["timeline"].quick_custom = False
-                    break
+        if mode == "custom":
+            self.dataset["timeline"].quick_selected = _("Custom")
+        else:
+            wanted = (self._parameters["timeline_value"], self._parameters["timeline_unit"], mode == "absolute")
+            self.dataset["timeline"].quick_selected = self.dataset["timeline"].quick.get(wanted, _("None"))
 
         self._setup_timeline_range()
         self._set_timeline(self.start, self.end)

@@ -298,8 +298,6 @@ class Parameters(dict):
 
 
 class GeneralParameters(Parameters):
-    _INTERNAL_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_absolute", "auto_apply_value"]
-
     def register(self):
         Parameters.register(self)
         mainmenu._register_parameters(self)

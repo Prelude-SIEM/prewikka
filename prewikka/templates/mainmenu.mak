@@ -23,12 +23,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
 
     var menu = MainMenuInit(${ int(inline) }, "${timeline.start}", "${timeline.end}", "${timeline.time_format}");
 
-  % if timeline.quick_custom:
-    menu.trigger_custom_date(true);
-  % else:
-    menu.trigger_custom_date(false);
-  % endif
-
+    menu.trigger_custom_date("${timeline.mode}" == "custom");
     $('#main_menu_ng').trigger('mainmenu_ready');
 });
 </script>
@@ -57,7 +52,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
             </div>
 
             <ul class="dropdown-menu refresh-select">
-              % for label, value in timeline.refresh:
+              % for value, label in timeline.refresh.items():
                 <li><a data-value="${value}">${label}</a></li>
               % endfor
 
@@ -70,9 +65,9 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
     % endif
 
     % if period:
-      <input type="hidden" name="timeline_value" value="${timeline.value}" ${disabled(timeline.quick_custom)} />
-      <input type="hidden" name="timeline_unit" value="${timeline.unit}" ${disabled(timeline.quick_custom)} />
-      <input type="hidden" name="timeline_absolute" value="${timeline.absolute}" ${disabled(timeline.quick_custom)} />
+      <input type="hidden" name="timeline_mode" value="${timeline.mode}" />
+      <input type="hidden" name="timeline_value" value="${timeline.value}" ${disabled(timeline.mode == "custom")} />
+      <input type="hidden" name="timeline_unit" value="${timeline.unit}" ${disabled(timeline.mode == "custom")} />
 
       <div class="form-group">
         <div>
@@ -89,14 +84,14 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
             <ul class="dropdown-menu dropdown-fixed timeline_quick_select">
 
               % if period_optional:
-              <li><a data-value="0" data-unit="" data-absolute="">${ _("None") }</a></li>
+              <li><a data-mode="">${ _("None") }</a></li>
               % endif
 
-              <li><a data-value="" data-unit="" data-absolute="" class="timeline_quick_select_custom">${ _("Custom") }</a></li>
+              <li><a data-mode="custom" class="timeline_quick_select_custom">${ _("Custom") }</a></li>
               <li role="separator" class="divider"></li>
 
-              % for label, value, unit, absolute in timeline.quick:
-                 <li><a data-value="${value}" data-unit="${unit}" data-absolute="${absolute}">${label}</a></li>
+              % for (value, unit, absolute), label in timeline.quick.items():
+                 <li><a data-value="${value}" data-unit="${unit}" data-mode="${'absolute' if absolute else 'relative'}">${label}</a></li>
               % endfor
             </ul>
           </div>
@@ -114,6 +109,9 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
               <label>${ _("Start:") }</label>
             </div>
             <div>
+              % if "timeline_start" in env.request.menu_parameters:
+                <input type="hidden" name="timeline_start" value="${env.request.menu_parameters['timeline_start']}" />
+              % endif
               <input class="form-control input-timeline-datetime timeline_start" type="text" placeholder="${ _("start") }" data-toggle="tooltip" title="${ _("Start date") }" data-trigger="hover" data-container="#main" data-name="timeline_start">
             </div>
           </div>
@@ -124,6 +122,9 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
             </div>
 
             <div>
+              % if "timeline_end" in env.request.menu_parameters:
+               <input type="hidden" name="timeline_end" value="${env.request.menu_parameters['timeline_end']}" />
+              % endif
               <input class="form-control input-timeline-datetime timeline_end" type="text" placeholder="${ _("end") }" data-toggle="tooltip" title="${ _("End date") }" data-trigger="hover" data-container="#main" data-name="timeline_end">
             </div>
           </div>

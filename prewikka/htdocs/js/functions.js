@@ -484,15 +484,17 @@ window.json_registry.register("Criterion", function(obj) {
 function DatetimePicker(input, date, options, delta)
 {
     var that = {};
-    var hidden_input = $('<input/>').attr({ type: 'hidden',
-                                            name: input.data('name'),
-                                            class: 'form-control input-sm hidden_' + input.data('name'),
-                                            value: date });
+    var hidden_input = $(input).parent().find("[name=" + input.data('name') + "]");
+
+    if ( hidden_input.length == 0 ) {
+        hidden_input = $('<input/>').attr({ type: 'hidden', name: input.data('name') });
+        hidden_input.appendTo(input.parent());
+    }
+
+    hidden_input.attr("value", date);
 
     if ( ! delta )
         delta = 0;
-
-    hidden_input.appendTo(input.parent());
 
     that.get_value = function() {
         return input.datetimepicker("getDate");
