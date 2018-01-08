@@ -409,14 +409,8 @@ class _ViewDescriptor(object):
     def _criteria_to_urlparams(self, criteria):
         return {}
 
-    def make_parameters(self, criteria=None, **kwargs):
-        if criteria:
-            kwargs.update(self._criteria_to_urlparams(criteria))
-
-        return kwargs
-
     def make_url(self, **kwargs):
-        return url_for(self.view_endpoint, **self.make_parameters(**kwargs))
+        return self.view_base.make_url(_view_descriptor=self, **kwargs)
 
 
 class _View(_ViewDescriptor, registrar.DelayedRegistrar):
@@ -447,6 +441,26 @@ class _View(_ViewDescriptor, registrar.DelayedRegistrar):
             if self.view_path:
                 self.view_path = utils.nameToPath(self.view_path)
 
+    def make_parameters(self, criteria=None, **kwargs):
+        values = {}
+
+        for k, v in kwargs.items():
+            key = "%s[]" % k if isinstance(v, list) else k
+            values[key] = v
+
+        if criteria:
+            values.update(self._criteria_to_urlparams(criteria))
+
+        return values
+
+    def make_url(self, _view_descriptor=None, **kwargs):
+        if _view_descriptor:
+            endpoint = _view_descriptor.view_endpoint
+        else:
+            endpoint = self.view_endpoint
+
+        return env.request.url_adapter.build(endpoint, values=self.make_parameters(**kwargs))
+
 
 class View(_View, pluginmanager.PluginBase):
     def __init__(self):
@@ -471,8 +485,19 @@ class ViewManager(registrar.DelayedRegistrar):
     def get(self, datatype=None, keywords=None):
         return filter(lambda x: set(keywords or []).issubset(x.view_keywords), self._references.get(datatype, []))
 
-    def getView(self, view_id):
-        return self._views.get(view_id.lower())
+    def getView(self, id=None, endpoint=None):
+        if id:
+            return self._views.get(id.lower())
+
+        endpoint = endpoint.lower()
+
+        if endpoint[0] == "." and env.request.view:
+            endpoint = "%s%s" % (env.request.view.view_id, endpoint if len(endpoint) > 1 else "")
+
+        if endpoint[0] != "." and endpoint.find(".") == -1:
+            endpoint += ".render"
+
+        return self._views_endpoints[endpoint]
 
     def _getViewByPath(self, path, method=None):
         try:
@@ -517,7 +542,7 @@ class ViewManager(registrar.DelayedRegistrar):
 
         v = _ViewDescriptor()
         v.render = method
-
+        v.view_base = baseview
         v.view_id = baseview.view_id
         v.view_template = baseview.view_template
         v.view_users = baseview.view_users
@@ -613,27 +638,12 @@ class ViewManager(registrar.DelayedRegistrar):
 
         builtins.url_for = self.url_for
 
-    def url_for(self, endpoint, **kwargs):
-        endpoint = endpoint.lower()
-
-        if endpoint[0] == "." and env.request.view:
-            endpoint = "%s%s" % (env.request.view.view_id, endpoint if len(endpoint) > 1 else "")
-
-        if endpoint[0] != "." and endpoint.find(".") == -1:
-            endpoint += ".render"
-
-        values = {}
-        default = kwargs.pop("_default", _SENTINEL)
-
-        for k, v in kwargs.items():
-            key = "%s[]" % k if isinstance(v, list) else k
-            values[key] = v
-
+    def url_for(self, endpoint, _default=_SENTINEL, **kwargs):
         try:
-            return env.request.url_adapter.build(endpoint, values=values)
+            return self.getView(endpoint=endpoint).make_url(**kwargs)
         except Exception as exc:
-            if default is not _SENTINEL:
-                return default
+            if _default is not _SENTINEL:
+                return _default
 
             raise exc
 
