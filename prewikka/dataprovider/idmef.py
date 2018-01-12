@@ -7,7 +7,7 @@ import datetime
 import prelude
 
 from prewikka import utils, version
-from prewikka.dataprovider import DataProviderBase
+from prewikka.dataprovider import DataProviderBase, Criterion
 
 
 class _IDMEFProvider(DataProviderBase):
@@ -61,18 +61,20 @@ class _IDMEFProvider(DataProviderBase):
 
         return "*%s*" % value
 
-    def criterion_to_string(self, path, operator, value):
-        if not(value) and operator == "==":
-            if prelude.IDMEFPath(path).getValueType() == prelude.IDMEFValue.TYPE_STRING:
-                return "(! %s || %s == '')" % (path, path)
+    def compile_criterion(self, criterion):
+        if criterion.right:
+            criterion.right = self._value_adjust(criterion.operator, criterion.right)
 
-            return "! %s" % (path)
+        elif criterion.operator == "==":
+            criterion = Criterion(criterion.left, "==", None)
+            if prelude.IDMEFPath(criterion.left).getValueType() == prelude.IDMEFValue.TYPE_STRING:
+                criterion |= Criterion(criterion.left, "==", "''")
 
-        return DataProviderBase.criterion_to_string(self, path, operator, self._value_adjust(operator, value))
+        return DataProviderBase.compile_criterion(self, criterion)
 
     def compile_criteria(self, criteria):
         if criteria:
-            return prelude.IDMEFCriteria(criteria.to_string(self.dataprovider_type))
+            return prelude.IDMEFCriteria(criteria.to_string())
 
 
 class IDMEFAlertProvider(_IDMEFProvider):

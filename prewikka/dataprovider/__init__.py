@@ -242,7 +242,7 @@ class DataProviderBase(pluginmanager.PluginBase):
 
     @staticmethod
     def _value_escape(value):
-        if isinstance(value, (int, long)):
+        if isinstance(value, (int, long, float)):
             return value
 
         if not isinstance(value, compat.STRING_TYPES):
@@ -269,19 +269,13 @@ class DataProviderBase(pluginmanager.PluginBase):
         return paths, []
 
     def compile_criterion(self, criterion):
+        if criterion.right is not None and not isinstance(criterion.right, Criterion):
+            criterion.right = self._value_escape(criterion.right)
+
         return criterion
 
     def compile_criteria(self, criteria):
         return criteria
-
-    def criterion_to_string(self, path, operator, value):
-        if operator == "==" and value is None:
-            return "!%s" % (path)
-
-        if operator in ("!=", None) and value is None:
-            return path
-
-        return "%s %s %s" % (path, operator, self._value_escape(value))
 
     def get_paths(self):
         raise error.NotImplementedError
@@ -316,30 +310,43 @@ class Criterion(json.JSONObject):
 
         return res
 
-    def _compile(self, base):
+    def _compile(self, base, format_only=False):
         if not self.left:
             return copy.copy(self)
 
         if self.operator in ("&&", "||"):
-            return Criterion(self.left._compile(base), self.operator, self.right._compile(base))
+            return Criterion(self.left._compile(base, format_only), self.operator, self.right._compile(base, format_only))
 
-        tpl = [base.format_path(self.left), self.right]
+        left = base.format_path(self.left)
+        if format_only:
+            return Criterion(left, self.operator, self.right)
+
+        tpl = [left, self.right]
+
         list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE_WRITE", tpl))
-
         return base.compile_criterion(Criterion(tpl[0], self.operator, tpl[1]))
 
-    def to_string(self, type=None):
+    def _criterion_to_string(self, path, operator, value):
+        if operator == "==" and value is None:
+            return "!%s" % (path)
+
+        if operator in ("!=", None) and value is None:
+            return path
+
+        return "%s %s %s" % (path, operator, value)
+
+    def to_string(self, noroot=False):
         if not self.left:
             return ""
 
         if self.operator in ("&&", "||"):
-            return "(" + " ".join((self.left.to_string(type), self.operator, self.right.to_string(type))) + ")"
+            return "(" + " ".join((self.left.to_string(noroot), self.operator, self.right.to_string(noroot))) + ")"
 
-        if not type:
-            return " ".join(text_type(i) for i in [self.left, self.operator, self.right])
+        lst = [self.left, self.operator, self.right]
+        if noroot:
+            lst[0] = lst[0].split(".", 1)[-1]
 
-        base = env.dataprovider._type_handlers[type]
-        return base.criterion_to_string(base.format_path(self.left), self.operator, self.right)
+        return self._criterion_to_string(*lst)
 
     def to_list(self, type=None):
         if not self.left:
@@ -351,13 +358,11 @@ class Criterion(json.JSONObject):
             return [self]
 
     def compile(self, type):
-        self = copy.copy(self)
-
-        for c in filter(None, hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", type)):
-            self += c
-
         base = env.dataprovider._type_handlers[type]
         return base.compile_criteria(self._compile(base))
+
+    def format(self, type):
+        return self._compile(env.dataprovider._type_handlers[type], format_only=True)
 
     def _apply_self(self, operator, other):
         if not other:
@@ -495,6 +500,8 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         if criteria is None:
             criteria = Criterion()
+        else:
+            criteria = copy.copy(criteria)
 
         type = self._check_data_type(type, paths, criteria)
 
@@ -505,6 +512,9 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         paths = plugin.format_paths(paths)
         parsed_paths, paths_types = plugin.parse_paths(paths)
+
+        for c in filter(None, hookmanager.trigger("HOOK_DATAPROVIDER_CRITERIA_PREPARE", type)):
+            criteria += c
 
         return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, criteria=criteria.compile(type))
 

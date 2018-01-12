@@ -141,7 +141,7 @@ class AlertListingParameters(MessageListingParameters):
     def _check_value(self, obj, operator, value):
         if operator != "!" and obj != "__all__":
             try:
-                prelude.IDMEFCriteria(Criterion(obj, operator, value).to_string("alert"))
+                Criterion(obj, operator, value).compile("alert")
             except RuntimeError:
                 raise view.InvalidParameterValueError(obj, value)
 
@@ -792,11 +792,11 @@ class AlertListing(MessageListing):
         # Check whether the path can handle substring comparison
         # this need to be done first, since enum check with * won't work with "=" operator.
         try:
-            prelude.IDMEFCriteria(Criterion(path, "<>*", value).to_string("alert"))
+            Criterion(path, "<>*", value).compile("alert")
         except:
             # Check whether this path can handle the provided value.
             try:
-                prelude.IDMEFCriteria(Criterion(path, "=", value).to_string("alert"))
+                Criterion(path, "=", value).compile("alert")
             except:
                 return None
 
@@ -1225,7 +1225,7 @@ class AlertListing(MessageListing):
     def _criteria_to_urlparams(self, criteria):
         params = {}
 
-        for index, criterion in enumerate(criteria.to_list()):
+        for index, criterion in enumerate(criteria.format("alert").to_list()):
             path, operator, value = criterion.left, criterion.operator, criterion.right
 
             # Special case for classification checkboxes
