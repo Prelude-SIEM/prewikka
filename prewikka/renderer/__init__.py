@@ -178,6 +178,6 @@ class RendererPluginManager(pluginmanager.PluginManager):
                  var size = prewikka_getRenderSize("#%s", %s);
 
                  $("#%s").width(size[0]).css("height", size[1] + 'px').css("line-height", size[1] + 'px');
-                """ % (cssid, html.escapejs(kwargs), cssid))
+                """ % (cssid, html.escapejs({k: v for k, v in kwargs.items() if k in ('width', 'height', 'spacing')}), cssid))
 
             return {"html": htmls, "script": script}
