@@ -34,11 +34,11 @@ function Criterion(left, operator, right) {
 
     this.json = function() {
         var left = this.left;
-        if ( typeof(left) == "object" )
+        if ( left && typeof(left) == "object" )
             left = left.json();
 
         var right = this.right;
-        if ( typeof(right) == "object" )
+        if ( right && typeof(right) == "object" )
             right = right.json();
 
         return {
