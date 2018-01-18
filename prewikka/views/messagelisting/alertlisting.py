@@ -178,7 +178,7 @@ class AlertListingParameters(MessageListingParameters):
 
             try:
                 value = params_dict[column + "_value_" + text_type(num)]
-            except KeyError:
+            except view.MissingParameterError:
                 if operator != "!":
                     continue
                 value = ""
