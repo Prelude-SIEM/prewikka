@@ -39,7 +39,7 @@ class ParseError(Exception):
 
 class ConfigValueError(Exception):
     def __init__(self, value, key):
-        self._message = _('Invalid value "%s" for parameter "%s"' % (value, key))
+        self._message = _("Invalid value '%(value)s' for parameter '%(name)s'") % {'value': value, 'name': key}
 
     def __str__(self):
         return self._message

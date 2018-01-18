@@ -116,7 +116,7 @@ class HTMLNode(json.JSONObject):
 
         if self.tag in self._HTML5_VOID_TAGS:
             if self.childs:
-                raise Exception(_("HTMLNode with void tag '%s' contains children") % self.tag)
+                raise Exception("HTMLNode with void tag '%s' contains children" % self.tag)
 
             return HTMLSource("<%s%s />" % (self.tag, attr_s))
 
