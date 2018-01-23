@@ -240,16 +240,6 @@ class DataProviderBase(pluginmanager.PluginBase):
     def get_common_paths(self, index=False):
         return []
 
-    @staticmethod
-    def _value_escape(value):
-        if isinstance(value, (int, long, float)):
-            return value
-
-        if not isinstance(value, compat.STRING_TYPES):
-            value = text_type(value)
-
-        return "'%s'" % value.replace("\\", "\\\\").replace("'", "\\'")
-
     def format_path(self, path):
         return path.format(backend=self.dataprovider_type, time_field=self._time_field)
 
@@ -269,9 +259,6 @@ class DataProviderBase(pluginmanager.PluginBase):
         return paths, []
 
     def compile_criterion(self, criterion):
-        if criterion.right is not None and not isinstance(criterion.right, Criterion):
-            criterion.right = self._value_escape(criterion.right)
-
         return criterion
 
     def compile_criteria(self, criteria):
@@ -326,6 +313,16 @@ class Criterion(json.JSONObject):
         list(hookmanager.trigger("HOOK_DATAPROVIDER_VALUE_WRITE", tpl))
         return base.compile_criterion(Criterion(tpl[0], self.operator, tpl[1]))
 
+    @staticmethod
+    def _value_escape(value):
+        if isinstance(value, (int, long, float)):
+            return value
+
+        if not isinstance(value, compat.STRING_TYPES):
+            value = text_type(value)
+
+        return "'%s'" % value.replace("\\", "\\\\").replace("'", "\\'")
+
     def _criterion_to_string(self, path, operator, value):
         if operator == "==" and value is None:
             return "!%s" % (path)
@@ -333,7 +330,7 @@ class Criterion(json.JSONObject):
         if operator in ("!=", None) and value is None:
             return path
 
-        return "%s %s %s" % (path, operator, value)
+        return "%s %s %s" % (path, operator, self._value_escape(value))
 
     def to_string(self, noroot=False):
         if not self.left:
