@@ -453,12 +453,12 @@ class _View(_ViewDescriptor, registrar.DelayedRegistrar):
     def make_parameters(self, criteria=None, **kwargs):
         values = {}
 
+        if criteria:
+            kwargs.update(self._criteria_to_urlparams(criteria))
+
         for k, v in kwargs.items():
             key = "%s[]" % k if isinstance(v, list) else k
             values[key] = v
-
-        if criteria:
-            values.update(self._criteria_to_urlparams(criteria))
 
         return values
 
