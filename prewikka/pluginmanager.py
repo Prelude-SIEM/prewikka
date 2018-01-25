@@ -99,6 +99,7 @@ class PluginManager(object):
                 logger.exception("%s: %s", i.module_name, e)
                 continue
 
+            plugin_class.error = None
             plugin_class._assigned_name = i.name
             plugin_class.full_module_name = ":".join((plugin_class.__module__, i.attrs[0]))
 
@@ -140,10 +141,12 @@ class PluginManager(object):
                 self._addPlugin(plugin_class, autoupdate, name=plugin_class._assigned_name)
 
         except error.PrewikkaUserError as e:
+            plugin_class.error = e
             logger.warning("%s: plugin loading failed: %s", plugin_class.full_module_name, e)
             return False
 
         except Exception as e:
+            plugin_class.error = e
             logger.exception("%s: plugin loading failed: %s", plugin_class.full_module_name, e)
             return False
 
@@ -153,18 +156,22 @@ class PluginManager(object):
         if mname in loaded:
             return loaded[mname]
 
-        if mname in deplist:
-            logger.warning("%s: plugin loading failed, circular dependencies detected: %s -> %s" % (mname, " -> ".join(deplist), mname))
-            return False
-
         plugin_class = pmap.get(mname)
         if not plugin_class:
+            return False
+
+        if mname in deplist:
+            plugin_class.error = N_("Circular dependencies detected: %s", " -> ".join(deplist + [mname]))
+            logger.warning("%s: plugin loading failed, circular dependencies detected: %s" % (mname, " -> ".join(deplist + [mname])))
             return False
 
         plist = [(p, True) for p in plugin_class.plugin_require]
         ret = self._load_plugin_list(plist, pmap, autoupdate, loaded, deplist + [mname])
         if ret is not True:
-            logger.warning("%s: plugin loading failed: missing dependency '%s'" % (mname, ret))
+            if not plugin_class.error:
+                plugin_class.error = N_("Missing dependency: %s", ret)
+                logger.warning("%s: plugin loading failed: missing dependency '%s'" % (mname, ret))
+
             return False
 
         ret = self._load_single(plugin_class, autoupdate)
@@ -187,9 +194,15 @@ class PluginManager(object):
         self.__instances = []
         self.__dinstances = {}
 
+        loaded = {}
+        for value in env.all_plugins.values():
+            for name, plugin in value.items():
+                loaded[name] = not(plugin.error)
+
         plugins = self.iter_plugins(entrypoint)
         plist = [(p, False) for p in plugins]
-        self._load_plugin_list(plist, plugins, autoupdate, {}, [])
+        self._load_plugin_list(plist, plugins, autoupdate, loaded, [])
+        env.all_plugins[entrypoint] = plugins
 
     def getPluginCount(self):
         return self._count

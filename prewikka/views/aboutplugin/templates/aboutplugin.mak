@@ -195,12 +195,17 @@
           </tr>
 
         % for mod, enabled in sorted(list, key=lambda x: x[0].plugin_name or x[0].full_module_name):
-          <tr>
+          <tr class="${ 'danger' if mod.error and enabled else 'disabled-app' if not enabled else '' }">
             <td>${ mod.plugin_name or mod.full_module_name }</td>
             <td>${ _(mod.plugin_description) }</td>
             <td>${ mod.plugin_version }</td>
             <td class="text-center">${ mod.plugin_database_version or '-' }</td>
-            <td class="text-right"><input type="checkbox" name="enable_plugin[]" value="${ mod.full_module_name }" ${ checked(enabled) } ${ disabled(mod.plugin_mandatory) } /></td>
+            <td class="text-right">
+              % if mod.error and enabled:
+              <a data-content="${ _(mod.error) }" data-toggle="popover" data-placement="left"><i class="fa fa-exclamation-triangle text-danger"></i></a>
+              % endif
+              <input type="checkbox" name="enable_plugin[]" value="${ mod.full_module_name }" ${ checked(enabled) } ${ disabled(mod.plugin_mandatory) } />
+            </td>
           </tr>
         % endfor
         </table>

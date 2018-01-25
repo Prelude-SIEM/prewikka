@@ -23,7 +23,7 @@ import itertools
 import json
 import pkg_resources
 
-from prewikka import database, error, pluginmanager, template, utils, version, view, response
+from prewikka import database, error, response, template, utils, version, view
 from prewikka.utils import html
 
 
@@ -65,7 +65,7 @@ class AboutPlugin(view.View):
 
     def _iter_plugin(self):
         for catname, entrypoint in self._all_plugins:
-            for plugin in pluginmanager.PluginManager.iter_plugins(entrypoint).values():
+            for plugin in env.all_plugins[entrypoint].values():
                 yield catname, plugin
 
     def _get_plugin_infos(self):

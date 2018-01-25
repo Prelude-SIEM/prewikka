@@ -144,6 +144,8 @@ class Core(object):
         obj.init(config)
 
     def _loadPlugins(self):
+        env.all_plugins = {}
+
         env.menumanager = menu.MenuManager()
         env.dataprovider = dataprovider.DataProviderManager()
         env.dataprovider.load()

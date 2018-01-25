@@ -19,3 +19,8 @@ table.update_log td.result {
 .hiddenRow {
     padding: 0 !important;
 }
+
+tr.disabled-app {
+    font-style: italic;
+    color: gray;
+}
