@@ -579,7 +579,7 @@ function prewikka_resource_register(obj)
     if ( target.length > 0 )
         _resource_register(obj, target);
 
-    if ( ! $(target).is($("#main")) )
+    if ( ! target.is($("#main")) && $.contains($("#main")[0], target[0]) )
         _resource_register(obj, $("#main"));
 }
 
