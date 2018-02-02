@@ -29,9 +29,9 @@ from prewikka import siteconfig
 
 
 if sys.version_info >= (3, 0):
-    from urllib.parse import quote, urlsplit, urlunsplit, urlencode as _urlencode
+    from urllib.parse import quote, quote_plus, urlsplit, urlunsplit, urlencode as _urlencode  # noqa: imported but unused
 else:
-    from urllib import quote, urlencode as __urlencode
+    from urllib import quote, quote_plus, urlencode as __urlencode  # noqa: imported but unused
     from urlparse import urlsplit, urlunsplit
 
     def _convert(d):

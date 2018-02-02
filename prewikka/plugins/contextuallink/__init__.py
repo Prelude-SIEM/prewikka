@@ -21,7 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import functools
 
-from prewikka import hookmanager, pluginmanager, resource, version
+from prewikka import hookmanager, pluginmanager, resource, utils, version
 
 
 class ContextualLink(pluginmanager.PluginBase):
@@ -58,6 +58,6 @@ class ContextualLink(pluginmanager.PluginBase):
     def _get_url_link(self, label, value, arg=None, path=None):
         d = {"data-path": path} if path else {}
         if arg:
-            value = value.replace("$value", arg)
+            value = value.replace("$value", utils.url.quote_plus(arg.encode("utf-8")))
 
         return resource.HTMLNode("a", _(label.capitalize()), href=value, **d)
