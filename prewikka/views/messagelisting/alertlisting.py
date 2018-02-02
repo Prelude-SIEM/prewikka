@@ -35,9 +35,9 @@ from prewikka.utils import json
 from .messagelisting import AttrDict, ListedMessage, MessageListing, MessageListingParameters
 
 if sys.version_info >= (3, 0):
-    from urllib.parse import quote
+    from urllib.parse import quote, quote_plus
 else:
-    from urllib import quote
+    from urllib import quote, quote_plus
 
 
 def cmp_severities(x, y):
@@ -519,11 +519,18 @@ class ListedAlert(ListedMessage):
             fstr = self.createInlineFilteredField(pl, vl, "classification", fstr)
             dataset["classification_references"].append((urlstr, fstr))
 
+    @staticmethod
+    def _quote_plus(value):
+        if not value:
+            return value
+
+        return quote_plus(value.encode("utf-8"))
+
     def _setMessageClassificationURL(self, dataset, classification):
         dataset["classification_url"] = [ ]
         if "classification" in env.url:
             for urlname, url in env.url["classification"].items():
-                dataset["classification_url"].append((_(urlname), url.replace("$classification", classification)))
+                dataset["classification_url"].append((_(urlname), url.replace("$classification", self._quote_plus(classification))))
 
     def _setMessageClassification(self, dataset, message):
         self._setMessageClassificationReferences(dataset, message)
@@ -558,9 +565,9 @@ class ListedAlert(ListedMessage):
             t = text_type(int(compat.timedelta_total_seconds(t - epoch) * 1000))
 
             for urlname, url in env.url["time"].items():
-                url = url.replace("$time", t)
+                url = url.replace("$time", self._quote_plus(t))
                 if host:
-                    url = url.replace("$host", host)
+                    url = url.replace("$host", self._quote_plus(host))
                 ret.append((_(urlname), url))
 
         return ret
