@@ -61,6 +61,25 @@ class _IDMEFProvider(DataProviderBase):
 
         return "*%s*" % value
 
+    @staticmethod
+    def _path_adjust(path):
+        """
+        Automatically add indexes to IDMEF listed fields
+        FIXME: to be removed when libpreludedb supports != for listed fields
+        """
+        fields = []
+        for elem in path.split("."):
+            p = ".".join(fields + [elem])
+
+            if elem == "analyzer":
+                fields.append("%s(-1)" % elem)
+            elif prelude.IDMEFPath(p).isAmbiguous():
+                fields.append("%s(0)" % elem)
+            else:
+                fields.append(elem)
+
+        return ".".join(fields)
+
     def compile_criterion(self, criterion):
         if criterion.right:
             criterion.right = self._value_adjust(criterion.operator, criterion.right)
@@ -69,6 +88,9 @@ class _IDMEFProvider(DataProviderBase):
             criterion = Criterion(criterion.left, "==", None)
             if prelude.IDMEFPath(criterion.left).getValueType() == prelude.IDMEFValue.TYPE_STRING:
                 criterion |= Criterion(criterion.left, "==", "''")
+
+        if criterion.operator.startswith("!") and prelude.IDMEFPath(criterion.left).isAmbiguous():
+            criterion.left = self._path_adjust(criterion.left)
 
         return DataProviderBase.compile_criterion(self, criterion)
 
