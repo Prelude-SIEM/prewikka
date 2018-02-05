@@ -30,6 +30,10 @@ class HistoryDatabase(database.DatabaseHelper):
     def __init__(self):
         database.DatabaseHelper.__init__(self)
 
+    def init(self):
+        # This should not be executed if env.db fails to initialize
+        crontab.schedule("search_history", N_("Search history deletion"), "0 * * * *", _regfunc=history._history_cron, enabled=True)
+
     def create(self, user, form):
         return utils.AttrObj(
             content=self.get_queries(user, form),
@@ -94,9 +98,8 @@ class HistoryDatabase(database.DatabaseHelper):
 
 history = HistoryDatabase()
 
+init = history.init
 create = history.create
 delete = history.delete
 get = history.get_queries
 save = history.save
-
-crontab.schedule("search_history", N_("Search history deletion"), "0 * * * *", _regfunc=history._history_cron, enabled=True)
