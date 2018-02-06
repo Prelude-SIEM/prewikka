@@ -1,3 +1,13 @@
+* 2018-02-06, prewikka-4.1.8:
+
+Author: Antoine Luong
+
+- Fix error when env.db is not defined
+- Fix crontab reinitialization when reloading plugins
+- Quote URL query in contextual links
+
+
+
 * 2018-01-27, prewikka-4.1.7:
 
 Author: Antoine Luong
