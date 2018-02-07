@@ -524,6 +524,16 @@ class ViewManager(registrar.DelayedRegistrar):
     def getViewByPath(self, path, method=None):
         return self._getViewByPath(path, method)[0]
 
+    def get_baseview(self):
+        # Import here, because of cyclic dependency
+        from prewikka import baseview
+        bview = self._views.get("baseview")
+        if not bview:
+            bview = baseview.BaseView()
+            self.addView(bview)
+
+        return bview
+
     def loadView(self, request, userl):
         view_layout = None
 
@@ -610,9 +620,7 @@ class ViewManager(registrar.DelayedRegistrar):
             self._views_endpoints[view.view_endpoint] = view
 
     def loadViews(self, autoupdate=False):
-        # Import here, because of cyclic dependency
-        from prewikka.baseview import BaseView
-        self.addView(BaseView())
+        self.get_baseview()
 
         for view_class in pluginmanager.PluginManager("prewikka.views", autoupdate):
             try:

@@ -87,7 +87,7 @@ class PrewikkaError(PrewikkaException):
         return dataset
 
     def _html_respond(self):
-        return env.viewmanager.getView("BaseView").respond(self._setup_template(self.template, False), self.code)
+        return env.viewmanager.get_baseview().respond(self._setup_template(self.template, False), self.code)
 
     def _get_traceback(self):
         if self.display_traceback and env.config.general.get_bool("enable_error_traceback", True):
