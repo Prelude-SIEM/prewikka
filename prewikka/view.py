@@ -336,6 +336,7 @@ class _ViewDescriptor(object):
     view_layout = "BaseView"
     view_endpoint = None
     view_datatype = None
+    view_priority = 0
     view_keywords = set()
 
     view_help = None
@@ -477,22 +478,24 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
-def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, keywords=set(), help=None, parameters=_SENTINEL):
+def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, priority=0, keywords=set(), help=None, parameters=_SENTINEL):
     usergroup.ALL_PERMISSIONS.declare(permissions)
 
     if method is not _SENTINEL:
         ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu,
-                                         defaults=defaults, endpoint=endpoint, datatype=datatype, keywords=keywords, help=help, parameters=parameters)
+                                         defaults=defaults, endpoint=endpoint, datatype=datatype, priority=priority,
+                                         keywords=keywords, help=help, parameters=parameters)
     else:
         ret = registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route, path, methods=methods, permissions=permissions,
-                                                        menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype, keywords=keywords, help=help, parameters=parameters)
+                                                        menu=menu, defaults=defaults, endpoint=endpoint, datatype=datatype, keywords=keywords,
+                                                        priority=priority, help=help, parameters=parameters)
 
     return ret
 
 
 class ViewManager(registrar.DelayedRegistrar):
     def get(self, datatype=None, keywords=None):
-        return filter(lambda x: set(keywords or []).issubset(x.view_keywords), self._references.get(datatype, []))
+        return sorted(filter(lambda x: set(keywords or []).issubset(x.view_keywords), self._references.get(datatype, [])), key=lambda x: x.view_priority)
 
     def getView(self, id=None, endpoint=None):
         if id:
@@ -556,7 +559,7 @@ class ViewManager(registrar.DelayedRegistrar):
         env.request.view = view
         return view
 
-    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, keywords=set(), help=None, parameters=None):
+    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, priority=0, keywords=set(), help=None, parameters=None):
         baseview = method.__self__
 
         v = _ViewDescriptor()
@@ -580,6 +583,7 @@ class ViewManager(registrar.DelayedRegistrar):
         v.view_permissions = set(permissions) | set(baseview.view_permissions)
         v.view_endpoint = "%s.%s" % (v.view_id, endpoint or method.__name__)
         v.view_datatype = datatype
+        v.view_priority = priority
         v.view_keywords = set(keywords)
 
         if v.view_menu:
