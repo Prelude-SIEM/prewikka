@@ -105,8 +105,11 @@ class PrewikkaResponse(object):
         return self
 
     def content(self):
-        if self.data is None and not(self.ext_content):
-            return None
+        if self.data is None:
+            if not self.ext_content:
+                return None
+
+            self.data = {}
 
         return self._encode_response(self.data)
 
