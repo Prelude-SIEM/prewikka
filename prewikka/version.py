@@ -3,7 +3,7 @@ import pkg_resources
 
 __version__ = pkg_resources.get_distribution("prewikka").version
 __version_info__ = __version__.split(".")
-__branch__ = "4.1"
+__branch__ = "4.2"
 __author__ = "Prelude Team"
 __license__ = "GPL"
 __copyright__ = "CSSI"

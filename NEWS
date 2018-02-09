@@ -1,3 +1,61 @@
+* 2018-02-09, prewikka-4.2.0rc1:
+
+Author: Yoann Vandoorselaere
+
+- Evolutions
+
+    - Implement a system of plugin dependencies
+    - Javascript resources loading/unloading framework
+    - Finer grained reload mechanism
+
+    - Parameters handling overhaul
+        - Proper jQuery parameters handling
+        - Provide a way to update/save parameters with AJAX
+
+    - MainMenu improvements
+        - Replace timeline_absolute parameter by timeline_mode
+        - Use POST in place of GET
+        - Provide microsecond precision
+
+    - Rework criteria
+    - Rework PrewikkaResponse code
+    - Class can now provide their own JSON deserialization function
+    - Rework user configuration storage
+
+- Bugfixes
+
+    - Redirection fixes
+    - Fix exception with history query containing unicode
+    - Properly add wildcard on not substring operator
+
+Author: Antoine Luong
+
+- Evolutions
+
+    - Port the contextual links to a dedicated plugin
+    - Raise normalization errors when parameters are incorrect
+    - Save and reload grid preferences
+    - Better support for multiple control menus
+    - Add get_int, get_float and get_bool methods to ConfigParserSection
+
+- Bugfixes
+
+    - Fix various Prewikka initialization errors
+    - IE11 and Chrome compatibility work
+    - Automatically add indexes when needed in IDMEF paths
+    - Fix creation of filters with undefined fields
+    - Do not duplicate filter when renaming it
+    - Correctly build criteria for aggregating alerts
+    - Fix SQL migration sequence
+    - Fix Criterion JSON construction
+
+Author: Camille Gardet
+
+- Delete tasks linked to a removed user
+- Fix the SQL mapping of the queries history
+
+
+
 * 2017-07-24, prewikka-4.1.0:
 
 Author: Thomas Andrejak
