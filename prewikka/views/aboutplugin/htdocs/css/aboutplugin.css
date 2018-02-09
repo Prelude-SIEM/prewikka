@@ -24,3 +24,7 @@ tr.disabled-app {
     font-style: italic;
     color: gray;
 }
+
+.popover-content {
+    word-wrap: break-word;
+}
