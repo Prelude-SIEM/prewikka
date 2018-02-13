@@ -371,3 +371,5 @@ $.jgrid.extend({
         return oldSortableRows.call($(this), opts);
     }
 });
+
+$.jgrid.guiStyles.bootstrap.states.select = "active";
