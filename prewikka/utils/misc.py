@@ -274,3 +274,6 @@ class CachingIterator(object):
             raise IndexError
 
         return self._cache[key]
+
+    def __json__(self):
+        return list(self)
