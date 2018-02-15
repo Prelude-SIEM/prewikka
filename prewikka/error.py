@@ -118,7 +118,7 @@ class PrewikkaError(PrewikkaException):
 
     def __json__(self):
         dset = self._setup_template(PrewikkaError.template, True)
-        return {"content": dset.render()}
+        return {"content": dset.render(), "error": True}
 
 
 class PrewikkaUserError(PrewikkaError):

@@ -291,14 +291,34 @@ function _dialog_common(dialog, opts)
 }
 
 
+function _is_error_duplicate(content)
+{
+    var duplicate = false;
+    var cur = content.find(".modal-body").text();
+
+    $("#prewikka-dialog-container").find(".error-dialog").each(function(i, elem) {
+        if ( $(elem).find(".modal-body").text() == cur ) {
+            duplicate = true;
+            return false;
+        }
+    });
+
+    return duplicate;
+}
+
+
 function prewikka_json_dialog(data, opts)
 {
     var dialog;
+    var content = $(data.content);
+
+    if ( data.error && _is_error_duplicate(content) )
+        return false;
 
     if ( typeof(opts) == 'undefined' )
-        opts = { class: "ajax-modal", show: true }
+        opts = { class: "ajax-modal", show: true };
 
-    $("#prewikka-dialog-container").append(data.content);
+    $("#prewikka-dialog-container").append(content);
     dialog = $("#prewikka-dialog-container > :last-child");
 
     $(dialog).addClass("modal fade");
