@@ -6,16 +6,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from datetime import datetime
 
 import prelude
-import preludedb
 from prelude import IDMEFTime, IDMEFValue
 from prewikka import usergroup, utils, version
 from prewikka.dataprovider import DataProviderBackend, QueryResults, QueryResultsRow, ResultObject
-
-
-_ORDER_MAP = {
-    "time_asc": preludedb.DB.ORDER_BY_CREATE_TIME_ASC,
-    "time_desc": preludedb.DB.ORDER_BY_CREATE_TIME_DESC
-}
 
 
 class IDMEFResultObject(ResultObject, utils.json.JSONObject):
@@ -74,7 +67,7 @@ class _IDMEFPlugin(DataProviderBackend):
         env.idmef_db.update(list(paths), [IDMEFValue(v) for v in values], criteria)
 
     def get(self, criteria, order_by, limit, offset):
-        results = self._get_idents(criteria, limit, offset, _ORDER_MAP[order_by])
+        results = self._get_idents(criteria, limit, offset, order_by)
         return utils.CachingIterator(self._iterate_object(results))
 
     @usergroup.permissions_required(["IDMEF_VIEW"])
