@@ -23,6 +23,7 @@ function MainMenuInit(inline, start, end, date_format) {
         root.find(".form-group-date input").toggleClass("disabled", !enabled);
 
         if ( enabled ) {
+            root.find("[name=timeline_mode]").val("custom");
             root.find(".main_menu_form_submit").removeClass("disabled");
             root.find(".timeline_quick_selected").html($(root.find(".timeline_quick_select_custom")).text());
             that.update_date();
