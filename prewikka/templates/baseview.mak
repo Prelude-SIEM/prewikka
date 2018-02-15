@@ -256,10 +256,10 @@ def _get_view_url(section, tabs):
                 <li role="separator" class="divider"></li>
                 <% url = url_for('About.render', _default=None) %>
                 % if url:
-                <li><a title="${ _("About") }" href="${ url }">${ _("About") }</a></li>
+                <li><a href="${ url }">${ _("About") }</a></li>
                 % endif
                 % if env.session.can_logout():
-                <li><a id="logout" title="${ _("Logout") }" class="ajax-bypass" href="${ url_for('BaseView.logout') }" data-confirm="${ _("Are you sure you want to log out?") }">${ _("Logout") }</a></li>
+                <li><a id="logout" class="ajax-bypass" href="${ url_for('BaseView.logout') }" data-confirm="${ _("Are you sure you want to log out?") }">${ _("Logout") }</a></li>
                 % endif
             % endif
             </ul>
