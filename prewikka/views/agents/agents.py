@@ -46,8 +46,12 @@ class Agents(view.View):
     def _get_analyzers(self, reqstatus):
         # Do not take the control menu into account.
         # The expected behavior is yet to be determined.
-        for (analyzerid,) in env.dataprovider.query(["heartbeat.analyzer(-1).analyzerid/group_by"]):
-            analyzer, heartbeat = self._get_analyzer(analyzerid)
+        c = Criterion()
+        for (create_time, analyzerid) in env.dataprovider.query(["max(heartbeat.create_time)", "heartbeat.analyzer(-1).analyzerid/group_by"]):
+            c |= Criterion("heartbeat.create_time", "==", create_time) & Criterion("heartbeat.analyzer(-1).analyzerid", "==", analyzerid)
+
+        for heartbeat in env.dataprovider.get(c):
+            heartbeat = heartbeat["heartbeat"]
             status, status_text = utils.get_analyzer_status_from_latest_heartbeat(
                 heartbeat, self._heartbeat_error_margin
             )
@@ -61,6 +65,7 @@ class Agents(view.View):
             alert_listing = url_for("AlertListing.render", **{"analyzer_object_0": "alert.analyzer.analyzerid", "analyzer_operator_0": "=", "analyzer_value_0": analyzerid})
             heartbeat_analyze = url_for(".analyze", analyzerid=analyzerid)
 
+            analyzer = heartbeat["analyzer(-1)"]
             node_name = analyzer["node.name"] or _("Node name n/a")
             osversion = analyzer["osversion"] or _("OS version n/a")
             ostype = analyzer["ostype"] or _("OS type n/a")
