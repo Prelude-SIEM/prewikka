@@ -182,9 +182,9 @@ class FilterView(FilterPlugin, view.View):
         return f.criteria.get(ctype)
 
     @hookmanager.register("HOOK_MAINMENU_EXTRA_CONTENT")
-    def _filter_html_menu(self, ctype, **kwargs):
+    def _filter_html_menu(self, ctype, parameters, **kwargs):
         dset = self._filter_menu_tmpl.dataset(
-            current_filter=env.request.menu_parameters.get("filter", ""),
+            current_filter=parameters.get("filter", ""),
             filter_list=self._db.get_filters(env.request.user, ctype),
             **kwargs
         )
