@@ -20,6 +20,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import functools
+import re
 
 from prewikka import hookmanager, pluginmanager, resource, utils, version
 
@@ -44,8 +45,7 @@ class ContextualLink(pluginmanager.PluginBase):
                 continue
 
             hookmanager.register("HOOK_%s_LINK" % type.upper(), functools.partial(self._get_url_link, option, value))
-
-            for path in config.get("paths", "").split(", "):
+            for path in filter(None, re.split('\s|,', config.get("paths", ""))):
                 hookmanager.register("HOOK_PATH_LINK", functools.partial(self._get_path_link, path, option, value))
                 hookmanager.register("HOOK_%s_LINK" % path.upper(), functools.partial(self._get_url_link, option, value))
 
