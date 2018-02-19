@@ -1,3 +1,16 @@
+* 2018-02-21, prewikka-4.1.9:
+
+Author: Yoann Vandoorselaere
+
+- Fix exception with history query containing unicode
+
+Author: Antoine Luong
+
+- Always fetch addresses in AlertListing aggregations
+- Greatly improve the performance of the Agents view
+
+
+
 * 2018-02-06, prewikka-4.1.8:
 
 Author: Antoine Luong
