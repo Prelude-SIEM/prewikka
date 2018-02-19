@@ -630,8 +630,8 @@ class ListedAlert(ListedMessage):
         if extra_link:
             param = {
                 'classification': [classification],
-                'source': source_address,
-                'target': target_address,
+                'source': [source_address],
+                'target': [target_address],
                 'time_min': ctime,
                 'time_max': ctime
             }
@@ -854,7 +854,8 @@ class AlertListing(MessageListing):
         index = 0
         selection_list = [ ]
 
-        path_list = ["alert.classification.text", "alert.analyzer(-1).node.name",
+        path_list = ["alert.classification.text", "alert.source(0).node.address(0).address",
+                     "alert.target(0).node.address(0).address", "alert.analyzer(-1).node.name",
                      "alert.analyzer(-1).name", "alert.analyzer(-1).model",
                      "alert.assessment.impact.severity"]
 
@@ -868,6 +869,8 @@ class AlertListing(MessageListing):
         alert_list = env.dataprovider.query( selection + ["max(alert.messageid)", "count(alert.messageid)" ], criteria2)
         alertsraw = { }
         nodesraw = { }
+        sources = set()
+        targets = set()
 
         for values in alert_list:
             for path, index in selection_list:
@@ -877,11 +880,16 @@ class AlertListing(MessageListing):
             alert_count = values[-1]
 
             classification = path_value_hash["alert.classification.text"]
+            source_address = path_value_hash["alert.source(0).node.address(0).address"]
+            target_address = path_value_hash["alert.target(0).node.address(0).address"]
             analyzer_name = path_value_hash["alert.analyzer(-1).name"]
             analyzer_model = path_value_hash["alert.analyzer(-1).model"]
             analyzer_node_name = path_value_hash["alert.analyzer(-1).node.name"]
             severity = path_value_hash["alert.assessment.impact.severity"]
             completion = None
+
+            sources.add(source_address)
+            targets.add(target_address)
 
             alertkey = (classification or "") + "-" + (severity or "") + "-" + (completion or "")
 
@@ -897,13 +905,10 @@ class AlertListing(MessageListing):
 
         res = sorted(alertsraw.values(), key=lambda y: { None: 4, "info": 3, "low": 2, "medium": 1, "high": 0 }[y[1]])
 
-        source_value = path_value_hash.get("alert.source(0).node.address(0).address", None)
-        target_value = path_value_hash.get("alert.target(0).node.address(0).address", None)
-
         param = {
             'classification': [r[0] for r in res],
-            'source': source_value,
-            'target': target_value,
+            'source': list(sources),
+            'target': list(targets),
             'time_min': time_min,
             'time_max': time_max
         }
