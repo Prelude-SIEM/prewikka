@@ -14,6 +14,7 @@ function MainMenuInit(inline, start, end, date_format) {
     var end_picker = DatetimePicker(root.find(".timeline_end"), end, options, 59);
 
     // Make sure whole mainmenu input have the mainmenu class.
+    $(root).data("mainmenu", that);
     $(root).find(":input").addClass("mainmenu");
 
     that.trigger_custom_date = function(enabled) {
@@ -33,6 +34,11 @@ function MainMenuInit(inline, start, end, date_format) {
          * This will trigger a collapse only in non-inline mode.
          */
         root.find(".form-group.collapse").collapse((enabled) ? "show" : "hide");
+    };
+
+    that.set_date = function(start, end) {
+        start_picker.set_date(start);
+        end_picker.set_date(end);
     };
 
     that.update_date = function() {

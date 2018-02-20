@@ -540,6 +540,13 @@ function DatetimePicker(input, date, options, delta)
         return input.datetimepicker("getDate");
     };
 
+    that.set_date = function(date) {
+        var dt = new Date(moment(date));
+
+        input.datetimepicker("setDate", dt);
+        _update_input(dt);
+    };
+
     function _timestamp(dt) {
         return (dt.getTime() - (dt.getTimezoneOffset() * 60000)) / 1000;
     }
@@ -562,11 +569,7 @@ function DatetimePicker(input, date, options, delta)
         })
     );
 
-    var dt = new Date(moment(date));
-
-    input.datetimepicker("setDate", dt);
-    _update_input(dt);
-
+    that.set_date(date);
     return that;
 }
 

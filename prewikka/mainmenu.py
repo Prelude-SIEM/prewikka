@@ -251,7 +251,7 @@ class _MainMenu(TimePeriod):
             self._criteria_type = env.request.view.view_datatype
 
         self._parameters = parameters or env.request.menu_parameters
-        self.dataset = _MAINMENU_TEMPLATE.dataset(inline=True, period=True, refresh=True, period_optional=False, label_width=2, input_size="sm")
+        self.dataset = _MAINMENU_TEMPLATE.dataset(inline=True, period=True, refresh=True, period_optional=False, label_width=2, input_size="sm", update=False)
         self.dataset.update(kwargs)
 
         self.dataset["timeline"] = utils.AttrObj()

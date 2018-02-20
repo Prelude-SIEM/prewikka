@@ -3,12 +3,16 @@
 <script type="text/javascript">
 "use strict";
 
-% if not inline:
+%if update:
+  $("#${root_id}").data("mainmenu").set_date("${timeline.start}", "${timeline.end}");
+%else:
+
+  % if not inline:
   $('#main_menu_ng_block div.form-group-date > div:first-child').addClass("control-label col-sm-${label_width} input-${input_size}");
   $('#main_menu_ng_block div.form-group > div:first-child').addClass("control-label col-sm-${label_width} input-${input_size}");
   $('#main_menu_ng_block div.form-group > div:last-child').addClass("col-sm-${12 - label_width}");
   $('#main_menu_ng_block button').addClass("btn-block");
-% endif
+  % endif
 
 $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(function() {
     window.mainmenu.reset();
@@ -18,12 +22,13 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
   % endif
 
     var menu = MainMenuInit(${ int(inline) }, "${timeline.start}", "${timeline.end}", "${timeline.time_format}");
-
     menu.trigger_custom_date("${timeline.mode}" == "custom");
-    $('#main_menu_ng').trigger('mainmenu_ready');
 });
+
+%endif
 </script>
 
+%if not update:
 <div id="${ root_id }">
   <div class="main_menu_navbar${ ' form-inline pull-right' if inline else ''}">
     % for i in menu_extra:
@@ -138,4 +143,4 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
     % endif
   </div>
 </div>
-
+%endif
