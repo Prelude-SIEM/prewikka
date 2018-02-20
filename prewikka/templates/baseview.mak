@@ -33,7 +33,11 @@ function check_same_origin(url) {
 
 $(function() {
         % if not(context.get("is_error_template")):
-           prewikka_ajax({url: window.location.pathname, data: "${env.request.web.get_query_string() | n}", type: "${env.request.web.method}", context: "tab" });
+            prewikka_ajax({ url: window.location.pathname,
+                            data: "${env.request.web.get_query_string() | n}",
+                            type: "${env.request.web.method}",
+                            prewikka: { target: PrewikkaAjaxTarget.TAB }
+            });
         % endif
 
         /*
@@ -43,7 +47,7 @@ $(function() {
                 if ( e.originalEvent.state == null )
                         return;
 
-                prewikka_ajax({url: e.originalEvent.state, history:false, context:"tab"});
+                prewikka_ajax({url: e.originalEvent.state, prewikka: { history:false, target: PrewikkaAjaxTarget.TAB }});
         });
 
         $(document).on("click", "a:not(.ajax-bypass), area:not(.ajax-bypass)", function(event) {
@@ -60,7 +64,7 @@ $(function() {
                         return false;
                 }
 
-                prewikka_ajax({ url: url, context: $(this).hasClass("no-widget") ? "tab" : null });
+                prewikka_ajax({ url: url, prewikka: { target: $(this).hasClass("no-widget") ? PrewikkaAjaxTarget.TAB : PrewikkaAjaxTarget.AUTO }});
                 return false;
         });
 
@@ -89,7 +93,7 @@ $(function() {
                         url: (orig && orig.attr("formAction")) || $(this).attr("action"),
                         type: (orig && orig.attr("formMethod")) || $(this).attr("method"),
                         data: data,
-                        context: $(this).hasClass("no-widget") ? "tab" : null,
+                        prewikka: { target: $(this).hasClass("no-widget") ? PrewikkaAjaxTarget.TAB : PrewikkaAjaxTarget.AUTO },
                         success: function() {
                               $("form").trigger("submit-success", [form, data]);
 

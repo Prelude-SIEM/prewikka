@@ -1,27 +1,91 @@
 "use strict";
 
+var PrewikkaAjaxTarget = Object.freeze({"AUTO": 1, "TAB": 2, "LAYOUT": 3});
+
 $(function() {
+    $.xhrPool = function() {
+        var that = {};
+
+        that.pool = [];
+        that.active = 0;
+
+        that.push = function(xhr, settings) {
+            if ( settings.prewikka.target == PrewikkaAjaxTarget.LAYOUT )
+                return;
+
+            that.active++;
+            xhr._pool_index = that.pool.push(xhr) - 1;
+        };
+
+        that.done = function(xhr) {
+            if ( xhr._pool_index == undefined || xhr._aborted ) /* LAYOUT target */
+                return;
+
+            that.pool[xhr._pool_index] = null;
+            if ( --that.active == 0 )
+                that.pool = [];
+        };
+
+        that.abortAll = function() {
+            $(that.pool).each(function(idx, xhr) {
+                if ( xhr ) {
+                    xhr._aborted = true;
+                    xhr.abort();
+                    xhr.onreadystatechange = null;
+                }
+            });
+
+            that.active = 0;
+            that.pool = [];
+        };
+
+        return that;
+    }();
+
+    $.ajaxSetup({
+        prewikka: { spinner: true,
+                    error: true,
+                    target: PrewikkaAjaxTarget.AUTO,
+                    history: true,
+                    bypass: false
+        }
+    });
+
     $(document).ajaxSend(function(event, xhr, settings) {
-        if ( settings['spinner'] == undefined || settings['spinner'] )
+        if ( settings.prewikka.spinner )
             $("#ajax-spinner").show();
+
+        $.xhrPool.push(xhr, settings);
+    });
+
+    $(document).ajaxSuccess(function(event, xhr, settings, data) {
+        $.xhrPool.done(xhr);
+        if ( ! settings.prewikka.bypass )
+            prewikka_process_ajax_response(settings, data, xhr);
     });
 
     $(document).ajaxComplete(function(event, xhr, settings) {
-        if ( settings['spinner'] == undefined || settings['spinner'] )
+        if ( settings.prewikka.spinner )
             $("#ajax-spinner").hide();
     });
 
-    $(document).ajaxError(function( event, xhr, settings, error ) {
-       /*
-        * If the user aborded the request, this is not an error.
-        */
-       if ( error == "abort" )
-           return;
+    $(document).ajaxError(function(event, xhr, settings) {
+        $.xhrPool.done(xhr);
 
-       if ( xhr.responseText )
-           prewikka_json_dialog(JSON.parse(xhr.responseText));
-       else
-           $("#prewikka-dialog-connection-error").modal();
+        /*
+         * User aborted the request or no error handling required
+         */
+        if ( xhr._aborted || ! settings.prewikka.error )
+            return;
+
+        if ( ! xhr.responseText )
+            $("#prewikka-dialog-connection-error").modal();
+
+        else if ( xhr.getResponseHeader("content-type") == "application/json" )
+            prewikka_json_dialog(JSON.parse(xhr.responseText));
+
+        else
+            prewikka_json_dialog({content: xhr.responseText, error: true});
     });
 
     $(window).on('resize', prewikka_resizeTopMenu);
@@ -61,6 +125,8 @@ function prewikka_drawTab(data)
 
     if ( ! data.content )
         return;
+
+    $.xhrPool.abortAll();
 
     /*
      * Check self and descendant
@@ -108,17 +174,17 @@ function _url_update(xhr, settings)
 
         var tab = $("#topmenu .topmenu_item a[href='" + url.split("?")[0] + "']");
 
-        if ( settings['history'] && (redirect || (settings['type'] || "").toUpperCase() != "POST") ) {
-                var params = settings['data'];
+        if ( redirect || (settings.prewikka.history && (settings.type || "").toUpperCase() != "POST") ) {
+            var params = settings['data'];
 
-                if ( params && ! redirect ) {
-                        if ( typeof(params) != 'string' )
-                                params = $.param(params);
+            if ( params && ! redirect ) {
+                if ( typeof(params) != 'string' )
+                        params = $.param(params);
 
-                        url += "?" + params;
-                }
+                url += "?" + params;
+            }
 
-                history.pushState(url, document.title, url);
+            history.pushState(url, document.title, url);
         }
 
         if ( tab.length > 0 ) {
@@ -181,7 +247,7 @@ function _process_ajax_response(settings, data, xhr)
     else if ( data.type == "view" ) {
         var widget = $(data.content).find(".widget").addBack(".widget");
 
-        if ( settings['context'] != "tab" && widget.length > 0 ) {
+        if ( settings.prewikka.target == PrewikkaAjaxTarget.AUTO && widget.length > 0 ) {
             result = _process_widget(data, widget);
         } else {
             _url_update(xhr, settings);
@@ -207,34 +273,16 @@ function prewikka_process_ajax_response(settings, data, xhr)
     if ( data.constructor == Object )
         return _process_ajax_response(settings, data, xhr);
 
-    for ( var i in data )
-        _process_ajax_response(settings, data[i], xhr);
+    else if ( data.constructor == Array ) {
+        for ( var i in data )
+            _process_ajax_response(settings, data[i], xhr);
+    }
 }
 
 
 function prewikka_ajax(settings)
 {
-        if ( settings['dataType'] == undefined )
-                settings['dataType'] = "json";
-
-        if ( settings['history'] == undefined )
-            settings['history'] = true;
-
-        settings['beforeSend'] = function(xhr) {
-                if ( window._prewikka_current_xhr != null)
-                        window._prewikka_current_xhr.abort();
-
-                window._prewikka_current_xhr = xhr;
-        };
-
-        settings['complete'] = $.makeArray(settings['complete']);
-        settings['complete'].push(function(xhr) {
-                window._prewikka_current_xhr = null;
-        });
-
-        return $.ajax(settings).done(function(data, status, xhr) {
-                prewikka_process_ajax_response(settings, data, xhr);
-        });
+    return $.ajax(settings);
 }
 
 
@@ -291,7 +339,7 @@ function _update_parameters(data, location, method)
 
     return prewikka_ajax({ method: method,
              url: location + "/ajax_parameters_update",
-             spinner: false,
+             prewikka: { spinner: false },
              data: data
     });
 }

@@ -179,7 +179,7 @@ $(function() {
       }));
 
       prewikka_ajax({
-          spinner: false,
+          prewikka: { spinner: false },
           type: "GET",
           url: $(this).data("popup-url"),
           success: function(data) {
@@ -426,7 +426,7 @@ function prewikka_autocomplete(field, url, submit, allow_empty) {
                 url: url,
                 data: {query: request.term},
                 dataType: "json",
-                global: false, // No prewikka dialog in case of error
+                prewikka: { spinner: false, error: false },
                 success: function(data) {
                     var rows = $.map(data.rows, function(row) {
                         var name = row.cell.name;
