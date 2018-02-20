@@ -189,6 +189,12 @@ function _process_ajax_response(settings, data, xhr)
         }
     }
 
+    if ( data._extensions ) {
+        $.each(data._extensions.html_content, function(_, value) {
+            $(value.target || default_target).append(value.html);
+        });
+    }
+
     return result;
 }
 
