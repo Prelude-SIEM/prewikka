@@ -19,7 +19,9 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import errno
 import os
+import socket
 
 import pkg_resources
 import prelude
@@ -281,4 +283,8 @@ class Core(object):
                 details=err
             ).respond()
 
-        webreq.send_response(response)
+        try:
+            webreq.send_response(response)
+        except socket.error as e:
+            if e.errno != errno.EPIPE:
+                raise
