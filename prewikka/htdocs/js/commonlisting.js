@@ -90,7 +90,7 @@ function CommonListing(elem, text, options, restored_parameters) {
         },
         loadComplete: function() {
             _resizeGrid($(elem));
-            if ( options.datatype == "json" ) $(elem).find('[data-toggle="tooltip"]').tooltip();
+            if ( options.datatype == "json" ) _initialize_components(elem);
         },
         loadError: null  // This prevents an error row to appear in the grid
     }, options);

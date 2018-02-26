@@ -23,34 +23,6 @@ from prewikka import usergroup
         div.toggle();
         return false;
   });
-
-    $(".ajax-tooltip").tooltip({
-        html: true,
-        container: '#main',
-        trigger: 'hover',
-        delay: { "show": 200, "hide": 0 },
-        title: function() {
-            var title = $(this).data("title");
-            if ( ! title && $(this).data("title-url") ) {
-                prewikka_ajax({
-                    spinner: false,
-                    async: false,
-                    type: "GET",
-                    url: $(this).data("title-url"),
-                    success: function(data) {
-                        if ( data instanceof Array ) {
-                            title = data.map(function(v, i) {
-                                return $("<div>").text(v).html();
-                            }).join("<br>");
-                        }
-                    }
-                });
-                $(this).data("title-url", null);
-                $(this).data("title", title);
-            }
-            return title;
-        }
-  });
 </script>
 
 <%block name="message_listing_header"></%block>

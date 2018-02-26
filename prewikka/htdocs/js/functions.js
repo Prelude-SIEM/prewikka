@@ -38,6 +38,36 @@ $(function() {
         return this.each(function() { this.checked = mode; } );
   };
 
+  $.fn.ajaxTooltip = function() {
+      this.tooltip({
+          html: true,
+          container: '#main',
+          trigger: 'hover',
+          delay: { "show": 200, "hide": 0 },
+          title: function() {
+              var title = $(this).data("title");
+              if ( ! title && $(this).data("title-url") ) {
+                  prewikka_ajax({
+                      spinner: false,
+                      async: false,
+                      type: "GET",
+                      url: $(this).data("title-url"),
+                      success: function(data) {
+                          if ( data instanceof Array ) {
+                              title = data.map(function(v, i) {
+                                  return $("<div>").text(v).html();
+                              }).join("<br>");
+                          }
+                      }
+                  });
+                  $(this).data("title-url", null);
+                  $(this).data("title", title);
+              }
+              return title;
+          }
+      });
+  };
+
   $(document).on("reload", "#main", function() {
       return prewikka_ajax({ url: prewikka_location().href });
   });
