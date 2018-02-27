@@ -594,7 +594,7 @@ class ViewManager(registrar.DelayedRegistrar):
         v.view_keywords = set(keywords)
 
         if v.view_menu:
-            env.menumanager.add_section_info(v)
+            env.menumanager.add_section_info(v.view_menu[0], v.view_menu[1], v.view_endpoint)
 
         if datatype:
             self._references.setdefault(datatype, []).append(v)
@@ -611,10 +611,10 @@ class ViewManager(registrar.DelayedRegistrar):
             if not view.view_path:
                 view.view_path = "/views/%s" % (view.view_id)
 
-            if view.view_menu:
-                env.menumanager.add_section_info(view)
-
             view.view_endpoint = "%s.render" % (view.view_id)
+
+            if view.view_menu:
+                env.menumanager.add_section_info(view.view_menu[0], view.view_menu[1], view.view_endpoint)
 
             if view.view_datatype:
                 self._references.setdefault(view.view_datatype, []).append(view)

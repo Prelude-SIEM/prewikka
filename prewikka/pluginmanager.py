@@ -72,11 +72,6 @@ class PluginManager(object):
         else:
             dh.check()
 
-    @staticmethod
-    def _handle_section(plugin_class):
-        if hasattr(plugin_class, "view_menu") and plugin_class.view_menu:
-            env.menumanager.add_section(plugin_class.view_menu[0])
-
     def _addPlugin(self, plugin_class, autoupdate, name=None):
         self._handle_attributes(plugin_class, autoupdate)
         self[name or plugin_class.__name__] = plugin_class
@@ -122,10 +117,6 @@ class PluginManager(object):
         return plist
 
     def _handle_preload(self, plugin_class, autoupdate):
-        # Get sections from all views before testing plugin database version
-        for x in plugin_class.plugin_classes:
-            self._handle_section(x)
-
         self._handle_attributes(plugin_class, autoupdate)
 
         for i in plugin_class().plugin_classes:
@@ -137,7 +128,6 @@ class PluginManager(object):
             if issubclass(plugin_class, PluginPreload):
                 self._handle_preload(plugin_class, autoupdate)
             else:
-                self._handle_section(plugin_class)
                 self._addPlugin(plugin_class, autoupdate, name=plugin_class._assigned_name)
 
         except error.PrewikkaUserError as e:

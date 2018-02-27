@@ -129,28 +129,15 @@ $(function() {
           sections = env.menumanager.get_sections()
     %>
     % for section in sections:
-        <% style = "" %>
-
-        % if nameToPath(section) != env.request.web.path_elements[0] if len(env.request.web.path_elements) > 0 else "":
-            <% style="display:none;" %>
-        % endif
-
-        <ul style="${style}" class="nav nav-tabs topmenu_section" id="topmenu_${ nameToPath(section) }" data-section-title="${ _(section) }">
-        % for name, views in sections.get(section).items():
+        <ul style="display:none;" class="nav nav-tabs topmenu_section" data-section-title="${ _(section) }">
+        % for tab, (endpoint, kwargs) in sections[section].items():
             <%
-            class_ = ""
-            firstview = builtins.next(builtins.iter(views.values()))
+            view = env.viewmanager.getView(endpoint=endpoint)
+            if not(view.check_permissions(env.request.user)):
+                continue
             %>
 
-            % if not(firstview.check_permissions(env.request.user)):
-                <% continue %>
-            % endif
-
-            % if env.request.web.path == firstview.view_path:
-                <% class_ = 'active' %>
-            % endif
-
-            <li role="presentation" class="${class_} topmenu_item"><a href="${ url_for(firstview.view_endpoint) }" class="topmenu_links no-widget">${_(name)}</a></li>
+            <li role="presentation" class="topmenu_item"><a href="${ url_for(view.view_endpoint, **kwargs) }" class="topmenu_links no-widget">${_(tab)}</a></li>
         % endfor
         </ul>
     % endfor
@@ -186,9 +173,10 @@ def _get_view_url(section, tabs):
         if tab not in sections[section]:
             continue
 
-        for view in sections[section][tab].values():
-            if view.check_permissions(env.request.user):
-                return url_for(view.view_endpoint)
+        endpoint, kwargs = sections[section][tab]
+        view = env.viewmanager.getView(endpoint=endpoint)
+        if view.check_permissions(env.request.user):
+            return url_for(endpoint, **kwargs)
 %>
 
 <%def name="write_menu(obj, section, tabs)">

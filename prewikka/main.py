@@ -204,9 +204,8 @@ class Core(object):
         env.viewmanager.set_url_adapter(env.request, cache=False)
 
     def _redirect_default(self, request):
-        default_view = env.menumanager.get_default_view()
-        if default_view:
-            url = url_for(default_view.view_endpoint)
+        if env.menumanager.default_endpoint:
+            url = url_for(env.menumanager.default_endpoint)
         else:
             # The configured view does not exist. Fall back to "settings/my_account"
             # which does not require any specific permission.
