@@ -42,6 +42,7 @@ class PluginBase(registrar.DelayedRegistrar):
     plugin_htdocs = None
     plugin_locale = None
 
+    plugin_after = []
     plugin_require = []
     plugin_deprecate = []
     plugin_mandatory = False
@@ -155,7 +156,7 @@ class PluginManager(object):
             logger.warning("%s: plugin loading failed, circular dependencies detected: %s" % (mname, " -> ".join(deplist + [mname])))
             return False
 
-        plist = [(p, True) for p in plugin_class.plugin_require]
+        plist = [(p, True) for p in plugin_class.plugin_require] + [(p, False) for p in plugin_class.plugin_after]
         ret = self._load_plugin_list(plist, pmap, autoupdate, loaded, deplist + [mname])
         if ret is not True:
             if not plugin_class.error:
