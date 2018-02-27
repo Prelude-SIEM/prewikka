@@ -559,6 +559,13 @@ class ViewManager(registrar.DelayedRegistrar):
         env.request.view = view
         return view
 
+    def _generic_add_view(self, view, path, methods=None, defaults=None):
+        rule = Rule(path, endpoint=view.view_endpoint, methods=methods, defaults=defaults)
+        rule._prewikka_view = view
+
+        self._views_endpoints[view.view_endpoint] = view
+        self._rule_map.add(rule)
+
     def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, defaults={}, endpoint=None, datatype=None, priority=0, keywords=set(), help=None, parameters=None):
         baseview = method.__self__
 
@@ -593,11 +600,7 @@ class ViewManager(registrar.DelayedRegistrar):
             self._references.setdefault(datatype, []).append(v)
             v._criteria_to_urlparams = baseview._criteria_to_urlparams
 
-        rule = Rule(path, endpoint=v.view_endpoint, methods=methods, defaults=defaults)
-        rule._prewikka_view = v
-
-        self._rule_map.add(rule)
-        self._views_endpoints[v.view_endpoint] = v
+        self._generic_add_view(v, path, methods=methods, defaults=defaults)
 
     def addView(self, view):
         rdfunc = getattr(view, "render")
@@ -616,13 +619,8 @@ class ViewManager(registrar.DelayedRegistrar):
             if view.view_datatype:
                 self._references.setdefault(view.view_datatype, []).append(view)
 
-            rule = Rule((view.view_path or "/" + view.view_id), endpoint=view.view_endpoint)
-            rule._prewikka_view = view
-
-            self._rule_map.add(rule)
-
+            self._generic_add_view(view, (view.view_path or "/" + view.view_id))
             self._views[view.view_id] = view
-            self._views_endpoints[view.view_endpoint] = view
 
     def loadViews(self, autoupdate=False):
         self.get_baseview()
