@@ -603,6 +603,11 @@ div.prewikka-view-config {
     vertical-align: middle;
 }
 
+svg text {
+    fill: @active-text;
+}
+
+
 /*
  * Customize Bootstrap
  */
@@ -649,11 +654,11 @@ div.prewikka-view-config {
     }
 }
 
-.modal .modal-content {
+.modal-dialog .modal-content {
     background: @active-background;
 }
 
-.modal .modal-body {
+.modal-dialog .modal-body {
     max-height: 500px;
     overflow: auto;
 }
@@ -830,6 +835,30 @@ div.prewikka-view-config {
 
 .tooltip.left .tooltip-arrow {
     border-left-color: @tooltip-background;
+}
+
+.popover {
+    background-color: @active-background;
+
+    .popover-title {
+        color: #333;
+    }
+
+    &.top .arrow::after {
+        border-top-color: @active-background;
+    }
+
+    &.bottom .arrow::after {
+        border-bottom-color: @active-background;
+    }
+
+    &.right .arrow::after {
+        border-right-color: @active-background;
+    }
+
+    &.left .arrow::after {
+        border-left-color: @active-background;
+    }
 }
 
 div.ui-jqgrid-titlebar {
