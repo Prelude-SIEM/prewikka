@@ -603,7 +603,8 @@ class ViewManager(registrar.DelayedRegistrar):
         rdfunc = getattr(view, "render")
         route = getattr(rdfunc, registrar._ATTRIBUTE, {}).get("route")
 
-        if rdfunc and not route:
+        # check that the retrieved render method is not the default _View.render method
+        if view.__class__.respond != _View.respond or (view.__class__.render != _View.render and rdfunc and not route):
             if not view.view_path:
                 view.view_path = "/views/%s" % (view.view_id)
 
