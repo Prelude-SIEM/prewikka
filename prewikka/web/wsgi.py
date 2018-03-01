@@ -23,7 +23,7 @@ import sys
 import wsgiref.headers
 import wsgiref.util
 
-from prewikka import main
+from prewikka import main, utils
 from prewikka.web import request
 
 from prewikka.compat.jquery_unparam import jquery_unparam
@@ -95,7 +95,7 @@ class WSGIRequest(request.Request):
         return bool(self._write)
 
     def send_headers(self, headers=[], code=200, status_text=None):
-        headers = list(headers) + [("X-responseURL", self.get_uri())]
+        headers = list(headers) + [("X-responseURL", utils.iri2uri(self.get_uri()))]
 
         if sys.version_info[0] < 3:
             headers = [(k.encode("ISO-8859-1"), v.encode("ISO-8859-1")) for k, v in headers]
