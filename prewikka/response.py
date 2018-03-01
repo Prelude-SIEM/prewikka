@@ -26,6 +26,7 @@ import os
 import time
 import datetime
 import dateutil.parser
+import stat
 import string
 import unicodedata
 
@@ -202,9 +203,12 @@ class PrewikkaFileResponse(PrewikkaResponse):
         PrewikkaResponse.__init__(self)
         self._path = path
 
-        stat = os.stat(path)
+        fst = os.stat(path)
+        if not stat.S_ISREG(fst.st_mode):
+            raise Exception("Attempt to send an invalid file")
+
         content_type = mimetypes.guess_type(path)[0] or "application/octet-stream"
-        mtime = datetime.datetime.utcfromtimestamp(stat.st_mtime).replace(tzinfo=utils.timeutil.tzutc())
+        mtime = datetime.datetime.utcfromtimestamp(fst.st_mtime).replace(tzinfo=utils.timeutil.tzutc())
 
         ims = env.request.web.headers.get("if-modified-since")
         if ims is not None:
@@ -215,7 +219,7 @@ class PrewikkaFileResponse(PrewikkaResponse):
         self.headers = collections.OrderedDict((('Content-Type', content_type),))
 
         if self.code != 304:
-            self.headers["Content-Length"] = str(stat.st_size)
+            self.headers["Content-Length"] = str(fst.st_size)
             self.headers["Expires"] = (mtime + datetime.timedelta(days=30)).strftime("%a, %d %b %Y %H:%M:%S GMT")
             self.headers["Last-Modified"] = mtime.strftime("%a, %d %b %Y %H:%M:%S GMT")
 

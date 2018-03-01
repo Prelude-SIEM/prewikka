@@ -216,22 +216,22 @@ class Core(object):
 
     def _process_static(self, webreq):
         pathkey = webreq.path_elements[0]
+        endpath = webreq.path[len(pathkey) + 2:]
 
         mapping = env.htdocs_mapping.get(pathkey, None)
-        if not mapping:
+        if not (mapping and endpath and endpath.find(".") != -1):
+            # There is no mapping, or no path beyond the mapped portion was provided.
+            # FIXME: .ext check is not clean: proper way to handle this would be to map statics
+            # files to a /static base directory
             return
 
-        path = os.path.abspath(os.path.join(mapping, webreq.path[len(pathkey) + 2:]))
+        path = os.path.abspath(os.path.join(mapping, endpath))
         if not path.startswith(mapping):
             return response.PrewikkaResponse(code=403, status_text="Request Forbidden")
 
-        # If the path doesn't map to a regular file, let prewikka continue the processing
-        if not os.path.isfile(path):
-            return
-
         try:
             return response.PrewikkaFileResponse(path)
-        except Exception:
+        except OSError:
             return response.PrewikkaResponse(code=404, status_text="File not found")
 
     def _process_dynamic(self, webreq):
