@@ -288,3 +288,5 @@ class Core(object):
         except socket.error as e:
             if e.errno != errno.EPIPE:
                 raise
+        finally:
+            env.request.cleanup()

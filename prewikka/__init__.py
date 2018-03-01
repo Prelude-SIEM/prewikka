@@ -57,6 +57,14 @@ class Request(local):
         self.parameters = None
         self.cache = _cache()
         self.view_kwargs = {}
+        self._cleanup_list = []
+
+    def register_cleanup(self, callable):
+        self._cleanup_list.append(callable)
+
+    def cleanup(self):
+        for i in self._cleanup_list:
+            i()
 
     @utils.request_memoize_property("menu")
     def menu(self):
