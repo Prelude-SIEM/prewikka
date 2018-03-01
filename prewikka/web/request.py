@@ -104,7 +104,7 @@ class Request(object):
         if sync:
             self._buffer.flush()
 
-    def send_response(self, response, code=200, status_text=None):
+    def send_response(self, response):
         """Send a PrewikkaResponse response."""
 
         if self.is_stream:
