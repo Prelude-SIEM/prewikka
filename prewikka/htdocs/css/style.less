@@ -186,19 +186,19 @@ p {
         input {
             width: 100%;
         }
-        .btn-group {
-          max-width: 100%;
-          button {
+        button {
+            min-width: 70px;
             max-width: 100%;
-            span {
-              text-overflow: ellipsis;
-              white-space: nowrap;
-              overflow: hidden;
-              max-width: 100%;
-              display: inherit;
-              max-height: 14px;
+            text-align: left;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            padding-right: 20px;
+
+            .caret {
+                position: absolute;
+                right: 10px;
+                top: calc(~"50% - 1px");
             }
-          }
         }
     }
     .form-group-date {
@@ -223,6 +223,11 @@ p {
 
     label {
         display: none;
+    }
+
+    .dropdown-header-custom {
+        font-weight: bold;
+        padding: 3px 10px;
     }
 }
 

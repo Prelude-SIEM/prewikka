@@ -183,9 +183,15 @@ class FilterView(FilterPlugin, view.View):
 
     @hookmanager.register("HOOK_MAINMENU_EXTRA_CONTENT")
     def _filter_html_menu(self, ctype, parameters, **kwargs):
+        filters = list(self._db.get_filters(env.request.user, ctype))
+
+        current_filter = parameters.get("filter")
+        if current_filter not in filters:
+            current_filter = None
+
         dset = self._filter_menu_tmpl.dataset(
-            current_filter=parameters.get("filter", ""),
-            filter_list=self._db.get_filters(env.request.user, ctype),
+            current_filter=current_filter,
+            filters=filters,
             **kwargs
         )
 

@@ -47,7 +47,9 @@ function MainMenuInit(inline, start, end, date_format) {
         root.find(".main_menu_form_submit").prop('disabled', error).toggleClass('error-date', error);
     };
 
-    root.find(".main_menu_extra :input").on("change", function() {
+    root.find(".main_menu_extra a").on("click", function() {
+        $(this).closest(".dropdown").find(".selected-value").text($(this).text());
+        $(this).closest(".main_menu_extra").find("input[type=hidden]").val($(this).data("value"));
         root.find(".main_menu_form_submit").removeClass("disabled");
     });
 
