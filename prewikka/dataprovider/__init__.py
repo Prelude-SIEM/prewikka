@@ -253,6 +253,9 @@ class DataProviderBackend(pluginmanager.PluginBase):
         """Update root objects matching the given criteria."""
         raise error.NotImplementedError
 
+    def get_properties(self):
+        return AttrObj()
+
     def get_path_info(self, path):
         return PathInfo(path, env.dataprovider.get_path_type(path), value_accept=self._get_path_values(path), type=self.type)
 
@@ -597,6 +600,9 @@ class DataProviderManager(pluginmanager.PluginManager):
 
     def has_type(self, wanted_type):
         return wanted_type in self._backends
+
+    def get_properties(self, type):
+        return self._backends[type].get_properties()
 
     def get_label(self, type):
         return self._type_handlers[type].dataprovider_label

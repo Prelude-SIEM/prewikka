@@ -26,7 +26,7 @@ import socket
 import pkg_resources
 import prelude
 import preludedb
-from prewikka import (auth, config, database, dataprovider, error, history, hookmanager, idmefdatabase, link, localization,
+from prewikka import (auth, config, database, dataprovider, error, history, hookmanager, link, localization,
                       log, menu, pluginmanager, renderer, resolve, response, siteconfig, version, view)
 from prewikka.utils import viewhelpers
 
@@ -120,7 +120,6 @@ class Core(object):
         try:
             self._checkVersion()
             env.db = database.Database(env.config.database)
-            env.idmef_db = idmefdatabase.IDMEFDatabase(env.config.idmef_database)
             history.init()
             self._loadPlugins()
             self._prewikka_initialized = True

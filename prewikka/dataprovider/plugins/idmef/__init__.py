@@ -7,7 +7,7 @@ from datetime import datetime
 
 import prelude
 from prelude import IDMEFTime, IDMEFValue
-from prewikka import usergroup, utils, version
+from prewikka import error, idmefdatabase, usergroup, utils, version
 from prewikka.dataprovider import DataProviderBackend, QueryResults, QueryResultsRow, ResultObject
 
 
@@ -55,6 +55,15 @@ class _IDMEFPlugin(DataProviderBackend):
         None: ("=", "!=", "<", ">", "<=", ">=")
     }
 
+    def __init__(self):
+        try:
+            self._db = idmefdatabase.IDMEFDatabase(env.config.idmef_database)
+        except Exception as e:
+            raise error.PrewikkaUserError(N_("Initialization error"), e)
+
+    def get_properties(self):
+        return utils.AttrObj(format=self._db.getFormatName())
+
     def _iterate_object(self, results):
         for ident in results:
             res = IDMEFResultObject(self._get_object(ident))
@@ -64,7 +73,7 @@ class _IDMEFPlugin(DataProviderBackend):
 
     def update(self, data, criteria):
         paths, values = zip(*data)
-        env.idmef_db.update(list(paths), [IDMEFValue(v) for v in values], criteria)
+        self._db.update(list(paths), [IDMEFValue(v) for v in values], criteria)
 
     def get(self, criteria, order_by, limit, offset):
         results = self._get_idents(criteria, limit, offset, order_by)
@@ -80,11 +89,11 @@ class _IDMEFPlugin(DataProviderBackend):
         if not criteria and not env.dataprovider.guess_datatype(paths, default=None):
             criteria = "%s.messageid" % self.type
 
-        return IDMEFQueryResults(env.idmef_db.getValues(paths, criteria, bool(distinct), limit, offset))
+        return IDMEFQueryResults(self._db.getValues(paths, criteria, bool(distinct), limit, offset))
 
     @usergroup.permissions_required(["IDMEF_ALTER"])
     def delete(self, criteria, paths):
-        env.idmef_db.remove(criteria)
+        self._db.remove(criteria)
 
     def _get_path_values(self, path):
         klass = prelude.IDMEFClass(path)
@@ -102,11 +111,11 @@ class IDMEFAlertPlugin(_IDMEFPlugin):
 
     @property
     def _get_object(self):
-        return env.idmef_db.getAlert
+        return self._db.getAlert
 
     @property
     def _get_idents(self):
-        return env.idmef_db.getAlertIdents
+        return self._db.getAlertIdents
 
 
 class IDMEFHeartbeatPlugin(_IDMEFPlugin):
@@ -116,8 +125,8 @@ class IDMEFHeartbeatPlugin(_IDMEFPlugin):
 
     @property
     def _get_object(self):
-        return env.idmef_db.getHeartbeat
+        return self._db.getHeartbeat
 
     @property
     def _get_idents(self):
-        return env.idmef_db.getHeartbeatIdents
+        return self._db.getHeartbeatIdents
