@@ -231,7 +231,7 @@ function _process_ajax_response(settings, data, xhr)
 
     if ( data.type == "reload" ) {
         if ( data.target == "window" )
-            location.reload();
+            $("#prewikka-notifications-container > div").promise().done(function() { location.reload(); });
 
         else if ( data.target == "view" )
             data.target = default_target;

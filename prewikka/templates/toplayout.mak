@@ -5,7 +5,8 @@ from prewikka import utils, env
 software = env.config.interface.get("software", "<img src='prewikka/images/prelude-logo.png' alt='Prelude' />")
 %>
 
-<div id="prewikka-notification">
+<div id="prewikka-notifications-container"></div>
+<div id="prewikka-notification" class="prewikka-notification">
     <div class="alert">
         <button type="button" class="close">
             <span aria-hidden="true">&times;</span>
