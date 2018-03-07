@@ -1,7 +1,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pkg_resources
-from prewikka import version, view
+from prewikka import template, version, view
 
 
 class About(view.View):
@@ -13,5 +13,6 @@ class About(view.View):
     plugin_description = N_("Prelude About page")
     plugin_htdocs = (("about", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
-    view_template = pkg_resources.resource_filename(__name__, 'templates/about.mak')
-    view_help = "#about"
+    @view.route("/about", help="#about")
+    def about(self):
+        return view.ViewResponse(template.PrewikkaTemplate(__name__, "templates/about.mak"))

@@ -258,7 +258,7 @@ def _get_view_url(section, tabs):
             % endfor
 
                 <li role="separator" class="divider"></li>
-                <% url = url_for('About.render', _default=None) %>
+                <% url = url_for('About.about', _default=None) %>
                 % if url:
                 <li><a href="${ url }">${ _("About") }</a></li>
                 % endif
