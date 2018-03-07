@@ -175,6 +175,10 @@ class User(NameID):
 
         return {}
 
+    @configuration.setter
+    def configuration(self, conf):
+        env.request.cache.user_configuration._set((self,), conf)
+
     @cache.request_memoize_property("user_timezone")
     def timezone(self):
         return utils.timeutil.timezone(self.get_property("timezone", default=env.config.general.default_timezone))
