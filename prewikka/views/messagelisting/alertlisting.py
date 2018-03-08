@@ -731,7 +731,7 @@ class AlertListing(MessageListing):
         self._max_aggregated_classification = env.config.general.get_int("max_aggregated_classification", 10)
 
     def _setMessage(self, message, ident):
-        msg = self.listed_alert(self.view_path, env.request.parameters)
+        msg = self.listed_alert()
         msg.setMessage(message, ident)
         msg["aggregated"] = False
         msg["selection"] = Criterion("alert.messageid", "=", ident)
@@ -1019,7 +1019,7 @@ class AlertListing(MessageListing):
             aggregated_count = values[start]
 
             select_criteria = Criterion()
-            message = self.listed_aggregated_alert(self.view_path, env.request.parameters)
+            message = self.listed_aggregated_alert()
 
             valueshash = {}
             for path, value in zip(ag_list, values[:start]):

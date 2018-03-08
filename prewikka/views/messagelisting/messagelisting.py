@@ -45,10 +45,6 @@ class MessageListingParameters(view.Parameters):
 
 
 class ListedMessage(AttrDict):
-    def __init__(self, view_path, parameters):
-        AttrDict.__init__(self)
-        self.view_path = view_path
-
     def _isAlreadyFiltered(self, column, path, criterion, value):
         col = env.request.parameters.get(column)
         if not column:

@@ -70,7 +70,7 @@ class HeartbeatListing(MessageListing):
     listed_heartbeat = ListedHeartbeat
 
     def _setMessage(self, message, ident):
-        msg = self.listed_heartbeat(self.view_path, env.request.parameters)
+        msg = self.listed_heartbeat()
         msg.setMessage(message, ident)
 
         return msg
