@@ -138,9 +138,11 @@ class ParameterDesc(object):
 class Parameters(dict):
     allow_extra_parameters = True
 
-    def __init__(self, *args, **kwargs):
-        dict.__init__(self, *args, **kwargs)
+    def __init__(self, view, _save=True, **kwargs):
+        dict.__init__(self, **kwargs)
 
+        self.view = view
+        self._save = _save
         self._hard_default = {}
         self._default = {}
         self._parameters = {}
@@ -159,9 +161,9 @@ class Parameters(dict):
 
         self._parameters[name] = ParameterDesc(name, type, mandatory=False, default=default, save=save, general=general, persist=persist)
 
-    def normalize(self, view, user, save=True):
-        do_update = save and env.request.web.method == "PATCH"
-        do_save = save and env.request.web.method in ("POST", "PUT", "PATCH")
+    def normalize(self):
+        do_update = self._save and env.request.web.method == "PATCH"
+        do_save = self._save and env.request.web.method in ("POST", "PUT", "PATCH")
 
         for name, value in self.items():
             param = self._parameters.get(name)
@@ -172,8 +174,8 @@ class Parameters(dict):
                 continue
 
             value = param.parse(value)
-            if user and param.save and do_save:
-                user.set_property(name, value, view if not(param.general) else None)
+            if env.request.user and param.save and do_save:
+                env.request.user.set_property(name, value, self.view.view_endpoint if not(param.general) else None)
 
             self[name] = value
 
@@ -190,26 +192,26 @@ class Parameters(dict):
             elif param.has_default():
                 self[name] = param.default
 
-            if not param.save or not user:
+            if not param.save or not env.request.user:
                 continue
 
             if param.general:
                 save_view = ""
             else:
-                save_view = view
+                save_view = self.view.view_endpoint
 
             if do_save and not(param.persist) and not do_update:
-                user.del_property(name, view=save_view)
+                env.request.user.del_property(name, view=save_view)
 
-            if name not in user.configuration.get(save_view, {}):
+            if name not in env.request.user.configuration.get(save_view, {}):
                 continue
 
-            value = user.get_property(name, view=save_view)
+            value = env.request.user.get_property(name, view=save_view)
             self._default[name] = value
             self[name] = value
 
         # In case the view was dynamically added through HOOK_VIEW_LOAD, the hook isn't available
-        list(hookmanager.trigger("HOOK_%s_PARAMETERS_NORMALIZE" % view.upper(), self))
+        list(hookmanager.trigger("HOOK_%s_PARAMETERS_NORMALIZE" % self.view.view_endpoint.upper(), self))
 
     def handleLists(self, value):
         if isinstance(value, dict):
@@ -312,9 +314,9 @@ class GeneralParameters(Parameters):
         mainmenu._register_parameters(self)
 
     def __init__(self, vobj, kw):
-        Parameters.__init__(self, kw)
         # Only allow parameters saving if the view is a primary route (has a view_menu entry)
-        self.normalize(vobj.view_endpoint or vobj.view.view_id, env.request.user, save=bool(vobj.view_menu))
+        Parameters.__init__(self, vobj, _save=bool(vobj.view_menu), **kw)
+        self.normalize()
 
 
 class ViewResponse(response.PrewikkaResponse):
@@ -379,8 +381,8 @@ class _ViewDescriptor(object):
     def process_parameters(self):
         env.request.parameters = {}
         if self.view_parameters:
-            env.request.parameters = self.view_parameters(env.request.web.arguments)
-            env.request.parameters.normalize(self.view_endpoint or self.view_id, env.request.user)
+            env.request.parameters = self.view_parameters(self, **env.request.web.arguments)
+            env.request.parameters.normalize()
 
     def respond(self):
         env.log.info("Loading view %s, endpoint %s" % (self.__class__.__name__, self.view_endpoint))

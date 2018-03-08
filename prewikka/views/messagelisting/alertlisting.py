@@ -145,14 +145,16 @@ class AlertListingParameters(MessageListingParameters):
             except RuntimeError:
                 raise view.InvalidParameterValueError(obj, value)
 
-    def _setParam(self, view_name, user, column, param, value, is_default=False):
+    def _setParam(self, column, param, value, is_default=False):
         self._dynamic_param[column][param] = value
 
         if is_default:
             self._default_param[column][param] = value
-            user.set_property(param, value, view=view_name)
+            env.request.user.set_property(param, value, view=self.view.view_endpoint)
 
-        elif view_name in user.configuration and param in user.configuration[view_name] and user.configuration[view_name][param] != value:
+        elif self.view.view_endpoint in env.request.user.configuration and \
+                param in env.request.user.configuration[self.view.view_endpoint] and \
+                env.request.user.configuration[self.view.view_endpoint][param] != value:
             self._default_param[column][param] = value
 
         if param not in self:
@@ -197,7 +199,7 @@ class AlertListingParameters(MessageListingParameters):
         sorted.sort()
         return ret, sorted
 
-    def _loadColumnParam(self, view_name, user, paramlist, column, do_save):
+    def _loadColumnParam(self, paramlist, column, do_save):
         if do_save:
             paramlist = copy.copy(paramlist)
 
@@ -205,20 +207,20 @@ class AlertListingParameters(MessageListingParameters):
         ret, sorted = self._paramDictToList(paramlist, column)
 
         if do_save:
-            user.del_property_match("%s_object_" % column, view=view_name)
-            user.del_property_match("%s_operator_" % column, view=view_name)
-            user.del_property_match("%s_value_" % column, view=view_name)
+            env.request.user.del_property_match("%s_object_" % column, view=self.view.view_endpoint)
+            env.request.user.del_property_match("%s_operator_" % column, view=self.view.view_endpoint)
+            env.request.user.del_property_match("%s_value_" % column, view=self.view.view_endpoint)
 
         for i in sorted:
-            self._setParam(view_name, user, column, "%s_object_%d" % (column, i[0]), i[1], is_default=do_save)
-            self._setParam(view_name, user, column, "%s_operator_%d" % (column, i[0]), i[2], is_default=do_save)
-            self._setParam(view_name, user, column, "%s_value_%d" % (column, i[0]), i[3], is_default=do_save)
+            self._setParam(column, "%s_object_%d" % (column, i[0]), i[1], is_default=do_save)
+            self._setParam(column, "%s_operator_%d" % (column, i[0]), i[2], is_default=do_save)
+            self._setParam(column, "%s_value_%d" % (column, i[0]), i[3], is_default=do_save)
             self[column].append(i[1:])
 
         return ret
 
-    def normalize(self, view_name, user):
-        MessageListingParameters.normalize(self, view_name, user)
+    def normalize(self):
+        MessageListingParameters.normalize(self)
         do_save = env.request.web.method in ("POST", "PUT", "PATCH")
 
         for severity in self["alert.assessment.impact.severity"]:
@@ -235,22 +237,22 @@ class AlertListingParameters(MessageListingParameters):
 
         load_saved = True
         for column in "classification", "source", "target", "analyzer":
-            ret = self._loadColumnParam(view_name, user, self, column, do_save)
+            ret = self._loadColumnParam(self, column, do_save)
             if ret:
                 load_saved = False
 
-        if load_saved and view_name in user.configuration:
+        if load_saved and self.view.view_endpoint in env.request.user.configuration:
             for column in "classification", "source", "target", "analyzer":
-                self._loadColumnParam(view_name, user, user.configuration[view_name], column, do_save)
+                self._loadColumnParam(env.request.user.configuration[self.view.view_endpoint], column, do_save)
 
         for column in COLUMN_LIST:
-            if view_name in user.configuration:
-                for i in self._paramDictToList(user.configuration[view_name], column)[1]:
+            if self.view.view_endpoint in env.request.user.configuration:
+                for i in self._paramDictToList(env.request.user.configuration[self.view.view_endpoint], column)[1]:
                     self._saved[column].append(i[1:])
 
-                for i in user.configuration[view_name].keys():
+                for i in env.request.user.configuration[self.view.view_endpoint].keys():
                     if i.find(column + "_object_") != -1 or i.find(column + "_operator_") != -1 or i.find(column + "_value_") != -1:
-                        self._default_param[column][i] = user.configuration[view_name][i]
+                        self._default_param[column][i] = env.request.user.configuration[self.view.view_endpoint][i]
 
             i = 0
             for path in self["aggregated_%s" % column]:
