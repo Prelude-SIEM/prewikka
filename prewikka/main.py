@@ -202,8 +202,6 @@ class Core(object):
         hookmanager.unregister(exclude=["HOOK_PLUGINS_RELOAD"])
         self._loadPlugins()
 
-        env.viewmanager.set_url_adapter(env.request, cache=False)
-
     def _redirect_default(self, request):
         if env.menumanager.default_endpoint:
             url = url_for(env.menumanager.default_endpoint)

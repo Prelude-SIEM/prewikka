@@ -78,10 +78,6 @@ class Request(local):
     def init(self, request):
         self._init(request)
 
-        # env.viewmanager might be empty in case of early error (database)
-        if env.viewmanager:
-            env.viewmanager.set_url_adapter(self)
-
     def __init__(self):
         local.__init__(self)
         self._init(None)

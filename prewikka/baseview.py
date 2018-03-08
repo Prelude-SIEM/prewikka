@@ -23,7 +23,7 @@ import base64
 import collections
 import string
 
-from prewikka import error, history, hookmanager, resource, response, template, utils, usergroup, view
+from prewikka import error, history, hookmanager, resource, response, template, utils, view
 
 
 CSS_FILES = (
@@ -60,10 +60,7 @@ class BaseView(view._View):
 
     @view.route("/<path:path>/ajax_parameters_update", methods=["PUT", "PATCH"])
     def ajax_parameters_update(self, path):
-        viewobj = env.viewmanager.getViewByPath(path)
-        if not viewobj.check_permissions(env.request.user):
-            raise usergroup.PermissionDeniedError(viewobj.view_permissions, path)
-
+        viewobj, vkw = env.viewmanager.getViewByPath(path)
         viewobj.process_parameters()
 
         if viewobj.view_menu:

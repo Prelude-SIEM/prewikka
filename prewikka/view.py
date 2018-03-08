@@ -36,7 +36,33 @@ else:
 
 _SENTINEL = object()
 _URL_ADAPTER_CACHE = {}
+_ROUTE_OVERRIDE_TYPE = ("make_url", "make_parameters", "check_permissions")
 logger = log.getLogger(__name__)
+
+
+def check_permissions(user, users=([], []), groups=([], []), others=[]):
+    if user:
+        if user in users[0]:
+            return user.has(users[1])
+
+        if groups[0] and set(env.auth.get_member_of(user)) & set(groups[0]):
+            return user.has(groups[1])
+
+        if others:
+            return user.has(others)
+
+    # If there is no users / groups / others permission defined, then it is considered public and we return True
+    # Otherwise, if any kind of permission is defined and there was no match, return False.
+    return not(users[0] or groups[0] or others)
+
+
+def route_override(endpoint, type):
+    assert(type in _ROUTE_OVERRIDE_TYPE)
+
+    def decorator(func):
+        env.viewmanager._route_override.setdefault(type, {})[endpoint] = func
+
+    return decorator
 
 
 class ParameterError(Exception):
@@ -403,26 +429,31 @@ class _ViewDescriptor(object):
 
         return resp
 
-    def check_permissions(self, user):
-        if user:
-            if user in self.view_users:
-                return user.has(self.view_users_permissions)
-
-            if self.view_groups and set(env.auth.get_member_of(user)) & self.view_groups:
-                return user.has(self.view_groups_permissions)
-
-            if self.view_permissions:
-                return user.has(self.view_permissions)
-
-        # If this view has no users / groups / others permission defined, then it is considered public and we return True
-        # Otherwise, if any kind of permission is defined and there was no match, return False.
-        return not(self.view_users or self.view_groups or self.view_permissions)
-
     def _criteria_to_urlparams(self, criteria):
         return {}
 
+    def _call_override(self, _type, *args, **kwargs):
+        f = env.viewmanager._route_override[_type].get(self.view_endpoint)
+        if f:
+            return f(self.view_base, *args, **kwargs)
+
+        return getattr(self.view_base, _type)(*args, _view_descriptor=self, **kwargs)
+
+    def make_parameters(self, **kwargs):
+        return self._call_override("make_parameters", **kwargs)
+
     def make_url(self, **kwargs):
-        return self.view_base.make_url(_view_descriptor=self, **kwargs)
+        return self._call_override("make_url", **kwargs)
+
+    def check_permissions(self, userl, fail=False, view_kwargs={}):
+        ret = self._call_override("check_permissions", userl, view_kwargs=view_kwargs)
+        if fail and not ret:
+            raise usergroup.PermissionDeniedError(None, env.request.web.path)
+
+        return ret
+
+    def __repr__(self):
+        return "_ViewDescriptor(%s)" % self.view_endpoint
 
 
 class _View(_ViewDescriptor, registrar.DelayedRegistrar):
@@ -453,11 +484,12 @@ class _View(_ViewDescriptor, registrar.DelayedRegistrar):
             if self.view_path:
                 self.view_path = utils.nameToPath(self.view_path)
 
-    def make_parameters(self, criteria=None, **kwargs):
+    def make_parameters(self, _view_descriptor=None, criteria=None, **kwargs):
         values = {}
+        view = _view_descriptor or self
 
         if criteria:
-            kwargs.update(self._criteria_to_urlparams(criteria))
+            kwargs.update(view._criteria_to_urlparams(criteria))
 
         for k, v in kwargs.items():
             key = "%s[]" % k if isinstance(v, list) else k
@@ -466,12 +498,17 @@ class _View(_ViewDescriptor, registrar.DelayedRegistrar):
         return values
 
     def make_url(self, _view_descriptor=None, **kwargs):
-        if _view_descriptor:
-            endpoint = _view_descriptor.view_endpoint
-        else:
-            endpoint = self.view_endpoint
+        view = _view_descriptor or self
+        return env.viewmanager.url_adapter.build(view.view_endpoint, values=self.make_parameters(**kwargs))
 
-        return env.request.url_adapter.build(endpoint, values=self.make_parameters(**kwargs))
+    def check_permissions(self, user, _view_descriptor=None, fail=False, view_kwargs={}):
+        view = _view_descriptor or self
+
+        ret = check_permissions(user, (view.view_users, view.view_users_permissions), (view.view_groups, view.view_groups_permissions), view.view_permissions)
+        if fail and not ret:
+            raise usergroup.PermissionDeniedError(None, env.request.web.path)
+
+        return ret
 
 
 class View(_View, pluginmanager.PluginBase):
@@ -499,10 +536,7 @@ class ViewManager(registrar.DelayedRegistrar):
     def get(self, datatype=None, keywords=None):
         return sorted(filter(lambda x: set(keywords or []).issubset(x.view_keywords), self._references.get(datatype, [])), key=lambda x: x.view_priority)
 
-    def getView(self, id=None, endpoint=None):
-        if id:
-            return self._views.get(id.lower())
-
+    def getView(self, endpoint, default=None):
         endpoint = endpoint.lower()
 
         if endpoint[0] == "." and env.request.view:
@@ -511,11 +545,11 @@ class ViewManager(registrar.DelayedRegistrar):
         if endpoint[0] != "." and endpoint.find(".") == -1:
             endpoint += ".render"
 
-        return self._views_endpoints[endpoint]
+        return self._views_endpoints.get(endpoint, default)
 
-    def _getViewByPath(self, path, method=None):
+    def getViewByPath(self, path, method=None, check_permissions=True):
         try:
-            rule, view_kwargs = env.request.url_adapter.match(path, method=method, return_rule=True)
+            rule, view_kwargs = self.url_adapter.match(path, method=method, return_rule=True)
 
         except werkzeug.exceptions.MethodNotAllowed:
             raise InvalidMethodError(N_("Method '%(method)s' is not allowed for view '%(view)s'",
@@ -524,15 +558,16 @@ class ViewManager(registrar.DelayedRegistrar):
         except werkzeug.exceptions.NotFound:
             raise InvalidViewError(N_("View '%s' does not exist", path))
 
-        return rule._prewikka_view, view_kwargs
+        if check_permissions and not rule._prewikka_view.check_permissions(env.request.user, view_kwargs=view_kwargs):
+            raise usergroup.PermissionDeniedError(rule._prewikka_view.view_permissions, path)
 
-    def getViewByPath(self, path, method=None):
-        return self._getViewByPath(path, method)[0]
+        return rule._prewikka_view, view_kwargs
 
     def get_baseview(self):
         # Import here, because of cyclic dependency
         from prewikka import baseview
-        bview = self._views.get("baseview")
+
+        bview = self.getView("baseview.render")
         if not bview:
             bview = baseview.BaseView()
             self.addView(bview)
@@ -542,21 +577,15 @@ class ViewManager(registrar.DelayedRegistrar):
     def loadView(self, request, userl):
         view_layout = None
 
-        view, view_kwargs = self._getViewByPath(request.path, method=request.method)
+        view, view_kwargs = self.getViewByPath(request.path, method=request.method)
         if view:
             view_layout = view.view_layout
 
         if not (request.is_xhr or request.is_stream) and view_layout:
-            view = self._views.get(view_layout.lower())
+            view = self.getView(view_layout)
 
         elif view_kwargs:
             env.request.view_kwargs = view_kwargs
-
-        if not view:
-            raise InvalidViewError(N_("View '%s' does not exist", request.path))
-
-        if not view.check_permissions(userl):
-            raise usergroup.PermissionDeniedError(view.view_permissions, request.path)
 
         env.request.view = view
         return view
@@ -622,9 +651,9 @@ class ViewManager(registrar.DelayedRegistrar):
                 self._references.setdefault(view.view_datatype, []).append(view)
 
             self._generic_add_view(view, (view.view_path or "/" + view.view_id))
-            self._views[view.view_id] = view
 
     def loadViews(self, autoupdate=False):
+        self._init()
         self.get_baseview()
 
         for view_class in pluginmanager.PluginManager("prewikka.views", autoupdate):
@@ -639,24 +668,33 @@ class ViewManager(registrar.DelayedRegistrar):
 
             self.addView(vi)
 
-    def set_url_adapter(self, request, cache=True):
-        scname = request.web.get_script_name() if request.web else None
+    @property
+    def url_adapter(self):
+        scname = None
+        if env.request.web:
+            scname = env.request.web.get_script_name()
 
-        ad = _URL_ADAPTER_CACHE.get(scname) if cache else None
+        ad = _URL_ADAPTER_CACHE.get(scname)
         if not ad:
             ad = _URL_ADAPTER_CACHE[scname] = self._rule_map.bind("", scname)
 
-        request.url_adapter = ad
+        return ad
 
-    def __init__(self):
-        registrar.DelayedRegistrar.__init__(self)
+    def _init(self):
+        _URL_ADAPTER_CACHE.clear()
 
-        self._views = {}
-        self._routes = Map()
         self._references = {}
         self._views_endpoints = {}
 
+        self._route_override = {}
+        for i in _ROUTE_OVERRIDE_TYPE:
+            self._route_override[i] = {}
+
         self._rule_map = Map(converters={'list': ListConverter})
+
+    def __init__(self):
+        registrar.DelayedRegistrar.__init__(self)
+        self._init()
 
         builtins.url_for = self.url_for
 
@@ -668,6 +706,3 @@ class ViewManager(registrar.DelayedRegistrar):
                 return _default
 
             raise exc
-
-    def __contains__(self, view_id):
-        return view_id in self._views
