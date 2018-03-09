@@ -793,6 +793,23 @@ body .tooltip {
     .button-variant(@primary-color, @primary-background-color, darken(@primary-background-color, 5%));
 }
 
+/*
+ * It looks like a button
+ * It tastes like a button
+ * But it is not a button
+ */
+.btn-static {
+    background-color: white;
+    border: 1px solid lightgrey;
+    cursor: default;
+}
+
+.btn-static:active {
+    -moz-box-shadow: inset 0 0 0px white;
+    -webkit-box-shadow: inset 0 0 0px white;
+    box-shadow: inset 0 0 0px white;
+}
+
 .tooltip-inner {
     color: #000;
     background-color: #fff;
