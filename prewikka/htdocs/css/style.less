@@ -606,10 +606,6 @@ div.prewikka-view-config {
     background: @fieldset-background;
 }
 
-body .tooltip {
-  border: none;
-}
-
 .navbar-primary {
   background-color: @primary-background-color;
   border-color: darken(@primary-background-color, 5%);
@@ -811,8 +807,24 @@ body .tooltip {
 }
 
 .tooltip-inner {
-    color: #000;
-    background-color: #fff;
+    color: @tooltip-text;
+    background-color: @tooltip-background;
+}
+
+.tooltip.top .tooltip-arrow {
+    border-top-color: @tooltip-background;
+}
+
+.tooltip.bottom .tooltip-arrow {
+    border-bottom-color: @tooltip-background;
+}
+
+.tooltip.right .tooltip-arrow {
+    border-right-color: @tooltip-background;
+}
+
+.tooltip.left .tooltip-arrow {
+    border-left-color: @tooltip-background;
 }
 
 div.ui-jqgrid-titlebar {
