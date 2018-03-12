@@ -39,7 +39,7 @@ function CommonListing(elem, text, options) {
         cellEdit: true,
         caption: text['title'],
         rowNum: -1,
-        rowList: ['-1:all', 10, 20, 30],
+        rowList: options.datatype == "json" ? [10, 20, 30] : ['-1:all', 10, 20, 30],
         pager: true,
         hidegrid: false,
         viewrecords: true,
