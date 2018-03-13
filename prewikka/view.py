@@ -699,8 +699,15 @@ class ViewManager(registrar.DelayedRegistrar):
         builtins.url_for = self.url_for
 
     def url_for(self, endpoint, _default=_SENTINEL, **kwargs):
+        view = self.getView(endpoint=endpoint)
+        if not view:
+            if _default is not _SENTINEL:
+                return _default
+
+            raise InvalidViewError(N_("View '%s' does not exist", endpoint))
+
         try:
-            return self.getView(endpoint=endpoint).make_url(**kwargs)
+            return view.make_url(**kwargs)
         except Exception as exc:
             if _default is not _SENTINEL:
                 return _default
