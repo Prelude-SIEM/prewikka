@@ -20,6 +20,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import abc
+import copy
 import hashlib
 
 from prewikka import compat, error, hookmanager, localization, log, utils
@@ -142,12 +143,10 @@ class Group(NameID):
 
 class User(NameID):
     __sentinel = object()
-    __PROPERTIES_STATE_BEGIN = 0x01
-    __PROPERTIES_STATE_DIRTY = 0x02
 
     def __init__(self, login=None, userid=None):
+        self._orig_configuration = None
         NameID.__init__(self, login, userid)
-        self._properties_state = self.__PROPERTIES_STATE_BEGIN
 
     def _id2name(self, id):
         return env.auth.get_user_by_id(id).name
@@ -171,9 +170,12 @@ class User(NameID):
     def configuration(self):
         rows = env.db.query("SELECT config FROM Prewikka_User_Configuration WHERE userid = %s", self.id)
         if rows:
-            return json.loads(rows[0][0])
+            ret = json.loads(rows[0][0])
+        else:
+            ret = {}
 
-        return {}
+        self._orig_configuration = copy.deepcopy(ret)
+        return ret
 
     @configuration.setter
     def configuration(self, conf):
@@ -192,17 +194,12 @@ class User(NameID):
         view = view or ""
 
         if not key:
-            r = self.configuration.pop(view, None)
+            self.configuration.pop(view, None)
         else:
-            r = self.configuration.get(view, {}).pop(key, None)
-
-        if r:
-            self._properties_state |= self.__PROPERTIES_STATE_DIRTY
+            self.configuration.get(view, {}).pop(key, None)
 
     def del_properties(self, view):
-        r = self.configuration.pop(view, None)
-        if r:
-            self._properties_state |= self.__PROPERTIES_STATE_DIRTY
+        self.configuration.pop(view, None)
 
     def del_property_match(self, key, view=None):
         view = view or ""
@@ -231,17 +228,13 @@ class User(NameID):
         return self.get_property_fail(key, view or "", default)
 
     def set_property(self, key, value, view=None):
-        old = self.configuration.get(view or "", {}).get(key)
-        if old != value:
-            self._properties_state |= self.__PROPERTIES_STATE_DIRTY
-
         self.configuration.setdefault(view or "", {})[key] = value
 
     def sync_properties(self):
-        if self._properties_state & self.__PROPERTIES_STATE_DIRTY:
+        if self._orig_configuration is not None and self._orig_configuration != self.configuration:
+            self._orig_configuration = copy.deepcopy(self.configuration)
             env.db.upsert("Prewikka_User_Configuration", ["userid", "config"], [[self.id, json.dumps(self.configuration)]], pkey=("userid",))
 
-        self._properties_state = self.__PROPERTIES_STATE_BEGIN
         if env.request.user == self:
             env.request.user = self
 
