@@ -69,6 +69,10 @@ class HeartbeatListing(MessageListing):
     filters = {}
     listed_heartbeat = ListedHeartbeat
 
+    def __init__(self):
+        env.dataprovider.check_datatype("heartbeat")
+        MessageListing.__init__(self)
+
     def _setMessage(self, message, ident):
         msg = self.listed_heartbeat()
         msg.setMessage(message, ident)

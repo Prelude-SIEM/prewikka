@@ -74,8 +74,11 @@ class DataProviderError(Exception):
     pass
 
 
-class NoBackendError(DataProviderError):
-    pass
+class NoBackendError(error.PrewikkaUserError):
+    def __init__(self, type_):
+        error.PrewikkaUserError.__init__(self,
+                                         N_("Backend error"),
+                                         N_("No backend available for '%s' datatype", type_))
 
 
 class ItemNotFoundError(error.PrewikkaUserError):
@@ -482,12 +485,12 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         return list(res)[0]
 
-    def _check_data_type(self, type, *args):
+    def check_datatype(self, type, *args):
         if not type:
             type = self.guess_datatype(*args)
 
         if type not in self._type_handlers or type not in self._backends:
-            raise NoBackendError("No backend available for '%s' datatype" % type)
+            raise NoBackendError(type)
 
         return type
 
@@ -500,7 +503,7 @@ class DataProviderManager(pluginmanager.PluginManager):
         else:
             criteria = copy.copy(criteria)
 
-        type = self._check_data_type(type, paths, criteria)
+        type = self.check_datatype(type, paths, criteria)
 
         parsed_paths = paths
         paths_types = []
@@ -577,9 +580,9 @@ class DataProviderManager(pluginmanager.PluginManager):
         return self._type_handlers[type].get_common_paths(index)
 
     def get_path_info(self, path, type=None):
-        type = self._check_data_type(type, [path])
+        type = self.check_datatype(type, [path])
         return self._backends[type].get_path_info(path)
 
     def get_path_type(self, path, type=None):
-        type = self._check_data_type(type, [path])
+        type = self.check_datatype(type, [path])
         return self._type_handlers[type].get_path_type(path)

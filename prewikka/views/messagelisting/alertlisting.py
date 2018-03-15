@@ -729,6 +729,7 @@ class AlertListing(MessageListing):
     ]
 
     def __init__(self):
+        env.dataprovider.check_datatype("alert")
         MessageListing.__init__(self)
         self._max_aggregated_classification = env.config.general.get_int("max_aggregated_classification", 10)
 

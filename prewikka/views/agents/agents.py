@@ -32,6 +32,8 @@ class Agents(view.View):
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     def __init__(self):
+        env.dataprovider.check_datatype("heartbeat")
+
         view.View.__init__(self)
         self._heartbeat_count = env.config.general.get_int("heartbeat_count", 30)
         self._heartbeat_error_margin = env.config.general.get_int("heartbeat_error_margin", 3)
