@@ -1,27 +1,12 @@
-<%! from collections import OrderedDict %>
+<%!
+    from collections import OrderedDict
+    from prewikka.dataprovider import OPERATORS
+%>
 
 <%namespace file="/prewikka/views/filter/templates/widget.mak" import="init, condition, group"/>
 
 <%
-    tooltips = {
-        "=": _("Equal"),
-        "=*": _("Equal (case-insensitive)"),
-        "!=": _("Not equal"),
-        "!=*": _("Not equal (case-insensitive)"),
-        "~": _("Regular expression"),
-        "~*": _("Regular expression (case-insensitive)"),
-        "!~": _("Not regular expression"),
-        "!~*": _("Not regular expression (case-insensitive)"),
-        "<": _("Lesser than"),
-        "<=": _("Lesser or equal"),
-        ">": _("Greater than"),
-        ">=": _("Greater or equal"),
-        "<>": _("Substring"),
-        "<>*": _("Substring (case-insensitive)"),
-        "!<>": _("Not substring"),
-        "!<>*": _("Not substring (case-insensitive)")
-    }
-
+    tooltips = {op: _(label) for op, label in OPERATORS.items()}
     default_paths = {}
     all_paths = {}
     operators = {}

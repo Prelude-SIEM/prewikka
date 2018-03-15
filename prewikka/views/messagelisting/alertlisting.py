@@ -29,7 +29,7 @@ import sys
 import prelude
 
 from prewikka import crontab, hookmanager, localization, resource, template, utils, view
-from prewikka.dataprovider import Criterion
+from prewikka.dataprovider import Criterion, OPERATORS
 
 from .messagelisting import AttrDict, ListedMessage, MessageListing, MessageListingParameters
 
@@ -135,7 +135,7 @@ class AlertListingParameters(MessageListingParameters):
         self.optional("alert.type", list, ["alert.create_time", "alert.correlation_alert.name", "alert.overflow_alert.program", "alert.tool_alert.name"], save=True)
 
     def _checkOperator(self, operator):
-        if operator not in ("=", "==", "<", ">", "<=", ">=", "~", "~*", "<>", "<>*", "!"):
+        if operator not in (OPERATORS.keys() + ["==", "==*", "!"]):
             raise view.InvalidParameterValueError("operator", operator)
 
     def _check_value(self, obj, operator, value):

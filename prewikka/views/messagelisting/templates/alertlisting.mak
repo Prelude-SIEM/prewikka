@@ -1,7 +1,6 @@
 <%!
-import prelude
-from prewikka.utils import json
-from prewikka import usergroup, utils, idmefbrowser
+    import prelude
+    from prewikka.dataprovider import OPERATORS
 %>
 
 <%inherit file="/prewikka/views/messagelisting/templates/messagelisting.mak" />
@@ -30,19 +29,8 @@ $(".sortable_${ field }").on("click", function() {
 
 <script type="text/javascript">
 
-var operators = {
-        "!": "${ _("Not defined") }",
-        "=": "${ _("Equal") }",
-        "!=": "${ _("Not equal") }",
-        "<": "${ _("Lesser than") }",
-        ">": "${ _("Greater than") }",
-        "<=": "${ _("Lesser or equal") }",
-        ">=": "${ _("Greater or equal") }",
-        "<>": "${ _("Substring") }",
-        "<>*": "${ _("Substring (case-insensitive)") }",
-        "~": "${ _("Regular expression") }",
-        "~*": "${ _("Regular expression (case-insensitive)") }"
-};
+var operators = ${ html.escapejs({op: _(label) for op, label in OPERATORS.items()}) };
+operators["!"] = "${ _("Not defined") }";
 
 var stateArray = [ "default", "saved", "current" ];
 var saved_forms = Array();
@@ -117,7 +105,7 @@ $(function() {
            % endif
 
            <%
-             oplist = idmefbrowser.getOperatorList(rootcl.getValueType())
+             oplist = list(env.dataprovider.get_path_info(rootcl.getPath()).operators) + ["!"]
              is_enum = rootcl.getValueType() == prelude.IDMEFValue.TYPE_ENUM
            %>
 

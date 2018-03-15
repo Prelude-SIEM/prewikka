@@ -28,6 +28,26 @@ from prewikka.utils import AttrObj, CachingIterator, json
 from prewikka.utils.timeutil import parser, tzutc
 
 
+OPERATORS = {
+    "=": N_("Equal"),
+    "=*": N_("Equal (case-insensitive)"),
+    "!=": N_("Not equal"),
+    "!=*": N_("Not equal (case-insensitive)"),
+    "~": N_("Regular expression"),
+    "~*": N_("Regular expression (case-insensitive)"),
+    "!~": N_("Not regular expression"),
+    "!~*": N_("Not regular expression (case-insensitive)"),
+    "<": N_("Lesser than"),
+    "<=": N_("Lesser or equal"),
+    ">": N_("Greater than"),
+    ">=": N_("Greater or equal"),
+    "<>": N_("Substring"),
+    "<>*": N_("Substring (case-insensitive)"),
+    "!<>": N_("Not substring"),
+    "!<>*": N_("Not substring (case-insensitive)")
+}
+
+
 def PathInfo(path, value_type, operators=[], value_accept=[], type=None):
     assert(operators or type)
 

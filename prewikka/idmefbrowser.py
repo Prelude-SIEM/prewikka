@@ -19,20 +19,8 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import prelude
 from prewikka import resource
 from prewikka.utils import html
-
-
-def getOperatorList(type):
-    if type == prelude.IDMEFValue.TYPE_STRING:
-        return ["<>*", "<>", "=", "~*", "~", "!"]
-
-    elif type == prelude.IDMEFValue.TYPE_DATA:
-        return ["<>*", "<>", "~", "~*", "=", "<", ">", "!"]
-
-    else:
-        return ["=", "<", ">", "<=", ">="]
 
 
 def _gen_option_list(iterator, selected):
