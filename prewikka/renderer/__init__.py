@@ -179,7 +179,7 @@ class RendererPluginManager(pluginmanager.PluginManager):
                                         % (cssid, classname, data.get("html", "")))
 
             return {"html": htmls, "script": resource.HTMLSource(data.get("script", ""))}
-        except RendererNoDataException as e:
+        except RendererException as e:
             htmls = resource.HTMLSource('<div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>'
                                         % (cssid, classname, text_type(e)))
             script = resource.HTMLSource("""
