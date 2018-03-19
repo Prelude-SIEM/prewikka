@@ -352,7 +352,7 @@ class Criterion(json.JSONObject):
 
     @staticmethod
     def _value_escape(value):
-        if isinstance(value, (int, long, float)):
+        if isinstance(value, (int, float)):
             return value
 
         if not isinstance(value, compat.STRING_TYPES):

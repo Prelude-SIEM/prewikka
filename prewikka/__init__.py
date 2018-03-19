@@ -10,7 +10,6 @@ import preludedb
 if sys.version_info >= (3, 0):
     import builtins
     builtins.text_type = str
-    long = int
 else:
     import __builtin__ as builtins
     builtins.text_type = unicode
