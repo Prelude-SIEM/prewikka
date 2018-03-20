@@ -102,7 +102,3 @@ div.operator > div[data-toggle=dropdown] {
     height: 30px; /* same as input-sm */
     border-radius: 5px 0 0 5px;
 }
-
-.chosen-container.chosen-with-drop .chosen-drop {
-    width: 300px;
-}

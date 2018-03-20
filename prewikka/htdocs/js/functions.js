@@ -159,13 +159,14 @@ $(function() {
       return false;
   });
 
-  function _position_dropdown(elem, selector) {
+  function _position_dropdown(elem, selector, adapt_width) {
       /*
        * Allow dropdowns expanding out of the modal
        * Setting "top: auto; left: auto" works only with Firefox
        */
       var modal = elem.closest(".modal-content:visible");
-      var top, left;
+      var style = {position: "fixed"};
+      if ( adapt_width ) style.width = elem.width();
 
       if ( window.navigator.userAgent.indexOf("Trident/") != -1 ) {
           /*
@@ -173,19 +174,15 @@ $(function() {
            * of the modal (which has a transform property)
            * See https://bugs.chromium.org/p/chromium/issues/detail?id=20574
            */
-          top = elem.offset().top + elem.height();
-          left = elem.offset().left;
+          style.top = elem.offset().top + elem.height();
+          style.left = elem.offset().left;
       }
       else {
-          top = elem.offset().top - modal.offset().top + elem.height();
-          left = elem.offset().left - modal.offset().left;
+          style.top = elem.offset().top - modal.offset().top + elem.height();
+          style.left = elem.offset().left - modal.offset().left;
       }
 
-      elem.find(selector).css({
-          position: "fixed",
-          top: top,
-          left: left
-      });
+      elem.find(selector).css(style);
   }
 
   $(document).on('show.bs.dropdown', '.modal-content:visible .dropdown-fixed', function() {
@@ -193,7 +190,7 @@ $(function() {
   });
 
   $(document).on('chosen:showing_dropdown', '.modal-content:visible select', function() {
-      _position_dropdown($(this).siblings(".chosen-container"), ".chosen-drop");
+      _position_dropdown($(this).siblings(".chosen-container"), ".chosen-drop", true);
   });
 
   $(document).on('click', '.popup_menu_dynamic', function() {
