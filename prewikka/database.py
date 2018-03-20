@@ -446,7 +446,6 @@ class DatabaseCommon(preludedb.SQL):
 
     NotNone = NotNone
     __sentinel = object()
-    __ALL_PROPERTIES = object()
 
     __TRANSACTION_STATE_NONE = 0
     __TRANSACTION_STATE_BEGIN = 1
@@ -559,7 +558,7 @@ class DatabaseCommon(preludedb.SQL):
         return preludedb.SQL.query(self, sql)
 
     def _chk(self, key, value, join="AND"):
-        if value is not None and value is not self.__ALL_PROPERTIES:
+        if value is not None:
             return " %s %s = %s" % (join, key, self.escape(value))
 
         return ""
