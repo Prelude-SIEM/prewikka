@@ -166,16 +166,21 @@ class User(NameID):
     # Support access to _permissions to modify object permission without backend modification.
     _permissions = property(permissions, _permissions)
 
-    @cache.request_memoize_property("user_configuration")
+    @property
     def configuration(self):
+        ret = self._configuration()
+        if self._orig_configuration is None:
+            self._orig_configuration = copy.deepcopy(ret)
+
+        return ret
+
+    @cache.request_memoize("user_configuration")
+    def _configuration(self):
         rows = env.db.query("SELECT config FROM Prewikka_User_Configuration WHERE userid = %s", self.id)
         if rows:
-            ret = json.loads(rows[0][0])
+            return json.loads(rows[0][0])
         else:
-            ret = {}
-
-        self._orig_configuration = copy.deepcopy(ret)
-        return ret
+            return {}
 
     @configuration.setter
     def configuration(self, conf):
