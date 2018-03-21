@@ -142,7 +142,7 @@ def inherit(context):
         <div class="modal-body">
              <p>${_(message)}</p>
              % if details:
-                   <p><b>${_(details)}</b></p>
+                   <p><b>${_("Error: {0}").format(_(details))}</b></p>
              % endif
 
              % if code != 401 and code >= 400 and code < 500:
