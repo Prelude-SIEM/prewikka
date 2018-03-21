@@ -96,9 +96,23 @@ class DataProviderError(Exception):
 
 class NoBackendError(error.PrewikkaUserError):
     def __init__(self, type_):
-        error.PrewikkaUserError.__init__(self,
-                                         N_("Backend error"),
-                                         N_("No backend available for '%s' datatype", type_))
+        error.PrewikkaUserError.__init__(
+            self, N_("Backend error"), N_("No backend available for '%s' datatype", type_)
+        )
+
+
+class InvalidPathError(error.PrewikkaUserError):
+    def __init__(self, path, details=None):
+        error.PrewikkaUserError.__init__(
+            self, N_("Syntax error"), N_("Unknown path: %s", path), details=details
+        )
+
+
+class InvalidCriterionError(error.PrewikkaUserError):
+    def __init__(self, details=None):
+        error.PrewikkaUserError.__init__(
+            self, N_("Syntax error"), N_("Invalid criterion"), details=details
+        )
 
 
 class ItemNotFoundError(error.PrewikkaUserError):

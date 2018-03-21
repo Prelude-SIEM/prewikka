@@ -7,7 +7,23 @@ import datetime
 import prelude
 
 from prewikka import utils, version
-from prewikka.dataprovider import DataProviderBase, Criterion
+from prewikka.dataprovider import DataProviderBase, Criterion, InvalidCriterionError, InvalidPathError
+
+
+class _IDMEFPath(prelude.IDMEFPath):
+    def __init__(self, path):
+        try:
+            prelude.IDMEFPath.__init__(self, path)
+        except RuntimeError as e:
+            raise InvalidPathError(path, details=e)
+
+
+class _IDMEFCriterion(prelude.IDMEFCriteria):
+    def __init__(self, criteria):
+        try:
+            prelude.IDMEFCriteria.__init__(self, criteria)
+        except RuntimeError as e:
+            raise InvalidCriterionError(details=e)
 
 
 class _IDMEFProvider(DataProviderBase):
@@ -73,7 +89,7 @@ class _IDMEFProvider(DataProviderBase):
 
             if elem == "analyzer":
                 fields.append("%s(-1)" % elem)
-            elif prelude.IDMEFPath(p).isAmbiguous():
+            elif _IDMEFPath(p).isAmbiguous():
                 fields.append("%s(0)" % elem)
             else:
                 fields.append(elem)
@@ -86,17 +102,17 @@ class _IDMEFProvider(DataProviderBase):
 
         elif criterion.operator == "==":
             criterion = Criterion(criterion.left, "==", None)
-            if prelude.IDMEFPath(criterion.left).getValueType() == prelude.IDMEFValue.TYPE_STRING:
+            if _IDMEFPath(criterion.left).getValueType() == prelude.IDMEFValue.TYPE_STRING:
                 criterion |= Criterion(criterion.left, "==", "''")
 
-        if criterion.operator.startswith("!") and prelude.IDMEFPath(criterion.left).isAmbiguous():
+        if criterion.operator.startswith("!") and _IDMEFPath(criterion.left).isAmbiguous():
             criterion.left = self._path_adjust(criterion.left)
 
         return DataProviderBase.compile_criterion(self, criterion)
 
     def compile_criteria(self, criteria):
         if criteria:
-            return prelude.IDMEFCriteria(criteria.to_string())
+            return _IDMEFCriterion(criteria.to_string())
 
 
 class IDMEFAlertProvider(_IDMEFProvider):
