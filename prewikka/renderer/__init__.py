@@ -106,7 +106,7 @@ class RendererPluginManager(pluginmanager.PluginManager):
         pluginmanager.PluginManager.__init__(self, "prewikka.renderer.type")
 
         for typ, backend in env.config.renderer_defaults.items():
-            self._default_backends[typ] = backend.value
+            self._default_backends[typ] = backend
 
         self._renderer = {}
         for i in self:

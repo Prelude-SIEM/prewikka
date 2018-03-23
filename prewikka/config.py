@@ -29,6 +29,9 @@ import re
 from prewikka import siteconfig
 
 
+_sentinel = object()
+
+
 class ParseError(Exception):
     def __init__(self, filename, lineno, line):
         self._message = _("parse error in \"%(txt)s\" at %(file)s line %(line)d") % {'txt': line.rstrip(), 'file': filename, 'line': lineno}
@@ -43,18 +46,6 @@ class ConfigValueError(Exception):
 
     def __str__(self):
         return self._message
-
-
-class ConfigParserOption(text_type):
-    def __new__(cls, *args, **kw):
-        return text_type.__new__(cls, args[1])
-
-    def __init__(self, name, value):
-        self.name = name
-        self.value = value
-
-    def __repr__(self):
-        return "<ConfigParserOption %s%s%s>" % (self.name, "=" if self.value else "", self.value or "")
 
 
 class ConfigParserSection(collections.Mapping):
@@ -123,11 +114,11 @@ class ConfigParserSection(collections.Mapping):
     def get_bool(self, name, default=False):
         assert isinstance(default, bool)
 
-        value = self.get(name)
-        if value is None:
+        value = self.get(name, _sentinel)
+        if value is _sentinel:
             return default
 
-        if value.value is None or value.lower() in ['true', 'yes']:
+        if value is None or value.lower() in ['true', 'yes']:
             return True
         elif value.lower() in ['false', 'no']:
             return False
@@ -237,7 +228,7 @@ class MyConfigParser(object):
                 continue
 
             name, value = result.group("name").strip(), result.group("value")
-            cursection[name] = ConfigParserOption(name, value.strip() if value else None)
+            cursection[name] = value.strip() if value else None
 
     def get(self, name, default):
         return self._sections.get(name, default)
