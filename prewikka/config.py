@@ -48,13 +48,13 @@ class ConfigValueError(Exception):
         return self._message
 
 
-class ConfigParserSection(collections.Mapping):
+class ConfigSection(collections.Mapping):
     def __init__(self, name):
         object.__setattr__(self, "_instance_name", name)
         object.__setattr__(self, "_od", collections.OrderedDict())
 
     def __repr__(self):
-        return "ConfigParserSection<%s,%s>" % (self._instance_name, self._od.items())
+        return "ConfigSection<%s,%s>" % (self._instance_name, self._od.items())
 
     def __len__(self):
         return self._od.__len__()
@@ -150,7 +150,7 @@ class SectionRoot(list):
 
     def __getattr__(self, attr):
         if not self:
-            self.append(ConfigParserSection(""))
+            self.append(ConfigSection(""))
 
         return getattr(self[0], attr)
 
@@ -191,7 +191,7 @@ class MyConfigParser(object):
             if section.get_instance_name() == instance:
                 return section
 
-        self._sections[name].append(ConfigParserSection(instance))
+        self._sections[name].append(ConfigSection(instance))
         return self._sections[name][-1]
 
     def read_string(self, string):
