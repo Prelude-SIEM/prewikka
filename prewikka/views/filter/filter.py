@@ -186,7 +186,7 @@ class FilterView(FilterPlugin, view.View):
         filters = list(self._db.get_filters(env.request.user, ctype))
 
         current_filter = parameters.get("filter")
-        if current_filter not in filters:
+        if current_filter not in [x.name for x in filters]:
             current_filter = None
 
         dset = self._filter_menu_tmpl.dataset(
