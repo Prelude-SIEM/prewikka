@@ -101,7 +101,7 @@ class HTMLNode(json.JSONObject):
 
             if v is True:
                 attr_s += HTMLSource(" %s" % k)
-            elif v is not False:
+            elif v not in (False, None):
                 attr_s += HTMLSource(" %s=\"%s\"") % (k, v)
 
         if _class:
