@@ -1,0 +1,248 @@
+/* Timeline widget */
+#datasearch .panel {
+    margin-bottom: 5px;
+}
+
+#datasearch .panel .panel-heading {
+    padding: 5px 5px;
+}
+
+#datasearch .panel .panel-heading .panel-title {
+    font-size: 13px;
+}
+
+#datasearch .row .form-group {
+    margin-bottom: 5px;
+}
+
+#datasearch #datasearch_search_bar .label-xs {
+    font-size: 80%;
+}
+
+.ui-autocomplete {
+    max-height: 200px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    position: fixed;
+}
+
+.ui-autocomplete-category {
+    color: #999;
+    font-weight: bold;
+    line-height: 1.42857;
+    margin: 0;
+    padding: 5px 6px;
+}
+
+.ui-autocomplete > li.datasearch-field {
+    padding: 3px 20px;
+    line-height: 1.42857;
+    color: #333;
+}
+
+.ui-autocomplete > li.datasearch-field:hover {
+    color: #FFF;
+    background-color: #428BCA;
+}
+
+.ui-autocomplete > i.history-query-delete {
+    float: left;
+    color: #d9534f;  /* Bootstrap red */
+    border: none;
+    line-height: 1.42857;
+    font-size: 1.1em;
+    padding-right: 10px;
+    padding-left: 10px;
+}
+
+#datasearch #timeline_results {
+    height: 200px;
+    width: 100%;
+    display: inline-block;
+}
+
+#datasearch #datasearch_search_bar {
+    position: relative;
+    padding-top: 0px;
+    z-index: 1;
+    margin-bottom: 5px;
+    padding-right: 10px;
+}
+
+@media (max-width: 768px) {
+    #datasearch #datasearch_search_bar {
+        position: static;
+    }
+}
+
+#datasearch .chosen-choices li.search-field input[type="text"] {
+    /* Same as the rest of Prewikka */
+    font-family: Verdana, Arial, Helvetica, sans-serif;
+}
+
+#datasearch .hover-details {
+    cursor: pointer;
+}
+
+#datasearch .hover-details:hover {
+    text-decoration: underline;
+}
+
+#datasearch .hover-details i {
+    margin-right: 0.3em;
+}
+
+#datasearch .hl {
+    background-color: #A8F2FD;
+    color: #333;
+}
+
+#datasearch .hover, .hover .hl {
+    background-color: #FDE9A8;
+    color: #333;
+}
+
+#datasearch .l {
+    cursor: text;
+}
+
+#datasearch #PopoverOption {
+    position: fixed;
+    width: 20em;
+    word-wrap: break-word;
+}
+
+#datasearch #PopoverOption .popover {
+    display: block;
+    padding: 0px;
+    font-size: 13px;
+}
+
+#datasearch #PopoverOption .list-group {
+    margin-bottom: 0;
+}
+
+#datasearch #PopoverOption .list-group-item {
+    padding: 5px 10px;
+}
+
+#datasearch #PopoverOption .bottom .list-group:first-of-type .list-group-item:first-child {
+    border-top: 0;
+}
+
+#datasearch #PopoverOption .top .list-group:last-of-type .list-group-item:last-child {
+    border-bottom: 0;
+}
+
+#datasearch #datasearch_table.table-nowrap tr.jqgrow > td {
+    white-space: nowrap;
+}
+
+#datasearch div.tablediv {
+    line-height: 0;
+}
+
+#datasearch td.subgrid-data table.subgrid {
+    margin-bottom: 0;
+    table-layout: auto;
+    background: none;
+}
+
+#datasearch div#datasearch_table .ui-jqgrid tr.ui-subgrid > td {
+    white-space: normal;
+}
+
+#datasearch table.subgrid td.field,
+#datasearch table.subgrid td.filter {
+    width: 1%;
+    white-space: nowrap;
+}
+
+#datasearch table.subgrid td.field i {
+    opacity: .4;
+}
+
+#datasearch table.subgrid td.filter i {
+    cursor: pointer;
+}
+
+#datasearch table img {
+    /* GeoIP flags */
+    margin: 0 2px;
+}
+
+
+/*
+ * IDMEF OBJECT
+ */
+#datasearch table ul:hover .dp-1000 {
+    visibility: visible;
+    display: block;
+}
+
+#datasearch table ul .dp-1000 {
+    visibility: hidden;
+    display: none;
+}
+
+#datasearch table ul {
+   padding-left: 0px;
+    margin-bottom: 0px;
+}
+
+#datasearch table ul li {
+   display: inline;
+}
+
+/*
+ * No label on the first ul
+ */
+
+#datasearch table li:not(:last-child):after {
+    content: " ";
+}
+
+#datasearch table ul:not(:first-child):before {
+    content: " (";
+}
+
+#datasearch table ul:not(:first-child):after {
+    content: ")";
+}
+
+#datasearch table label {
+    margin-bottom: 0px;
+}
+
+#datasearch table ul > li.text > label {
+    display: none;
+}
+
+#datasearch table label.assessment, label.impact {
+    display: none;
+}
+
+#datasearch table ul.impact:before, #datasearch table ul.impact:after {
+    content: "";
+}
+
+#datasearch table ul.list > ul.object > label, #datasearch ul.user_id > label {
+    display: none;
+}
+
+#datasearch table ul {
+    display: inline;
+}
+
+#datasearch table ul.source + ul.source, ul.target + ul.target {
+    display: block;
+    border-top: 1px dashed gray;
+}
+
+#datasearch table ul.source:first-child, table ul.target:first-child {
+    border-top: 0;
+}
+
+#datasearch table td > ul > label {
+    display: none;
+}

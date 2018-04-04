@@ -300,7 +300,7 @@ $(function() {
   <th>${ sortable(_("Date"), "time", order_by) }</th>
 
   % for column in extra_column:
-  <th>${ column }</th>
+  <th>${ column[0].label }</th>
   % endfor
 
   % if messages and env.request.user.has("IDMEF_ALTER"):

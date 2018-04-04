@@ -188,6 +188,8 @@ setup(
         'prewikka.views': [
             'About = prewikka.views.about:About',
             'AboutPlugin = prewikka.views.aboutplugin:AboutPlugin',
+            'AlertDataSearch = prewikka.views.datasearch.alert:AlertDataSearch',
+            'HeartbeatDataSearch = prewikka.views.datasearch.heartbeat:HeartbeatDataSearch',
             'CrontabView = prewikka.views.crontab:CrontabView',
             'MessageSummary = prewikka.views.messagesummary:MessageSummary',
             'MessageListing = prewikka.views.messagelisting:MessageListing',

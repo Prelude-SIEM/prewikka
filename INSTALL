@@ -28,6 +28,7 @@ Run requires:
 - python-dateutil
 - python-enum34
 - python-mako >= 0.8.1
+- python-parsley
 - python-tz / pytz
 - python-werkzeug
 - python-yaml / PyYAML

@@ -1094,7 +1094,7 @@ class AlertListing(MessageListing):
         env.request.dataset["aggregated_classification"] = env.request.parameters["aggregated_classification"]
         env.request.dataset["aggregated_analyzer"] = env.request.parameters["aggregated_analyzer"]
 
-        env.request.dataset["extra_column"] = filter(None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_COLUMN"))
+        env.request.dataset["extra_column"] = filter(None, hookmanager.trigger("HOOK_DATASEARCH_ALERT_EXTRA_COLUMN"))
 
         def cmp(x):
             return x != "none"
