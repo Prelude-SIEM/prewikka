@@ -544,7 +544,7 @@ class ListedAlert(ListedMessage):
             dataset["classification_references"].append((urlstr, fstr))
 
     def _setMessageClassificationURL(self, dataset, classification):
-        dataset["classification_url"] = list(hookmanager.trigger("HOOK_CLASSIFICATION_LINK", classification))
+        dataset["classification_url"] = env.linkmanager.get_links("classification", classification)
 
     def _setMessageClassification(self, dataset, message):
         self._setMessageClassificationReferences(dataset, message)
@@ -566,7 +566,7 @@ class ListedAlert(ListedMessage):
         dataset["count"] = 1
         dataset["severity"] = AttrDict(value=message["alert.assessment.impact.severity"])
         dataset["links"] = [resource.HTMLNode("a", _("Alert details"), href=url_for("AlertSummary", messageid=ident))]
-        dataset["links"] += list(hookmanager.trigger("HOOK_MESSAGEID_LINK", ident))
+        dataset["links"] += list(env.linkmanager.get_links("messageid", ident))
 
         dataset["completion"] = self.createInlineFilteredField("alert.assessment.impact.completion", message["alert.assessment.impact.completion"])
         dataset["description"] = message["alert.assessment.impact.description"]
@@ -578,7 +578,7 @@ class ListedAlert(ListedMessage):
         epoch = datetime.datetime.utcfromtimestamp(0).replace(tzinfo=utils.timeutil.tzutc())
         t = text_type(int((t - epoch).total_seconds() * 1000))
 
-        return list(hookmanager.trigger("HOOK_TIME_LINK", t))
+        return env.linkmanager.get_links("time", t)
 
     def _setMessageTime(self, message):
         self["time"] = self.createTimeField(message["alert.create_time"])
@@ -949,7 +949,7 @@ class AlertListing(MessageListing):
                     message.setMessage(res, messageid, extra_link=False)
                 else:
                     infos["links"] = [resource.HTMLNode("a", _("Alert details"), href=url_for("AlertSummary", messageid=messageid))]
-                    infos["links"] += list(hookmanager.trigger("HOOK_MESSAGEID_LINK", messageid))
+                    infos["links"] += list(env.linkmanager.get_links("messageid", messageid))
             else:
                 entry_param = {}
 

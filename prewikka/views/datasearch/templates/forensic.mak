@@ -214,13 +214,13 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
           % endfor
         </ul>
         <%
-          path_list = list(hookmanager.trigger("HOOK_PATH_LINK"))
+          links = list(env.linkmanager.get_links(arg="$value"))
         %>
-        % if path_list:
+        % if links:
           <div class="arrow"></div>
           <ul class="list-group">
-            % for path, func in path_list:
-            ${ func.to_string(_class="list-group-item addon_search") }
+            % for link in links:
+            ${ link.to_string(_class="list-group-item addon_search") }
             % endfor
           </ul>
         % endif

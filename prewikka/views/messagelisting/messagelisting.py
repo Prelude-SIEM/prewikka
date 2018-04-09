@@ -114,7 +114,7 @@ class ListedMessage(AttrDict):
         if not value:
             return field
 
-        field["host_links"] = list(hookmanager.trigger("HOOK_HOST_LINK", value))
+        field["host_links"] = env.linkmanager.get_links("host", value)
 
         return field
 

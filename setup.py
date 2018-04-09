@@ -178,9 +178,7 @@ setup(
             'alert = prewikka.dataprovider.idmef:IDMEFAlertProvider',
             'heartbeat = prewikka.dataprovider.idmef:IDMEFHeartbeatProvider',
         ],
-        'prewikka.plugins': [
-            'ContextualLink = prewikka.plugins.contextuallink:ContextualLink',
-        ],
+        'prewikka.plugins': [],
         'prewikka.session': [
             'Anonymous = prewikka.session.anonymous:AnonymousSession',
         ],

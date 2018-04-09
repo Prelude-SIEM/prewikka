@@ -26,8 +26,8 @@ import socket
 import pkg_resources
 import prelude
 import preludedb
-from prewikka import (auth, config, database, dataprovider, error, history, hookmanager, idmefdatabase, localization, log,
-                      menu, pluginmanager, renderer, resolve, response, siteconfig, version, view)
+from prewikka import (auth, config, database, dataprovider, error, history, hookmanager, idmefdatabase, link, localization,
+                      log, menu, pluginmanager, renderer, resolve, response, siteconfig, version, view)
 from prewikka.utils import viewhelpers
 
 try:
@@ -151,6 +151,7 @@ class Core(object):
         env.menumanager = menu.MenuManager()
         env.dataprovider = dataprovider.DataProviderManager()
         env.dataprovider.load()
+        env.linkmanager = link.LinkManager()
 
         env.plugins = {}
         for i in pluginmanager.PluginManager("prewikka.plugins", autoupdate=self.autoupdate):
