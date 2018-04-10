@@ -163,8 +163,13 @@ setup(
         'Babel'
     ],
     entry_points={
-        'prewikka.renderer.backend': [],
-        'prewikka.renderer.type': [],
+        'prewikka.renderer.backend': [
+            'ChartJS = prewikka.renderer.chartjs:ChartJSPlugin',
+        ],
+        'prewikka.renderer.type': [
+            'ChartJSBar = prewikka.renderer.chartjs.bar:ChartJSBarPlugin',
+            'ChartJSTimebar = prewikka.renderer.chartjs.timeline:ChartJSTimebarPlugin',
+        ],
         'prewikka.dataprovider.backend': [
             'IDMEFAlert = prewikka.dataprovider.plugins.idmef:IDMEFAlertPlugin',
             'IDMEFHeartbeat = prewikka.dataprovider.plugins.idmef:IDMEFHeartbeatPlugin',
@@ -211,6 +216,9 @@ setup(
             "locale/*/LC_MESSAGES/*.mo",
             "sql/*.py",
             "templates/*.mak"
+        ],
+        'prewikka.renderer.chartjs': [
+            "htdocs/js/*.js"
         ],
         'prewikka.views.about': [
             "htdocs/css/*.css",
