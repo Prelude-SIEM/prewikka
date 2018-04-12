@@ -12,6 +12,9 @@
 %>
 
 <link rel="stylesheet" type="text/css" href="prewikka/css/bootstrap-chosen.css">
+% for resource in extra_resources:
+  ${resource}
+% endfor
 
 <script type="text/javascript">
 $LAB.script("datasearch/js/datasearch.js").wait(function() {
@@ -20,7 +23,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
                             ${ html.escapejs(labels) });
 
   $(".form-control-chosen").chosen({ width: "100%", search_contains: true });
-    DataSearchPage("${backend}", ${html.escapejs(criterion_config)}, ${html.escapejs(criterion_config_default)}, "${url_for('.ajax_timeline')}");
+  DataSearchPage("${backend}", ${html.escapejs(criterion_config)}, ${html.escapejs(criterion_config_default)}, "${url_for('.ajax_timeline')}");
 
   % if not search.groupby:
     <%

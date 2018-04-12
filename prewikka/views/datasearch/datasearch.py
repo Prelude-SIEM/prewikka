@@ -140,7 +140,7 @@ class Formatter(object):
     }
 
     def __init__(self):
-        self._enrich_data_cb = list(hookmanager.trigger("HOOK_DATASEARCH_FORMATTER_ENRICH_CALLBACK"))
+        self._enrich_data_cb = [elem[1] for elem in sorted(hookmanager.trigger("HOOK_DATASEARCH_FORMATTER_ENRICH_CALLBACK"))]
 
     def _format_nonstring(self, field, value):
         return resource.HTMLNode("span", value, **{"_class": "l", "data-field": field})
@@ -373,6 +373,7 @@ class DataSearch(view.View):
     criterion_config_default = "lucene"
     path_translate = {}
     default_columns = {}
+    _extra_resources = []
 
     criterion_config["lucene"] = {
         "format": 'operator + path + ":" + value',
@@ -491,6 +492,9 @@ class DataSearch(view.View):
     def dashboard(self, groupby=[]):
         return self.forensic(groupby, is_dashboard=True)
 
+    def _get_dataset(self):
+        return template.PrewikkaTemplate(__name__, "templates/forensic.mak").dataset()
+
     def forensic(self, groupby=[], is_dashboard=False):
         groupby = env.request.parameters.getlist("groupby") or groupby
 
@@ -500,7 +504,7 @@ class DataSearch(view.View):
         if not groupby and is_dashboard:
             groupby = self.groupby_default
 
-        dataset = template.PrewikkaTemplate(__name__, "templates/forensic.mak").dataset()
+        dataset = self._get_dataset()
         self._set_common(dataset)
 
         dataset["available_types"] = filter(lambda x: list(env.renderer.get_backends(x)), DiagramChart.TYPES if groupby else ChronologyChart.TYPES)
@@ -512,6 +516,7 @@ class DataSearch(view.View):
                                               groupby=groupby,
                                               limit=env.request.parameters["limit"],
                                               parent=self)
+        dataset["extra_resources"] = self._extra_resources
 
         return view.ViewResponse(dataset)
 
