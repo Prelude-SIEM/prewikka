@@ -92,6 +92,7 @@ class AlertDataSearch(idmef.IDMEFDataSearch):
         ("alert.target", N_("Target")),
         ("alert.analyzer(-1)", N_("Analyzer"))
     ])
+    lucene_search_fields = ["classification", "source", "target", "analyzer(-1)"]
     _delete_confirm = N_("Delete the selected alerts?")
 
     def _get_default_cells(self, obj):

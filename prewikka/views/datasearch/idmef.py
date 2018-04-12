@@ -180,10 +180,6 @@ class IDMEFDataSearch(datasearch.DataSearch):
         return datasearch.COLUMN_PROPERTIES(label=label, name=field, index=field, hidden=hidden, sortable=sortable)
 
     def __init__(self, *args, **kwargs):
-        # Lucene is not supported by this backend
-        self.criterion_config = dict(self.criterion_config.items())
-        self.criterion_config.pop("lucene")
-
         self._extra_table_fields = []
 
         config = env.config.datasearch.get_instance_by_name(self.type)

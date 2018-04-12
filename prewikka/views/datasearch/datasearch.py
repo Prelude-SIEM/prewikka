@@ -34,6 +34,7 @@ import re
 from prewikka.utils import json
 from prewikka import error, history, hookmanager, mainmenu, resource, response, template, utils, view
 from prewikka.dataprovider import Criterion, pathparser
+from prewikka.dataprovider.parsers.lucene.parser import lucene_to_criterion
 from prewikka.localization import format_datetime
 from prewikka.renderer import RendererItem
 from prewikka.statistics import ChronologyChart, DiagramChart, Query
@@ -321,7 +322,10 @@ class QueryParser(object):
             return pathparser.string_to_criterion(query, compile=self._criterion_compile)
 
         elif qmode == "lucene":
-            return Criterion("{backend}._raw_query", "==", query)
+            if self._parent.criterion_config_default != "lucene":
+                return lucene_to_criterion(query, compile=self._criterion_compile, default_paths=self._parent.lucene_search_fields)
+            else:
+                return Criterion("{backend}._raw_query", "==", query)
 
     def _time_selection(self, time_unit):
         selection = []
@@ -373,6 +377,7 @@ class DataSearch(view.View):
     criterion_config_default = "lucene"
     path_translate = {}
     default_columns = {}
+    lucene_search_fields = []
     _extra_resources = []
 
     criterion_config["lucene"] = {
