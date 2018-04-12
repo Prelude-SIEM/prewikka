@@ -294,18 +294,18 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
 
         $("#PopoverOption .addon_search").each(function() {
             var d = $(this).data();
-            if ( ! d.parameter )
-                d.parameter = "value";
 
-            var href = $(this).attr("href");
+            var href = d.link;
+            if ( ! href ) {
+                href = $(this).attr("href");
+                $(this).data("link", href);
+            }
+
             var value = selected_value;
             if ( d.field )
                 value = $('#datasearch_table').jqGrid('getCell', rowid, d.field);
 
-            // The {[key]: value} syntax is not supported by IE11
-            var params = {};
-            params[d.parameter] = value;
-            $(this).attr("href", href + (href.indexOf('?') >= 0 ? '&' : '?') + $.param(params));
+            $(this).attr("href", href.replace(/%24value/g, encodeURIComponent(value)));
             if ( d.path )
                 $(this).toggle(d.path === backend + "." + selected_field.replace(/\(\d+\)/g, ""));
         });
