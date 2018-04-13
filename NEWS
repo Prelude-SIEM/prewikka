@@ -1,3 +1,53 @@
+* 2018-04-13, prewikka-5.0.0beta1:
+
+Author: Yoann Vandoorselaere
+
+- Evolutions
+
+    - Implement a DataSearch framework and new alert/heartbeat views, with:
+        - a zoomable timeline
+        - a search bar
+        - a configurable grid
+
+    - Slower, but failsafe synchronisation of user configuration
+    - Prewikka menu rework
+    - AJAX request will now always be processed through the prewikka framework
+
+- Bugfixes
+
+    - Notifications fixes and reload handling
+    - Prevent duplicate error dialog
+
+Author: Sélim Menouar
+
+- New renderer type: ChartJS
+
+Author: Camille Gardet
+
+- Evolutions
+
+    - Add a Threats view based on the DataSearch framework
+    - Create statistics helpers
+    - Add an "update" method to the renderer
+    - Translate scripts
+
+Author: Antoine Luong
+
+- Evolutions
+
+    - Add a Lucene parser
+    - Improve dark theme
+    - Drop the ConfigParserOption class
+    - Add the plugin_after attribute to load plugins in order
+    - Handle the AJAX tooltips globally
+    - Greatly improve the performance of the Agents view
+
+Author: Thomas Andrejak
+
+- Python3 compatibility work
+
+
+
 * 2018-02-09, prewikka-4.2.0rc1:
 
 Author: Yoann Vandoorselaere
