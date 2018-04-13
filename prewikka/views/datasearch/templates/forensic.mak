@@ -204,30 +204,52 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
   </div>
 </div>
 
-<div id="PopoverOption" class="popover-options" style="display:none">
-    <div class="popover">
-        <div class="arrow"></div>
-        <ul class="list-group">
-          <a class="list-group-item add_search default_search">${ _("Add to search") }</a>
-          <a class="list-group-item del_search default_search">${ _("Exclude from search") }</a>
-          <a class="list-group-item new_search default_search">${ _("New search") }</a>
-          <a class="list-group-item groupby_search">${ _("Group by") } <span></span></a>
-          % for obj in itertools.chain(hookmanager.trigger("HOOK_DATASEARCH_LINK"), hookmanager.trigger("HOOK_DATASEARCH_%s_LINK" % backend.upper())):
-            ${ obj.to_string(_class="list-group-item addon_search") }
-          % endfor
-        </ul>
-        <%
-          links = list(env.linkmanager.get_links(arg="$value"))
-        %>
-        % if links:
-          <div class="arrow"></div>
-          <ul class="list-group">
-            % for link in links:
-            ${ link.to_string(_class="list-group-item addon_search") }
-            % endfor
-          </ul>
-        % endif
-    </div>
+<div id="PopoverOption" class="popover-options">
+  <ul class="popover dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
+    <div class="arrow"></div>
+    <li class="dropdown-submenu">
+      <a>${ _("Search") }</a>
+      <ul class="dropdown-menu">
+        <li><a class="add_search">${ _("Add to search") }</a></li>
+        <li><a class="del_search">${ _("Exclude from search") }</a></li>
+        <li><a class="new_search">${ _("New search") }</a></li>
+        <li><a class="groupby_search">${ _("Group by") } <span></span></a></li>
+      </ul>
+    </li>
+
+    <%
+      links = list(env.linkmanager.get_links(arg="$value"))
+    %>
+    % if links:
+    <li class="dropdown-submenu">
+      <a>${ _("Actions") }</a>
+      <ul class="dropdown-menu">
+        % for link in links:
+        <li>${ link.to_string(_class="addon_search") }</li>
+        % endfor
+        % for obj in itertools.chain(hookmanager.trigger("HOOK_DATASEARCH_LINK"), hookmanager.trigger("HOOK_DATASEARCH_%s_LINK" % backend.upper())):
+        <li>${ obj.to_string(_class="addon_search") }</li>
+        % endfor
+      </ul>
+    </li>
+    % endif
+
+    <li class="dropdown-submenu oca-infos">
+      <a>${ _("Informations") }</a>
+      <div class="dropdown-menu panel panel-default">
+        <div class="ajax-spinner hidden">
+          <i class="fa fa-circle-o-notch fa-3x fa-spin"></i>
+        </div>
+        <div class="processed-content">
+          <div class="panel-heading"></div>
+          <div class="panel-body">
+            <ul class="nav nav-pills nav-justified" role="tablist"></ul>
+            <div class="tab-content"></div>
+          </div>
+        </div>
+      </div>
+    </li>
+  </ul>
 </div>
 % endif
 

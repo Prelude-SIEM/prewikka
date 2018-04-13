@@ -25,7 +25,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import collections
 import prelude
 
-from prewikka import resource, version
+from prewikka import resource, utils, version
 
 from . import idmef
 
@@ -103,3 +103,48 @@ class AlertDataSearch(idmef.IDMEFDataSearch):
             cells["_classes"] = "assessment_impact_severity_%s" % severity
 
         return cells
+
+    def _build_table(self, idmefd):
+        rows = []
+
+        for key, value in sorted(idmefd.items()):
+            colkey = resource.HTMLNode("td", key)
+            colval = resource.HTMLNode("td", ", ".join(value) if isinstance(value, list) else value)
+            rows.append(resource.HTMLNode("tr", colkey, colval))
+
+        return resource.HTMLNode("table", *rows, _class="table table-condensed")
+
+    def _build_classification(self, alert):
+        idmef = {}
+        self._recurse_idmef(idmef, alert["classification"])
+        self._recurse_idmef(idmef, alert["assessment"])
+
+        return self._build_table(idmef)
+
+    def _generic_builder(self, alert, path):
+        idmef = {}
+        self._recurse_idmef(idmef, alert[path])
+
+        return self._build_table(idmef)
+
+    def _get_extra_infos(self):
+        builders = {
+            "classification": self._build_classification,
+            "assessment": self._build_classification
+        }
+
+        field = env.request.parameters["field"]
+        parent_field = field.split('.', 1)[0]
+        criteria = utils.json.loads(env.request.parameters["_criteria"])
+        alert = env.dataprovider.get(criteria)[0]["alert"]
+
+        builder = next((v for k, v in builders.items() if k in field), None)
+        if builder:
+            html = builder(alert)
+        else:
+            try:
+                html = self._generic_builder(alert, parent_field)
+            except RuntimeError:
+                return
+
+        return [("idmef", utils.AttrObj(label=_("IDMEF"), info=html))]

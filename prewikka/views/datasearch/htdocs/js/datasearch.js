@@ -199,6 +199,38 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
         render_timeline(true);
     }
 
+    /* Create the "Informations" content */
+    function _create_dom_infos(category, infos, is_first) {
+        var li = $('<li>', {
+            class: is_first ? "active" : ""
+        });
+
+        var pill = $('<a>', {
+            text: infos.label,
+            class: 'ajax-bypass',
+            href: '.' + category,
+            role: 'tab',
+            'data-toggle': 'pill'
+        });
+
+        pill.appendTo(li);
+        li.appendTo($(".oca-infos .nav"));
+
+        var div_infos = $('<div>', {
+            role: "tabpanel",
+            class: "tab-pane fade in " + category + (is_first ? " active" : "")
+        });
+
+        div_infos.append(infos.info.toHTML ? infos.info.toHTML() : infos.info);
+        div_infos.appendTo($(".oca-infos .tab-content"));
+    }
+
+    /* Delete the "Informations" content and show the spinner */
+    function _clean_dom_infos() {
+        $(".oca-infos .nav > li, .oca-infos .tab-content > div").remove();
+        $(".oca-infos").find('.ajax-spinner, .processed-content').toggleClass("hidden");
+    }
+
     /* Custom event to update datasearch */
     $("#main").on("datasearch:update", function() {
         prewikka_save_parameters($("#form_search").serializeArray());
@@ -297,22 +329,26 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
             .data("operator", selected_operator)
             .data("value", selected_value).show();
 
-        $("#PopoverOption .addon_search").each(function() {
-            var d = $(this).data();
+        $("#PopoverOption .dropdown-submenu:not(.oca-infos)").each(function() {
+            $(this).find('.addon_search').each(function() {
+                var d = $(this).data();
 
-            var href = d.link;
-            if ( ! href ) {
-                href = $(this).attr("href");
-                $(this).data("link", href);
-            }
+                var href = d.link;
+                if ( ! href ) {
+                    href = $(this).attr("href");
+                    $(this).data("link", href);
+                }
 
-            var value = selected_value;
-            if ( d.field )
-                value = $('#datasearch_table').jqGrid('getCell', rowid, d.field);
+                var value = selected_value;
+                if ( d.field )
+                    value = $('#datasearch_table').jqGrid('getCell', rowid, d.field);
 
-            $(this).attr("href", href.replace(/%24value/g, encodeURIComponent(value)));
-            if ( d.path )
-                $(this).toggle(d.path === backend + "." + selected_field.replace(/\(\d+\)/g, ""));
+                $(this).attr("href", href.replace(/%24value/g, encodeURIComponent(value)));
+                if ( d.path )
+                    $(this).toggleClass('hidden', d.path !== backend + "." + selected_field.replace(/\(\d+\)/g, ""));
+            });
+
+            $(this).toggleClass('disabled', $(this).find('li a:not(.hidden)').length == 0);
         });
 
         $("#PopoverOption a.groupby_search").attr("href", prewikka_location().href + "?groupby[]=" + selected_field);
@@ -322,30 +358,98 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
 
         $("#PopoverOption").show();
 
-        var top = offset.top - $(window).scrollTop() + $(this).height();
-        var left = offset.left - $(window).scrollLeft() - $("#PopoverOption .popover").width() / 2 + $(this).width() / 2;
+        var oca_position = "bottom";
+        var popover = $("#PopoverOption .popover");
+        var top = offset.top + $(this).height();
+        var left = offset.left - popover.width() / 2 + $(this).width() / 2;
 
-        if ( top + $("#PopoverOption .popover").height() > window.innerHeight ) {
-            top = offset.top - $(window).scrollTop() - $("#PopoverOption .popover").height();
-            $("#PopoverOption .popover").removeClass("bottom").addClass("top");
-        }
-        else {
-            $("#PopoverOption .popover").removeClass("top").addClass("bottom");
+        popover.find(".dropdown-submenu").removeClass("pull-left");
+
+        if ( offset.left + $(this).width() / 2 + popover.width() > window.innerWidth ) {
+            top -= popover.height() / 2 + $(this).height() / 2;
+            left = offset.left - popover.width();
+            oca_position = "left";
+            popover.find(".dropdown-submenu").addClass("pull-left");
+        } else if ( offset.left - $(this).width() / 2 - popover.width() / 2 < 0 ) {
+            top -= popover.height() / 2 + $(this).height() / 2;
+            left = offset.left + $(this).width();
+            oca_position = "right";
+        } else if ( offset.top + $(this).height() + popover.height() > window.innerHeight ) {
+            top = offset.top - ($(this).height() / 2 + popover.height());
+            oca_position = "top";
         }
 
-        $("#PopoverOption")
-            .css({"top": top, "left": left})
-            .on("click", "a", function() {
-                $("#PopoverOption").hide();
-            });
+        popover.removeClass("bottom top right left").addClass(oca_position);
+        $("#PopoverOption").css({"top": top, "left": left});
 
         $("#datasearch_table").jqGrid("setSelection", $(this).closest("tr").attr("id"));
+
+        /* Modify the "informations" content if empty */
+        var divinfos = $(".oca-infos");
+
+        if ( divinfos.find('.panel-heading').text() === selected_value )
+            return false;
+        else
+            _clean_dom_infos();
+
+        var elem = {
+            field: selected_field,
+            value: selected_value,
+            query: criterion(selected_field, selected_operator, quote(selected_value)),
+            query_mode: criterion_config_default
+        };
+
+        var orig = $("#datasearch_table").jqGrid('getGridParam', 'userData')[rowid].cell;
+
+        for ( var i in orig ) {
+            elem[i] = (orig[i] && orig[i].toString) ? orig[i].toString() : orig[i];
+        }
+
+        if ( orig._criteria )
+            elem["_criteria"] = JSON.stringify(orig._criteria);
+
+        $.ajax({
+            url: prewikka_location().pathname + "/ajax_infos",
+            data: elem,
+            prewikka: {spinner: false},
+            success: function(data) {
+                divinfos.find('.panel-heading').text(selected_value);
+                var is_first = true;
+                $.each(data.infos, function(k, v) {
+                    _create_dom_infos(k, v, is_first);
+                    is_first = false;
+                });
+            },
+            error: function(xhr, status, error) {
+                var m;
+
+                if ( ! xhr.responseText )
+                    m = {message: error};
+                else
+                    m = JSON.parse(xhr.responseText);
+
+                divinfos.find(".tab-content").html(m.content);
+            },
+            complete: function() {
+                divinfos.find('.ajax-spinner, .processed-content').toggleClass("hidden");
+            }
+        });
 
         return false;
     });
 
-    $("#main").on("click scroll", function() {
+    $("#main").on("click scroll", function(event) {
+        if ( $(event.target).parents(".processed-content").length > 0 )
+            return;
+
         $("#PopoverOption").hide();
+    });
+
+    $("#PopoverOption .dropdown-submenu").hover(function handlerIn() {
+        if ( $(this).offset().top + 500 > window.innerHeight )
+            $(this).find(".dropdown-menu").css({"top": "unset", "bottom": 0});
+    }, function handlerOut() {
+        $(this).find(".dropdown-menu").css({"top": "", "bottom": ""});
     });
 
     var window_width = $(window).width();

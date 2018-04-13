@@ -1,4 +1,5 @@
 /* Timeline widget */
+
 #datasearch .panel {
     margin-bottom: 5px;
 }
@@ -11,6 +12,14 @@
     font-size: 13px;
 }
 
+#datasearch #timeline_results {
+    display: inline-block;
+    height: 200px;
+    width: 100%;
+}
+
+/* Search bar */
+
 #datasearch .row .form-group {
     margin-bottom: 5px;
 }
@@ -21,8 +30,8 @@
 
 .ui-autocomplete {
     max-height: 200px;
-    overflow-y: auto;
     overflow-x: hidden;
+    overflow-y: auto;
     position: fixed;
 }
 
@@ -35,38 +44,32 @@
 }
 
 .ui-autocomplete > li.datasearch-field {
-    padding: 3px 20px;
-    line-height: 1.42857;
     color: #333;
+    line-height: 1.42857;
+    padding: 3px 20px;
 }
 
 .ui-autocomplete > li.datasearch-field:hover {
-    color: #FFF;
     background-color: #428BCA;
+    color: #FFF;
 }
 
-.ui-autocomplete > i.history-query-delete {
-    float: left;
-    color: #d9534f;  /* Bootstrap red */
+.ui-autocomplete > .history-query-delete {
     border: none;
-    line-height: 1.42857;
+    color: #d9534f;  /* Bootstrap red */
+    float: left;
     font-size: 1.1em;
-    padding-right: 10px;
+    line-height: 1.42857;
     padding-left: 10px;
-}
-
-#datasearch #timeline_results {
-    height: 200px;
-    width: 100%;
-    display: inline-block;
+    padding-right: 10px;
 }
 
 #datasearch #datasearch_search_bar {
-    position: relative;
-    padding-top: 0px;
-    z-index: 1;
     margin-bottom: 5px;
     padding-right: 10px;
+    padding-top: 0;
+    position: relative;
+    z-index: 1;
 }
 
 @media (max-width: 768px) {
@@ -79,6 +82,8 @@
     /* Same as the rest of Prewikka */
     font-family: Verdana, Arial, Helvetica, sans-serif;
 }
+
+/* Results table */
 
 #datasearch .hover-details {
     cursor: pointer;
@@ -97,7 +102,8 @@
     color: #333;
 }
 
-#datasearch .hover, .hover .hl {
+#datasearch .hover,
+#datasearch .hover .hl {
     background-color: #FDE9A8;
     color: #333;
 }
@@ -106,56 +112,30 @@
     cursor: text;
 }
 
-#datasearch #PopoverOption {
-    position: fixed;
-    width: 20em;
-    word-wrap: break-word;
+#datasearch table img {
+    margin: 0 2px;
 }
 
-#datasearch #PopoverOption .popover {
-    display: block;
-    padding: 0px;
-    font-size: 13px;
-}
+/* Subgrid details */
 
-#datasearch #PopoverOption .list-group {
-    margin-bottom: 0;
-}
-
-#datasearch #PopoverOption .list-group-item {
-    padding: 5px 10px;
-}
-
-#datasearch #PopoverOption .bottom .list-group:first-of-type .list-group-item:first-child {
-    border-top: 0;
-}
-
-#datasearch #PopoverOption .top .list-group:last-of-type .list-group-item:last-child {
-    border-bottom: 0;
-}
-
-#datasearch #datasearch_table.table-nowrap tr.jqgrow > td {
-    white-space: nowrap;
-}
-
-#datasearch div.tablediv {
+#datasearch .tablediv {
     line-height: 0;
 }
 
-#datasearch td.subgrid-data table.subgrid {
+#datasearch .subgrid-data table.subgrid {
+    background: none;
     margin-bottom: 0;
     table-layout: auto;
-    background: none;
 }
 
-#datasearch div#datasearch_table .ui-jqgrid tr.ui-subgrid > td {
+#datasearch #datasearch_table .ui-jqgrid .ui-subgrid > td {
     white-space: normal;
 }
 
 #datasearch table.subgrid td.field,
 #datasearch table.subgrid td.filter {
-    width: 1%;
     white-space: nowrap;
+    width: 1%;
 }
 
 #datasearch table.subgrid td.field i {
@@ -166,32 +146,27 @@
     cursor: pointer;
 }
 
-#datasearch table img {
-    /* GeoIP flags */
-    margin: 0 2px;
-}
-
-
 /*
  * IDMEF OBJECT
  */
+
 #datasearch table ul:hover .dp-1000 {
-    visibility: visible;
     display: block;
+    visibility: visible;
 }
 
 #datasearch table ul .dp-1000 {
-    visibility: hidden;
     display: none;
+    visibility: hidden;
 }
 
 #datasearch table ul {
-   padding-left: 0px;
-    margin-bottom: 0px;
+    margin-bottom: 0;
+    padding-left: 0;
 }
 
 #datasearch table ul li {
-   display: inline;
+    display: inline;
 }
 
 /*
@@ -211,22 +186,25 @@
 }
 
 #datasearch table label {
-    margin-bottom: 0px;
+    margin-bottom: 0;
 }
 
 #datasearch table ul > li.text > label {
     display: none;
 }
 
-#datasearch table label.assessment, label.impact {
+#datasearch table label.assessment,
+#datasearch table label.impact {
     display: none;
 }
 
-#datasearch table ul.impact:before, #datasearch table ul.impact:after {
+#datasearch table ul.impact:before,
+#datasearch table ul.impact:after {
     content: "";
 }
 
-#datasearch table ul.list > ul.object > label, #datasearch ul.user_id > label {
+#datasearch table ul.list > ul.object > label,
+#datasearch ul.user_id > label {
     display: none;
 }
 
@@ -234,15 +212,124 @@
     display: inline;
 }
 
-#datasearch table ul.source + ul.source, ul.target + ul.target {
-    display: block;
+#datasearch table ul.source + ul.source,
+#datasearch table ul.target + ul.target {
     border-top: 1px dashed gray;
+    display: block;
 }
 
-#datasearch table ul.source:first-child, table ul.target:first-child {
+#datasearch table ul.source:first-child,
+#datasearch table ul.target:first-child {
     border-top: 0;
 }
 
 #datasearch table td > ul > label {
     display: none;
+}
+
+/* One click action */
+
+#datasearch #PopoverOption {
+    display: none;
+    position: fixed;
+    word-wrap: break-word;
+}
+
+#datasearch #PopoverOption .popover {
+    display: block;
+    font-size: small;
+}
+
+#datasearch #PopoverOption .popover .top > .arrow {
+    border-bottom-width: 1px;
+}
+
+#datasearch #PopoverOption .popover .bottom > .arrow {
+    border-top-width: 11px;
+}
+
+#datasearch .dropdown-submenu {
+    width: 100%;
+}
+
+#datasearch .dropdown-submenu > .dropdown-menu {
+    font-size: small;
+    margin-left: -1px;
+    margin-top: -6px;
+    max-width: inherit;
+    top: 0;
+}
+
+#datasearch .dropdown-submenu.disabled:hover > .dropdown-menu {
+    display: none;
+}
+
+#datasearch .popover.left .dropdown-submenu > a:before {
+    border-color: transparent;
+    border-right-color: #ccc;
+    border-style: solid;
+    border-width: 5px 5px 5px 0;
+    content: " ";
+    display: block;
+    float: left;
+    height: 0;
+    margin-right: -10px;
+    margin-top: 5px;
+    width: 0;
+}
+
+#datasearch .popover.left .dropdown-submenu > a:after {
+    all: unset;
+}
+
+#datasearch .popover.left .dropdown-submenu > a {
+    text-align: right;
+}
+
+/* Informations div content */
+
+#datasearch .oca-infos > .dropdown-menu {
+    width: fit-content;
+}
+
+#datasearch .oca-infos .ajax-spinner {
+    transform: translate(-50%, 0);
+}
+
+#datasearch .oca-infos .panel-heading {
+    padding: 5px 15px;
+    text-align: center;
+}
+
+#datasearch .oca-infos .panel-body {
+    padding: 0;
+}
+
+#datasearch .oca-infos .tab-content {
+    max-height: 300px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+#datasearch .oca-infos .tab-content .panel {
+    margin: 0;
+    padding: 0;
+}
+
+#datasearch .oca-infos .tab-content table {
+    margin-bottom: 0;
+}
+
+#datasearch .oca-infos .tab-content table td {
+    line-height: inherit;
+    vertical-align: middle;
+}
+
+#datasearch .oca-infos .tab-content table ul li {
+    display: block;
+}
+
+#datasearch .oca-infos .nav > li > a {
+    padding: 5px 15px;
 }

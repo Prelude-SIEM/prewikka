@@ -454,6 +454,7 @@ class DataSearch(view.View):
         view.route("/%s/forensic/ajax_timeline" % self.name, self.ajax_timeline)
         view.route("/%s/forensic/ajax_table" % self.name, self.ajax_table)
         view.route("/%s/forensic/ajax_details" % self.name, self.ajax_details)
+        view.route("/%s/forensic/ajax_infos" % self.name, self.ajax_infos)
         view.route("/%s/forensic/csv_download" % self.name, self.csv_download)
         view.route("/%s/forensic" % self.name, self.forensic, menu=(section, tabs[0]), keywords=["listing"],
                    datatype=self.type, priority=1, help="#%sforensic" % self.type, methods=["POST", "GET"])
@@ -599,6 +600,29 @@ class DataSearch(view.View):
         tmpl = template.PrewikkaTemplate(__name__, "templates/details.mak")
         return response.PrewikkaResponse(tmpl.dataset(fields_info=self.fields_info,
                                                       fields_value=env.request.parameters))
+
+    def _get_common_infos(self):
+        tmpl = template.PrewikkaTemplate(__name__, "templates/infos.mak")
+        query = self.query_parser(env.request.parameters["query"],
+                                  groupby=[env.request.parameters["field"]],
+                                  limit=5,
+                                  parent=self)
+
+        occurrences = [(value, count) for count, value in query.get_result()]
+        return tmpl.dataset(selected_field=env.request.parameters["field"], selected_occur=occurrences).render()
+
+    def _get_extra_infos(self):
+        return []
+
+    def ajax_infos(self):
+        infos = collections.OrderedDict()
+        infos["general"] = utils.AttrObj(label=_("General"), info=self._get_common_infos())
+
+        extra_infos = filter(None, hookmanager.trigger("HOOK_DATASEARCH_INFO", env.request.parameters)) + self._get_extra_infos()
+        for category, data in extra_infos:
+            infos[category] = data
+
+        return response.PrewikkaResponse({"infos": infos})
 
 
 class ResultDatetimeIterator(object):
