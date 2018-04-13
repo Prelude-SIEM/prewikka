@@ -48,7 +48,7 @@ $(function() {
               var title = $(this).data("title");
               if ( ! title && $(this).data("title-url") ) {
                   prewikka_ajax({
-                      spinner: false,
+                      prewikka: {spinner: false},
                       async: false,
                       type: "GET",
                       url: $(this).data("title-url"),
