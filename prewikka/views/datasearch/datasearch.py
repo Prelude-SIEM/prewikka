@@ -380,6 +380,7 @@ class DataSearch(view.View):
             "equal": "",
             "notequal": "-",
             "substr": "",
+            "notsubstr": "-",
             "AND": ["", "AND"],
             "OR": ["OR"]
         }
