@@ -235,10 +235,10 @@ class IDMEFDataSearch(datasearch.DataSearch):
                 if isinstance(child, utils.CachingIterator):
                     for idx, j in enumerate(child):
                         path = obj.path + "." + i.getName() + "(%d)" % idx
-                        output[path[6:]] = j
+                        output[path.split(".", 1)[-1]] = j
                 else:
                     path = obj.path + "." + i.getName()
-                    output[path[6:]] = child
+                    output[path.split(".", 1)[-1]] = child
 
     def ajax_details(self):
         obj = env.dataprovider.get(utils.json.loads(env.request.parameters["_criteria"]))[0]
