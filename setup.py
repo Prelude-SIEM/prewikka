@@ -191,7 +191,6 @@ setup(
             'CrontabView = prewikka.views.crontab:CrontabView',
             'FilterView = prewikka.views.filter.filter:FilterView',
             'HeartbeatDataSearch = prewikka.views.datasearch.heartbeat:HeartbeatDataSearch',
-            'MessageListing = prewikka.views.messagelisting:MessageListing',
             'MessageSummary = prewikka.views.messagesummary:MessageSummary',
             'ThreatDataSearch = prewikka.views.datasearch.threat:ThreatDataSearch',
             'UserManagement = prewikka.views.usermanagement:UserManagement',
@@ -227,10 +226,6 @@ setup(
         ],
         'prewikka.views.aboutplugin': [
             "htdocs/css/*.css"
-        ],
-        'prewikka.views.messagelisting': [
-            "htdocs/css/*.css",
-            "htdocs/js/*.js"
         ],
     },
     scripts=[

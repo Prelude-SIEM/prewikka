@@ -63,8 +63,9 @@ class Agents(view.View):
 
             delta = float(heartbeat.get("create_time")) - time.time()
 
-            heartbeat_listing = url_for("HeartbeatListing.render", **{"heartbeat.analyzer(-1).analyzerid": analyzerid})
-            alert_listing = url_for("AlertListing.render", **{"analyzer_object_0": "alert.analyzer.analyzerid", "analyzer_operator_0": "=", "analyzer_value_0": analyzerid})
+            analyzerid = heartbeat["analyzer(-1).analyzerid"]
+            heartbeat_listing = url_for("HeartbeatDataSearch.forensic", criteria=Criterion("heartbeat.analyzer(-1).analyzerid", "==", analyzerid), _default=None)
+            alert_listing = url_for("AlertDataSearch.forensic", criteria=Criterion("alert.analyzer(-1).analyzerid", "==", analyzerid), _default=None)
             heartbeat_analyze = url_for(".analyze", analyzerid=analyzerid)
 
             analyzer = heartbeat["analyzer(-1)"]
