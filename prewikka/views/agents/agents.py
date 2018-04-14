@@ -65,7 +65,7 @@ class Agents(view.View):
 
             analyzerid = heartbeat["analyzer(-1).analyzerid"]
             heartbeat_listing = url_for("HeartbeatDataSearch.forensic", criteria=Criterion("heartbeat.analyzer(-1).analyzerid", "==", analyzerid), _default=None)
-            alert_listing = url_for("AlertDataSearch.forensic", criteria=Criterion("alert.analyzer(-1).analyzerid", "==", analyzerid), _default=None)
+            alert_listing = url_for("AlertDataSearch.forensic", criteria=Criterion("alert.analyzer.analyzerid", "==", analyzerid), _default=None)
             heartbeat_analyze = url_for(".analyze", analyzerid=analyzerid)
 
             analyzer = heartbeat["analyzer(-1)"]
