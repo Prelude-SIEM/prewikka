@@ -343,7 +343,7 @@ function prewikka_json_dialog(data, opts)
     var dialog;
     var content = $(data.content);
 
-    if ( data.error && _is_error_duplicate(content) )
+    if ( data.error && !(opts && opts.allow_error_duplicates) && _is_error_duplicate(content) )
         return false;
 
     if ( typeof(opts) == 'undefined' )

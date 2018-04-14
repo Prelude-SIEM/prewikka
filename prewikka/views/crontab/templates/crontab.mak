@@ -28,7 +28,10 @@ from prewikka.utils import html, json
             var cl = "";
 
             if ( cur.error ) {
-                prewikka_json_dialog(cur.error, { class: "cronjob-error-dialog cronjob-error-dialog-" + erridx });
+                prewikka_json_dialog(cur.error, {
+                    class: "cronjob-error-dialog cronjob-error-dialog-" + erridx,
+                    allow_error_duplicates: true
+                });
                 erridx += 1;
             }
 
