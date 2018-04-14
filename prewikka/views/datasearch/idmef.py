@@ -211,7 +211,7 @@ class IDMEFDataSearch(datasearch.DataSearch):
 
         if criteria:
             env.dataprovider.delete(criteria)
-            return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})
+            return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting", "options": {"current": False}})
 
     def _recurse_idmef(self, output, obj):
         for i in self._formatter.get_childs(obj):
