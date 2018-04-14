@@ -7,15 +7,15 @@
   icon: exclamation-triangle
   categories:
       - sections:
-            - name: Alerts
-              default_tab: Alerts
-              tabs:
-                  - Alerts
-                  - Aggregated alerts
             - name: Threats
+              default_tab: Threats
               tabs:
                   - Threats
                   - Aggregated threats
+            - name: Alerts
+              tabs:
+                  - Alerts
+                  - Aggregated alerts
             - name: Agents
               tabs:
                   - Agents
