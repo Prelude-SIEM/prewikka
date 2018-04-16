@@ -533,8 +533,12 @@ class DataSearch(view.View):
         search = self.query_parser(query, groupby=env.request.parameters.get("groupby"),
                                    offset=(page - 1) * limit, limit=limit, parent=self)
 
-        if env.request.parameters.get("sort_index") in self.all_fields:
-            search.add_order(env.request.parameters["sort_index"], env.request.parameters["sort_order"])
+        field = env.request.parameters.get("sort_index")
+        order = env.request.parameters.get("sort_order")
+        if field in self.all_fields:
+            search.add_order(field, order)
+        elif field in self.path_translate:
+            search.add_order(self.path_translate[field][0][0].split(".", 1)[-1], order)
         else:
             search.add_order(self.sort_path_default, "desc")
 
