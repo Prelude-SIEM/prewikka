@@ -415,6 +415,7 @@ function datasearch_autocomplete_init(availabledata, history, labels) {
     /* Delete specific query in history */
     function delete_query(item) {
         prewikka_ajax({
+            type: 'POST',
             url: $(item).data('url'),
             data: {query: $(item).data('query')},
             prewikka: {spinner: false}
