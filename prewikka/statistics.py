@@ -19,6 +19,8 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import collections
+
 from prewikka import dataprovider, error, hookmanager, mainmenu, usergroup, utils
 from prewikka.dataprovider import Criterion
 from prewikka.renderer import RendererItem
@@ -207,7 +209,7 @@ class ChronologyChart(GenericChart):
         step = self._menu.get_step(100)
         can_zoom = mainmenu.TimeUnit(step.unit) > mainmenu.TimeUnit("minute")
 
-        out = {}
+        out = collections.OrderedDict()
         links = []
         legends = []
 
@@ -244,7 +246,7 @@ class ChronologyChart(GenericChart):
         if len(self.query) == 1:
             data = self._get_series(self.query[0], selection, date_precision)
         else:
-            data = {}
+            data = collections.OrderedDict()
             for query in self.query:
                 series = self._get_series(query, selection, date_precision).get(self.title, {})
                 legend = query.aggregation.replace("(1)", "(%s)" % query.datatype)
