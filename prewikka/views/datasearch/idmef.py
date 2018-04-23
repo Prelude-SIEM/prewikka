@@ -45,7 +45,7 @@ class IDMEFFormatter(datasearch.Formatter):
         if root["%s.messageid" % self.type]:
             href = url_for("%ssummary" % self.type, messageid=root["%s.messageid" % self.type], _default=None)
 
-        return resource.HTMLNode("a", format_datetime(obj), href=href)
+        return resource.HTMLNode("a", format_datetime(obj), href=href, title=_("See IDMEF details"), **{"data-toggle": "tooltip", "data-container": "#main"})
 
     def _format_value(self, obj, iclass, default="", label=True, _class="", tooltip=None):
         key = text_type(iclass)
