@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import uuid
 
 from prewikka import error, pluginmanager, resource
-from prewikka.utils import cache, html
+from prewikka.utils import cache
 
 RED_STD = "E78D90"
 ORANGE_STD = "F5B365"
@@ -180,12 +180,7 @@ class RendererPluginManager(pluginmanager.PluginManager):
 
             return {"html": htmls, "script": resource.HTMLSource(data.get("script", ""))}
         except RendererException as e:
-            htmls = resource.HTMLSource('<div id="%s" class="renderer-elem renderer-elem-error %s">%s</div>'
+            htmls = resource.HTMLSource('<div id="%s" class="renderer-elem renderer-elem-error %s"><div class="text-center-vh">%s</div></div>'
                                         % (cssid, classname, text_type(e)))
-            script = resource.HTMLSource("""
-                 var size = prewikka_getRenderSize("#%s", %s);
 
-                 $("#%s").width(size[0]).css("height", size[1] + 'px').css("line-height", size[1] + 'px');
-                """ % (cssid, html.escapejs({k: v for k, v in kwargs.items() if k in ('width', 'height', 'spacing')}), cssid))
-
-            return {"html": htmls, "script": script}
+            return {"html": htmls, "script": None}
