@@ -200,7 +200,10 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
     }
 
     /* Custom event to update datasearch */
-    $("#main").on("datasearch:update", update_datasearch);
+    $("#main").on("datasearch:update", function() {
+        prewikka_save_parameters($("#form_search").serializeArray());
+        update_datasearch();
+    });
 
     /* Event on popover link */
     $("#main").on("click", "#PopoverOption .new_search, #PopoverOption .add_search, .subgrid i.add_search", function() {
