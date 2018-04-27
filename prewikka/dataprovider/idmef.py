@@ -69,7 +69,7 @@ class _IDMEFProvider(DataProviderBase):
         if operator not in ("<>*", "<>", "!<>", "!<>*"):
             return value
 
-        value = value.strip()
+        value = text_type(value).strip()
 
         has_wildcard = utils.find_unescaped_characters(value, ["*"])
         if has_wildcard:
