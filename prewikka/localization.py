@@ -219,8 +219,20 @@ def format_timedelta(*args, **kwargs):
     return _format_timedelta(*args, locale=translation.getLocale(), **kwargs)
 
 
-def format_number(*args, **kwargs):
-    return babel.numbers.format_number(*args, locale=translation.getLocale(), **kwargs)
+def _abbreviate_number(number):
+    for unit in ['', 'K', 'M', 'G', 'T', 'P']:
+        if abs(number) < 1000 or unit == 'P':
+            format_ = None if isinstance(number, int) else "@@@"  # three significant digits
+            return "%s%s" % (format_number(number, format=format_), unit)
+
+        number /= 1000.0
+
+
+def format_number(number, short=False, **kwargs):
+    if short:
+        return _abbreviate_number(number)
+
+    return babel.numbers.format_decimal(number, locale=translation.getLocale(), **kwargs)
 
 
 def get_period_names(*args, **kwargs):
