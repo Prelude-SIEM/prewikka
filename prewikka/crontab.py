@@ -103,7 +103,10 @@ class CronJob(object):
         # run
         err = None
         try:
-            self.callback(self)
+            if self.callback:
+                self.callback(self)
+            else:
+                raise self.error
         except Exception as err:
             logger.exception("[%d/%s]: cronjob failed: %s", self.id, self.name, err)
             err = utils.json.dumps(error.PrewikkaError(err, N_("Scheduled job execution failed")))
