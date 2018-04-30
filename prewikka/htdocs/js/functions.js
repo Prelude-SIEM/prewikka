@@ -39,17 +39,18 @@ $(function() {
   };
 
   $.fn.ajaxTooltip = function() {
+      var current = null;
       this.tooltip({
           html: true,
           container: '#main',
           trigger: 'hover',
           delay: { "show": 200, "hide": 0 },
           title: function() {
+              var that = current = this;
               var title = $(this).data("title");
               if ( ! title && $(this).data("title-url") ) {
                   prewikka_ajax({
                       prewikka: {spinner: false},
-                      async: false,
                       type: "GET",
                       url: $(this).data("title-url"),
                       success: function(data) {
@@ -58,13 +59,19 @@ $(function() {
                                   return $("<div>").text(v).html();
                               }).join("<br>");
                           }
+                      },
+                      complete: function() {
+                          $(that).data("title-url", null)
+                                 .attr("data-original-title", title);
+
+                          if ( current == that ) $(that).tooltip("show");
                       }
                   });
-                  $(this).data("title-url", null);
-                  $(this).data("title", title);
               }
-              return title;
           }
+      })
+      .on("mouseleave", function() {
+          current = null;
       });
   };
 
