@@ -48,8 +48,12 @@ class Agents(view.View):
     def _get_analyzers(self, reqstatus):
         # Do not take the control menu into account.
         # The expected behavior is yet to be determined.
+        results = env.dataprovider.query(["max(heartbeat.create_time)", "heartbeat.analyzer(-1).analyzerid/group_by"])
+        if not results:
+            return
+
         c = Criterion()
-        for (create_time, analyzerid) in env.dataprovider.query(["max(heartbeat.create_time)", "heartbeat.analyzer(-1).analyzerid/group_by"]):
+        for create_time, analyzerid in results:
             c |= Criterion("heartbeat.create_time", "==", create_time) & Criterion("heartbeat.analyzer(-1).analyzerid", "==", analyzerid)
 
         for heartbeat in env.dataprovider.get(c):
