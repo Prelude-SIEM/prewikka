@@ -185,7 +185,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
   <form id="datasearch_grid_form">
     <input type="hidden" value="${ json.dumps(search.all_criteria) }" name="datasearch_criteria"/>
   </form>
-  <form id="datasearch_export_form">
+  <form id="datasearch_export_form" method="post">
     <input type="hidden" value="${ json.dumps(search.all_criteria) }" name="datasearch_criteria"/>
   </form>
 
