@@ -50,7 +50,7 @@ class Agents(view.View):
         for (create_time, analyzerid) in env.dataprovider.query(["max(heartbeat.create_time)", "heartbeat.analyzer(-1).analyzerid/group_by"]):
             c |= Criterion("heartbeat.create_time", "==", create_time) & Criterion("heartbeat.analyzer(-1).analyzerid", "==", analyzerid)
 
-        for heartbeat in env.dataprovider.get(c):
+        for heartbeat in env.dataprovider.get(c) if c else []:
             heartbeat = heartbeat["heartbeat"]
             status, status_text = utils.get_analyzer_status_from_latest_heartbeat(
                 heartbeat, self._heartbeat_error_margin
