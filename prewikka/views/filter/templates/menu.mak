@@ -20,7 +20,7 @@
       <li role="separator" class="divider"></li>
       % endif
       % for fltr in filters:
-        <li><a data-value="${fltr.name}" data-type="${ " ".join(fltr.criteria.keys()) }">${fltr.name}</a></li>
+        <li><a data-value="${fltr.name}" data-type="${ " ".join(fltr.criteria.keys()) }" data-toggle="tooltip" data-container="#main" data-placement="left" title="${fltr.description}">${fltr.name}</a></li>
       % endfor
     </ul>
   </div>
