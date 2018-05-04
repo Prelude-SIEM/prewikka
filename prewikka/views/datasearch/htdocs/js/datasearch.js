@@ -411,7 +411,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
         $.ajax({
             url: prewikka_location().pathname + "/ajax_infos",
             data: elem,
-            prewikka: {spinner: false},
+            prewikka: {spinner: false, error: false},
             success: function(data) {
                 divinfos.find('.panel-heading').text(selected_value);
                 var is_first = true;
