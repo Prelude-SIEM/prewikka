@@ -145,6 +145,6 @@ class AlertDataSearch(idmef.IDMEFDataSearch):
             try:
                 html = self._generic_builder(alert, parent_field)
             except RuntimeError:
-                return
+                return []
 
         return [("idmef", utils.AttrObj(label=_("IDMEF"), info=html))]
