@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.0.0beta1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-16 19:38+0200\n"
+"POT-Creation-Date: 2018-05-04 16:29+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: Alex Bochkin <ba@is-systems.org>\n"
 "Language-Team: Russian\n"
@@ -67,30 +67,30 @@ msgstr "Настраиваемый"
 msgid "Disabled"
 msgstr "Выключено"
 
-#: prewikka/crontab.py:109
+#: prewikka/crontab.py:112
 msgid "Scheduled job execution failed"
 msgstr ""
 
-#: prewikka/crontab.py:131
+#: prewikka/crontab.py:134
 #, fuzzy
 msgid "Invalid job extension"
 msgstr "Неверная сессия"
 
-#: prewikka/crontab.py:131
+#: prewikka/crontab.py:134
 #, python-format
 msgid "Scheduled job with invalid extension type '%s'"
 msgstr ""
 
-#: prewikka/crontab.py:235
+#: prewikka/crontab.py:238
 #, fuzzy
 msgid "Invalid schedule"
 msgstr "Неверный пользователь"
 
-#: prewikka/crontab.py:235
+#: prewikka/crontab.py:238
 msgid "The specified job schedule is invalid"
 msgstr ""
 
-#: prewikka/crontab.py:261
+#: prewikka/crontab.py:264
 #, python-format
 msgid "Custom (%s)"
 msgstr "Настраиваемый (%s)"
@@ -390,17 +390,17 @@ msgid ""
 "required: %s"
 msgstr ""
 
-#: prewikka/statistics.py:97
+#: prewikka/statistics.py:99
 #, fuzzy
 msgid "Filter error"
 msgstr "отфильтровано"
 
-#: prewikka/statistics.py:97
+#: prewikka/statistics.py:99
 #, fuzzy, python-format
 msgid "Filter '%s' does not exist"
 msgstr "Отображение '%s' не существует"
 
-#: prewikka/statistics.py:145 prewikka/statistics.py:186
+#: prewikka/statistics.py:147 prewikka/statistics.py:188
 #: prewikka/renderer/__init__.py:69 prewikka/views/crontab/__init__.py:82
 msgid "n/a"
 msgstr ""
@@ -903,7 +903,7 @@ msgstr ""
 msgid "Offline"
 msgstr "Выключен"
 
-#: prewikka/utils/misc.py:69 prewikka/views/agents/agents.py:172
+#: prewikka/utils/misc.py:69 prewikka/views/agents/agents.py:176
 msgid "Unknown"
 msgstr "Неизвестен"
 
@@ -1177,72 +1177,72 @@ msgstr "Обновить"
 msgid "Agents status information page"
 msgstr "Страница информации о статусе агентов"
 
-#: prewikka/views/agents/agents.py:72
+#: prewikka/views/agents/agents.py:76
 msgid "Node name n/a"
 msgstr "Имя узла неизвестно"
 
-#: prewikka/views/agents/agents.py:73
+#: prewikka/views/agents/agents.py:77
 msgid "OS version n/a"
 msgstr "Версия ОС неизвестна"
 
-#: prewikka/views/agents/agents.py:74
+#: prewikka/views/agents/agents.py:78
 msgid "OS type n/a"
 msgstr "Тип ОС неизвестен"
 
-#: prewikka/views/agents/agents.py:79
+#: prewikka/views/agents/agents.py:83
 msgid "Node location n/a"
 msgstr "Расположение узла неизвестно"
 
-#: prewikka/views/agents/agents.py:89
+#: prewikka/views/agents/agents.py:93
 msgid "Alert listing"
 msgstr "Список событий"
 
-#: prewikka/views/agents/agents.py:90
+#: prewikka/views/agents/agents.py:94
 msgid "Heartbeat listing"
 msgstr "Анализ событий состояния"
 
-#: prewikka/views/agents/agents.py:91
+#: prewikka/views/agents/agents.py:95
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:12
 msgid "Heartbeat analysis"
 msgstr "Анализ событий состояния"
 
-#: prewikka/views/agents/agents.py:95 prewikka/views/agents/agents.py:119
+#: prewikka/views/agents/agents.py:99 prewikka/views/agents/agents.py:123
 #: prewikka/views/datasearch/idmef.py:160 prewikka/views/filter/filter.py:114
 #: prewikka/views/messagesummary/messagesummary.py:332
 msgid "IDMEF_VIEW"
 msgstr "IDMEF_VIEW (Просмотр IDMEF)"
 
-#: prewikka/views/agents/agents.py:95 prewikka/views/datasearch/heartbeat.py:57
+#: prewikka/views/agents/agents.py:99 prewikka/views/datasearch/heartbeat.py:57
 msgid "Agents"
 msgstr "Агенты"
 
-#: prewikka/views/agents/agents.py:104
+#: prewikka/views/agents/agents.py:108
 msgid "IDMEF_ALTER"
 msgstr "IDMEF_ALTER (Изменение IDMEF)"
 
-#: prewikka/views/agents/agents.py:146
+#: prewikka/views/agents/agents.py:150
 msgid "Normal sensor start"
 msgstr "Нормальный запуск сенсора"
 
-#: prewikka/views/agents/agents.py:148
+#: prewikka/views/agents/agents.py:152
 msgid "Unexpected sensor restart"
 msgstr "Неожиданный перезапуск сенсора"
 
-#: prewikka/views/agents/agents.py:154
+#: prewikka/views/agents/agents.py:158
 #, python-format
 msgid "Unexpected heartbeat interval: %(delta)s"
 msgstr "Неожиданный интервал статусного сообщения (heartbeat): %(delta)s"
 
-#: prewikka/views/agents/agents.py:157
+#: prewikka/views/agents/agents.py:161
 msgid "Normal sensor stop"
 msgstr "Нормальная остановка сенсора"
 
-#: prewikka/views/agents/agents.py:169
+#: prewikka/views/agents/agents.py:173
 #, python-format
 msgid "Sensor is down since %s"
 msgstr "Сенсор недоступен с %s"
 
-#: prewikka/views/agents/agents.py:178
+#: prewikka/views/agents/agents.py:182
 #, python-format
 msgid ""
 "No anomaly in the last %(count)d heartbeats (one heartbeat every "
@@ -1476,6 +1476,10 @@ msgstr "Анализатор"
 msgid "Delete the selected alerts?"
 msgstr "Удалить выбранные события?"
 
+#: prewikka/views/datasearch/alert.py:150
+msgid "IDMEF"
+msgstr ""
+
 #: prewikka/views/datasearch/datasearch.py:47
 msgid "minute"
 msgstr "минута"
@@ -1513,8 +1517,12 @@ msgstr ""
 msgid "Dashboard"
 msgstr "Доска диаграмм"
 
-#: prewikka/views/datasearch/datasearch.py:494
+#: prewikka/views/datasearch/datasearch.py:495
 msgid "CSV export"
+msgstr ""
+
+#: prewikka/views/datasearch/datasearch.py:619
+msgid "General"
 msgstr ""
 
 #: prewikka/views/datasearch/heartbeat.py:53
@@ -1536,6 +1544,11 @@ msgstr "Агент"
 msgid "Delete the selected heartbeats?"
 msgstr "Удалить выбранные события?"
 
+#: prewikka/views/datasearch/idmef.py:48
+#, fuzzy
+msgid "See IDMEF details"
+msgstr "Сигналы тревоги"
+
 #: prewikka/views/datasearch/threat.py:66
 #, fuzzy
 msgid "Threat listing page"
@@ -1556,12 +1569,12 @@ msgid "Program"
 msgstr ""
 
 #: prewikka/views/datasearch/templates/details.mak:19
-#: prewikka/views/datasearch/templates/forensic.mak:211
+#: prewikka/views/datasearch/templates/forensic.mak:213
 msgid "Add to search"
 msgstr "Добавить к поиску"
 
 #: prewikka/views/datasearch/templates/details.mak:20
-#: prewikka/views/datasearch/templates/forensic.mak:212
+#: prewikka/views/datasearch/templates/forensic.mak:214
 msgid "Exclude from search"
 msgstr "Удалить из поиска"
 
@@ -1594,6 +1607,7 @@ msgid "Search mode"
 msgstr ""
 
 #: prewikka/views/datasearch/templates/forensic.mak:106
+#: prewikka/views/datasearch/templates/forensic.mak:211
 msgid "Search"
 msgstr "Искать"
 
@@ -1602,7 +1616,7 @@ msgid "Reset search"
 msgstr ""
 
 #: prewikka/views/datasearch/templates/forensic.mak:118
-#: prewikka/views/datasearch/templates/forensic.mak:214
+#: prewikka/views/datasearch/templates/forensic.mak:216
 #, fuzzy
 msgid "Group by"
 msgstr "Группировать записи по:"
@@ -1625,9 +1639,28 @@ msgstr ""
 msgid "Timeline"
 msgstr ""
 
-#: prewikka/views/datasearch/templates/forensic.mak:213
+#: prewikka/views/datasearch/templates/forensic.mak:215
 msgid "New search"
 msgstr "Новый поиск"
+
+#: prewikka/views/datasearch/templates/forensic.mak:225
+#: prewikka/views/messagesummary/messagesummary.py:1013
+msgid "Actions"
+msgstr "Действие"
+
+#: prewikka/views/datasearch/templates/forensic.mak:238
+#, fuzzy
+msgid "Informations"
+msgstr "Информационный"
+
+#: prewikka/views/datasearch/templates/infos.mak:3
+msgid "Field"
+msgstr ""
+
+#: prewikka/views/datasearch/templates/infos.mak:9
+#, fuzzy
+msgid "Occurrence"
+msgstr "Источник"
 
 #: prewikka/views/datasearch/templates/table.mak:12
 msgid "Count"
@@ -2156,10 +2189,6 @@ msgstr "Событие"
 #: prewikka/views/messagesummary/messagesummary.py:1005
 msgid "MessageID"
 msgstr ""
-
-#: prewikka/views/messagesummary/messagesummary.py:1013
-msgid "Actions"
-msgstr "Действие"
 
 #: prewikka/views/messagesummary/messagesummary.py:1052
 msgid "Network centric information"
