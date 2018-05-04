@@ -1,3 +1,29 @@
+* 2018-05-04, prewikka-5.0.0beta2:
+
+Author: Camille Gardet
+
+- Evolutions
+
+    - New one-click action menu
+
+- Bugfixes
+
+    - Save parameters when updating the datasearch table
+    - Fix IDMEF dataprovider value adjustment
+    - Request for deleting a query should be "POST"
+
+Author: Antoine Luong
+
+- Bugfixes
+
+    - Fix issue when there are no heartbeats in database
+    - Make the dropdown-header-custom CSS declaration global
+    - Add a tooltip for the IDMEF detail in DataSearch
+    - Raise the correct error when the cronjob callback is missing
+    - Keep the order of timeline series
+
+
+
 * 2018-04-13, prewikka-5.0.0beta1:
 
 Author: Yoann Vandoorselaere
