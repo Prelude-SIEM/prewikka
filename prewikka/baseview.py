@@ -22,6 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import base64
 import collections
 import string
+import urlparse
 
 from prewikka import error, history, hookmanager, resource, response, template, utils, view
 
@@ -89,9 +90,17 @@ class BaseView(view._View):
 
         return default
 
+    @staticmethod
+    def _get_server():
+        url = urlparse.urlparse(env.config.general.get("help_location"))
+        if not url.netloc and not url.scheme and not url.path.startswith('/'):  # relative url
+            return '/' + url.geturl()
+
+        return url.geturl()
+
     @view.route("/help/<path:path>")
     def help(self, path=None):
-        server = string.Template(env.config.general.get("help_location"))
+        server = string.Template(self._get_server())
 
         lang = None
         if env.request.user:
