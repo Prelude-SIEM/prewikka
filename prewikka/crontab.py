@@ -178,6 +178,9 @@ class Crontab(object):
 
     def get(self, id):
         res = env.db.query("SELECT id, name, userid, schedule, ext_type, ext_id, base, runcnt, enabled, error FROM Prewikka_Crontab WHERE id=%d", id)
+        if not res:
+            raise error.PrewikkaError(N_('Invalid CronJob'), N_('CronJob with id=%d cannot be found in database', id))
+
         return self._make_job(res[0])
 
     def delete(self, **kwargs):
