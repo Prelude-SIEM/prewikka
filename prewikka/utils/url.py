@@ -124,7 +124,7 @@ def iri2uri(iri, encoding="utf8"):
     else:
         authority = tpl[0].encode('idna') + ":%s" % tpl[1]
 
-    return urlunsplit((scheme.encode(encoding), authority,
+    return urlunsplit((scheme, text_type(authority, encoding),
                        quote(path.encode(encoding), safe),
                        quote(query.encode(encoding), safe),
                        quote(frag.encode(encoding), safe)))

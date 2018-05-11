@@ -49,7 +49,7 @@ class LinkManager(object):
                 continue
 
             paths = filter(None, re.split('\s|,', config.get("paths", "")))
-            self._register_link(paths + [type], option, value)
+            self._register_link(list(paths) + [type], option, value)
 
     def _check_option(self, option, value):
         return option != "paths"

@@ -111,7 +111,8 @@ class PrewikkaError(PrewikkaException):
         if details:
             return "%s: %s" % (message, details)
 
-        return message
+        # message might be an exception class
+        return text_type(message)
 
     def __str__(self):
         return self._format_error(self.message, self.details)

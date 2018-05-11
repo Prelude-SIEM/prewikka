@@ -22,6 +22,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import datetime
 import json
 
+from prewikka.compat import with_metaclass
+
 _TYPES = {}
 
 
@@ -34,15 +36,17 @@ class _JSONMetaClass(type):
         return nclass
 
 
-class JSONObject(object):
-    __metaclass__ = _JSONMetaClass
-
+class _JSONObject(object):
     @classmethod
     def from_json(cls, data):
         return cls(**data)
 
     def __jsonobj__(self):
         return {"__prewikka_class__": (self.__class__.__name__, self.__json__())}
+
+
+class JSONObject(with_metaclass(_JSONMetaClass, _JSONObject)):
+    pass
 
 
 class PrewikkaJSONEncoder(json.JSONEncoder):

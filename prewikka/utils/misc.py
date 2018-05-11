@@ -163,7 +163,8 @@ def soundex(name):
     sndx = ''
     fc = ''
 
-    name = unicodedata.normalize("NFKD", name).encode("ascii", "ignore")
+    # We need to call text_type() so that we work on a string (not bytes) with Py3
+    name = text_type(unicodedata.normalize("NFKD", name).encode("ascii", "ignore"))
 
     # translate alpha chars in name to soundex digits
     for i, c in enumerate(name):

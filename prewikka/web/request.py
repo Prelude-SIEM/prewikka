@@ -39,7 +39,7 @@ class BufferedWriter(object):
                 self._buffersize = buffersize
 
         def flush(self):
-                self._wcb(''.join(self._dlist))
+                self._wcb(b''.join(self._dlist))
                 self._dlist = []
                 self._len = 0
 
@@ -92,15 +92,15 @@ class Request(object):
             self.send_headers([("Content-Type", "text/event-stream")])
 
             if retry:
-                self._buffer.write("retry: %d\n" % retry)
+                self._buffer.write(b"retry: %d\n" % retry)
 
         # Join is used in place of concatenation / formatting, because we
         # prefer performance over readability in this place
         if event:
-            self._buffer.write("".join(["event: ", event.encode("utf8"), "\n"]))
+            self._buffer.write(b"".join([b"event: ", event.encode("utf8"), b"\n"]))
 
         if data:
-            self._buffer.write("".join(["data: ", data.encode("utf8"), "\n\n"]))
+            self._buffer.write(b"".join([b"data: ", data.encode("utf8"), b"\n\n"]))
 
         if sync:
             self._buffer.flush()

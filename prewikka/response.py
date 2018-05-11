@@ -112,19 +112,17 @@ class PrewikkaResponse(object):
 
             self.data = {}
 
-        return self._encode_response(self.data)
+        if isinstance(self.data, compat.STRING_TYPES):
+            return self.data
+
+        self.headers["Content-Type"] = "application/json"
+        if isinstance(self.data, dict):
+            self.data["_extensions"] = self.ext_content
+
+        return json.dumps(self.data)
 
     def _encode_response(self, res):
-        encoding = env.config.general.get("encoding", "utf8")
-
-        if not isinstance(res, compat.STRING_TYPES):
-            self.headers["Content-Type"] = "application/json"
-            if isinstance(res, dict):
-                res["_extensions"] = self.ext_content
-
-            return json.dumps(res, encoding=encoding)
-
-        return res.encode(encoding, "xmlcharrefreplace")
+        return res.encode(env.config.general.get("encoding", "utf8"), "xmlcharrefreplace")
 
     def write(self, request):
         content = self.content()
@@ -133,7 +131,7 @@ class PrewikkaResponse(object):
 
         request.send_headers(self.headers.items(), self.code or 200, self.status_text)
         if content is not None:
-            request.write(content)
+            request.write(self._encode_response(content))
 
 
 class PrewikkaDownloadResponse(PrewikkaResponse):
