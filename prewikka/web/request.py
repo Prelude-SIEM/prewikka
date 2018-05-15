@@ -76,6 +76,7 @@ class Request(object):
 
         self._output_cookie[param] = value
         self._output_cookie[param]["expires"] = expires
+        self._output_cookie[param]["httponly"] = True
         if path:
             self._output_cookie[param]["path"] = path
 
