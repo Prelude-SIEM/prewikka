@@ -19,18 +19,12 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
-# flake8: noqa: E402 (ignore "module level import not at top of file" because of ez_setup)
-
 from glob import glob
 import io
 import os
 import stat
 import subprocess
 import tempfile
-
-from ez_setup import use_setuptools
-
-use_setuptools()
 
 from setuptools import Command, setup, find_packages
 from distutils.dist import Distribution
