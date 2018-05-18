@@ -671,3 +671,40 @@ function prewikka_resource_destroy(target)
         }
     }
 }
+
+
+function prewikka_import(settings)
+{
+    var file_selector = $("<input>", {
+        "type": "file",
+        "name": "file",
+        "accept": settings.extensions,
+        "multiple": settings.multiple
+    });
+
+    /* Use the HTML 5 FileReader API */
+    file_selector.on("change", function(e) {
+        var total = e.target.files.length;
+        if ( settings.init ) settings.init(total);
+
+        $.each(e.target.files, function(i, file) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                $('body').queue(function() {
+                    $('body').dequeue();
+                    if ( settings.callback ) settings.callback(total, file.name, e.target.result);
+                });
+            };
+            reader.onerror = function(e) {
+                prewikka_notification({
+                    name: e.target.error.name,
+                    message: e.target.error.message,
+                    classname: "danger",
+                    duration: 5000
+                });
+            };
+            reader.readAsText(file);
+        });
+    });
+    file_selector.click();
+}
