@@ -61,6 +61,7 @@ class Agents(view.View):
 
             delta = float(heartbeat.get("create_time")) - time.time()
 
+            analyzerid = heartbeat["analyzer(-1).analyzerid"]
             heartbeat_listing = url_for("HeartbeatListing.render", **{"heartbeat.analyzer(-1).analyzerid": analyzerid})
             alert_listing = url_for("AlertListing.render", **{"analyzer_object_0": "alert.analyzer.analyzerid", "analyzer_operator_0": "=", "analyzer_value_0": analyzerid})
             heartbeat_analyze = url_for(".analyze", analyzerid=analyzerid)
