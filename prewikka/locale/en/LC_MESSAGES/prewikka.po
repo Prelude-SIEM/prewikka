@@ -4,10 +4,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Prewikka 4.1.9\n"
+"Project-Id-Version: Prewikka 4.1.10\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2016-09-13 21:57+0200\n"
-"PO-Revision-Date: 2017-07-24 16:56+0200\n"
+"PO-Revision-Date: 2018-05-18 11:45+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -66,24 +66,24 @@ msgstr ""
 msgid "Scheduled job execution failed"
 msgstr ""
 
-#: prewikka/crontab.py:130
+#: prewikka/crontab.py:131
 msgid "Invalid job extension"
 msgstr ""
 
-#: prewikka/crontab.py:130
+#: prewikka/crontab.py:131
 #, python-format
 msgid "Scheduled job with invalid extension type '%s'"
 msgstr ""
 
-#: prewikka/crontab.py:230
+#: prewikka/crontab.py:231
 msgid "Invalid schedule"
 msgstr ""
 
-#: prewikka/crontab.py:230
+#: prewikka/crontab.py:231
 msgid "The specified job schedule is invalid"
 msgstr ""
 
-#: prewikka/crontab.py:257
+#: prewikka/crontab.py:258
 #, python-format
 msgid "Custom (%s)"
 msgstr ""
@@ -143,15 +143,15 @@ msgid ""
 "%(version2)s"
 msgstr ""
 
-#: prewikka/database.py:894
+#: prewikka/database.py:863
 msgid "Database configuration error"
 msgstr ""
 
-#: prewikka/database.py:894
+#: prewikka/database.py:863
 msgid "Only MySQL and PostgreSQL databases are supported at the moment"
 msgstr ""
 
-#: prewikka/error.py:48 prewikka/templates/error.mak:141
+#: prewikka/error.py:48 prewikka/templates/error.mak:139
 msgid "An unexpected condition happened"
 msgstr ""
 
@@ -163,7 +163,7 @@ msgstr ""
 msgid "Backend does not implement this operation"
 msgstr ""
 
-#: prewikka/history.py:98
+#: prewikka/history.py:35
 msgid "Search history deletion"
 msgstr ""
 
@@ -230,23 +230,23 @@ msgstr ""
 msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
 msgstr ""
 
-#: prewikka/main.py:130 prewikka/main.py:146
+#: prewikka/main.py:131 prewikka/main.py:147
 msgid "Initialization error"
 msgstr ""
 
-#: prewikka/main.py:147
+#: prewikka/main.py:148
 #, python-format
 msgid ""
 "Cannot use %(type)s mode '%(name)s', please contact your local "
 "administrator."
 msgstr ""
 
-#: prewikka/main.py:180
+#: prewikka/main.py:181
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
 msgstr ""
 
-#: prewikka/main.py:284
+#: prewikka/main.py:285
 #, python-format
 msgid "An unexpected condition happened while trying to load %s"
 msgstr ""
@@ -388,12 +388,12 @@ msgstr ""
 msgid "Invalid view"
 msgstr ""
 
-#: prewikka/view.py:532
+#: prewikka/view.py:529
 #, python-format
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
 msgstr ""
 
-#: prewikka/view.py:536 prewikka/view.py:548
+#: prewikka/view.py:533 prewikka/view.py:545
 #, python-format
 msgid "View '%s' does not exist"
 msgstr ""
@@ -429,51 +429,51 @@ msgstr ""
 msgid "Only one manager should be configured for '%s' backend"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:56
+#: prewikka/dataprovider/idmef.py:78
 msgid "Provides an API to fetch IDMEF alerts"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:57
+#: prewikka/dataprovider/idmef.py:79
 #: prewikka/views/agents/templates/agents.mak:88
-#: prewikka/views/messagelisting/alertlisting.py:697
-#: prewikka/views/messagelisting/alertlisting.py:1259
+#: prewikka/views/messagelisting/alertlisting.py:704
+#: prewikka/views/messagelisting/alertlisting.py:1271
 msgid "Alerts"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:64
+#: prewikka/dataprovider/idmef.py:86
 #: prewikka/views/messagelisting/templates/alertlisting.mak:238
 msgid "Classification"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:65
+#: prewikka/dataprovider/idmef.py:87
 msgid "Source IP"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:66
+#: prewikka/dataprovider/idmef.py:88
 #: prewikka/views/messagesummary/messagesummary.py:566
 #: prewikka/views/messagesummary/messagesummary.py:587
 msgid "Source port"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:67
+#: prewikka/dataprovider/idmef.py:89
 msgid "Target IP"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:68
+#: prewikka/dataprovider/idmef.py:90
 #: prewikka/views/messagesummary/messagesummary.py:567
 #: prewikka/views/messagesummary/messagesummary.py:588
 msgid "Target port"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:69
+#: prewikka/dataprovider/idmef.py:91
 msgid "Analyzer name"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:75
+#: prewikka/dataprovider/idmef.py:97
 msgid "Provides an API to fetch IDMEF heartbeats"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:76
+#: prewikka/dataprovider/idmef.py:98
 #: prewikka/views/agents/templates/agents.mak:92
 #: prewikka/views/messagelisting/heartbeatlisting.py:62
 msgid "Heartbeats"
@@ -525,7 +525,7 @@ msgid ""
 msgstr ""
 
 #: prewikka/plugins/warning/templates/warning.mak:30
-#: prewikka/templates/error.mak:168 prewikka/templates/toplayout.mak:30
+#: prewikka/templates/error.mak:166 prewikka/templates/toplayout.mak:30
 #: prewikka/templates/toplayout.mak:45 prewikka/templates/toplayout.mak:62
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:44
 msgid "OK"
@@ -641,42 +641,42 @@ msgstr ""
 msgid "Copy to clipboard"
 msgstr ""
 
-#: prewikka/templates/error.mak:139
+#: prewikka/templates/error.mak:137
 msgid "Error: {0}"
 msgstr ""
 
-#: prewikka/templates/error.mak:152
+#: prewikka/templates/error.mak:150
 msgid "This may be due to one or more of the following reasons:"
 msgstr ""
 
-#: prewikka/templates/error.mak:154
+#: prewikka/templates/error.mak:152
 msgid "You don't have the required permissions."
 msgstr ""
 
-#: prewikka/templates/error.mak:155
+#: prewikka/templates/error.mak:153
 #, python-format
 msgid "Required apps are disabled. See the %s page for more details."
 msgstr ""
 
-#: prewikka/templates/error.mak:173 prewikka/templates/toplayout.mak:29
+#: prewikka/templates/error.mak:171 prewikka/templates/toplayout.mak:29
 #: prewikka/views/crontab/templates/cronjob.mak:126
-#: prewikka/views/filter/templates/filteredition.mak:119
+#: prewikka/views/filter/templates/filteredition.mak:123
 msgid "Cancel"
 msgstr ""
 
-#: prewikka/templates/error.mak:174
+#: prewikka/templates/error.mak:172
 msgid "Sign in"
 msgstr ""
 
-#: prewikka/templates/error.mak:178
+#: prewikka/templates/error.mak:176
 msgid "Back"
 msgstr ""
 
-#: prewikka/templates/error.mak:181
+#: prewikka/templates/error.mak:179
 msgid "Retry"
 msgstr ""
 
-#: prewikka/templates/error.mak:183
+#: prewikka/templates/error.mak:181
 msgid "Redirect to main page"
 msgstr ""
 
@@ -742,7 +742,7 @@ msgstr ""
 msgid "Offline"
 msgstr ""
 
-#: prewikka/utils/misc.py:64 prewikka/views/agents/agents.py:162
+#: prewikka/utils/misc.py:64 prewikka/views/agents/agents.py:168
 msgid "Unknown"
 msgstr ""
 
@@ -830,7 +830,7 @@ msgstr ""
 #: prewikka/views/about/templates/about.mak:67
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:132
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:71
-#: prewikka/views/messagesummary/templates/messagesummary.mak:90
+#: prewikka/views/messagesummary/templates/messagesummary.mak:93
 msgid "Close"
 msgstr ""
 
@@ -993,75 +993,75 @@ msgstr ""
 msgid "Agents status information page"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:64
+#: prewikka/views/agents/agents.py:70
 msgid "Node name n/a"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:65
+#: prewikka/views/agents/agents.py:71
 msgid "OS version n/a"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:66
+#: prewikka/views/agents/agents.py:72
 msgid "OS type n/a"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:70
+#: prewikka/views/agents/agents.py:76
 msgid "Node location n/a"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:80
+#: prewikka/views/agents/agents.py:86
 msgid "Alert listing"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:81
+#: prewikka/views/agents/agents.py:87
 msgid "Heartbeat listing"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:82
+#: prewikka/views/agents/agents.py:88
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:12
 msgid "Heartbeat analysis"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:85 prewikka/views/agents/agents.py:109
+#: prewikka/views/agents/agents.py:91 prewikka/views/agents/agents.py:115
 #: prewikka/views/filter/filter.py:111
-#: prewikka/views/messagelisting/alertlisting.py:699
+#: prewikka/views/messagelisting/alertlisting.py:706
 #: prewikka/views/messagelisting/heartbeatlisting.py:64
 #: prewikka/views/messagesummary/messagesummary.py:349
 msgid "IDMEF_VIEW"
 msgstr "IDMEF VIEW"
 
-#: prewikka/views/agents/agents.py:85
+#: prewikka/views/agents/agents.py:91
 #: prewikka/views/messagelisting/heartbeatlisting.py:62
 msgid "Agents"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:94
+#: prewikka/views/agents/agents.py:100
 msgid "IDMEF_ALTER"
 msgstr "IDMEF ALTER"
 
-#: prewikka/views/agents/agents.py:136
+#: prewikka/views/agents/agents.py:142
 msgid "Normal sensor start"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:138
+#: prewikka/views/agents/agents.py:144
 msgid "Unexpected sensor restart"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:144
+#: prewikka/views/agents/agents.py:150
 #, python-format
 msgid "Unexpected heartbeat interval: %(delta)s"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:147
+#: prewikka/views/agents/agents.py:153
 msgid "Normal sensor stop"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:159
+#: prewikka/views/agents/agents.py:165
 #, python-format
 msgid "Sensor is down since %s"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:168
+#: prewikka/views/agents/agents.py:174
 #, python-format
 msgid ""
 "No anomaly in the last %(count)d heartbeats (one heartbeat every "
@@ -1222,13 +1222,13 @@ msgid "Edit Job"
 msgstr ""
 
 #: prewikka/views/crontab/templates/cronjob.mak:116
-#: prewikka/views/filter/templates/filteredition.mak:82
+#: prewikka/views/filter/templates/filteredition.mak:86
 #: prewikka/views/usermanagement/templates/usersettings.mak:13
 msgid "Name:"
 msgstr ""
 
 #: prewikka/views/crontab/templates/cronjob.mak:127
-#: prewikka/views/filter/templates/filteredition.mak:120
+#: prewikka/views/filter/templates/filteredition.mak:124
 #: prewikka/views/usermanagement/templates/usersettings.mak:61
 msgid "Save"
 msgstr ""
@@ -1276,7 +1276,7 @@ msgid "Filters"
 msgstr ""
 
 #: prewikka/views/filter/filter.py:135
-#: prewikka/views/filter/templates/filteredition.mak:75
+#: prewikka/views/filter/templates/filteredition.mak:79
 #, python-format
 msgid "Filter %s"
 msgstr ""
@@ -1367,16 +1367,16 @@ msgstr ""
 msgid "Not substring (case-insensitive)"
 msgstr ""
 
-#: prewikka/views/filter/templates/filteredition.mak:75
+#: prewikka/views/filter/templates/filteredition.mak:79
 #: prewikka/views/filter/templates/filterlisting.mak:22
 msgid "New filter"
 msgstr ""
 
-#: prewikka/views/filter/templates/filteredition.mak:84
+#: prewikka/views/filter/templates/filteredition.mak:88
 msgid "Filter name"
 msgstr ""
 
-#: prewikka/views/filter/templates/filteredition.mak:89
+#: prewikka/views/filter/templates/filteredition.mak:93
 msgid "Description:"
 msgstr ""
 
@@ -1445,34 +1445,34 @@ msgstr ""
 msgid "Alert and Heartbeat listing page"
 msgstr ""
 
-#: prewikka/views/messagelisting/alertlisting.py:547
-#: prewikka/views/messagelisting/alertlisting.py:921
+#: prewikka/views/messagelisting/alertlisting.py:554
+#: prewikka/views/messagelisting/alertlisting.py:933
 #: prewikka/views/messagesummary/messagesummary.py:659
 msgid "Alert details"
 msgstr ""
 
-#: prewikka/views/messagelisting/alertlisting.py:605
+#: prewikka/views/messagelisting/alertlisting.py:612
 #: prewikka/views/messagesummary/messagesummary.py:680
 #: prewikka/views/messagesummary/messagesummary.py:997
 msgid "Correlation Alert"
 msgstr ""
 
-#: prewikka/views/messagelisting/alertlisting.py:609
+#: prewikka/views/messagelisting/alertlisting.py:616
 #: prewikka/views/messagesummary/messagesummary.py:697
 #: prewikka/views/messagesummary/messagesummary.py:1000
 msgid "Tool Alert"
 msgstr ""
 
-#: prewikka/views/messagelisting/alertlisting.py:1219
+#: prewikka/views/messagelisting/alertlisting.py:1231
 #, python-format
 msgid "The path '%s' cannot be mapped to a column"
 msgstr ""
 
-#: prewikka/views/messagelisting/alertlisting.py:1235
+#: prewikka/views/messagelisting/alertlisting.py:1247
 msgid "Alert deletion"
 msgstr ""
 
-#: prewikka/views/messagelisting/alertlisting.py:1259
+#: prewikka/views/messagelisting/alertlisting.py:1271
 msgid "Threats"
 msgstr ""
 
@@ -2104,7 +2104,7 @@ msgstr ""
 msgid "Heartbeat"
 msgstr ""
 
-#: prewikka/views/messagesummary/templates/messagesummary.mak:82
+#: prewikka/views/messagesummary/templates/messagesummary.mak:85
 msgid "Summary"
 msgstr ""
 
