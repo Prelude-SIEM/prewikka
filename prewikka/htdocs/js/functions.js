@@ -517,6 +517,9 @@ function HTMLNode(obj) {
     else
         element = $("<div>").html(inner);
 
+    if ( obj.extra )
+        ret.extra = obj.extra;
+
     ret.toHTML = function() {
         return element.html();
     };

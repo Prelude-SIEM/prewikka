@@ -85,6 +85,7 @@ class HTMLNode(json.JSONObject):
             self.childs = (HTMLNode("i", _class="fa %s" % icon), " ") + self.childs
 
         self._sortkey = attrs.pop("_sortkey", None)
+        self._extra = attrs.pop("_extra", None)
 
         tmp = attrs.pop("_class", None)
         if tmp:
@@ -137,7 +138,7 @@ class HTMLNode(json.JSONObject):
         return self.to_string().format(*args, **kwargs)
 
     def __json__(self):
-        return {"tag": self.tag, "childs": self.childs, "attrs": self.attrs}
+        return {"tag": self.tag, "childs": self.childs, "attrs": self.attrs, "extra": self._extra}
 
     def __html__(self):
         return self.to_string()

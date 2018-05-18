@@ -40,7 +40,7 @@ from prewikka.renderer import RendererItem
 from prewikka.statistics import ChronologyChart, DiagramChart, Query
 
 
-COLUMN_PROPERTIES = functools.partial(utils.AttrObj, hidden=False, align="center")
+COLUMN_PROPERTIES = functools.partial(utils.AttrObj, hidden=False, align="center", cellattr="default_cellattr")
 
 _DEFAULT_CHART_TYPES = {"chronology": "timebar", "diagram": "bar"}
 _DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
@@ -477,7 +477,7 @@ class DataSearch(view.View):
         # Deepcopy is necessary because the forensic template updates the object values
         dataset["columns_properties"] = colsprop = copy.deepcopy(self.columns_properties)
         for prop, finfo, func in filter(None, self._trigger_datasearch_hook("EXTRA_COLUMN")):
-            colsprop[prop.label] = prop
+            colsprop[prop.label] = COLUMN_PROPERTIES(**dict(prop))
 
         dataset["criterion_config"] = self.criterion_config
         dataset["criterion_config_default"] = env.request.parameters.get("query_mode", self.criterion_config_default)

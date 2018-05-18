@@ -372,4 +372,12 @@ $.jgrid.extend({
     }
 });
 
+$.jgrid.cellattr = $.jgrid.cellattr || {};
+$.extend($.jgrid.cellattr, {
+    default_cellattr: function(rowId, value, rowObj) {
+        if ( value && value.extra && value.extra["_classes"] )
+            return ' class="' + value.extra["_classes"] + '"';
+    }
+});
+
 $.jgrid.guiStyles.bootstrap.states.select = "active";
