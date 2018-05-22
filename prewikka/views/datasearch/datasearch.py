@@ -45,8 +45,6 @@ COLUMN_PROPERTIES = functools.partial(utils.AttrObj, hidden=False, align="center
 _DEFAULT_CHART_TYPES = {"chronology": "timebar", "diagram": "bar"}
 _DATETIME_FMT = "%Y-%m-%d %H:%M:%S"
 _TEMPORAL_VALUES = [N_("minute"), N_("hour"), N_("day"), N_("month"), N_("year")]
-_HIGHLIGHT_PRE_TAG = "❤I💘PRELUDE❤"
-_HIGHLIGHT_POST_TAG = "❥I💘PRELUDE❥"
 _MAX_RECURSION_DEPTH = 100
 
 
@@ -96,7 +94,7 @@ class HighLighter(object):
             try:
                 parsed_phrase.append(cls.__split_word(word))
             except MaximumDepthExceeded:
-                parsed_phrase.append(cls._highlight_if_needed(word, _class="l"))
+                parsed_phrase.append(cls.word_prepare(word, _class="l"))
 
         if len(parsed_phrase) == 1:
             return parsed_phrase[0]
@@ -356,8 +354,7 @@ class QueryParser(object):
             yield RendererItem(value or "", ", ".join((text_type(x) or "" for x in labels)), link)
 
     def _query(self):
-        hl = {"pre_tags": [_HIGHLIGHT_PRE_TAG], "post_tags": [_HIGHLIGHT_POST_TAG], "number_of_fragments": 0}
-        return env.dataprovider.query(self._path, self.all_criteria, limit=self.limit, offset=self.offset, type=self.type, highlight=hl)
+        return env.dataprovider.query(self._path, self.all_criteria, limit=self.limit, offset=self.offset, type=self.type)
 
     def _groupby_query(self):
         return self._query()
