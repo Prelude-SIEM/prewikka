@@ -1,3 +1,20 @@
+* 2018-05-22, prewikka-5.0.0beta3:
+
+Author: Antoine Luong
+
+- Fix DataSearch highlighting
+- Simplify styling of renderer errors
+- Make tooltip AJAX requests asynchronous
+- Raise a proper exception when view is not found in url_for
+- Stop using ez_setup.py
+
+Author: Camille Gardet
+
+- Fix redirection to the helper pages
+- Add "httponly" options to cookies
+
+
+
 * 2018-05-04, prewikka-5.0.0beta2:
 
 Author: Camille Gardet
