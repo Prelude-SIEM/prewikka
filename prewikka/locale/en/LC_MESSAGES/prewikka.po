@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.0.0beta2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-04 16:29+0200\n"
+"POT-Creation-Date: 2018-05-22 12:00+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: English\n"
@@ -16,11 +16,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: prewikka/baseview.py:77 prewikka/usergroup.py:48
+#: prewikka/baseview.py:78 prewikka/usergroup.py:48
 msgid "Permission Denied"
 msgstr ""
 
-#: prewikka/baseview.py:77
+#: prewikka/baseview.py:78
 msgid "Missing permission to access the specified file"
 msgstr ""
 
@@ -431,7 +431,7 @@ msgstr ""
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
 msgstr ""
 
-#: prewikka/view.py:559
+#: prewikka/view.py:559 prewikka/view.py:707
 #, python-format
 msgid "View '%s' does not exist"
 msgstr ""
@@ -1441,27 +1441,27 @@ msgstr ""
 msgid "year"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:194
+#: prewikka/views/datasearch/datasearch.py:192
 msgid "Time group error"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:194
+#: prewikka/views/datasearch/datasearch.py:192
 msgid "Only one time unit can be specified in a groupby query"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:452
+#: prewikka/views/datasearch/datasearch.py:449
 msgid "Forensic"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:452
+#: prewikka/views/datasearch/datasearch.py:449
 msgid "Dashboard"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:495
+#: prewikka/views/datasearch/datasearch.py:492
 msgid "CSV export"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:619
+#: prewikka/views/datasearch/datasearch.py:616
 msgid "General"
 msgstr ""
 
