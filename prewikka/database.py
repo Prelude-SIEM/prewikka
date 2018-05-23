@@ -440,7 +440,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
         return self._from_version
 
 
-class DatabaseCommon(preludedb.SQL):
+class DatabaseCommon(object):
     required_branch = version.__branch__
     required_version = "0"
 
@@ -490,9 +490,9 @@ class DatabaseCommon(preludedb.SQL):
         stpl = tuple((k, v) for k, v in config.items())
         settings.update(stpl)
 
-        preludedb.SQL.__init__(self, settings)
+        self._db = preludedb.SQL(settings)
 
-        self._version = self.getServerVersion()
+        self._version = self._db.getServerVersion()
         self._dbhash = hash(stpl)
         self._dbtype = settings["type"]
 
@@ -547,7 +547,7 @@ class DatabaseCommon(preludedb.SQL):
 
     def query(self, sql, *args, **kwargs):
         if self._transaction_state == self.__TRANSACTION_STATE_BEGIN:
-            self.transactionStart()
+            self._db.transactionStart()
             self._transaction_state = self.__TRANSACTION_STATE_QUERY
 
         if args:
@@ -555,7 +555,7 @@ class DatabaseCommon(preludedb.SQL):
         elif kwargs:
             sql = sql % dict((key, self.escape(value)) for key, value in kwargs.items())
 
-        return preludedb.SQL.query(self, sql)
+        return self._db.query(sql)
 
     def _chk(self, key, value, join="AND"):
         if value is not None:
@@ -587,7 +587,10 @@ class DatabaseCommon(preludedb.SQL):
         if not isinstance(data, compat.STRING_TYPES):
             return data if data is not None else "NULL"
 
-        return preludedb.SQL.escape(self, data)
+        return self._db.escape(data)
+
+    def getLastInsertIdent(self):
+        return self._db.getLastInsertIdent()
 
     def is_plugin_active(self, plugin):
         plugin = self.modinfos.get(plugin)
@@ -668,13 +671,13 @@ class DatabaseCommon(preludedb.SQL):
 
     def transaction_end(self):
         if self._transaction_state == self.__TRANSACTION_STATE_QUERY:
-            self.transactionEnd()
+            self._db.transactionEnd()
 
         self._transaction_state = self.__TRANSACTION_STATE_NONE
 
     def transaction_abort(self):
         if self._transaction_state == self.__TRANSACTION_STATE_QUERY:
-            self.transactionAbort()
+            self._db.transactionAbort()
 
         self._transaction_state = self.__TRANSACTION_STATE_NONE
 

@@ -20,6 +20,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import errno
+import gc
 import os
 import socket
 
@@ -127,6 +128,9 @@ class Core(object):
             self._prewikka_initialized = e
         except Exception as e:
             self._prewikka_initialized = error.PrewikkaError(e, name=_("Initialization error"))
+        finally:
+            # Needed for Database object
+            gc.collect()
 
         if isinstance(self._prewikka_initialized, Exception):
             env.log.log(self._prewikka_initialized.log_priority, text_type(self._prewikka_initialized))
