@@ -955,11 +955,11 @@ label.disabled a {
 @label_critical_bg: #b03030;
 @table_critical_bg: #f2c0c0;
 
-.label-critical {
+.label-critical, .btn-critical {
     background-color: @label_critical_bg;
 }
 
-.label-critical[href]:focus, .label-critical[href]:hover {
+.label-critical[href]:focus, .label-critical[href]:hover, .btn-critical:hover {
     background-color: darken(@label_critical_bg, 5%);
 }
 
@@ -978,11 +978,11 @@ label.disabled a {
 @label_panic_bg: #800000;
 @table_panic_bg: #f2a0a0;
 
-.label-panic {
+.label-panic, .btn-panic {
     background-color: @label_panic_bg;
 }
 
-.label-panic[href]:focus, .label-panic[href]:hover {
+.label-panic[href]:focus, .label-panic[href]:hover, .btn-panic:hover {
     background-color: darken(@label_panic_bg, 5%);
 }
 
@@ -1008,6 +1008,10 @@ label.disabled a {
     > td.panic, > th.panic, &.panic > td, &.panic > th {
         color: #444;
     }
+}
+
+.btn-critical, .btn-panic {
+    color: white;
 }
 
 
