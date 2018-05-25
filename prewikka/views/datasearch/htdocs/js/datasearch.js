@@ -237,6 +237,16 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
         update_datasearch();
     });
 
+    /* Event on link to add a complex filter in the searchbar */
+    $("#main").on("click", "td a.add_search", function() {
+        var criteria = $(this).data("criteria");
+        criteria.forEach(function(criterion) {
+            _add_to_input(criterion["field"], criterion["operator"], criterion["value"], true);
+        });
+
+        update_datasearch();
+    });
+
     /* Event on popover link */
     $("#main").on("click", "#PopoverOption .new_search, #PopoverOption .add_search, .subgrid i.add_search", function() {
         if ( $(this).hasClass("new_search") )
