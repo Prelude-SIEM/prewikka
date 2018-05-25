@@ -197,7 +197,7 @@ p {
             .caret {
                 position: absolute;
                 right: 10px;
-                top: calc(~"50% - 1px");
+                top: e("calc(50% - 1px)");
             }
         }
     }
@@ -655,7 +655,7 @@ svg text {
 }
 
 .modal-dialog .modal-body {
-    max-height: 500px;
+    max-height: e("calc(100vh - 200px)");
     overflow: auto;
 }
 
