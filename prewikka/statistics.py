@@ -21,7 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import collections
 
-from prewikka import dataprovider, error, hookmanager, mainmenu, usergroup, utils
+from prewikka import dataprovider, hookmanager, mainmenu, usergroup, utils
 from prewikka.dataprovider import Criterion
 from prewikka.renderer import RendererItem
 
@@ -89,17 +89,6 @@ class GenericChart(object):
             parameters.update(period)
             self._menu = mainmenu.TimePeriod(dict(("timeline_%s" % k, v) for k, v in parameters.items()))
 
-    def _prepare_criteria(self, query):
-        filter_name = self.options.get("filter")
-        if not filter_name:
-            return
-
-        for c in hookmanager.trigger("HOOK_FILTER_GET_CRITERIA", filter_name, query.datatype):
-            if not c:
-                raise error.PrewikkaUserError(N_("Filter error"), N_("Filter '%s' does not exist", filter_name))
-
-            query.criteria &= c
-
     def _prepare_query(self, query):
         all_paths = ["%s/order_desc" % query.aggregation]
         for path in query.paths:
@@ -112,7 +101,7 @@ class GenericChart(object):
         if self._default_view:
             self._default_view = self._default_view[-1]
 
-        self._prepare_criteria(query)
+        list(hookmanager.trigger("HOOK_CHART_PREPARE", query, self.options))
         all_criteria = self._menu.get_criteria() & query.criteria
 
         return all_paths, all_criteria

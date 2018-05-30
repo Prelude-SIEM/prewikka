@@ -197,6 +197,18 @@ class FilterView(FilterPlugin, view.View):
 
         return resource.HTMLSource(dset.render())
 
+    @hookmanager.register("HOOK_CHART_PREPARE")
+    def _chart_prepare(self, query, options):
+        filter_name = options.get("filter")
+        if not filter_name:
+            return
+
+        c = self._filter_get_criteria_by_name(filter_name, query.datatype)
+        if not c:
+            raise error.PrewikkaUserError(N_("Filter error"), N_("Filter '%s' does not exist", filter_name))
+
+        query.criteria &= c
+
     @view.route("/settings/filters/new", help="#filteredition")
     @view.route("/settings/filters/<name>/edit", help="#filteredition")
     def edit(self, name=None):
