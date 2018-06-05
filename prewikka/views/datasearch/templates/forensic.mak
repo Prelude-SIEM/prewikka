@@ -22,7 +22,9 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
                             ${ html.escapejs(history) },
                             ${ html.escapejs(labels) });
 
-  $(".form-control-chosen").chosen({ width: "100%", search_contains: true });
+  var groupby = $(".form-control-chosen");
+  groupby.closest(".form-group").show();
+  groupby.chosen({ width: "100%", search_contains: true });
   DataSearchPage("${backend}", ${html.escapejs(criterion_config)}, ${html.escapejs(criterion_config_default)}, "${url_for('.ajax_timeline')}");
 
   % if not search.groupby:
@@ -113,7 +115,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
     </div>
 
     <div class="col-md-3">
-      <div class="form-group">
+      <div class="form-group" style="display: none;">
         <div class="input-group">
           <span class="input-group-addon">${ _("Group by") }</span>
           <select class="form-control form-control-chosen" multiple name="groupby[]" data-placeholder="${ _("Select your field") }">
