@@ -462,17 +462,13 @@ function prewikka_autocomplete(field, url, submit, allow_empty) {
         source: function(request, response) {
             $.ajax({
                 url: url,
-                data: {query: request.term},
+                data: {term: request.term},
                 dataType: "json",
                 prewikka: { spinner: false, error: false },
                 success: function(data) {
-                    var rows = $.map(data.rows, function(row) {
-                        var name = row.cell.name;
-                        return name.toHTML ? $(name.toHTML()).text() : name;
-                    });
-                    response(rows);
-                    field.parent("div").toggleClass("has-error", !rows.length);
-                    field.next().toggleClass("fa-close", !rows.length);
+                    response(data);
+                    field.parent("div").toggleClass("has-error", !data.length);
+                    field.next().toggleClass("fa-close", !data.length);
                     if ( submit ) submit.prop("disabled", $(".has-error").length);
                 },
                 error: function(xhr, status, error) {
