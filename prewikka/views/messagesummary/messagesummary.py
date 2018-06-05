@@ -502,7 +502,8 @@ class MessageSummary(Table, view.View):
             if ad["data"] is not None:
                 value = ad["data"]
                 if ad["type"] == "byte-string" and meaning != "payload":
-                    value = utils.hexdump(value)
+                    value = html.escape(utils.hexdump(value)).replace(" ", resource.HTMLSource("&nbsp;"))
+                    value = resource.HTMLSource("<span class='fixed'>%s</span>" % value)
 
             for field in ignore:
                 if meaning is not None and meaning == field[0]:
