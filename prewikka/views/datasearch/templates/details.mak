@@ -13,7 +13,10 @@
           continue
     %>
     <tr>
-      <td class="field hover-details gbonly" data-field="${ field }"><i class="fa fa-${ icon_type }"></i>${ field }</td>
+      <td class="field" data-field="${ field }">
+        <i class="fa fa-${ icon_type }"></i>
+        <a data-container="#main" data-toggle="tooltip" title="${ _("Group by %s") % field }" href="${ url_for('.forensic', groupby=[field]) }">${ field }</a>
+      </td>
       <td class="filter">
         <span>
           <i data-field="${field}" data-value="${ fields_value[field] }" data-toggle="tooltip" title="${ _("Add to search") }" data-container="#main" class="fa fa-search-plus add_search"></i>

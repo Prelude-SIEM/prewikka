@@ -312,7 +312,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
     });
 
     /* Popover on click on element with hover class */
-    $("#main").on("click", ".hover, .hover-details", function() {
+    $("#main").on("click", ".hover", function() {
         var offset = $(this).offset();
         var rowid = $(this).closest("tr").attr("id");
         var td = $(this).closest("td").first();
@@ -353,9 +353,6 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
 
         $("#PopoverOption a.groupby_search").attr("href", prewikka_location().href + "?groupby[]=" + selected_field);
         $("#PopoverOption .groupby_search span").text(selected_field);
-        if ( $(this).hasClass("gbonly") )
-            $("#PopoverOption a:not(.groupby_search)").hide();
-
         $("#PopoverOption").show();
 
         var oca_position = "bottom";
@@ -660,12 +657,14 @@ function DataSearchListing(elem, columns, url, nbRow, jqgrid_params) {
             $("#datasearch input[name='datasearch_criteria']").val(JSON.stringify(data.criteria));
         },
         subGridRowExpanded: function(subgridDivId, rowId) {
+            var subgrid = $("#" + $.jgrid.jqID(subgridDivId));
+
             /* Delete the first empty td when the checkboxes are not present */
             if (! $("#view-config-editable").prop("checked")) {
-                $("#" + $.jgrid.jqID(subgridDivId)).parent().siblings().first().remove();
+                subgrid.parent().siblings().first().remove();
             }
 
-            $("#" + $.jgrid.jqID(subgridDivId)).html("<div class=\"loader\"></div>");
+            subgrid.html("<div class=\"loader\"></div>");
 
             var elem = {};
             var orig = $(this).jqGrid('getGridParam', 'userData')[rowId].cell;
@@ -682,10 +681,11 @@ function DataSearchListing(elem, columns, url, nbRow, jqgrid_params) {
                 data: elem,
                 prewikka: {spinner: false},
                 success: function(result) {
-                    $("#" + $.jgrid.jqID(subgridDivId)).html(result);
+                    subgrid.html(result);
+                    _initialize_components(subgrid);
                 },
                 error: function(result) {
-                    $("#" + $.jgrid.jqID(subgridDivId)).html(result.responseJSON.content);
+                    subgrid.html(result.responseJSON.content);
                 }
             });
         }

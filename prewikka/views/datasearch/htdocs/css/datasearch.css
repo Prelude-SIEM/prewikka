@@ -85,18 +85,6 @@
 
 /* Results table */
 
-#datasearch .hover-details {
-    cursor: pointer;
-}
-
-#datasearch .hover-details:hover {
-    text-decoration: underline;
-}
-
-#datasearch .hover-details i {
-    margin-right: 0.3em;
-}
-
 #datasearch .hl {
     background-color: #A8F2FD;
     color: #333;
