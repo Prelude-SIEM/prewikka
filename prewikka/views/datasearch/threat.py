@@ -53,8 +53,8 @@ class ThreatQueryParser(alert.AlertQueryParser):
             dataprovider.Criterion("alert.correlation_alert.name", "!=", None)
         )
 
-        self.criteria = self.get_criteria(query) + threat_criterion
-        self.all_criteria = self.criteria + env.request.menu.get_criteria() + threat_criterion
+        self.criteria += threat_criterion
+        self.all_criteria = self.criteria + env.request.menu.get_criteria()
 
 
 class ThreatDataSearch(alert.AlertDataSearch):
