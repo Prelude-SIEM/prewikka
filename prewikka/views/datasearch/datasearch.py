@@ -510,9 +510,11 @@ class DataSearch(view.View):
 
     def forensic(self, groupby=[], is_dashboard=False):
         groupby = env.request.parameters.getlist("groupby") or groupby
+        query = env.request.parameters.get("query")
+        mode = env.request.parameters.get("query_mode", self.criterion_config_default)
 
         if groupby and not(is_dashboard):
-            raise error.RedirectionError(url_for(".dashboard", groupby=groupby), 302)
+            raise error.RedirectionError(url_for(".dashboard", query=query, groupby=groupby, query_mode=mode), 302)
 
         if not groupby and is_dashboard:
             groupby = self.groupby_default
@@ -525,7 +527,7 @@ class DataSearch(view.View):
         dataset["groupby_tempo"] = _TEMPORAL_VALUES
         dataset["fields_info"] = self.fields_info
         dataset["actions"] = itertools.chain(self.get_forensic_actions(), self._trigger_datasearch_hook("ACTION"))
-        dataset["search"] = self.query_parser(env.request.parameters.get("query", ""),
+        dataset["search"] = self.query_parser(query,
                                               groupby=groupby,
                                               limit=env.request.parameters["limit"],
                                               parent=self)
