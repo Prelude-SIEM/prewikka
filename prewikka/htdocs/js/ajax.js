@@ -52,6 +52,9 @@ $(function() {
     });
 
     $(document).ajaxSend(function(event, xhr, settings) {
+        if ( ! _csrf_safe_method(settings.type) && check_same_origin(settings.url) );
+            xhr.setRequestHeader("X-CSRFToken", get_cookie("CSRF_COOKIE"));
+
         if ( settings.prewikka.spinner )
             $("#ajax-spinner").show();
 
@@ -119,6 +122,19 @@ function _initialize_components(container) {
 }
 
 
+function _csrf_safe_method(method)
+{
+    return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);
+}
+
+
+function get_cookie(name) {
+  var value = "; " + document.cookie;
+  var parts = value.split("; " + name + "=");
+  if (parts.length == 2) return parts.pop().split(";").shift();
+}
+
+
 function prewikka_drawTab(data)
 {
     var form;
@@ -135,6 +151,9 @@ function prewikka_drawTab(data)
     form = $(content).find("form").addBack("form").first();
     if ( ! form.length )
         form = content = content.wrapAll('<form method="POST" action="' + prewikka_location().pathname + '"></form>').parent();
+
+    if ( ! _csrf_safe_method(form.attr("method")) )
+        form.prepend('<input type="hidden" name="_csrftoken" value="' + get_cookie("CSRF_COOKIE") + '" />');
 
     form.prepend(data._extensions.menu);
 

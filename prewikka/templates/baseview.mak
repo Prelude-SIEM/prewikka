@@ -16,6 +16,12 @@ else:
 "use strict";
 
 function check_same_origin(url) {
+    if ( typeof(url) == 'string' ) {
+        var obj = document.createElement("a");
+        obj.href = url;
+        url = obj;
+    }
+
     /*
      * Force url.hostname to be defined in IE
      * (problem with dynamically created links)

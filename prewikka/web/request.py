@@ -66,7 +66,7 @@ class Request(object):
         cookie = cookies.SimpleCookie(self.get_cookie())
         self.input_cookie = dict(cookie.items())
 
-    def add_cookie(self, param, value, expires, path="/"):
+    def add_cookie(self, param, value, expires=None, path="/", httponly=False):
         if not self._output_cookie:
             self._output_cookie = cookies.SimpleCookie()
 
@@ -75,10 +75,15 @@ class Request(object):
             value = value.encode("utf8")
 
         self._output_cookie[param] = value
-        self._output_cookie[param]["expires"] = expires
-        self._output_cookie[param]["httponly"] = True
+
+        if expires:
+            self._output_cookie[param]["expires"] = expires
+
         if path:
             self._output_cookie[param]["path"] = path
+
+        if httponly:
+            self._output_cookie[param]["httpOnly"] = httponly
 
     def delete_cookie(self, param):
         self.add_cookie(param, "deleted", 0)

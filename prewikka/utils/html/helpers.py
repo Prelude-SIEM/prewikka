@@ -19,7 +19,11 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import resource
+from prewikka import csrf, resource
+
+
+def csrftoken():
+    return resource.HTMLSource('<input type="hidden" name="%s" value="%s" />' % (csrf.CSRF_POST_KEY, csrf.get_token(env.request.web)))
 
 
 def selected(condition):

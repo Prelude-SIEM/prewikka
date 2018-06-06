@@ -36,7 +36,7 @@ _MAKO_GENERIC_ARGS = {
     "buffer_filters": _MAKO_FILTERS,
     "input_encoding": 'utf8', "imports": [
         'from prewikka.utils import html, json',
-        'from prewikka.utils.html.helpers import checked, disabled, selected'
+        'from prewikka.utils.html.helpers import checked, disabled, selected, csrftoken'
     ],
     "future_imports": ["unicode_literals"],
     "module_directory": os.path.join(siteconfig.tmp_dir, "mako")

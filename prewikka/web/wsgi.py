@@ -20,6 +20,7 @@
 from __future__ import absolute_import, division, print_function
 
 import sys
+import werkzeug.wsgi
 import wsgiref.headers
 import wsgiref.util
 
@@ -58,11 +59,14 @@ class WSGIRequest(request.Request):
         return value.encode("ISO-8859-1") if Py3 else value
 
     def _wsgi_get_unicode(self, key, default=None):
-        return self._wsgi_get_bytes(key, default).decode("utf8")
+        value = self._wsgi_get_bytes(key, default)
+        if value is not None:
+            return value.decode("utf8")
 
     def _wsgi_get_str(self, key, default=None):
         value = self._wsgi_get_bytes(key, default)
-        return value.decode("utf8") if Py3 else value
+        if value is not None:
+            return value.decode("utf8") if Py3 else value
 
     def __init__(self, environ, start_response):
         self._write = None
@@ -72,8 +76,7 @@ class WSGIRequest(request.Request):
         self.method = environ['REQUEST_METHOD']
 
         request.Request.__init__(self, self._wsgi_get_unicode("PATH_INFO"))
-        qs = self._wsgi_get_str("QUERY_STRING")
-        self.arguments = jquery_unparam(qs)
+        self.arguments = jquery_unparam(self._wsgi_get_str("QUERY_STRING"))
 
         if self.method in ('POST', 'PUT', 'PATCH'):
             qs = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
@@ -86,6 +89,21 @@ class WSGIRequest(request.Request):
         # Force request type when client wait explicitly for "text/event-stream"
         if self._environ.get("HTTP_ACCEPT", "text/html") == "text/event-stream":
             self.is_stream = True
+
+    def get_target_origin(self):
+        return "%s://%s" % (self._environ.get("wsgi.url_scheme"), werkzeug.wsgi.get_host(self._environ))
+
+    def get_origin(self):
+        ret = self._wsgi_get_unicode("HTTP_ORIGIN")
+        if ret:
+            return ret
+
+        ret = self._wsgi_get_unicode("HTTP_REFERER")
+        if not ret:
+            return None
+
+        scheme, netloc, path, query, frag = utils.url.urlsplit(ret)
+        return "%s://%s" % (scheme, netloc)
 
     def write(self, data):
         self._write(data)

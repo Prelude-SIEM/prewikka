@@ -23,7 +23,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import sys
 
 from copy import copy
-from prewikka import compat, error, hookmanager, log, mainmenu, pluginmanager, registrar, response, template, usergroup, utils
+from prewikka import compat, csrf, error, hookmanager, log, mainmenu, pluginmanager, registrar, response, template, usergroup, utils
 
 import werkzeug.exceptions
 from werkzeug.routing import Map, Rule, BaseConverter
@@ -376,6 +376,8 @@ class _ViewDescriptor(object):
     view_groups = []
     view_groups_permissions = []
 
+    view_csrf_exempt = False
+
     @property
     def view_others_permissions(self):
         return self.view_permissions
@@ -586,6 +588,9 @@ class ViewManager(registrar.DelayedRegistrar):
 
         elif view_kwargs:
             env.request.view_kwargs = view_kwargs
+
+        if not view.view_csrf_exempt:
+            csrf.process(request)
 
         env.request.view = view
         return view

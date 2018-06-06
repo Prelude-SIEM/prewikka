@@ -93,7 +93,7 @@ class Session(pluginmanager.PluginBase):
         hookmanager.register("HOOK_USER_DELETE", lambda user: self._db.delete_session(user=user))
 
     def __set_session(self, request, sessionid):
-        request.add_cookie("sessionid", sessionid, self._expiration * 3)
+        request.add_cookie("sessionid", sessionid, expires=self._expiration * 3, httponly=True)
 
     def __check_session(self, request):
         sessionid = request.input_cookie.get("sessionid")
@@ -159,6 +159,8 @@ class Session(pluginmanager.PluginBase):
 
         user = self.authenticate(request, info)
         self.__create_session(request, user)
+
+        list(hookmanager.trigger("HOOK_SESSION_CREATE", user))
 
         is_admin = set(user.permissions) == usergroup.ALL_PERMISSIONS
         env.log.info("User login with profile '%s'" % ("admin" if is_admin else "default"))
