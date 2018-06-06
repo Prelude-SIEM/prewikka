@@ -230,12 +230,22 @@ class QueryParser(object):
         self._result = res
         return res
 
-    @staticmethod
-    def format_criterion(path, value, mode):
-        if mode == "lucene":
-            return "%s%s:%s" % ("" if value else "-", path, value or "[* TO *]")
+    @classmethod
+    def _lucene_escape(cls, value):
+        if re.search(r'[/\s+\-!(){}[\]^"~*?\:\\]|&&|\|\|', value):
+            return '"%s"' % value.replace('"', '\\"')
 
-        return '%s = "%s"' % (path, value) if value else "!%s" % path
+        return value
+
+    @classmethod
+    def format_criterion(cls, path, value, mode):
+        if mode == "lucene":
+            if not value:
+                return "-%s:[* TO *]" % path
+
+            return "%s:%s" % (path, cls._lucene_escape(value))
+
+        return text_type(Criterion(path, "==", value))
 
     def get_groupby_link(self, groups, values, step, cview):
         url_param = env.request.menu.get_parameters()
