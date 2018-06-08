@@ -1,3 +1,23 @@
+* 2018-06-08, prewikka-5.0.0beta4:
+
+Author: Camille Gardet
+
+- Fix the display of byte-string data in an IDMEF message
+- Fix actions in the datasearch subgrids
+
+Author: Antoine Luong
+
+- Move filter-specific code to the dedicated plugin
+- Keep the search query when using DataSearch aggregation
+- Add missing escaping in Lucene mode
+- Reduce flickering when loading DataSearch pages
+
+Author: Yoann Vandoorselaere
+
+- Improve invalid cronjob exception
+
+
+
 * 2018-05-22, prewikka-5.0.0beta3:
 
 Author: Antoine Luong
