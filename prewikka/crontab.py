@@ -166,7 +166,7 @@ class Crontab(object):
 
         return CronJob(int(id), name, schedule, func, base, int(runcnt), ext_type=ext_type, ext_id=ext_id, user=user, error=err, enabled=bool(int(enabled)))
 
-    @database.use_transaction
+    @database.use_lock("Prewikka_Crontab")
     def _init_system_job(self, ext_type, name, schedule, enabled, method):
         self._plugin_callback[ext_type] = method
 

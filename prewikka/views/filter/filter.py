@@ -70,7 +70,6 @@ class Filter(object):
 
 
 class FilterDatabase(database.DatabaseHelper):
-    @database.use_transaction
     def get_filters(self, user, ftype=None):
         l = self.query("SELECT id, name, description, value FROM Prewikka_Filter "
                        "WHERE userid = %s ORDER BY name", user.id)
@@ -96,7 +95,6 @@ class FilterDatabase(database.DatabaseHelper):
         values = (user.id, filter_.id_, filter_.name, filter_.description, json.dumps(filter_.criteria))
         self.upsert("Prewikka_Filter", ("userid", "id", "name", "description", "value"), [values], pkey=("id",))
 
-    @database.use_transaction
     def delete_filter(self, user, name=None):
         query = "SELECT id, name FROM Prewikka_Filter WHERE userid = %(user)s"
         if name:
