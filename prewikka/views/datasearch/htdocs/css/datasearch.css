@@ -104,6 +104,10 @@
     margin: 0 2px;
 }
 
+#datasearch #datasearch_table.table-nowrap tr.jqgrow > td {
+    white-space: nowrap;
+}
+
 /* Subgrid details */
 
 #datasearch .tablediv {
