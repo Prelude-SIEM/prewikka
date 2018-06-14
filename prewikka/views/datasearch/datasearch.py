@@ -138,8 +138,9 @@ class Formatter(object):
         datetime.datetime: lambda f, r, o: resource.HTMLNode("span", format_datetime(o), **{"data-field": f.field})
     }
 
-    def __init__(self):
+    def __init__(self, data_type):
         self._enrich_data_cb = [elem[1] for elem in sorted(hookmanager.trigger("HOOK_DATASEARCH_FORMATTER_ENRICH_CALLBACK"))]
+        self.type = data_type
 
     def _format_nonstring(self, field, value):
         return resource.HTMLNode("span", value, **{"_class": "l", "data-field": field})
@@ -152,7 +153,7 @@ class Formatter(object):
         node.attrs["data-field"] = field
 
         for i in self._enrich_data_cb:
-            node = i(node, value)
+            node = i(node, value, self.type)
 
         return node
 
@@ -442,7 +443,7 @@ class DataSearch(view.View):
     def __init__(self):
         env.dataprovider.check_datatype(self.type)
 
-        self._formatter = self.formatter()
+        self._formatter = self.formatter(self.type)
         self._column_index = 0
 
         self.all_fields = []

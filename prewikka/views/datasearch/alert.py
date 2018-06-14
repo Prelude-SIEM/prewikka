@@ -31,10 +31,8 @@ from . import idmef
 
 
 class AlertFormatter(idmef.IDMEFFormatter):
-    type = "alert"
-
-    def __init__(self):
-        idmef.IDMEFFormatter.__init__(self)
+    def __init__(self, data_type):
+        idmef.IDMEFFormatter.__init__(self, data_type)
         self._objects = {"alert.create_time": self._format_time,
                          "alert.classification": self._format_classification}
 

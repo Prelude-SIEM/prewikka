@@ -31,8 +31,8 @@ from . import alert, datasearch
 
 
 class ThreatFormatter(alert.AlertFormatter):
-    def __init__(self):
-        alert.AlertFormatter.__init__(self)
+    def __init__(self, data_type):
+        alert.AlertFormatter.__init__(self, data_type)
         self._objects["alert.classification.text"] = self._format_classification
 
     def _format_classification(self, root, obj, finfo):

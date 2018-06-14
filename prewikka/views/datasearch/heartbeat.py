@@ -30,10 +30,8 @@ from . import idmef
 
 
 class HeartbeatFormatter(idmef.IDMEFFormatter):
-    type = "heartbeat"
-
-    def __init__(self):
-        idmef.IDMEFFormatter.__init__(self)
+    def __init__(self, data_type):
+        idmef.IDMEFFormatter.__init__(self, data_type)
         self._objects = {"heartbeat.create_time": self._format_time}
 
 
