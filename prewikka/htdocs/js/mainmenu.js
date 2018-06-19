@@ -57,7 +57,7 @@ function MainMenuInit(inline, start, end, date_format, url) {
         return false;
     });
 
-    root.find(".main_menu_extra a").on("click", function() {
+    root.find(".main_menu_extra a:not([href])").on("click", function() {
         $(this).closest(".dropdown").find(".selected-value").text($(this).text());
         $(this).closest(".main_menu_extra").find("input[type=hidden]").val($(this).data("value"));
         root.find(".main_menu_form_submit").removeClass("disabled");

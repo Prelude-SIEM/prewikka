@@ -15,7 +15,10 @@
     </div>
 
     <ul class="dropdown-menu filter-select">
-      <li><a data-value="">${ _("No filter") }</a></li>
+      <li><a data-value=""><i class="fa fa-ban text-danger"></i> ${ _("No filter") }</a></li>
+      % if inline:
+      <li><a href="${ url_for('FilterView.edit') }" class="new-filter"><i class="fa fa-plus text-success"></i> ${ _("New filter") }</a></li>
+      % endif
       % if filters:
       <li role="separator" class="divider"></li>
       % endif

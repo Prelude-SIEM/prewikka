@@ -1,5 +1,12 @@
 <script type="text/javascript">
 
+$("#main").on("prewikka-ajax-response", function(event, data) {
+    if ( data._extensions && data._extensions._source == "filterview.save" ) {
+        $(this).trigger("reload");
+        return false;
+    }
+});
+
 function type_formatter(cellValue, options, rowObject) {
     var elem = $("<i>", {"class": cellValue ? "fa fa-check text-success" : ""});
     return elem[0].outerHTML;
