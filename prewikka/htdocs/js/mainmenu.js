@@ -1,6 +1,6 @@
 "use strict";
 
-function MainMenuInit(inline, start, end, date_format) {
+function MainMenuInit(inline, start, end, date_format, url) {
     var that = {};
     var root = $((inline) ? "#main_menu_ng" : "#main_menu_ng_block");
 
@@ -14,8 +14,8 @@ function MainMenuInit(inline, start, end, date_format) {
     var end_picker = DatetimePicker(root.find(".timeline_end"), end, options, 59);
 
     // Make sure whole mainmenu input have the mainmenu class.
-    $(root).data("mainmenu", that);
-    $(root).find(":input").addClass("mainmenu");
+    root.data("mainmenu", that);
+    root.find(":input").addClass("mainmenu");
 
     that.trigger_custom_date = function(enabled) {
         root.find("[name=timeline_start], [name=timeline_end]").prop("disabled", !enabled);
@@ -26,7 +26,7 @@ function MainMenuInit(inline, start, end, date_format) {
         if ( enabled ) {
             root.find("[name=timeline_mode]").val("custom");
             root.find(".main_menu_form_submit").removeClass("disabled");
-            root.find(".timeline_quick_selected").html($(root.find(".timeline_quick_select_custom")).text());
+            root.find(".timeline_quick_selected").text(root.find(".timeline_quick_select_custom").text());
             that.update_date();
         }
 
@@ -46,6 +46,16 @@ function MainMenuInit(inline, start, end, date_format) {
         root.find(".input-timeline-datetime").closest(".form-group").toggleClass('has-error', error);
         root.find(".main_menu_form_submit").prop('disabled', error).toggleClass('error-date', error);
     };
+
+    root.on("reload", function(event, options) {
+        $.ajax({
+            url: url,
+            prewikka: {spinner: false},
+            data: options
+        });
+
+        return false;
+    });
 
     root.find(".main_menu_extra a").on("click", function() {
         $(this).closest(".dropdown").find(".selected-value").text($(this).text());

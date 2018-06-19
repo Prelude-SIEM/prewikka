@@ -301,6 +301,7 @@ class _MainMenu(TimePeriod):
         self._setup_timeline_range()
         self._set_timeline(self.start, self.end)
 
+        self.dataset["mainmenu_url"] = url_for("BaseView.mainmenu", datatype=self._criteria_type)
         self.dataset["menu_extra"] = filter(None, hookmanager.trigger("HOOK_MAINMENU_EXTRA_CONTENT", self._criteria_type, parameters=self._parameters, **self.dataset))
 
     def render(self):

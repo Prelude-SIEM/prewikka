@@ -24,7 +24,7 @@ import collections
 import string
 import urlparse
 
-from prewikka import error, history, hookmanager, resource, response, template, utils, view
+from prewikka import error, history, hookmanager, mainmenu, resource, response, template, utils, view
 
 
 CSS_FILES = (
@@ -81,6 +81,15 @@ class BaseView(view._View):
         filename = base64.urlsafe_b64decode(str(filename)).decode("utf8")
 
         return response.PrewikkaDownloadResponse(fd, filename=filename, inline=inline)
+
+    @view.route("/mainmenu")
+    @view.route("/mainmenu/<datatype>")
+    def mainmenu(self, datatype=None):
+        kwargs = {}
+        if datatype:
+            kwargs["criteria_type"] = datatype
+
+        return response.PrewikkaResponse({"type": "content", "target": "#main_menu_ng", "content": mainmenu.HTMLMainMenu(**kwargs)})
 
     @staticmethod
     def _get_help_language(lang, default=None):

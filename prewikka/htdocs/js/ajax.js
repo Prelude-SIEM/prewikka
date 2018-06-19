@@ -264,14 +264,21 @@ function _process_ajax_response(settings, data, xhr)
         result = false;
     }
 
-    else if ( data.type == "view" ) {
-        var widget = $(data.content).find(".widget").addBack(".widget");
+    else if ( data.type == "content" ) {
+        if ( data.target ) {
+            $(data.target).replaceWith(data.content);
+            _initialize_components(data.target);
+        }
 
-        if ( settings.prewikka.target == PrewikkaAjaxTarget.AUTO && widget.length > 0 ) {
-            result = _process_widget(data, widget);
-        } else {
-            _url_update(xhr, settings);
-            result = prewikka_drawTab(data);
+        else {
+            var widget = $(data.content).find(".widget").addBack(".widget");
+
+            if ( settings.prewikka.target == PrewikkaAjaxTarget.AUTO && widget.length > 0 ) {
+                result = _process_widget(data, widget);
+            } else {
+                _url_update(xhr, settings);
+                result = prewikka_drawTab(data);
+            }
         }
     }
 

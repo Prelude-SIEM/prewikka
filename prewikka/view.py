@@ -347,7 +347,7 @@ class GeneralParameters(Parameters):
 
 class ViewResponse(response.PrewikkaResponse):
     def __init__(self, data, **kwargs):
-        response.PrewikkaResponse.__init__(self, {"type": "view", "content": data})
+        response.PrewikkaResponse.__init__(self, {"type": "content", "content": data})
 
         menu = kwargs.get("menu", mainmenu.HTMLMainMenu() if env.request.has_menu else None)
         if menu:
