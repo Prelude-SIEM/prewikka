@@ -380,16 +380,13 @@ function prewikka_autocomplete(field, url, submit, allow_empty) {
         source: function(request, response) {
             $.ajax({
                 url: url,
-                data: {query: request.term},
+                data: {term: request.term},
                 dataType: "json",
                 global: false, // No prewikka dialog in case of error
                 success: function(data) {
-                    var rows = $.map(data.rows, function(row) {
-                        return row.cell.name;
-                    });
-                    response(rows);
-                    field.parent("div").toggleClass("has-error", !rows.length);
-                    field.next().toggleClass("fa-close", !rows.length);
+                    response(data);
+                    field.parent("div").toggleClass("has-error", !data.length);
+                    field.next().toggleClass("fa-close", !data.length);
                     if ( submit ) submit.prop("disabled", $(".has-error").length);
                 },
                 error: function(xhr, status, error) {
