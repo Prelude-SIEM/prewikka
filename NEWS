@@ -1,3 +1,15 @@
+* 2018-06-22, prewikka-4.1.11:
+
+Author: Antoine Luong
+
+- Do not rely on grid rows in prewikka_autocomplete
+
+Author: Camille Gardet
+
+- Remove 'all' option in Ajax listing pager
+
+
+
 * 2018-05-18, prewikka-4.1.10:
 
 Author: Antoine Luong
