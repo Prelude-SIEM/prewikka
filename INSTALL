@@ -29,6 +29,7 @@ Run requires:
 - python-mako >= 0.8.1
 - python-parsley
 - python-tz / pytz
+- python-voluptuous
 - python-werkzeug
 - python-yaml / PyYAML
 - libprelude with python bindings

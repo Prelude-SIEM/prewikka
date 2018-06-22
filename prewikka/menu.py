@@ -23,10 +23,29 @@ import collections
 import copy
 import itertools
 import os
+import voluptuous
 import yaml
 
 from prewikka import error, hookmanager, siteconfig
 from prewikka.utils import cache
+
+
+_SCHEMA = voluptuous.Schema([{
+    "name": str,
+    "icon": str,
+    "default": bool,
+    voluptuous.Required("categories", default=[]): [{
+        "name": str,
+        "icon": str,
+        voluptuous.Required("sections", default=[]): [{
+            voluptuous.Required("name"): str,
+            "icon": str,
+            voluptuous.Required("tabs", default=[]): [str],
+            "default_tab": str,
+            "expand": bool
+        }]
+    }]
+}])
 
 
 class MenuManager(object):
@@ -44,8 +63,11 @@ class MenuManager(object):
         if not os.path.isabs(filename):
             filename = os.path.join(siteconfig.conf_dir, filename)
 
-        with open(filename, "r") as f:
-            self._menus = yaml.load(f)
+        try:
+            with open(filename, "r") as f:
+                self._menus = _SCHEMA(yaml.load(f))
+        except (IOError, yaml.error.YAMLError, voluptuous.Invalid) as e:
+            raise error.PrewikkaUserError(N_("Menu error"), N_("The provided YAML menu is invalid"), details=e)
 
         if not self._menus:
             raise error.PrewikkaUserError(N_("Menu error"), N_("Empty menu"))
@@ -62,19 +84,15 @@ class MenuManager(object):
 
                 default_menu = True
 
-            for category in menu.get("categories", []):
-
-                for section in category.get("sections", []):
-                    if "name" not in section:
-                        raise error.PrewikkaUserError(N_("Menu error"), N_("Section without a name in %s", filename))
-
+            for category in menu["categories"]:
+                for section in category["sections"]:
                     if "default_tab" in section:
                         if self._default_menu:
                             raise error.PrewikkaUserError(N_("Menu error"), N_("Multiple default views"))
 
                         self._default_menu = (section["name"], section["default_tab"])
 
-                    self._declared_sections[section["name"]] = collections.OrderedDict((v, idx) for idx, v in enumerate(section.get("tabs", [])))
+                    self._declared_sections[section["name"]] = collections.OrderedDict((v, idx) for idx, v in enumerate(section["tabs"]))
 
         if not default_menu:
             self._menus[-1]["default"] = True
