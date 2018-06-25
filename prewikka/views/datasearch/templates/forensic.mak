@@ -39,7 +39,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
     };
 
     $(document).ready(function() {
-        DataSearchListing('#datasearch_table', columns, "${url_for('.ajax_table')}", ${limit}, ${html.escapejs(env.request.parameters['jqgrid_params_datasearch_table'])});
+        DataSearchListing('#datasearch_table', columns, "${url_for('.ajax_table')}", ${html.escapejs(env.request.parameters['jqgrid_params_datasearch_table'])});
         $("#datasearch_table").jqGrid($("#view-config-editable").prop("checked") ? 'showCol' : 'hideCol', 'cb');
     });
   % endif
@@ -68,6 +68,8 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
               % endfor
               </select>
           </div>
+
+          % if search.groupby:
           <div class="form-group">
               <label for=view-config-limit>${_("Limit")}</label>
               <select class="form-control input-sm" id="view-config-limit" name="limit">
@@ -76,9 +78,11 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
               % endfor
               </select>
           </div>
+          % endif
 
           <%block name="extra_datasearch_parameters"/>
 
+          % if not search.groupby:
           <div class="form-group">
             <label for="view-config-editable">
               ${ _("Expert mode") }
@@ -93,6 +97,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
               <input type="hidden" name="condensed" value="${env.request.parameters.get('condensed')}" />
             </label>
           </div>
+          % endif
       </div>
   </div>
 

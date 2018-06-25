@@ -639,12 +639,11 @@ function datasearch_autocomplete_init(availabledata, history, labels) {
 
 
 
-function DataSearchListing(elem, columns, url, nbRow, jqgrid_params) {
+function DataSearchListing(elem, columns, url, jqgrid_params) {
     CommonListing(elem, {}, {
         datatype: "json",
         url: url,
         postData: set_postdata(),
-        rowNum: nbRow,
         colNames: columns.names,
         colModel: columns.model,
         rowattr: function(row, data, id) {
