@@ -15,7 +15,6 @@ Dependencies
 Build requires:
 
 - python >= 2.7 (not python 3.x)
-- python-argparse
 - python-babel
 - python-lesscpy
 - python-setuptools
