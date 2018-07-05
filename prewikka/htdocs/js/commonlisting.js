@@ -53,7 +53,7 @@ function CommonListing(elem, text, options, restored_parameters) {
         multiSort: true,
         cellEdit: true,
         caption: text['title'],
-        rowNum: -1,
+        rowNum: restored_parameters.limit || -1,
         rowList: options.datatype == "json" ? [10, 20, 30] : ['-1:all', 10, 20, 30],
         pager: true,
         hidegrid: false,
@@ -85,8 +85,11 @@ function CommonListing(elem, text, options, restored_parameters) {
         onSelectRow: function() {
             update_buttons_state($(this).jqGrid('getGridParam', 'selarrrow').length);
         },
+        onPaging: function(pgButton) {
+            if ( pgButton == "records" ) saveGrid($(this));
+        },
         resizeStop: function() {
-            saveGridColumns($(this));
+            saveGrid($(this));
         },
         loadComplete: function() {
             _resizeGrid($(elem));
@@ -95,8 +98,8 @@ function CommonListing(elem, text, options, restored_parameters) {
         loadError: null  // This prevents an error row to appear in the grid
     }, options);
 
-    if ( restored_parameters )
-        adaptColumns(options, restored_parameters);
+    if ( restored_parameters.columns )
+        adaptColumns(options, restored_parameters.columns);
 
     function update_buttons_state(rows_count) {
         if ( rows_count == 0 ) {
@@ -139,7 +142,7 @@ function CommonListing(elem, text, options, restored_parameters) {
                     if (perm) {
                         $(elem).jqGrid("remapColumns", perm, true);
                         resizeGrid();
-                        saveGridColumns($(elem));
+                        saveGrid($(elem));
                     }
                 }
             });
@@ -148,16 +151,16 @@ function CommonListing(elem, text, options, restored_parameters) {
     .jqGrid('navButtonAdd', {
         buttonicon: "fa-bolt",
         caption: "",
-        title: "Reset columns",
+        title: "Reset preferences",
         onClickButton: function() {
-            prewikka_dialog({message: "Reset the column preferences for this grid?", type: "confirm"});
+            prewikka_dialog({message: "Reset the preferences for this grid?", type: "confirm"});
 
             $('#prewikka-dialog-confirm-OK').off("click").on("click", function() {
                 var params = {};
-                params["jqgrid_params_" + grid.attr("id")] = "[]";
+                params["jqgrid_params_" + grid.attr("id")] = "{}";
                 prewikka_update_parameters(params).done(function() {
                     prewikka_notification({
-                        message: "Column preferences have been reset to default. Reload the page for the changes to take effect.",
+                        message: "Grid preferences have been reset to default. Reload the page for the changes to take effect.",
                         classname: "info",
                         duration: 5000
                     });
@@ -327,7 +330,7 @@ function enableButtons(elem, title) {
     $(elem).prop("disabled", false).prop("title", "");
 }
 
-function saveGridColumns(grid) {
+function saveGrid(grid) {
     var columns = [];
     var colModel = grid.jqGrid("getGridParam", "colModel");
     var params = {};
@@ -343,7 +346,10 @@ function saveGridColumns(grid) {
     });
 
     // The {[key]: value} syntax is not supported by IE11
-    params["jqgrid_params_" + grid.attr("id")] = JSON.stringify(columns);
+    params["jqgrid_params_" + grid.attr("id")] = JSON.stringify({
+        columns: columns,
+        limit: parseInt($(".ui-pg-selbox", grid.jqGrid("getGridParam", "pager")).val())
+    });
     prewikka_update_parameters(params);
 }
 
