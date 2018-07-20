@@ -450,13 +450,13 @@ class Criterion(json.JSONObject):
 
 
 class DataProviderManager(pluginmanager.PluginManager):
-    def __init__(self):
-        pluginmanager.PluginManager.__init__(self, "prewikka.dataprovider.type")
+    def __init__(self, autoupdate=False):
+        pluginmanager.PluginManager.__init__(self, "prewikka.dataprovider.type", autoupdate=autoupdate)
 
         self._type_handlers = {}
         self._backends = {}
 
-    def load(self):
+    def load(self, autoupdate=False):
         for k in self.keys():
             try:
                 p = self[k]()
@@ -467,7 +467,7 @@ class DataProviderManager(pluginmanager.PluginManager):
 
             self._type_handlers[k] = p
 
-        for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend"):
+        for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend", autoupdate=autoupdate):
 
             if plugin.type not in self._type_handlers:
                 env.log.warning("%s: plugin failed to load: %s" % (plugin.__name__,

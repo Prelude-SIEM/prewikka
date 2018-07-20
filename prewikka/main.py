@@ -149,8 +149,8 @@ class Core(object):
         env.all_plugins = {}
 
         env.menumanager = menu.MenuManager()
-        env.dataprovider = dataprovider.DataProviderManager()
-        env.dataprovider.load()
+        env.dataprovider = dataprovider.DataProviderManager(autoupdate=self.autoupdate)
+        env.dataprovider.load(autoupdate=self.autoupdate)
         env.linkmanager = link.LinkManager()
 
         env.plugins = {}
@@ -188,7 +188,7 @@ class Core(object):
             env.auth = env.session
 
         env.viewmanager.addView(viewhelpers.AjaxHostURL())
-        env.renderer = renderer.RendererPluginManager()
+        env.renderer = renderer.RendererPluginManager(autoupdate=self.autoupdate)
         list(hookmanager.trigger("HOOK_PLUGINS_LOAD"))
 
     def _reload_plugin_if_needed(self):
