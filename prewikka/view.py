@@ -407,7 +407,6 @@ class _ViewDescriptor(object):
         return self.render(**env.request.view_kwargs) or env.request.dataset
 
     def process_parameters(self):
-        env.request.parameters = {}
         if self.view_parameters:
             env.request.parameters = self.view_parameters(self, **env.request.web.arguments)
             env.request.parameters.normalize()

@@ -33,6 +33,7 @@ import sys
 
 from optparse import OptionParser
 from prewikka import crontab, localization, main, siteconfig
+from prewikka import FakeRequest
 
 
 _LOCKFD = None
@@ -108,4 +109,5 @@ if __name__ == "__main__":
 
     # Setup the environment
     main.Core.from_config(options.config)
+    env.request = FakeRequest()
     crontab.run()

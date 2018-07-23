@@ -25,7 +25,7 @@ import datetime
 import gevent
 
 from prewikka.utils import timeutil
-from prewikka import database, error, hookmanager, log, usergroup, utils, registrar
+from prewikka import database, error, hookmanager, log, registrar, usergroup, utils
 
 
 logger = log.getLogger(__name__)
@@ -298,9 +298,12 @@ def schedule_to_menuparams(x):
 
     val = _SCHEDULE_PARAMS.get(x)
     if val:
+        params["timeline_mode"] = "relative"
+        params["timeline_value"] = 1
         params["timeline_unit"] = val
     else:
         now = timeutil.now()
+        params["timeline_mode"] = "custom"
         params["timeline_start"] = timeutil.get_timestamp_from_datetime(croniter.croniter(x, now).get_prev(datetime.datetime))
         params["timeline_end"] = timeutil.get_timestamp_from_datetime(now)
 

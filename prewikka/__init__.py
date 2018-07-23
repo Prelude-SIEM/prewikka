@@ -54,7 +54,7 @@ class Request(local):
         self.view = None
         self.has_menu = False
         self.dataset = None
-        self.parameters = None
+        self.parameters = {}
         self.cache = _cache()
         self.view_kwargs = {}
         self._cleanup_list = []
@@ -81,6 +81,22 @@ class Request(local):
     def __init__(self):
         local.__init__(self)
         self._init(None)
+
+
+class FakeRequest(Request):
+    def __init__(self):
+        Request.__init__(self)
+        self.parameters = {}
+        self._menu_parameters = FakeParameters(None)
+
+    @property
+    def menu_parameters(self):
+        return self._menu_parameters
+
+
+class FakeParameters(view.Parameters):
+    def register(self):
+        mainmenu._register_parameters(self)
 
 
 class Env(object):
