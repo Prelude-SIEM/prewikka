@@ -92,7 +92,7 @@ selection_func_constant = function_constant:fc (':' EXTRACT:ex -> ex)?:ex ('/' O
 selection =   selection_path:p -> p
             | selection_func_constant:fc -> fc
 
-noseparator = anything:x ?(x not in ')\t\n\x0b\x0c\r ') -> x
+noseparator = anything:x ?(x not in '&|()\t\n\x0b\x0c\r ') -> x
 unquoted_string = (noseparator)+:c -> ''.join(c)
 
 operand = ((intfloat:i ~noseparator -> i) | string | unquoted_string):opd -> opd

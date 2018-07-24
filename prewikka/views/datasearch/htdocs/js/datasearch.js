@@ -26,7 +26,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
 
     function idmef_need_quotes(value)
     {
-        return /\s/g.test(value);
+        return /[\s()&|]/g.test(value);
     }
 
     function need_quotes(value)
