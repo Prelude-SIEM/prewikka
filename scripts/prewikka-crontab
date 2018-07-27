@@ -21,6 +21,9 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import gevent.monkey
+gevent.monkey.patch_all()
+
 import base64
 import fcntl
 import locale

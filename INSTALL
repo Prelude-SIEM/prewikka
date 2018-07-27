@@ -26,6 +26,7 @@ Run requires:
 - python-croniter >= 0.3.6
 - python-dateutil
 - python-enum34
+- python-gevent
 - python-mako >= 0.8.1
 - python-parsley
 - python-tz / pytz

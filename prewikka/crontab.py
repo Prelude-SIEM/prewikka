@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import collections
 import croniter
 import datetime
-import time
+import gevent
 
 from prewikka.utils import timeutil
 from prewikka import database, error, hookmanager, log, usergroup, utils, registrar
@@ -47,6 +47,12 @@ _SCHEDULE_PARAMS = dict((("0 * * * *", "hour"),
 
 
 class CronJob(object):
+    def __hash__(self):
+        return self.id
+
+    def __eq__(self, other):
+        return self.id == other.id
+
     def __init__(self, id, name, schedule, func, base, runcnt, ext_type=None, ext_id=None, user=None, error=None, enabled=True):
         self.id = id
         self.name = name
@@ -60,6 +66,7 @@ class CronJob(object):
         self.base = base
         self.runcnt = runcnt
 
+        self._running = False
         self._timedelta = self._prev_schedule = self._next_schedule = None
 
     def _timeinit_once(self):
@@ -88,11 +95,8 @@ class CronJob(object):
         self._timeinit_once()
         return self._next_schedule
 
-    def run(self, now):
-        if not(self.next_schedule) or now < self.next_schedule:
-            return
-
-        env.log.info("[%d/%s]: RUNNING JOB schedule=%s callback=%s" % (self.id, self.name, self.schedule, self.callback))
+    def _run(self):
+        self._running = True
 
         # setup the environment
         env.request.init(None)
@@ -101,7 +105,6 @@ class CronJob(object):
         if self.user:
             self.user.set_locale()
 
-        # run
         err = None
         try:
             if self.callback:
@@ -112,7 +115,17 @@ class CronJob(object):
             logger.exception("[%d/%s]: cronjob failed: %s", self.id, self.name, err)
             err = utils.json.dumps(error.PrewikkaError(err, N_("Scheduled job execution failed")))
 
-        env.db.query("UPDATE Prewikka_Crontab SET base=%s, runcnt=runcnt+1, error=%s WHERE id=%d", timeutil.utcnow(), err, self.id)
+        self.runcnt += 1
+        self._running = False
+        self.base = timeutil.utcnow()
+        env.db.query("UPDATE Prewikka_Crontab SET base=%s, runcnt=runcnt+1, error=%s WHERE id=%d", self.base, err, self.id)
+
+    def run(self, now):
+        if not(self.next_schedule) or now < self.next_schedule or self._running:
+            return
+
+        env.log.info("[%d/%s]: RUNNING JOB schedule=%s callback=%s" % (self.id, self.name, self.schedule, self.callback))
+        gevent.spawn(self._run)
 
 
 class Crontab(object):
@@ -123,6 +136,7 @@ class Crontab(object):
 
     def __init__(self):
         self._reinit()
+        self._joblist = set()
         hookmanager.register("HOOK_PLUGINS_RELOAD", self._reinit)
         hookmanager.register("HOOK_USER_DELETE", lambda user: self.delete(user=user))
 
@@ -157,10 +171,21 @@ class Crontab(object):
         if not res:
             self.add(name, schedule, ext_type=ext_type, enabled=enabled)
 
+    def _update_joblist(self):
+        mainlist = set(self.list(enabled=True))
+
+        # Suppress jobs that were removed from the main list
+        self._joblist -= self._joblist.difference(mainlist)
+
+        # Add jobs that were added to the main list
+        self._joblist |= mainlist.difference(self._joblist)
+
+        return self._joblist
+
     def _run_jobs(self):
         first = now = timeutil.utcnow()
 
-        for job in self.list(enabled=True):
+        for job in self._update_joblist():
             job.run(now)
             now = timeutil.utcnow()
 
@@ -170,7 +195,7 @@ class Crontab(object):
         while True:
             next = self._run_jobs()
             if next > 0:
-                time.sleep(next)
+                gevent.sleep(next)
 
     def list(self, **kwargs):
         qs = env.db.kwargs2query(kwargs, prefix=" WHERE ")
