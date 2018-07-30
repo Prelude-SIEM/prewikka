@@ -76,7 +76,7 @@ def _daemonize(options):
         getattr(sys, i).close()
         setattr(sys, i, nd)
 
-    os.umask(027)
+    os.umask(0o27)
     os.chdir('/')
 
     _LOCKFD.write('%s\n' % (os.getpid()))
