@@ -22,49 +22,40 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 GRAMMAR = r"""
     ?criteria: criterion
-             | criteria (_WS|BOOL_AND|BOOL_OR) criterion -> bool_
+             | criteria "&&" criterion -> and_
+             | criteria "||" criterion -> or_
 
-    criterion: operator (inclusive_range | exclusive_range | value_string)
-             | LPAR criteria RPAR -> parenthesis
+    criterion: path operator value
+             | "(" criteria ")" -> parenthesis
 
-    inclusive_range: field _WS* "[" _string _WS "TO" _WS _string "]"
-    exclusive_range: field _WS* "{" _string _WS "TO" _WS _string "}"
-    value_string: field _string (string_modifier)?
+    !operator: "=" | "=*" | "==" | "!=" | "!=*" | "<>" | "<>*" | "!<>" | "!<>*" | "<" | "<=" | ">" | ">=" | "~" | "~*" | "!~" | "!~*" -> operator
 
-    operator: OPERATOR?
-    OPERATOR.1: "NOT" _WS+ | "!" | "-" | "+"
+    int_: DIGIT+
+    float_: NUMBER
+    path: PATH
 
-    _string: (dqstring | sqstring | regstr | uqstring)
-    string_modifier: BOOST_MODIFIER | FUZZY_MODIFIER
-
-    BOOST_MODIFIER: "^" /[0-9]+/
-    FUZZY_MODIFIER: "~" /[0-9]*/
+    ?value: string
+    string: (dqstring | sqstring | uqstring)
 
     SQSTRING.1: "'" ("\\'" | /[^']/)* "'"
     DQSTRING.1: "\"" ("\\\""|/[^"]/)* "\""
-    RESTRING.1: "/" ("\\/"|/[^\/]/)* "/"
     !sqstring: SQSTRING
     !dqstring: DQSTRING
-    !regstr: RESTRING
     !uqstring: UNQUOTED_STRING
 
-    SPECIAL_CHARACTERS: "+" | "-" | "!" | "(" | ")" | "{" | "}" | "[" | "]" | "^" | "\"" | "~" | "*" | "?" | ":" | "\\" | "&" | "|"
+    // Normally && and ||
+    SPECIAL_CHARACTERS: "&" | "|" | "(" | ")"
     ESCAPED_SPECIAL_CHARACTERS: "\\" SPECIAL_CHARACTERS
-    UNQUOTED_STRING.0: (ESCAPED_SPECIAL_CHARACTERS | /[^+\-!(){}\[\]^\"\~:\s\+]/)+
+    UNQUOTED_STRING.0: (ESCAPED_SPECIAL_CHARACTERS | /[^\s&|()]/)+
 
-    field: (FIELD)? -> field
-    FIELD: PATH ":"
     PATH: (PATHELEM ".")* PATHELEM
     PATHELEM: WORD ("(" PATHINDEX ")")?
-    PATHINDEX: "-"? (DIGIT+ | UNQUOTED_STRING)
-    WORD: LETTER (LETTER | DIGIT | "-" | "_")+
+    PATHINDEX: ("-"? DIGIT+ | DQSTRING | SQSTRING)
+    WORD: LETTER (LETTER | DIGIT | "-" | "_")*
     DIGIT: /[0-9]/
     LETTER: /[a-z]/
-    BOOL_AND: _WS* ("&&" | "AND") _WS*
-    BOOL_OR: _WS* ("||" | "OR") _WS*
 
-    LPAR: _WS* "(" _WS*
-    RPAR: _WS* ")" _WS*
-
-    _WS: /[ \t\f\r\n]/+
+    %import common.NUMBER
+    %import common.WS
+    %ignore WS
 """

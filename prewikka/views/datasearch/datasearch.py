@@ -33,8 +33,8 @@ import re
 
 from prewikka.utils import json
 from prewikka import error, history, hookmanager, mainmenu, resource, response, template, utils, view
-from prewikka.dataprovider import Criterion, pathparser
-from prewikka.dataprovider.parsers.lucene.parser import lucene_to_criterion
+from prewikka.dataprovider import Criterion
+from prewikka.dataprovider.parsers import criteria, lucene
 from prewikka.localization import format_datetime
 from prewikka.renderer import RendererItem
 from prewikka.statistics import ChronologyChart, DiagramChart, Query
@@ -292,13 +292,15 @@ class QueryParser(object):
 
         qmode = env.request.parameters.get("query_mode", self._parent.criterion_config_default)
         if qmode == "criterion":
-            return pathparser.string_to_criterion(query, compile=self._criterion_compile)
+            tr = criteria.CriteriaTransformer(compile=self._criterion_compile)
+            return criteria.parse(query, transformer=tr)
 
         elif qmode == "lucene":
             if self._parent.criterion_config_default != "lucene":
-                return lucene_to_criterion(query, compile=self._criterion_compile, default_paths=self._parent.lucene_search_fields)
+                tr = lucene.CriteriaTransformer(compile=self._criterion_compile, default_paths=self._parent.lucene_search_fields)
+                return lucene.parse(query, transformer=tr)
             else:
-                return Criterion("{backend}._raw_query", "==", query)
+                return Criterion("{backend}._raw_query", "==", lucene.parse(query, transformer=lucene.ReconstructTransformer()))
 
     def _time_selection(self, time_unit):
         selection = []
