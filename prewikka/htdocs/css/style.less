@@ -894,6 +894,27 @@ div.ui-jqgrid-titlebar {
     display: block;
 }
 
+.top-right-buttons {
+    position: fixed;
+    right: 80px;
+    top: 59px;
+    z-index: 5;
+}
+
+.modal-dialog .top-right-buttons {
+    top: 10px;
+}
+
+@media (max-width: 768px) {
+    .top-right-buttons {
+        position: static;
+    }
+
+    .modal-dialog .top-right-buttons {
+        position: fixed;
+    }
+}
+
 .widget .modal-dialog .widget-only {
     display: initial;
 }
