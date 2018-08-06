@@ -66,7 +66,8 @@ class CronJob(object):
         if self._timedelta:
             return
 
-        c = croniter.croniter(self.schedule, self.base)
+        # Interpret the cronjob configuration as local time
+        c = croniter.croniter(self.schedule, self.base.astimezone(utils.timeutil.tzlocal()))
 
         self._next_schedule = c.get_next(datetime.datetime)
         self._prev_schedule = c.get_prev(datetime.datetime)
