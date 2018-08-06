@@ -122,6 +122,13 @@ function _initialize_components(container) {
 }
 
 
+function _destroy_components(container) {
+    $(container).find('[data-toggle="tooltip"]').tooltip("destroy");
+    $(container).find('[data-toggle="popover"]').popover("destroy");
+    $(container).find('[data-title-url]').tooltip("destroy");
+}
+
+
 function _csrf_safe_method(method)
 {
     return /^(GET|HEAD|OPTIONS|TRACE)$/.test(method);

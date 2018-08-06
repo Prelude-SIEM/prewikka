@@ -91,6 +91,9 @@ function CommonListing(elem, text, options, restored_parameters) {
         resizeStop: function() {
             saveGrid($(this));
         },
+        beforeProcessing: function() {
+            if ( options.datatype == "json" ) _destroy_components(elem);
+        },
         loadComplete: function() {
             _resizeGrid($(elem));
             if ( options.datatype == "json" ) _initialize_components(elem);

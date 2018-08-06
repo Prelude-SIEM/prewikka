@@ -662,6 +662,7 @@ function DataSearchListing(elem, columns, url, jqgrid_params) {
         },
         subGrid: true,
         beforeProcessing: function(data) {
+            _destroy_components(elem);
             data.userdata = data.rows;
             $("#datasearch input[name='datasearch_criteria']").val(JSON.stringify(data.criteria));
         },
