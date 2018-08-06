@@ -40,6 +40,7 @@ else:
     import __builtin__ as builtins
 
 try:
+    # Needs babel >= 1.0
     from babel.dates import format_timedelta as _format_timedelta
 except ImportError:
     from prewikka.compat.babelcompat import format_timedelta as _format_timedelta
@@ -274,6 +275,7 @@ def get_timezones():
 
 def get_system_timezone():
     try:
+        # Needs babel >= 1.0
         return babel.dates.LOCALTZ.zone
     except:
         return "UTC"
