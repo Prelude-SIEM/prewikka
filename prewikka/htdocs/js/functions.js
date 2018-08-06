@@ -76,7 +76,10 @@ $(function() {
   };
 
   $(document).on("reload", "#main", function() {
-      return prewikka_ajax({ url: prewikka_location().href });
+      return prewikka_ajax({
+          url: prewikka_location().href,
+          prewikka: {target: PrewikkaAjaxTarget.TAB}
+      });
   });
 
   $(document).on("click", ".popup_menu_toggle", function(){
