@@ -171,6 +171,9 @@ if env.menumanager:
     sections = env.menumanager.get_sections()
     declared_sections = env.menumanager.get_declared_sections()
 
+def _merge_tabs(section):
+    return section["tabs"] + [tab for tab in sections.get(section["name"], []) if tab not in section["tabs"]]
+
 def _get_view_url(section, tabs):
     if section not in sections:
         return
@@ -231,15 +234,16 @@ def _get_view_url(section, tabs):
             </a>
 
             <ul class="dropdown-menu" role="menu">
-            % for category in menu.get("categories", []):
+            % for category in menu["categories"]:
                 % if "name" in category:
-                    ${write_menu_expand(category, [(section["name"], section.get("tabs", []), section["name"]) for section in category.get("sections", [])])}
+                    ${write_menu_expand(category, [(section["name"], _merge_tabs(section), section["name"]) for section in category["sections"]])}
                 % else:
-                    % for section in category.get("sections", []):
+                    % for section in category["sections"]:
+                        <% tabs = _merge_tabs(section) %>
                         % if not section.get("expand"):
-                            ${write_menu(section, section["name"], section.get("tabs", []))}
+                            ${write_menu(section, section["name"], tabs)}
                         % else:
-                            ${write_menu_expand(section, [(section["name"], [tab], tab) for tab in section.get("tabs", [])])}
+                            ${write_menu_expand(section, [(section["name"], [tab], tab) for tab in tabs])}
                         % endif
                     % endfor
                 % endif

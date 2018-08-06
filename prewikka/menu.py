@@ -57,7 +57,7 @@ class MenuManager(object):
     def __init__(self):
         self._declared_sections = {}
         self._loaded_sections = {}
-        self._default_menu = None
+        self._default_view = None
 
         filename = env.config.interface.get("menu_order", "menu.yml")
         if not os.path.isabs(filename):
@@ -87,10 +87,10 @@ class MenuManager(object):
             for category in menu["categories"]:
                 for section in category["sections"]:
                     if "default_tab" in section:
-                        if self._default_menu:
+                        if self._default_view:
                             raise error.PrewikkaUserError(N_("Menu error"), N_("Multiple default views"))
 
-                        self._default_menu = (section["name"], section["default_tab"])
+                        self._default_view = (section["name"], section["default_tab"])
 
                     self._declared_sections[section["name"]] = collections.OrderedDict((v, idx) for idx, v in enumerate(section["tabs"]))
 
@@ -124,5 +124,5 @@ class MenuManager(object):
     def add_section_info(self, section, tab, endpoint, **kwargs):
         self._loaded_sections.setdefault(section, collections.OrderedDict())[tab] = (endpoint, kwargs)
 
-        if (section, tab) == self._default_menu:
+        if (section, tab) == self._default_view:
             self.default_endpoint = endpoint
