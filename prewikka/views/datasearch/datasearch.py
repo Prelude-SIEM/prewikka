@@ -64,70 +64,28 @@ class DataSearchParameters(view.Parameters):
 
 
 class HighLighter(object):
-    """ Create an HTML representation for a log """
-
-    _separators = [r"\s", r"\[", r"\]", r"\=", r"\(", r"\)", r"\"", r"\'", "\<", "\>"]
-    _separator_regex = re.compile(r"([" + "".join(_separators) + r"])")
-
-    _word_regex = re.compile("^(.*)([-/,.:?\\\@_])(.*?)$")
+    """ Create an HTML representation of a phrase """
+    _word_separators = [' ', '[', ']', '=', '(', ')', '"', "'", '<', '>', '\r', '\n', '\t']
+    _term_separators = ['-', '/', '\\', ',', '.', ':', '?', '@', '_']
 
     def __init__(self, phrase):
-        self.html = self._parse_phrase(phrase)
+        parsed_phrase = [self.word_prepare(word) for word in self.split_phrase(phrase)]
+        self.html = resource.HTMLNode("span", *parsed_phrase, _class="selectable")
 
     @classmethod
-    def is_separator(cls, word):
-        return word in cls._separators
+    def get_separators(cls):
+        return {
+            "word": cls._word_separators,
+            "term": cls._term_separators
+        }
 
     @classmethod
-    def _parse_phrase(cls, phrase):
-        """ Return a structured representation of a phrase:
-        "/tmp/test example" ->
-            [{diviser: "/", left: {diviser: "/", left: "", right: "tmp"}, right: "test"},
-             {diviser: "", left: "", right: "example"}]
-        """
-
-        if not phrase:
-            return resource.HTMLNode("span", phrase)
-
-        parsed_phrase = []
-        for word in cls._separator_regex.split(phrase):
-            try:
-                parsed_phrase.append(cls.__split_word(word))
-            except MaximumDepthExceeded:
-                parsed_phrase.append(cls.word_prepare(word, _class="l"))
-
-        if len(parsed_phrase) == 1:
-            return parsed_phrase[0]
-        else:
-            return resource.HTMLNode("span", *parsed_phrase)
+    def split_phrase(cls, phrase):
+        return [phrase]
 
     @classmethod
-    def wordsplit_prepare(cls, obj):
-        pass
-
-    @classmethod
-    def word_prepare(cls, word, _class=None):
-        return word if not _class else resource.HTMLNode("span", word, _class=_class)
-
-    @classmethod
-    def __split_word(cls, word, depth=0):
-        """ Take a word and split it into sub-terms """
-        if depth > _MAX_RECURSION_DEPTH:
-            # Avoid "maximum recursion depth exceeded" errors (mainly at JSON serialization)
-            raise MaximumDepthExceeded
-
-        wordsplit = cls._word_regex.search(word)
-        if wordsplit:
-            obj = utils.AttrObj(left=wordsplit.group(1), diviser=wordsplit.group(2), right=wordsplit.group(3), _class="l")
-            cls.wordsplit_prepare(obj)
-
-            return resource.HTMLNode("span", cls.__split_word(obj.left, depth + 1), obj.diviser, obj.right, _class=obj._class)
-
-        elif cls.is_separator(word):
-            return word
-
-        else:
-            return cls.word_prepare(word, _class="l")
+    def word_prepare(cls, word):
+        return resource.HTMLNode("span", word)
 
 
 class Formatter(object):
@@ -143,7 +101,7 @@ class Formatter(object):
         self.type = data_type
 
     def _format_nonstring(self, field, value):
-        return resource.HTMLNode("span", value, **{"_class": "l", "data-field": field})
+        return resource.HTMLNode("span", value, **{"data-field": field})
 
     def format_value(self, field, value):
         if not isinstance(value, text_type):
@@ -480,6 +438,7 @@ class DataSearch(view.View):
         for prop, finfo, func in filter(None, self._trigger_datasearch_hook("EXTRA_COLUMN")):
             colsprop[prop.label] = COLUMN_PROPERTIES(**dict(prop))
 
+        dataset["separators"] = self._formatter.highlighter.get_separators()
         dataset["criterion_config"] = self.criterion_config
         dataset["criterion_config_default"] = env.request.parameters.get("query_mode", self.criterion_config_default)
 

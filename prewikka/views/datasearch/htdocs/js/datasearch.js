@@ -1,18 +1,8 @@
 "use strict";
 
-function set_postdata()
+function DataSearchPage(backend, criterion_config, criterion_config_default, separators, timeline_url)
 {
-    var pdata = $("#datasearch_table").getGridParam("postData") || {};
-
-    $.each($("#form_search :input").serializeArray(), function(i, input) {
-        pdata[input.name] = input.value;
-    });
-
-    return pdata;
-}
-
-function DataSearchPage(backend, criterion_config, criterion_config_default, timeline_url)
-{
+    var page = {};
     var escapeRegex = $.ui.autocomplete.escapeRegex;
 
     /* Check if a word needs quotes */
@@ -231,6 +221,355 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
         $(".oca-infos").find('.ajax-spinner, .processed-content').toggleClass("hidden");
     }
 
+    function get_range_info(e) {
+        var range;
+        var textNode;
+        var offset;
+        var startNode;
+
+        if ( document.caretPositionFromPoint ) {
+            range = document.caretPositionFromPoint(e.clientX, e.clientY);
+            textNode = range.offsetNode;
+            offset = range.offset;
+            range = document.createRange();
+            range.setStart(textNode, offset);
+            range.setEnd(textNode, offset);
+        } else if ( document.caretRangeFromPoint ) {
+            range = document.caretRangeFromPoint(e.clientX, e.clientY);
+            textNode = range.startContainer;
+            offset = range.startOffset;
+        } else if ( document.body.createTextRange ) {
+            range = document.body.createTextRange();
+            range.moveToPoint(event.clientX, event.clientY);
+            textNode = range.parentElement();
+            startNode = document.body.createTextRange();
+            startNode.moveToElementText(textNode);
+            range.setEndPoint("StartToStart", startNode);
+            offset = range.text.length;
+            textNode = textNode.firstChild;
+        }
+
+        return [range, offset, textNode];
+    }
+
+    function update_selection(e) {
+        var range;
+        var textNode;
+        var offset;
+        var startNode;
+        var startPos;
+        var endNode;
+        var endPos;
+        var textLen;
+
+        // Do not change the selection when the popover is shown
+        var visible = $("#PopoverOption").is(':visible');
+        if ( visible )
+            return;
+
+        [range, offset, textNode] = get_range_info(e);
+
+        // If the current node is not a text node, do nothing
+        if ( textNode === null || textNode.nodeType != 3 )
+            return;
+
+        // When the mouse is hovering over the start of a paragraph,
+        // or when it's hovering over a word separator, do nothing.
+        if ( offset === 0 || separators.word.indexOf(textNode[offset]) > -1 )
+            return;
+
+        textNode.parentNode.focus();
+
+        startNode = textNode;
+        startPos = offset;
+        endNode = textNode;
+        endPos = offset;
+
+        // Find the word's starting position
+        find_start:
+        while ( true ) {
+            for ( ; startPos > 0; startPos-- ) {
+                if ( separators.word.indexOf(startNode.textContent[startPos - 1]) > -1 ) {
+                    break find_start;
+                }
+            }
+            if ( startNode.parentNode.previousSibling !== null ) {
+                startNode = startNode.parentNode.previousSibling.firstChild;
+                startPos = startNode.textContent.length;
+            } else {
+                break find_start;
+            }
+        }
+
+        // Find the word's ending position
+        find_end:
+        while ( true ) {
+            for ( textLen = endNode.length; endPos < textLen; endPos++ ) {
+                if ( separators.word.indexOf(endNode.textContent[endPos]) > -1 || separators.term.indexOf(endNode.textContent[endPos]) > -1 ) {
+                    break find_end;
+                }
+            }
+            if ( endNode.parentNode.nextSibling !== null ) {
+                endNode = endNode.parentNode.nextSibling.firstChild;
+                endPos = 0;
+            } else {
+                break find_end;
+            }
+        }
+
+        // Apply the new selection
+        range = document.createRange();
+        range.setStart(startNode, startPos);
+        range.setEnd(endNode, endPos);
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+    }
+
+    function remove_selection(e) {
+        // Do not change the selection when the popover is shown
+        var visible = $("#PopoverOption").is(':visible');
+        if ( visible )
+            return;
+
+        var selection = window.getSelection();
+        selection.removeAllRanges();
+    }
+
+    function hide_popover(e) {
+        $("#PopoverOption").hide();
+        $("span.selected").each(function() {
+            var parent = $(this).parent();
+            $(this).contents().unwrap();
+            // Merge text nodes
+            parent.html(function(i, html) {
+                return html;
+            });
+        });
+    }
+
+    function prepare_popover(e) {
+        if ( e.which != 1 ) return;
+
+        var selection = window.getSelection();
+        if ( selection === null || selection.anchorNode === null || !selection.rangeCount )
+            return;
+
+        var range = selection.getRangeAt(0);
+        var range2 = get_range_info(e)[0];
+        if ( range !== null && range2 !== null &&
+             range.compareBoundaryPoints(Range.START_TO_START, range2) > 0 ||
+             range.compareBoundaryPoints(Range.END_TO_END, range2) < 0 ) {
+            hide_popover(e);
+            return;
+        }
+
+        e.stopImmediatePropagation();
+        e.preventDefault();
+
+        var selected_value = selection.toString();
+        var contents = range.extractContents();
+        var div = $("<span>", {class: "selected"});
+        div[0].appendChild(contents);
+        range.insertNode(div[0]);
+        div.closest(".selectable").find("span:empty").remove();
+
+        if ( ! $("#PopoverOption").is(':visible') ) {
+            display_popover(div, selected_value);
+            selection.removeAllRanges();
+        }
+    }
+
+    /* Popover on click on selection */
+    function display_popover(node, selected_value) {
+        var offset = node.offset();
+        var rowid = node.closest("tr").attr("id");
+        var td = node.closest("td").first();
+        var selected_field = node.closest("[data-field]");
+        var selected_operator = node.is(selected_field) ? "equal" : "substr";
+
+        selected_value = node.closest("[data-value]").data("value") || selected_value;
+        selected_field = selected_field.data("field");
+
+        $("#PopoverOption a:not(.addon_search)")
+            .data("field", selected_field)
+            .data("operator", selected_operator)
+            .data("value", selected_value).show();
+
+        $("#PopoverOption .dropdown-submenu:not(.oca-infos)").each(function() {
+            $(this).find('.addon_search').each(function() {
+                var d = $(this).data();
+
+                var href = d.link;
+                if ( ! href ) {
+                    href = $(this).attr("href");
+                    $(this).data("link", href);
+                }
+
+                var value = selected_value;
+                if ( d.field )
+                    value = $('#datasearch_table').jqGrid('getCell', rowid, d.field);
+
+                $(this).attr("href", href.replace(/%24value/g, encodeURIComponent(value)));
+                if ( d.path )
+                    $(this).toggleClass('hidden', d.path !== backend + "." + selected_field.replace(/\(\d+\)/g, ""));
+            });
+
+            $(this).toggleClass('disabled', $(this).find('li a:not(.hidden)').length == 0);
+        });
+
+        $("#PopoverOption a.groupby_search").attr("href", prewikka_location().href + "?groupby[]=" + selected_field);
+        $("#PopoverOption .groupby_search span").text(selected_field);
+        $("#PopoverOption").show();
+
+        var oca_position = "bottom";
+        var popover = $("#PopoverOption .popover");
+        var top = offset.top + node.height();
+        var left = offset.left - popover.width() / 2 + node.width() / 2;
+
+        popover.find(".dropdown-submenu").removeClass("pull-left");
+
+        if ( offset.left + node.width() / 2 + popover.width() > window.innerWidth ) {
+            top -= popover.height() / 2 + node.height() / 2;
+            left = offset.left - popover.width();
+            oca_position = "left";
+            popover.find(".dropdown-submenu").addClass("pull-left");
+        } else if ( offset.left - node.width() / 2 - popover.width() / 2 < 0 ) {
+            top -= popover.height() / 2 + node.height() / 2;
+            left = offset.left + node.width();
+            oca_position = "right";
+        } else if ( offset.top + node.height() + popover.height() > window.innerHeight ) {
+            top = offset.top - (node.height() / 2 + popover.height());
+            oca_position = "top";
+        }
+
+        popover.removeClass("bottom top right left").addClass(oca_position);
+        $("#PopoverOption").css({"top": top, "left": left});
+
+        $("#datasearch_table").jqGrid("setSelection", $(this).closest("tr").attr("id"));
+
+        /* Modify the "informations" content if empty */
+        var divinfos = $(".oca-infos");
+
+        if ( divinfos.find('.panel-heading').text() === selected_value )
+            return false;
+        else
+            _clean_dom_infos();
+
+        var elem = {
+            field: selected_field,
+            value: selected_value,
+            query: criterion(selected_field, selected_operator, quote(selected_value)),
+            query_mode: criterion_config_default
+        };
+
+        var orig = $("#datasearch_table").jqGrid('getGridParam', 'userData')[rowid].cell;
+
+        for ( var i in orig ) {
+            elem[i] = (orig[i] && orig[i].toString) ? orig[i].toString() : orig[i];
+        }
+
+        if ( orig._criteria )
+            elem["_criteria"] = JSON.stringify(orig._criteria);
+
+        $.ajax({
+            url: prewikka_location().pathname + "/ajax_infos",
+            data: elem,
+            prewikka: {spinner: false, error: false},
+            success: function(data) {
+                divinfos.find('.panel-heading').text(selected_value);
+                var is_first = true;
+                $.each(data.infos, function(k, v) {
+                    _create_dom_infos(k, v, is_first);
+                    is_first = false;
+                });
+            },
+            error: function(xhr, status, error) {
+                var m;
+
+                if ( ! xhr.responseText )
+                    m = {message: error};
+                else
+                    m = JSON.parse(xhr.responseText);
+
+                divinfos.find(".tab-content").html(m.content);
+            },
+            complete: function() {
+                divinfos.find('.ajax-spinner, .processed-content').toggleClass("hidden");
+            }
+        });
+    }
+
+    function set_postdata() {
+        var pdata = $("#datasearch_table").getGridParam("postData") || {};
+
+        $.each($("#form_search :input").serializeArray(), function(i, input) {
+            pdata[input.name] = input.value;
+        });
+
+        return pdata;
+    }
+
+    page.listing = function(elem, columns, url, jqgrid_params) {
+        CommonListing(elem, {}, {
+            datatype: "json",
+            url: url,
+            postData: set_postdata(),
+            colNames: columns.names,
+            colModel: columns.model,
+            rowattr: function(row, data, id) {
+                if ( data._classes )
+                    return { "class": data._classes };
+            },
+            subGrid: true,
+            beforeProcessing: function(data) {
+                _destroy_components(elem);
+                data.userdata = data.rows;
+                $("#datasearch input[name='datasearch_criteria']").val(JSON.stringify(data.criteria));
+            },
+            loadComplete: function() {
+                _resizeGrid($(elem));
+                _initialize_components(elem);
+                $("span.selectable", elem).on("mousemove", "span", update_selection)
+                                          .on("mouseleave", "span", remove_selection)
+                                          .on("mousedown", "span", prepare_popover);
+            },
+            subGridRowExpanded: function(subgridDivId, rowId) {
+                var subgrid = $("#" + $.jgrid.jqID(subgridDivId));
+
+                /* Delete the first empty td when the checkboxes are not present */
+                if (! $("#view-config-editable").prop("checked")) {
+                    subgrid.parent().siblings().first().remove();
+                }
+
+                subgrid.html("<div class=\"loader\"></div>");
+
+                var elem = {};
+                var orig = $(this).jqGrid('getGridParam', 'userData')[rowId].cell;
+
+                for ( var i in orig ) {
+                    elem[i] = (orig[i] && orig[i].toString) ? orig[i].toString() : orig[i];
+                }
+
+                if ( orig._criteria )
+                    elem["_criteria"] = JSON.stringify(orig._criteria);
+
+                $.ajax({
+                    url: prewikka_location().pathname + "/ajax_details",
+                    data: elem,
+                    prewikka: {spinner: false},
+                    success: function(result) {
+                        subgrid.html(result);
+                        _initialize_components(subgrid);
+                    },
+                    error: function(result) {
+                        subgrid.html(result.responseJSON.content);
+                    }
+                });
+            }
+        }, jqgrid_params);
+    };
+
     /* Custom event to update datasearch */
     $("#main").on("datasearch:update", function() {
         prewikka_save_parameters($("#form_search").serializeArray());
@@ -243,7 +582,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
         criteria.forEach(function(criterion) {
             _add_to_input(criterion["field"], criterion["operator"], criterion["value"], true);
         });
-
+        hide_popover();
         update_datasearch();
     });
 
@@ -253,6 +592,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
             reset_search();
 
         _add_to_input($(this).data("field"), $(this).data("operator") || "equal", $(this).data("value"), true);
+        hide_popover();
         update_datasearch();
     });
 
@@ -261,6 +601,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
         $("#input_search").val(search);
 
         _add_to_input($(this).data("field"), "not" + $(this).data("operator"), $(this).data("value"), false);
+        hide_popover();
         update_datasearch();
     });
 
@@ -321,135 +662,11 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
         return false;
     });
 
-    /* Popover on click on element with hover class */
-    $("#main").on("click", ".hover", function() {
-        var offset = $(this).offset();
-        var rowid = $(this).closest("tr").attr("id");
-        var td = $(this).closest("td").first();
-        var span = $(td).children();
-        var selected_field = $(this).closest("[data-field]");
-        var selected_operator = ($(this).is(selected_field)) ? "equal" : "substr";
-        var selected_value = $(this).closest("[data-value]").data("value") || $(this).text();
-
-        selected_field = selected_field.data("field");
-        $(this).addClass("selected");
-
-        $("#PopoverOption a:not(.addon_search)")
-            .data("field", selected_field)
-            .data("operator", selected_operator)
-            .data("value", selected_value).show();
-
-        $("#PopoverOption .dropdown-submenu:not(.oca-infos)").each(function() {
-            $(this).find('.addon_search').each(function() {
-                var d = $(this).data();
-
-                var href = d.link;
-                if ( ! href ) {
-                    href = $(this).attr("href");
-                    $(this).data("link", href);
-                }
-
-                var value = selected_value;
-                if ( d.field )
-                    value = $('#datasearch_table').jqGrid('getCell', rowid, d.field);
-
-                $(this).attr("href", href.replace(/%24value/g, encodeURIComponent(value)));
-                if ( d.path )
-                    $(this).toggleClass('hidden', d.path !== backend + "." + selected_field.replace(/\(\d+\)/g, ""));
-            });
-
-            $(this).toggleClass('disabled', $(this).find('li a:not(.hidden)').length == 0);
-        });
-
-        $("#PopoverOption a.groupby_search").attr("href", prewikka_location().href + "?groupby[]=" + selected_field);
-        $("#PopoverOption .groupby_search span").text(selected_field);
-        $("#PopoverOption").show();
-
-        var oca_position = "bottom";
-        var popover = $("#PopoverOption .popover");
-        var top = offset.top + $(this).height();
-        var left = offset.left - popover.width() / 2 + $(this).width() / 2;
-
-        popover.find(".dropdown-submenu").removeClass("pull-left");
-
-        if ( offset.left + $(this).width() / 2 + popover.width() > window.innerWidth ) {
-            top -= popover.height() / 2 + $(this).height() / 2;
-            left = offset.left - popover.width();
-            oca_position = "left";
-            popover.find(".dropdown-submenu").addClass("pull-left");
-        } else if ( offset.left - $(this).width() / 2 - popover.width() / 2 < 0 ) {
-            top -= popover.height() / 2 + $(this).height() / 2;
-            left = offset.left + $(this).width();
-            oca_position = "right";
-        } else if ( offset.top + $(this).height() + popover.height() > window.innerHeight ) {
-            top = offset.top - ($(this).height() / 2 + popover.height());
-            oca_position = "top";
-        }
-
-        popover.removeClass("bottom top right left").addClass(oca_position);
-        $("#PopoverOption").css({"top": top, "left": left});
-
-        $("#datasearch_table").jqGrid("setSelection", $(this).closest("tr").attr("id"));
-
-        /* Modify the "informations" content if empty */
-        var divinfos = $(".oca-infos");
-
-        if ( divinfos.find('.panel-heading').text() === selected_value )
-            return false;
-        else
-            _clean_dom_infos();
-
-        var elem = {
-            field: selected_field,
-            value: selected_value,
-            query: criterion(selected_field, selected_operator, quote(selected_value)),
-            query_mode: criterion_config_default
-        };
-
-        var orig = $("#datasearch_table").jqGrid('getGridParam', 'userData')[rowid].cell;
-
-        for ( var i in orig ) {
-            elem[i] = (orig[i] && orig[i].toString) ? orig[i].toString() : orig[i];
-        }
-
-        if ( orig._criteria )
-            elem["_criteria"] = JSON.stringify(orig._criteria);
-
-        $.ajax({
-            url: prewikka_location().pathname + "/ajax_infos",
-            data: elem,
-            prewikka: {spinner: false, error: false},
-            success: function(data) {
-                divinfos.find('.panel-heading').text(selected_value);
-                var is_first = true;
-                $.each(data.infos, function(k, v) {
-                    _create_dom_infos(k, v, is_first);
-                    is_first = false;
-                });
-            },
-            error: function(xhr, status, error) {
-                var m;
-
-                if ( ! xhr.responseText )
-                    m = {message: error};
-                else
-                    m = JSON.parse(xhr.responseText);
-
-                divinfos.find(".tab-content").html(m.content);
-            },
-            complete: function() {
-                divinfos.find('.ajax-spinner, .processed-content').toggleClass("hidden");
-            }
-        });
-
-        return false;
-    });
-
-    $("#main").on("click scroll", function(event) {
-        if ( $(event.target).parents(".processed-content").length > 0 )
-            return;
-
-        $("#PopoverOption").hide();
+    $("#main").on("mousedown", function(event) {
+        // Hide the popover if clicked outside
+        var in_popover = $(event.target).parents("#PopoverOption", ".processed-content").length > 0;
+        if ( ! in_popover )
+            hide_popover();
     });
 
     $("#PopoverOption .dropdown-submenu").hover(function handlerIn() {
@@ -511,6 +728,8 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, tim
 
     if ( $("#main #timeline").hasClass("in") )
         render_timeline();
+
+    return page;
 }
 
 
@@ -547,162 +766,110 @@ function datasearch_autocomplete_init(availabledata, history, labels) {
                                'url': history.url['delete']});
         });
 
-        /* Redesign the select (without overwriting autocomplete) */
-        $.widget("datasearch.myautocomplete", $.ui.autocomplete, {
-            _create: function() {
-                this._super();
-                this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
-            },
-            _renderMenu: function(ul, items) {
-                var that = this,
-                    currentcategory = "";
-
-                $.each(items, function(index, item) {
-                    if ( item.category != currentcategory ) {
-                        ul.append($("<li>", {"class": "ui-autocomplete-category",
-                                             "text": item.category}));
-                        currentcategory = item.category;
-                    }
-
-                    that._renderItemData(ul, item);
-                });
-            },
-            _renderItem: function(ul, item) {
-                var li = $("<li>")
-                    .attr("class", "datasearch-field")
-                    .append(item.value);
-
-                // The class ui-menu-item is mandatory
-                // otherwise, the element is processed as a menu separator
-                if ( item.url ) {
-                    li = $("<i>", {"class": "fa fa-trash history-query-delete ui-menu-item",
-                                   "data-url": item.url,
-                                   "data-query": item.value})
-                        .add(li);
-                }
-
-                li.appendTo(ul);
-
-                return li;
-            },
-            _close: function (event) {
-                if ( event != undefined && event.keepOpen === true ) {
-                    this.search(null, event);
-                    return true;
-                }
-
-                return this._super(event);
-            }
-        });
-
-        $("#form_search").on("submit", function() {
-            data.history.unshift({'category': labels['Query history'],
-                                  'value': $("#input_search").val(),
-                                  'url': history.url['delete']});
-        });
-
-        /* Autocomplete on search bar */
-        $("#input_search").on("keydown", function(event) {
-            if ( event.which === $.ui.keyCode.TAB && $(this).myautocomplete("instance").menu.active ) {
-                event.preventDefault();
-            }
-        }).myautocomplete({
-            appendTo: "#datasearch",
-            minLength: 0,
-            delay: 700,
-            source: function(request, response) {
-                var matcher = new RegExp("^-?" + escapeRegex(extractLast(request.term)), "i");
-                var entries = {};
-                $.each(data, function(key, value) {
-                    entries[key] = $.grep(value, function(item) {
-                        return matcher.test(item.value);
-                    });
-                });
-                // Display only 5 history entries
-                response(entries.fields.concat(entries.history.slice(0, 5)));
-            },
-            focus: function() {
-                return false;
-            },
-            select: function( event, ui ) {
-                var target = event.originalEvent.originalEvent.target;
-                if ( target.localName == "i" ) {
-                    // Delete the entry remotely
-                    delete_query(target);
-
-                    // Delete the entry locally
-                    data.history = $.grep(data.history, function(e) {
-                        return e.value != ui.item.value;
-                    });
-
-                    $.extend(event.originalEvent, {keepOpen: true});
-                    return false;
-                }
-
-                // Replace the last term with the selection
-                var terms = this.value.split(/\s+/);
-                terms.pop();
-                terms.push(ui.item.value);
-                this.value = terms.join(" ");
-
-                return false;
-            }
-        }).focus(function() {
-            $(this).myautocomplete("search");
-        });
-}
-
-
-
-function DataSearchListing(elem, columns, url, jqgrid_params) {
-    CommonListing(elem, {}, {
-        datatype: "json",
-        url: url,
-        postData: set_postdata(),
-        colNames: columns.names,
-        colModel: columns.model,
-        rowattr: function(row, data, id) {
-            if ( data._classes )
-                return { "class": data._classes };
+    /* Redesign the select (without overwriting autocomplete) */
+    $.widget("datasearch.myautocomplete", $.ui.autocomplete, {
+        _create: function() {
+            this._super();
+            this.widget().menu( "option", "items", "> :not(.ui-autocomplete-category)" );
         },
-        subGrid: true,
-        beforeProcessing: function(data) {
-            _destroy_components(elem);
-            data.userdata = data.rows;
-            $("#datasearch input[name='datasearch_criteria']").val(JSON.stringify(data.criteria));
-        },
-        subGridRowExpanded: function(subgridDivId, rowId) {
-            var subgrid = $("#" + $.jgrid.jqID(subgridDivId));
+        _renderMenu: function(ul, items) {
+            var that = this,
+                currentcategory = "";
 
-            /* Delete the first empty td when the checkboxes are not present */
-            if (! $("#view-config-editable").prop("checked")) {
-                subgrid.parent().siblings().first().remove();
-            }
-
-            subgrid.html("<div class=\"loader\"></div>");
-
-            var elem = {};
-            var orig = $(this).jqGrid('getGridParam', 'userData')[rowId].cell;
-
-            for ( var i in orig ) {
-                elem[i] = (orig[i] && orig[i].toString) ? orig[i].toString() : orig[i];
-            }
-
-            if ( orig._criteria )
-                elem["_criteria"] = JSON.stringify(orig._criteria);
-
-            $.ajax({
-                url: prewikka_location().pathname + "/ajax_details",
-                data: elem,
-                prewikka: {spinner: false},
-                success: function(result) {
-                    subgrid.html(result);
-                    _initialize_components(subgrid);
-                },
-                error: function(result) {
-                    subgrid.html(result.responseJSON.content);
+            $.each(items, function(index, item) {
+                if ( item.category != currentcategory ) {
+                    ul.append($("<li>", {"class": "ui-autocomplete-category",
+                                         "text": item.category}));
+                    currentcategory = item.category;
                 }
+
+                that._renderItemData(ul, item);
             });
+        },
+        _renderItem: function(ul, item) {
+            var li = $("<li>")
+                .attr("class", "datasearch-field")
+                .append(item.value);
+
+            // The class ui-menu-item is mandatory
+            // otherwise, the element is processed as a menu separator
+            if ( item.url ) {
+                li = $("<i>", {"class": "fa fa-trash history-query-delete ui-menu-item",
+                               "data-url": item.url,
+                               "data-query": item.value})
+                    .add(li);
+            }
+
+            li.appendTo(ul);
+
+            return li;
+        },
+        _close: function (event) {
+            if ( event != undefined && event.keepOpen === true ) {
+                this.search(null, event);
+                return true;
+            }
+
+            return this._super(event);
         }
-    }, jqgrid_params);
+    });
+
+    $("#form_search").on("submit", function() {
+        var query = $("#input_search").val();
+        if ( ! query || data.history.indexOf(query) === -1 ) return;
+
+        data.history.unshift({'category': labels['Query history'],
+                              'value': query,
+                              'url': history.url['delete']});
+    });
+
+    /* Autocomplete on search bar */
+    $("#input_search").on("keydown", function(event) {
+        if ( event.which === $.ui.keyCode.TAB && $(this).myautocomplete("instance").menu.active ) {
+            event.preventDefault();
+        }
+    }).myautocomplete({
+        appendTo: "#datasearch",
+        minLength: 0,
+        delay: 700,
+        source: function(request, response) {
+            var matcher = new RegExp("^-?" + escapeRegex(extractLast(request.term)), "i");
+            var entries = {};
+            $.each(data, function(key, value) {
+                entries[key] = $.grep(value, function(item) {
+                    return matcher.test(item.value);
+                });
+            });
+            // Display only 5 history entries
+            response(entries.fields.concat(entries.history.slice(0, 5)));
+        },
+        focus: function() {
+            return false;
+        },
+        select: function( event, ui ) {
+            var target = event.originalEvent.originalEvent.target;
+            if ( target.localName == "i" ) {
+                // Delete the entry remotely
+                delete_query(target);
+
+                // Delete the entry locally
+                data.history = $.grep(data.history, function(e) {
+                    return e.value != ui.item.value;
+                });
+
+                $.extend(event.originalEvent, {keepOpen: true});
+                return false;
+            }
+
+            // Replace the last term with the selection
+            var terms = this.value.split(/\s+/);
+            terms.pop();
+            terms.push(ui.item.value);
+            this.value = terms.join(" ");
+
+            return false;
+        }
+    }).focus(function() {
+        $(this).myautocomplete("search");
+    });
 }

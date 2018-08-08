@@ -90,14 +90,9 @@
     color: #333;
 }
 
-#datasearch .hover,
-#datasearch .hover .hl {
+#datasearch .selected, #datasearch .selected .hl {
     background-color: #FDE9A8;
     color: #333;
-}
-
-#datasearch .l {
-    cursor: text;
 }
 
 #datasearch table img {

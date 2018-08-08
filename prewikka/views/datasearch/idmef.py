@@ -29,12 +29,10 @@ from . import datasearch
 
 import collections
 import prelude
-import re
 
 
 class IDMEFHighLighter(datasearch.HighLighter):
-    _separators = [r"\n"]
-    _separator_regex = re.compile(r"([" + "".join(_separators) + r"])")
+    _word_separators = ["\n"]
 
 
 class IDMEFFormatter(datasearch.Formatter):

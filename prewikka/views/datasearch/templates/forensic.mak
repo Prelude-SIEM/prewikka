@@ -25,7 +25,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
   var groupby = $(".form-control-chosen");
   groupby.closest(".form-group").show();
   groupby.chosen({ width: "100%", search_contains: true });
-  DataSearchPage("${backend}", ${html.escapejs(criterion_config)}, ${html.escapejs(criterion_config_default)}, "${url_for('.ajax_timeline')}");
+  var page = DataSearchPage("${backend}", ${html.escapejs(criterion_config)}, ${html.escapejs(criterion_config_default)}, ${html.escapejs(separators)}, "${url_for('.ajax_timeline')}");
 
   % if not search.groupby:
     <%
@@ -39,7 +39,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
     };
 
     $(document).ready(function() {
-        DataSearchListing('#datasearch_table', columns, "${url_for('.ajax_table')}", ${html.escapejs(env.request.parameters['jqgrid_params_datasearch_table'])});
+        page.listing('#datasearch_table', columns, "${url_for('.ajax_table')}", ${html.escapejs(env.request.parameters['jqgrid_params_datasearch_table'])});
         $("#datasearch_table").jqGrid($("#view-config-editable").prop("checked") ? 'showCol' : 'hideCol', 'cb');
     });
   % endif
