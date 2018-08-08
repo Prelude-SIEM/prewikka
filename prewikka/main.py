@@ -134,6 +134,7 @@ class Core(object):
 
         if isinstance(self._prewikka_initialized, Exception):
             env.log.log(self._prewikka_initialized.log_priority, text_type(self._prewikka_initialized))
+            self._unregister_plugin_data()
             raise self._prewikka_initialized
 
     def _load_auth_or_session(self, typename, plugins, name, config=config.SectionRoot()):
@@ -147,6 +148,10 @@ class Core(object):
         obj = plugins[name](config)
         setattr(env, typename, obj)
         obj.init(config)
+
+    def _unregister_plugin_data(self):
+        list(hookmanager.trigger("HOOK_PLUGINS_RELOAD"))
+        hookmanager.unregister(exclude=["HOOK_PLUGINS_RELOAD"])
 
     def _loadPlugins(self):
         env.all_plugins = {}
@@ -200,9 +205,7 @@ class Core(object):
 
         # Some changes happened, and every process has to reload the plugin configuration
         env.log.warning("plugins were activated: triggering reload")
-
-        list(hookmanager.trigger("HOOK_PLUGINS_RELOAD"))
-        hookmanager.unregister(exclude=["HOOK_PLUGINS_RELOAD"])
+        self._unregister_plugin_data()
         self._loadPlugins()
 
     def _redirect_default(self, request):
