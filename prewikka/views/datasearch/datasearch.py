@@ -69,6 +69,7 @@ class HighLighter(object):
     _term_separators = ['-', '/', '\\', ',', '.', ':', '?', '@', '_']
 
     def __init__(self, phrase):
+        self.value = self.get_clean_value(phrase)
         parsed_phrase = [self.word_prepare(word) for word in self.split_phrase(phrase)]
         self.html = resource.HTMLNode("span", *parsed_phrase, _class="selectable")
 
@@ -78,6 +79,10 @@ class HighLighter(object):
             "word": cls._word_separators,
             "term": cls._term_separators
         }
+
+    @staticmethod
+    def get_clean_value(value):
+        return value
 
     @classmethod
     def split_phrase(cls, phrase):
@@ -107,7 +112,8 @@ class Formatter(object):
         if not isinstance(value, text_type):
             return self._format_nonstring(field, value)
 
-        node = self.highlighter(value or "n/a").html
+        hl = self.highlighter(value or "n/a")
+        node, value = hl.html, hl.value
         node.attrs["data-field"] = field
 
         for i in self._enrich_data_cb:
