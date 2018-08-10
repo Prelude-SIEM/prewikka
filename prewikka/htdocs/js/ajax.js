@@ -186,12 +186,25 @@ function _update_browser_title(title)
     document.title = document.orig_title + " - " + title;
 }
 
+function _split_url(url) {
+    var idx = url.indexOf('#');
+    var frag = '';
+
+    if ( idx != -1 ) {
+        frag = url.substr(idx);
+        url = url.substr(0, idx);
+    }
+
+    return [url, frag];
+}
 
 /* Update the tab's menu according to the url */
 function _url_update(xhr, settings)
 {
         var redirect = false;
-        var url = settings.url;
+        var url = _split_url(settings.url);
+        var fragment = url[1];
+        url = url[0];
         var newurl = xhr.getResponseHeader("X-responseURL");
 
         if ( newurl && newurl != url ) {
@@ -199,7 +212,7 @@ function _url_update(xhr, settings)
             redirect = true;
         }
 
-        var tab = $("#topmenu .topmenu_item a[href='" + url.split("?")[0] + "']");
+        var tab = $("#topmenu .topmenu_item a[href='" + url.split("?")[0] + fragment + "']");
 
         if ( redirect || (settings.prewikka.history && (settings.type || "").toUpperCase() != "POST") ) {
             var params = settings['data'];
@@ -211,6 +224,7 @@ function _url_update(xhr, settings)
                 url += "?" + params;
             }
 
+            url += fragment;
             history.pushState(url, document.title, url);
         }
 

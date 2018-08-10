@@ -39,7 +39,7 @@ function check_same_origin(url) {
 
 $(function() {
         % if not(context.get("is_error_template")):
-            prewikka_ajax({ url: window.location.pathname,
+            prewikka_ajax({ url: window.location.pathname + window.location.hash,
                             data: "${env.request.web.get_query_string() | n}",
                             type: "${env.request.web.method}",
                             prewikka: { target: PrewikkaAjaxTarget.TAB }
