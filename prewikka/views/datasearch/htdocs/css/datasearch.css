@@ -165,6 +165,10 @@
  * No label on the first ul
  */
 
+#datasearch table td > ul:first-child:not(:last-child):after {
+    content: " ";
+}
+
 #datasearch table li:not(:last-child):after {
     content: " ";
 }
