@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import datetime
 import prelude
 
-from prewikka import utils, version
+from prewikka import crontab, utils, version
 from prewikka.dataprovider import DataProviderBase, Criterion, InvalidCriterionError, InvalidPathError
 
 
@@ -133,6 +133,28 @@ class IDMEFAlertProvider(_IDMEFProvider):
             (N_("Analyzer name"), "alert.analyzer(-1).name" if index else "alert.analyzer.name")
         ]
 
+    @crontab.schedule("alert", N_("Alert deletion"), "0 0 * * *", enabled=False)
+    def _alert_cron(self, job):
+        config = env.config.cron.get_instance_by_name("alert")
+        if config is None:
+            return
+
+        criteria = Criterion()
+        age = int(config.get("age", 0))
+        now = utils.timeutil.utcnow()
+        for severity in ("info", "low", "medium", "high"):
+            days = int(config.get(severity, age))
+            if days < 1:
+                continue
+
+            criteria |= (Criterion("alert.assessment.impact.severity", "==", severity) &
+                         Criterion("alert.create_time", "<", now - datetime.timedelta(days=days)))
+
+        if not criteria:
+            return
+
+        env.dataprovider.delete(criteria, type="alert")
+
 
 class IDMEFHeartbeatProvider(_IDMEFProvider):
     plugin_name = "IDMEF Heartbeat provider"
@@ -141,3 +163,16 @@ class IDMEFHeartbeatProvider(_IDMEFProvider):
 
     def get_paths(self):
         return self._get_paths(prelude.IDMEFClass("heartbeat"))
+
+    @crontab.schedule("heartbeat", N_("Heartbeat deletion"), "0 0 * * *", enabled=False)
+    def _heartbeat_cron(self, job):
+        config = env.config.cron.get_instance_by_name("heartbeat")
+        if config is None:
+            return
+
+        days = int(config.get("age", 0))
+        if days < 1:
+            return
+
+        criteria = Criterion("heartbeat.create_time", "<", utils.timeutil.utcnow() - datetime.timedelta(days=days))
+        env.dataprovider.delete(criteria, type="heartbeat")
