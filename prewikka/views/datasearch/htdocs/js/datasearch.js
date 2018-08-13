@@ -639,7 +639,12 @@ function datasearch_autocomplete_init(availabledata, history, labels) {
                     return false;
                 }
 
-                this.value = ui.item.value;
+                // Replace the last term with the selection
+                var terms = this.value.split(/\s+/);
+                terms.pop();
+                terms.push(ui.item.value);
+                this.value = terms.join(" ");
+
                 return false;
             }
         }).focus(function() {
