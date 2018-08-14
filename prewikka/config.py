@@ -26,26 +26,33 @@ import glob
 import os
 import re
 
-from prewikka import siteconfig
+from prewikka import error, siteconfig
 
 
 _sentinel = object()
 
 
-class ParseError(Exception):
+class ConfigError(error.PrewikkaUserError):
+    def __init__(self, message):
+        error.PrewikkaUserError.__init__(self, N_("Configuration error"), message)
+
+
+class ConfigParseError(ConfigError):
     def __init__(self, filename, lineno, line):
-        self._message = _("parse error in \"%(txt)s\" at %(file)s line %(line)d") % {'txt': line.rstrip(), 'file': filename, 'line': lineno}
-
-    def __str__(self):
-        return self._message
+        ConfigError.__init__(self, N_("Parse error in \"%(txt)s\" at %(file)s line %(line)d",
+                                      {'txt': line.rstrip(), 'file': filename, 'line': lineno}))
 
 
-class ConfigValueError(Exception):
+class ConfigValueError(ConfigError):
     def __init__(self, value, key):
-        self._message = _("Invalid value '%(value)s' for parameter '%(name)s'") % {'value': value, 'name': key}
+        ConfigError.__init__(self, N_("Invalid value '%(value)s' for parameter '%(name)s'",
+                                      {'value': value, 'name': key}))
 
-    def __str__(self):
-        return self._message
+
+class ConfigMissingError(ConfigError, AttributeError):
+    def __init__(self, key):
+        ConfigError.__init__(self, N_("Missing value for parameter '%(name)s'",
+                                      {'name': key}))
 
 
 class ConfigSection(collections.Mapping):
@@ -71,7 +78,7 @@ class ConfigSection(collections.Mapping):
     def __getattr__(self, key):
         ret = self._od.get(key, None)
         if ret is None:
-            raise AttributeError
+            raise ConfigMissingError(key)
 
         return ret
 
@@ -222,7 +229,7 @@ class MyConfigParser(object):
 
             result = self.OPTION_REGEXP.match(line)
             if not result:
-                raise ParseError(file.name, lineno + 1, line)
+                raise ConfigParseError(file.name, lineno + 1, line)
 
             if cursection is None:
                 continue
