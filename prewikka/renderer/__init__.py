@@ -111,9 +111,11 @@ class RendererPluginManager(pluginmanager.PluginManager):
         self._renderer = {}
         for i in self:
             try:
-                self._renderer.setdefault(i.renderer_backend, {})[i.renderer_type] = i()
-            except Exception as e:
-                env.log.error("%s: %s" % (i.__module__, e))
+                p = self.initialize_plugin(i)
+            except Exception:
+                continue
+
+            self._renderer.setdefault(i.renderer_backend, {})[i.renderer_type] = p
 
             if i.renderer_type not in self._default_backends:
                 self._default_backends[i.renderer_type] = i.renderer_backend

@@ -662,12 +662,8 @@ class ViewManager(registrar.DelayedRegistrar):
 
         for view_class in pluginmanager.PluginManager("prewikka.views", autoupdate):
             try:
-                vi = view_class()
-            except error.PrewikkaUserError as e:
-                logger.warning("%s: plugin loading failed: %s", view_class.__name__, e)
-                continue
-            except Exception as e:
-                logger.exception("%s: plugin loading failed: %s", view_class.__name__, e)
+                vi = pluginmanager.PluginManager.initialize_plugin(view_class)
+            except Exception:
                 continue
 
             self.addView(vi)

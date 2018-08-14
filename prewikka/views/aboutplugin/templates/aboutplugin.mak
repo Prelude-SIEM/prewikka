@@ -202,7 +202,7 @@
             <td class="text-center">${ mod.plugin_database_version or '-' }</td>
             <td class="text-right">
               % if mod.error and enabled:
-              <a data-content="${ _(mod.error) }" data-toggle="popover" data-placement="left"><i class="fa fa-exclamation-triangle text-danger"></i></a>
+              <a data-content="${ _(getattr(mod.error, 'message', mod.error)) }" data-toggle="popover" data-placement="left"><i class="fa fa-exclamation-triangle text-danger"></i></a>
               % endif
               <input type="checkbox" name="enable_plugin[]" value="${ mod.full_module_name }" ${ checked(enabled) } ${ disabled(mod.plugin_mandatory) } />
             </td>

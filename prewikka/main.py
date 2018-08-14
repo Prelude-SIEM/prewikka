@@ -164,9 +164,9 @@ class Core(object):
         env.plugins = {}
         for i in pluginmanager.PluginManager("prewikka.plugins", autoupdate=self.autoupdate):
             try:
-                env.plugins[i.__name__] = i()
-            except error.PrewikkaUserError as err:
-                env.log.warning("%s: plugin loading failed: %s" % (i.__name__, err))
+                env.plugins[i.__name__] = pluginmanager.PluginManager.initialize_plugin(i)
+            except error.PrewikkaUserError:
+                pass
 
         # Load views before auth/session to find all permissions
         env.viewmanager.loadViews(autoupdate=self.autoupdate)

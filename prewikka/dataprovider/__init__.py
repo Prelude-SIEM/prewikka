@@ -462,25 +462,23 @@ class DataProviderManager(pluginmanager.PluginManager):
     def load(self, autoupdate=False):
         for k in self.keys():
             try:
-                p = self[k]()
-                p.dataprovider_type = k
-            except error.PrewikkaUserError as err:
-                env.log.warning("%s: plugin failed to load: %s" % (self[k].__name__, err))
+                p = self.initialize_plugin(self[k])
+            except Exception:
                 continue
 
+            p.dataprovider_type = k
             self._type_handlers[k] = p
 
         for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend", autoupdate=autoupdate):
 
             if plugin.type not in self._type_handlers:
-                env.log.warning("%s: plugin failed to load: %s" % (plugin.__name__,
-                                _("No handler configured for '%s' datatype" % plugin.type)))
+                plugin.error = N_("No handler configured for '%s' datatype", plugin.type)
+                env.log.warning("%s: plugin loading failed: %s" % (plugin.__name__, plugin.error))
                 continue
 
             try:
-                p = plugin()
-            except error.PrewikkaUserError as err:
-                env.log.warning("%s: plugin failed to load: %s" % (plugin.__name__, err))
+                p = self.initialize_plugin(plugin)
+            except Exception:
                 continue
 
             if p.type in self._backends:

@@ -79,6 +79,19 @@ class PluginManager(object):
         self._count += 1
 
     @staticmethod
+    def initialize_plugin(plugin_class):
+        try:
+            return plugin_class()
+        except error.PrewikkaUserError as e:
+            plugin_class.error = e
+            logger.warning("%s: plugin loading failed: %s", plugin_class.__name__, e)
+            raise
+        except Exception as e:
+            plugin_class.error = e
+            logger.exception("%s: plugin loading failed: %s", plugin_class.__name__, e)
+            raise
+
+    @staticmethod
     def iter_plugins(entrypoint):
         plist = {}
         ignore = {}
