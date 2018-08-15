@@ -389,4 +389,6 @@ $.extend($.jgrid.cellattr, {
     }
 });
 
-$.jgrid.guiStyles.bootstrap.states.select = "active";
+$.jgrid.guiStyles.bootstrap.states.active = "";
+$.jgrid.guiStyles.bootstrap.states.hover = "";
+$.jgrid.guiStyles.bootstrap.states.select = "";

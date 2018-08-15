@@ -446,8 +446,6 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         popover.removeClass("bottom top right left").addClass(oca_position);
         $("#PopoverOption").css({"top": top, "left": left});
 
-        $("#datasearch_table").jqGrid("setSelection", $(this).closest("tr").attr("id"));
-
         /* Modify the "informations" content if empty */
         var divinfos = $(".oca-infos");
 

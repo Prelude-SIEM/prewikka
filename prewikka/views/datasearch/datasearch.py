@@ -534,7 +534,7 @@ class DataSearch(view.View):
         return response.PrewikkaResponse(resource.HTMLSource("""
             %s
             <script type="text/javascript">%s</script>
-            """ % (data["html"], data["script"])))
+            """ % (data["html"], data["script"] or "")))
 
     def _get_default_cells(self, obj):
         r = {}
