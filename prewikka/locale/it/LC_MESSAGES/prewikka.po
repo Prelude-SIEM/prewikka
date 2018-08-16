@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.0.0beta4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-06-08 17:16+0200\n"
+"POT-Creation-Date: 2018-08-17 17:00+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian\n"
@@ -16,22 +16,31 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: prewikka/baseview.py:78 prewikka/usergroup.py:48
+#: prewikka/baseview.py:79 prewikka/usergroup.py:48
 msgid "Permission Denied"
 msgstr "Accesso negato"
 
-#: prewikka/baseview.py:78
+#: prewikka/baseview.py:79
 msgid "Missing permission to access the specified file"
 msgstr ""
 
-#: prewikka/config.py:37
-#, python-format
-msgid "parse error in \"%(txt)s\" at %(file)s line %(line)d"
+#: prewikka/config.py:37 prewikka/dataprovider/__init__.py:485
+msgid "Configuration error"
+msgstr "Errore di configurazione"
+
+#: prewikka/config.py:43
+#, fuzzy, python-format
+msgid "Parse error in \"%(txt)s\" at %(file)s line %(line)d"
 msgstr "errore di parsing in \"%(txt)s\" alla linea %(line)d di %(file)s"
 
-#: prewikka/config.py:45 prewikka/view.py:82
+#: prewikka/config.py:48 prewikka/view.py:82
 #, python-format
 msgid "Invalid value '%(value)s' for parameter '%(name)s'"
+msgstr "Valore invalido '%(value)s' per il parametro '%(name)s'"
+
+#: prewikka/config.py:54
+#, fuzzy, python-format
+msgid "Missing value for parameter '%(name)s'"
 msgstr "Valore invalido '%(value)s' per il parametro '%(name)s'"
 
 #: prewikka/crontab.py:34
@@ -63,38 +72,38 @@ msgstr "Personalizzato"
 msgid "Disabled"
 msgstr "Disabilitato"
 
-#: prewikka/crontab.py:112
+#: prewikka/crontab.py:116
 msgid "Scheduled job execution failed"
 msgstr "Esecuzione dell'operazione pianificata fallita"
 
-#: prewikka/crontab.py:134
+#: prewikka/crontab.py:149
 msgid "Invalid job extension"
 msgstr "Estensione di operazione invalida"
 
-#: prewikka/crontab.py:134
+#: prewikka/crontab.py:149
 #, python-format
 msgid "Scheduled job with invalid extension type '%s'"
 msgstr "Operazione pianificata con tipo di estensione invalido '%s'"
 
-#: prewikka/crontab.py:182
+#: prewikka/crontab.py:208
 #, fuzzy
 msgid "Invalid CronJob"
 msgstr "Sessione invalida"
 
-#: prewikka/crontab.py:182
+#: prewikka/crontab.py:208
 #, python-format
 msgid "CronJob with id=%d cannot be found in database"
 msgstr ""
 
-#: prewikka/crontab.py:241
+#: prewikka/crontab.py:267
 msgid "Invalid schedule"
 msgstr "Pianificazione non valida"
 
-#: prewikka/crontab.py:241
+#: prewikka/crontab.py:267
 msgid "The specified job schedule is invalid"
 msgstr "L'operazione pianificata è invalida"
 
-#: prewikka/crontab.py:267
+#: prewikka/crontab.py:293
 #, python-format
 msgid "Custom (%s)"
 msgstr "Personalizzato (%s)"
@@ -154,11 +163,11 @@ msgid ""
 "%(version2)s"
 msgstr ""
 
-#: prewikka/database.py:874
+#: prewikka/database.py:877
 msgid "Database configuration error"
 msgstr "Errore di configurazione del database"
 
-#: prewikka/database.py:874
+#: prewikka/database.py:877
 msgid "Only MySQL and PostgreSQL databases are supported at the moment"
 msgstr "Solamente MySQL e PostgreSQL sono supportati in questo momento"
 
@@ -166,11 +175,11 @@ msgstr "Solamente MySQL e PostgreSQL sono supportati in questo momento"
 msgid "An unexpected condition happened"
 msgstr "Si è verificato un errore imprevisto"
 
-#: prewikka/error.py:143
+#: prewikka/error.py:144
 msgid "Not implemented"
 msgstr "Non implementato"
 
-#: prewikka/error.py:145
+#: prewikka/error.py:146
 msgid "Backend does not implement this operation"
 msgstr "Il backend non implementa questa operazione"
 
@@ -178,47 +187,35 @@ msgstr "Il backend non implementa questa operazione"
 msgid "Search history deletion"
 msgstr ""
 
-#: prewikka/idmefbrowser.py:48 prewikka/views/filter/templates/widget.mak:13
-msgid "All paths"
-msgstr "Tutti i percorsi"
-
-#: prewikka/idmefbrowser.py:72
-msgid "Select paths..."
-msgstr "Selezionare percorsi..."
-
-#: prewikka/idmefbrowser.py:73 prewikka/views/filter/templates/widget.mak:7
-msgid "Default paths"
-msgstr "Percorsi predefiniti"
-
-#: prewikka/localization.py:142
+#: prewikka/localization.py:143
 msgid "%m/%Y"
 msgstr "%m/%Y"
 
-#: prewikka/localization.py:143
+#: prewikka/localization.py:144
 #, python-format
 msgid "%m/%d/%Y"
 msgstr "%d/%m/%Y"
 
-#: prewikka/localization.py:144
+#: prewikka/localization.py:145
 #, python-format
 msgid "%m/%d/%Y %Hh"
 msgstr "%d/%m/%Y %H:00"
 
-#: prewikka/localization.py:145
+#: prewikka/localization.py:146
 #, python-format
 msgid "%m/%d/%Y %H:%M"
 msgstr "%d/%m/%Y %H:%M"
 
-#: prewikka/localization.py:146
+#: prewikka/localization.py:147
 #, python-format
 msgid "%m/%d/%Y %H:%M:%S"
 msgstr "%d/%m/%Y %H:%M:%S"
 
-#: prewikka/localization.py:148
+#: prewikka/localization.py:149
 msgid "%H:%M"
 msgstr "%H:%M"
 
-#: prewikka/localization.py:149
+#: prewikka/localization.py:150
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
@@ -227,37 +224,38 @@ msgstr "%H:%M:%S"
 msgid "Unknown logtype specified: '%s'"
 msgstr "Tipo sconosciuto di log: '%s'"
 
-#: prewikka/main.py:45
+#: prewikka/main.py:46
 msgid "Version Requirement error"
 msgstr "Errore di requisito di versione"
 
-#: prewikka/main.py:48
+#: prewikka/main.py:49
 #, python-format
 msgid "Prewikka %(vPre)s requires libprelude %(vLib)s or higher"
 msgstr "Prewikka %(vPre)s richiede libprelude %(vLib)s o successiva"
 
-#: prewikka/main.py:53
+#: prewikka/main.py:54
 #, python-format
 msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
 msgstr "Prewikka %(vPre)s richiede libpreludedb %(vLib)s o successiva"
 
-#: prewikka/main.py:130 prewikka/main.py:139
+#: prewikka/main.py:130 prewikka/main.py:143
+#: prewikka/dataprovider/plugins/idmef/__init__.py:62
 msgid "Initialization error"
 msgstr "Errore di inizializzazione"
 
-#: prewikka/main.py:140
+#: prewikka/main.py:144
 #, python-format
 msgid ""
 "Cannot use %(type)s mode '%(name)s', please contact your local "
 "administrator."
 msgstr ""
 
-#: prewikka/main.py:176
+#: prewikka/main.py:184
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
 msgstr ""
 
-#: prewikka/main.py:280
+#: prewikka/main.py:286
 #, python-format
 msgid "An unexpected condition happened while trying to load %s"
 msgstr "Si è verificato un errore imprevisto durante il tentativo di caricare %s"
@@ -337,39 +335,39 @@ msgstr "Inattivo"
 msgid "None"
 msgstr "Nessun"
 
-#: prewikka/menu.py:51 prewikka/menu.py:57 prewikka/menu.py:61
-#: prewikka/menu.py:69 prewikka/menu.py:73
+#: prewikka/menu.py:70 prewikka/menu.py:73 prewikka/menu.py:79
+#: prewikka/menu.py:83 prewikka/menu.py:91
 msgid "Menu error"
 msgstr "Errore di menu"
 
-#: prewikka/menu.py:51
+#: prewikka/menu.py:70
+#, fuzzy
+msgid "The provided YAML menu is invalid"
+msgstr "L'operazione pianificata è invalida"
+
+#: prewikka/menu.py:73
 msgid "Empty menu"
 msgstr "Menu vuoto"
 
-#: prewikka/menu.py:57
+#: prewikka/menu.py:79
 #, python-format
 msgid "Menu without a name in %s"
 msgstr "Menu senza nome in %s"
 
-#: prewikka/menu.py:61
+#: prewikka/menu.py:83
 msgid "Multiple default menus"
 msgstr "Menu predefiniti multipli"
 
-#: prewikka/menu.py:69
-#, python-format
-msgid "Section without a name in %s"
-msgstr "Sezione senza nome in %s"
-
-#: prewikka/menu.py:73
+#: prewikka/menu.py:91
 msgid "Multiple default views"
 msgstr "Viste predefinite multiple"
 
-#: prewikka/pluginmanager.py:155
+#: prewikka/pluginmanager.py:168
 #, python-format
 msgid "Circular dependencies detected: %s"
 msgstr ""
 
-#: prewikka/pluginmanager.py:163
+#: prewikka/pluginmanager.py:176
 #, python-format
 msgid "Missing dependency: %s"
 msgstr ""
@@ -427,12 +425,12 @@ msgstr "Metodo non valido"
 msgid "Invalid view"
 msgstr "Vista invalida"
 
-#: prewikka/view.py:555
+#: prewikka/view.py:556
 #, python-format
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
 msgstr "Il metodo '%(method)s' non è permesso per la vista '%(view)s'"
 
-#: prewikka/view.py:559 prewikka/view.py:707
+#: prewikka/view.py:560 prewikka/view.py:707
 #, python-format
 msgid "View '%s' does not exist"
 msgstr "La vista '%s' non esiste"
@@ -539,20 +537,16 @@ msgstr ""
 msgid "Invalid criterion"
 msgstr "Sessione invalida"
 
-#: prewikka/dataprovider/__init__.py:269
+#: prewikka/dataprovider/__init__.py:272
 msgid "Backend normalization error"
 msgstr "Errore di normalizzazione del backend"
 
-#: prewikka/dataprovider/__init__.py:474
+#: prewikka/dataprovider/__init__.py:475
 #, python-format
 msgid "No handler configured for '%s' datatype"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:484
-msgid "Configuration error"
-msgstr "Errore di configurazione"
-
-#: prewikka/dataprovider/__init__.py:485
+#: prewikka/dataprovider/__init__.py:486
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
 msgstr ""
@@ -563,11 +557,11 @@ msgstr ""
 
 #: prewikka/dataprovider/idmef.py:121
 #: prewikka/views/agents/templates/agents.mak:83
-#: prewikka/views/datasearch/alert.py:77 prewikka/views/datasearch/alert.py:78
+#: prewikka/views/datasearch/alert.py:75 prewikka/views/datasearch/alert.py:76
 msgid "Alerts"
 msgstr "Allerte"
 
-#: prewikka/dataprovider/idmef.py:128 prewikka/views/datasearch/alert.py:90
+#: prewikka/dataprovider/idmef.py:128 prewikka/views/datasearch/alert.py:88
 #: prewikka/views/datasearch/threat.py:75
 msgid "Classification"
 msgstr "Classificazione"
@@ -596,21 +590,31 @@ msgstr "Porta di destinazione"
 msgid "Analyzer name"
 msgstr "Nome dell'analizzatore"
 
-#: prewikka/dataprovider/idmef.py:139
+#: prewikka/dataprovider/idmef.py:136
+#, fuzzy
+msgid "Alert deletion"
+msgstr "Elenco delle allerte"
+
+#: prewikka/dataprovider/idmef.py:161
 msgid "Provides an API to fetch IDMEF heartbeats"
 msgstr ""
 
-#: prewikka/dataprovider/idmef.py:140
+#: prewikka/dataprovider/idmef.py:162
 #: prewikka/views/agents/templates/agents.mak:87
-#: prewikka/views/datasearch/heartbeat.py:58
+#: prewikka/views/datasearch/heartbeat.py:56
 msgid "Heartbeats"
 msgstr "Pulsazioni"
 
-#: prewikka/dataprovider/plugins/idmef/__init__.py:101
+#: prewikka/dataprovider/idmef.py:167
+#, fuzzy
+msgid "Heartbeat deletion"
+msgstr "Elenco delle pulsazioni"
+
+#: prewikka/dataprovider/plugins/idmef/__init__.py:110
 msgid "Plugin for fetching IDMEF alerts from the Prelude database"
 msgstr ""
 
-#: prewikka/dataprovider/plugins/idmef/__init__.py:115
+#: prewikka/dataprovider/plugins/idmef/__init__.py:124
 msgid "Plugin for fetching IDMEF heartbeats from the Prelude database"
 msgstr ""
 
@@ -678,22 +682,22 @@ msgstr "Informativo"
 msgid "No data to display."
 msgstr "Nessun dato da visualizzare."
 
-#: prewikka/renderer/__init__.py:149 prewikka/renderer/__init__.py:153
-#: prewikka/renderer/__init__.py:157
+#: prewikka/renderer/__init__.py:151 prewikka/renderer/__init__.py:155
+#: prewikka/renderer/__init__.py:159
 msgid "Renderer error"
 msgstr "Errore di rendering"
 
-#: prewikka/renderer/__init__.py:150
+#: prewikka/renderer/__init__.py:152
 #, python-format
 msgid "No backend supporting render type '%s'"
 msgstr ""
 
-#: prewikka/renderer/__init__.py:154
+#: prewikka/renderer/__init__.py:156
 #, python-format
 msgid "No backend named '%s'"
 msgstr ""
 
-#: prewikka/renderer/__init__.py:158
+#: prewikka/renderer/__init__.py:160
 #, python-format
 msgid "Backend '%(backend)s' does not support render type '%(type)s'"
 msgstr ""
@@ -728,7 +732,7 @@ msgstr ""
 "La tua sessione è scaduta: accedi nuovamente per continuare ad usare "
 "Prelude"
 
-#: prewikka/session/session.py:176
+#: prewikka/session/session.py:178
 msgid "Logged out"
 msgstr "Sessione finita"
 
@@ -736,31 +740,31 @@ msgstr "Sessione finita"
 msgid "Anonymous authentication"
 msgstr "Autenticazione anonima"
 
-#: prewikka/templates/baseview.mak:148
+#: prewikka/templates/baseview.mak:154
 msgid "View options"
 msgstr "Opzioni di vista"
 
-#: prewikka/templates/baseview.mak:151
+#: prewikka/templates/baseview.mak:157
 msgid "View help"
 msgstr ""
 
-#: prewikka/templates/baseview.mak:189
+#: prewikka/templates/baseview.mak:198
 msgid "This app has been disabled or failed to load."
 msgstr "Questo app è stato disabilitato o non è riuscito a caricare."
 
-#: prewikka/templates/baseview.mak:195 prewikka/templates/baseview.mak:206
+#: prewikka/templates/baseview.mak:204 prewikka/templates/baseview.mak:215
 msgid "name"
 msgstr "nome"
 
-#: prewikka/templates/baseview.mak:251
+#: prewikka/templates/baseview.mak:261
 msgid "About"
 msgstr "Circa"
 
-#: prewikka/templates/baseview.mak:254
+#: prewikka/templates/baseview.mak:264
 msgid "Are you sure you want to log out?"
 msgstr "È sicuro di voler disconnettersi?"
 
-#: prewikka/templates/baseview.mak:254
+#: prewikka/templates/baseview.mak:264
 msgid "Logout"
 msgstr "Sconnessione"
 
@@ -791,7 +795,7 @@ msgstr ""
 
 #: prewikka/templates/error.mak:171 prewikka/templates/toplayout.mak:61
 #: prewikka/views/crontab/templates/cronjob.mak:122
-#: prewikka/views/filter/templates/filteredition.mak:107
+#: prewikka/views/filter/templates/filteredition.mak:106
 msgid "Cancel"
 msgstr "Annullare"
 
@@ -1075,7 +1079,7 @@ msgstr ""
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:19
 #: prewikka/views/crontab/templates/cronjob.mak:114
 #: prewikka/views/crontab/templates/crontab.mak:17
-#: prewikka/views/filter/templates/filterlisting.mak:16
+#: prewikka/views/filter/templates/filterlisting.mak:23
 #: prewikka/views/messagesummary/messagesummary.py:288
 #: prewikka/views/messagesummary/messagesummary.py:425
 #: prewikka/views/messagesummary/messagesummary.py:664
@@ -1090,7 +1094,7 @@ msgstr "Nome"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:155
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:191
-#: prewikka/views/filter/templates/filterlisting.mak:20
+#: prewikka/views/filter/templates/filterlisting.mak:27
 #: prewikka/views/messagesummary/messagesummary.py:733
 #: prewikka/views/messagesummary/messagesummary.py:739
 msgid "Description"
@@ -1171,12 +1175,12 @@ msgid "Heartbeat analysis"
 msgstr "Analisi delle pulsazioni"
 
 #: prewikka/views/agents/agents.py:99 prewikka/views/agents/agents.py:123
-#: prewikka/views/datasearch/idmef.py:160 prewikka/views/filter/filter.py:114
+#: prewikka/views/datasearch/idmef.py:158 prewikka/views/filter/filter.py:114
 #: prewikka/views/messagesummary/messagesummary.py:332
 msgid "IDMEF_VIEW"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:99 prewikka/views/datasearch/heartbeat.py:57
+#: prewikka/views/agents/agents.py:99 prewikka/views/datasearch/heartbeat.py:55
 msgid "Agents"
 msgstr "Agenti"
 
@@ -1233,7 +1237,7 @@ msgstr "Nodo"
 
 #: prewikka/views/agents/templates/agents.mak:32
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:20
-#: prewikka/views/datasearch/heartbeat.py:69
+#: prewikka/views/datasearch/heartbeat.py:67
 #: prewikka/views/messagesummary/messagesummary.py:424
 msgid "Model"
 msgstr "Modello"
@@ -1265,8 +1269,8 @@ msgid "Delete the selected IDMEF messages?"
 msgstr "Rimovuere i messaggi IDMEF selezionati?"
 
 #: prewikka/views/agents/templates/agents.mak:89
-#: prewikka/views/datasearch/idmef.py:196
-#: prewikka/views/filter/templates/filterlisting.mak:34
+#: prewikka/views/datasearch/idmef.py:194
+#: prewikka/views/filter/templates/filterlisting.mak:41
 msgid "Delete"
 msgstr "Rimovuere"
 
@@ -1275,7 +1279,7 @@ msgid "OS"
 msgstr ""
 
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:22
-#: prewikka/views/datasearch/heartbeat.py:68
+#: prewikka/views/datasearch/heartbeat.py:66
 #: prewikka/views/messagesummary/messagesummary.py:412
 msgid "Node name"
 msgstr "Nome del nodo"
@@ -1286,7 +1290,7 @@ msgid "Node location"
 msgstr "Posizione del nodo"
 
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:24
-#: prewikka/views/datasearch/heartbeat.py:67
+#: prewikka/views/datasearch/heartbeat.py:65
 #: prewikka/views/messagesummary/messagesummary.py:418
 msgid "Node address"
 msgstr "Indirizzo del nodo"
@@ -1365,13 +1369,13 @@ msgid "Edit Job"
 msgstr "Modificare l'operazione"
 
 #: prewikka/views/crontab/templates/cronjob.mak:112
-#: prewikka/views/filter/templates/filteredition.mak:70
+#: prewikka/views/filter/templates/filteredition.mak:69
 #: prewikka/views/usermanagement/templates/usersettings.mak:13
 msgid "Name:"
 msgstr "Nome:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:123
-#: prewikka/views/filter/templates/filteredition.mak:108
+#: prewikka/views/filter/templates/filteredition.mak:107
 #: prewikka/views/usermanagement/templates/usersettings.mak:61
 msgid "Save"
 msgstr "Salvare"
@@ -1404,38 +1408,38 @@ msgstr "Disattivare"
 msgid "Enable"
 msgstr "Attivare"
 
-#: prewikka/views/datasearch/alert.py:73
+#: prewikka/views/datasearch/alert.py:71
 #, fuzzy
 msgid "Alert listing page"
 msgstr "Elenco delle allerte"
 
-#: prewikka/views/datasearch/alert.py:78
+#: prewikka/views/datasearch/alert.py:76
 msgid "Aggregated alerts"
 msgstr "Allerte aggregate"
 
-#: prewikka/views/datasearch/alert.py:89
-#: prewikka/views/datasearch/heartbeat.py:65
+#: prewikka/views/datasearch/alert.py:87
+#: prewikka/views/datasearch/heartbeat.py:63
 #: prewikka/views/datasearch/threat.py:74
 msgid "Date"
 msgstr "Data"
 
-#: prewikka/views/datasearch/alert.py:91 prewikka/views/datasearch/threat.py:76
+#: prewikka/views/datasearch/alert.py:89 prewikka/views/datasearch/threat.py:76
 msgid "Source"
 msgstr "Fonte"
 
-#: prewikka/views/datasearch/alert.py:92 prewikka/views/datasearch/threat.py:77
+#: prewikka/views/datasearch/alert.py:90 prewikka/views/datasearch/threat.py:77
 msgid "Target"
 msgstr "Obiettivo"
 
-#: prewikka/views/datasearch/alert.py:93
+#: prewikka/views/datasearch/alert.py:91
 msgid "Analyzer"
 msgstr "Analizzatore"
 
-#: prewikka/views/datasearch/alert.py:96
+#: prewikka/views/datasearch/alert.py:94
 msgid "Delete the selected alerts?"
 msgstr "Rimovuere le allerte selezionate?"
 
-#: prewikka/views/datasearch/alert.py:150
+#: prewikka/views/datasearch/alert.py:148
 msgid "IDMEF"
 msgstr "IDMEF"
 
@@ -1459,49 +1463,49 @@ msgstr "mese"
 msgid "year"
 msgstr "anno"
 
-#: prewikka/views/datasearch/datasearch.py:192
+#: prewikka/views/datasearch/datasearch.py:157
 #, fuzzy
 msgid "Time group error"
 msgstr "Errore di menu"
 
-#: prewikka/views/datasearch/datasearch.py:192
+#: prewikka/views/datasearch/datasearch.py:157
 msgid "Only one time unit can be specified in a groupby query"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:459
+#: prewikka/views/datasearch/datasearch.py:424
 msgid "Forensic"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:459
+#: prewikka/views/datasearch/datasearch.py:424
 msgid "Dashboard"
 msgstr "Cruscotto"
 
-#: prewikka/views/datasearch/datasearch.py:502
+#: prewikka/views/datasearch/datasearch.py:468
 msgid "CSV export"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:628
+#: prewikka/views/datasearch/datasearch.py:594
 msgid "General"
 msgstr "Generale"
 
-#: prewikka/views/datasearch/heartbeat.py:53
+#: prewikka/views/datasearch/heartbeat.py:51
 #, fuzzy
 msgid "Heartbeat listing page"
 msgstr "Elenco delle pulsazioni"
 
-#: prewikka/views/datasearch/heartbeat.py:58
+#: prewikka/views/datasearch/heartbeat.py:56
 msgid "Aggregated heartbeats"
 msgstr "Pulsazioni aggregate"
 
-#: prewikka/views/datasearch/heartbeat.py:66
+#: prewikka/views/datasearch/heartbeat.py:64
 msgid "Agent"
 msgstr "Agente"
 
-#: prewikka/views/datasearch/heartbeat.py:71
+#: prewikka/views/datasearch/heartbeat.py:69
 msgid "Delete the selected heartbeats?"
 msgstr "Rimovuere le pulsazioni selezionate?"
 
-#: prewikka/views/datasearch/idmef.py:48
+#: prewikka/views/datasearch/idmef.py:46
 #, fuzzy
 msgid "See IDMEF details"
 msgstr "Vedere i dettagli IDMEF"
@@ -1530,12 +1534,12 @@ msgid "Group by %s"
 msgstr "Raggrupa per"
 
 #: prewikka/views/datasearch/templates/details.mak:22
-#: prewikka/views/datasearch/templates/forensic.mak:215
+#: prewikka/views/datasearch/templates/forensic.mak:219
 msgid "Add to search"
 msgstr "Aggiungere alla ricerca"
 
 #: prewikka/views/datasearch/templates/details.mak:23
-#: prewikka/views/datasearch/templates/forensic.mak:216
+#: prewikka/views/datasearch/templates/forensic.mak:220
 msgid "Exclude from search"
 msgstr "Escludere della ricerca"
 
@@ -1547,67 +1551,67 @@ msgstr "Campi"
 msgid "Query history"
 msgstr ""
 
-#: prewikka/views/datasearch/templates/forensic.mak:64
+#: prewikka/views/datasearch/templates/forensic.mak:63
 msgid "Chart type"
 msgstr "Tipo di grafico"
 
-#: prewikka/views/datasearch/templates/forensic.mak:72
+#: prewikka/views/datasearch/templates/forensic.mak:73
 msgid "Limit"
 msgstr "Limite"
 
-#: prewikka/views/datasearch/templates/forensic.mak:84
+#: prewikka/views/datasearch/templates/forensic.mak:87
 msgid "Expert mode"
 msgstr "Modo esperto"
 
-#: prewikka/views/datasearch/templates/forensic.mak:91
+#: prewikka/views/datasearch/templates/forensic.mak:94
 msgid "Condensed mode"
 msgstr "Modo condensato"
 
-#: prewikka/views/datasearch/templates/forensic.mak:104
+#: prewikka/views/datasearch/templates/forensic.mak:108
 msgid "Search mode"
 msgstr ""
 
-#: prewikka/views/datasearch/templates/forensic.mak:108
-#: prewikka/views/datasearch/templates/forensic.mak:213
+#: prewikka/views/datasearch/templates/forensic.mak:112
+#: prewikka/views/datasearch/templates/forensic.mak:217
 msgid "Search"
 msgstr "Cercare"
 
-#: prewikka/views/datasearch/templates/forensic.mak:110
+#: prewikka/views/datasearch/templates/forensic.mak:114
 msgid "Reset search"
 msgstr "Azzerare la ricerca"
 
-#: prewikka/views/datasearch/templates/forensic.mak:120
-#: prewikka/views/datasearch/templates/forensic.mak:218
+#: prewikka/views/datasearch/templates/forensic.mak:124
+#: prewikka/views/datasearch/templates/forensic.mak:222
 msgid "Group by"
 msgstr "Raggrupa per"
 
-#: prewikka/views/datasearch/templates/forensic.mak:121
+#: prewikka/views/datasearch/templates/forensic.mak:125
 msgid "Select your field"
 msgstr "Scegli il campo"
 
-#: prewikka/views/datasearch/templates/forensic.mak:122
+#: prewikka/views/datasearch/templates/forensic.mak:126
 msgid "Time values"
 msgstr "Valori temporali"
 
-#: prewikka/views/datasearch/templates/forensic.mak:127
+#: prewikka/views/datasearch/templates/forensic.mak:131
 #, python-format
 msgid "%s fields"
 msgstr "Campi %s"
 
-#: prewikka/views/datasearch/templates/forensic.mak:163
+#: prewikka/views/datasearch/templates/forensic.mak:167
 msgid "Timeline"
 msgstr "Cronologia"
 
-#: prewikka/views/datasearch/templates/forensic.mak:217
+#: prewikka/views/datasearch/templates/forensic.mak:221
 msgid "New search"
 msgstr "Nuova ricerca"
 
-#: prewikka/views/datasearch/templates/forensic.mak:227
+#: prewikka/views/datasearch/templates/forensic.mak:231
 #: prewikka/views/messagesummary/messagesummary.py:1014
 msgid "Actions"
 msgstr "Azioni"
 
-#: prewikka/views/datasearch/templates/forensic.mak:240
+#: prewikka/views/datasearch/templates/forensic.mak:244
 msgid "Informations"
 msgstr "Informazioni"
 
@@ -1634,12 +1638,12 @@ msgid "Preferences"
 msgstr "Preferenze"
 
 #: prewikka/views/filter/filter.py:127
-#: prewikka/views/filter/templates/filterlisting.mak:10
+#: prewikka/views/filter/templates/filterlisting.mak:17
 msgid "Filters"
 msgstr "Filtri"
 
 #: prewikka/views/filter/filter.py:138
-#: prewikka/views/filter/templates/filteredition.mak:63
+#: prewikka/views/filter/templates/filteredition.mak:62
 #, python-format
 msgid "Filter %s"
 msgstr "Filtro %s"
@@ -1666,28 +1670,29 @@ msgstr "Nome del filtro mancante"
 msgid "The filter name is already used by another filter"
 msgstr "Il nome del filtro è già usato da un altro filtro"
 
-#: prewikka/views/filter/templates/filteredition.mak:63
-#: prewikka/views/filter/templates/filterlisting.mak:10
+#: prewikka/views/filter/templates/filteredition.mak:62
+#: prewikka/views/filter/templates/filterlisting.mak:17
+#: prewikka/views/filter/templates/menu.mak:20
 msgid "New filter"
 msgstr "Nuovo filtro"
 
-#: prewikka/views/filter/templates/filteredition.mak:72
+#: prewikka/views/filter/templates/filteredition.mak:71
 msgid "Filter name"
 msgstr "Nome del filtro"
 
-#: prewikka/views/filter/templates/filteredition.mak:77
+#: prewikka/views/filter/templates/filteredition.mak:76
 msgid "Description:"
 msgstr "Descrizione:"
 
-#: prewikka/views/filter/templates/filterlisting.mak:32
+#: prewikka/views/filter/templates/filterlisting.mak:39
 msgid "Create"
 msgstr "Creare"
 
-#: prewikka/views/filter/templates/filterlisting.mak:33
+#: prewikka/views/filter/templates/filterlisting.mak:40
 msgid "Duplicate"
 msgstr "Duplicare"
 
-#: prewikka/views/filter/templates/filterlisting.mak:34
+#: prewikka/views/filter/templates/filterlisting.mak:41
 msgid "Delete the selected filters?"
 msgstr "Rimovuere i filtri selezionati?"
 
@@ -1707,6 +1712,14 @@ msgstr "Nessun filtro"
 #: prewikka/views/filter/templates/widget.mak:5
 msgid "Select a path..."
 msgstr "Selezionare un percorso..."
+
+#: prewikka/views/filter/templates/widget.mak:7
+msgid "Default paths"
+msgstr "Percorsi predefiniti"
+
+#: prewikka/views/filter/templates/widget.mak:13
+msgid "All paths"
+msgstr "Tutti i percorsi"
 
 #: prewikka/views/filter/templates/widget.mak:23
 #: prewikka/views/filter/templates/widget.mak:44
@@ -2233,12 +2246,12 @@ msgstr "Tema:"
 msgid "Timezone:"
 msgstr "Fuso orario:"
 
-#: scripts/prewikka-crontab:95 scripts/prewikka-httpd:93
+#: scripts/prewikka-crontab:99 scripts/prewikka-httpd:93
 #, python-format
 msgid "configuration file to use (default: %default)"
 msgstr ""
 
-#: scripts/prewikka-crontab:96
+#: scripts/prewikka-crontab:100
 msgid "run as a system daemon"
 msgstr ""
 
