@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="${document.lang}">
     <head>
         <title>${ env.config.interface.get("browser_title", "Prelude") }</title>
         <base href="${document.base_url}" />

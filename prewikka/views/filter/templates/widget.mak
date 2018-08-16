@@ -2,7 +2,7 @@
     <div class="form-group">
         <div class="input-group">
             <div class="form-control input-sm" style="border: none; padding: 0; position: static">
-                <select class="data-paths input-value" data-placeholder="${_('Select a path...')}">
+                <select class="data-paths input-value input-sm" data-placeholder="${_('Select a path...')}">
                     <% default_field = None %>
                     <optgroup label="${_('Default paths')}">
                         % for label, path in kwargs.get("default_paths", {}).items():

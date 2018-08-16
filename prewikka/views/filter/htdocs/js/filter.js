@@ -38,12 +38,9 @@ function FilterEdition(selector, default_paths, all_paths, operators, enums, too
     }
 
     this.init_condition = function(select) {
-        select.chosen({
-            max_selected_options: 1,
-            width: "300px",
-            search_contains: true
+        select.select2_container({
+            width: "300px"
         });
-
         that.init_operators(select);
         that.init_autocomplete(select);
     }

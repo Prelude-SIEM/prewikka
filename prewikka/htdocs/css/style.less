@@ -523,14 +523,6 @@ div.prewikka-view-config {
     position: fixed;
     right: 0;
     z-index: 1;
-
-    /*
-     * Mod Chosen to fit in the window
-     */
-    .chosen-container-multi {
-        display: block;
-    }
-
 }
 
 
@@ -1066,4 +1058,20 @@ label.disabled a {
 
 .panel .instance:first-child {
     margin: 5px 0;
+}
+
+/*
+ * Customize Select2 dropdown appearance
+ */
+.select2-results {
+    font-size: 13px;
+
+    .select2-results__option {
+        overflow-x: hidden;
+
+        .select2-results__option {
+            padding: 3px 20px;
+            overflow-wrap: break-word;
+        }
+    }
 }

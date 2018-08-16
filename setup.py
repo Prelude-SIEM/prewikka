@@ -204,6 +204,7 @@ setup(
             "htdocs/images/*.*",
             "htdocs/js/*.js",
             "htdocs/js/locales/*.js",
+            "htdocs/js/locales/*/*.js",
             "htdocs/js/*.map",
             "htdocs/js/locales/*.map",
             "locale/*.pot",

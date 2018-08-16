@@ -30,7 +30,8 @@ from prewikka import error, history, hookmanager, mainmenu, resource, response, 
 CSS_FILES = (
     "prewikka/css/jquery-ui.min.css",
     "prewikka/css/bootstrap.min.css",
-    "prewikka/css/chosen.min.css",
+    "prewikka/css/select2.min.css",
+    "prewikka/css/select2-bootstrap.min.css",
     "prewikka/css/jquery-ui-timepicker-addon.min.css",
     "prewikka/css/font-awesome.min.css",
     "prewikka/css/ui.jqgrid.min.css",
@@ -42,14 +43,14 @@ JS_FILES = (
     "prewikka/js/jquery.js",
     "prewikka/js/jquery-ui.min.js",
     "prewikka/js/bootstrap.min.js",
+    "prewikka/js/select2.full.min.js",
     "prewikka/js/functions.js",
     "prewikka/js/ajax.js",
     "prewikka/js/underscore-min.js",
     "prewikka/js/jquery-ui-timepicker-addon.min.js",
     "prewikka/js/ui.multiselect.min.js",
     "prewikka/js/jquery.jqgrid.min.js",
-    "prewikka/js/commonlisting.js",
-    "prewikka/js/chosen.jquery.min.js"
+    "prewikka/js/commonlisting.js"
 )
 
 
@@ -166,6 +167,7 @@ class BaseView(view._View):
 
         # The jqgrid locale files use only two characters for identifying the language (e.g. pt_BR -> pt)
         _HEAD[resource.JSLink("prewikka/js/locales/grid.locale-%s.min.js" % lang[:2])] = True
+        _HEAD[resource.JSLink("prewikka/js/locales/select2/%s.js" % lang[:2])] = True
 
         for contents in filter(None, hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT")):
             _HEAD.update((i, True) for i in contents)
@@ -180,6 +182,7 @@ class BaseView(view._View):
         self._setup_dataset_default(dataset)
         dataset["document"].head_content = _HEAD
         dataset["document"].body_content = _BODY
+        dataset["document"].lang = lang[:2]
         dataset["toplayout_extra_content"] = filter(None, hookmanager.trigger("HOOK_TOPLAYOUT_EXTRA_CONTENT"))
 
         return dataset.render()

@@ -97,8 +97,3 @@ div.operator {
 div.operator > div[data-toggle=dropdown] {
     line-height: 28px;
 }
-
-.chosen-container-single a.chosen-single {
-    height: 30px; /* same as input-sm */
-    border-radius: 5px 0 0 5px;
-}

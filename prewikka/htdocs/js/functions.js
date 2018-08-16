@@ -75,6 +75,17 @@ $(function() {
       });
   };
 
+  // Default bootstrap select2 options
+  $.fn.select2.defaults.set("theme", "bootstrap");
+  $.fn.select2.defaults.set("containerCssClass", ":all:");
+  $.fn.select2.defaults.set("width", null);
+
+  $.fn.select2_container = function(options) {
+      options = options || {};
+      options.dropdownParent = this.closest(".prewikka-resources-container");
+      return this.select2(options);
+  };
+
   $(document).on("reload", "#main", function() {
       return prewikka_ajax({
           url: prewikka_location().href,
@@ -197,10 +208,6 @@ $(function() {
 
   $(document).on('show.bs.dropdown', '.modal-content:visible .dropdown-fixed', function() {
       _position_dropdown($(this), ".dropdown-menu");
-  });
-
-  $(document).on('chosen:showing_dropdown', '.modal-content:visible select', function() {
-      _position_dropdown($(this).siblings(".chosen-container"), ".chosen-drop", true);
   });
 
   $(document).on('click', '.popup_menu_dynamic', function() {

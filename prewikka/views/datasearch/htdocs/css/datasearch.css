@@ -78,11 +78,6 @@
     }
 }
 
-#datasearch .chosen-choices li.search-field input[type="text"] {
-    /* Same as the rest of Prewikka */
-    font-family: Verdana, Arial, Helvetica, sans-serif;
-}
-
 /* Results table */
 
 #datasearch .hl {

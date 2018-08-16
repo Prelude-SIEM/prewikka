@@ -36,7 +36,6 @@
     $LAB.script("filter/js/filter.js").wait(function() {
         $(".filter-form .modal-body").on("scroll", function() {
             $(".dropdown-fixed.open").find("[data-toggle=dropdown]").dropdown("toggle");
-            $('.data-paths').trigger("chosen:close");
         });
         $(".type-checkbox").on("change", function() {
             $(this).closest(".panel-heading").siblings(".panel-body").slideToggle();

@@ -11,7 +11,6 @@
     ))
 %>
 
-<link rel="stylesheet" type="text/css" href="prewikka/css/bootstrap-chosen.css">
 % for resource in extra_resources:
   ${resource}
 % endfor
@@ -22,9 +21,9 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
                             ${ html.escapejs(history) },
                             ${ html.escapejs(labels) });
 
-  var groupby = $(".form-control-chosen");
+  var groupby = $(".form-control-select2");
   groupby.closest(".form-group").show();
-  groupby.chosen({ width: "100%", search_contains: true });
+  groupby.select2_container();
   var page = DataSearchPage("${backend}", ${html.escapejs(criterion_config)}, ${html.escapejs(criterion_config_default)}, ${html.escapejs(separators)}, "${url_for('.ajax_timeline')}");
 
   % if not search.groupby:
@@ -46,7 +45,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
 
   prewikka_resource_register({
       destroy: function() {
-          $(".form-control-chosen").chosen('destroy');
+          $("select.form-control-select2").select2('destroy');
           $("#input_search").myautocomplete('destroy');
       },
       container: "#datasearch"
@@ -123,7 +122,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
       <div class="form-group" style="display: none;">
         <div class="input-group">
           <span class="input-group-addon">${ _("Group by") }</span>
-          <select class="form-control form-control-chosen" multiple name="groupby[]" data-placeholder="${ _("Select your field") }">
+          <select class="form-control form-control-select2" multiple name="groupby[]" data-placeholder="${ _("Select your field") }">
             <optgroup label="${ _("Time values") }">
               % for field in groupby_tempo:
               <option ${ selected(field in search.groupby) } value="${ field }">${ _(field) }</option>
