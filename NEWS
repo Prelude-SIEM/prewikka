@@ -1,3 +1,49 @@
+* 2018-08-17, prewikka-5.0.0rc1:
+
+Author: Antoine Luong
+
+- Evolutions
+
+    - Replace Chosen by Select2
+    - Save and restore the grid limit
+    - Remove globally accessible env.idmef_db
+    - Verify the schema of the YAML menu
+    - Make filter creation accessible from the control menu
+
+- Bugfixes
+
+    - Various DataSearch fixes
+    - Unregister plugin data in case of initialization error
+    - Avoid SQL connection leaks
+    - Destroy active tooltips when reloading grid content
+    - Correctly merge menu sections
+    - Do not open a modal when reloading #main
+    - Interpret cronjobs configuration as local time, not UTC
+
+Author: Francois Poirotte
+
+- Handle DataSearch selections in the browser
+
+Author: Thomas Andrejak
+
+- Keep the url fragment in browser history
+- Fix correlated alerts classification display on alert board
+- Move alerts and heartbeats cronjob to dataprovider
+
+Author: Yoann Vandoorselaere
+
+- IDMEF Criterion parser fixes
+- Use gevent in Crontab
+- Implement origin check and CSRF tokens
+- Python 3 compatibility work
+
+Author: Camille Gardet
+
+- Allow complex criteria in DataSearch cells
+- Give the data type to the formatter instance
+
+
+
 * 2018-06-08, prewikka-5.0.0beta4:
 
 Author: Camille Gardet
