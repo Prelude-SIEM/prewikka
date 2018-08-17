@@ -96,7 +96,7 @@ class Agents(view.View):
                 ]
             }
 
-    @view.route("/agents/agents", methods=["GET", "POST"], permissions=[N_("IDMEF_VIEW")], help="#agents", menu=(N_("Agents"), N_("Agents")), parameters=GridParameters("agents"))
+    @view.route("/agents/agents", methods=["GET", "POST"], permissions=[N_("IDMEF_VIEW")], help="#agents", menu=(N_("Monitoring"), N_("Agents")), parameters=GridParameters("agents"))
     def agents(self):
 
         analyzer_data = list(self._get_analyzers(env.request.parameters.getlist("status")))

@@ -52,7 +52,7 @@ class HeartbeatDataSearch(idmef.IDMEFDataSearch):
 
     type = "heartbeat"
     name = "heartbeats"
-    section = N_("Agents")
+    section = N_("Monitoring")
     tabs = (N_("Heartbeats"), N_("Aggregated heartbeats"))
     formatter = HeartbeatFormatter
     query_parser = HeartbeatQueryParser

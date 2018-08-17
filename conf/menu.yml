@@ -7,20 +7,15 @@
   icon: exclamation-triangle
   categories:
       - sections:
+            - name: Alerts
+              tabs:
+                  - Alerts
+                  - Aggregated alerts
             - name: Threats
               default_tab: Threats
               tabs:
                   - Threats
                   - Aggregated threats
-            - name: Alerts
-              tabs:
-                  - Alerts
-                  - Aggregated alerts
-            - name: Agents
-              tabs:
-                  - Agents
-                  - Heartbeats
-                  - Aggregated heartbeats
 - name: ADMIN
   icon: sliders
   categories:
@@ -33,6 +28,12 @@
               tabs:
                   - My account
                   - Filters
+            - name: Monitoring
+              expand: true
+              tabs:
+                  - Agents
+                  - Heartbeats
+                  - Aggregated heartbeats
 - icon: question
   default: true
   categories:
