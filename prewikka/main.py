@@ -101,24 +101,31 @@ class Core(object):
         env.viewmanager = view.ViewManager()
         env.htdocs_mapping.update((("prewikka", pkg_resources.resource_filename(__name__, 'htdocs')),))
 
-        custom_theme = env.config.interface.get("custom_theme", None)
-        if custom_theme:
-            if os.path.isdir("%s%s" % (os.path.sep, custom_theme)):
-                env.htdocs_mapping.update((("custom", custom_theme),))
-            else:
-                env.htdocs_mapping.update((("custom", pkg_resources.resource_filename(custom_theme, 'htdocs')),))
-
         try:
             self._prewikka_initialized = False
             self._prewikka_init_if_needed()
         except:
             pass
 
+    def _load_custom_theme(self):
+        custom_theme = env.config.interface.get("custom_theme")
+        if custom_theme is None:
+            return
+
+        if os.path.isdir("%s%s" % (os.path.sep, custom_theme)):
+            env.htdocs_mapping.update((("custom", custom_theme),))
+        else:
+            try:
+                env.htdocs_mapping.update((("custom", pkg_resources.resource_filename(custom_theme, 'htdocs')),))
+            except ImportError:
+                raise config.ConfigValueError(custom_theme, "custom_theme")
+
     def _prewikka_init_if_needed(self):
         if self._prewikka_initialized is True:
             return self._reload_plugin_if_needed()
 
         try:
+            self._load_custom_theme()
             self._checkVersion()
             env.db = database.Database(env.config.database)
             history.init()
