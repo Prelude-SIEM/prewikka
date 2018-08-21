@@ -185,6 +185,7 @@ setup(
             'CrontabView = prewikka.views.crontab:CrontabView',
             'FilterView = prewikka.views.filter.filter:FilterView',
             'HeartbeatDataSearch = prewikka.views.datasearch.heartbeat:HeartbeatDataSearch',
+            "IDMEFnav = prewikka.views.idmefnav:IDMEFNav",
             'MessageSummary = prewikka.views.messagesummary:MessageSummary',
             'ThreatDataSearch = prewikka.views.datasearch.threat:ThreatDataSearch',
             'UserManagement = prewikka.views.usermanagement:UserManagement',
@@ -221,6 +222,10 @@ setup(
         ],
         'prewikka.views.aboutplugin': [
             "htdocs/css/*.css"
+        ],
+        "prewikka.views.idmefnav": [
+            "htdocs/yaml/*.yml",
+            "htdocs/graph/*",
         ],
     },
     scripts=[

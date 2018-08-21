@@ -1,0 +1,29 @@
+---
+name: Action
+description: 'The Action class is used to describe any actions taken by the analyzer
+  in response to the event.  Is is represented in the IDMEF DTD as follows: '
+color: "#FF5024"
+aggregates: {}
+attributes:
+  category:
+    name: category
+    multiplicity:
+    type: ENUM
+    description: The default value is "other".  (See also Section 10.)
+    values:
+    - rank: '0'
+      keyword: block-installed
+      description: A block of some sort was installed to prevent an attack from reaching
+        its destination.  The block could be a port block, address block, etc., or
+        disabling a user account.
+    - rank: '1'
+      keyword: notification-sent
+      description: A notification message of some sort was sent out-of-band (via pager,
+        e-mail, etc.).  Does not include the transmission of this alert.
+    - rank: '2'
+      keyword: taken-offline
+      description: A system, computer, or user was taken offline, as when the computer
+        is shut down or a user is logged off.
+    - rank: '3'
+      keyword: other
+      description: Anything not in one of the above categories.

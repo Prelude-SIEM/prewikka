@@ -1,0 +1,42 @@
+---
+name: Process
+description: 'The Process class is used to describe processes being executed on sources,
+  targets, and analyzers. '
+color: "#FFCC66"
+aggregates:
+  name:
+    name: name
+    multiplicity: '1'
+    type: STRING
+    description: The name of the program being executed. This is a short name; path
+      and argument information are provided elsewhere.
+  pid:
+    name: pid
+    multiplicity: 0..1
+    type: INTEGER
+    description: The process identifier of the process.
+  path:
+    name: path
+    multiplicity: 0..1
+    type: STRING
+    description: The full path of the program being executed.
+  arg:
+    name: arg
+    multiplicity: 0..*
+    type: STRING
+    description: A command-line argument to the program. Multiple arguments may be
+      specified (they are assumed to have occurred in the same order they are provided)
+      with multiple uses of arg.
+  env:
+    name: env
+    multiplicity: 0..*
+    type: STRING
+    description: An environment string associated with the process; generally of the
+      format "VARIABLE=value".  Multiple environment strings may be specified with
+      multiple uses of env.
+attributes:
+  ident:
+    name: ident
+    multiplicity: Optional
+    type: STRING
+    description: A unique identifier for the process; see Section 3.2.9.

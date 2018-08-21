@@ -1,0 +1,59 @@
+---
+name: Linkage
+description: 'The Linkage class represents file system connections between the file
+  described in the <File> element and other objects in the file system. For example,
+  if the <File> element is a symbolic link or shortcut, then the <Linkage> element
+  should contain the name of the object the link points to.  Further information can
+  be provided about the object in the <Linkage> element with another <File> element,
+  if appropriate. '
+color: "#FFCC00"
+aggregates:
+  name:
+    name: name
+    multiplicity: '1'
+    type: STRING
+    description: The name of the file system object, not including the path.
+  path:
+    name: path
+    multiplicity: '1'
+    type: STRING
+    description: The full path to the file system object, including the name.  The
+      path name should be represented in as "universal" a manner as possible, to facilitate
+      processing of the alert.
+  File:
+    name: File
+    multiplicity: '1'
+    type:
+    description: A <File> element may be used in place of the <name> and <path> elements
+      if additional information about the file is to be included.
+attributes:
+  category:
+    name: category
+    multiplicity: Optional
+    type: ENUM
+    description: Section 10.)
+    values:
+    - rank: '0'
+      keyword: hard-link
+      description: The <name> element represents another name for this file.  This
+        information may be more easily obtainable on NTFS file systems than others.
+    - rank: '1'
+      keyword: mount-point
+      description: An alias for the directory specified by the parent's <name> and
+        <path> elements.
+    - rank: '2'
+      keyword: reparse-point
+      description: Applies only to Windows; excludes symbolic links and mount points,
+        which are specific types of reparse points.
+    - rank: '3'
+      keyword: shortcut
+      description: The file represented by a Windows "shortcut".  A shortcut is distinguished
+        from a symbolic link because of the difference in their contents, which may
+        be of importance to the manager.
+    - rank: '4'
+      keyword: stream
+      description: An Alternate Data Stream (ADS) in Windows; a fork on MacOS.  Separate
+        file system entity that is considered an extension of the main <File>.
+    - rank: '5'
+      keyword: symbolic-link
+      description: The <name> element represents the file to which the link points.

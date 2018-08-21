@@ -1,0 +1,77 @@
+---
+name: UserId
+description: 'The UserId class provides specific information about a user.  More than
+  one UserId can be used within the User class to indicate attempts to transition
+  from one user to another, or to provide complete information about a user''s (or
+  process'') privileges. '
+color: "#66CCFF"
+aggregates:
+  name:
+    name: name
+    multiplicity: 0..1
+    type: STRING
+    description: A user or group name.
+  number:
+    name: number
+    multiplicity: 0..1
+    type: INTEGER
+    description: A user or group number.
+attributes:
+  ident:
+    name: ident
+    multiplicity: Optional
+    type: STRING
+    description: A unique identifier for the user id, see Section 3.2.9.
+  type:
+    name: type
+    multiplicity: Optional
+    type: ENUM
+    description: The type of user information represented.  The permitted values for
+      this attribute are shown below.  The default value is "original-user".  (See
+      also Section 10.)
+    values:
+    - rank: '0'
+      keyword: current-user
+      description: The current user id being used by the user or process.  On Unix
+        systems, this would be the "real" user id, in general.
+    - rank: '1'
+      keyword: original-user
+      description: The actual identity of the user or process being reported on.  On
+        those systems that (a) do some type of auditing and (b) support extracting
+        a user id from the "audit id" token, that value should be used.  On those
+        systems that do not support this, and where the user has logged into the system,
+        the "login id" should be used.
+    - rank: '2'
+      keyword: target-user
+      description: The user id the user or process is attempting to become.  This
+        would apply, on Unix systems for example, when the user attempts to use "su",
+        "rlogin", "telnet", etc.
+    - rank: '3'
+      keyword: user-privs
+      description: Another user id the user or process has the ability to use, or
+        a user id associated with a file permission.  On Unix systems, this would
+        be the "effective" user id in a user or process context, and the owner permissions
+        in a file context.  Multiple UserId elements of this type may be used to specify
+        a list of privileges.
+    - rank: '4'
+      keyword: current-group
+      description: The current group id (if applicable) being used by the user or
+        process.  On Unix systems, this would be the "real" group id, in general.
+    - rank: '5'
+      keyword: group-privs
+      description: Another group id the group or process has the ability to use, or
+        a group id associated with a file permission.  On Unix systems, this would
+        be the "effective" group id in a group or process context, and the group permissions
+        in a file context.  On BSD-derived Unix systems, multiple UserId elements
+        of this type would be used to include all the group ids on the "group list".
+    - rank: '6'
+      keyword: other-privs
+      description: Not used in a user, group, or process context, only used in the
+        file context. The file permissions assigned to users who do not match either
+        the user or group permissions on the file.  On Unix systems, this would be
+        the "world" permissions.
+  tty:
+    name: tty
+    multiplicity: Optional
+    type: STRING
+    description: The tty the user is using.

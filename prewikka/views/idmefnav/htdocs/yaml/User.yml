@@ -1,0 +1,34 @@
+---
+name: User
+description: 'The User class is used to describe users.  It is primarily used as a
+  "container" class for the UserId aggregate class, as shown in Figure 16. '
+color: "#66CCFF"
+aggregates:
+  UserId:
+    name: UserId
+    multiplicity: 1..*
+    type:
+    description: Identification of a user, as indicated by its type attribute (see
+      Section 4.2.7.3.1).
+attributes:
+  ident:
+    name: ident
+    multiplicity: Optional
+    type: STRING
+    description: A unique identifier for the user; see Section 3.2.9.
+  category:
+    name: category
+    multiplicity: Optional
+    type: ENUM
+    description: The type of user represented.  The permitted values for this attribute
+      are shown below.  The default value is "unknown". (See also Section 10.)
+    values:
+    - rank: '0'
+      keyword: unknown
+      description: User type unknown
+    - rank: '1'
+      keyword: application
+      description: An application user
+    - rank: '2'
+      keyword: os-device
+      description: An operating system or device user

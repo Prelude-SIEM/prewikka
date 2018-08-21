@@ -1,0 +1,56 @@
+---
+name: Reference
+description: 'The Reference class provides the "name" of an alert, or other information
+  allowing the manager to determine what it is. '
+color: "#996633"
+aggregates:
+  name:
+    name: name
+    multiplicity: '1'
+    type: STRING
+    description: The name of the alert, from one of the origins listed below.
+  url:
+    name: url
+    multiplicity: '1'
+    type: STRING
+    description: A URL at which the manager (or the human operator of the manager)
+      can find additional information about the alert.  The document pointed to by
+      the URL may include an in-depth description of the attack, appropriate countermeasures,
+      or other information deemed relevant by the vendor.
+attributes:
+  origin:
+    name: origin
+    multiplicity: Required
+    type: ENUM
+    description: The source from which the name of the alert originates. The permitted
+      values for this attribute are shown below.  The default value is "unknown".  (See
+      also Section 10.)
+    values:
+    - rank: '0'
+      keyword: unknown
+      description: Origin of the name is not known
+    - rank: '1'
+      keyword: vendor-specific
+      description: A vendor-specific name (and hence, URL); this can be used to provide
+        product-specific information
+    - rank: '2'
+      keyword: user-specific
+      description: A user-specific name (and hence, URL); this can be used to provide
+        installation-specific information
+    - rank: '3'
+      keyword: bugtraqid
+      description: The SecurityFocus ("Bugtraq") vulnerability database identifier
+        (http://www.securityfocus.com/bid)
+    - rank: '4'
+      keyword: cve
+      description: The Common Vulnerabilities and Exposures (CVE) name (http://cve.mitre.org/)
+    - rank: '5'
+      keyword: osvdb
+      description: The Open Source Vulnerability Database (http://www.osvdb.org)
+  meaning:
+    name: meaning
+    multiplicity: Optional
+    type: STRING
+    description: The meaning of the reference, as understood by the alert provider.  This
+      field is only valid if the value of the <origin> attribute is set to "vendor-specific"
+      or "user-specific".

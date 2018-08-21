@@ -1,0 +1,8 @@
+---
+name: AnalyzerTime
+description: 'The AnalyzerTime class is used to indicate the current date and time
+  on the analyzer.  Its values should be filled in as late as possible in the message
+  transmission process, ideally immediately before placing the message "on the wire". '
+color: "#9999FF"
+aggregates: {}
+attributes: {}

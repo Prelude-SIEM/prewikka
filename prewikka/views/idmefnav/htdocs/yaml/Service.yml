@@ -1,0 +1,67 @@
+---
+name: Service
+description: 'The Service class describes network services on sources and targets.
+  It can identify services by name, port, and protocol.  When Service occurs as an
+  aggregate class of Source, it is understood that the service is one from which activity
+  of interest is originating; and that the service is "attached" to the Node, Process,
+  and User information also contained in Source.  Likewise, when Service occurs as
+  an aggregate class of Target, it is understood that the service is one to which
+  activity of interest is being directed; and that the service is "attached" to the
+  Node, Process, and User information also contained in Target.  If Service occurs
+  in both Source and Target, then information in both locations should be the same.  If
+  information is the same in both locations and implementers wish to carry it in only
+  one location, they should specify it as an aggregate of the Target class. '
+color: "#FFCCCC"
+childs:
+  WebService:
+    name: WebService
+  SNMPService:
+    name: SNMPService
+aggregates:
+  name:
+    name: name
+    multiplicity: 0..1
+    type: STRING
+    description: The name of the service.  Whenever possible, the name from the IANA
+      list of well-known ports SHOULD be used.
+  port:
+    name: port
+    multiplicity: 0..1
+    type: INTEGER
+    description: The port number being used.
+  portlist:
+    name: portlist
+    multiplicity: 0..1
+    type: PORTLIST
+    description: A list of port numbers being used; see Section 3.2.8 for formatting
+      rules.  If a portlist is given, the iana_protocol_number and iana_protocol_name
+      MUST apply to all the elements of the list.
+  protocol:
+    name: protocol
+    multiplicity: 0..1
+    type: STRING
+    description: Additional information about the protocol being used.  The intent
+      of the protocol field is to carry additional information related to the protocol
+      being used when the <Service> attributes iana_protocol_number or/and iana_protocol_name
+      are filed.
+attributes:
+  ident:
+    name: ident
+    multiplicity: Optional
+    type: STRING
+    description: A unique identifier for the service; see Section 3.2.9.
+  ip_version:
+    name: ip_version
+    multiplicity: Optional
+    type: INTEGER
+    description: The IP version number.
+  iana_protocol_number:
+    name: iana_protocol_number
+    multiplicity: Optional
+    type: INTEGER
+    description: The IANA protocol number.
+  iana_protocol_name:
+    name: iana_protocol_name
+    multiplicity: Optional
+    type: STRING
+    description: The IANA protocol name.

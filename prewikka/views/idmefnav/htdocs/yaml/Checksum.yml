@@ -1,0 +1,54 @@
+---
+name: Checksum
+description: 'The Checksum class represents checksum information associated with the
+  file.  This checksum information can be provided by file integrity checkers, among
+  others. '
+color: "#FFCC00"
+aggregates:
+  value:
+    name: value
+    multiplicity: '1'
+    type: STRING
+    description: The value of the checksum.
+  key:
+    name: key
+    multiplicity: 0..1
+    type: STRING
+    description: The key to the checksum, if appropriate.
+attributes:
+  algorithm:
+    name: algorithm
+    multiplicity: Required
+    type: ENUM
+    description: default value.  (See also Section 10.)
+    values:
+    - rank: '0'
+      keyword: MD4
+      description: The MD4 algorithm.
+    - rank: '1'
+      keyword: MD5
+      description: The MD5 algorithm.
+    - rank: '2'
+      keyword: SHA1
+      description: The SHA1 algorithm.
+    - rank: '3'
+      keyword: SHA2-256
+      description: The SHA2 algorithm with 256 bits length.
+    - rank: '4'
+      keyword: SHA2-384
+      description: The SHA2 algorithm with 384 bits length.
+    - rank: '5'
+      keyword: SHA2-512
+      description: The SHA2 algorithm with 512 bits length.
+    - rank: '6'
+      keyword: CRC-32
+      description: The CRC algorithm with 32 bits length.
+    - rank: '7'
+      keyword: Haval
+      description: The Haval algorithm.
+    - rank: '8'
+      keyword: Tiger
+      description: The Tiger algorithm.
+    - rank: '9'
+      keyword: Gost
+      description: The Gost algorithm.

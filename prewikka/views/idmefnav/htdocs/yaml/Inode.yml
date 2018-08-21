@@ -1,0 +1,40 @@
+---
+name: Inode
+description: 'The Inode class is used to represent the additional information contained
+  in a Unix file system i-node. '
+color: "#FFCC00"
+aggregates:
+  change-time:
+    name: change-time
+    multiplicity: 0..1
+    type: DATETIME
+    description: The time of the last inode change, given by the st_ctime element
+      of "struct stat".
+  number:
+    name: number
+    multiplicity: 0..1
+    type: INTEGER
+    description: The inode number.
+  major-device:
+    name: major-device
+    multiplicity: 0..1
+    type: INTEGER
+    description: The major device number of the device the file resides on.
+  minor-device:
+    name: minor-device
+    multiplicity: 0..1
+    type: INTEGER
+    description: The minor device number of the device the file resides on.
+  c-major-device:
+    name: c-major-device
+    multiplicity: 0..1
+    type: INTEGER
+    description: The major device of the file itself, if it is a character special
+      device.
+  c-minor-device:
+    name: c-minor-device
+    multiplicity: 0..1
+    type: INTEGER
+    description: The minor device of the file itself, if it is a character special
+      device.
+attributes: {}

@@ -1,0 +1,53 @@
+---
+name: SNMPService
+description: 'The SNMPService class carries additional information related to SNMP
+  traffic.  The aggregate classes composing SNMPService must be interpreted as described
+  in RFC 3411 [15] and RFC 3584 [16]. '
+color: "#FFCCCC"
+aggregates:
+  oid:
+    name: oid
+    multiplicity: 0..1
+    type: STRING
+    description: The object identifier in the request.
+  messageProcessingModel:
+    name: messageProcessingModel
+    multiplicity: 0..1
+    type: INTEGER
+    description: The SNMP version, typically 0 for SNMPv1, 1 for SNMPv2c, 2 for SNMPv2u
+      and SNMPv2*, and 3 for SNMPv3; see RFC 3411 [15] Section 5 for appropriate values.
+  securityModel:
+    name: securityModel
+    multiplicity: 0..1
+    type: INTEGER
+    description: The identification of the security model in use, typically 0 for
+      any, 1 for SNMPv1, 2 for SNMPv2c, and 3 for USM; see RFC 3411 [15] Section 5
+      for appropriate values.
+  securityName:
+    name: securityName
+    multiplicity: 0..1
+    type: STRING
+    description: The object's security name; see RFC 3411 [15] Section 3.2.2.
+  securityLevel:
+    name: securityLevel
+    multiplicity: 0..1
+    type: INTEGER
+    description: The security level of the SNMP request; see RFC 3411 [15] Section
+      3.4.3.
+  contextName:
+    name: contextName
+    multiplicity: 0..1
+    type: STRING
+    description: The object's context name; see RFC 3411 [15] Section 3.3.3.
+  contextEngineID:
+    name: contextEngineID
+    multiplicity: 0..1
+    type: STRING
+    description: The object's context engine identifier; see RFC 3411 [15] Section
+      3.3.2.
+  command:
+    name: command
+    multiplicity: 0..1
+    type: STRING
+    description: The command sent to the SNMP server (GET, SET, etc.).
+attributes: {}

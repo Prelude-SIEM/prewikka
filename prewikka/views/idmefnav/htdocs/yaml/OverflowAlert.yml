@@ -1,0 +1,26 @@
+---
+name: OverflowAlert
+description: 'The OverflowAlert carries additional information related to buffer overflow
+  attacks.  It is intended to enable an analyzer to provide the details of the overflow
+  attack itself. '
+color: "#BFBFBF"
+aggregates:
+  program:
+    name: program
+    multiplicity: '1'
+    type: STRING
+    description: 'The program that the overflow attack attempted to run (NOTE: this
+      is not the program that was attacked).'
+  size:
+    name: size
+    multiplicity: 0..1
+    type: INTEGER
+    description: The size, in bytes, of the overflow (i.e., the number of bytes the
+      attacker sent).
+  buffer:
+    name: buffer
+    multiplicity: 0..1
+    type: BYTE[]
+    description: Some or all of the overflow data itself (dependent on how much the
+      analyzer can capture).
+attributes: {}

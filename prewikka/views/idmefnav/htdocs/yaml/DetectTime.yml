@@ -1,0 +1,10 @@
+---
+name: DetectTime
+description: 'The DetectTime class is used to indicate the date and time that the
+  event(s) producing an alert was detected by the analyzer.  In the case of more than
+  one event, it is the time that the first event was detected.  (This may or may not
+  be the same time as CreateTime; analyzers are not required to send alerts immediately
+  upon detection). '
+color: "#9999FF"
+aggregates: {}
+attributes: {}

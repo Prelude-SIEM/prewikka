@@ -1,0 +1,58 @@
+---
+name: Source
+description: 'The Source class contains information about the possible source(s) of
+  the event(s) that generated an alert.  An event may have more than one source (e.g.,
+  in a distributed denial-of-service attack). '
+color: "#284F9F"
+aggregates:
+  Node:
+    name: Node
+    multiplicity: 0..1
+    type:
+    description: Information about the host or device that appears to be causing the
+      events (network address, network name, etc.).
+  User:
+    name: User
+    multiplicity: 0..1
+    type:
+    description: Information about the user that appears to be causing the event(s).
+  Process:
+    name: Process
+    multiplicity: 0..1
+    type:
+    description: Information about the process that appears to be causing the event(s).
+  Service:
+    name: Service
+    multiplicity: 0..1
+    type:
+    description: Information about the network service involved in the event(s).
+attributes:
+  ident:
+    name: ident
+    multiplicity: Optional
+    type: STRING
+    description: A unique identifier for this source; see Section 3.2.9.
+  spoofed:
+    name: spoofed
+    multiplicity: Optional
+    type: ENUM
+    description: An indication of whether the source is, as far as the analyzer can
+      determine, a spoofed address used for hiding the real origin of the attack.  The
+      permitted values for this attribute are shown below.  The default value is "unknown".  (See
+      also Section 10.)
+    values:
+    - rank: '0'
+      keyword: unknown
+      description: Accuracy of source information unknown
+    - rank: '1'
+      keyword: 'yes'
+      description: Source is believed to be a decoy
+    - rank: '2'
+      keyword: 'no'
+      description: Source is believed to be "real"
+  interface:
+    name: interface
+    multiplicity: Optional
+    type: STRING
+    description: May be used by a network-based analyzer with multiple interfaces
+      to indicate which interface this source was seen on.

@@ -1,0 +1,7 @@
+---
+name: CreateTime
+description: 'The CreateTime class is used to indicate the date and time the alert
+  or heartbeat was created by the analyzer. '
+color: "#9999FF"
+aggregates: {}
+attributes: {}

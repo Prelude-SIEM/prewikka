@@ -1,0 +1,77 @@
+---
+name: Analyzer
+description: 'The Analyzer class identifies the analyzer from which the Alert or Heartbeat
+  message originates.  Only one analyzer may be encoded for each alert or heartbeat,
+  and that MUST be the analyzer at which the alert or heartbeat originated.  Although
+  the IDMEF data model does not prevent the use of hierarchical intrusion detection
+  systems (where alerts get relayed up the tree), it does not provide any way to record
+  the identity of the "relay" analyzers along the path from the originating analyzer
+  to the manager that ultimately receives the alert. '
+color: "#FFFF66"
+aggregates:
+  Node:
+    name: Node
+    multiplicity: 0..1
+    type:
+    description: Information about the host or device on which the analyzer resides
+      (network address, network name, etc.).
+  Process:
+    name: Process
+    multiplicity: 0..1
+    type:
+    description: Information about the process in which the analyzer is executing.
+  Analyzer:
+    name: Analyzer
+    multiplicity: 0..1
+    type:
+    description: Information about the analyzer from which the message may have gone
+      through.  The idea behind this mechanism is that when a manager receives an
+      alert and wants to forward it to another analyzer, it needs to substitute the
+      original analyzer
+attributes:
+  analyzerid:
+    name: analyzerid
+    multiplicity: Optional
+    type: STRING
+    description: "(but see below).  A unique identifier for the analyzer; see Section
+      3.2.9."
+  name:
+    name: name
+    multiplicity: Optional
+    type: STRING
+    description: An explicit name for the analyzer that may be easier to understand
+      than the analyzerid.
+  manufacturer:
+    name: manufacturer
+    multiplicity: Optional
+    type: STRING
+    description: The manufacturer of the analyzer software and/or hardware.
+  model:
+    name: model
+    multiplicity: Optional
+    type: STRING
+    description: The model name/number of the analyzer software and/or hardware.
+  version:
+    name: version
+    multiplicity: Optional
+    type: STRING
+    description: The version number of the analyzer software and/or hardware.
+  class:
+    name: class
+    multiplicity: Optional
+    type: STRING
+    description: The class of analyzer software and/or hardware.
+  ostype:
+    name: ostype
+    multiplicity: Optional
+    type: STRING
+    description: Operating system name.  On POSIX 1003.1 compliant systems, this is
+      the value returned in utsname.sysname by the uname() system call, or the output
+      of the "uname -s" command.
+  osversion:
+    name: osversion
+    multiplicity: Optional
+    type: STRING
+    description: Operating system version.  On POSIX 1003.1 compliant systems, this
+      is the value returned in utsname.release by the uname() system call, or the
+      output of the "uname -r" command.

@@ -1,0 +1,97 @@
+---
+name: File
+description: 'The File class provides specific information about a file or other file-like
+  object that has been created, deleted, or modified on the target.  The description
+  can provide either the file settings prior to the event or the file settings at
+  the time of the event, as specified using the "category" attribute. '
+color: "#FFCC00"
+aggregates:
+  name:
+    name: name
+    multiplicity: '1'
+    type: STRING
+    description: The name of the file to which the alert applies, not including the
+      path to the file.
+  path:
+    name: path
+    multiplicity: '1'
+    type: STRING
+    description: The full path to the file, including the name.  The path name should
+      be represented in as "universal" a manner as possible, to facilitate processing
+      of the alert.
+  create-time:
+    name: create-time
+    multiplicity: 0..1
+    type: DATETIME
+    description: Time the file was created.  Note that this is *not* the Unix "st_ctime"
+      file attribute (which is not file creation time).  The Unix "st_ctime" attribute
+      is contained in the "Inode" class.
+  modify-time:
+    name: modify-time
+    multiplicity: 0..1
+    type: DATETIME
+    description: Time the file was last modified.
+  access-time:
+    name: access-time
+    multiplicity: 0..1
+    type: DATETIME
+    description: Time the file was last accessed.
+  data-size:
+    name: data-size
+    multiplicity: 0..1
+    type: INTEGER
+    description: The size of the data, in bytes.  Typically what is meant when referring
+      to file size.  On Unix UFS file systems, this value corresponds to stat.st_size.  On
+      Windows NTFS, this value corresponds to Valid Data Length (VDL).
+  disk-size:
+    name: disk-size
+    multiplicity: 0..1
+    type: INTEGER
+    description: The physical space on disk consumed by the file, in bytes.  On Unix
+      UFS file systems, this value corresponds to 512 * stat.st_blocks.  On Windows
+      NTFS, this value corresponds to End of File (EOF).
+  FileAccess:
+    name: FileAccess
+    multiplicity: 0..*
+    type:
+    description: Access permissions on the file.
+  Linkage:
+    name: Linkage
+    multiplicity: 0..*
+    type:
+    description: File system objects to which this file is linked (other references
+      for the file).
+  Inode:
+    name: Inode
+    multiplicity: 0..1
+    type:
+    description: Inode information for this file (relevant to Unix).
+  Checksum:
+    name: Checksum
+    multiplicity: 0..*
+    type:
+    description: Checksum information for this file.
+  ident:
+    name: ident
+    multiplicity: 0..1
+    type: STRING
+    description: A unique identifier for this file; see Section 3.2.9.
+  category:
+    name: category
+    multiplicity: 0..1
+    type: ENUM
+    description: The type of file system the file resides on.  This attribute governs
+      how path names and other attributes are interpreted.
+    values:
+    - rank: '0'
+      keyword: current
+      description: The file information is from after the reported change
+    - rank: '1'
+      keyword: original
+      description: The file information is from before the reported change
+  file-type:
+    name: file-type
+    multiplicity: 0..1
+    type: STRING
+    description: The type of file, as a mime-type.
+attributes: {}

@@ -1,0 +1,23 @@
+---
+name: Assessment
+description: 'The Assessment class is used to provide the analyzer''s assessment of
+  an event -- its impact, actions taken in response, and confidence. '
+color: "#FF5024"
+aggregates:
+  Impact:
+    name: Impact
+    multiplicity: 0..1
+    type:
+    description: The analyzer's assessment of the impact of the event on the target(s).
+  Action:
+    name: Action
+    multiplicity: 0..*
+    type:
+    description: The action(s) taken by the analyzer in response to the event.
+  Confidence:
+    name: Confidence
+    multiplicity: 0..1
+    type:
+    description: A measurement of the confidence the analyzer has in its evaluation
+      of the event.
+attributes: {}

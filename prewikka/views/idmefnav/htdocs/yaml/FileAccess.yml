@@ -1,0 +1,50 @@
+---
+name: FileAccess
+description: 'The FileAccess class represents the access permissions on a file. The
+  representation is intended to be useful across operating systems. '
+color: "#FFCC00"
+aggregates:
+  UserId:
+    name: UserId
+    multiplicity: '1'
+    type:
+    description: The user (or group) to which these permissions apply.  The value
+      of the "type" attribute must be "user-privs", "group-privs", or "other-privs"
+      as appropriate.  Other values for "type" MUST NOT be used in this context.
+  Permission:
+    name: Permission
+    multiplicity: 1..*
+    type: ENUM
+    description: Level of access allowed.  The permitted values are shown below.  There
+      is no default value.  (See also Section 10.)
+    values:
+    - rank: '0'
+      keyword: noAccess
+      description: No access at all is allowed for this user
+    - rank: '1'
+      keyword: read
+      description: This user has read access to the file
+    - rank: '2'
+      keyword: write
+      description: This user has write access to the file
+    - rank: '3'
+      keyword: execute
+      description: This user has the ability to execute the file
+    - rank: '4'
+      keyword: search
+      description: This user has the ability to search this file (applies to "execute"
+        permission on directories in Unix)
+    - rank: '5'
+      keyword: delete
+      description: This user has the ability to delete this file
+    - rank: '6'
+      keyword: executeAs
+      description: This user has the ability to execute this file as another user
+    - rank: '7'
+      keyword: changePermissions
+      description: This user has the ability to change the access permissions on this
+        file
+    - rank: '8'
+      keyword: takeOwnership
+      description: This user has the ability to take ownership of this file
+attributes: {}

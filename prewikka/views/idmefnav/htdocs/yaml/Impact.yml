@@ -1,0 +1,61 @@
+---
+name: Impact
+description: 'The Impact class is used to provide the analyzer''s assessment of the
+  impact of the event on the target(s).  It is represented in the IDMEF DTD as follows: '
+color: "#FF5024"
+aggregates: {}
+attributes:
+  severity:
+    name: severity
+    multiplicity: Optional
+    type: ENUM
+    description: Section 10.)
+    values:
+    - rank: '0'
+      keyword: info
+      description: 'Alert represents informational activity  '
+    - rank: '1'
+      keyword: low
+      description: 'Low severity  '
+    - rank: '2'
+      keyword: medium
+      description: 'Medium severity  '
+    - rank: '3'
+      keyword: high
+      description: High severity
+  completion:
+    name: completion
+    multiplicity: Optional
+    type: ENUM
+    description: Section 10.)
+    values:
+    - rank: '0'
+      keyword: failed
+      description: The attempt was not successful
+    - rank: '1'
+      keyword: succeeded
+      description: The attempt succeeded
+  type:
+    name: type
+    multiplicity: Optional
+    type: ENUM
+    description: value is "other".  (See also Section 10.)
+    values:
+    - rank: '0'
+      keyword: admin
+      description: Administrative privileges were attempted or obtained
+    - rank: '1'
+      keyword: dos
+      description: A denial of service was attempted or completed
+    - rank: '2'
+      keyword: file
+      description: An action on a file was attempted or completed
+    - rank: '3'
+      keyword: recon
+      description: A reconnaissance probe was attempted or completed
+    - rank: '4'
+      keyword: user
+      description: User privileges were attempted or obtained
+    - rank: '5'
+      keyword: other
+      description: Anything not in one of the above categories

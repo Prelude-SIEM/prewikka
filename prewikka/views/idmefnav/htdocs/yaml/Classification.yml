@@ -1,0 +1,24 @@
+---
+name: Classification
+description: 'The Classification class provides the "name" of an alert, or other information
+  allowing the manager to determine what it is.  This name is chosen by the alert
+  provider. '
+color: "#996633"
+aggregates:
+  Reference:
+    name: Reference
+    multiplicity: 0..*
+    type:
+    description: Information about the message, pointing to external documentation
+      sites, that will provide background information about the alert.
+attributes:
+  ident:
+    name: ident
+    multiplicity: Optional
+    type: STRING
+    description: A unique identifier for this classification; see Section 3.2.9.
+  text:
+    name: text
+    multiplicity: Required
+    type: STRING
+    description: A vendor-provided string identifying the Alert message.

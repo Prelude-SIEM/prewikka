@@ -1,0 +1,26 @@
+---
+name: Confidence
+description: 'The Confidence class is used to represent the analyzer''s best estimate
+  of the validity of its analysis.  It is represented in the IDMEF DTD as follows: '
+color: "#FF5024"
+aggregates: {}
+attributes:
+  rating:
+    name: rating
+    multiplicity:
+    type: ENUM
+    description: also Section 10.)
+    values:
+    - rank: '0'
+      keyword: low
+      description: The analyzer has little confidence in its validity
+    - rank: '1'
+      keyword: medium
+      description: The analyzer has average confidence in its validity
+    - rank: '2'
+      keyword: high
+      description: The analyzer has high confidence in its validity
+    - rank: '3'
+      keyword: numeric
+      description: The analyzer has provided a posterior probability value indicating
+        its confidence in its validity

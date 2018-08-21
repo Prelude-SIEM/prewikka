@@ -1,0 +1,87 @@
+---
+name: Address
+description: 'The Address class is used to represent network, hardware, and application
+  addresses. '
+color: "#00CC00"
+aggregates:
+  address:
+    name: address
+    multiplicity: '1'
+    type: STRING
+    description: The address information.  The format of this data is governed by
+      the category attribute.
+  netmask:
+    name: netmask
+    multiplicity: 0..1
+    type: STRING
+    description: The network mask for the address, if appropriate.
+attributes:
+  ident:
+    name: ident
+    multiplicity: Optional
+    type: STRING
+    description: A unique identifier for the address; see Section 3.2.9.
+  category:
+    name: category
+    multiplicity: Optional
+    type: ENUM
+    description: The type of address represented.  The permitted values for this attribute
+      are shown below.  The default value is "unknown".  (See also Section 10.)
+    values:
+    - rank: '0'
+      keyword: unknown
+      description: Address type unknown
+    - rank: '1'
+      keyword: atm
+      description: Asynchronous Transfer Mode network address
+    - rank: '2'
+      keyword: e-mail
+      description: Electronic mail address (RFC 822)
+    - rank: '3'
+      keyword: lotus-notes
+      description: Lotus Notes e-mail address
+    - rank: '4'
+      keyword: mac
+      description: Media Access Control (MAC) address
+    - rank: '5'
+      keyword: sna
+      description: IBM Shared Network Architecture (SNA) address
+    - rank: '6'
+      keyword: vm
+      description: IBM VM ("PROFS") e-mail address
+    - rank: '7'
+      keyword: ipv4-addr
+      description: IPv4 host address in dotted-decimal notation (a.b.c.d)
+    - rank: '8'
+      keyword: ipv4-addr-hex
+      description: IPv4 host address in hexadecimal notation
+    - rank: '9'
+      keyword: ipv4-net
+      description: IPv4 network address in dotted-decimal notation, slash, significant
+        bits (a.b.c.d/nn)
+    - rank: '10'
+      keyword: ipv4-net-mask
+      description: IPv4 network address in dotted-decimal notation, slash, network
+        mask in dotted-decimal notation (a.b.c.d/w.x.y.z)
+    - rank: '11'
+      keyword: ipv6-addr
+      description: IPv6 host address
+    - rank: '12'
+      keyword: ipv6-addr-hex
+      description: IPv6 host address in hexadecimal notation
+    - rank: '13'
+      keyword: ipv6-net
+      description: IPv6 network address, slash, significant bits
+    - rank: '14'
+      keyword: ipv6-net-mask
+      description: IPv6 network address, slash, network mask
+  vlan-name:
+    name: vlan-name
+    multiplicity: Optional
+    type: STRING
+    description: The name of the Virtual LAN to which the address belongs.
+  vlan-num:
+    name: vlan-num
+    multiplicity: Optional
+    type: INTEGER
+    description: The number of the Virtual LAN to which the address belongs.

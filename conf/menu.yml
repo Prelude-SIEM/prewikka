@@ -40,3 +40,6 @@
             - name: Apps
               tabs:
                   - Apps
+            - name: Help
+              tabs:
+                  - IDMEF

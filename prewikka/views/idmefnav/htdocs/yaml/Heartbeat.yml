@@ -1,0 +1,43 @@
+---
+name: Heartbeat
+description: 'Analyzers use Heartbeat messages to indicate their current status to
+  managers.  Heartbeats are intended to be sent in a regular period, say, every ten
+  minutes or every hour.  The receipt of a Heartbeat message from an analyzer indicates
+  to the manager that the analyzer is up and running; lack of a Heartbeat message
+  (or more likely, lack of some number of consecutive Heartbeat messages) indicates
+  that the analyzer or its network connection has failed. '
+color: "#94C600"
+aggregates:
+  Analyzer:
+    name: Analyzer
+    multiplicity: '1'
+    type:
+    description: Identification information for the analyzer that originated the heartbeat.
+  CreateTime:
+    name: CreateTime
+    multiplicity: '1'
+    type:
+    description: The time the heartbeat was created.
+  HeartbeatInterval:
+    name: HeartbeatInterval
+    multiplicity: 0..1
+    type: INTEGER
+    description: The interval in seconds at which heartbeats are generated.
+  AnalyzerTime:
+    name: AnalyzerTime
+    multiplicity: 0..1
+    type:
+    description: The current time on the analyzer (see Section 6.3).
+  AdditionalData:
+    name: AdditionalData
+    multiplicity: 0..*
+    type:
+    description: Information included by the analyzer that does not fit into the data
+      model.  This may be an atomic piece of data or a large amount of data provided
+      through an extension to the IDMEF (see Section 5).
+attributes:
+  messageid:
+    name: messageid
+    multiplicity: Optional
+    type: STRING
+    description: A unique identifier for the heartbeat; see Section 3.2.9.

@@ -1,0 +1,76 @@
+---
+name: Node
+description: 'The Node class is used to identify hosts and other network devices (routers,
+  switches, etc.). '
+color: "#00CC00"
+aggregates:
+  location:
+    name: location
+    multiplicity: 0..1
+    type: STRING
+    description: The location of the equipment.
+  name:
+    name: name
+    multiplicity: 0..1
+    type: STRING
+    description: The name of the equipment.  This information MUST be provided if
+      no Address information is given.
+  Address:
+    name: Address
+    multiplicity: 0..*
+    type:
+    description: The network or hardware address of the equipment. Unless a name (above)
+      is provided, at least one address must be specified.
+attributes:
+  ident:
+    name: ident
+    multiplicity: Optional
+    type: STRING
+    description: A unique identifier for the node; see Section 3.2.9.
+  category:
+    name: category
+    multiplicity: Optional
+    type: ENUM
+    description: The "domain" from which the name information was obtained, if relevant.  The
+      permitted values for this attribute are shown in the table below.  The default
+      value is "unknown". (See also Section 10 for extensions to the table.)
+    values:
+    - rank: '0'
+      keyword: unknown
+      description: Domain unknown or not relevant
+    - rank: '1'
+      keyword: ads
+      description: Windows 2000 Advanced Directory Services
+    - rank: '2'
+      keyword: afs
+      description: Andrew File System (Transarc)
+    - rank: '3'
+      keyword: coda
+      description: Coda Distributed File System
+    - rank: '4'
+      keyword: dfs
+      description: Distributed File System (IBM)
+    - rank: '5'
+      keyword: dns
+      description: Domain Name System
+    - rank: '6'
+      keyword: hosts
+      description: Local hosts file
+    - rank: '7'
+      keyword: kerberos
+      description: Kerberos realm
+    - rank: '8'
+      keyword: nds
+      description: Novell Directory Services
+    - rank: '9'
+      keyword: nis
+      description: Network Information Services (Sun)
+    - rank: '10'
+      keyword: nisplus
+      description: Network Information Services Plus (Sun)
+    - rank: '11'
+      keyword: nt
+      description: Windows NT domain
+    - rank: '12'
+      keyword: wfw
+      description: Windows for Workgroups

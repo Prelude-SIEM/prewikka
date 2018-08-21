@@ -1,0 +1,26 @@
+---
+name: WebService
+description: 'The WebService class carries additional information related to web traffic. '
+color: "#FFCCCC"
+aggregates:
+  url:
+    name: url
+    multiplicity: '1'
+    type: STRING
+    description: The URL in the request.
+  cgi:
+    name: cgi
+    multiplicity: 0..1
+    type: STRING
+    description: The CGI script in the request, without arguments.
+  http-method:
+    name: http-method
+    multiplicity: 0..1
+    type: STRING
+    description: The HTTP method (PUT, GET) used in the request.
+  arg:
+    name: arg
+    multiplicity: 0..*
+    type: STRING
+    description: The arguments to the CGI script.
+attributes: {}

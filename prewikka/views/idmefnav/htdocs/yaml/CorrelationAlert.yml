@@ -1,0 +1,24 @@
+---
+name: CorrelationAlert
+description: 'The CorrelationAlert class carries additional information related to
+  the correlation of alert information.  It is intended to group one or more previously-sent
+  alerts together, to say "these alerts are all related". '
+color: "#BFBFBF"
+aggregates:
+  name:
+    name: name
+    multiplicity: '1'
+    type: STRING
+    description: The reason for grouping the alerts together, for example, a particular
+      correlation method.
+  alertident:
+    name: alertident
+    multiplicity: 1..*
+    type: STRING
+    description: The list of alert identifiers that are related to this alert.  Because
+      alert identifiers are only unique across the alerts sent by a single analyzer,
+      the optional "analyzerid" attribute of "alertident" should be used to identify
+      the analyzer that a particular alert came from.  If the "analyzerid" is not
+      provided, the alert is assumed to have come from the same analyzer that is sending
+      the CorrelationAlert.
+attributes: {}

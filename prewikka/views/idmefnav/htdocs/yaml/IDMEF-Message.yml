@@ -1,0 +1,13 @@
+---
+name: IDMEF-Message
+description: 'All IDMEF messages are instances of the IDMEF-Message class; it is the
+  top-level class of the IDMEF data model, as well as the IDMEF DTD.  There are currently
+  two types (subclasses) of IDMEF-Message: Alert and Heartbeat. '
+color: "#94C600"
+childs:
+  Heartbeat:
+    name: Heartbeat
+  Alert:
+    name: Alert
+aggregates: {}
+attributes: {}
