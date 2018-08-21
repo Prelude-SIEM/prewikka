@@ -25,6 +25,10 @@ tr.disabled-app {
     color: gray;
 }
 
+.popover {
+    z-index: 2;
+}
+
 .popover-content {
     word-wrap: break-word;
 }
