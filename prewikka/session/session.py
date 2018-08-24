@@ -173,6 +173,7 @@ class Session(pluginmanager.PluginBase):
     def logout(self, request):
         login = self.__check_session(request)
         self.__delete_session(request)
+        list(hookmanager.trigger("HOOK_SESSION_DELETE", usergroup.User(login)))
         env.log.info("Logged out")
 
         raise SessionInvalid(message=N_("Logged out"),
