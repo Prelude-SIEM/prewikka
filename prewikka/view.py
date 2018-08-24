@@ -353,8 +353,13 @@ class ViewResponse(response.PrewikkaResponse):
         if menu:
             self.add_ext_content("menu", menu)
 
-        if env.request.view.view_help and env.config.general.get("help_location"):
-            self.add_ext_content("help", url_for("baseview.help", path=env.request.view.view_help))
+        view_help = env.request.view.view_help
+        if view_help:
+            if view_help.startswith(("http://", "https://")):
+                self.add_ext_content("help", view_help)
+
+            elif env.config.general.get("help_location"):
+                self.add_ext_content("help", url_for("baseview.help", path=view_help))
 
 
 class _ViewDescriptor(object):
