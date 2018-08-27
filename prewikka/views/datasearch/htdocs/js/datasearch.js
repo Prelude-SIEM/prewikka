@@ -51,12 +51,13 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
 
     function lucene_criterion(path, operator, value)
     {
-        return _criterion(path, operator, (operator == "substr") ? value + "*" : value);
+        // We can't mix wildcards and quotes in Lucene
+        return _criterion(path, operator, (operator == "substr" && ! need_quotes(value)) ? value + "*" : quote(value));
     }
 
     function idmef_criterion(path, operator, value)
     {
-        return _criterion(path, operator, value);
+        return _criterion(path, operator, quote(value));
     }
 
     function criterion(path, operator, value)
@@ -154,7 +155,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
             search = search.replace(/(\s\s+)$/g, " ");
         }
 
-        $("#input_search").val(search + criterion(field, operator, quote(value)));
+        $("#input_search").val(search + criterion(field, operator, value));
     }
 
     function render_timeline(force) {
@@ -458,7 +459,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         var elem = {
             field: selected_field,
             value: selected_value,
-            query: criterion(selected_field, selected_operator, quote(selected_value)),
+            query: criterion(selected_field, selected_operator, selected_value),
             query_mode: criterion_config_default
         };
 
