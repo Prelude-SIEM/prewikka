@@ -24,9 +24,12 @@ import croniter
 import datetime
 import gevent
 
+from prewikka.compat.gevent import fix_ssl
 from prewikka.utils import timeutil
 from prewikka import database, error, hookmanager, log, registrar, usergroup, utils
 
+
+fix_ssl()
 
 logger = log.getLogger(__name__)
 
