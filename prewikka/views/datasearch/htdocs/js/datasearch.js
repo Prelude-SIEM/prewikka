@@ -386,7 +386,8 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         var rowid = node.closest("tr").attr("id");
         var td = node.closest("td").first();
         var selected_field = node.closest("[data-field]");
-        var selected_operator = node.is(selected_field) ? "equal" : "substr";
+        var next_char = node[0].nextSibling.nodeValue[0];
+        var selected_operator = separators.term.indexOf(next_char) === -1 ? "equal" : "substr";
 
         selected_value = node.closest("[data-value]").data("value") || selected_value;
         selected_field = selected_field.data("field");
