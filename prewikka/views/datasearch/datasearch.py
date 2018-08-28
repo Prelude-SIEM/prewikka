@@ -106,7 +106,7 @@ class Formatter(object):
         self.type = data_type
 
     def _format_nonstring(self, field, value):
-        return resource.HTMLNode("span", value, **{"data-field": field})
+        return resource.HTMLNode("span", resource.HTMLNode("span", value), _class="selectable", **{"data-field": field})
 
     def format_value(self, field, value):
         if not isinstance(value, text_type):
