@@ -214,7 +214,7 @@ def _get_view_url(section, tabs):
             % endif
             ${ _(obj["name"]) }
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu dropdown-menu-theme">
             % for section, tabs, name in sections:
             ${write_menu({"name": name}, section, tabs)}
             % endfor
@@ -233,7 +233,7 @@ def _get_view_url(section, tabs):
                 ${ menu.get("name", "") }
             </a>
 
-            <ul class="dropdown-menu" role="menu">
+            <ul class="dropdown-menu dropdown-menu-theme" role="menu">
             % for category in menu["categories"]:
                 % if "name" in category:
                     ${write_menu_expand(category, [(section["name"], _merge_tabs(section), section["name"]) for section in category["sections"]])}

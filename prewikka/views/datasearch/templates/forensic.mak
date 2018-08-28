@@ -211,11 +211,11 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
 </div>
 
 <div id="PopoverOption" class="popover-options">
-  <ul class="popover dropdown-menu multi-level" role="menu" aria-labelledby="dropdownMenu">
+  <ul class="popover dropdown-menu dropdown-menu-theme multi-level" role="menu" aria-labelledby="dropdownMenu">
     <div class="arrow"></div>
     <li class="dropdown-submenu">
       <a>${ _("Search") }</a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu dropdown-menu-theme">
         <li><a class="add_search">${ _("Add to search") }</a></li>
         <li><a class="del_search">${ _("Exclude from search") }</a></li>
         <li><a class="new_search">${ _("New search") }</a></li>
@@ -229,7 +229,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
     % if links:
     <li class="dropdown-submenu">
       <a>${ _("Actions") }</a>
-      <ul class="dropdown-menu">
+      <ul class="dropdown-menu dropdown-menu-theme">
         % for link in links:
         <li>${ link.to_string(_class="addon_search") }</li>
         % endfor
@@ -242,7 +242,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
 
     <li class="dropdown-submenu oca-infos">
       <a>${ _("Informations") }</a>
-      <div class="dropdown-menu panel panel-default">
+      <div class="dropdown-menu dropdown-menu-theme panel panel-default">
         <div class="ajax-spinner hidden">
           <i class="fa fa-circle-o-notch fa-3x fa-spin"></i>
         </div>
