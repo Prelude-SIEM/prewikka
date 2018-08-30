@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.0.0rc1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-08-17 17:00+0200\n"
+"POT-Creation-Date: 2018-08-30 17:50+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: Bjoern Weiland <bjoern.weiland@web.de>\n"
 "Language-Team: German\n"
@@ -44,69 +44,69 @@ msgstr ""
 msgid "Missing value for parameter '%(name)s'"
 msgstr ""
 
-#: prewikka/crontab.py:34
+#: prewikka/crontab.py:37
 msgid "Hourly"
 msgstr "Stündlich"
 
-#: prewikka/crontab.py:35
+#: prewikka/crontab.py:38
 msgid "Daily"
 msgstr "Täglich"
 
-#: prewikka/crontab.py:36
+#: prewikka/crontab.py:39
 msgid "Weekly"
 msgstr "Wöchentlich"
 
-#: prewikka/crontab.py:37
+#: prewikka/crontab.py:40
 msgid "Monthly"
 msgstr "Monatlich"
 
-#: prewikka/crontab.py:38
+#: prewikka/crontab.py:41
 msgid "Yearly"
 msgstr "Jährlich"
 
-#: prewikka/crontab.py:39 prewikka/mainmenu.py:296
+#: prewikka/crontab.py:42 prewikka/mainmenu.py:296
 #: prewikka/templates/mainmenu.mak:91
 msgid "Custom"
 msgstr "Maßgeschneidert"
 
-#: prewikka/crontab.py:40 prewikka/views/crontab/__init__.py:71
+#: prewikka/crontab.py:43 prewikka/views/crontab/__init__.py:71
 msgid "Disabled"
 msgstr "Deaktiviert"
 
-#: prewikka/crontab.py:116
+#: prewikka/crontab.py:119
 msgid "Scheduled job execution failed"
 msgstr ""
 
-#: prewikka/crontab.py:149
+#: prewikka/crontab.py:152
 #, fuzzy
 msgid "Invalid job extension"
 msgstr "Session ungültig"
 
-#: prewikka/crontab.py:149
+#: prewikka/crontab.py:152
 #, python-format
 msgid "Scheduled job with invalid extension type '%s'"
 msgstr ""
 
-#: prewikka/crontab.py:208
+#: prewikka/crontab.py:211
 #, fuzzy
 msgid "Invalid CronJob"
 msgstr "Session ungültig"
 
-#: prewikka/crontab.py:208
+#: prewikka/crontab.py:211
 #, python-format
 msgid "CronJob with id=%d cannot be found in database"
 msgstr ""
 
-#: prewikka/crontab.py:267
+#: prewikka/crontab.py:270
 #, fuzzy
 msgid "Invalid schedule"
 msgstr "Ungültiger Benutzer"
 
-#: prewikka/crontab.py:267
+#: prewikka/crontab.py:270
 msgid "The specified job schedule is invalid"
 msgstr ""
 
-#: prewikka/crontab.py:293
+#: prewikka/crontab.py:296
 #, python-format
 msgid "Custom (%s)"
 msgstr "Maßgeschneidert (%s)"
@@ -119,59 +119,59 @@ msgstr "Datenbanksfehler"
 msgid "Database schema error"
 msgstr "Datenbankschema Fehler"
 
-#: prewikka/database.py:293
+#: prewikka/database.py:292
 msgid "database installation required"
 msgstr ""
 
-#: prewikka/database.py:296
+#: prewikka/database.py:295
 msgid "database activation required"
 msgstr ""
 
-#: prewikka/database.py:299
+#: prewikka/database.py:298
 #, python-format
 msgid "database schema branch %(required)s required (found %(current)s)"
 msgstr ""
 
-#: prewikka/database.py:305
+#: prewikka/database.py:304
 #, python-format
 msgid "database schema version %(required)s required (found %(current)s)"
 msgstr ""
 
-#: prewikka/database.py:368
+#: prewikka/database.py:367
 msgid "Database installation error"
 msgstr ""
 
-#: prewikka/database.py:370
+#: prewikka/database.py:369
 #, python-format
 msgid ""
 "No database installation script found for module %(module)s, version "
 "%(version)s"
 msgstr ""
 
-#: prewikka/database.py:378 prewikka/database.py:416
+#: prewikka/database.py:377 prewikka/database.py:415
 msgid "Database migration error"
 msgstr ""
 
-#: prewikka/database.py:382
+#: prewikka/database.py:381
 #, python-format
 msgid ""
 "No database branch migration script found for module %(module)s, branch "
 "transition %(current)s -> %(required)s"
 msgstr ""
 
-#: prewikka/database.py:420
+#: prewikka/database.py:419
 #, python-format
 msgid ""
 "No linear migration script found for module %(module)s %(version1)s -> "
 "%(version2)s"
 msgstr ""
 
-#: prewikka/database.py:877
+#: prewikka/database.py:876
 #, fuzzy
 msgid "Database configuration error"
 msgstr "Konfigurationsfehler"
 
-#: prewikka/database.py:877
+#: prewikka/database.py:876
 msgid "Only MySQL and PostgreSQL databases are supported at the moment"
 msgstr ""
 
@@ -242,24 +242,24 @@ msgstr "Prewikka %(vPre)s benötigt libprelude %(vLib)s oder höher"
 msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
 msgstr "Prewikka %(vPre)s benötigt libpreludedb %(vLib)s oder höher"
 
-#: prewikka/main.py:130 prewikka/main.py:143
+#: prewikka/main.py:137 prewikka/main.py:150
 #: prewikka/dataprovider/plugins/idmef/__init__.py:62
 msgid "Initialization error"
 msgstr ""
 
-#: prewikka/main.py:144
+#: prewikka/main.py:151
 #, python-format
 msgid ""
 "Cannot use %(type)s mode '%(name)s', please contact your local "
 "administrator."
 msgstr ""
 
-#: prewikka/main.py:184
+#: prewikka/main.py:191
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
 msgstr ""
 
-#: prewikka/main.py:286
+#: prewikka/main.py:293
 #, python-format
 msgid "An unexpected condition happened while trying to load %s"
 msgstr ""
@@ -365,12 +365,12 @@ msgstr ""
 msgid "Multiple default views"
 msgstr ""
 
-#: prewikka/pluginmanager.py:168
+#: prewikka/pluginmanager.py:169
 #, python-format
 msgid "Circular dependencies detected: %s"
 msgstr ""
 
-#: prewikka/pluginmanager.py:176
+#: prewikka/pluginmanager.py:177
 #, python-format
 msgid "Missing dependency: %s"
 msgstr ""
@@ -426,12 +426,12 @@ msgstr "Ungültige Methode"
 msgid "Invalid view"
 msgstr "Ungültige Aussicht"
 
-#: prewikka/view.py:556
+#: prewikka/view.py:561
 #, python-format
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
 msgstr ""
 
-#: prewikka/view.py:560 prewikka/view.py:707
+#: prewikka/view.py:565 prewikka/view.py:712
 #, python-format
 msgid "View '%s' does not exist"
 msgstr "Die Aussicht '%s' existiert nicht"
@@ -611,6 +611,17 @@ msgstr "Heartbeats"
 msgid "Heartbeat deletion"
 msgstr "Heartbeat-Liste"
 
+#: prewikka/dataprovider/parsers/lucene/__init__.py:52
+#, fuzzy
+msgid "Lucene emulation error"
+msgstr "Konfigurationsfehler"
+
+#: prewikka/dataprovider/parsers/lucene/__init__.py:53
+msgid ""
+"This Lucene expression cannot be emulated properly using the Criterion "
+"backend"
+msgstr ""
+
 #: prewikka/dataprovider/plugins/idmef/__init__.py:110
 msgid "Plugin for fetching IDMEF alerts from the Prelude database"
 msgstr ""
@@ -732,7 +743,7 @@ msgstr "Session abgelaufen"
 msgid "Your session has expired: please sign in again to continue using Prelude"
 msgstr ""
 
-#: prewikka/session/session.py:178
+#: prewikka/session/session.py:179
 msgid "Logged out"
 msgstr "Ausgeloggt"
 
@@ -1098,6 +1109,7 @@ msgstr "Name"
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:155
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:191
 #: prewikka/views/filter/templates/filterlisting.mak:27
+#: prewikka/views/idmefnav/templates/idmefnav.mak:56
 #: prewikka/views/messagesummary/messagesummary.py:733
 #: prewikka/views/messagesummary/messagesummary.py:739
 msgid "Description"
@@ -1179,12 +1191,16 @@ msgid "Heartbeat analysis"
 msgstr "Heartbeat-Analyse"
 
 #: prewikka/views/agents/agents.py:99 prewikka/views/agents/agents.py:123
-#: prewikka/views/datasearch/idmef.py:158 prewikka/views/filter/filter.py:114
+#: prewikka/views/datasearch/idmef.py:158 prewikka/views/filter/filter.py:112
 #: prewikka/views/messagesummary/messagesummary.py:332
 msgid "IDMEF_VIEW"
 msgstr ""
 
 #: prewikka/views/agents/agents.py:99 prewikka/views/datasearch/heartbeat.py:55
+msgid "Monitoring"
+msgstr "Überwachung"
+
+#: prewikka/views/agents/agents.py:99
 msgid "Agents"
 msgstr "Agenten"
 
@@ -1447,6 +1463,7 @@ msgid "Delete the selected alerts?"
 msgstr ""
 
 #: prewikka/views/datasearch/alert.py:148
+#: prewikka/views/idmefnav/__init__.py:44
 #, fuzzy
 msgid "IDMEF"
 msgstr "TZeit"
@@ -1480,19 +1497,19 @@ msgstr "Menü Fehler"
 msgid "Only one time unit can be specified in a groupby query"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:424
+#: prewikka/views/datasearch/datasearch.py:426
 msgid "Forensic"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:424
+#: prewikka/views/datasearch/datasearch.py:426
 msgid "Dashboard"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:468
+#: prewikka/views/datasearch/datasearch.py:470
 msgid "CSV export"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:594
+#: prewikka/views/datasearch/datasearch.py:596
 msgid "General"
 msgstr ""
 
@@ -1647,42 +1664,42 @@ msgstr "Zählung"
 msgid "Filters management page"
 msgstr "Nach Agent filtern"
 
-#: prewikka/views/filter/filter.py:127
+#: prewikka/views/filter/filter.py:125
 #: prewikka/views/usermanagement/usermanagement.py:18
 msgid "Preferences"
 msgstr "Vorlieben"
 
-#: prewikka/views/filter/filter.py:127
+#: prewikka/views/filter/filter.py:125
 #: prewikka/views/filter/templates/filterlisting.mak:17
 msgid "Filters"
 msgstr "Filter"
 
-#: prewikka/views/filter/filter.py:138
+#: prewikka/views/filter/filter.py:136
 #: prewikka/views/filter/templates/filteredition.mak:62
 #, python-format
 msgid "Filter %s"
 msgstr "Filter %s"
 
-#: prewikka/views/filter/filter.py:208
+#: prewikka/views/filter/filter.py:206
 #, fuzzy
 msgid "Filter error"
 msgstr "gefiltert"
 
-#: prewikka/views/filter/filter.py:208
+#: prewikka/views/filter/filter.py:206
 #, fuzzy, python-format
 msgid "Filter '%s' does not exist"
 msgstr "Die Aussicht '%s' existiert nicht"
 
-#: prewikka/views/filter/filter.py:244 prewikka/views/filter/filter.py:256
+#: prewikka/views/filter/filter.py:242 prewikka/views/filter/filter.py:254
 #, fuzzy
 msgid "Could not save filter"
 msgstr "Wählen Sie einen Filter"
 
-#: prewikka/views/filter/filter.py:244
+#: prewikka/views/filter/filter.py:242
 msgid "No name for this filter was provided"
 msgstr ""
 
-#: prewikka/views/filter/filter.py:256
+#: prewikka/views/filter/filter.py:254
 msgid "The filter name is already used by another filter"
 msgstr ""
 
@@ -1769,6 +1786,35 @@ msgstr "Gruppe hinzufügen"
 #: prewikka/views/filter/templates/widget.mak:57
 msgid "Delete group"
 msgstr "Gruppe löschen"
+
+#: prewikka/views/idmefnav/__init__.py:36
+msgid "IDMEF navigator"
+msgstr ""
+
+#: prewikka/views/idmefnav/__init__.py:44
+msgid "Help"
+msgstr "Hilfe"
+
+#: prewikka/views/idmefnav/templates/idmefnav.mak:12
+msgid "Children"
+msgstr ""
+
+#: prewikka/views/idmefnav/templates/idmefnav.mak:20
+#, fuzzy
+msgid "Aggregates"
+msgstr "Korrelierte Alarme"
+
+#: prewikka/views/idmefnav/templates/idmefnav.mak:36
+msgid "Attributes"
+msgstr ""
+
+#: prewikka/views/idmefnav/templates/idmefnav.mak:54
+msgid "Rank"
+msgstr ""
+
+#: prewikka/views/idmefnav/templates/idmefnav.mak:55
+msgid "Keyword"
+msgstr ""
 
 #: prewikka/views/messagesummary/__init__.py:13
 #, fuzzy
