@@ -46,6 +46,7 @@ class PluginBase(registrar.DelayedRegistrar):
     plugin_require = []
     plugin_deprecate = []
     plugin_mandatory = False
+    plugin_enabled = True
 
 
 class PluginPreload(PluginBase):
@@ -67,7 +68,7 @@ class PluginManager(object):
         for permission in getattr(plugin_class, "additional_permissions", []):
             usergroup.ALL_PERMISSIONS.declare(permission)
 
-        dh = database.DatabaseUpdateHelper(plugin_class.full_module_name, plugin_class.plugin_database_version, plugin_class.plugin_database_branch)
+        dh = database.DatabaseUpdateHelper(plugin_class.full_module_name, plugin_class.plugin_database_version, plugin_class.plugin_database_branch, plugin_class.plugin_enabled)
         if autoupdate or plugin_class.plugin_database_autoupdate:
             dh.apply()
         else:

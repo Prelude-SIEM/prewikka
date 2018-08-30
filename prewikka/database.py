@@ -264,8 +264,6 @@ class DatabaseHelper(object):
 
 
 class DatabaseUpdateHelper(DatabaseHelper):
-    _default_modinfo = ModuleInfo(None, None, True)
-
     def _init_version_attr(self):
         if self._initialized:
             return
@@ -277,13 +275,14 @@ class DatabaseUpdateHelper(DatabaseHelper):
         self._need_enable = not(module.enabled)
         self._initialized = True
 
-    def __init__(self, module_name, reqversion, reqbranch=None):
+    def __init__(self, module_name, reqversion, reqbranch=None, enabled=True):
         DatabaseHelper.__init__(self)  # for use_transaction
 
         self._reqbranch = reqbranch
         self._reqversion = reqversion
         self._module_name = module_name.split(":")[0]
         self._full_module_name = module_name
+        self._default_modinfo = ModuleInfo(None, None, enabled)
         self._initialized = False
 
     def check(self):
@@ -593,11 +592,11 @@ class DatabaseCommon(object):
         return self._db.getLastInsertIdent()
 
     def is_plugin_active(self, plugin):
-        plugin = self.modinfos.get(plugin)
-        if plugin:
-            return plugin.enabled == 1
+        module = self.modinfos.get(plugin.full_module_name)
+        if module:
+            return module.enabled == 1
 
-        return True
+        return plugin.plugin_enabled
 
     def _get_last_plugin_changed(self):
         rows = self.query("SELECT time FROM Prewikka_Module_Changed")[0][0]

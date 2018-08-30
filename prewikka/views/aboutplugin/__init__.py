@@ -58,7 +58,7 @@ class AboutPlugin(view.View):
                 data.maintenance_total += len(upinfo)
                 data.maintenance.setdefault(catname, []).append((mod, curversion, upinfo))
             else:
-                data.installed.setdefault(catname, []).append((mod, env.db.is_plugin_active(mod.full_module_name)))
+                data.installed.setdefault(catname, []).append((mod, env.db.is_plugin_active(mod)))
 
         except error.PrewikkaUserError as e:
             data.maintenance.setdefault(catname, []).append((mod, curversion, [e]))
