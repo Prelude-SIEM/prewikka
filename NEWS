@@ -1,3 +1,31 @@
+* 2018-08-30, prewikka-5.0.0rc2:
+
+Author: Yoann Vandoorselaere
+
+- Remove useless calls to use_transaction()
+- Implement Lucene and Criteria Lark parsers
+
+Author: Antoine Luong
+
+- Fix dropdown appearance for dark theme
+- Allow plugins to be disabled by default
+- More DataSearch fixes
+- Use a workaround for gevent compatibility with Python 2.7.5
+- Allow absolute URL for view help
+
+Author: Thomas Andrejak
+
+- Update menu organization
+- Import IDMEF Navigator
+- Fix custom_theme with invalid python module
+- Add HOOK_SESSION_DELETE
+
+Author: Augustin Laville
+
+- Addition of unit tests
+
+
+
 * 2018-08-17, prewikka-5.0.0rc1:
 
 Author: Antoine Luong
