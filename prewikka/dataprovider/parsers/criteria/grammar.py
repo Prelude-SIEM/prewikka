@@ -26,6 +26,8 @@ GRAMMAR = r"""
              | criteria "||" criterion -> or_
 
     criterion: path operator value
+             | path -> not_null
+             | "!" path -> null
              | "(" criteria ")" -> parenthesis
 
     !operator: "=" | "=*" | "==" | "!=" | "!=*" | "<>" | "<>*" | "!<>" | "!<>*" | "<" | "<=" | ">" | ">=" | "~" | "~*" | "!~" | "!~*" -> operator
