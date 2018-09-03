@@ -316,12 +316,12 @@ function clearGridEdition(grid) {
 
 function setConfirmDialogPosition(grid, form) {
     var rowid = grid.jqGrid('getGridParam', 'selrow');
-    // Do not use jQuery selector because rowid may contain dots
-    var row = document.getElementById(rowid);
+    // Use escaping because rowid may contain dots
+    var row = grid.find("#" + $.escapeSelector(rowid));
     form.closest('div.ui-jqdialog').position({
         my: "right",
         at: "right",
-        of: $(row)
+        of: row
     });
 }
 
