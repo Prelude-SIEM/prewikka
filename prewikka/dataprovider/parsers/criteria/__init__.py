@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from lark import Lark, Transformer, v_args
 from lark.exceptions import LarkError
 
-from prewikka.dataprovider import Criterion, InvalidCriterionError
+from prewikka.dataprovider import Criterion, ParserError
 
 from . import grammar
 
@@ -65,8 +65,8 @@ def parse(input, transformer=CriteriaTransformer()):
     """Convert a Criterion string to a Criterion object."""
     try:
         tree = _grammar.parse(input)
-    except LarkError:
-        raise InvalidCriterionError
+    except LarkError as e:
+        raise ParserError(details=e)
 
     if transformer:
         return transformer.transform(tree)

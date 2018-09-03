@@ -108,10 +108,10 @@ class InvalidPathError(error.PrewikkaUserError):
         )
 
 
-class InvalidCriterionError(error.PrewikkaUserError):
+class ParserError(error.PrewikkaUserError):
     def __init__(self, details=None):
         error.PrewikkaUserError.__init__(
-            self, N_("Syntax error"), N_("Invalid criterion"), details=details
+            self, N_("Syntax error"), N_("Could not parse input"), details=details
         )
 
 

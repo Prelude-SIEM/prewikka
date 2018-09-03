@@ -300,7 +300,7 @@ class QueryParser(object):
                 tr = lucene.CriteriaTransformer(compile=self._criterion_compile, default_paths=self._parent.lucene_search_fields)
                 return lucene.parse(query, transformer=tr)
             else:
-                return Criterion("{backend}._raw_query", "==", lucene.parse(query, transformer=lucene.ReconstructTransformer()))
+                return Criterion("{backend}._raw_query", "==", query)
 
     def _time_selection(self, time_unit):
         selection = []

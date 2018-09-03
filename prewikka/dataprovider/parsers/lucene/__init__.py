@@ -26,12 +26,12 @@ from lark import Lark, Transformer, v_args
 from lark.exceptions import LarkError
 
 from prewikka import error
-from prewikka.dataprovider import Criterion, InvalidCriterionError
+from prewikka.dataprovider import Criterion, ParserError
 
 from . import grammar
 
 
-_grammar = Lark(grammar.GRAMMAR, start="criteria", parser="lalr")
+_grammar = Lark(grammar.GRAMMAR, start="criteria", parser="lalr", keep_all_tokens=True)
 
 
 def _wildcard_to_regex(value):
@@ -68,119 +68,139 @@ class CommonTransformer(Transformer):
     def uqstring(self, s):
         r = _wildcard_to_regex(s)
         if r[0] > 1:
-            self._operator = "~"
-
             # We modify the internal value representation, directly accessed from value_string()
             s.value = r[1]
+            op = "~"
+        else:
+            op = "<>*"
 
-        return s
+        return op, s
 
     string = v_args(inline=True)(lambda _, s: s)
-    sqstring = v_args(inline=True)(lambda _, s: CommonTransformer._hack(s, "'"))
-    dqstring = v_args(inline=True)(lambda _, s: CommonTransformer._hack(s, '"'))
+    sqstring = v_args(inline=True)(lambda _, s: ("<>*", CommonTransformer._hack(s, "'")))
+    dqstring = v_args(inline=True)(lambda _, s: ("<>*", CommonTransformer._hack(s, '"')))
+    regstr = v_args(inline=True)(lambda _, s: ("~", CommonTransformer._hack(s, '/')))
 
 
 class CriteriaTransformer(CommonTransformer):
-    _attrlst = ["_operator"]
-
-    def _reset(self):
-        for i in self._attrlst:
-            setattr(self, i, None)
-
     def __init__(self, compile=Criterion, default_paths=[]):
         self._compile = compile
         self._default_paths = default_paths
-        self._bool_operator = None
-        self._reset()
 
-    @v_args(inline=True)
-    def regstr(self, s):
-        self._operator = "~"
-        return self._hack(s, "/")
-
-    def string_modifier(self, s):
+    def string_modifier(self, data):
         raise LuceneEmulationError
 
     @v_args(inline=True)
-    def field(self, s=None):
-        return [s[0:-1]] if s else None
-
-    @v_args(inline=True)
-    def value_string(self, field, value, modifier=None):
-        op = self._operator or "="
-        if not field:
-            op = self._operator or "<>*"
-            field = self._default_paths
-
-        return functools.reduce(lambda x, y: x | y, (self._compile(path, op, value.value) for path in field), Criterion())
-
-    def _range(self, fields, from_, to, op_a, op_b):
-        return functools.reduce(lambda x, y: x | y, (self._compile(path, op_a, from_) & self._compile(path, op_b, to) for path in fields), Criterion())
-
-    @v_args(inline=True)
-    def inclusive_range(self, field, from_, to):
-        if not field:
-            field = self._default_paths
-
-        if self._operator not in ("NOT ", "-", "!"):
-            return self._range(field, from_, to, ">=", "<=")
-        else:
-            return self._range(field, from_, to, "<=", ">=")
-
-    @v_args(inline=True)
-    def exclusive_range(self, field, from_, to):
-        if not field:
-            field = self._default_paths
-
-        if self._operator not in ("NOT ", "-", "!"):
-            return self._range(field, from_, to, ">", "<")
-        else:
-            return self._range(field, from_, to, "<", ">")
-
-    @v_args(inline=True)
-    def criterion(self, operator, crit):
-        if operator in ("NOT ", "-"):
-            crit.operator = "!=" if crit.operator == "==" else "!" + crit.operator
-
-        elif operator == "+":
+    def operator(self, data=None):
+        if data == "+":
             raise LuceneEmulationError
 
-        return crit
+        return data
 
-    def bool_(self, s):
-        if len(s) == 3:
-            left, op, right = s
-        else:
-            op = "||"
-            left, right = s
+    def _get_value_operator(self, t, parent_operator, parent_field):
+        op, value = t
+        if parent_operator in ("-", "!", "NOT"):
+            op = "!" + op
 
-        ret = Criterion(left, self._bool_operator or {"AND": "&&", "OR": "||"}.get(op, "||"), right)
-        self._bool_operator = None
-        return ret
+        return value.value, op
 
-    operator = v_args(inline=True)(text_type)
-    parenthesis = v_args(inline=False)(lambda s, x: x[1])
-    or_ = v_args(inline=True)(lambda _, left, right: Criterion(left, "||", right))
-    and_ = v_args(inline=True)(lambda _, left, right: Criterion(left, "&&", right))
+    def _get_fields(self, parent_field):
+        return [parent_field] if parent_field else self._default_paths
+
+    def _range(self, parent_field, from_, to, op_a, op_b):
+        fields = self._get_fields(parent_field)
+        return functools.reduce(lambda x, y: x | y, (self._compile(path, op_a, from_) & self._compile(path, op_b, to) for path in fields), Criterion())
+
+    def _tree_to_criteria(self, t, parent_operator=None, parent_field=[]):
+        tag = getattr(t, "data", None)
+        if not tag:
+            return text_type(t.value) if t else None
+
+        if tag == "bool_":
+            if "AND" in t.children[1] or "&&" in t.children[1]:
+                op = "&&"
+            else:
+                op = "||"
+
+            return Criterion(self._tree_to_criteria(t.children[0], parent_operator, parent_field), op, self._tree_to_criteria(t.children[2], parent_operator, parent_field))
+
+        elif tag == "field":
+            return t.children[0][:-1] if t.children else None
+
+        elif tag == "criterion":
+            operator, field, value = t.children
+            return self._tree_to_criteria(value, self._tree_to_criteria(operator) or parent_operator, self._tree_to_criteria(field) or parent_field)
+
+        elif tag == "parenthesis":
+            operator, field, _, data, _ = t.children
+            return self._tree_to_criteria(data, self._tree_to_criteria(operator) or parent_operator, self._tree_to_criteria(field) or parent_field)
+
+        elif tag == "value_string":
+            value, op = self._get_value_operator(t.children[0], parent_operator, parent_field)
+
+            ret = Criterion()
+            for i in self._get_fields(parent_field):
+                ret |= self._compile(i, op, value)
+
+            return ret
+
+        elif tag == "inclusive_range":
+            from_, to = filter(lambda x: isinstance(x, tuple), t.children)
+            if parent_operator not in ("-", "!", "NOT"):
+                ret = self._range(parent_field, from_[1], to[1], ">=", "<=")
+            else:
+                ret = self._range(parent_field, from_[1], to[1], "<=", ">=")
+
+            return ret
+
+        elif tag == "exclusive_range":
+            from_, to = filter(lambda x: isinstance(x, tuple), t.children)
+            if parent_operator not in ("-", "!", "NOT"):
+                ret = self._range(parent_field, from_[1], to[1], ">", "<")
+            else:
+                ret = self._range(parent_field, from_[1], to[1], "<", ">")
+
+            return ret
+
+        elif t.children:
+            return self._tree_to_criteria(t.children[0], parent_operator, parent_field)
+
+    def transform(self, tree):
+        return self._tree_to_criteria(Transformer.transform(self, tree))
 
 
 class ReconstructTransformer(CommonTransformer):
-    def _tree_tostring(self, t):
+    def _value_string(self, vl, field=None):
+        return vl[1]
+
+    def _tree_tostring(self, t, parent_field=None):
         tag = getattr(t, "data", None)
+
+        if tag == "value_string":
+            return self._value_string(t.children[0], parent_field)
+
         if not tag:
+            if isinstance(t, tuple):
+                return text_type(t[1])
+
             return text_type(t)
 
-        elif tag == "bool_" and len(t.children) == 2:
-            return "%s %s" % tuple(self._tree_tostring(i) for i in t.children)
+        elif tag == "criterion":
+            operator, field, value = t.children
+            operator = self._tree_tostring(operator)
+            field = self._tree_tostring(field)
+            value = self._tree_tostring(value, field or parent_field)
+            return "".join([operator, field, value])
 
-        elif tag == "inclusive_range":
-            return "%s[%s TO %s]" % tuple(self._tree_tostring(i) for i in t.children)
-
-        elif tag == "exclusive_range":
-            return "%s{%s TO %s}" % tuple(self._tree_tostring(i) for i in t.children)
+        elif tag == "parenthesis":
+            operator, field, lp, value, rp = t.children
+            operator = self._tree_tostring(operator)
+            field = self._tree_tostring(field)
+            value = self._tree_tostring(value, field or parent_field)
+            return "".join([operator, field, lp, value, rp])
 
         else:
-            return "".join(self._tree_tostring(i) for i in t.children)
+            return "".join(self._tree_tostring(i, parent_field) for i in t.children)
 
         return ""
 
@@ -192,8 +212,8 @@ def parse(input, transformer=None):
     """Convert a Lucene string to a Criterion object."""
     try:
         tree = _grammar.parse(input)
-    except LarkError:
-        raise InvalidCriterionError
+    except LarkError as e:
+        raise ParserError(details=e)
 
     if transformer:
         return transformer.transform(tree)

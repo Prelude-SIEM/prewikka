@@ -22,17 +22,19 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 GRAMMAR = r"""
     ?criteria: criterion
-             | criteria (_WS|BOOL_AND|BOOL_OR) criterion -> bool_
+             | criteria (WS|BOOL_AND|BOOL_OR) criterion -> bool_
 
-    criterion: operator (inclusive_range | exclusive_range | value_string)
-             | LPAR criteria RPAR -> parenthesis
+    criterion: operator field (value | criteria)
+             | operator field LPAR criteria RPAR -> parenthesis
 
-    inclusive_range: field _WS* "[" _string _WS "TO" _WS _string "]"
-    exclusive_range: field _WS* "{" _string _WS "TO" _WS _string "}"
-    value_string: field _string (string_modifier)?
+    value: (inclusive_range | exclusive_range | value_string)
+
+    inclusive_range: "[" WS* _string WS "TO" WS _string WS* "]"
+    exclusive_range: "{" WS* _string WS "TO" WS _string WS* "}"
+    value_string: _string (string_modifier)?
 
     operator: OPERATOR?
-    OPERATOR.1: "NOT" _WS+ | "!" | "-" | "+"
+    OPERATOR.3: "NOT" WS+ | "!" | "-" | "+"
 
     _string: (dqstring | sqstring | regstr | uqstring)
     string_modifier: BOOST_MODIFIER | FUZZY_MODIFIER
@@ -40,9 +42,9 @@ GRAMMAR = r"""
     BOOST_MODIFIER: "^" /[0-9]+/
     FUZZY_MODIFIER: "~" /[0-9]*/
 
-    SQSTRING.1: "'" ("\\'" | /[^']/)* "'"
-    DQSTRING.1: "\"" ("\\\""|/[^"]/)* "\""
-    RESTRING.1: "/" ("\\/"|/[^\/]/)* "/"
+    SQSTRING.3: "'" ("\\'" | /[^']/)* "'"
+    DQSTRING.3: "\"" ("\\\""|/[^"]/)* "\""
+    RESTRING.3: "/" ("\\/"|/[^\/]/)* "/"
     !sqstring: SQSTRING
     !dqstring: DQSTRING
     !regstr: RESTRING
@@ -50,21 +52,21 @@ GRAMMAR = r"""
 
     SPECIAL_CHARACTERS: "+" | "-" | "!" | "(" | ")" | "{" | "}" | "[" | "]" | "^" | "\"" | "~" | "*" | "?" | ":" | "\\" | "&" | "|"
     ESCAPED_SPECIAL_CHARACTERS: "\\" SPECIAL_CHARACTERS
-    UNQUOTED_STRING.0: (ESCAPED_SPECIAL_CHARACTERS | /[^+\-!(){}\[\]^\"\~:\s\+]/)+
+    UNQUOTED_STRING.2: (ESCAPED_SPECIAL_CHARACTERS | /[^+!(){}\[\]^\"\~:\s]/)+
 
     field: (FIELD)? -> field
-    FIELD: PATH ":"
-    PATH: (PATHELEM ".")* PATHELEM
-    PATHELEM: WORD ("(" PATHINDEX ")")?
-    PATHINDEX: "-"? (DIGIT+ | UNQUOTED_STRING)
+    FIELD.2: PATH ":"
+    PATH.0: (PATHELEM ".")* PATHELEM
+    PATHELEM.0: WORD ("(" PATHINDEX ")")?
+    PATHINDEX.0: "-"? (DIGIT+ | UNQUOTED_STRING)
     WORD: LETTER (LETTER | DIGIT | "-" | "_")+
     DIGIT: /[0-9]/
     LETTER: /[a-z]/
-    BOOL_AND: _WS* ("&&" | "AND") _WS*
-    BOOL_OR: _WS* ("||" | "OR") _WS*
+    BOOL_AND.1: WS+ ("&&" | "AND") WS+
+    BOOL_OR.1: WS+ ("||" | "OR") WS+
 
-    LPAR: _WS* "(" _WS*
-    RPAR: _WS* ")" _WS*
+    LPAR: WS* "("
+    RPAR: WS* ")"
 
-    _WS: /[ \t\f\r\n]/+
+    WS: /[ \t\f\r\n]/+
 """

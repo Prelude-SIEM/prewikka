@@ -7,7 +7,7 @@ import datetime
 import prelude
 
 from prewikka import crontab, utils, version
-from prewikka.dataprovider import DataProviderBase, Criterion, InvalidCriterionError, InvalidPathError
+from prewikka.dataprovider import DataProviderBase, Criterion, ParserError, InvalidPathError
 
 
 class _IDMEFPath(prelude.IDMEFPath):
@@ -23,7 +23,7 @@ class _IDMEFCriterion(prelude.IDMEFCriteria):
         try:
             prelude.IDMEFCriteria.__init__(self, criteria)
         except RuntimeError as e:
-            raise InvalidCriterionError(details=e)
+            raise ParserError(details=e)
 
 
 class _IDMEFProvider(DataProviderBase):
