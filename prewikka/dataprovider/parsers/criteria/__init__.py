@@ -54,8 +54,8 @@ class CriteriaTransformer(CommonTransformer):
         self._compile = compile
 
     parenthesis = v_args(inline=True)(lambda self, criterion: criterion)
-    or_ = v_args(inline=True)(lambda self, left, right: self._compile(left, "||", right))
-    and_ = v_args(inline=True)(lambda self, left, right: self._compile(left, "&&", right))
+    or_ = v_args(inline=True)(lambda self, left, right: Criterion(left, "||", right))
+    and_ = v_args(inline=True)(lambda self, left, right: Criterion(left, "&&", right))
     criterion = v_args(inline=True)(lambda self, left, op, right: self._compile(left, op, right))
 
 
