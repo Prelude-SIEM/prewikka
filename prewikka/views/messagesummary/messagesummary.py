@@ -20,6 +20,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import hashlib
+import itertools
 import re
 import string
 import struct
@@ -645,26 +646,38 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
             calist.setdefault(analyzerid, []).append(alertident["alertident"])
 
-        for idx, analyzerid in enumerate(calist):
-
+        for idx, (analyzerid, idents) in enumerate(calist.items()):
             content = ""
-            criteria = Criterion()
-            for ident in calist[analyzerid]:
-                criteria |= self._get_alert_ident_criterion(analyzerid, ident)
+            results = []
+            total = 0
+            step = 50
+            limit = min(len(idents), 500)
 
-            results = env.dataprovider.query(["alert.messageid", "alert.classification.text"], criteria)
+            for i in range(0, limit, step):
+                # FIXME #3250, #3251
+                # We execute several queries to avoid recursion errors
+                criteria = Criterion()
+                for ident in idents[i:i+step]:
+                    criteria |= self._get_alert_ident_criterion(analyzerid, ident)
 
-            for ident, classif in results:
+                results.append(env.dataprovider.query(["alert.messageid", "alert.classification.text"], criteria))
+
+            for ident, classif in itertools.chain(*results):
                 link = url_for(".", analyzerid=analyzerid, messageid=ident)
                 content += '<li><a title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, html.escape(classif))
+                total += 1
 
-            missing = len(calist[analyzerid]) - len(results)
+            missing = limit - total
             if missing > 0:
                 content += "<li>" + (_("%d linked alerts missing (probably deleted)") % missing) + "</li>"
 
+            omitted = len(idents) - limit
+            if omitted > 0:
+                content += "<li>" + (_("%d linked alerts omitted") % omitted) + "</li>"
+
             self.newTableCol(idx + 1, resource.HTMLSource("<ul style='padding: 0px; margin: 0px 0px 0px 10px;'>%s</ul>" % content))
 
-            linked_alerts = env.dataprovider.get(self._get_alert_ident_criterion(analyzerid, ident))
+            linked_alerts = env.dataprovider.get(self._get_alert_ident_criterion(analyzerid, idents[0]))
             if linked_alerts:
                 self.buildAnalyzer(linked_alerts[0]["alert.analyzer(-1)"])
             else:
