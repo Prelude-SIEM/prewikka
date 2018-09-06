@@ -1,3 +1,18 @@
+* 2018-09-07, prewikka-5.0.0:
+
+Author: Yoann Vandoorselaere
+
+- Better Lucene coverage
+
+Author: Antoine Luong
+
+- Fix possible error in correlation alert detail
+- Handle only-path criteria in parser
+- Do not use the compile callback with boolean criteria
+- Avoid issues with ID conflicts
+
+
+
 * 2018-08-30, prewikka-5.0.0rc2:
 
 Author: Yoann Vandoorselaere
