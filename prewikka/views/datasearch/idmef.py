@@ -186,6 +186,7 @@ class IDMEFDataSearch(datasearch.DataSearch):
 
         datasearch.DataSearch.__init__(self, *args, **kwargs)
         view.route("/%s/delete" % self.type, method=self.delete, methods=["POST"], permissions=["IDMEF_ALTER"])
+        self.columns_properties["create_time"].width = 110
 
     def get_forensic_actions(self):
         ret = []
