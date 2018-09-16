@@ -1,6 +1,7 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
+import functools
 import re
 import sys
 
@@ -68,11 +69,7 @@ def merge_structs(structs):
     if len(structs) == 0:
         return None
 
-    if len(structs) == 1:
-        return structs[0]
-
-    first, rest = structs[0], structs[1:]
-    return merge_two_structs(first, merge_structs(rest))
+    return functools.reduce(lambda x, y: merge_two_structs(y, x), reversed(structs))
 
 
 def _unparam(jquery_params, unquote=True):
