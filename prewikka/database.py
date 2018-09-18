@@ -355,6 +355,11 @@ class DatabaseUpdateHelper(DatabaseHelper):
                 if ret:
                     return ret
 
+        for upd in self._list(from_version=curversion, branch=curbranch, type="update"):
+            ret = self._resolve_branch_switch(upd.branch, upd.version, outstack=outstack[:] + [upd])
+            if ret:
+                return ret
+
         return []
 
     def _list(self, *args, **kwargs):
