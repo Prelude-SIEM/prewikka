@@ -7,7 +7,7 @@ import datetime
 import prelude
 
 from prewikka import crontab, utils, version
-from prewikka.dataprovider import DataProviderBase, Criterion, ParserError, InvalidPathError
+from prewikka.dataprovider import DataProviderBase, Criterion, CriterionOperator, ParserError, InvalidPathError
 
 
 class _IDMEFPath(prelude.IDMEFPath):
@@ -66,7 +66,7 @@ class _IDMEFProvider(DataProviderBase):
 
     @staticmethod
     def _value_adjust(operator, value):
-        if operator not in ("<>*", "<>", "!<>", "!<>*"):
+        if not operator.is_substring:
             return value
 
         value = text_type(value).strip()
@@ -100,12 +100,12 @@ class _IDMEFProvider(DataProviderBase):
         if criterion.right:
             criterion.right = self._value_adjust(criterion.operator, criterion.right)
 
-        elif criterion.operator == "==":
+        elif criterion.operator == CriterionOperator.EQUAL:
             criterion = Criterion(criterion.left, "==", None)
             if _IDMEFPath(criterion.left).getValueType() == prelude.IDMEFValue.TYPE_STRING:
                 criterion |= Criterion(criterion.left, "==", "''")
 
-        if criterion.operator.startswith("!") and _IDMEFPath(criterion.left).isAmbiguous():
+        if criterion.operator.negated and _IDMEFPath(criterion.left).isAmbiguous():
             criterion.left = self._path_adjust(criterion.left)
 
         return DataProviderBase.compile_criterion(self, criterion)

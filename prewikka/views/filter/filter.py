@@ -23,6 +23,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import pkg_resources
 
 from prewikka import database, error, hookmanager, resource, response, template, view
+from prewikka.dataprovider import CriterionOperator
 from prewikka.utils import AttrObj, json
 from prewikka.utils.viewhelpers import GridParameters
 
@@ -33,7 +34,7 @@ _TYPES = ["alert", "heartbeat", "log", "ticket"]
 
 
 def _flatten(criterion):
-    if criterion.operator not in ("&&", "||"):
+    if not criterion.operator.is_boolean:
         return criterion
 
     ret = AttrObj(operator=criterion.operator, operands=[])
@@ -61,8 +62,8 @@ class Filter(object):
         ret = {}
         for typ, criterion in self.criteria.items():
             crit = _flatten(criterion)
-            if crit.operator not in ("&&", "||"):
-                crit = AttrObj(operator="&&", operands=[crit])
+            if not crit.operator.is_boolean:
+                crit = AttrObj(operator=CriterionOperator.AND, operands=[crit])
 
             ret[typ] = crit
 

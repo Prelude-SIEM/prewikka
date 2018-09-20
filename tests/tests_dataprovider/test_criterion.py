@@ -23,9 +23,8 @@ Tests for `prewikka.dataprovider.Criterion()`.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import copy
-import json
 
-from prewikka.dataprovider import Criterion
+from prewikka.dataprovider import Criterion, CriterionOperator
 
 
 def test_criterion_to_string():
@@ -40,11 +39,11 @@ def test_criterion_to_string():
     # simple criterion
     criterion = Criterion('alert.messageid', '=', 'fakemessageid')
 
-    assert criterion.to_string() == "alert.messageid == 'fakemessageid'"
+    assert criterion.to_string() == "alert.messageid = 'fakemessageid'"
 
     criterion = Criterion('alert.messageid', '==', 'fakemessageid')
 
-    assert criterion.to_string() == "alert.messageid == 'fakemessageid'"
+    assert criterion.to_string() == "alert.messageid = 'fakemessageid'"
 
     criterion = Criterion('alert.messageid', '!=', 'fakemessageid')
 
@@ -75,11 +74,11 @@ def test_criterion_to_string():
     criterion_2 = Criterion('alert.messageid', '=', 'fakemessageid2')
     criterion = Criterion(criterion_1, '||', criterion_2)
 
-    assert criterion.to_string() == "(alert.messageid == 'fakemessageid1' || alert.messageid == 'fakemessageid2')"
+    assert criterion.to_string() == "alert.messageid = 'fakemessageid1' || alert.messageid = 'fakemessageid2'"
 
     criterion = Criterion(criterion_1, '&&', criterion_2)
 
-    assert criterion.to_string() == "(alert.messageid == 'fakemessageid1' && alert.messageid == 'fakemessageid2')"
+    assert criterion.to_string() == "alert.messageid = 'fakemessageid1' && alert.messageid = 'fakemessageid2'"
 
 
 def test_criterion_get_path():
@@ -142,9 +141,7 @@ def test_criterion_operations():
     assert criterion_copy.to_string() == criterion_1.to_string()
 
     # __json__()
-    assert json.dumps(criterion_1.__json__()) == json.dumps({'left': 'alert.messageid',
-                                                             'operator': '==',
-                                                             'right': 'fakemessageid1'})
+    assert criterion_1.__json__() == {'left': 'alert.messageid', 'operator': CriterionOperator.EQUAL, 'right': 'fakemessageid1'}
 
     # __iadd__()
     criterion_iadd = copy.copy(criterion_1)

@@ -1,4 +1,6 @@
-<%def name="condition(field='', operator='=', value='', **kwargs)">
+<%! from prewikka.dataprovider import CriterionOperator %>
+
+<%def name="condition(field='', operator=CriterionOperator.EQUAL, value='', **kwargs)">
     <div class="form-group">
         <div class="input-group">
             <div class="form-control input-sm" style="border: none; padding: 0; position: static">
@@ -19,8 +21,8 @@
                 </select>
             </div>
             <div class="input-group-addon dropdown dropdown-fixed operator">
-                <input type="hidden" class="input-value" value="${operator}"/>
-                <div data-toggle="dropdown" title="${_('Change operator')}"><span>${operator}</span></div>
+                <input type="hidden" class="input-value" value="${operator.name}"/>
+                <div data-toggle="dropdown" title="${_('Change operator')}"><span>${operator.name}</span></div>
                 <ul class="dropdown-menu">
                 % for op in (kwargs["operators"].get(field or default_field, []) if "operators" in kwargs else []):
                     <li><a data-value="${op}" title="${kwargs['tooltips'][op]}">${op}</a></li>
@@ -36,13 +38,13 @@
 </%def>
 
 
-<%def name="group(operator='&&', operands=None, root=False, **kwargs)">
+<%def name="group(operator=CriterionOperator.AND, operands=None, root=False, **kwargs)">
     <% OPERATORS = {"&&": _("AND"), "||": _("OR")} %>
     <div class="filter-group">
         <span class="dropdown dropdown-fixed">
-            <input type="hidden" class="input-value" value="${operator}"/>
+            <input type="hidden" class="input-value" value="${operator.name}"/>
             <button type="button" class="btn btn-xs btn-primary" data-toggle="dropdown" title="${_('Change operator')}">
-                <span>${OPERATORS[operator]}</span>
+                <span>${OPERATORS[operator.name]}</span>
                 <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
@@ -71,8 +73,8 @@
 
 <%def name="init(criterion, root=False, **kwargs)">
     % if not criterion:
-        ${group("&&", None, root, **kwargs)}
-    % elif criterion.operator in ("&&", "||"):
+        ${group(root=root, **kwargs)}
+    % elif criterion.operator.is_boolean:
         ${group(criterion.operator, criterion.operands, root, **kwargs)}
     % else:
         ${condition(criterion.left, criterion.operator, criterion.right, **kwargs)}

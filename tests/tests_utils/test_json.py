@@ -87,7 +87,7 @@ def test_dumps():
     criterion_dumps = json.dumps(criterion)
 
     assert '{"__prewikka_class__": ["Criterion"' in criterion_dumps
-    assert '"operator": "=="' in criterion_dumps
+    assert '"operator": "="' in criterion_dumps
     assert '"right": "fakemessageid"' in criterion_dumps
     assert '"left": "alert.messageid"' in criterion_dumps
 

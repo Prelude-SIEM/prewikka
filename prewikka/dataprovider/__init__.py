@@ -20,8 +20,11 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import copy
+import itertools
 import time
+
 from datetime import datetime
+from enum import Enum
 
 from prewikka import compat, error, hookmanager, pluginmanager
 from prewikka.utils import AttrObj, CachingIterator, json
@@ -314,6 +317,80 @@ class DataProviderBase(pluginmanager.PluginBase):
         raise error.NotImplementedError
 
 
+class _CriterionOperatorFamily(Enum):
+    BOOLEAN = 0
+    STANDARD = 1
+    REGEX = 2
+    SUBSTRING = 3
+
+
+# ["String1", StringN, "ENUM_VALUE"], Family, Negated, Case-Insensitive
+_CriterionOperatorList = [
+    (["&&", "AND"], _CriterionOperatorFamily.BOOLEAN, False, False),
+    (["||", "OR"], _CriterionOperatorFamily.BOOLEAN, False, False),
+    (["!", "NOT"], _CriterionOperatorFamily.BOOLEAN, True, False),
+
+    # STANDARD
+    (["=", "==", "EQUAL"], _CriterionOperatorFamily.STANDARD, False, False),
+    (["=*", "EQUAL_NOCASE"], _CriterionOperatorFamily.STANDARD, False, True),
+    (["!=", "NOT_EQUAL"], _CriterionOperatorFamily.STANDARD, True, False),
+    (["!=*", "NOT_EQUAL_NOCASE"], _CriterionOperatorFamily.STANDARD, True, True),
+    (["<", "LOWER"], _CriterionOperatorFamily.STANDARD, False, False),
+    ([">", "GREATER"], _CriterionOperatorFamily.STANDARD, False, False),
+    (["<=", "LOWER_OR_EQUAL"], _CriterionOperatorFamily.STANDARD, False, False),
+    ([">=", "GREATER_OR_EQUAL"], _CriterionOperatorFamily.STANDARD, False, False),
+
+    # REGEX
+    (["~", "REGEX"], _CriterionOperatorFamily.REGEX, False, False),
+    (["!~", "NOT_REGEX"], _CriterionOperatorFamily.REGEX, True, False),
+    (["~*", "REGEX_NOCASE"], _CriterionOperatorFamily.REGEX, False, True),
+    (["!~*", "NOT_REGEX_NOCASE"], _CriterionOperatorFamily.REGEX, True, True),
+
+    # SUBSTRING
+    (["<>", "SUBSTR"], _CriterionOperatorFamily.SUBSTRING, False, False),
+    (["!<>", "NOT_SUBSTR"], _CriterionOperatorFamily.SUBSTRING, True, False),
+    (["<>*", "SUBSTR_NOCASE"], _CriterionOperatorFamily.SUBSTRING, False, True),
+    (["!<>*", "NOT_SUBSTR_NOCASE"], _CriterionOperatorFamily.SUBSTRING, True, True),
+]
+
+
+class _CriterionEnum(Enum):
+    @property
+    def family(self):
+        return _CriterionOperatorList[self.value][1]
+
+    @property
+    def negated(self):
+        return _CriterionOperatorList[self.value][2]
+
+    @property
+    def case_insensitive(self):
+        return _CriterionOperatorList[self.value][3]
+
+    @property
+    def is_regex(self):
+        return self.family is _CriterionOperatorFamily.REGEX
+
+    @property
+    def is_boolean(self):
+        return self.family is _CriterionOperatorFamily.BOOLEAN
+
+    @property
+    def is_substring(self):
+        return self.family is _CriterionOperatorFamily.SUBSTRING
+
+    def __json__(self):
+        return self.name
+
+
+CriterionOperator = _CriterionEnum(
+    value="CriterionOperator",
+    names=itertools.chain.from_iterable(
+        itertools.product(v[0], [k]) for k, v in enumerate(_CriterionOperatorList)
+    )
+)
+
+
 class Criterion(json.JSONObject):
     def _init(self, left, operator, right):
         self.left, self.operator, self.right = left, operator, right
@@ -321,28 +398,33 @@ class Criterion(json.JSONObject):
     def __init__(self, left=None, operator=None, right=None):
         json.JSONObject.__init__(self)
 
-        # Normalize equality test
-        if operator == "=":
-            operator = "=="
+        if isinstance(operator, text_type):
+            operator = CriterionOperator[operator]
 
         self._init(left, operator, right)
 
     def get_paths(self):
-        if self.operator in ("&&", "||"):
-            return self.left.get_paths() | self.right.get_paths()
-
         res = set()
-        if self.left:
+        if not self:
+            return res
+
+        if not self.operator.is_boolean:
             res.add(self.left)
+        else:
+            if self.left:
+                res |= self.left.get_paths()
+
+            res |= self.right.get_paths()
 
         return res
 
     def _compile(self, base, format_only=False):
-        if not self.left:
+        if not self:
             return copy.copy(self)
 
-        if self.operator in ("&&", "||"):
-            return Criterion(self.left._compile(base, format_only), self.operator, self.right._compile(base, format_only))
+        if self.operator.is_boolean:
+            left = self.left._compile(base, format_only) if self.left else None
+            return Criterion(left, self.operator, self.right._compile(base, format_only))
 
         left = base.format_path(self.left)
         if format_only:
@@ -364,20 +446,26 @@ class Criterion(json.JSONObject):
         return "'%s'" % value.replace("\\", "\\\\").replace("'", "\\'")
 
     def _criterion_to_string(self, path, operator, value):
-        if operator == "==" and value is None:
-            return "!%s" % (path)
+        if value is None:
+            if operator == CriterionOperator.EQUAL:
+                return "!%s" % (path)
 
-        if operator in ("!=", None) and value is None:
-            return path
+            if operator == CriterionOperator.NOT_EQUAL:
+                return path
 
-        return "%s %s %s" % (path, operator, self._value_escape(value))
+        return "%s %s %s" % (path, operator.name, self._value_escape(value))
 
-    def to_string(self, noroot=False):
-        if not self.left:
+    def to_string(self, noroot=False, _depth=0):
+        if not self:
             return ""
 
-        if self.operator in ("&&", "||"):
-            return "(" + " ".join((self.left.to_string(noroot), self.operator, self.right.to_string(noroot))) + ")"
+        if self.operator.is_boolean:
+            if self.operator == CriterionOperator.NOT:
+                res = "!%s" % self.right.to_string(noroot, _depth + 1)
+            else:
+                res = " ".join((self.left.to_string(noroot, _depth + 1), self.operator.name, self.right.to_string(noroot, _depth + 1)))
+
+            return res if _depth == 0 else "(%s)" % res
 
         lst = [self.left, self.operator, self.right]
         if noroot:
@@ -386,13 +474,13 @@ class Criterion(json.JSONObject):
         return self._criterion_to_string(*lst)
 
     def to_list(self, type=None):
-        if not self.left:
+        if not self:
             return []
 
-        if self.operator in ("&&", "||"):
-            return self.left.to_list(type) + self.right.to_list(type)
-        else:
-            return [self]
+        if self.operator.is_boolean:
+            return (self.left.to_list(type) if self.left else []) + self.right.to_list(type)
+
+        return [self]
 
     def compile(self, type):
         base = env.dataprovider._type_handlers[type]
@@ -434,19 +522,19 @@ class Criterion(json.JSONObject):
         return {"left": self.left, "operator": self.operator, "right": self.right}
 
     def __iadd__(self, other):
-        return self._apply_self("&&", other)
+        return self._apply_self(CriterionOperator.AND, other)
 
     def __ior__(self, other):
-        return self._apply_self("||", other)
+        return self._apply_self(CriterionOperator.OR, other)
 
     def __iand__(self, other):
-        return self._apply_self("&&", other)
+        return self._apply_self(CriterionOperator.AND, other)
 
     def __add__(self, other):
-        return self._apply_new("&&", other)
+        return self._apply_new(CriterionOperator.AND, other)
 
     def __or__(self, other):
-        return self._apply_new("||", other)
+        return self._apply_new(CriterionOperator.OR, other)
 
     __and__ = __add__
     __nonzero__ = __bool__
