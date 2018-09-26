@@ -70,7 +70,11 @@ class CronJob(object):
         self.runcnt = runcnt
 
         self._running = False
-        self._timedelta = self._prev_schedule = self._next_schedule = None
+        self._timedelta = None
+
+    def set_schedule(self, schedule):
+        self.schedule = schedule
+        self._timedelta = None
 
     def _timeinit_once(self):
         if self._timedelta:
@@ -121,6 +125,7 @@ class CronJob(object):
         self.runcnt += 1
         self._running = False
         self.base = timeutil.utcnow()
+        self._timedelta = None
         env.db.query("UPDATE Prewikka_Crontab SET base=%s, runcnt=runcnt+1, error=%s WHERE id=%d", self.base, err, self.id)
 
     def run(self, now):
@@ -175,6 +180,7 @@ class Crontab(object):
             self.add(name, schedule, ext_type=ext_type, enabled=enabled)
 
     def _update_joblist(self):
+        # Update jobs instead of re-creating them because some of them may be currently running
         mainlist = set(self.list(enabled=True))
 
         # Suppress jobs that were removed from the main list
@@ -182,6 +188,13 @@ class Crontab(object):
 
         # Add jobs that were added to the main list
         self._joblist |= mainlist.difference(self._joblist)
+
+        # Take schedule changes into account
+        for job in self._joblist:
+            for j in mainlist:
+                if j == job and j.schedule != job.schedule:
+                    job.set_schedule(j.schedule)
+                    break
 
         return self._joblist
 
