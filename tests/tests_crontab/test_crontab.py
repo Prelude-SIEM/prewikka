@@ -100,9 +100,11 @@ def test_cronjob():
     """
     Test `prewikka.crontab.CronJob` class.
     """
+    now = datetime.now(timezone("UTC"))
+
     cron_name = 'test_name'
-    cron_schedule = '*/1 * * * *'
-    cron_base = datetime.now(timezone("UTC")).replace(second=0, microsecond=0)
+    cron_schedule = '* * * * *'
+    cron_base = now.replace(second=0, microsecond=0)
     cron_runcnt = 0
 
     # create a crontab for tests
@@ -112,13 +114,23 @@ def test_cronjob():
                       cron_name,
                       cron_schedule,
                       cronjob_test_func,
+                      cron_base - timedelta(minutes=33),
+                      cron_runcnt,
+                      user=env.request.user)
+
+    # replace() needed for croniter < 0.3.8
+    assert now - timedelta(minutes=1) < cronjob.next_schedule.replace(microsecond=0) < now
+
+    cronjob = CronJob(cron_id,
+                      cron_name,
+                      cron_schedule,
+                      cronjob_test_func,
                       cron_base,
                       cron_runcnt,
                       user=env.request.user)
 
-    assert cronjob.prev_schedule == cron_base
-    assert cronjob.next_schedule == cron_base + timedelta(minutes=1)
-    assert cronjob.timedelta == timedelta(minutes=1)
+    # replace() needed for croniter < 0.3.8
+    assert now < cronjob.next_schedule.replace(microsecond=0) < now + timedelta(minutes=1)
 
     # run()
     query = env.db.query("SELECT id, runcnt FROM Prewikka_Crontab WHERE id=%d", cron_id)
@@ -126,14 +138,19 @@ def test_cronjob():
     assert len(query) == 1
 
     runcnt = int(query[0][1])
-    cronjob.run(datetime.now(timezone("UTC")) + timedelta(minutes=2))
+    cronjob.run(now + timedelta(minutes=1))
     gevent.sleep(1)
     query = env.db.query("SELECT id, runcnt FROM Prewikka_Crontab WHERE id=%d", cron_id)
 
     assert len(query) == 1
     assert int(query[0][1]) == runcnt+1
 
-    assert not cronjob.run(datetime.now(timezone("UTC")))
+    cronjob.run(now + timedelta(minutes=1))
+    gevent.sleep(1)
+    query = env.db.query("SELECT id, runcnt FROM Prewikka_Crontab WHERE id=%d", cron_id)
+
+    assert len(query) == 1
+    assert int(query[0][1]) == runcnt+1
 
     with pytest.raises(Exception):
         CronJob(cron_id,

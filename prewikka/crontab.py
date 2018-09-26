@@ -68,35 +68,21 @@ class CronJob(object):
         self.enabled = enabled
         self.base = base
         self.runcnt = runcnt
-
         self._running = False
-        self._timedelta = self._prev_schedule = self._next_schedule = None
 
-    def _timeinit_once(self):
-        if self._timedelta:
-            return
+        self.set_schedule(schedule)
 
+    def set_schedule(self, schedule):
         # Interpret the cronjob configuration as local time
-        c = croniter.croniter(self.schedule, self.base.astimezone(utils.timeutil.tzlocal()))
+        self._cron = croniter.croniter(schedule, datetime.datetime.now(utils.timeutil.tzlocal()))
 
-        self._next_schedule = c.get_next(datetime.datetime)
-        self._prev_schedule = c.get_prev(datetime.datetime)
-        self._timedelta = self._next_schedule - self._prev_schedule
+        # If the job was not executed at the previous scheduled time,
+        # make sure to schedule it back
+        self._cron.get_next()
+        if self.base and self._cron.get_prev(datetime.datetime).replace(microsecond=0) <= self.base:  # replace() needed for croniter < 0.3.8
+            self._cron.get_next()
 
-    @property
-    def timedelta(self):
-        self._timeinit_once()
-        return self._timedelta
-
-    @property
-    def prev_schedule(self):
-        self._timeinit_once()
-        return self._prev_schedule
-
-    @property
-    def next_schedule(self):
-        self._timeinit_once()
-        return self._next_schedule
+        self.next_schedule = self._cron.get_current(datetime.datetime)
 
     def _run(self):
         self._running = True
@@ -121,10 +107,11 @@ class CronJob(object):
         self.runcnt += 1
         self._running = False
         self.base = timeutil.utcnow()
+        self.next_schedule = self._cron.get_next(datetime.datetime)
         env.db.query("UPDATE Prewikka_Crontab SET base=%s, runcnt=runcnt+1, error=%s WHERE id=%d", self.base, err, self.id)
 
     def run(self, now):
-        if not(self.next_schedule) or now < self.next_schedule or self._running:
+        if now < self.next_schedule or self._running:
             return
 
         env.log.info("[%d/%s]: RUNNING JOB schedule=%s callback=%s" % (self.id, self.name, self.schedule, self.callback))
@@ -175,6 +162,7 @@ class Crontab(object):
             self.add(name, schedule, ext_type=ext_type, enabled=enabled)
 
     def _update_joblist(self):
+        # Update jobs instead of re-creating them because some of them may be currently running
         mainlist = set(self.list(enabled=True))
 
         # Suppress jobs that were removed from the main list
@@ -182,6 +170,13 @@ class Crontab(object):
 
         # Add jobs that were added to the main list
         self._joblist |= mainlist.difference(self._joblist)
+
+        # Take schedule changes into account
+        for job in self._joblist:
+            for j in mainlist:
+                if j == job and j.schedule != job.schedule:
+                    job.set_schedule(j.schedule)
+                    break
 
         return self._joblist
 
