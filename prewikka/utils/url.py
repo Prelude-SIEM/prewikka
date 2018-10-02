@@ -131,4 +131,4 @@ def iri2uri(iri, encoding="utf8"):
 
 
 def urlencode(parameters, doseq=False):
-    return _urlencode(parameters, doseq).replace('&', '&amp;')
+    return _urlencode(parameters, doseq)
