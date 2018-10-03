@@ -21,13 +21,17 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 GRAMMAR = r"""
-    ?criteria: criterion
-             | criteria "&&" criterion -> and_
-             | criteria "||" criterion -> or_
+    ?criteria: and
+        | criteria "||" and -> or_
+
+    ?and: not
+        | and "&&" not -> and_
+
+    ?not: criterion
+        | "!" not -> not_
 
     criterion: path operator value
              | path -> not_null
-             | "!" path -> null
              | "(" criteria ")" -> parenthesis
 
     !operator: "=" | "=*" | "==" | "!=" | "!=*" | "<>" | "<>*" | "!<>" | "!<>*" | "<" | "<=" | ">" | ">=" | "~" | "~*" | "!~" | "!~*" -> operator

@@ -513,7 +513,7 @@ class Criterion(json.JSONObject):
         return self.to_string()
 
     def __bool__(self):
-        return self.left is not None
+        return self.operator is not None
 
     def __copy__(self):
         return Criterion(self.left, self.operator, self.right)
