@@ -31,7 +31,7 @@ from prewikka.dataprovider import Criterion, ParserError
 from . import grammar
 
 
-_grammar = Lark(grammar.GRAMMAR, start="criteria", parser="lalr", keep_all_tokens=True)
+_grammar = Lark(grammar.GRAMMAR, start="input", parser="lalr", keep_all_tokens=True)
 
 
 def _wildcard_to_regex(value):
@@ -82,6 +82,50 @@ class CommonTransformer(Transformer):
     regstr = v_args(inline=True)(lambda _, s: ("~", CommonTransformer._hack(s, '/')))
 
 
+class _CustomCriterion(object):
+    def __init__(self, c):
+        self.criterion = c
+
+
+class _Required(_CustomCriterion):
+    pass
+
+
+class _Optional(_CustomCriterion):
+    pass
+
+
+# From http://lucene.472066.n3.nabble.com/operator-precedence-and-confusing-result-td642263.html:
+#
+# Lucene's query model is based on REQUIRED, OPTIONAL, and EXCLUDED
+# clauses.  A clause with no annotation is always OPTIONAL, and doesn't
+# affect matching unless there are only OPTIONAL clauses on that level.
+# brackets () create a subclause (note that this is OPTIONAL by
+# default!).  AND terms are translated into REQUIRED clauses, AND NOT's
+# are translated into EXCLUDED clauses.  Require clauses are annotated
+# with +'s
+#
+# A AND B OR C OR D OR E OR F
+# -> +A +B C D E F
+# -> find documents that match clause A and clause B (other clauses
+# don't affect matching)
+#
+# C OR D OR E OR F
+# -> C D E F
+# -> find documents matching at least one of these clauses
+#
+# A AND (B OR C OR D OR E OR F)
+# -> +A +(B C D E F)
+# -> find documents that match A, and match one of B, C, D, E, or F
+#
+# (A AND B) OR C OR D OR E OR F
+# -> (+A +B) C D E F
+# -> find documents that match at least one of C, D, E, F, or both of A
+# and B
+#
+# The key takeaway: once you have an AND in a grouped set of clauses,
+# the OR are completely irrelevant for matching.
+#
 class CriteriaTransformer(CommonTransformer):
     def __init__(self, compile=Criterion, default_paths=[]):
         self._compile = compile
@@ -90,20 +134,6 @@ class CriteriaTransformer(CommonTransformer):
     def string_modifier(self, data):
         raise LuceneEmulationError
 
-    @v_args(inline=True)
-    def operator(self, data=None):
-        if data == "+":
-            raise LuceneEmulationError
-
-        return data
-
-    def _get_value_operator(self, t, parent_operator, parent_field):
-        op, value = t
-        if parent_operator in ("-", "!", "NOT"):
-            op = "!" + op
-
-        return value.value, op
-
     def _get_fields(self, parent_field):
         return [parent_field] if parent_field else self._default_paths
 
@@ -111,62 +141,82 @@ class CriteriaTransformer(CommonTransformer):
         fields = self._get_fields(parent_field)
         return functools.reduce(lambda x, y: x | y, (self._compile(path, op_a, from_) & self._compile(path, op_b, to) for path in fields), Criterion())
 
-    def _tree_to_criteria(self, t, parent_operator=None, parent_field=[]):
+    def _get_criterion(self, data, field, parent_field):
+        obj = self._tree_to_criteria(data, self._tree_to_criteria(field) or parent_field)
+        if not isinstance(obj, Criterion):
+            return obj.criterion
+
+        return obj
+
+    def _bool(self, a, op, b, parent_field=[]):
+        a = self._tree_to_criteria(a, parent_field)
+        b = self._tree_to_criteria(b, parent_field)
+        if b is None or (isinstance(a, _Required) and isinstance(b, _Optional)):
+            return a
+
+        elif a is None or (isinstance(b, _Required) and isinstance(a, _Optional)):
+            return b
+
+        else:
+            return a.__class__(Criterion(a.criterion, "&&" if isinstance(a, _Required) else op, b.criterion))
+
+    def _tree_to_criteria(self, t, parent_field=[], has_required=False):
         tag = getattr(t, "data", None)
         if not tag:
             return text_type(t.value) if t else None
 
-        if tag == "bool_":
-            if "AND" in t.children[1] or "&&" in t.children[1]:
-                op = "&&"
-            else:
-                op = "||"
+        if tag == "or_":
+            return self._bool(t.children[0], "||", t.children[2], parent_field)
 
-            return Criterion(self._tree_to_criteria(t.children[0], parent_operator, parent_field), op, self._tree_to_criteria(t.children[2], parent_operator, parent_field))
+        elif tag == "and_":
+            return self._bool(t.children[0], "&&", t.children[2], parent_field)
 
-        elif tag == "field":
-            return t.children[0][:-1] if t.children else None
-
-        elif tag == "criterion":
-            operator, field, value = t.children
-            return self._tree_to_criteria(value, self._tree_to_criteria(operator) or parent_operator, self._tree_to_criteria(field) or parent_field)
+        elif tag == "field" and t.children:
+            return t.children[0].replace(" ", "")[:-1]
 
         elif tag == "parenthesis":
-            operator, field, _, data, _ = t.children
-            return self._tree_to_criteria(data, self._tree_to_criteria(operator) or parent_operator, self._tree_to_criteria(field) or parent_field)
+            _, data, _ = t.children
+            return self._tree_to_criteria(data, parent_field).criterion
 
         elif tag == "value_string":
-            value, op = self._get_value_operator(t.children[0], parent_operator, parent_field)
+            op, value = t.children[0]
 
             ret = Criterion()
             for i in self._get_fields(parent_field):
-                ret |= self._compile(i, op, value)
+                ret |= self._compile(i, op, value.value)
 
             return ret
 
         elif tag == "inclusive_range":
             from_, to = filter(lambda x: isinstance(x, tuple), t.children)
-            if parent_operator not in ("-", "!", "NOT"):
-                ret = self._range(parent_field, from_[1], to[1], ">=", "<=")
-            else:
-                ret = self._range(parent_field, from_[1], to[1], "<=", ">=")
-
-            return ret
+            return self._range(parent_field, from_[1], to[1], ">=", "<=")
 
         elif tag == "exclusive_range":
             from_, to = filter(lambda x: isinstance(x, tuple), t.children)
-            if parent_operator not in ("-", "!", "NOT"):
-                ret = self._range(parent_field, from_[1], to[1], ">", "<")
-            else:
-                ret = self._range(parent_field, from_[1], to[1], "<", ">")
+            return self._range(parent_field, from_[1], to[1], ">", "<")
 
-            return ret
+        elif tag in "required":
+            if len(t.children) > 1:
+                _, field, data = t.children
+                return _Required(self._get_criterion(data, field, parent_field))
+
+        elif tag == "excluded":
+            if len(t.children) > 1:
+                _, field, data = t.children
+                return _Required(Criterion(operator="!", right=self._get_criterion(data, field, parent_field)))
+
+        elif tag == "optional":
+            field, data = t.children
+            return _Optional(self._get_criterion(data, field, parent_field))
+
+        elif tag == "input":
+            return self._tree_to_criteria(t.children[1], parent_field)
 
         elif t.children:
-            return self._tree_to_criteria(t.children[0], parent_operator, parent_field)
+            return self._tree_to_criteria(t.children[0], parent_field)
 
     def transform(self, tree):
-        return self._tree_to_criteria(Transformer.transform(self, tree))
+        return self._tree_to_criteria(Transformer.transform(self, tree)).criterion
 
 
 class ReconstructTransformer(CommonTransformer):
@@ -179,25 +229,24 @@ class ReconstructTransformer(CommonTransformer):
         if tag == "value_string":
             return self._value_string(t.children[0], parent_field)
 
+        elif tag in ("required", "excluded"):
+            if len(t.children) == 1:
+                return self._tree_tostring(t.children[0])
+
+            operator, field, value = t.children
+            field = self._tree_tostring(field)
+            return "".join([self._tree_tostring(operator), field, self._tree_tostring(value, field or parent_field)])
+
+        elif tag == "optional":
+            field, value = t.children
+            field = self._tree_tostring(field)
+            return "".join([field, self._tree_tostring(value, field or parent_field)])
+
         if not tag:
             if isinstance(t, tuple):
                 return text_type(t[1])
 
             return text_type(t)
-
-        elif tag == "criterion":
-            operator, field, value = t.children
-            operator = self._tree_tostring(operator)
-            field = self._tree_tostring(field)
-            value = self._tree_tostring(value, field or parent_field)
-            return "".join([operator, field, value])
-
-        elif tag == "parenthesis":
-            operator, field, lp, value, rp = t.children
-            operator = self._tree_tostring(operator)
-            field = self._tree_tostring(field)
-            value = self._tree_tostring(value, field or parent_field)
-            return "".join([operator, field, lp, value, rp])
 
         else:
             return "".join(self._tree_tostring(i, parent_field) for i in t.children)

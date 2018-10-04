@@ -21,20 +21,26 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 GRAMMAR = r"""
-    ?criteria: criterion
-             | criteria (WS|BOOL_AND|BOOL_OR) criterion -> bool_
+    ?input: WS* criteria WS*
+    ?criteria: operator_
+        | criteria WS+ operator_ -> or_
+        | criteria BOOL_OR operator_ -> or_
+        | criteria BOOL_AND operator_ -> and_
 
-    criterion: operator field (value | criteria)
-             | operator field LPAR criteria RPAR -> parenthesis
+    ?operator_: (optional | excluded | required)
+
+    excluded: EXCLUDED _criterion?
+    required: REQUIRED _criterion?
+    optional: _criterion
+
+    parenthesis: LPAR criteria RPAR
+    _criterion: field (value | parenthesis)
 
     value: (inclusive_range | exclusive_range | value_string)
 
     inclusive_range: "[" WS* _string WS "TO" WS _string WS* "]"
     exclusive_range: "{" WS* _string WS "TO" WS _string WS* "}"
     value_string: _string (string_modifier)?
-
-    operator: OPERATOR?
-    OPERATOR.3: "NOT" WS+ | "!" | "-" | "+"
 
     _string: (dqstring | sqstring | regstr | uqstring)
     string_modifier: BOOST_MODIFIER | FUZZY_MODIFIER
@@ -55,17 +61,22 @@ GRAMMAR = r"""
     UNQUOTED_STRING.2: (ESCAPED_SPECIAL_CHARACTERS | /[^+!(){}\[\]^\"\~:\s]/)+
 
     field: (FIELD)? -> field
-    FIELD.2: PATH ":"
+    FIELD.2: PATH WS* ":" WS*
     PATH.0: (PATHELEM ".")* PATHELEM
     PATHELEM.0: WORD ("(" PATHINDEX ")")?
     PATHINDEX.0: "-"? (DIGIT+ | UNQUOTED_STRING)
     WORD: LETTER (LETTER | DIGIT | "-" | "_")+
     DIGIT: /[0-9]/
     LETTER: /[a-z]/
+
     BOOL_AND.1: WS+ ("&&" | "AND") WS+
     BOOL_OR.1: WS+ ("||" | "OR") WS+
 
-    LPAR: WS* "("
+    NOT_STR: "NOT" WS+
+    EXCLUDED.3: WS* ("-" | "!" | NOT_STR)
+    REQUIRED.1: WS* "+"
+
+    LPAR: "(" WS*
     RPAR: WS* ")"
 
     WS: /[ \t\f\r\n]/+
