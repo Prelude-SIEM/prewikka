@@ -66,7 +66,7 @@ def route_override(endpoint, type):
 
 
 class ParameterError(Exception):
-        pass
+    pass
 
 
 class InvalidParameterError(error.PrewikkaUserError):

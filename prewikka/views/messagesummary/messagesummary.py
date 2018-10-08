@@ -436,7 +436,7 @@ class MessageSummary(Table, view.View):
 
         self.buildNode(analyzer["node"])
         if analyzer["ostype"] or analyzer["osversion"]:
-                self.newTableEntry(_("Operating System"), "%s %s" % (analyzer["ostype"] or "", analyzer["osversion"] or ""))
+            self.newTableEntry(_("Operating System"), "%s %s" % (analyzer["ostype"] or "", analyzer["osversion"] or ""))
 
         self.endTable()
         self.newTableRow()

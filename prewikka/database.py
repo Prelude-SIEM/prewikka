@@ -53,14 +53,14 @@ class DatabaseSchemaError(DatabaseError):
 
 # Internal workaround since SWIG generated exception use class RuntimeError
 def _fix_exception(func):
-        def inner(self, *args, **kwargs):
-            try:
-                ret = func(self, *args, **kwargs)
-            except RuntimeError as e:
-                raise DatabaseError(message=text_type(e))
+    def inner(self, *args, **kwargs):
+        try:
+            ret = func(self, *args, **kwargs)
+        except RuntimeError as e:
+            raise DatabaseError(message=text_type(e))
 
-            return ret
-        return inner
+        return ret
+    return inner
 
 
 def _use_flock(func):
@@ -338,10 +338,9 @@ class DatabaseUpdateHelper(DatabaseHelper):
 
             version = pkg_resources.parse_version(mod.version)
             if (not from_version or (version > from_version)) and (not to_version or (version <= to_version)):
-                    yield mod
+                yield mod
 
     def _resolve_branch_switch(self, curbranch, curversion, outstack=[]):
-
         for upd in self._list(from_branch=(curbranch, curversion), type="branch"):
             if upd.branch == self._reqbranch and pkg_resources.parse_version(upd.version) <= pkg_resources.parse_version(self._reqversion):
                 return outstack + [upd]

@@ -52,17 +52,17 @@ class RendererNoDataException(RendererException):
 
 
 class RendererItem(object):
-        __slots__ = ["values", "labels", "links", "_tuple"]
+    __slots__ = ["values", "labels", "links", "_tuple"]
 
-        def __init__(self, values=0, labels=None, links=None):
-                self._tuple = values, labels, links
+    def __init__(self, values=0, labels=None, links=None):
+        self._tuple = values, labels, links
 
-                self.values = values
-                self.labels = labels
-                self.links = links
+        self.values = values
+        self.labels = labels
+        self.links = links
 
-        def __getitem__(self, i):
-                return self._tuple[i]
+    def __getitem__(self, i):
+        return self._tuple[i]
 
 
 class RendererUtils(object):

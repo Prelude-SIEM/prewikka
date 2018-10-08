@@ -88,11 +88,11 @@ class TranslationProxy(object):
     def setLocale(self, lang):
         first = None
         for domain, locale_dir in self._domains.items():
-                t = self._getCatalog(domain, lang)
-                if not first:
-                    first = t
-                else:
-                    first._catalog.update(t._catalog)
+            t = self._getCatalog(domain, lang)
+            if not first:
+                first = t
+            else:
+                first._catalog.update(t._catalog)
 
         self._data.lang = lang
         self._data.catalog = first

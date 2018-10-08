@@ -32,23 +32,23 @@ else:
 
 
 class BufferedWriter(object):
-        def __init__(self, wcb, buffersize=8192):
-                self._wcb = wcb
-                self._dlist = []
-                self._len = 0
-                self._buffersize = buffersize
+    def __init__(self, wcb, buffersize=8192):
+        self._wcb = wcb
+        self._dlist = []
+        self._len = 0
+        self._buffersize = buffersize
 
-        def flush(self):
-                self._wcb(b''.join(self._dlist))
-                self._dlist = []
-                self._len = 0
+    def flush(self):
+        self._wcb(b''.join(self._dlist))
+        self._dlist = []
+        self._len = 0
 
-        def write(self, data):
-                self._dlist.append(data)
-                self._len += len(data)
+    def write(self, data):
+        self._dlist.append(data)
+        self._len += len(data)
 
-                if self._len >= self._buffersize:
-                        self.flush()
+        if self._len >= self._buffersize:
+            self.flush()
 
 
 class Request(object):

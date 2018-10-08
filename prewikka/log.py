@@ -162,4 +162,4 @@ class Log(object):
 
 
 def getLogger(name=__name__):
-        return logging.getLogger(name)
+    return logging.getLogger(name)
