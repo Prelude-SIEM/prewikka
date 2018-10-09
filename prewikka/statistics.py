@@ -193,6 +193,10 @@ class ChronologyChart(GenericChart):
 
         return idx + 1, selection
 
+    @staticmethod
+    def _get_default_value(datatype):
+        return None if env.dataprovider.is_continuous(datatype) else 0
+
     def get_data(self):
         data, date_precision, base_parameters = self._prepare_timeline()
         step = self._menu.get_step(100)
@@ -201,6 +205,12 @@ class ChronologyChart(GenericChart):
         out = collections.OrderedDict()
         links = []
         legends = []
+
+        if len(self.query) == 1:
+            default = self._get_default_value(self.query[0].datatype)
+            default_values = {key: default for key in data}
+        else:
+            default_values = {key: self._get_default_value(self.query[i].datatype) for i, key in enumerate(data)}
 
         start = self._menu.start
         while start < self._menu.end:
@@ -219,7 +229,7 @@ class ChronologyChart(GenericChart):
 
             key = start.timetuple()[:date_precision]
             for i in data.keys():
-                out.setdefault(i, []).append(data[i].get(key, 0))
+                out.setdefault(i, []).append(data[i].get(key, default_values[i]))
 
             legends.append(start.strftime(step.unit_format))
             start = next

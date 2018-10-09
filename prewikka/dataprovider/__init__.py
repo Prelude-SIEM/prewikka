@@ -269,6 +269,7 @@ class DataProviderBackend(pluginmanager.PluginBase):
 class DataProviderBase(pluginmanager.PluginBase):
     dataprovider_type = None
     dataprovider_label = None
+    dataprovider_continuous = False
 
     def __init__(self, time_field=None):
         if time_field is None:
@@ -712,3 +713,7 @@ class DataProviderManager(pluginmanager.PluginManager):
     def get_path_type(self, path, type=None):
         type = self.check_datatype(type, [path])
         return self._type_handlers[type].get_path_type(path)
+
+    def is_continuous(self, type):
+        # Whether data can be interpolated (e.g. for metric-type dataproviders)
+        return self._type_handlers[type].dataprovider_continuous
