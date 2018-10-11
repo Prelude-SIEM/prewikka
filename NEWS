@@ -1,3 +1,13 @@
+* 2018-10-11, prewikka-5.0.1:
+
+Author: Antoine Luong
+
+- Make jquery_unparam iterative
+- Fix cronjob scheduling
+- Allow more complex branch migrations
+
+
+
 * 2018-09-07, prewikka-5.0.0:
 
 Author: Yoann Vandoorselaere
