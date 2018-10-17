@@ -121,7 +121,7 @@ class GenericChart(object):
 
 
 class DiagramChart(GenericChart):
-    TYPES = ["pie", "bar", "radar", "polar", "doughnut", "line", "table"]
+    TYPES = ["pie", "bar", "horizontal-bar", "radar", "polar", "doughnut", "line", "table"]
 
     def _get_series(self, query):
         for value, label, crit in self._get_categories(query):
