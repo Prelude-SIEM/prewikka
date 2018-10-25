@@ -51,9 +51,6 @@ def test_urlencode():
     """
     Test `prewikka.utils.url.urlencode()`.
     """
-    url_encode = url.urlencode({'foo': 1, 'bar': 2, '42': 0})
+    url_encode = url.urlencode([('foo', 1), ('bar', 2), ('42', '&')])
 
-    assert '42=0' in url_encode
-    assert 'foo=1' in url_encode
-    assert 'bar=2' in url_encode
-    assert len(url_encode.split(';')) == 3
+    assert url_encode == 'foo=1&bar=2&42=%26'
