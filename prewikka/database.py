@@ -481,6 +481,7 @@ class DatabaseCommon(object):
         env.db = self
 
         self.__ESCAPE_PREFILTER = {
+            bool: int,
             datetime: lambda dt: self.escape(self.datetime(dt)),
             set: self._prefilter_iterate,
             list: self._prefilter_iterate,

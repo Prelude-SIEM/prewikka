@@ -235,18 +235,13 @@ class Crontab(object):
 
     def update(self, id, **kwargs):
         accept = {
-            "name": None,
-            "schedule": None,
-            "user": lambda x: ("userid", getattr(x, "id", None)),
-            "ext_type": None,
-            "ext_id": None,
-            "enabled": lambda x: ("enabled", int(x))
+            "user": lambda x: ("userid", getattr(x, "id", None))
         }
 
         cols = []
         data = []
         for field, value in kwargs.items():
-            dec = accept[field]
+            dec = accept.get(field)
             if dec:
                 field, value = dec(value)
 
