@@ -96,7 +96,7 @@ class AboutPlugin(view.View):
 
         for catname, plugin in self._iter_plugin():
             enabled = plugin.plugin_mandatory or plugin.full_module_name in env.request.parameters["enable_plugin"]
-            upsrt.append((plugin.full_module_name, int(enabled)))
+            upsrt.append((plugin.full_module_name, enabled))
 
         if upsrt:
             env.db.upsert("Prewikka_Module_Registry", ["module", "enabled"], upsrt, pkey=["module"])
