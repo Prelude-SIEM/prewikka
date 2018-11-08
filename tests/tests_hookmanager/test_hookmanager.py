@@ -27,81 +27,67 @@ import pytest
 from prewikka import hookmanager
 
 
-HOOK_TEST = 'TEST_HOOK'
-
-
-def fake_function_with_hook():
-    """
-    Fake function to test hook register. Hook is register only when it's triggered.
-
-    :return: 42
-    :rtype: int
-    """
-    list(hookmanager.trigger(HOOK_TEST, 'foo'))
-
-    return 42
-
-
 def test_hookmanager_register():
     """
     Test `prewikka.hookmanager.HookManager.register()` method.
     """
-    hook_2 = 'hook_2'
-    hook_2_method = 'hook_2_method'
+    hook = 'hook_1'
 
-    # simple hook
-    assert HOOK_TEST not in hookmanager.hookmgr
+    assert hook not in hookmanager.hookmgr
 
-    hookmanager.register(HOOK_TEST)
+    hookmanager.register(hook, lambda x: 42)
 
-    assert HOOK_TEST not in hookmanager.hookmgr
-
-    fake_function_with_hook()
-
-    assert HOOK_TEST in hookmanager.hookmgr
-
-    # hook with _regfunc arg
-    assert hook_2 not in hookmanager.hookmgr
-
-    hookmanager.register(hook_2, hook_2_method)
-
-    assert hook_2 in hookmanager.hookmgr
+    assert hook in hookmanager.hookmgr
 
 
 def test_hookmanager_trigger():
     """
     Test `prewikka.hookmanager.HookManager.trigger()` method.
     """
-    hook_3 = 'hook_3'
-    hook_3_method = 'hook_3_method'
+    # Test method return value
+    hook = 'hook_2'
+    hookmanager.register(hook, lambda x: x + '42')
 
-    assert hook_3 not in hookmanager.hookmgr
+    assert list(hookmanager.trigger(hook, 'bar')) == ['bar42']
 
-    hookmanager.register(hook_3, hook_3_method)
+    with pytest.raises(TypeError):
+        list(hookmanager.trigger(hook, 'foo', 'bar'))
 
-    assert hook_3 in hookmanager.hookmgr
+    with pytest.raises(TypeError):
+        list(hookmanager.trigger(hook, 'bar', type=int))
 
-    assert list(hookmanager.trigger(hook_3, 'bar'))
+    # Test exception handling
+    hook = 'hook_3'
+    hookmanager.register(hook, lambda x: 1/x)
 
-    with pytest.raises(Exception):
-        list(hookmanager.trigger(hook_3, 'bar', type=str))
+    with pytest.raises(ZeroDivisionError):
+        list(hookmanager.trigger(hook, 0))
+
+    assert list(hookmanager.trigger(hook, 0, _except=lambda e: None)) == []
+
+    # Test constant value
+    hook = 'hook_4'
+    hookmanager.register(hook, 42)
+
+    assert list(hookmanager.trigger(hook, type=int)) == [42]
+
+    # Test return ordering
+    hook = 'hook_5'
+    hookmanager.register(hook, 'a', _order=2)
+    hookmanager.register(hook, 'b', _order=1)
+    hookmanager.register(hook, 'r', _order=3)
+
+    assert ''.join(hookmanager.trigger(hook)) == 'bar'
 
 
 def test_hookmanager_unregister():
     """
     Test `prewikka.hookmanager.HookManager.unregister()` method.
     """
-    hook_4 = 'hook_4'
-    hook_4_method = 'hook_4_method'
+    hook = 'hook_6'
+    method = lambda x: x
 
-    # register
-    assert hook_4 not in hookmanager.hookmgr
+    hookmanager.register(hook, method)
+    hookmanager.unregister(hook, method)
 
-    hookmanager.register(hook_4, hook_4_method)
-
-    assert hook_4 in hookmanager.hookmgr
-
-    # unregister
-    hookmanager.unregister(hook_4, hook_4_method)
-
-    assert hook_4 in hookmanager.hookmgr  # hooks exist but method is empty
+    assert list(hookmanager.trigger(hook, 'bar')) == []

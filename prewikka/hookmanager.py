@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import operator
 from prewikka import registrar
 
 _sentinel = object()
@@ -33,30 +34,38 @@ class HookManager(object):
 
     def unregister(self, hook=None, method=None, exclude=[]):
         if hook and method:
-            self._hooks[hook].remove(method)
+            self._hooks[hook] = [(order, func) for order, func in self._hooks[hook] if func != method]
         elif hook:
             self._hooks[hook] = []
         else:
             for i in set(self._hooks) - set(exclude):
                 self._hooks[i] = []
 
-    def register(self, hook, _regfunc=_sentinel):
+    def register(self, hook, _regfunc=_sentinel, _order=2**16):
         if _regfunc is not _sentinel:
-            self._hooks.setdefault(hook, []).append(_regfunc)
+            self._hooks.setdefault(hook, []).append((_order, _regfunc))
         else:
-            return registrar.DelayedRegistrar.make_decorator("hook", self.register, hook)
+            return registrar.DelayedRegistrar.make_decorator("hook", self.register, hook, _order=_order)
 
     def trigger(self, hook, *args, **kwargs):
         wtype = kwargs.pop("type", None)
+        _except = kwargs.pop("_except", None)
 
-        for cb in self._hooks.setdefault(hook, []):
-            if callable(cb):
-                result = cb(*args, **kwargs)
-            else:
+        for order, cb in sorted(self._hooks.setdefault(hook, []), key=operator.itemgetter(0)):
+            if not callable(cb):
                 result = cb
+            else:
+                try:
+                    result = cb(*args, **kwargs)
+                except Exception as e:
+                    if _except:
+                        _except(e)
+                        continue
+                    else:
+                        raise
 
             if result and wtype and not isinstance(result, wtype):
-                raise Exception("Hook '%s' expect return type of '%s' but got '%s'" % (hook, wtype, type(result)))
+                raise TypeError("Hook '%s' expect return type of '%s' but got '%s'" % (hook, wtype, type(result)))
 
             yield result
 
