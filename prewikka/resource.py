@@ -84,7 +84,7 @@ class HTMLNode(json.JSONObject):
         if icon:
             self.childs = (HTMLNode("i", _class="fa %s" % icon), " ") + self.childs
 
-        self._sortkey = attrs.pop("_sortkey", None)
+        self._sortkey = attrs.pop("_sortkey", "")
         self._extra = attrs.pop("_extra", None)
 
         tmp = attrs.pop("_class", None)

@@ -22,7 +22,6 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import base64
 import collections
 import string
-import urlparse
 
 from prewikka import error, history, hookmanager, mainmenu, resource, response, template, utils, view
 
@@ -102,7 +101,7 @@ class BaseView(view._View):
 
     @staticmethod
     def _get_server():
-        url = urlparse.urlparse(env.config.general.get("help_location"))
+        url = utils.urlparse(env.config.general.get("help_location"))
         if not url.netloc and not url.scheme and not url.path.startswith('/'):  # relative url
             return '/' + url.geturl()
 

@@ -20,6 +20,7 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import collections
+import functools
 
 from prewikka import dataprovider, hookmanager, mainmenu, usergroup, utils
 from prewikka.dataprovider import Criterion
@@ -135,8 +136,8 @@ class DiagramChart(GenericChart):
             value = row[0]
             labels = [text_type(i) or _("n/a") for i in row[1:]]
             label = labels if self.chart_type == "table" else ", ".join(labels)
-            crit = reduce(lambda x, y: x & y, (Criterion(path, '=', row[i + 1])
-                                               for i, path in enumerate(query.paths)))
+            crit = functools.reduce(lambda x, y: x & y, (Criterion(path, '=', row[i + 1])
+                                                         for i, path in enumerate(query.paths)))
             yield value, label, crit
 
     def get_data(self):
@@ -167,7 +168,7 @@ class ChronologyChart(GenericChart):
         crit = Criterion()
         if query.limit > 0 and query.paths:
             for values in self._query(all_paths, all_criteria, limit=query.limit, type=query.datatype):
-                crit |= reduce(lambda x, y: x & y, (Criterion(query.paths[i], "=", value) for i, value in enumerate(values[1:])))
+                crit |= functools.reduce(lambda x, y: x & y, (Criterion(query.paths[i], "=", value) for i, value in enumerate(values[1:])))
 
         res = []
         if query.limit != 0:
@@ -189,7 +190,7 @@ class ChronologyChart(GenericChart):
 
     def _gen_selection(self, time_unit):
         selection = []
-        for idx, unit in enumerate(range(mainmenu.TimeUnit(time_unit) + 1)):
+        for idx, unit in enumerate(range(int(mainmenu.TimeUnit(time_unit) + 1))):
             selection += ["%s:%s/order_desc,group_by" % (self._ctime_as_timezone(), mainmenu.TimeUnit(unit).dbunit)]
 
         return idx + 1, selection

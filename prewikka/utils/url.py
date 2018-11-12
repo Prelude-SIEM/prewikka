@@ -29,10 +29,10 @@ from prewikka import siteconfig
 
 
 if sys.version_info >= (3, 0):
-    from urllib.parse import quote, quote_plus, urlsplit, urlunsplit, urlencode as _urlencode  # noqa: imported but unused
+    from urllib.parse import quote, quote_plus, urlparse, urlsplit, urlunsplit, urlencode as _urlencode  # noqa: imported but unused
 else:
     from urllib import quote, quote_plus, urlencode as __urlencode  # noqa: imported but unused
-    from urlparse import urlsplit, urlunsplit
+    from urlparse import urlparse, urlsplit, urlunsplit  # noqa: imported but unused
 
     def _convert(d):
         if isinstance(d, (list, tuple)):

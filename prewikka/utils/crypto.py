@@ -26,6 +26,7 @@
 # (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 # SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+import binascii
 import hashlib
 import hmac
 import os
@@ -43,7 +44,7 @@ except NotImplementedError:
     using_sysrandom = False
 
 
-PREWIKKA_SECRET = os.urandom(24).encode("hex")
+PREWIKKA_SECRET = binascii.hexlify(os.urandom(24))
 
 
 def get_random_string(length=12, allowed_chars='abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'):

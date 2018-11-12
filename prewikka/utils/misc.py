@@ -58,6 +58,12 @@ class AttrObj(object):
         else:
             return self.__dict__.iteritems()
 
+    def __getitem__(self, val):
+        return self.__dict__.__getitem__(val)
+
+    def keys(self):
+        return self.__dict__.keys()
+
 
 # FIXME: Need appropriate implementation
 def get_analyzer_status_from_latest_heartbeat(heartbeat, error_margin):

@@ -256,7 +256,8 @@ class Core(object):
         try:
             env.request.user = env.session.get_user(webreq)
             env.request.user.set_locale()
-        except error.PrewikkaError as autherr:
+        except error.PrewikkaError as e:
+            autherr = e
             pass
 
         if webreq.path == "/":

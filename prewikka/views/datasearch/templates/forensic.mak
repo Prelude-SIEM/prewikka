@@ -17,7 +17,7 @@
 
 <script type="text/javascript">
 $LAB.script("datasearch/js/datasearch.js").wait(function() {
-  datasearch_autocomplete_init(${ html.escapejs(fields_info.keys()) },
+  datasearch_autocomplete_init(${ html.escapejs(list(fields_info.keys())) },
                             ${ html.escapejs(history) },
                             ${ html.escapejs(labels) });
 
@@ -33,7 +33,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
     %>
 
     var columns = {
-        'model': ${ html.escapejs(columns_properties.values()) },
+        'model': ${ html.escapejs(list(columns_properties.values())) },
         'subgrid': true
     };
 

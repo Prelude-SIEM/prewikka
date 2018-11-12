@@ -27,7 +27,6 @@ import operator
 import pkgutil
 import re
 import time
-import types
 from datetime import datetime
 
 import pkg_resources
@@ -463,12 +462,18 @@ class DatabaseCommon(object):
 
         return dict((i[0], ModuleInfo(i[1], i[2], int(i[3]))) for i in rows)
 
+    def _get_prefilter(self, v):
+        if not(isinstance(v, (text_type, bytes))) and isinstance(v, collections.Iterable):
+            return self.__ESCAPE_PREFILTER["iterable"]
+        else:
+            return self.__ESCAPE_PREFILTER.get(type(v))
+
     def _prefilter_iterate(self, l):
         tmp = []
         for v in l:
             tmp.append(text_type(self.escape(v)))
 
-        if self.__ESCAPE_PREFILTER.get(type(v)) == self._prefilter_iterate:
+        if self._get_prefilter(v) == self._prefilter_iterate:
             fmt = '%s'
         else:
             fmt = '(%s)'
@@ -482,10 +487,7 @@ class DatabaseCommon(object):
         self.__ESCAPE_PREFILTER = {
             bool: int,
             datetime: lambda dt: self.escape(self.datetime(dt)),
-            set: self._prefilter_iterate,
-            list: self._prefilter_iterate,
-            tuple: self._prefilter_iterate,
-            types.GeneratorType: self._prefilter_iterate
+            "iterable": self._prefilter_iterate,
         }
 
         self._transaction_state = self.__TRANSACTION_STATE_NONE
@@ -584,7 +586,7 @@ class DatabaseCommon(object):
         return self._dbtype
 
     def escape(self, data):
-        prefilter = self.__ESCAPE_PREFILTER.get(type(data))
+        prefilter = self._get_prefilter(data)
         if prefilter:
             return prefilter(data)
 

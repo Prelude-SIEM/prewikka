@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import collections
 import datetime
 import json
 
@@ -59,6 +60,9 @@ class PrewikkaJSONEncoder(json.JSONEncoder):
 
         elif isinstance(obj, datetime.datetime):
             return text_type(obj)
+
+        elif isinstance(obj, collections.Iterable):
+            return list(obj)
 
         return json.JSONEncoder.default(self, obj)
 

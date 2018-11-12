@@ -310,7 +310,7 @@ class QueryParser(object):
 
     def _time_selection(self, time_unit):
         selection = []
-        for unit in range(mainmenu.TimeUnit(time_unit) + 1):
+        for unit in range(int(mainmenu.TimeUnit(time_unit) + 1)):
             selection += ["timezone({backend}.{time_field}, '%s'):%s/order_asc,group_by" % (env.request.user.timezone, mainmenu.TimeUnit(unit).dbunit)]
 
         return selection
@@ -422,7 +422,7 @@ class DataSearch(view.View):
         self._column_index = 0
 
         self.all_fields = []
-        self._main_fields = self.default_columns.keys()
+        self._main_fields = list(self.default_columns.keys())
         self.fields_info = collections.OrderedDict()
         self.columns_properties = collections.OrderedDict()
 

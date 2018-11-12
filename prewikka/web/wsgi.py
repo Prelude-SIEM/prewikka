@@ -58,7 +58,8 @@ class WSGIRequest(request.Request):
         # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
         # decoded with ISO-8859-1. This is wrong for Prewikka where UTF-8 is the
         # default. Re-encode to recover the original bytestring.
-        return value.encode("ISO-8859-1") if Py3 else value
+        if value is not None:
+            return value.encode("ISO-8859-1") if Py3 else value
 
     def _wsgi_get_unicode(self, key, default=None):
         value = self._wsgi_get_bytes(key, default)
