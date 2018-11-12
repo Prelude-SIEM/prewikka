@@ -31,6 +31,37 @@ class Agents(view.View):
     view_datatype = "heartbeat"
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
+    @hookmanager.register("HOOK_SUMMARYWIDGET_DATA", _order=0)
+    def _set_agents_summary(self):
+        results = env.dataprovider.query(["max(heartbeat.create_time)", "heartbeat.analyzer(-1).analyzerid/group_by"])
+        if not results:
+            return
+
+        c = Criterion()
+        for create_time, analyzerid in results:
+            c |= Criterion("heartbeat.create_time", "==", create_time) & Criterion("heartbeat.analyzer(-1).analyzerid", "==", analyzerid)
+
+        agents = {
+            "up": utils.AttrObj(count=0, title=_("Online"), label="label-success", status=["online"]),
+            "down": utils.AttrObj(count=0, title=_("Offline"), label="label-danger", status=["offline", "missing", "unknown"])
+        }
+        heartbeat_error_margin = env.config.general.get_int("heartbeat_error_margin", 3)
+
+        for heartbeat in env.dataprovider.get(c):
+            heartbeat = heartbeat["heartbeat"]
+            analyzer = heartbeat["analyzer"][-1]
+            analyzer.status = utils.get_analyzer_status_from_latest_heartbeat(heartbeat, heartbeat_error_margin)[0]
+
+            for key, values in agents.items():
+                if analyzer.status in values.status:
+                    values.count += 1
+
+        parameters = env.request.menu_parameters
+        val = agents["down"] if agents["down"].count else agents["up"]
+        data = resource.HTMLNode("a", localization.format_number(val.count), title=val.title, _class="label " + val.label, href=url_for("Agents.agents", status=val.status, **parameters))
+
+        return utils.AttrObj(title=resource.HTMLNode("a", _("Agents"), href=url_for("Agents.agents", **parameters)), data=[data])
+
     def __init__(self):
         env.dataprovider.check_datatype("heartbeat")
 
