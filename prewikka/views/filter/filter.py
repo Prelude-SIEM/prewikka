@@ -30,9 +30,6 @@ from prewikka.utils.viewhelpers import GridParameters
 from . import FilterPlugin
 
 
-_TYPES = ["alert", "heartbeat", "log", "ticket"]
-
-
 def _flatten(criterion):
     if not criterion.operator.is_boolean:
         return criterion
@@ -119,9 +116,8 @@ class FilterView(FilterPlugin, view.View):
         self._db = FilterDatabase()
 
     def _get_types(self):
-        for typ in _TYPES:
-            if env.dataprovider.has_type(typ):
-                yield typ, _(env.dataprovider.get_label(typ))
+        for typ in sorted(env.dataprovider.get_types(public=True)):
+            yield typ, _(env.dataprovider.get_label(typ))
 
     @view.route("/settings/filters", menu=(N_("Preferences"), N_("Filters")), help="#filters", parameters=GridParameters("filters"))
     def listing(self):

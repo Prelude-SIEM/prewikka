@@ -49,12 +49,6 @@ class _IDMEFPlugin(DataProviderBackend):
     plugin_license = version.__license__
     plugin_copyright = version.__copyright__
 
-    TYPE_OPERATOR_MAPPING = {
-        text_type: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*"),
-        bytes: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*", "<", ">"),
-        None: ("=", "!=", "<", ">", "<=", ">=")
-    }
-
     def __init__(self):
         try:
             self._db = idmefdatabase.IDMEFDatabase(env.config.idmef_database)
@@ -94,14 +88,6 @@ class _IDMEFPlugin(DataProviderBackend):
     @usergroup.permissions_required(["IDMEF_ALTER"])
     def delete(self, criteria, paths):
         self._db.remove(criteria)
-
-    def _get_path_values(self, path):
-        klass = prelude.IDMEFClass(path)
-
-        if klass.getValueType() == prelude.IDMEFValue.TYPE_ENUM:
-            return klass.getEnumValues()
-        else:
-            return None
 
 
 class IDMEFAlertPlugin(_IDMEFPlugin):

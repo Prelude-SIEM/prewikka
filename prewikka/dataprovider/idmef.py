@@ -32,6 +32,12 @@ class _IDMEFProvider(DataProviderBase):
     plugin_license = version.__license__
     plugin_copyright = version.__copyright__
 
+    TYPE_OPERATOR_MAPPING = {
+        text_type: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*"),
+        bytes: ("=", "=*", "!=", "!=*", "~", "~*", "!~", "!~*", "<>", "<>*", "!<>", "!<>*", "<", ">"),
+        None: ("=", "!=", "<", ">", "<=", ">=")
+    }
+
     def __init__(self):
         DataProviderBase.__init__(self, "create_time")
 
@@ -113,6 +119,14 @@ class _IDMEFProvider(DataProviderBase):
     def compile_criteria(self, criteria):
         if criteria:
             return _IDMEFCriterion(criteria.to_string())
+
+    def _get_path_values(self, path):
+        klass = prelude.IDMEFClass(path)
+
+        if klass.getValueType() == prelude.IDMEFValue.TYPE_ENUM:
+            return klass.getEnumValues()
+        else:
+            return None
 
 
 class IDMEFAlertProvider(_IDMEFProvider):

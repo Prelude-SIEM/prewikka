@@ -55,8 +55,8 @@ def PathInfo(path, value_type, operators=[], value_accept=[], type=None):
     assert(operators or type)
 
     if not operators:
-        backend = env.dataprovider._backends[type]
-        operators = backend.TYPE_OPERATOR_MAPPING.get(value_type, backend.TYPE_OPERATOR_MAPPING.get(None, []))
+        base = env.dataprovider._type_handlers[type]
+        operators = base.get_operator_by_datatype(value_type, default=base.get_operator_by_datatype(None, default=[]))
 
     return AttrObj(path=path, field=".".join(path.split(".")[1:]), type=value_type, operators=operators, value_accept=value_accept)
 
@@ -257,19 +257,17 @@ class DataProviderBackend(pluginmanager.PluginBase):
         raise error.NotImplementedError
 
     def get_properties(self):
-        return AttrObj()
-
-    def get_path_info(self, path):
-        return PathInfo(path, env.dataprovider.get_path_type(path), value_accept=self._get_path_values(path), type=self.type)
+        pass
 
     def _get_path_values(self, path):
-        return None
+        pass
 
 
 class DataProviderBase(pluginmanager.PluginBase):
     dataprovider_type = None
     dataprovider_label = None
     dataprovider_continuous = False
+    TYPE_OPERATOR_MAPPING = {}
 
     def __init__(self, time_field=None):
         if time_field is None:
@@ -316,6 +314,30 @@ class DataProviderBase(pluginmanager.PluginBase):
 
     def register_path(self, path, type):
         raise error.NotImplementedError
+
+    def get_path_info(self, path):
+        return PathInfo(path, env.dataprovider.get_path_type(path), value_accept=self._get_path_values(path), type=self.dataprovider_type)
+
+    # The following methods might be implemented by the backend or by the type itself.
+    def _get_path_values(self, path):
+        backend = env.dataprovider._backends.get(self.dataprovider_type)
+        if backend:
+            return backend._get_path_values(path)
+
+    def get_properties(self):
+        backend = env.dataprovider._backends.get(self.dataprovider_type)
+        if backend:
+            return backend.get_properties()
+
+    def get_operator_by_datatype(self, datatype, default=None):
+        mapping = None
+        if self.dataprovider_type in env.dataprovider._backends:
+            mapping = env.dataprovider._backends[self.dataprovider_type].TYPE_OPERATOR_MAPPING
+
+        if not mapping:
+            mapping = self.TYPE_OPERATOR_MAPPING
+
+        return mapping.get(datatype, default)
 
 
 class _CriterionOperatorFamily(Enum):
@@ -609,11 +631,11 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         return list(res)[0]
 
-    def check_datatype(self, type, *args):
+    def check_datatype(self, type, *args, **kwargs):
         if not type:
             type = self.guess_datatype(*args)
 
-        if type not in self._type_handlers or type not in self._backends:
+        if type not in self._type_handlers or (kwargs.get("require_backend", True) and type not in self._backends):
             raise NoBackendError(type)
 
         return type
@@ -682,14 +704,19 @@ class DataProviderManager(pluginmanager.PluginManager):
         o = self._normalize(type, paths, criteria)
         return self._backends[o.type].update(self._resolve_values(o.parsed_paths, data.values()), o.criteria)
 
-    def get_types(self):
-        return self._backends.keys()
+    def get_types(self, public=False, require_backend=True):
+        for k, v in self._type_handlers.items():
+            if require_backend and k not in self._backends:
+                continue
+
+            if (not public) or v.dataprovider_label:
+                yield k
 
     def has_type(self, wanted_type):
         return wanted_type in self._backends
 
     def get_properties(self, type):
-        return self._backends[type].get_properties()
+        return self._type_handlers[type].get_properties()
 
     def get_label(self, type):
         return self._type_handlers[type].dataprovider_label
@@ -707,12 +734,15 @@ class DataProviderManager(pluginmanager.PluginManager):
         return self._type_handlers[type].get_common_paths(index)
 
     def get_path_info(self, path, type=None):
-        type = self.check_datatype(type, [path])
-        return self._backends[type].get_path_info(path)
+        type = self.check_datatype(type, [path], require_backend=False)
+        return self._type_handlers[type].get_path_info(path)
 
     def get_path_type(self, path, type=None):
-        type = self.check_datatype(type, [path])
+        type = self.check_datatype(type, [path], require_backend=False)
         return self._type_handlers[type].get_path_type(path)
+
+    def get_operator_by_datatype(self, type, datatype, default=None):
+        return self._type_handlers[type].get_operator_by_datatype(datatype, default=None)
 
     def is_continuous(self, type):
         # Whether data can be interpolated (e.g. for metric-type dataproviders)
