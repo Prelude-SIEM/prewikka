@@ -23,7 +23,7 @@ import itertools
 import json
 import pkg_resources
 
-from prewikka import database, error, response, template, utils, version, view
+from prewikka import cli, database, error, response, template, utils, version, view
 from prewikka.utils import html
 
 
@@ -79,6 +79,15 @@ class AboutPlugin(view.View):
 
         return data
 
+    @cli.register("list", "plugin", help=N_("list plugin: list installed plugins"))
+    def _list_plugins(self):
+        ret = []
+        for plugins in self._get_plugin_infos().installed.values():
+            for mod, active in plugins:
+                ret.append(mod.full_module_name)
+
+        return sorted(ret)
+
     @view.route("/settings/apps", methods=["GET"], menu=(N_("Apps"), N_("Apps")), help="#apps")
     def render_get(self):
         dset = template.PrewikkaTemplate(__name__, "templates/aboutplugin.mak").dataset()
@@ -106,9 +115,16 @@ class AboutPlugin(view.View):
 
     @view.route("/settings/apps/update", methods=["GET"])
     def update(self):
+        self._update(env.request.web.send_stream)
+
+    @cli.register("init", "plugin", help=N_("init plugin: initialize the plugin database schemas"))
+    def _update_plugins(self):
+        self._update(lambda *args, **kwargs: None)
+
+    def _update(self, send_stream):
         data = self._get_plugin_infos()
 
-        env.request.web.send_stream(json.dumps({"total": data.maintenance_total}), event="begin", sync=True)
+        send_stream(json.dumps({"total": data.maintenance_total}), event="begin", sync=True)
 
         for mod, fromversion, uplist in itertools.chain.from_iterable(data.maintenance.values()):
             for upscript in uplist:
@@ -116,16 +132,16 @@ class AboutPlugin(view.View):
                     continue
 
                 label = _("Applying %(module)s %(script)s...") % {'module': mod.full_module_name, 'script': text_type(upscript)}
-                env.request.web.send_stream(json.dumps({"label": html.escape(label), 'module': html.escape(mod.full_module_name), 'script': html.escape(text_type(upscript))}), sync=True)
+                send_stream(json.dumps({"label": html.escape(label), 'module': html.escape(mod.full_module_name), 'script': html.escape(text_type(upscript))}), sync=True)
 
                 try:
                     upscript.apply()
                 except Exception as e:
-                    env.request.web.send_stream(json.dumps({"logs": "\n".join(html.escape(x) for x in upscript.query_logs), "error": html.escape(text_type(e))}), sync=True)
+                    send_stream(json.dumps({"logs": "\n".join(html.escape(x) for x in upscript.query_logs), "error": html.escape(text_type(e))}), sync=True)
                 else:
-                    env.request.web.send_stream(json.dumps({"logs": "\n".join(html.escape(x) for x in upscript.query_logs), "success": True}), sync=True)
+                    send_stream(json.dumps({"logs": "\n".join(html.escape(x) for x in upscript.query_logs), "success": True}), sync=True)
 
-        env.request.web.send_stream(data=json.dumps({"label": _("All updates applied")}), event="finish", sync=True)
-        env.request.web.send_stream("close", event="close")
+        send_stream(data=json.dumps({"label": _("All updates applied")}), event="finish", sync=True)
+        send_stream("close", event="close")
 
         env.db.trigger_plugin_change()

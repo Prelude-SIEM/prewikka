@@ -1,0 +1,245 @@
+#!/usr/bin/env python
+
+# Copyright (C) 2019 CS-SI. All Rights Reserved.
+# Author: Antoine Luong <antoine.luong@c-s.fr>
+#
+# This file is part of the Prewikka program.
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation; either version 2, or (at your option)
+# any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License along
+# with this program; if not, write to the Free Software Foundation, Inc.,
+# 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+
+from __future__ import absolute_import, division, print_function, unicode_literals
+
+import argparse
+import cmd
+import getpass
+import glob
+import io
+import locale
+import logging
+import os
+import re
+import sys
+
+from prewikka import cli, localization, log, main, siteconfig, usergroup, utils, version
+from prewikka import FakeRequest
+
+
+COMMAND_ERROR = 1
+PARSE_ERROR = 2
+SYSTEM_ERROR = 3
+UNEXPECTED_ERROR = 10
+
+
+class PrewikkaCLI(cmd.Cmd):
+    prompt = "(prewikka-cli) "
+    _interactive = False
+
+    def _complete_command(self, command, line):
+        if len(line.split(" ")) != 2:
+            return
+
+        last_term = line.split(" ")[-1]
+        return [category for category in cli.get(command) if category.startswith(last_term)]
+
+    def _do_command(self, command, category, *args, **kwargs):
+        c = cli.get(command).get(category)
+        if not c:
+            print("*** %s" % _("Unknown command"))
+            return COMMAND_ERROR
+
+        method, permissions, help = c
+        env.request.user.check(permissions)
+        try:
+            result = method(*args, **kwargs)
+        except Exception as e:
+            print("*** %s" % _("An unexpected error occurred: %s") % e)
+            return UNEXPECTED_ERROR
+
+        for elem in result or []:
+            print(elem)
+
+        return 0
+
+    def _help_command(self, command, description):
+        additional_help = []
+        for category, (method, permissions, help) in sorted(cli.get(command).items()):
+            if help:
+                additional_help.append(_(help))
+
+        print("\n".join(description + [" - %s" % h for h in additional_help]))
+
+    def complete_create(self, text, line, begidx, endidx):
+        return self._complete_command("create", line)
+
+    def complete_delete(self, text, line, begidx, endidx):
+        return self._complete_command("delete", line)
+
+    def complete_import(self, text, line, begidx, endidx):
+        if len(line.split(" ")) < 3:
+            return self._complete_command("import", line)
+
+        path = line.split(" ")[-1]
+        offset = len(path) - len(text)
+        return [f[offset:] + (os.sep if os.path.isdir(f) else "") for f in glob.glob(path + "*")]
+
+    def complete_init(self, text, line, begidx, endidx):
+        return self._complete_command("init", line)
+
+    def complete_list(self, text, line, begidx, endidx):
+        return self._complete_command("list", line)
+
+    def do_create(self, arg):
+        try:
+            category, name, data = re.findall("^(\S+) (\S+)(?: '(.+)')?", arg)[0]
+            data = utils.json.loads(data) if data else None
+        except (IndexError, ValueError):
+            print("*** %s" % _("Could not parse input"))
+            return PARSE_ERROR
+
+        return self._do_command("create", category, name=name, data=data)
+
+    def do_delete(self, arg):
+        try:
+            category, name = arg.split()
+        except ValueError:
+            print("*** %s" % _("Could not parse input"))
+            return PARSE_ERROR
+
+        return self._do_command("delete", category, name=name)
+
+    def do_import(self, arg):
+        args = arg.split()
+        try:
+            category = args[0]
+            filenames = args[1:]
+        except IndexError:
+            print("*** %s" % _("Could not parse input"))
+            return PARSE_ERROR
+
+        files = []
+
+        for pattern in filenames:
+            for path in glob.glob(pattern):
+                with io.open(path) as f:
+                    files.append({
+                        "name": os.path.basename(f.name),
+                        "data": f.read()
+                    })
+
+        return self._do_command("import", category, files=files)
+
+    def do_init(self, arg):
+        return self._do_command("init", arg)
+
+    def do_list(self, arg):
+        return self._do_command("list", arg)
+
+    def do_update(self, arg):
+        return self._do_command("update", arg)
+
+    def help_create(self):
+        return self._help_command("create", ["create <type> <name> <data>", _("Create an object of the specified type")])
+
+    def help_delete(self):
+        return self._help_command("delete", ["delete <type> <name>", _("Delete an object of the specified type")])
+
+    def help_import(self):
+        return self._help_command("import", ["import <type> <files...>", _("Import objects of the specified type from files")])
+
+    def help_init(self):
+        return self._help_command("init", ["init <type>", _("Initialize Prewikka")])
+
+    def help_list(self):
+        return self._help_command("list", ["list <type>", _("List objects of the specified type")])
+
+    def help_update(self):
+        return self._help_command("update", ["update <type> <data>", _("Update objects of the specified type")])
+
+    def do_EOF(self, line):
+        return True
+
+    def get_names(self):
+        # Hide not implemented actions from the list of commands
+        return [name for name in cmd.Cmd.get_names(self) if not name.startswith(("do_", "help_")) or name.endswith("help") or cli.get(name.split("_")[-1])]
+
+    def emptyline(self):
+        pass
+
+    def preloop(self):
+        self._interactive = True
+
+    def postcmd(self, stop, line):
+        if line and line.strip() not in ("help", "?"):
+            print()
+
+        if self._interactive and not isinstance(stop, bool):
+            # Do not exit on error in interactive mode
+            return False
+
+        return stop
+
+
+def set_locale(lang):
+    if lang[0] not in localization.get_languages():
+        lang = "en_GB.utf8"
+    else:
+        lang = ".".join(lang)
+
+    localization.translation.set_locale(lang)
+
+
+if __name__ == "__main__":
+    set_locale(locale.getdefaultlocale())
+
+    parser = argparse.ArgumentParser(description=_("Prewikka command-line tool"))
+    parser.add_argument("-u", "--user", default="admin", help=_("name of the user"))
+    parser.add_argument("-c", "--config", default="%s/prewikka.conf" % siteconfig.conf_dir, help=_("configuration file to use (default: %(default)s)"))
+    parser.add_argument("-C", "--command", help=_("command to execute"))
+    parser.add_argument("-D", "--debug", action="store_true", help=_("enable debugging output"))
+
+    args = parser.parse_args()
+    interpreter = PrewikkaCLI()
+    env.request = FakeRequest()
+
+    if getpass.getuser() != "prewikka":
+        print("*** %s" % _("prewikka-cli must be executed as the prewikka user"))
+        sys.exit(SYSTEM_ERROR)
+
+    main.Core.from_config(args.config)
+    env.request.user = env.auth.authenticate(args.user, no_password_check=True)
+    env.request.user.set_locale()
+
+    if args.debug:
+        formatter = logging.Formatter('%(asctime)s prewikka-cli (pid:%(process)d) %(levelname)s: %(message)s', '%X')
+        handler = logging.StreamHandler()
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(formatter)
+        env.log._logger.addHandler(handler)
+
+    if args.command:
+        ret = 0
+        for command in args.command.split(";"):
+            r = interpreter.onecmd(command)
+            if r > ret:
+                ret = r
+
+        sys.exit(ret)
+
+    else:
+        interpreter.cmdloop("\n".join([
+            _("Prewikka command-line tool (%s)") % version.__version__,
+            _("Type \"help\" or \"?\" to list commands"),
+            ""
+        ]))

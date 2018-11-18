@@ -27,7 +27,7 @@ import socket
 import pkg_resources
 import prelude
 import preludedb
-from prewikka import (auth, config, database, dataprovider, error, history, hookmanager, link, localization,
+from prewikka import (auth, cli, config, database, dataprovider, error, history, hookmanager, link, localization,
                       log, menu, pluginmanager, renderer, resolve, response, siteconfig, usergroup, version, view)
 
 try:
@@ -158,6 +158,7 @@ class Core(object):
     def _unregister_plugin_data(self):
         list(hookmanager.trigger("HOOK_PLUGINS_RELOAD"))
         hookmanager.unregister(exclude=["HOOK_PLUGINS_RELOAD"])
+        cli.unregister()
         usergroup.ACTIVE_PERMISSIONS = usergroup.Permissions()
 
     def _load_plugins(self):

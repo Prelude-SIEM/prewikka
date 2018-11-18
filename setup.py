@@ -299,6 +299,7 @@ setup(
         ],
     },
     scripts=[
+        "scripts/prewikka-cli",
         "scripts/prewikka-crontab",
         "scripts/prewikka-httpd"
     ],
@@ -319,6 +320,7 @@ setup(
     distclass=MyDistribution,
     message_extractors={
         'scripts': [
+            ('prewikka-cli', 'python', None),
             ('prewikka-httpd', 'python', None),
             ('prewikka-crontab', 'python', None)
         ],
