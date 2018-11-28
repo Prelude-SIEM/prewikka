@@ -98,7 +98,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         else
             operator = "\\s*[=<>]+\\s*";
 
-        return escapeRegex(path) + operator + escapeRegex(value);
+        return escapeRegex(path) + operator + escapeRegex(value.toString());
     }
 
     function criterion_regex(path, operator, value)
@@ -600,7 +600,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         var search = sub_from_search($(this).data("field"), null, quote($(this).data("value")), false);
         $("#input_search").val(search);
 
-        _add_to_input($(this).data("field"), "not" + $(this).data("operator"), $(this).data("value"), false);
+        _add_to_input($(this).data("field"), "not" + ($(this).data("operator") || "equal"), $(this).data("value"), false);
         hide_popover();
         update_datasearch();
     });
