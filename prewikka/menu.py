@@ -26,7 +26,7 @@ import os
 import voluptuous
 import yaml
 
-from prewikka import error, hookmanager, siteconfig
+from prewikka import error, hookmanager
 from prewikka.utils import cache
 
 
@@ -61,7 +61,7 @@ class MenuManager(object):
 
         filename = env.config.interface.get("menu_order", "menu.yml")
         if not os.path.isabs(filename):
-            filename = os.path.join(siteconfig.conf_dir, filename)
+            filename = os.path.join(env.config.basedir, filename)
 
         try:
             with open(filename, "r") as f:

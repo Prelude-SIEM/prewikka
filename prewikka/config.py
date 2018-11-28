@@ -254,9 +254,10 @@ class Config(MyConfigParser):
         conf_filename = filename or siteconfig.conf_dir + "/prewikka.conf"
         self.read(conf_filename)
 
+        self.basedir = os.path.dirname(conf_filename)
         for fpattern in self.include.keys():
             if not os.path.isabs(fpattern):
-                fpattern = os.path.join(os.path.dirname(conf_filename), fpattern)
+                fpattern = os.path.join(self.basedir, fpattern)
 
             # Files are loaded in alphabetical order
             for fname in sorted(glob.glob(fpattern)):
