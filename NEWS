@@ -1,3 +1,13 @@
+* 2018-11-30, prewikka-5.0.2:
+
+Author: Antoine Luong
+
+- Fix filtering issues in DataSearch
+- Add horizontal-bar diagram type
+- Automatically convert booleans for SQL queries
+
+
+
 * 2018-10-11, prewikka-5.0.1:
 
 Author: Antoine Luong
