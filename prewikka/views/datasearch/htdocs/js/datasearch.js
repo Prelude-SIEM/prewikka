@@ -522,6 +522,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
                     return { "class": data._classes };
             },
             subGrid: true,
+            useSearchbar: true,
             beforeProcessing: function(data) {
                 _destroy_components(elem);
                 data.userdata = data.rows;

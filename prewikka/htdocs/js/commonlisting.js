@@ -59,6 +59,7 @@ function CommonListing(elem, text, options, restored_parameters) {
         hidegrid: false,
         viewrecords: true,
         globalSearch: false,
+        useSearchbar: false,
         onInitGrid: function() {
             if ( options.globalSearch ) {
                 $(".ui-jqgrid-titlebar").css("overflow", "auto")
@@ -123,7 +124,7 @@ function CommonListing(elem, text, options, restored_parameters) {
         add: false,
         edit: false,
         del: false,
-        search: !options.globalSearch,
+        search: !(options.useSearchbar || options.globalSearch),
         refresh: false
     })
     .jqGrid('navButtonAdd', {
