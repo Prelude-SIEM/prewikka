@@ -19,16 +19,16 @@
 # with this program; if not, write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
+import argparse
 import locale
 import multiprocessing
 import socket
 import ssl
 import sys
 
-from optparse import OptionParser
 from wsgiref.simple_server import WSGIRequestHandler, WSGIServer, make_server
 
-from prewikka import localization, main, siteconfig
+from prewikka import localization, main, siteconfig, version
 from prewikka.web import wsgi
 
 global options
@@ -83,27 +83,29 @@ def set_locale(lang):
 if __name__ == "__main__":
     set_locale(locale.getdefaultlocale())
 
-    parser = OptionParser(epilog=" ")
+    parser = argparse.ArgumentParser(add_help=False)
 
-    parser.add_option("-r", "--root", action="store", type="string", dest="root", default="", help=_("root where the server is accessible"))
-    parser.add_option("-a", "--address", action="store", type="string", dest="addr", default="0.0.0.0", help=_("IP to bind to (default: %default)"))
-    parser.add_option("-p", "--port", action="store", type="int", dest="port", default=8000, help=_("port number to use (default: %default)"))
-    parser.add_option("", "--key", action="store", type="string", dest="key", default=None, help=_("SSL private key to use (default: no SSL)"))
-    parser.add_option("", "--cert", action="store", type="string", dest="cert", default=None, help=_("SSL certificate to use (default: no SSL)"))
-    parser.add_option("-c", "--config", action="store", type="string", dest="config", default="%s/prewikka.conf" % siteconfig.conf_dir, help=_("configuration file to use (default: %default)"))
-    parser.add_option("-m", "--multiprocess", action="store", type="int", dest="num_process", default=multiprocessing.cpu_count(),
-                      help=_("number of processes to use. Default value matches the number of available CPUs (i.e. %d)") % multiprocessing.cpu_count())
+    parser.add_argument("-r", "--root", help=_("root where the server is accessible"))
+    parser.add_argument("-a", "--address", default="0.0.0.0", help=_("IP to bind to (default: %(default)s)"))
+    parser.add_argument("-p", "--port", type=int, default=8000, help=_("port number to use (default: %(default)d)"))
+    parser.add_argument("--key", help=_("SSL private key to use (default: no SSL)"))
+    parser.add_argument("--cert", help=_("SSL certificate to use (default: no SSL)"))
+    parser.add_argument("-c", "--config", default="%s/prewikka.conf" % siteconfig.conf_dir, help=_("configuration file to use (default: %(default)s)"))
+    parser.add_argument("-m", "--multiprocess", type=int, default=multiprocessing.cpu_count(),
+                        help=_("number of processes to use. Default value matches the number of available CPUs (i.e. %d)") % multiprocessing.cpu_count())
+    parser.add_argument("-h", "--help", action="help", help=_("show this help message and exit"))
+    parser.add_argument("-v", "--version", action="version", version=version.__version__, help=_("show program's version number and exit"))
 
-    (options, args) = parser.parse_args()
+    options = parser.parse_args()
 
     if options.root:
         options.root = "/%s/" % (options.root.strip("/"))
 
-    server = make_server(options.addr, options.port, application, server_class=MyWSGIServer, handler_class=WSGIRequest)
+    server = make_server(options.address, options.port, application, server_class=MyWSGIServer, handler_class=WSGIRequest)
     if options.key and options.cert:
         server.socket = ssl.wrap_socket(server.socket, keyfile=options.key, certfile=options.cert, server_side=True)
 
-    for i in range(options.num_process - 1):
+    for i in range(options.multiprocess - 1):
         p = multiprocessing.Process(target=server.serve_forever)
         p.daemon = True
 
