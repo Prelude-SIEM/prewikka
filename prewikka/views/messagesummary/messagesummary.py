@@ -645,7 +645,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
                 results.append(env.dataprovider.query(["alert.messageid", "alert.classification.text"], criteria))
 
             for ident, classif in itertools.chain(*results):
-                link = url_for(".", analyzerid=analyzerid, messageid=ident)
+                link = url_for(".render", analyzerid=analyzerid, messageid=ident)
                 content += '<li><a title="%s" href="%s">%s</a></li>' % (_("Alert details"), link, html.escape(classif))
                 total += 1
 

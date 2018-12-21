@@ -38,7 +38,7 @@ def baseview_fixtures(request):
     Fixtures for tests of `prewikka.baseview`.
     """
     # view
-    load_view_for_fixtures('BaseView')
+    load_view_for_fixtures('BaseView.render')
 
     # dataset
     backup_dataset = copy(env.request.dataset)

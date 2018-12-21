@@ -38,7 +38,7 @@ def mainmenu_fixtures(request):
     """
     backup_parameters = env.request.parameters
 
-    view = load_view_for_fixtures('BaseView')
+    view = load_view_for_fixtures('BaseView.render')
 
     env.request.parameters['orderby'] = None
     env.request.parameters['timeline_mode'] = 'relative'
@@ -61,7 +61,7 @@ def test_mainmenu_parameters():
     """
     Test `prewikka.view.GeneralParameters` class.
     """
-    view = load_view_for_fixtures('BaseView')
+    view = load_view_for_fixtures('BaseView.render')
     mainmenu = GeneralParameters(view, {})
     mainmenu.register()
     mainmenu.normalize()

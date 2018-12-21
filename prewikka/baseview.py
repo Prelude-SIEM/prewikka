@@ -57,6 +57,7 @@ _BASEVIEW_TEMPLATE = template.PrewikkaTemplate(__name__, 'templates/baseview.mak
 
 
 class BaseView(view._View):
+    view_endpoint = "baseview.render"
     view_layout = None
 
     @view.route("/<path:path>/ajax_parameters_update", methods=["PUT", "PATCH"])

@@ -41,7 +41,7 @@ class IDMEFFormatter(datasearch.Formatter):
     def _format_time(self, root, obj, finfo):
         href = None
         if root["%s.messageid" % self.type]:
-            href = url_for("%ssummary" % self.type, messageid=root["%s.messageid" % self.type], _default=None)
+            href = url_for("%ssummary.render" % self.type, messageid=root["%s.messageid" % self.type], _default=None)
 
         return resource.HTMLNode("a", format_datetime(obj), href=href, title=_("See IDMEF details"), **{"data-toggle": "tooltip", "data-container": "#main"})
 

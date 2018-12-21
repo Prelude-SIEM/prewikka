@@ -324,13 +324,14 @@ class _ViewDescriptor(object):
     view_parameters = Parameters
     view_template = None
     view_require_session = True
-    view_layout = "BaseView"
+    view_layout = "BaseView.render"
     view_endpoint = None
     view_datatype = None
     view_priority = 0
     view_keywords = set()
 
     view_help = None
+    view_menu = []
     view_permissions = []
 
     view_users = []
@@ -422,8 +423,6 @@ class _ViewDescriptor(object):
 
 class _View(_ViewDescriptor, registrar.DelayedRegistrar):
     view_id = None
-    view_path = None
-    view_menu = []
 
     def render(self):
         pass
@@ -437,16 +436,6 @@ class _View(_ViewDescriptor, registrar.DelayedRegistrar):
             registrar.DelayedRegistrar.__init__(self)
 
         _ViewDescriptor.__init__(self)
-
-        if self.view_template and not isinstance(self.view_template, template.PrewikkaTemplate):
-            self.view_template = template.PrewikkaTemplate(self.view_template)
-
-        if not self.view_path:
-            if self.view_menu:
-                self.view_path = "/" + "/".join(self.view_menu)
-
-            if self.view_path:
-                self.view_path = utils.name_to_path(self.view_path)
 
     def make_parameters(self, _view_descriptor=None, criteria=None, **kwargs):
         values = {}
@@ -504,10 +493,7 @@ class ViewManager(registrar.DelayedRegistrar):
         endpoint = endpoint.lower()
 
         if endpoint[0] == "." and env.request.view:
-            endpoint = "%s%s" % (env.request.view.view_id, endpoint if len(endpoint) > 1 else "")
-
-        if endpoint[0] != "." and endpoint.find(".") == -1:
-            endpoint += ".render"
+            endpoint = "%s%s" % (env.request.view.view_id, endpoint)
 
         return self._views_endpoints.get(endpoint, default)
 
@@ -534,7 +520,7 @@ class ViewManager(registrar.DelayedRegistrar):
         bview = self.get_view("baseview.render")
         if not bview:
             bview = baseview.BaseView()
-            self.add_view(bview)
+            self._generic_add_view(bview, "/views/baseview")
 
         return bview
 
@@ -583,16 +569,15 @@ class ViewManager(registrar.DelayedRegistrar):
             v.view_parameters = parameters
 
         v.view_help = help or baseview.view_help
-        v.view_path = path[1:]
-        v.view_menu = menu or baseview.view_menu
+        v.view_menu = menu
         v.view_permissions = set(permissions) | set(baseview.view_permissions)
         v.view_endpoint = "%s.%s" % (v.view_id, endpoint or method.__name__)
         v.view_datatype = datatype
         v.view_priority = priority
         v.view_keywords = set(keywords)
 
-        if v.view_menu:
-            env.menumanager.add_section_info(v.view_menu[0], v.view_menu[1], v.view_endpoint)
+        if menu:
+            env.menumanager.add_section_info(menu[0], menu[1], v.view_endpoint)
 
         if datatype:
             self._references.setdefault(datatype, []).append(v)
@@ -600,36 +585,15 @@ class ViewManager(registrar.DelayedRegistrar):
 
         self._generic_add_view(v, path, methods=methods, defaults=defaults)
 
-    def add_view(self, view):
-        rdfunc = getattr(view, "render")
-        route = getattr(rdfunc, registrar._ATTRIBUTE, {}).get("route")
-
-        # check that the retrieved render method is not the default _View.render method
-        if view.__class__.respond != _View.respond or (view.__class__.render != _View.render and rdfunc and not route):
-            if not view.view_path:
-                view.view_path = "/views/%s" % (view.view_id)
-
-            view.view_endpoint = "%s.render" % (view.view_id)
-
-            if view.view_menu:
-                env.menumanager.add_section_info(view.view_menu[0], view.view_menu[1], view.view_endpoint)
-
-            if view.view_datatype:
-                self._references.setdefault(view.view_datatype, []).append(view)
-
-            self._generic_add_view(view, (view.view_path or "/" + view.view_id))
-
     def load_views(self, autoupdate=False):
         self._init()
         self.get_baseview()
 
         for view_class in pluginmanager.PluginManager("prewikka.views", autoupdate):
             try:
-                vi = pluginmanager.PluginManager.initialize_plugin(view_class)
+                pluginmanager.PluginManager.initialize_plugin(view_class)
             except Exception:
                 continue
-
-            self.add_view(vi)
 
     @property
     def url_adapter(self):
