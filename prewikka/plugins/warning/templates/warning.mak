@@ -18,7 +18,7 @@
 			<br><br>
 			<b><a href="http://www.prelude-siem.com">www.prelude-siem.com</a></b>
 			<br><br>
-			${ Markup(_("This OSS version has <span style='font-weight: bold'>lower performance</span> and <span style='font-weight: bold'>less <a href='%s'>features</a></span> than the Pro/Enterprise versions.")) % "http://www.prelude-siem.com/en/products/choose-your-version/" }
+			${ Markup(_("This OSS version has <span style='font-weight: bold'>lower performance</span> and <span style='font-weight: bold'>less <a href='%s'>features</a></span> than the Pro/Enterprise versions.")) % "http://www.prelude-siem.com/en/prelude-siem-en/" }
 			<br>${ _("It is intended for tests and small environments, and should not be used in critical environments.") }
 
 			<br>
