@@ -236,5 +236,5 @@ class PrewikkaRedirectResponse(PrewikkaResponse):
         Redirect response
     """
     def __init__(self, location, code=302, status_text=None):
-        PrewikkaResponse.__init__(self, code=code, status_text=status_text or "%d Redirect" % code)
+        PrewikkaResponse.__init__(self, code=code, status_text=status_text)
         self.headers = collections.OrderedDict((('Location', location),))

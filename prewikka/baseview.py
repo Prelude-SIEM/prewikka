@@ -131,7 +131,7 @@ class BaseView(view._View):
             # logout always generate an exception to render the logout template
             pass
 
-        return response.PrewikkaRedirectResponse(env.request.parameters.get("redirect", env.request.web.get_baseurl()), code=302)
+        return response.PrewikkaRedirectResponse(env.request.parameters.get("redirect", env.request.web.get_baseurl()))
 
     @view.route("/history/<form>/save", methods=["POST"])
     def history_save(self, form):

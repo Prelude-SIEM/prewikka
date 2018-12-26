@@ -223,7 +223,7 @@ class Core(object):
             # which does not require any specific permission.
             url = request.get_baseurl() + "settings/my_account"
 
-        return response.PrewikkaRedirectResponse(url, code=302)
+        return response.PrewikkaRedirectResponse(url)
 
     def _process_static(self, webreq):
         pathkey = webreq.path_elements[0]
