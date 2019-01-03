@@ -1,4 +1,4 @@
-# Copyright (C) 2018 CS-SI. All Rights Reserved.
+# Copyright (C) 2018-2019 CS-SI. All Rights Reserved.
 #
 # This file is part of the Prewikka program.
 #

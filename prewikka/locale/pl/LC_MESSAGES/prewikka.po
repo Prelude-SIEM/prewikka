@@ -1,5 +1,5 @@
 # Polish Translation for Prewikka
-# Copyright (C) 2007-2018 CS-SI
+# Copyright (C) 2007-2019 CS-SI
 # This file is distributed under the same license as the prewikka package.
 #
 msgid ""

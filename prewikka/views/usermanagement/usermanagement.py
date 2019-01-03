@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2018 CS-SI. All Rights Reserved.
+# Copyright (C) 2004-2019 CS-SI. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoann.v@prelude-ids.com>
 
 from __future__ import absolute_import, division, print_function, unicode_literals

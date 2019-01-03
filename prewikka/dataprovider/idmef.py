@@ -1,4 +1,4 @@
-# Copyright (C) 2016-2018 CS-SI. All Rights Reserved.
+# Copyright (C) 2016-2019 CS-SI. All Rights Reserved.
 # Author: Abdel ELMILI <abdel.elmili@c-s.fr>
 
 from __future__ import absolute_import, division, print_function, unicode_literals

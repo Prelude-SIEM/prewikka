@@ -1,4 +1,4 @@
-# Copyright (C) 2017-2018 CS-SI. All Rights Reserved.
+# Copyright (C) 2017-2019 CS-SI. All Rights Reserved.
 # Author: Camille Gardet <camille.gardet@c-s.fr>
 #
 # This file is part of the Prewikka program.

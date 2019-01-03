@@ -1,5 +1,5 @@
 # coding: utf-8
-# Copyright (C) 2018 CS-SI. All Rights Reserved.
+# Copyright (C) 2018-2019 CS-SI. All Rights Reserved.
 # Author: Antoine Luong <antoine.luong@c-s.fr>
 #
 # This file is part of the Prewikka program.
