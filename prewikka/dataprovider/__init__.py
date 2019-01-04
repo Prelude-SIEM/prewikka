@@ -721,6 +721,12 @@ class DataProviderManager(pluginmanager.PluginManager):
     def get_label(self, type):
         return self._type_handlers[type].dataprovider_label
 
+    def format_path(self, path, type=None):
+        if not type:
+            type = self.guess_datatype([path])
+
+        return self._type_handlers[type].format_path(path)
+
     def register_path(self, path, path_type, type=None):
         if not type:
             type = self.guess_datatype([path])
