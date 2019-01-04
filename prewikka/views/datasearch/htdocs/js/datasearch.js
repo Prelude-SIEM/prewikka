@@ -382,15 +382,16 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
     }
 
     /* Popover on click on selection */
-    function display_popover(node, selected_value) {
+    function display_popover(node, selvalue) {
         var offset = node.offset();
         var rowid = node.closest("tr").attr("id");
         var td = node.closest("td").first();
         var selected_field = node.closest("[data-field]");
+        var selected_value = node.closest("[data-value]");
         var next_char = node[0].nextSibling.nodeValue[0];
         var selected_operator = separators.term.indexOf(next_char) === -1 ? "equal" : "substr";
 
-        selected_value = node.closest("[data-value]").data("value") || selected_value;
+        selected_value = selected_value.length > 0 ? selected_value.data("value") : selvalue;
         selected_field = selected_field.data("field");
 
         $("#PopoverOption a:not(.addon_search)")
@@ -466,7 +467,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         var orig = $("#datasearch_table").jqGrid('getGridParam', 'userData')[rowid].cell;
 
         for ( var i in orig ) {
-            elem[i] = (orig[i] && orig[i].toString) ? orig[i].toString() : orig[i];
+            elem[i] = (orig[i] && orig[i].toValue) ? orig[i].toValue() : orig[i];
         }
 
         if ( orig._criteria )
@@ -549,7 +550,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
                 var orig = $(this).jqGrid('getGridParam', 'userData')[rowId].cell;
 
                 for ( var i in orig ) {
-                    elem[i] = (orig[i] && orig[i].toString) ? orig[i].toString() : orig[i];
+                    elem[i] = (orig[i] && orig[i].toValue) ? orig[i].toValue() : orig[i];
                 }
 
                 if ( orig._criteria )

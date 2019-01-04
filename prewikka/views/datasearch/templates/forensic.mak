@@ -82,18 +82,18 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
           <%block name="extra_datasearch_parameters"/>
 
           % if not search.groupby:
-          <div class="form-group">
+          <div>
             <label for="view-config-editable">
-              ${ _("Expert mode") }
               <input type="checkbox" id="view-config-editable" ${ checked(env.request.parameters.get("editable")) } />
               <input type="hidden" name="editable" value="${env.request.parameters.get('editable')}" />
+              ${ _("Expert mode") }
             </label>
           </div>
-          <div class="form-group">
+          <div>
             <label for="view-config-condensed">
-              ${ _("Condensed mode") }
               <input type="checkbox" id="view-config-condensed" ${ checked(env.request.parameters.get("condensed")) } />
               <input type="hidden" name="condensed" value="${env.request.parameters.get('condensed')}" />
+              ${ _("Condensed mode") }
             </label>
           </div>
           % endif

@@ -535,6 +535,11 @@ function HTMLNode(obj) {
         return element.text();
     };
 
+    ret.toValue = function() {
+        var subelem = element.find("[data-value]");
+        return subelem.length > 0 ? subelem.data("value") : element.text();
+    };
+
     return ret;
 }
 

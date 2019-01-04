@@ -33,7 +33,7 @@ import re
 
 from prewikka.utils import json
 from prewikka import error, history, hookmanager, mainmenu, resource, response, template, utils, view
-from prewikka.dataprovider import Criterion
+from prewikka.dataprovider import Criterion, ResultObject
 from prewikka.dataprovider.parsers import criteria, lucene
 from prewikka.localization import format_datetime
 from prewikka.renderer import RendererItem
@@ -106,6 +106,9 @@ class Formatter(object):
         self.type = data_type
 
     def _format_nonstring(self, field, value):
+        if isinstance(value, list):
+            value = ", ".join(value)
+
         return resource.HTMLNode("span", resource.HTMLNode("span", value), _class="selectable", **{"data-field": field})
 
     def format_value(self, field, value):
@@ -316,8 +319,11 @@ class QueryParser(object):
         if order not in ("asc, desc"):
             return
 
-        idx = self._path.index("{backend}.%s" % field)
-        if idx is not None:
+        try:
+            idx = self._path.index("{backend}.%s" % field)
+        except ValueError:
+            self._path.append("{backend}.%s/order_%s" % (field, order))
+        else:
             self._path[idx] += "/order_%s" % order
 
     def _diagram_data(self, cview, step):
@@ -466,7 +472,7 @@ class DataSearch(view.View):
             "query_mode": "criterion"
         }
 
-    def _trigger_datasearch_hook(self, name, **args):
+    def _trigger_datasearch_hook(self, name, *args):
         return itertools.chain(hookmanager.trigger("HOOK_DATASEARCH_%s" % name, *args), hookmanager.trigger("HOOK_DATASEARCH_%s_%s" % (self.type.upper(), name), *args))
 
     def get_forensic_actions(self):
@@ -561,12 +567,17 @@ class DataSearch(view.View):
         results = search.get_result()
         resrows = []
 
+        extradata = list(self._trigger_datasearch_hook("EXTRA_DATA", results))
         extracol = filter(None, self._trigger_datasearch_hook("EXTRA_COLUMN"))
 
         for i, obj in enumerate(results):
             cells = self._get_default_cells(obj)
             for prop, finfo, func in extracol:
-                ret = func(obj)
+                if isinstance(obj, ResultObject):
+                    ret = func(obj, extradata)
+                else:
+                    ret = func({"%s.%s" % (self.type, f): v for f, v in zip(self.all_fields, obj)}, extradata)
+
                 if finfo:
                     cells[prop.name] = self._formatter.format(finfo, obj, ret)
                 else:
