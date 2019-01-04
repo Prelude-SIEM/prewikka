@@ -124,12 +124,14 @@ class Session(pluginmanager.PluginBase):
 
         # And that the user it carry still exist in the current authentication
         # backend (which might have changed)
-        if not(env.auth.has_user(usergroup.User(login))):
+        user = usergroup.User(login)
+        if not env.auth.has_user(user):
             self.__delete_session(request)
             raise SessionInvalid(login, template=self.template)
 
         if (now - t) / 60 >= 5:
             self._db.update_session(sessionid, now)
+            list(hookmanager.trigger("HOOK_SESSION_UPDATE", user))
 
         self.__set_session(request, sessionid)
         return login
