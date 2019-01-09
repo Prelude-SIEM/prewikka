@@ -61,6 +61,10 @@ def PathInfo(path, value_type, operators=[], value_accept=[], type=None):
     return AttrObj(path=path, field=".".join(path.split(".")[1:]), type=value_type, operators=operators, value_accept=value_accept)
 
 
+def PathValue(value, label=None, color=None):
+    return AttrObj(value=value, label=label or value, color=color)
+
+
 def _str_to_datetime(date):
     if date.isdigit():
         return datetime.utcfromtimestamp(int(date))

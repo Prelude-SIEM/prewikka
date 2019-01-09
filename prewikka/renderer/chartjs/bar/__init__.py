@@ -51,9 +51,10 @@ class ChartJSBarPlugin(ChartJSRenderer):
         mapping = {}
 
         for count, value, link in data[0]:
+            label = rutils.get_label(value)
             bar_data.append(count)
-            labels.append(value)
-            mapping[value] = link
+            labels.append(label)
+            mapping[label] = link
 
         color = rutils.get_color(0)
 

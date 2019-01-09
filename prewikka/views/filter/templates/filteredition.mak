@@ -20,7 +20,7 @@
         for path in env.dataprovider.get_paths(typ):
             path_info = env.dataprovider.get_path_info(path, typ)
             operators[typ][path] = path_info.operators
-            enums[typ][path] = path_info.value_accept
+            enums[typ][path] = None if not path_info.value_accept else [v.value for v in path_info.value_accept]
 
             if path not in default_paths[typ].values():
                 all_paths[typ].append(path)

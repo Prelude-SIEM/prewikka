@@ -6,8 +6,8 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import datetime
 import prelude
 
-from prewikka import crontab, utils, version
-from prewikka.dataprovider import DataProviderBase, Criterion, CriterionOperator, ParserError, InvalidPathError
+from prewikka import crontab, renderer, utils, version
+from prewikka.dataprovider import DataProviderBase, Criterion, CriterionOperator, ParserError, PathValue, InvalidPathError
 
 
 class _IDMEFPath(prelude.IDMEFPath):
@@ -123,8 +123,15 @@ class _IDMEFProvider(DataProviderBase):
     def _get_path_values(self, path):
         klass = prelude.IDMEFClass(path)
 
-        if klass.getValueType() == prelude.IDMEFValue.TYPE_ENUM:
-            return klass.getEnumValues()
+        if path == "alert.assessment.impact.severity":
+            return [
+                PathValue("high", label=N_("High"), color=renderer.RED_STD),
+                PathValue("medium", label=N_("Medium"), color=renderer.ORANGE_STD),
+                PathValue("low", label=N_("Low"), color=renderer.GREEN_STD),
+                PathValue("info", label=N_("Informational"), color=renderer.BLUE_STD),
+            ]
+        elif klass.getValueType() == prelude.IDMEFValue.TYPE_ENUM:
+            return [PathValue(v) for v in klass.getEnumValues()]
         else:
             return None
 

@@ -31,15 +31,8 @@ GREEN_STD = "B1E55D"
 BLUE_STD = "93B9DD"
 GRAY_STD = "5C5C5C"
 
-SEVERITY_COLOR_MAP = {
-    "high": (_("High"), RED_STD),
-    "medium": (_("Medium"), ORANGE_STD),
-    "low": (_("Low"), GREEN_STD),
-    "info": (_("Informational"), BLUE_STD)
-}
-
-COLOR_MAP = "93B9DD", "B1E55D", "D4C608", "F5B365", "E78D90", "C6A0CF", "5256D3", \
-            "A7DE65", "F2A97B", "F6818A", "B087C6", "66DC92"
+COLORS = (BLUE_STD, GREEN_STD, YELLOW_STD, ORANGE_STD, RED_STD,
+          "C6A0CF", "5256D3", "A7DE65", "F2A97B", "F6818A", "B087C6", "66DC92")
 
 
 class RendererException(Exception):
@@ -70,23 +63,22 @@ class RendererUtils(object):
 
     def __init__(self, options):
         self._color_map_idx = 0
-
-        self._color_map = options.get("names_and_colors", None)
-        if not self._color_map:
-            self._color_map = COLOR_MAP
+        self._color_map = options.get("names_and_colors")
 
     def get_label(self, label):
-        if isinstance(self._color_map, dict):
-            return self._color_map.get(label, self._nexist_color)[0]
+        if self._color_map:
+            return _(self._color_map.get(label, self._nexist_color)[0])
 
         return label
 
     @cache.request_memoize("renderer_color")
     def get_color(self, label, onecolor=False):
-        if isinstance(self._color_map, dict):
-            return self._color_map.get(label, self._nexist_color)[1]
+        if self._color_map:
+            color = self._color_map.get(label, self._nexist_color)[1]
+            if color:
+                return color
 
-        color = self._color_map[self._color_map_idx % len(self._color_map)]
+        color = COLORS[self._color_map_idx % len(COLORS)]
 
         if not onecolor:
             self._color_map_idx += 1
@@ -168,9 +160,6 @@ class RendererPluginManager(pluginmanager.PluginManager):
 
     def render(self, type, data, renderer=None, **kwargs):
         renderer = self._setup_renderer(type, renderer)
-
-        if "names_and_colors" not in kwargs:
-            kwargs["names_and_colors"] = COLOR_MAP
 
         classname = kwargs["class"] = "-".join((renderer, type))
         cssid = kwargs["cssid"] = "-".join((classname, text_type(uuid.uuid4())))
