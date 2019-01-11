@@ -36,14 +36,10 @@ class Log(object):
     def __init__(self, conf):
         self._logger = None
 
-        for logconfig in conf:
-            config = {}
-            for key, value in logconfig.items():
-                config[key] = text_type(value)
-
+        for instance in conf:
             self._logger = logging.getLogger()
             self._logger.setLevel(logging.NOTSET)
-            self._logger.addHandler(self._getHandler(config, logconfig.get_instance_name()))
+            self._logger.addHandler(self._getHandler(instance))
 
     def _getSyslogHandlerAddress(self):
         for f in ("/dev/log", "/var/run/log", "/var/run/syslog"):
@@ -55,27 +51,27 @@ class Log(object):
 
         return "localhost", 514
 
-    def _getHandler(self, config, logtype='syslog'):
-        logtype = logtype.lower()
+    def _getHandler(self, config):
+        logtype = (config.get_instance_name() or "syslog").lower()
         level = config.get("level", "")
 
         if logtype == 'file':
-            hdlr = logging.FileHandler(config["file"])
+            hdlr = logging.FileHandler(config.file)
 
         elif logtype == 'nteventlog':
             hdlr = logging.handlers.NTEventLogHandler("Prewikka", logtype='Application')
 
-        elif logtype in ['syslog', 'unix']:
+        elif logtype in ('syslog', 'unix'):
             hdlr = logging.handlers.SysLogHandler(self._getSyslogHandlerAddress(), facility=logging.handlers.SysLogHandler.LOG_DAEMON)
 
-        elif logtype in ['smtp']:
-            hdlr = logging.handlers.SMTPHandler(config["host"], config["from"], config["to"].split(", "), config["subject"])
+        elif logtype == 'smtp':
+            hdlr = logging.handlers.SMTPHandler(config.host, getattr(config, "from"), config.to.split(", "), config.subject)
 
-        elif logtype in ['stderr']:
+        elif logtype == 'stderr':
             hdlr = logging.StreamHandler(sys.stderr)
 
         else:
-            raise ValueError(_("Unknown logtype specified: '%s'") % logtype)
+            raise ValueError("Unknown logtype specified: '%s'" % logtype)
 
         format = 'prewikka (pid:%(process)d) %(name)s %(levelname)s: %(message)s'
         if logtype in ['file', 'stderr']:
