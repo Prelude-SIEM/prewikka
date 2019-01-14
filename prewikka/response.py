@@ -210,7 +210,7 @@ class PrewikkaFileResponse(PrewikkaResponse):
 
         ims = env.request.web.headers.get("if-modified-since")
         if ims is not None:
-            ims = dateutil.parser.parse(ims)
+            ims = dateutil.parser.parse(ims.split(";")[0])  # Edge includes the length in this header
             if mtime <= ims:
                 self.code = 304
 
