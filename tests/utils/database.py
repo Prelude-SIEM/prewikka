@@ -60,7 +60,15 @@ def clean_database(database):
     sql = preludedb.SQL(dict(database))
 
     if db_type == 'pgsql':
-        sql_query = 'DROP SCHEMA public CASCADE; CREATE SCHEMA public;'
+        # https://stackoverflow.com/a/36023359
+        sql_query = """
+DO $$ DECLARE
+    r RECORD;
+BEGIN
+    FOR r IN (SELECT tablename FROM pg_tables WHERE schemaname = current_schema()) LOOP
+        EXECUTE 'DROP TABLE IF EXISTS ' || quote_ident(r.tablename) || ' CASCADE';
+    END LOOP;
+END $$;"""
     elif db_type == 'mysql':
         # http://stackoverflow.com/a/18625545
         sql_query = """
