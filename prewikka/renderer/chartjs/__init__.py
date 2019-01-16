@@ -65,7 +65,7 @@ class ChartJSRenderer(RendererBackend):
 
     $("#%(cssid)s").attr('resizeable', true);
 
-    var MyChart = new Chart(ctx, {type: '%(chart_type)s', data: %(data)s, options: %(options)s});
+    var myChart = new Chart(ctx, {type: '%(chart_type)s', data: %(data)s, options: %(options)s});
 
     $("#%(cssid)s").on('resize', function() {
         myChart.resize();
@@ -76,7 +76,7 @@ class ChartJSRenderer(RendererBackend):
         return;
 
     $("#canvas-%(cssid)s").click(function(evt) {
-        var activePoint = MyChart.getElementAtEvent(evt)[0];
+        var activePoint = myChart.getElementAtEvent(evt)[0];
         var value = %(multiple)s ? mapping[activePoint._view.datasetLabel][activePoint._view.label] : mapping[activePoint._view.label];
         if ( activePoint )
             prewikka_ajax({url: value});
