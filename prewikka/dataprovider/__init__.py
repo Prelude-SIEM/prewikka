@@ -343,6 +343,9 @@ class DataProviderBase(pluginmanager.PluginBase):
 
         return mapping.get(datatype, default)
 
+    def get_indexation_path(self, path):
+        raise error.NotImplementedError
+
 
 class _CriterionOperatorFamily(Enum):
     BOOLEAN = 0
@@ -753,6 +756,10 @@ class DataProviderManager(pluginmanager.PluginManager):
 
     def get_operator_by_datatype(self, type, datatype, default=None):
         return self._type_handlers[type].get_operator_by_datatype(datatype, default=None)
+
+    def get_indexation_path(self, path):
+        type = self.guess_datatype([path])
+        return self._type_handlers[type].get_indexation_path(path)
 
     def is_continuous(self, type):
         # Whether data can be interpolated (e.g. for metric-type dataproviders)
