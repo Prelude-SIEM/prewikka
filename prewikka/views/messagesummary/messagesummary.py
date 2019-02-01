@@ -520,7 +520,7 @@ class MessageSummary(Table, view.View):
 
             if meaning not in ignored:
                 self.newTableCol(index, resource.HTMLSource(meaning or "Data content"))
-                self.newTableCol(index, html.escape(value) if value else None)
+                self.newTableCol(index, html.escape(value) if value is not None else None)
                 index += 1
 
         self.endTable()
