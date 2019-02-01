@@ -216,7 +216,7 @@ class IDMEFDataSearch(datasearch.DataSearch):
         for i in self._formatter.get_childs(obj):
             vtype = i.getValueType()
             child = obj.get(i.getName())
-            if not child:
+            if child is None:
                 continue
 
             if vtype == prelude.IDMEFValue.TYPE_CLASS:
