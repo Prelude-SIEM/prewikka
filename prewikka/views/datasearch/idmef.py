@@ -241,4 +241,4 @@ class IDMEFDataSearch(datasearch.DataSearch):
         out = {}
         self._recurse_idmef(out, obj)
 
-        return response.PrewikkaResponse(template.PrewikkaTemplate(__name__, "templates/details.mak").dataset(fields_info=sorted(out.keys()), fields_value=out))
+        return response.PrewikkaResponse(template.PrewikkaTemplate(__name__, "templates/details.mak").dataset(fields_info=sorted(out.keys(), key=utils.path_sort_key), fields_value=out))

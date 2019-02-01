@@ -229,6 +229,14 @@ def deprecated(func):
     return new_func
 
 
+def path_sort_key(path):
+    """
+    Return a key to sort dataprovider paths in natural order,
+    so that alert.source(10) comes after alert.source(2).
+    """
+    return [int(part) if part.isdigit() else part for part in re.split("(\d+)", path)]
+
+
 class CachingIterator(object):
     def __init__(self, items, count=None):
         self._count = count
