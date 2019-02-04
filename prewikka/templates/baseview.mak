@@ -166,7 +166,22 @@ if env.menumanager:
     declared_sections = env.menumanager.get_declared_sections()
 
 def _merge_tabs(section):
-    return section["tabs"] + [tab for tab in sections.get(section["name"], []) if tab not in section["tabs"]]
+    if section["name"] not in sections:
+        return section["tabs"]
+
+    ret = []
+    tabs = section["tabs"] + [tab for tab in sections[section["name"]] if tab not in section["tabs"]]
+    for tab in tabs:
+        if tab not in sections[section["name"]]:
+            ret.append(tab)
+            continue
+
+        endpoint, kwargs = sections[section["name"]][tab]
+        view = env.viewmanager.get_view(endpoint=endpoint)
+        if view.check_permissions(env.request.user, view_kwargs=kwargs):
+            ret.append(tab)
+
+    return ret
 
 def _get_view_url(section, tabs):
     if section not in sections:
@@ -177,9 +192,7 @@ def _get_view_url(section, tabs):
             continue
 
         endpoint, kwargs = sections[section][tab]
-        view = env.viewmanager.get_view(endpoint=endpoint)
-        if view.check_permissions(env.request.user, view_kwargs=kwargs):
-            return url_for(endpoint, **kwargs)
+        return url_for(endpoint, **kwargs)
 %>
 
 <%def name="write_menu(obj, section, tabs)">
@@ -216,6 +229,30 @@ def _get_view_url(section, tabs):
     </li>
 </%def>
 
+<%def name="write_section(section, tabs=None)">
+    <% tabs = tabs or _merge_tabs(section) %>
+    % if tabs:
+        % if not section.get("expand"):
+            ${write_menu(section, section["name"], tabs)}
+        % else:
+            ${write_menu_expand(section, [(section["name"], [tab], tab) for tab in tabs])}
+        % endif
+    % endif
+</%def>
+
+<%def name="write_category(category)">
+    <% sections = [] %>
+    % for section in category["sections"]:
+        <% tabs = _merge_tabs(section) %>
+        % if tabs:
+            <% sections.append((section["name"], tabs, section["name"])) %>
+        % endif
+    % endfor
+    % if sections:
+        ${write_menu_expand(category, sections)}
+    % endif
+</%def>
+
 % if env.request.user:
     <ul id="top_view_navbar_menu" class="nav navbar-nav navbar-primary">
     % for menu in menus:
@@ -230,15 +267,10 @@ def _get_view_url(section, tabs):
             <ul class="dropdown-menu dropdown-menu-theme" role="menu">
             % for category in menu["categories"]:
                 % if "name" in category:
-                    ${write_menu_expand(category, [(section["name"], _merge_tabs(section), section["name"]) for section in category["sections"]])}
+                    ${write_category(category)}
                 % else:
                     % for section in category["sections"]:
-                        <% tabs = _merge_tabs(section) %>
-                        % if not section.get("expand"):
-                            ${write_menu(section, section["name"], tabs)}
-                        % else:
-                            ${write_menu_expand(section, [(section["name"], [tab], tab) for tab in tabs])}
-                        % endif
+                        ${write_section(section)}
                     % endfor
                 % endif
             % endfor
@@ -246,7 +278,7 @@ def _get_view_url(section, tabs):
 
             ## Put the sections not declared in the YAML file into the default menu
             % for name in set(sections) - set(declared_sections):
-                ${write_menu({"name": name}, name, sections[name].keys())}
+                ${write_section({"name": name, "tabs": []})}
             % endfor
 
                 <li role="separator" class="divider"></li>
