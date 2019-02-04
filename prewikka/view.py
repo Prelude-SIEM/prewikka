@@ -333,6 +333,12 @@ class Parameters(dict):
 
         return ret
 
+    def pop(self, key, default=None, type=lambda x: x):
+        ret = self.get(key, default, type)
+        dict.pop(self, key, None)
+
+        return ret
+
 
 class GeneralParameters(Parameters):
     def register(self):
