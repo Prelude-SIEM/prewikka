@@ -1,14 +1,3 @@
-<%!
-import sys
-from prewikka import utils
-from prewikka.utils import nameToPath
-
-if sys.version_info >= (3,0):
-    import builtins
-else:
-    import __builtin__ as builtins
-%>
-
 <%inherit file="/prewikka/templates/toplayout.mak" />
 
 <%block name="toplayout_content">

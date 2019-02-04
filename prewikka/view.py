@@ -239,54 +239,6 @@ class Parameters(dict):
         # In case the view was dynamically added through HOOK_VIEW_LOAD, the hook isn't available
         list(hookmanager.trigger("HOOK_%s_PARAMETERS_NORMALIZE" % self.view.view_endpoint.upper(), self))
 
-    def handleLists(self, value):
-        if isinstance(value, dict):
-            if all(key.isdigit() for key in value):
-                return [self.handleLists(val) for key, val in sorted(value.items(), key=lambda x: int(x[0]))]
-
-            return dict((key, self.handleLists(val)) for key, val in value.items())
-
-        elif isinstance(value, list):
-            return [self.handleLists(val) for val in value]
-
-        return value
-
-    def getDefault(self, param, usedb=True):
-        return self.getDefaultValues(usedb)[param]
-
-    def getDefaultValues(self, usedb=True):
-        if not usedb:
-            return self._hard_default
-        else:
-            return self._default
-
-    def isSaved(self, param):
-        if param not in self._parameters:
-            return False
-
-        if not self._parameters[param].save:
-            return False
-
-        val1 = self._hard_default[param]
-        val2 = self[param]
-
-        if type(val1) is list:
-            val1.sort()
-
-        if type(val2) is list:
-            val2.sort()
-
-        if val1 == val2:
-            return False
-
-        return True
-
-    def isDefault(self, param, usedb=True):
-        if not usedb:
-            return param in self._hard_default
-        else:
-            return param in self._default
-
     def __getitem__(self, key):
         try:
             return dict.__getitem__(self, key)

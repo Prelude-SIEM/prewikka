@@ -19,9 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from string import Template
-
-from prewikka import hookmanager, resource, response, utils, view
+from prewikka import response, utils, view
 
 
 def GridParameters(name):
@@ -57,29 +55,3 @@ class GridAjaxResponse(response.PrewikkaResponse):
         kwargs["rows"] = rows
         kwargs["records"] = total_results
         self.data = kwargs
-
-
-class AjaxHostURL(view.View):
-    class AjaxHostURLParameters(view.Parameters):
-        def register(self):
-            self.mandatory("host", text_type)
-
-    view_parameters = AjaxHostURLParameters
-
-    @staticmethod
-    def _link_generator(infos):
-        for label, url in hookmanager.trigger("HOOK_AJAX_HOST_URL"):
-            try:
-                url = Template(url).substitute(infos)
-            except KeyError:
-                continue
-
-            yield resource.HTMLNode("a", _(label), href=url, target=_(label))
-
-    def render(self):
-        infos = {"host": env.request.parameters["host"]}
-
-        for info in hookmanager.trigger("HOOK_HOST_INFO", env.request.parameters["host"]):
-            infos.update(info)
-
-        return response.PrewikkaResponse(list(self._link_generator(infos)))

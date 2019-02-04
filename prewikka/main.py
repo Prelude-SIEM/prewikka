@@ -29,7 +29,6 @@ import prelude
 import preludedb
 from prewikka import (auth, config, database, dataprovider, error, history, hookmanager, link, localization,
                       log, menu, pluginmanager, renderer, resolve, response, siteconfig, version, view)
-from prewikka.utils import viewhelpers
 
 try:
     from threading import Lock
@@ -202,7 +201,6 @@ class Core(object):
             self._load_auth_or_session("session", _SESSION_PLUGINS, "anonymous")
             env.auth = env.session
 
-        env.viewmanager.addView(viewhelpers.AjaxHostURL())
         env.renderer = renderer.RendererPluginManager(autoupdate=self.autoupdate)
         list(hookmanager.trigger("HOOK_PLUGINS_LOAD"))
 

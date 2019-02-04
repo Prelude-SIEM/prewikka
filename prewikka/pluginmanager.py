@@ -77,7 +77,6 @@ class PluginManager(object):
     def _addPlugin(self, plugin_class, autoupdate, name=None):
         self._handle_attributes(plugin_class, autoupdate)
         self[name or plugin_class.__name__] = plugin_class
-        self._count += 1
 
     @staticmethod
     def initialize_plugin(plugin_class):
@@ -195,7 +194,6 @@ class PluginManager(object):
         return True
 
     def __init__(self, entrypoint, autoupdate=False):
-        self._count = 0
         self.__instances = []
         self.__dinstances = {}
 
@@ -208,9 +206,6 @@ class PluginManager(object):
         plist = [(p, False) for p in plugins]
         self._load_plugin_list(plist, plugins, autoupdate, loaded, [])
         env.all_plugins[entrypoint] = plugins
-
-    def getPluginCount(self):
-        return self._count
 
     def keys(self):
         return self.__dinstances.keys()
