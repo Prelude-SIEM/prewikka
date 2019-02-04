@@ -41,7 +41,7 @@ _core_cache_lock = Lock()
 
 
 class Core(object):
-    def _checkVersion(self):
+    def _check_version(self):
         error_type = _("Version Requirement error")
         if not prelude.checkVersion(siteconfig.libprelude_required_version):
             raise error.PrewikkaUserError(error_type,
@@ -125,10 +125,10 @@ class Core(object):
 
         try:
             self._load_custom_theme()
-            self._checkVersion()
+            self._check_version()
             env.db = database.Database(env.config.database)
             history.init()
-            self._loadPlugins()
+            self._load_plugins()
             self._prewikka_initialized = True
         except error.PrewikkaError as e:
             self._prewikka_initialized = e
@@ -159,7 +159,7 @@ class Core(object):
         list(hookmanager.trigger("HOOK_PLUGINS_RELOAD"))
         hookmanager.unregister(exclude=["HOOK_PLUGINS_RELOAD"])
 
-    def _loadPlugins(self):
+    def _load_plugins(self):
         env.all_plugins = {}
 
         env.menumanager = menu.MenuManager()
@@ -175,7 +175,7 @@ class Core(object):
                 pass
 
         # Load views before auth/session to find all permissions
-        env.viewmanager.loadViews(autoupdate=self.autoupdate)
+        env.viewmanager.load_views(autoupdate=self.autoupdate)
 
         _AUTH_PLUGINS = pluginmanager.PluginManager("prewikka.auth", autoupdate=True)
         _SESSION_PLUGINS = pluginmanager.PluginManager("prewikka.session", autoupdate=True)
@@ -211,7 +211,7 @@ class Core(object):
         # Some changes happened, and every process has to reload the plugin configuration
         env.log.warning("plugins were activated: triggering reload")
         self._unregister_plugin_data()
-        self._loadPlugins()
+        self._load_plugins()
 
     def _redirect_default(self, request):
         if env.menumanager.default_endpoint:
@@ -263,7 +263,7 @@ class Core(object):
             return self._redirect_default(webreq)
 
         try:
-            view_object = env.viewmanager.loadView(webreq, env.request.user)
+            view_object = env.viewmanager.load_view(webreq, env.request.user)
         except Exception as err:
             raise autherr or err
 

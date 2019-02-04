@@ -46,7 +46,7 @@ except ImportError:
     from prewikka.compat.babelcompat import format_timedelta as _format_timedelta
 
 
-logger = log.getLogger(__name__)
+logger = log.get_logger(__name__)
 
 
 class TranslationProxy(object):
@@ -58,11 +58,11 @@ class TranslationProxy(object):
         self._domains_lock = Lock()
         self._domains = collections.OrderedDict([("prewikka", pkg_resources.resource_filename(__name__, "locale"))])
 
-    def addDomain(self, domain, locale_dir):
+    def add_domain(self, domain, locale_dir):
         with self._domains_lock:
             self._domains[domain] = locale_dir
 
-    def _getCatalog(self, domain, lang):
+    def _get_catalog(self, domain, lang):
         with self._catalogs_lock:
             if domain not in self._catalogs:
                 self._catalogs[domain] = {}
@@ -73,22 +73,22 @@ class TranslationProxy(object):
 
             return self._catalogs[domain][lang]
 
-    def getCharset(self):
+    def get_charset(self):
         try:
             return self._data.catalog.charset()
         except:
             return env.config.general.encoding
 
-    def getLocale(self):
+    def get_locale(self):
         try:
             return self._data.lang
         except:
             return env.config.general.default_locale
 
-    def setLocale(self, lang):
+    def set_locale(self, lang):
         first = None
         for domain, locale_dir in self._domains.items():
-            t = self._getCatalog(domain, lang)
+            t = self._get_catalog(domain, lang)
             if not first:
                 first = t
             else:
@@ -162,19 +162,19 @@ _LANGUAGES = {
 }
 
 
-def setLocale(lang):
+def set_locale(lang):
     if not lang:
         lang = env.config.general.default_locale
 
-    translation.setLocale("%s.%s" % (lang, env.config.general.encoding))
+    translation.set_locale("%s.%s" % (lang, env.config.general.encoding))
 
 
-def getLanguages():
+def get_languages():
     return _LANGUAGES
 
 
-def getCurrentCharset():
-    return translation.getCharset()
+def get_current_charset():
+    return translation.get_charset()
 
 
 def format_date(date=None, tzinfo=None, **kwargs):
@@ -185,7 +185,7 @@ def format_date(date=None, tzinfo=None, **kwargs):
     if date:
         date = date.astimezone(tzinfo or env.request.user.timezone)
 
-    return babel.dates.format_date(date, locale=translation.getLocale(), **kwargs)
+    return babel.dates.format_date(date, locale=translation.get_locale(), **kwargs)
 
 
 def format_time(dt=None, tzinfo=None, **kwargs):
@@ -195,7 +195,7 @@ def format_time(dt=None, tzinfo=None, **kwargs):
     if not tzinfo:
         tzinfo = env.request.user.timezone
 
-    return babel.dates.format_time(dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs)
+    return babel.dates.format_time(dt, tzinfo=tzinfo, locale=translation.get_locale(), **kwargs)
 
 
 def format_datetime(dt=None, tzinfo=None, **kwargs):
@@ -205,11 +205,11 @@ def format_datetime(dt=None, tzinfo=None, **kwargs):
     if not tzinfo:
         tzinfo = env.request.user.timezone
 
-    return babel.dates.format_datetime(datetime=dt, tzinfo=tzinfo, locale=translation.getLocale(), **kwargs)
+    return babel.dates.format_datetime(datetime=dt, tzinfo=tzinfo, locale=translation.get_locale(), **kwargs)
 
 
 def format_timedelta(*args, **kwargs):
-    return _format_timedelta(*args, locale=translation.getLocale(), **kwargs)
+    return _format_timedelta(*args, locale=translation.get_locale(), **kwargs)
 
 
 def _abbreviate_number(number):
@@ -225,27 +225,27 @@ def format_number(number, short=False, **kwargs):
     if short:
         return _abbreviate_number(number)
 
-    return babel.numbers.format_decimal(number, locale=translation.getLocale(), **kwargs)
+    return babel.numbers.format_decimal(number, locale=translation.get_locale(), **kwargs)
 
 
 def get_period_names(*args, **kwargs):
-    return babel.dates.get_period_names(*args, locale=translation.getLocale(), **kwargs)
+    return babel.dates.get_period_names(*args, locale=translation.get_locale(), **kwargs)
 
 
 def get_day_names(*args, **kwargs):
-    return babel.dates.get_day_names(*args, locale=translation.getLocale(), **kwargs)
+    return babel.dates.get_day_names(*args, locale=translation.get_locale(), **kwargs)
 
 
 def get_month_names(*args, **kwargs):
-    return babel.dates.get_month_names(*args, locale=translation.getLocale(), **kwargs)
+    return babel.dates.get_month_names(*args, locale=translation.get_locale(), **kwargs)
 
 
 def get_quarter_names(*args, **kwargs):
-    return babel.dates.get_quarter_names(*args, locale=translation.getLocale(), **kwargs)
+    return babel.dates.get_quarter_names(*args, locale=translation.get_locale(), **kwargs)
 
 
 def get_era_names(*args, **kwargs):
-    return babel.dates.get_era_names(*args, locale=translation.getLocale(), **kwargs)
+    return babel.dates.get_era_names(*args, locale=translation.get_locale(), **kwargs)
 
 
 def get_calendar_format():
@@ -253,7 +253,7 @@ def get_calendar_format():
 
     calendar_format = babel.dates.get_date_format(
         'short',
-        translation.getLocale()).pattern
+        translation.get_locale()).pattern
 
     # babel uses 'MM' for month, and jquery uses 'mm'
     # 4-digits year: "yyyy" in Babel, "yy" in jQuery.

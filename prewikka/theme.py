@@ -26,7 +26,7 @@ import os
 import pkg_resources
 
 
-def getThemes():
+def get_themes():
     theme_list = []
 
     css_files = glob.glob(pkg_resources.resource_filename(__name__, "htdocs/css/themes/*.css"))

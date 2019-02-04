@@ -23,7 +23,7 @@ from hashlib import md5
 
 from prewikka import crontab, database, log, utils, hookmanager
 
-logger = log.getLogger(__name__)
+logger = log.get_logger(__name__)
 
 
 class HistoryDatabase(database.DatabaseHelper):

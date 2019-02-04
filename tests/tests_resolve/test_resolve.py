@@ -47,13 +47,13 @@ def test_address_resolve_ipv4():
     res = AddressResolve(fail_ipv4)
 
     assert str(res) == fail_ipv4
-    assert not res.resolveSucceed()
+    assert not res.resolve_succeed()
 
     res = AddressResolve(success_ipv4)
 
     assert str(res) == success_domain_ipv4
     assert str(len(res)) != 0  # exact value could change function of server used, we check if no null only
-    assert res.resolveSucceed()
+    assert res.resolve_succeed()
 
     # invalid IP
 

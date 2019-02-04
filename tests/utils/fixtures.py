@@ -115,7 +115,7 @@ def load_view_for_fixtures(name):
     :return: The view object.
     :rtype: prewikka.view.View
     """
-    view = env.viewmanager.getView(name)
+    view = env.viewmanager.get_view(name)
 
     assert view
 

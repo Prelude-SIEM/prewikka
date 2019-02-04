@@ -28,8 +28,8 @@ import os
 import pytest
 
 from prewikka import utils
-from prewikka.localization import translation, setLocale, getLanguages, \
-    getCurrentCharset, format_date, format_time, format_datetime, format_timedelta, \
+from prewikka.localization import translation, set_locale, get_languages, \
+    get_current_charset, format_date, format_time, format_datetime, format_timedelta, \
     format_number, get_period_names, get_day_names, get_month_names, get_quarter_names, get_era_names, \
     get_calendar_format, get_timezones, get_system_timezone
 from tests.utils.vars import TEST_DATA_DIR
@@ -39,16 +39,16 @@ def test_translation_proxy():
     """
     Test `prewikka.localization.TranslationProxy()` class.
     """
-    # getCharset() (with translation._data empty)
-    assert translation.getCharset().lower() == 'utf-8'
+    # get_charset() (with translation._data empty)
+    assert translation.get_charset().lower() == 'utf-8'
 
-    # getLocale() (with translation._data empty)
-    assert 'en_GB' in translation.getLocale()
+    # get_locale() (with translation._data empty)
+    assert 'en_GB' in translation.get_locale()
 
-    # setLocale()
-    translation.setLocale('fr_FR')
+    # set_locale()
+    translation.set_locale('fr_FR')
 
-    assert translation.getLocale() == 'fr_FR'
+    assert translation.get_locale() == 'fr_FR'
 
     # gettext
     assert translation.gettext('foo') == 'foo'
@@ -58,12 +58,12 @@ def test_translation_proxy():
     assert translation.ngettext('foo', 'foos', 1) == 'foo'
     assert translation.ngettext('foo', 'foos', 42) == 'foos'
 
-    # addDomain()
+    # add_domain()
     assert len(translation._domains) == 1
 
     domain = 'prewikka_test'
     path = os.path.join(TEST_DATA_DIR, 'locale')
-    translation.addDomain(domain, path)
+    translation.add_domain(domain, path)
 
     assert translation._domains[domain] == path
     assert len(translation._domains) == 2
@@ -71,43 +71,43 @@ def test_translation_proxy():
     del translation._domains[domain]  # clean
 
     # clean
-    translation.setLocale('en_GB')
+    translation.set_locale('en_GB')
 
-    assert translation.getLocale() == 'en_GB'
+    assert translation.get_locale() == 'en_GB'
 
 
 def test_set_locale():
     """
-    Test `prewikka.localization.setLocale()` function.
+    Test `prewikka.localization.set_locale()` function.
     """
-    assert translation.getLocale() == 'en_GB'
+    assert translation.get_locale() == 'en_GB'
 
-    setLocale('fr_FR')
+    set_locale('fr_FR')
 
-    assert translation.getLocale() == 'fr_FR.UTF-8'
+    assert translation.get_locale() == 'fr_FR.UTF-8'
 
-    setLocale(None)
+    set_locale(None)
 
-    assert translation.getLocale() == 'en_GB.UTF-8'
+    assert translation.get_locale() == 'en_GB.UTF-8'
 
     # clean
-    translation.setLocale('en_GB')
+    translation.set_locale('en_GB')
 
-    assert translation.getLocale() == 'en_GB'
+    assert translation.get_locale() == 'en_GB'
 
 
 def test_get_languages():
     """
-    Test `prewikka.localization.getLanguages()` function.
+    Test `prewikka.localization.get_languages()` function.
     """
-    assert 'en_GB' in getLanguages()
+    assert 'en_GB' in get_languages()
 
 
 def test_get_current_charset():
     """
-    Test `prewikka.localization.getCurrentCharset()` function.
+    Test `prewikka.localization.get_current_charset()` function.
     """
-    assert getCurrentCharset().lower() == 'utf-8'
+    assert get_current_charset().lower() == 'utf-8'
 
 
 def test_format_date():

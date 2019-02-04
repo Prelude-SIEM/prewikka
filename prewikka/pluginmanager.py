@@ -24,7 +24,7 @@ import pkg_resources
 from prewikka import database, error, log, registrar, usergroup
 from prewikka.localization import translation
 
-logger = log.getLogger(__name__)
+logger = log.get_logger(__name__)
 
 
 class PluginBase(registrar.DelayedRegistrar):
@@ -60,7 +60,7 @@ class PluginManager(object):
             env.htdocs_mapping.update(plugin_class.plugin_htdocs)
 
         if plugin_class.plugin_locale:
-            translation.addDomain(*plugin_class.plugin_locale)
+            translation.add_domain(*plugin_class.plugin_locale)
 
         for permission in getattr(plugin_class, "view_permissions", []):
             usergroup.ALL_PERMISSIONS.declare(permission)
@@ -74,7 +74,7 @@ class PluginManager(object):
         else:
             dh.check()
 
-    def _addPlugin(self, plugin_class, autoupdate, name=None):
+    def _add_plugin(self, plugin_class, autoupdate, name=None):
         self._handle_attributes(plugin_class, autoupdate)
         self[name or plugin_class.__name__] = plugin_class
 
@@ -135,14 +135,14 @@ class PluginManager(object):
 
         for i in plugin_class().plugin_classes:
             i.full_module_name = ":".join((i.__module__, i.__name__))
-            self._addPlugin(i, autoupdate)
+            self._add_plugin(i, autoupdate)
 
     def _load_single(self, plugin_class, autoupdate):
         try:
             if issubclass(plugin_class, PluginPreload):
                 self._handle_preload(plugin_class, autoupdate)
             else:
-                self._addPlugin(plugin_class, autoupdate, name=plugin_class._assigned_name)
+                self._add_plugin(plugin_class, autoupdate, name=plugin_class._assigned_name)
 
         except error.PrewikkaUserError as e:
             plugin_class.error = e

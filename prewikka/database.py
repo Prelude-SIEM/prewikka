@@ -148,7 +148,7 @@ class SQLScript(object):
         self._full_module_name = dbup._full_module_name
         self._query_filter = {"sqlite3": self._mysql2sqlite,
                               "pgsql": self._mysql2pgsql,
-                              "mysql": self._mysqlhandler}[self.db.getType()]
+                              "mysql": self._mysqlhandler}[self.db.get_type()]
 
         if self.type in ("install", "update"):
             if not self.version:
@@ -221,7 +221,7 @@ class SQLScript(object):
 
     @use_transaction
     def apply(self):
-        log.getLogger().info("%s: please standby while %s is applied", self._full_module_name, text_type(self))
+        log.get_logger().info("%s: please standby while %s is applied", self._full_module_name, text_type(self))
 
         self.run()
 
@@ -312,7 +312,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
             try:
                 yield i.load().__path__[0]
             except Exception as e:
-                log.getLogger().exception("[%s]: error loading SQL updates: %s", self._full_module_name, e)
+                log.get_logger().exception("[%s]: error loading SQL updates: %s", self._full_module_name, e)
 
     def _get_schema_list(self, **kwargs):
         from_version = to_version = None
@@ -329,7 +329,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
             try:
                 mod = importer.find_module(package_name).load_module(package_name).SQLUpdate(self)
             except Exception as e:
-                log.getLogger().exception("[%s]: error loading SQL update '%s' : %s" %
+                log.get_logger().exception("[%s]: error loading SQL update '%s' : %s" %
                                           (self._full_module_name, package_name, e))
                 continue
 
@@ -346,7 +346,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
                 return outstack + [upd]
 
             elif upd in outstack:
-                log.getLogger().warning("cyclic branch dependencies detected: %s",  " -> ".join(text_type(i) for i in outstack + [upd]))
+                log.get_logger().warning("cyclic branch dependencies detected: %s",  " -> ".join(text_type(i) for i in outstack + [upd]))
                 continue
 
             else:
@@ -580,7 +580,7 @@ class DatabaseCommon(object):
         else:
             return (value,)
 
-    def getType(self):
+    def get_type(self):
         return self._dbtype
 
     def escape(self, data):
@@ -593,7 +593,7 @@ class DatabaseCommon(object):
 
         return self._db.escape(data)
 
-    def getLastInsertIdent(self):
+    def get_last_insert_ident(self):
         return self._db.getLastInsertIdent()
 
     def is_plugin_active(self, plugin):

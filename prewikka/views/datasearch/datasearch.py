@@ -263,7 +263,7 @@ class QueryParser(object):
         query = Query(path=paths, aggregate="count(1)", criteria=self.criteria, limit=self.limit, offset=self.offset, datatype=self._parent.type)
         label = _(env.dataprovider.get_label(self._parent.type))
 
-        linkview = env.viewmanager.getView(endpoint=".forensic")
+        linkview = env.viewmanager.get_view(endpoint=".forensic")
         linkparams = {"query": env.request.parameters.get("query"), "query_mode": env.request.parameters.get("query_mode", self._parent.criterion_config_default)}
 
         return ChronologyChart(env.request.parameters.get("chart_type", _DEFAULT_CHART_TYPES["chronology"]),

@@ -39,9 +39,9 @@ class Log(object):
         for instance in conf:
             self._logger = logging.getLogger()
             self._logger.setLevel(logging.NOTSET)
-            self._logger.addHandler(self._getHandler(instance))
+            self._logger.addHandler(self._get_handler(instance))
 
-    def _getSyslogHandlerAddress(self):
+    def _get_syslog_handler_address(self):
         for f in ("/dev/log", "/var/run/log", "/var/run/syslog"):
             try:
                 if stat.S_ISSOCK(os.stat(f).st_mode):
@@ -51,7 +51,7 @@ class Log(object):
 
         return "localhost", 514
 
-    def _getHandler(self, config):
+    def _get_handler(self, config):
         logtype = (config.get_instance_name() or "syslog").lower()
         level = config.get("level", "")
 
@@ -62,7 +62,7 @@ class Log(object):
             hdlr = logging.handlers.NTEventLogHandler("Prewikka", logtype='Application')
 
         elif logtype in ('syslog', 'unix'):
-            hdlr = logging.handlers.SysLogHandler(self._getSyslogHandlerAddress(), facility=logging.handlers.SysLogHandler.LOG_DAEMON)
+            hdlr = logging.handlers.SysLogHandler(self._get_syslog_handler_address(), facility=logging.handlers.SysLogHandler.LOG_DAEMON)
 
         elif logtype == 'smtp':
             hdlr = logging.handlers.SMTPHandler(config.host, getattr(config, "from"), config.to.split(", "), config.subject)
@@ -157,5 +157,5 @@ class Log(object):
         }[priority](message)
 
 
-def getLogger(name=__name__):
+def get_logger(name=__name__):
     return logging.getLogger(name)

@@ -91,14 +91,14 @@ def test_protocol_number_to_name():
 
 def test_name_to_path():
     """
-    Test `prewikka.utils.misc.nameToPath()`.
+    Test `prewikka.utils.misc.name_to_path()`.
     """
-    assert misc.nameToPath(None) == 'none'
-    assert misc.nameToPath('foo') == 'foo'
-    assert misc.nameToPath('foo bar') == 'foo_bar'
-    assert misc.nameToPath('foo_bar') == 'foo_bar'
-    assert misc.nameToPath(42) == '42'
-    assert misc.nameToPath(3.14) == '3.14'
+    assert misc.name_to_path(None) == 'none'
+    assert misc.name_to_path('foo') == 'foo'
+    assert misc.name_to_path('foo bar') == 'foo_bar'
+    assert misc.name_to_path('foo_bar') == 'foo_bar'
+    assert misc.name_to_path(42) == '42'
+    assert misc.name_to_path(3.14) == '3.14'
 
 
 def test_find_unescaped_characters():

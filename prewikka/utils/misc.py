@@ -110,7 +110,7 @@ def protocol_number_to_name(num):
     return None
 
 
-def nameToPath(name):
+def name_to_path(name):
     if not isinstance(name, compat.STRING_TYPES):
         name = text_type(name)
 

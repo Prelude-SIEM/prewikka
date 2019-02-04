@@ -37,7 +37,7 @@ else:
 _SENTINEL = object()
 _URL_ADAPTER_CACHE = {}
 _ROUTE_OVERRIDE_TYPE = ("make_url", "make_parameters", "check_permissions")
-logger = log.getLogger(__name__)
+logger = log.get_logger(__name__)
 
 
 def check_permissions(user, users=([], []), groups=([], []), others=[]):
@@ -446,7 +446,7 @@ class _View(_ViewDescriptor, registrar.DelayedRegistrar):
                 self.view_path = "/" + "/".join(self.view_menu)
 
             if self.view_path:
-                self.view_path = utils.nameToPath(self.view_path)
+                self.view_path = utils.name_to_path(self.view_path)
 
     def make_parameters(self, _view_descriptor=None, criteria=None, **kwargs):
         values = {}
@@ -500,7 +500,7 @@ class ViewManager(registrar.DelayedRegistrar):
     def get(self, datatype=None, keywords=None):
         return sorted(filter(lambda x: set(keywords or []).issubset(x.view_keywords), self._references.get(datatype, [])), key=lambda x: x.view_priority)
 
-    def getView(self, endpoint, default=None):
+    def get_view(self, endpoint, default=None):
         endpoint = endpoint.lower()
 
         if endpoint[0] == "." and env.request.view:
@@ -511,7 +511,7 @@ class ViewManager(registrar.DelayedRegistrar):
 
         return self._views_endpoints.get(endpoint, default)
 
-    def getViewByPath(self, path, method=None, check_permissions=True):
+    def get_view_by_path(self, path, method=None, check_permissions=True):
         try:
             rule, view_kwargs = self.url_adapter.match(path, method=method, return_rule=True)
 
@@ -531,22 +531,22 @@ class ViewManager(registrar.DelayedRegistrar):
         # Import here, because of cyclic dependency
         from prewikka import baseview
 
-        bview = self.getView("baseview.render")
+        bview = self.get_view("baseview.render")
         if not bview:
             bview = baseview.BaseView()
-            self.addView(bview)
+            self.add_view(bview)
 
         return bview
 
-    def loadView(self, request, userl):
+    def load_view(self, request, userl):
         view_layout = None
 
-        view, view_kwargs = self.getViewByPath(request.path, method=request.method)
+        view, view_kwargs = self.get_view_by_path(request.path, method=request.method)
         if view:
             view_layout = view.view_layout
 
         if not (request.is_xhr or request.is_stream) and view_layout:
-            view = self.getView(view_layout)
+            view = self.get_view(view_layout)
 
         elif view_kwargs:
             env.request.view_kwargs = view_kwargs
@@ -600,7 +600,7 @@ class ViewManager(registrar.DelayedRegistrar):
 
         self._generic_add_view(v, path, methods=methods, defaults=defaults)
 
-    def addView(self, view):
+    def add_view(self, view):
         rdfunc = getattr(view, "render")
         route = getattr(rdfunc, registrar._ATTRIBUTE, {}).get("route")
 
@@ -619,7 +619,7 @@ class ViewManager(registrar.DelayedRegistrar):
 
             self._generic_add_view(view, (view.view_path or "/" + view.view_id))
 
-    def loadViews(self, autoupdate=False):
+    def load_views(self, autoupdate=False):
         self._init()
         self.get_baseview()
 
@@ -629,7 +629,7 @@ class ViewManager(registrar.DelayedRegistrar):
             except Exception:
                 continue
 
-            self.addView(vi)
+            self.add_view(vi)
 
     @property
     def url_adapter(self):
@@ -662,7 +662,7 @@ class ViewManager(registrar.DelayedRegistrar):
         builtins.url_for = self.url_for
 
     def url_for(self, endpoint, _default=_SENTINEL, **kwargs):
-        view = self.getView(endpoint=endpoint)
+        view = self.get_view(endpoint=endpoint)
         if not view:
             if _default is not _SENTINEL:
                 return _default

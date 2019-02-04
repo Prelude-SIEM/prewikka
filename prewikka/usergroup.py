@@ -193,7 +193,7 @@ class User(NameID):
     def set_locale(self):
         lang = self.get_property("language", default=env.config.general.default_locale)
         if lang:
-            localization.setLocale(lang)
+            localization.set_locale(lang)
 
     def del_property(self, key, view=None):
         view = view or ""

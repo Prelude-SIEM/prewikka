@@ -98,7 +98,7 @@ class DNSResolver(object):
 
         # print "max=%f elapsed:%f" % (timeout, end-now)
 
-    def doQuery(self, addr, resolve_cb):
+    def do_query(self, addr, resolve_cb):
         self._lock.acquire()
 
         self._query += 1
@@ -113,7 +113,7 @@ class DNSResolver(object):
         except:
             return
 
-        self.doQuery(addr, resolve_cb)
+        self.do_query(addr, resolve_cb)
         self.process()
 
 
@@ -140,7 +140,7 @@ class AddressResolve(object):
     def __len__(self):
         return len(str(self))
 
-    def resolveSucceed(self):
+    def resolve_succeed(self):
         if self._name:
             return True
         else:

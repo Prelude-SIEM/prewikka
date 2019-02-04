@@ -38,7 +38,7 @@ def crontab_fixtures(request):
     :return: view for crontab.
     :rtype: prewikka.view.View
     """
-    view = env.viewmanager.getView(request.param)
+    view = env.viewmanager.get_view(request.param)
     backup_parameters = deepcopy(env.request.parameters)
     env.request.parameters = view.view_parameters(view)
     env.request.view = view

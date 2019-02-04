@@ -35,7 +35,7 @@ def aboutplugin_fixtures(request):
     :return: view for aboutplugin.
     :rtype: prewikka.view.View
     """
-    view = env.viewmanager.getView(request.param)
+    view = env.viewmanager.get_view(request.param)
     env.request.parameters = view.view_parameters(view)
     env.request.view = view
 

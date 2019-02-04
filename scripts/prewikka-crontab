@@ -83,12 +83,12 @@ def _daemonize(options):
 
 
 def set_locale(lang):
-    if lang[0] not in localization.getLanguagesIdentifiers():
+    if lang[0] not in localization.get_languages():
         lang = "en_GB.utf8"
     else:
         lang = ".".join(lang)
 
-    localization.translation.setLocale(lang)
+    localization.translation.set_locale(lang)
 
 
 if __name__ == "__main__":

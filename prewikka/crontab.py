@@ -31,7 +31,7 @@ from prewikka import database, error, hookmanager, log, registrar, usergroup, ut
 
 fix_ssl()
 
-logger = log.getLogger(__name__)
+logger = log.get_logger(__name__)
 
 
 DEFAULT_SCHEDULE = collections.OrderedDict((("0 * * * *", N_("Hourly")),
@@ -235,7 +235,7 @@ class Crontab(object):
 
         if not id:
             env.db.query("INSERT INTO Prewikka_Crontab (%s) VALUES %%s" % (", ".join(cols + ["base"])), data + [timeutil.utcnow()])
-            return env.db.getLastInsertIdent()
+            return env.db.get_last_insert_ident()
         else:
             env.db.query("UPDATE Prewikka_Crontab SET %s WHERE id IN %%s" % (", ".join(data)), env.db._mklist(id))
             return id

@@ -127,7 +127,7 @@ $(function() {
         <ul style="display:none;" class="nav nav-tabs topmenu_section" data-section-title="${ _(section) }">
         % for tab, (endpoint, kwargs) in sections[section].items():
             <%
-            view = env.viewmanager.getView(endpoint=endpoint)
+            view = env.viewmanager.get_view(endpoint=endpoint)
             if not(view.check_permissions(env.request.user, view_kwargs=kwargs)):
                 continue
             %>
@@ -172,7 +172,7 @@ def _get_view_url(section, tabs):
             continue
 
         endpoint, kwargs = sections[section][tab]
-        view = env.viewmanager.getView(endpoint=endpoint)
+        view = env.viewmanager.get_view(endpoint=endpoint)
         if view.check_permissions(env.request.user, view_kwargs=kwargs):
             return url_for(endpoint, **kwargs)
 %>

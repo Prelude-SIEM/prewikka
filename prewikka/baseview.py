@@ -62,7 +62,7 @@ class BaseView(view._View):
 
     @view.route("/<path:path>/ajax_parameters_update", methods=["PUT", "PATCH"])
     def ajax_parameters_update(self, path):
-        viewobj, vkw = env.viewmanager.getViewByPath(path)
+        viewobj, vkw = env.viewmanager.get_view_by_path(path)
         viewobj.process_parameters()
 
         if viewobj.view_menu:
