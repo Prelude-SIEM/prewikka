@@ -28,8 +28,8 @@ import os
 import pytest
 
 from prewikka import utils
-from prewikka.localization import translation, setLocale, getLanguages, getLanguagesIdentifiers, \
-    getLanguagesAndIdentifiers, getCurrentCharset, format_date, format_time, format_datetime, format_timedelta, \
+from prewikka.localization import translation, setLocale, getLanguages, \
+    getCurrentCharset, format_date, format_time, format_datetime, format_timedelta, \
     format_number, get_period_names, get_day_names, get_month_names, get_quarter_names, get_era_names, \
     get_calendar_format, get_timezones, get_system_timezone
 from tests.utils.vars import TEST_DATA_DIR
@@ -100,28 +100,7 @@ def test_get_languages():
     """
     Test `prewikka.localization.getLanguages()` function.
     """
-    languages = getLanguages()
-
-    assert 'English' in languages
-    assert languages == sorted(languages)
-
-
-def test_get_languages_idents():
-    """
-    Test `prewikka.localization.getLanguagesIdentifiers()` function.
-    """
-    identifiers = getLanguagesIdentifiers()
-
-    assert 'en_GB' in identifiers
-
-
-def test_get_languages_and_idents():
-    """
-    Test `prewikka.localization.getLanguagesAndIdentifiers()` function.
-    """
-    languages_and_identifiers = getLanguagesAndIdentifiers()
-
-    assert ('English', 'en_GB') in languages_and_identifiers
+    assert 'en_GB' in getLanguages()
 
 
 def test_get_current_charset():

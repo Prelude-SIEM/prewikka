@@ -151,14 +151,14 @@ TIME_HMS_FMT = N_("%H:%M:%S")
 
 
 _LANGUAGES = {
-    "Deutsch": "de_DE",
-    "Español": "es_ES",
-    "English": "en_GB",
-    "Français": "fr_FR",
-    "Italiano": "it_IT",
-    "Polski": "pl_PL",
-    "Português (Brasileiro)": "pt_BR",
-    "Русский": "ru_RU"
+    "de_DE": "Deutsch",
+    "es_ES": "Español",
+    "en_GB": "English",
+    "fr_FR": "Français",
+    "it_IT": "Italiano",
+    "pl_PL": "Polski",
+    "pt_BR": "Português (Brasileiro)",
+    "ru_RU": "Русский"
 }
 
 
@@ -170,15 +170,7 @@ def setLocale(lang):
 
 
 def getLanguages():
-    return sorted(_LANGUAGES)
-
-
-def getLanguagesIdentifiers():
-    return _LANGUAGES.values()
-
-
-def getLanguagesAndIdentifiers():
-    return [(_(x), _LANGUAGES[x]) for x in sorted(_LANGUAGES)]
+    return _LANGUAGES
 
 
 def getCurrentCharset():

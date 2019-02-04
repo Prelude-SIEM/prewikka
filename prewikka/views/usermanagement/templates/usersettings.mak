@@ -27,7 +27,7 @@
             <label for="inputUserLanguage" class="col-sm-2 control-label">${ _("Language:") }</label>
             <div class="col-sm-10">
                 <select id="inputUserLanguage" class="form-control" name="language">
-                % for lang, identifier in available_languages:
+                % for identifier, lang in sorted(available_languages.items()):
                     <option value="${identifier}" ${ selected(identifier == language) }>${lang}</option>
                 % endfor
 

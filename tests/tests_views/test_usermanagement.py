@@ -48,7 +48,7 @@ def test_modify():
 
     # valid
     params = {
-        'language': localization.getLanguagesIdentifiers()[0],
+        'language': next(iter(localization.getLanguages().keys())),
         'timezone': localization.get_timezones()[0],
     }
     env.request.parameters = params

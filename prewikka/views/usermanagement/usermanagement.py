@@ -28,7 +28,7 @@ class UserSettings(view.View):
         dataset["email"] = self._object.get_property("email")
         dataset["available_timezones"] = localization.get_timezones()
         dataset["timezone"] = self._object.get_property("timezone", default=env.config.general.default_timezone)
-        dataset["available_languages"] = localization.getLanguagesAndIdentifiers()
+        dataset["available_languages"] = localization.getLanguages()
         dataset["language"] = self._object.get_property("language", default=env.config.general.default_locale)
         dataset["available_themes"] = theme.getThemes()
         dataset["selected_theme"] = self._object.get_property("theme", default=env.config.general.default_theme)
@@ -39,7 +39,7 @@ class UserSettings(view.View):
     def modify(self):
         self._object = user = usergroup.User(env.request.parameters.get("name", env.request.user.name))
 
-        if not env.request.parameters["language"] in localization.getLanguagesIdentifiers():
+        if not env.request.parameters["language"] in localization.getLanguages():
             raise error.PrewikkaUserError(N_("Invalid Language"), N_("Specified language does not exist"), log_priority=log.WARNING)
 
         list(hookmanager.trigger("HOOK_USERMANAGEMENT_USER_MODIFY", user))
