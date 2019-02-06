@@ -133,7 +133,8 @@ class DiagramChart(GenericChart):
 
         for row in self._query(all_paths, all_criteria, limit=query.limit, type=query.datatype):
             value = row[0]
-            label = ", ".join((text_type(i) or _("n/a") for i in row[1:]))
+            labels = [text_type(i) or _("n/a") for i in row[1:]]
+            label = labels if self.chart_type == "table" else ", ".join(labels)
             crit = reduce(lambda x, y: x & y, (Criterion(path, '=', row[i + 1])
                                                for i, path in enumerate(query.paths)))
             yield value, label, crit
