@@ -205,6 +205,9 @@ class QueryParser(object):
     @classmethod
     def format_criterion(cls, path, value, mode):
         if mode == "lucene":
+            if isinstance(value, (int, float)):
+                return "%s:%s" % (path, value)
+
             if not value:
                 return "-%s:[* TO *]" % path
 
