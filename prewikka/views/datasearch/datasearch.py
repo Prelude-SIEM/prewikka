@@ -490,7 +490,7 @@ class DataSearch(view.View):
         dataset = self._get_dataset()
         self._set_common(dataset)
 
-        dataset["available_types"] = filter(lambda x: list(env.renderer.get_backends(x)), DiagramChart.TYPES if groupby else ChronologyChart.TYPES)
+        dataset["available_types"] = filter(lambda x: list(env.renderer.get_backends(x)) and x != "table", DiagramChart.TYPES if groupby else ChronologyChart.TYPES)
         dataset["chart_type"] = env.request.parameters.get("chart_type", _DEFAULT_CHART_TYPES["diagram" if groupby else "chronology"])
         dataset["groupby_tempo"] = _TEMPORAL_VALUES
         dataset["fields_info"] = self.fields_info
