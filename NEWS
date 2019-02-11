@@ -1,3 +1,18 @@
+* 2019-02-11, prewikka-5.0.3:
+
+Author: Antoine Luong
+
+- Fix DataSearch aggregation on numeric fields
+- Fix display of multi-column table charts
+- Forbid the table renderer in DataSearch aggregated view
+- Fix order of additional data in DataSearch
+- Fix display of falsy additional data
+- Fix Edge incompatibility
+- Handle incomplete log config sections
+- Fix PostgreSQL database cleanup in tests
+
+
+
 * 2018-11-30, prewikka-5.0.2:
 
 Author: Antoine Luong
