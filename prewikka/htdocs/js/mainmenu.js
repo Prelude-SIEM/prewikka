@@ -88,6 +88,7 @@ function MainMenuInit(inline, start, end, date_format, url) {
         if ( mode != "custom" ) {
             root.find("[name=timeline_value]").val($(this).data("value"));
             root.find("[name=timeline_unit]").val($(this).data("unit"));
+            root.find("[name=timeline_offset]").val($(this).data("offset"));
 
             if ( inline )
                 $(this).closest("form").submit();

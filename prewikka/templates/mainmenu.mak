@@ -69,6 +69,7 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
       <input type="hidden" name="timeline_mode" value="${timeline.mode}" />
       <input type="hidden" name="timeline_value" value="${timeline.value}" ${disabled(timeline.mode == "custom")} />
       <input type="hidden" name="timeline_unit" value="${timeline.unit}" ${disabled(timeline.mode == "custom")} />
+      <input type="hidden" name="timeline_offset" value="${timeline.offset}" ${disabled(timeline.mode == "custom")} />
 
       <div class="form-group">
         <div>
@@ -91,8 +92,8 @@ $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(
               <li><a data-mode="custom" class="timeline_quick_select_custom">${ _("Custom") }</a></li>
               <li role="separator" class="divider"></li>
 
-              % for (value, unit, absolute), label in timeline.quick.items():
-                 <li><a data-value="${value}" data-unit="${unit}" data-mode="${'absolute' if absolute else 'relative'}">${label}</a></li>
+              % for (value, unit, absolute, offset), label in timeline.quick.items():
+                 <li><a data-value="${value}" data-unit="${unit}" data-mode="${'absolute' if absolute else 'relative'}" data-offset="${offset}">${label}</a></li>
               % endfor
             </ul>
           </div>

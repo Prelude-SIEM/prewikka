@@ -29,13 +29,14 @@ from prewikka.dataprovider import Criterion
 
 _SENTINEL = object()
 _MAINMENU_TEMPLATE = template.PrewikkaTemplate(__name__, "templates/mainmenu.mak")
-_MAINMENU_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_mode", "auto_apply_value"]
+_MAINMENU_PARAMETERS = ["timeline_value", "timeline_unit", "timeline_end", "timeline_start", "timeline_mode", "timeline_offset", "auto_apply_value"]
 
 
 def _register_parameters(view_parameters):
     view_parameters.optional("timeline_mode", text_type, default="relative", save=True, general=True)
     view_parameters.optional("timeline_value", int, default=1, save=True, general=True)
     view_parameters.optional("timeline_unit", text_type, default="month", save=True, general=True)
+    view_parameters.optional("timeline_offset", int, default=0, save=True, general=True)
     view_parameters.optional("timeline_end", int, save=True, general=True)
     view_parameters.optional("timeline_start", int, save=True, general=True)
     view_parameters.optional("auto_apply_value", int, default=0, save=True, general=True)
@@ -198,7 +199,7 @@ class TimePeriod(object):
                 self.start = self.end - delta
                 self.end = self.end.replace(microsecond=999999)
             else:  # absolute
-                self.end = utils.timeutil.truncate(self.end, tunit) + relativedelta(**{tunit + "s": 1})
+                self.end = utils.timeutil.truncate(self.end, tunit) + relativedelta(**{tunit + "s": self._parameters["timeline_offset"] + 1})
                 if self._parameters["timeline_unit"] == "unlimited":
                     self.start = datetime.datetime.fromtimestamp(0).replace(tzinfo=env.request.user.timezone)
                 else:
@@ -256,17 +257,20 @@ class _MainMenu(TimePeriod):
 
         self.dataset["timeline"] = utils.AttrObj()
         self.dataset["timeline"].quick = collections.OrderedDict((
-            ((1, "day", True), _("Today")),
-            ((1, "week", True), _("This week")),
-            ((1, "month", True), _("This month")),
-            ((1, "hour", False), ngettext("%d hour", "%d hours", 1) % 1),
-            ((2, "hour", False), ngettext("%d hour", "%d hours", 2) % 2),
-            ((1, "day", False), ngettext("%d day", "%d days", 1) % 1),
-            ((2, "day", False), ngettext("%d day", "%d days", 2) % 2),
-            ((1, "week", False), ngettext("%d week", "%d weeks", 1) % 1),
-            ((1, "month", False), ngettext("%d month", "%d months", 1) % 1),
-            ((3, "month", False), ngettext("%d month", "%d months", 3) % 3),
-            ((1, "year", False), ngettext("%d year", "%d years", 1) % 1)
+            ((1, "day", True, 0), _("Today")),
+            ((1, "day", True, -1), _("Yesterday")),
+            ((1, "week", True, 0), _("This week")),
+            ((1, "week", True, -1), _("Last week")),
+            ((1, "month", True, 0), _("This month")),
+            ((1, "month", True, -1), _("Last month")),
+            ((1, "hour", False, 0), ngettext("%d hour", "%d hours", 1) % 1),
+            ((2, "hour", False, 0), ngettext("%d hour", "%d hours", 2) % 2),
+            ((1, "day", False, 0), ngettext("%d day", "%d days", 1) % 1),
+            ((2, "day", False, 0), ngettext("%d day", "%d days", 2) % 2),
+            ((1, "week", False, 0), ngettext("%d week", "%d weeks", 1) % 1),
+            ((1, "month", False, 0), ngettext("%d month", "%d months", 1) % 1),
+            ((3, "month", False, 0), ngettext("%d month", "%d months", 3) % 3),
+            ((1, "year", False, 0), ngettext("%d year", "%d years", 1) % 1)
         ))
 
         self.dataset["timeline"].refresh = collections.OrderedDict((
@@ -290,13 +294,14 @@ class _MainMenu(TimePeriod):
         self.dataset["auto_apply_value"] = self._parameters["auto_apply_value"]
         self.dataset["timeline"].value = self._parameters["timeline_value"]
         self.dataset["timeline"].unit = self._parameters["timeline_unit"]
+        self.dataset["timeline"].offset = self._parameters["timeline_offset"]
         self.dataset["timeline"].time_format = localization.get_calendar_format()
         self.dataset["timeline"].refresh_selected = self.dataset["timeline"].refresh.get(self._parameters["auto_apply_value"], _("Inactive"))
 
         if mode == "custom":
             self.dataset["timeline"].quick_selected = _("Custom")
         else:
-            wanted = (self._parameters["timeline_value"], self._parameters["timeline_unit"], mode == "absolute")
+            wanted = (self._parameters["timeline_value"], self._parameters["timeline_unit"], mode == "absolute", self._parameters["timeline_offset"])
             self.dataset["timeline"].quick_selected = self.dataset["timeline"].quick.get(wanted, _("None"))
 
         self._setup_timeline_range()
