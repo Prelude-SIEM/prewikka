@@ -27,9 +27,6 @@ logger = log.get_logger(__name__)
 
 
 class HistoryDatabase(database.DatabaseHelper):
-    def __init__(self):
-        database.DatabaseHelper.__init__(self)
-
     def init(self):
         # This should not be executed if env.db fails to initialize
         crontab.schedule("search_history", N_("Search history deletion"), "0 * * * *", _regfunc=history._history_cron, enabled=True)

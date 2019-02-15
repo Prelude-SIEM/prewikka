@@ -126,7 +126,7 @@ class Core(object):
         try:
             self._load_custom_theme()
             self._check_version()
-            env.db = database.Database(env.config.database)
+            env.db = database.PrewikkaDatabase(env.config.database)
             history.init()
             self._load_plugins()
             self._prewikka_initialized = True
@@ -211,7 +211,11 @@ class Core(object):
         # Some changes happened, and every process has to reload the plugin configuration
         env.log.warning("plugins were activated: triggering reload")
         self._unregister_plugin_data()
-        self._load_plugins()
+        try:
+            self._load_plugins()
+        finally:
+            # Needed for Database object
+            gc.collect()
 
     def _redirect_default(self, request):
         if env.menumanager.default_endpoint:

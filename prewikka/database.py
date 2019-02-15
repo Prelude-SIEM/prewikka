@@ -81,17 +81,19 @@ def _use_flock(func):
 def use_transaction(func):
     @functools.wraps(func)
     def inner(self, *args, **kwargs):
-        if env.db._transaction_state:
+        db = getattr(self, "__db", env.db)
+
+        if db._transaction_state:
             return func(self, *args, **kwargs)
 
-        env.db.transaction_start()
+        db.transaction_start()
         try:
             ret = func(self, *args, **kwargs)
         except:
-            env.db.transaction_abort()
+            db.transaction_abort()
             raise
 
-        env.db.transaction_end()
+        db.transaction_end()
         return ret
 
     return inner
@@ -102,15 +104,17 @@ def use_lock(table):
 
         @use_transaction
         def inner(self, *args, **kwargs):
-            env.db._lock_table(table)
+            db = getattr(self, "__db", env.db)
+
+            db._lock_table(table)
 
             try:
                 ret = func(self, *args, **kwargs)
             except:
-                env.db._unlock_table(table)
+                db._unlock_table(table)
                 raise
 
-            env.db._unlock_table(table)
+            db._unlock_table(table)
             return ret
 
         return inner
@@ -225,7 +229,7 @@ class SQLScript(object):
         self.run()
 
         if self.type == "install":
-            env.db.upsert(
+            self.db.upsert(
                 "Prewikka_Module_Registry",
                 ("module", "branch", "version"),
                 ((self._full_module_name, self.branch, self.version),),
@@ -267,7 +271,7 @@ class DatabaseUpdateHelper(DatabaseHelper):
         if self._initialized:
             return
 
-        module = self.modinfos.get(self._full_module_name, self._default_modinfo)
+        module = env.db.modinfos.get(self._full_module_name, self._default_modinfo)
 
         self._from_branch = module.branch
         self._from_version = module.version
@@ -275,8 +279,6 @@ class DatabaseUpdateHelper(DatabaseHelper):
         self._initialized = True
 
     def __init__(self, module_name, reqversion, reqbranch=None, enabled=True):
-        DatabaseHelper.__init__(self)  # for use_transaction
-
         self._reqbranch = reqbranch
         self._reqversion = reqversion
         self._module_name = module_name.split(":")[0]
@@ -453,15 +455,6 @@ class DatabaseCommon(object):
     __TRANSACTION_STATE_BEGIN = 1
     __TRANSACTION_STATE_QUERY = 2
 
-    @cache.memoize_property("modinfos_cache")
-    def modinfos(self):
-        try:
-            rows = self.query("SELECT module, branch, version, enabled FROM Prewikka_Module_Registry")
-        except:
-            return {}
-
-        return dict((i[0], ModuleInfo(i[1], i[2], int(i[3]))) for i in rows)
-
     def _get_prefilter(self, v):
         if not(isinstance(v, (text_type, bytes))) and isinstance(v, collections.Iterable):
             return self.__ESCAPE_PREFILTER["iterable"]
@@ -481,9 +474,7 @@ class DatabaseCommon(object):
         return fmt % ', '.join(tmp)
 
     @_fix_exception
-    def __init__(self, config):
-        env.db = self
-
+    def __init__(self, settings):
         self.__ESCAPE_PREFILTER = {
             bool: int,
             datetime: lambda dt: self.escape(self.datetime(dt)),
@@ -492,20 +483,12 @@ class DatabaseCommon(object):
 
         self._transaction_state = self.__TRANSACTION_STATE_NONE
 
-        settings = {"host": "localhost", "name": "prewikka", "user": "prewikka", "type": "mysql"}
-        stpl = tuple((k, v) for k, v in config.items())
-        settings.update(stpl)
-
+        stpl = tuple((k, v) for k, v in settings.items())
         self._db = preludedb.SQL(settings)
 
         self._version = self._db.getServerVersion()
         self._dbhash = hash(stpl)
         self._dbtype = settings["type"]
-
-        dh = DatabaseUpdateHelper("prewikka", self.required_version, self.required_branch)
-        dh.apply()
-
-        self._last_plugin_activation_change = self._get_last_plugin_changed()
 
     @staticmethod
     def parse_datetime(date):
@@ -597,31 +580,6 @@ class DatabaseCommon(object):
 
     def get_last_insert_ident(self):
         return self._db.getLastInsertIdent()
-
-    def is_plugin_active(self, plugin):
-        module = self.modinfos.get(plugin.full_module_name)
-        if module:
-            return module.enabled == 1
-
-        return plugin.plugin_enabled
-
-    def _get_last_plugin_changed(self):
-        rows = self.query("SELECT time FROM Prewikka_Module_Changed")[0][0]
-        return utils.timeutil.get_timestamp_from_string(rows)
-
-    def has_plugin_changed(self):
-        last = self._get_last_plugin_changed()
-
-        if last <= self._last_plugin_activation_change:
-            return False
-
-        self._last_plugin_activation_change = last
-        self.modinfos_cache.clear()
-
-        return True
-
-    def trigger_plugin_change(self):
-        self.query("UPDATE Prewikka_Module_Changed SET time=current_timestamp")
 
     def _get_merge_value(self, merged, field, rownum):
         value = merged[field]
@@ -727,9 +685,6 @@ class MySQLDatabase(DatabaseCommon):
 
 
 class PgSQLDatabase(DatabaseCommon):
-    def __init__(self, *args, **kwargs):
-        DatabaseCommon.__init__(self, *args, **kwargs)
-
     def _lock_table(self, table):
         self.query("LOCK TABLE %s IN EXCLUSIVE MODE" % ", ".join(self._mklist(table)))
 
@@ -738,7 +693,7 @@ class PgSQLDatabase(DatabaseCommon):
         out = {}
         typemap = {"bigint": "integer", "smallint": "integer", "character varying": "text"}
 
-        for field, _type, defval in env.db.query("SELECT column_name, data_type, column_default FROM information_schema.columns WHERE table_name = %s", table.lower()):
+        for field, _type, defval in self.query("SELECT column_name, data_type, column_default FROM information_schema.columns WHERE table_name = %s", table.lower()):
             out[field] = utils.AttrObj(type=_type, generic_type=typemap.get(_type, _type), default=defval, auto_increment="nextval" in (defval or ""))
 
         return out
@@ -876,21 +831,95 @@ class PgSQLDatabase(DatabaseCommon):
 
 
 class NoDatabase(DatabaseCommon):
-    def __init__(self, *args, **kwargs):
-        DatabaseCommon.__init__(self, *args, **kwargs)
-
     def query(self, *args, **kwargs):
         raise error.PrewikkaUserError(N_("Database configuration error"), N_("Only MySQL and PostgreSQL databases are supported at the moment"))
 
 
 class Database(object):
-    def __new__(cls, config):
-        type = config.get("type")
+    def __new__(cls, settings):
+        type = settings.get("type")
         if type == "pgsql":
-            return PgSQLDatabase(config)
+            return PgSQLDatabase(settings)
 
         elif type == "mysql":
-            return MySQLDatabase(config)
+            return MySQLDatabase(settings)
 
         else:
-            return NoDatabase(config)
+            return NoDatabase(settings)
+
+
+class PrewikkaDatabase(object):
+    def __new__(cls, config):
+        settings = {"host": "localhost", "name": "prewikka", "user": "prewikka", "type": "mysql"}
+        settings.update(config.items())
+
+        type = settings["type"]
+        if type == "pgsql":
+            return PrewikkaPgSQLDatabase(settings)
+
+        elif type == "mysql":
+            return PrewikkaMySQLDatabase(settings)
+
+        else:
+            return PrewikkaNoDatabase(settings)
+
+
+class PrewikkaDatabaseCommon(DatabaseCommon):
+    def __init__(self):
+        env.db = self
+        dh = DatabaseUpdateHelper("prewikka", self.required_version, self.required_branch)
+        dh.apply()
+
+        self._last_plugin_activation_change = self._get_last_plugin_changed()
+
+    @cache.memoize_property("modinfos_cache")
+    def modinfos(self):
+        try:
+            rows = self.query("SELECT module, branch, version, enabled FROM Prewikka_Module_Registry")
+        except:
+            return {}
+
+        return dict((i[0], ModuleInfo(i[1], i[2], int(i[3]))) for i in rows)
+
+    def is_plugin_active(self, plugin):
+        module = self.modinfos.get(plugin.full_module_name)
+        if module:
+            return module.enabled == 1
+
+        return plugin.plugin_enabled
+
+    def _get_last_plugin_changed(self):
+        rows = self.query("SELECT time FROM Prewikka_Module_Changed")[0][0]
+        return utils.timeutil.get_timestamp_from_string(rows)
+
+    def has_plugin_changed(self):
+        last = self._get_last_plugin_changed()
+
+        if last <= self._last_plugin_activation_change:
+            return False
+
+        self._last_plugin_activation_change = last
+        self.modinfos_cache.clear()
+
+        return True
+
+    def trigger_plugin_change(self):
+        self.query("UPDATE Prewikka_Module_Changed SET time=current_timestamp")
+
+
+class PrewikkaPgSQLDatabase(PgSQLDatabase, PrewikkaDatabaseCommon):
+    def __init__(self, settings):
+        PgSQLDatabase.__init__(self, settings)
+        PrewikkaDatabaseCommon.__init__(self)
+
+
+class PrewikkaMySQLDatabase(MySQLDatabase, PrewikkaDatabaseCommon):
+    def __init__(self, settings):
+        MySQLDatabase.__init__(self, settings)
+        PrewikkaDatabaseCommon.__init__(self)
+
+
+class PrewikkaNoDatabase(NoDatabase, PrewikkaDatabaseCommon):
+    def __init__(self, settings):
+        NoDatabase.__init__(self, settings)
+        PrewikkaDatabaseCommon.__init__(self)
