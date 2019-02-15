@@ -119,7 +119,7 @@ def inherit(context):
     $("div.traceback").accordion({collapsible: true, active: false, heightStyle: "content"});
 
     $(".traceback-copy").on("click", function() {
-        var elem = $("textarea.traceback-value")[0];
+        var elem = $(this).closest(".traceback").siblings("textarea.traceback-value")[0];
         elem.select();
         elem.setSelectionRange(0, elem.value.length);
         document.execCommand("copy");
