@@ -56,7 +56,7 @@ GRAMMAR = r"""
 
     PATH: (PATHELEM ".")* PATHELEM
     PATHELEM: WORD ("(" PATHINDEX ")")?
-    PATHINDEX: ("-"? DIGIT+ | DQSTRING | SQSTRING)
+    PATHINDEX: ("-"? DIGIT+ | DQSTRING | SQSTRING | "*")
     WORD: LETTER (LETTER | DIGIT | "-" | "_")*
     DIGIT: /[0-9]/
     LETTER: /[a-z]/
