@@ -28,6 +28,7 @@ import csv
 import datetime
 import functools
 import itertools
+import operator
 import pkg_resources
 import re
 
@@ -275,22 +276,33 @@ class QueryParser(object):
         return ChronologyChart(env.request.parameters.get("chart_type", _DEFAULT_CHART_TYPES["chronology"]),
                                label, [query], linkview=linkview, linkparams=linkparams, **kwargs).render()
 
+    def _fix_operator(self, left, op):
+        if op in env.dataprovider.get_path_info(left).operators:
+            return op
+
+        return "=" if op[0] != "!" else "!="
+
     def _criterion_compile(self, left, op, right):
         if left not in self._parent.path_translate:
-            return Criterion("%s.%s" % (self.type, left), op, right)
+            left = "%s.%s" % (self.type, left)
+            return Criterion(left, self._fix_operator(left, op), right)
 
         paths, valuefunc = self._parent.path_translate[left]
         if valuefunc:
             right = valuefunc(right)
 
-        c = Criterion()
-        for i in paths:
-            if op[0] == "!":
-                c &= Criterion(i, op, right)
-            else:
-                c |= Criterion(i, op, right)
+        # Translation (for source [A, B]):
+        # source : (A != None || B != None)
+        # !source : !(A != None || B != None) => !(A || B)
+        # source != test: (A != test && B != test)
+        # source == test: (A == test || B == test)
 
-        return c
+        if op[0] == "!" and right is not None:
+            f = operator.and_
+        else:
+            f = operator.or_
+
+        return functools.reduce(lambda x, y: f(x, y), (Criterion(i, self._fix_operator(i, op), right) for i in paths))
 
     def get_criteria(self, query):
         if not query:
@@ -298,8 +310,7 @@ class QueryParser(object):
 
         qmode = env.request.parameters.get("query_mode", self._parent.criterion_config_default)
         if qmode == "criterion":
-            tr = criteria.CriteriaTransformer(compile=self._criterion_compile)
-            return criteria.parse(query, transformer=tr)
+            return criteria.parse(query, transformer=criteria.CriteriaTransformer(compile=self._criterion_compile))
 
         elif qmode == "lucene":
             if self._parent.criterion_config_default != "lucene":
