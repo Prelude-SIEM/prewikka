@@ -90,7 +90,7 @@ class _IDMEFProvider(DataProviderBase):
         FIXME: to be removed when libpreludedb supports != for listed fields
         """
         fields = []
-        for elem in path.split("."):
+        for elem in path.replace("(*)", "").split("."):
             p = ".".join(fields + [elem])
 
             if elem == "analyzer":
