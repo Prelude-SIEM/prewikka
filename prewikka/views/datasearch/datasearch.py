@@ -579,7 +579,7 @@ class DataSearch(view.View):
         resrows = []
 
         extradata = list(self._trigger_datasearch_hook("EXTRA_DATA", results))
-        extracol = filter(None, self._trigger_datasearch_hook("EXTRA_COLUMN"))
+        extracol = list(filter(None, self._trigger_datasearch_hook("EXTRA_COLUMN")))
 
         for i, obj in enumerate(results):
             cells = self._get_default_cells(obj)
@@ -620,8 +620,8 @@ class DataSearch(view.View):
         infos = collections.OrderedDict()
         infos["general"] = utils.AttrObj(label=_("General"), info=self._get_common_infos())
 
-        extra_infos = filter(None, hookmanager.trigger("HOOK_DATASEARCH_INFO", env.request.parameters)) + self._get_extra_infos()
-        for category, data in extra_infos:
+        extra_infos = filter(None, hookmanager.trigger("HOOK_DATASEARCH_INFO", env.request.parameters))
+        for category, data in itertools.chain(extra_infos, self._get_extra_infos()):
             infos[category] = data
 
         return response.PrewikkaResponse({"infos": infos})
