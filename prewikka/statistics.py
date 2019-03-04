@@ -38,13 +38,14 @@ class Query(object):
             self.paths = [path] if path else []
 
         self.datatype = datatype
-        self.aggregation = aggregate or "count(1)"
+        self.aggregation = aggregate
         self.limit = int(limit or env.request.parameters["limit"])
         self.order = order or "desc"
         self.criteria = criteria or Criterion()
 
 
 class GenericChart(object):
+    default_aggregation = None
     default_link_mode = "immediate"
 
     def __init__(self, chart_type, title, query, **options):
@@ -92,9 +93,13 @@ class GenericChart(object):
             self._menu = mainmenu.TimePeriod(dict(("timeline_%s" % k, v) for k, v in parameters.items()))
 
     def _prepare_query(self, query):
-        all_paths = ["%s/order_%s" % (query.aggregation, query.order)]
-        for path in query.paths:
-            all_paths += ["%s/group_by" % path]
+        query.aggregation = query.aggregation or self.default_aggregation
+
+        if query.aggregation:
+            all_paths = ["%s/order_%s" % (query.aggregation, query.order)]
+            all_paths += ["%s/group_by" % path for path in query.paths]
+        else:
+            all_paths = ["{backend}.{time_field}/order_%s" % query.order] + query.paths
 
         if not query.datatype:
             query.datatype = env.dataprovider.guess_datatype(all_paths, query.criteria, default=None)
@@ -124,6 +129,7 @@ class GenericChart(object):
 
 class DiagramChart(GenericChart):
     TYPES = ["pie", "bar", "horizontal-bar", "radar", "polar", "doughnut", "line", "table"]
+    default_aggregation = "count(1)"
 
     def _get_series(self, query):
         for value, label, crit in self._get_categories(query):
@@ -160,6 +166,7 @@ class DiagramChart(GenericChart):
 
 class ChronologyChart(GenericChart):
     TYPES = ["timeline", "timearea", "timebar"]
+    default_aggregation = "count(1)"
     default_link_mode = "zoom"
 
     def _get_series(self, query, selection, date_precision):
