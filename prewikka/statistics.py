@@ -29,8 +29,8 @@ from prewikka.renderer import RendererItem
 
 class Query(object):
     def __init__(self, **kwargs):
-        keys = ["datatype", "path", "aggregate", "limit", "criteria"]
-        datatype, path, aggregate, limit, criteria = [kwargs.get(i) for i in keys]
+        keys = ["datatype", "path", "aggregate", "limit", "order", "criteria"]
+        datatype, path, aggregate, limit, order, criteria = [kwargs.get(i) for i in keys]
 
         if isinstance(path, list):
             self.paths = path
@@ -40,6 +40,7 @@ class Query(object):
         self.datatype = datatype
         self.aggregation = aggregate or "count(1)"
         self.limit = int(limit or env.request.parameters["limit"])
+        self.order = order or "desc"
         self.criteria = criteria or Criterion()
 
 
@@ -91,7 +92,7 @@ class GenericChart(object):
             self._menu = mainmenu.TimePeriod(dict(("timeline_%s" % k, v) for k, v in parameters.items()))
 
     def _prepare_query(self, query):
-        all_paths = ["%s/order_desc" % query.aggregation]
+        all_paths = ["%s/order_%s" % (query.aggregation, query.order)]
         for path in query.paths:
             all_paths += ["%s/group_by" % path]
 
