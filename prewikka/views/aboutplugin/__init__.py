@@ -39,14 +39,14 @@ class AboutPlugin(view.View):
 
     view_permissions = [N_("USER_MANAGEMENT")]
 
-    _all_plugins = ((_("Apps: View"), "prewikka.views"),
-                    (_("Apps: API"), "prewikka.plugins"),
-                    (_("Apps: Dataprovider backend"), "prewikka.dataprovider.backend"),
-                    (_("Apps: Dataprovider type"), "prewikka.dataprovider.type"),
-                    (_("Apps: Authentication"), "prewikka.auth"),
-                    (_("Apps: Identification"), "prewikka.session"),
-                    (_("Apps: Renderer backend"), "prewikka.renderer.backend"),
-                    (_("Apps: Renderer type"), "prewikka.renderer.type"))
+    _all_plugins = ((N_("Apps: View"), "prewikka.views"),
+                    (N_("Apps: API"), "prewikka.plugins"),
+                    (N_("Apps: Dataprovider backend"), "prewikka.dataprovider.backend"),
+                    (N_("Apps: Dataprovider type"), "prewikka.dataprovider.type"),
+                    (N_("Apps: Authentication"), "prewikka.auth"),
+                    (N_("Apps: Identification"), "prewikka.session"),
+                    (N_("Apps: Renderer backend"), "prewikka.renderer.backend"),
+                    (N_("Apps: Renderer type"), "prewikka.renderer.type"))
 
     def _add_plugin_info(self, data, catname, mod):
         dbup = database.DatabaseUpdateHelper(mod.full_module_name, mod.plugin_database_version, mod.plugin_database_branch)
