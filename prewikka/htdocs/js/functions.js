@@ -139,13 +139,6 @@ $(function() {
       return false;
   });
 
-  $(document).on("keypress", ".modal", function(e) {
-      if ( e.keyCode == $.ui.keyCode.ENTER ) {
-          $(this).find(".btn-primary").first().click();
-          return false;
-      }
-  });
-
   $(document).on('click', '[data-confirm]', function() {
       var input = $(this);
       var confirm = input.data("confirm");

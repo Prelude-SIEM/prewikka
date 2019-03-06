@@ -244,7 +244,7 @@ function _process_widget(data, widget)
         $(widget).wrapInner('<div class="modal-dialog ' + $(widget).attr("data-widget-options") + '"><div class="modal-content"></div></div>');
 
         if ( data._extensions.help ) {
-            var help = $("<button>", { "class": "close prewikka-help-button", "data-href": data._extensions.help, "html": '?&nbsp;' });
+            var help = $("<button>", { "type": "button", "class": "close prewikka-help-button", "data-href": data._extensions.help, "html": '?&nbsp;' });
             $(widget).find(".modal-header button").after(help);
         }
 

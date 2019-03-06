@@ -119,8 +119,8 @@ DEFAULT_OPTION = "0 * * * *"
     </div>
 
     <div class="modal-footer">
-      <button class="btn btn-default" data-dismiss="modal">${ _("Cancel") }</button>
-      <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> ${ _('Save') }</button>
+      <button type="button" class="btn btn-default" data-dismiss="modal">${ _("Cancel") }</button>
+      <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> ${ _('Save') }</button>
     </div>
   </form>
 </div>

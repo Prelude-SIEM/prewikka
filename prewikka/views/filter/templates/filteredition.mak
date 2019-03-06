@@ -103,8 +103,8 @@
       </div>
 
       <div class="modal-footer">
-        <button class="btn btn-default widget-only" aria-hidden="true" data-dismiss="modal">${ _("Cancel") }</button>
-        <button class="btn btn-primary" type="submit"><i class="fa fa-save"></i> ${ _("Save") }</button>
+        <button type="button" class="btn btn-default widget-only" aria-hidden="true" data-dismiss="modal">${ _("Cancel") }</button>
+        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> ${ _("Save") }</button>
       </div>
 
       <input type="hidden" name="filter_old_name" value="${fltr.name}">
