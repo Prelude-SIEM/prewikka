@@ -101,7 +101,7 @@ class BaseView(view._View):
 
     @staticmethod
     def _get_server():
-        url = utils.urlparse(env.config.general.get("help_location"))
+        url = utils.url.urlparse(env.config.general.get("help_location"))
         if not url.netloc and not url.scheme and not url.path.startswith('/'):  # relative url
             return '/' + url.geturl()
 
