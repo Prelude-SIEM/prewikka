@@ -168,6 +168,7 @@ class ChronologyChart(GenericChart):
     TYPES = ["timeline", "timearea", "timebar"]
     default_aggregation = "count(1)"
     default_link_mode = "zoom"
+    _number_of_points = 100
 
     def _get_series(self, query, selection, date_precision):
         selection_index = len(query.paths) + 1
@@ -209,7 +210,7 @@ class ChronologyChart(GenericChart):
 
     def get_data(self):
         data, date_precision, base_parameters = self._prepare_timeline()
-        step = self._menu.get_step(100)
+        step = self._menu.get_step(self._number_of_points)
         can_zoom = mainmenu.TimeUnit(step.unit) > mainmenu.TimeUnit("minute")
 
         out = collections.OrderedDict()
@@ -249,7 +250,7 @@ class ChronologyChart(GenericChart):
         return [RendererItem(labels=name, values=value, links=links) for name, value in out.items()]
 
     def _prepare_timeline(self):
-        step = self._menu.get_step(100)
+        step = self._menu.get_step(self._number_of_points)
         date_precision, selection = self._gen_selection(step.unit)
 
         if len(self.query) == 1:
