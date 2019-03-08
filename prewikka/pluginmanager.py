@@ -21,7 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 
 import pkg_resources
-from prewikka import database, error, log, registrar, usergroup
+from prewikka import database, error, log, registrar
 from prewikka.localization import translation
 
 logger = log.get_logger(__name__)
@@ -48,34 +48,29 @@ class PluginBase(registrar.DelayedRegistrar):
     plugin_mandatory = False
     plugin_enabled = True
 
+    @classmethod
+    def _handle_attributes(cls, autoupdate):
+        if cls.plugin_htdocs:
+            env.htdocs_mapping.update(cls.plugin_htdocs)
+
+        if cls.plugin_locale:
+            translation.add_domain(*cls.plugin_locale)
+
+        dh = database.DatabaseUpdateHelper(cls.full_module_name, cls.plugin_database_version, cls.plugin_database_branch, cls.plugin_enabled)
+        if autoupdate or cls.plugin_database_autoupdate:
+            dh.apply()
+        else:
+            dh.check()
+
 
 class PluginPreload(PluginBase):
     plugin_classes = []
 
 
 class PluginManager(object):
-    @staticmethod
-    def _handle_attributes(plugin_class, autoupdate):
-        if plugin_class.plugin_htdocs:
-            env.htdocs_mapping.update(plugin_class.plugin_htdocs)
-
-        if plugin_class.plugin_locale:
-            translation.add_domain(*plugin_class.plugin_locale)
-
-        for permission in getattr(plugin_class, "view_permissions", []):
-            usergroup.ALL_PERMISSIONS.declare(permission)
-
-        for permission in getattr(plugin_class, "additional_permissions", []):
-            usergroup.ALL_PERMISSIONS.declare(permission)
-
-        dh = database.DatabaseUpdateHelper(plugin_class.full_module_name, plugin_class.plugin_database_version, plugin_class.plugin_database_branch, plugin_class.plugin_enabled)
-        if autoupdate or plugin_class.plugin_database_autoupdate:
-            dh.apply()
-        else:
-            dh.check()
 
     def _add_plugin(self, plugin_class, autoupdate, name=None):
-        self._handle_attributes(plugin_class, autoupdate)
+        plugin_class._handle_attributes(autoupdate)
         self[name or plugin_class.__name__] = plugin_class
 
     @staticmethod
@@ -131,7 +126,7 @@ class PluginManager(object):
         return plist
 
     def _handle_preload(self, plugin_class, autoupdate):
-        self._handle_attributes(plugin_class, autoupdate)
+        plugin_class._handle_attributes(autoupdate)
 
         for i in plugin_class().plugin_classes:
             i.full_module_name = ":".join((i.__module__, i.__name__))

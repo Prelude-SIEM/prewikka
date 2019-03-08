@@ -351,9 +351,30 @@ class _ViewDescriptor(object):
     def view_others_permissions(self, permissions):
         self.view_permissions = permissions
 
-    def __init__(self):
+    @classmethod
+    def _handle_attributes(cls, *args):
+        for permission in cls.view_permissions:
+            usergroup.ALL_PERMISSIONS.declare(permission)
+
+        pluginmanager.PluginBase._handle_attributes.__func__(cls, *args)
+
+    def __init__(self, baseview=None):
+        if baseview:
+            self.view_base = baseview
+            self.view_id = baseview.view_id
+            self.view_template = baseview.view_template
+            self.view_users = baseview.view_users
+            self.view_groups = baseview.view_groups
+            self.view_layout = baseview.view_layout
+            self.view_require_session = baseview.view_require_session
+            self.view_help = baseview.view_help
+            self.view_permissions = baseview.view_permissions
+            self.view_parameters = baseview.view_parameters
+            self._criteria_to_urlparams = baseview._criteria_to_urlparams
+
         self.view_users = set(self.view_users)
         self.view_groups = set(self.view_groups)
+        self.view_permissions = set(self.view_permissions)
 
     def _setup_dataset_default(self, dataset):
         dataset["document"] = utils.AttrObj()
@@ -546,6 +567,9 @@ class ViewManager(registrar.DelayedRegistrar):
         return view
 
     def _generic_add_view(self, view, path, methods=None, defaults=None):
+        for permission in view.view_permissions:
+            usergroup.ACTIVE_PERMISSIONS.declare(permission)
+
         rule = Rule(path, endpoint=view.view_endpoint, methods=methods, defaults=defaults)
         rule._prewikka_view = view
 
@@ -553,38 +577,28 @@ class ViewManager(registrar.DelayedRegistrar):
         self._rule_map.add(rule)
 
     def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, label=None, defaults={}, endpoint=None, datatype=None, priority=0, keywords=set(), help=None, parameters=None):
-        baseview = method.__self__
+        v = _ViewDescriptor(baseview=method.__self__)
 
-        v = _ViewDescriptor()
         v.render = method
-        v.view_base = baseview
-        v.view_id = baseview.view_id
-        v.view_template = baseview.view_template
-        v.view_users = baseview.view_users
-        v.view_groups = baseview.view_groups
-        v.view_layout = baseview.view_layout
-        v.view_require_session = baseview.view_require_session
-
-        if parameters is _SENTINEL:
-            v.view_parameters = baseview.view_parameters
-        else:
-            v.view_parameters = parameters
-
-        v.view_help = help or baseview.view_help
         v.view_menu = menu
         v.view_label = label
-        v.view_permissions = set(permissions) | set(baseview.view_permissions)
+        v.view_permissions |= set(permissions)
         v.view_endpoint = "%s.%s" % (v.view_id, endpoint or method.__name__)
         v.view_datatype = datatype
         v.view_priority = priority
         v.view_keywords = set(keywords)
 
+        if help:
+            v.view_help = help
+
         if menu:
             env.menumanager.add_section_info(menu[0], menu[1], v.view_endpoint)
 
+        if parameters is not _SENTINEL:
+            v.view_parameters = parameters
+
         if datatype:
             self._references.setdefault(datatype, []).append(v)
-            v._criteria_to_urlparams = baseview._criteria_to_urlparams
 
         self._generic_add_view(v, path, methods=methods, defaults=defaults)
 

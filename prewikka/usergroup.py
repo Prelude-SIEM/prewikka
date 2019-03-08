@@ -72,6 +72,7 @@ class Permissions(set):
 
 
 ALL_PERMISSIONS = Permissions()
+ACTIVE_PERMISSIONS = Permissions()
 
 
 class NameID(object):
