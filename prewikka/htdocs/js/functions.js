@@ -262,6 +262,23 @@ $(function() {
   });
 });
 
+
+function abbreviate_number(number, precision, unit) {
+    if ( ! Number.isFinite(number) || Number.isNaN(number) )
+        return number.toString() + (unit ? " " + unit : "");
+
+    if ( number < 0 )
+        return "-" + abbreviate_number(-number, precision, unit);
+
+    var prefixes = ["", "k", "M", "G", "T", "P"];
+    var rank = Math.floor(Math.log10(number) / 3);
+    rank = Math.min(Math.max(0, rank), prefixes.length - 1);
+
+    // Use Number both for removing the exponential notation from toPrecision and for trimming trailing zeros
+    return Number((number / 10**(rank * 3)).toPrecision(precision)) + (unit ? " " : "") + prefixes[rank] + (unit || "");
+}
+
+
 function prewikka_resizeTopMenu() {
     var mainmenu = $('#main_menu_ng .main_menu_navbar');
 
