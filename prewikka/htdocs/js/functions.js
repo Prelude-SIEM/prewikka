@@ -474,27 +474,27 @@ function prewikka_grid(table, settings) {
 }
 
 
-function prewikka_autocomplete(field, url, submit, allow_empty) {
+function prewikka_autocomplete(field, options) {
     field.autocomplete({
         appendTo: $(field).closest("#main, .modal"),
         minLength: 0,
         autoFocus: true,
         source: function(request, response) {
             $.ajax({
-                url: url,
-                data: {term: request.term},
+                url: options.url,
+                data: options.data_callback ? options.data_callback(request) : {term: request.term},
                 dataType: "json",
                 prewikka: { spinner: false, error: false },
                 success: function(data) {
                     response(data);
                     field.parent("div").toggleClass("has-error", !data.length);
                     field.next().toggleClass("fa-close", !data.length);
-                    if ( submit ) submit.prop("disabled", $(".has-error").length);
+                    if ( options.submit ) options.submit.prop("disabled", $(".has-error").length);
                 },
                 error: function(xhr, status, error) {
                     field.parent("div").addClass("has-error");
                     field.next().addClass("fa-close");
-                    if ( submit ) submit.prop("disabled", true);
+                    if ( options.submit ) options.submit.prop("disabled", true);
                     var message = xhr.responseText ? JSON.parse(xhr.responseText).details : error || "Connection error";
                     field.prop("title", message);
                     response([]);
@@ -502,17 +502,17 @@ function prewikka_autocomplete(field, url, submit, allow_empty) {
             });
         },
         select: function() {
-            if ( submit ) submit.prop("disabled", $(".has-error").length);
+            if ( options.submit ) options.submit.prop("disabled", $(".has-error").length);
         }
     })
     .focus(function() {
         $(this).autocomplete("search");
     })
     .blur(function() {
-        if ( allow_empty && $(this).val() == "" ) {
+        if ( options.allow_empty && $(this).val() == "" ) {
             field.parent("div").removeClass("has-error");
             field.next().removeClass("fa-close");
-            if ( submit ) submit.prop("disabled", $(".has-error").length);
+            if ( options.submit ) options.submit.prop("disabled", $(".has-error").length);
         }
     });
 }
