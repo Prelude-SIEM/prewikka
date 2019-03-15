@@ -1,3 +1,60 @@
+* 2019-03-15, prewikka-5.1.0alpha1:
+
+Author: Yoann Vandoorselaere
+
+- Evolutions around paths and criteria
+
+    - Make sure path supports the operator
+    - Proper rewriting of ambiguous path using the (*) notation
+    - Parse path using the (*) notation
+    - Better Lucene coverage
+    - Criteria NOT, fix operator precedence
+    - Criterion now uses an enumeration as the operator storage
+
+- Other
+
+    - Python3 compatibility fixes
+    - Dataprovider get_types() rework
+    - Summary rework
+    - Improve hookmanager API
+
+Author: Antoine Luong
+
+- Evolutions
+
+    - Make the Database class generic
+    - Various improvements in the chart API
+    - Remove special case for Enter key in modals
+    - DataSearch improvements
+    - Automatically convert booleans for SQL queries
+    - Allow more complex branch migrations
+
+- Bugfixes
+
+    - Handle clipboard copying with multiple tracebacks
+    - Fix various issues in DataSearch
+    - Fix display of falsy additional data
+    - Fix Edge incompatibility
+    - Handle incomplete log config sections
+    - Fix PostgreSQL database cleanup in tests
+    - Fix cronjob scheduling
+    - Remove double ampersand encoding
+
+Author: Augustin Laville
+
+- Add 'This week' period in control menu
+
+Author: Thomas Andrejak
+
+- Update prelude-siem.com URLs
+- Fix HTTP status texts
+
+Author: Camille Gardet
+
+- Remove the search icon when the view uses a searchbar
+
+
+
 * 2018-09-07, prewikka-5.0.0:
 
 Author: Yoann Vandoorselaere
