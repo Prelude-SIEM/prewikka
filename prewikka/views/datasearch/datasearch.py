@@ -209,7 +209,7 @@ class QueryParser(object):
     @classmethod
     def format_criterion(cls, path, value, mode):
         if mode == "lucene":
-            if isinstance(value, (int, float)):
+            if isinstance(value, (int, float, datetime.datetime)):
                 return "%s:%s" % (path, value)
 
             if not value:
