@@ -1,3 +1,12 @@
+* 2019-03-26, prewikka-5.1.0alpha2:
+
+Author: Antoine Luong
+
+- Fix DataSearch grouping by time fields
+- Add comparison operators for additional data
+
+
+
 * 2019-03-15, prewikka-5.1.0alpha1:
 
 Author: Yoann Vandoorselaere
