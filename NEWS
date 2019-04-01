@@ -1,3 +1,13 @@
+* 2019-04-01, prewikka-5.0.4:
+
+Author: Antoine Luong
+
+- Fix DataSearch grouping by time fields
+- Fix translations in Apps page
+- Handle clipboard copying with multiple tracebacks
+
+
+
 * 2019-02-11, prewikka-5.0.3:
 
 Author: Antoine Luong
