@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.0.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-09-09 10:41+0200\n"
+"POT-Creation-Date: 2019-04-01 10:29+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: Italian\n"
@@ -72,38 +72,38 @@ msgstr "Personalizzato"
 msgid "Disabled"
 msgstr "Disabilitato"
 
-#: prewikka/crontab.py:119
+#: prewikka/crontab.py:123
 msgid "Scheduled job execution failed"
 msgstr "Esecuzione dell'operazione pianificata fallita"
 
-#: prewikka/crontab.py:152
+#: prewikka/crontab.py:157
 msgid "Invalid job extension"
 msgstr "Estensione di operazione invalida"
 
-#: prewikka/crontab.py:152
+#: prewikka/crontab.py:157
 #, python-format
 msgid "Scheduled job with invalid extension type '%s'"
 msgstr "Operazione pianificata con tipo di estensione invalido '%s'"
 
-#: prewikka/crontab.py:211
+#: prewikka/crontab.py:224
 #, fuzzy
 msgid "Invalid CronJob"
 msgstr "Sessione invalida"
 
-#: prewikka/crontab.py:211
+#: prewikka/crontab.py:224
 #, python-format
 msgid "CronJob with id=%d cannot be found in database"
 msgstr ""
 
-#: prewikka/crontab.py:270
+#: prewikka/crontab.py:278
 msgid "Invalid schedule"
 msgstr "Pianificazione non valida"
 
-#: prewikka/crontab.py:270
+#: prewikka/crontab.py:278
 msgid "The specified job schedule is invalid"
 msgstr "L'operazione pianificata è invalida"
 
-#: prewikka/crontab.py:296
+#: prewikka/crontab.py:304
 #, python-format
 msgid "Custom (%s)"
 msgstr "Personalizzato (%s)"
@@ -134,40 +134,40 @@ msgstr "attivazione del database richiesta"
 msgid "database schema version %(required)s required (found %(current)s)"
 msgstr "attivazione del database richiesta"
 
-#: prewikka/database.py:367
+#: prewikka/database.py:372
 msgid "Database installation error"
 msgstr "Errore di installazione del database"
 
-#: prewikka/database.py:369
+#: prewikka/database.py:374
 #, python-format
 msgid ""
 "No database installation script found for module %(module)s, version "
 "%(version)s"
 msgstr ""
 
-#: prewikka/database.py:377 prewikka/database.py:415
+#: prewikka/database.py:382 prewikka/database.py:420
 msgid "Database migration error"
 msgstr "Errore di migrazione del database"
 
-#: prewikka/database.py:381
+#: prewikka/database.py:386
 #, python-format
 msgid ""
 "No database branch migration script found for module %(module)s, branch "
 "transition %(current)s -> %(required)s"
 msgstr ""
 
-#: prewikka/database.py:419
+#: prewikka/database.py:424
 #, python-format
 msgid ""
 "No linear migration script found for module %(module)s %(version1)s -> "
 "%(version2)s"
 msgstr ""
 
-#: prewikka/database.py:876
+#: prewikka/database.py:882
 msgid "Database configuration error"
 msgstr "Errore di configurazione del database"
 
-#: prewikka/database.py:876
+#: prewikka/database.py:882
 msgid "Only MySQL and PostgreSQL databases are supported at the moment"
 msgstr "Solamente MySQL e PostgreSQL sono supportati in questo momento"
 
@@ -218,11 +218,6 @@ msgstr "%H:%M"
 #: prewikka/localization.py:150
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
-
-#: prewikka/log.py:78
-#, python-format
-msgid "Unknown logtype specified: '%s'"
-msgstr "Tipo sconosciuto di log: '%s'"
 
 #: prewikka/main.py:46
 msgid "Version Requirement error"
@@ -381,7 +376,7 @@ msgstr ""
 "Risoluzione DNS asincrona disabile: twisted.names et twisted.internet "
 "richiesti: %s"
 
-#: prewikka/statistics.py:136 prewikka/statistics.py:177
+#: prewikka/statistics.py:136 prewikka/statistics.py:178
 #: prewikka/renderer/__init__.py:69 prewikka/views/crontab/__init__.py:82
 msgid "n/a"
 msgstr ""
@@ -1489,19 +1484,19 @@ msgstr "Errore di menu"
 msgid "Only one time unit can be specified in a groupby query"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:426
+#: prewikka/views/datasearch/datasearch.py:429
 msgid "Forensic"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:426
+#: prewikka/views/datasearch/datasearch.py:429
 msgid "Dashboard"
 msgstr "Cruscotto"
 
-#: prewikka/views/datasearch/datasearch.py:470
+#: prewikka/views/datasearch/datasearch.py:473
 msgid "CSV export"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:596
+#: prewikka/views/datasearch/datasearch.py:599
 msgid "General"
 msgstr "Generale"
 
