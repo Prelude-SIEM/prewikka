@@ -49,23 +49,23 @@ def filter_fixtures(request):
 
     criterion_1 = Criterion('alert.messageid', '=', 'fakemessageid1')
     criteria_1 = {'alert': criterion_1}
-    filter_obj_1 = Filter(None, 'Test filter 1', 'Filter description', criteria_1)
+    filter_obj_1 = Filter(None, 'Test filter 1', 'Filter category', 'Filter description', criteria_1)
     database.upsert_filter(env.request.user, filter_obj_1)
 
     criterion_2 = Criterion('heartbeat.messageid', '=', 'fakemessageid1')
     criteria_2 = {'heartbeat': criterion_2}
-    filter_obj_2 = Filter(None, 'Test filter 2', 'Filter description', criteria_2)
+    filter_obj_2 = Filter(None, 'Test filter 2', 'Filter category', 'Filter description', criteria_2)
     database.upsert_filter(env.request.user, filter_obj_2)
 
     criterion_3 = Criterion(criterion_1, '||', criterion_2)
     criteria_3 = {'alert': criterion_3}
-    filter_obj_3 = Filter(None, 'Test filter 3', 'Filter description', criteria_3)
+    filter_obj_3 = Filter(None, 'Test filter 3', 'Filter category', 'Filter description', criteria_3)
     database.upsert_filter(env.request.user, filter_obj_3)
 
     # complex criterion
     criterion_4 = Criterion(criterion_3, '||', criterion_2)
     criteria_4 = {'alert': criterion_4}
-    filter_obj_4 = Filter(None, 'Test filter 4', 'Filter description', criteria_4)
+    filter_obj_4 = Filter(None, 'Test filter 4', 'Filter category', 'Filter description', criteria_4)
     database.upsert_filter(env.request.user, filter_obj_4)
 
     def tear_down():

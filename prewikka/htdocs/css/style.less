@@ -1111,3 +1111,17 @@ label.disabled a {
         }
     }
 }
+
+#main_menu_ng .main_menu_navbar {
+    .select2-selection__rendered {
+        color: @active-text;
+    }
+
+    .select2-selection__arrow b {
+        border-color: @active-text transparent transparent;
+    }
+
+    .select2-container--open .select2-selection__arrow b {
+        border-color: transparent transparent @active-text;
+    }
+}

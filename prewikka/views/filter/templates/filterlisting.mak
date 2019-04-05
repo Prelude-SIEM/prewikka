@@ -21,6 +21,7 @@ $LAB.wait(function() {
         deleteLink: "${url_for('FilterView.delete')}",
         colModel: [
             {name: 'name', label: "${_('Name')}", width: 20},
+            {name: 'category', label: "${_('Category')}", width: 20},
             % for name, label in columns:
             {name: "${name}", label: ${html.escapejs(label)}, width: 10, align: "center", formatter: type_formatter},
             % endfor

@@ -49,9 +49,10 @@ def _flatten(criterion):
 
 
 class Filter(object):
-    def __init__(self, id_, name, description, criteria):
+    def __init__(self, id_, name, category, description, criteria):
         self.id_ = id_
         self.name = name
+        self.category = category
         self.description = description
         self.criteria = criteria
 
@@ -69,29 +70,29 @@ class Filter(object):
 
 class FilterDatabase(database.DatabaseHelper):
     def get_filters(self, user, ftype=None):
-        l = self.query("SELECT id, name, description, value FROM Prewikka_Filter "
+        l = self.query("SELECT id, name, category, description, value FROM Prewikka_Filter "
                        "WHERE userid = %s ORDER BY name", user.id)
 
         l = next(hookmanager.trigger("HOOK_FILTER_LISTING", l), l)
 
-        for id_, name, description, value in l:
+        for id_, name, category, description, value in l:
             criteria = json.loads(value)
             if not ftype or ftype in criteria:
-                yield Filter(id_, name, description, criteria)
+                yield Filter(id_, name, category, description, criteria)
 
     def get_filter(self, user, name):
-        rows = self.query("SELECT id, description, value FROM Prewikka_Filter "
+        rows = self.query("SELECT id, category, description, value FROM Prewikka_Filter "
                           "WHERE userid = %s AND name = %s", user.id, name)
 
         if not rows:
             return None
 
-        id_, description, value = rows[0]
-        return Filter(id_, name, description, json.loads(value))
+        id_, category, description, value = rows[0]
+        return Filter(id_, name, category, description, json.loads(value))
 
     def upsert_filter(self, user, filter_):
-        values = (user.id, filter_.id_, filter_.name, filter_.description, json.dumps(filter_.criteria))
-        self.upsert("Prewikka_Filter", ("userid", "id", "name", "description", "value"), [values], pkey=("id",))
+        values = (user.id, filter_.id_, filter_.name, filter_.category, filter_.description, json.dumps(filter_.criteria))
+        self.upsert("Prewikka_Filter", ("userid", "id", "name", "category", "description", "value"), [values], pkey=("id",))
 
     def delete_filter(self, user, name=None):
         query = "SELECT id, name FROM Prewikka_Filter WHERE userid = %(user)s"
@@ -104,6 +105,10 @@ class FilterDatabase(database.DatabaseHelper):
             self.query("DELETE FROM Prewikka_Filter WHERE id IN %s", (row[0] for row in rows))
 
         return rows
+
+    def get_categories(self, user):
+        query = "SELECT category FROM Prewikka_Filter WHERE userid = %(user)s AND category IS NOT NULL GROUP BY category ORDER BY category"
+        return [row[0] for row in self.query(query, user=user.id)]
 
 
 class FilterView(FilterPlugin, view.View):
@@ -132,6 +137,7 @@ class FilterView(FilterPlugin, view.View):
                     href=url_for(".edit", name=fltr.name),
                     title=_("Filter %s") % fltr.name
                 ),
+                "category": fltr.category,
                 "description": fltr.description
             }
             for typ in fltr.criteria:
@@ -184,9 +190,13 @@ class FilterView(FilterPlugin, view.View):
         if current_filter not in [x.name for x in filters]:
             current_filter = None
 
+        filter_categories = {}
+        for fltr in filters:
+            filter_categories.setdefault(fltr.category, []).append(fltr)
+
         dset = self._filter_menu_tmpl.dataset(
             current_filter=current_filter,
-            filters=filters,
+            filter_categories=filter_categories,
             **kwargs
         )
 
@@ -211,7 +221,8 @@ class FilterView(FilterPlugin, view.View):
             name = env.request.parameters["duplicate"]
 
         dataset = {
-            "fltr": AttrObj(id_="", name="", description="", criteria={}),
+            "fltr": AttrObj(id_="", name="", category="", description="", criteria={}),
+            "categories": self._db.get_categories(env.request.user),
             "types": list(self._get_types())
         }
 
@@ -231,11 +242,12 @@ class FilterView(FilterPlugin, view.View):
 
     @view.route("/settings/filters/save", methods=["POST"])
     def save(self):
-        filter_name = env.request.parameters.get("filter_name")
-        filter_old_name = env.request.parameters.get("filter_old_name")
-        filter_description = env.request.parameters.get("filter_description")
+        name = env.request.parameters.get("filter_name")
+        old_name = env.request.parameters.get("filter_old_name")
+        category = env.request.parameters.get("filter_category")
+        description = env.request.parameters.get("filter_description")
 
-        if not filter_name:
+        if not name:
             raise error.PrewikkaUserError(N_("Could not save filter"), N_("No name for this filter was provided"))
 
         criteria = dict(zip(
@@ -243,11 +255,11 @@ class FilterView(FilterPlugin, view.View):
             (json.loads(c) for c in env.request.parameters.getlist("filter_criteria"))
         ))
 
-        filter_ = self._db.get_filter(env.request.user, filter_old_name)
+        filter_ = self._db.get_filter(env.request.user, old_name)
         filter_id = filter_.id_ if filter_ else None
 
-        # Ensure the filter_name is not already used by this user
-        if filter_name != filter_old_name and self._db.get_filter(env.request.user, filter_name):
+        # Ensure the filter name is not already used by this user
+        if name != old_name and self._db.get_filter(env.request.user, name):
             raise error.PrewikkaUserError(N_("Could not save filter"), N_("The filter name is already used by another filter"))
 
         # Do not erase filter components if the dataprovider failed to load
@@ -257,6 +269,6 @@ class FilterView(FilterPlugin, view.View):
             criteria = new_criteria
 
         criteria = dict((k, v) for k, v in criteria.items() if v is not None)
-        self._db.upsert_filter(env.request.user, Filter(filter_id, filter_name, filter_description, criteria))
+        self._db.upsert_filter(env.request.user, Filter(filter_id, name, category, description, criteria))
 
-        return response.PrewikkaResponse({"type": "reload", "target": "#main_menu_ng", "options": {"filter": filter_name}})
+        return response.PrewikkaResponse({"type": "reload", "target": "#main_menu_ng", "options": {"filter": name}})

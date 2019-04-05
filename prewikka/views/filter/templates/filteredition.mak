@@ -34,6 +34,10 @@
 
     <script type="text/javascript">
     $LAB.script("filter/js/filter.js").wait(function() {
+        $("#filter_category").select2_container({
+            tags: true
+        });
+
         $(".filter-form .modal-body").on("scroll", function() {
             $(".dropdown-fixed.open").find("[data-toggle=dropdown]").dropdown("toggle");
         });
@@ -69,6 +73,18 @@
             <label for="filter_name" class="col-sm-2 control-label required">${ _("Name:") }</label>
             <div class="col-sm-10">
               <input class="form-control" type="text" id="filter_name" name="filter_name" value="${fltr.name}" placeholder="${ _("Filter name") }" required/>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="filter_category" class="col-sm-2 control-label">${ _("Category:") }</label>
+            <div class="col-sm-10">
+              <select class="form-control" id="filter_category" name="filter_category" value="${fltr.category}">
+                <option value="">&nbsp;</option>
+                % for category in categories:
+                <option value="${ category }" ${ selected(category == fltr.category) }>${ category }</option>
+                % endfor
+              </select>
             </div>
           </div>
 

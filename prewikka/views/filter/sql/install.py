@@ -17,6 +17,7 @@ CREATE TABLE Prewikka_Filter (
         id BIGINT UNSIGNED NOT NULL PRIMARY KEY AUTO_INCREMENT,
         userid VARCHAR(32) NOT NULL,
         name VARCHAR(64) NOT NULL,
+        category VARCHAR(64) NULL,
         description TEXT NULL,
         value TEXT NOT NULL
 ) ENGINE=InnoDB;
