@@ -34,7 +34,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
     function quote(value)
     {
         if ( need_quotes(value) )
-            return '"' + value.replace(/"/g, '\\"') + '"';
+            return '"' + value.replace(/(["\\])/g, '\\$1') + '"';
 
         return value;
     }

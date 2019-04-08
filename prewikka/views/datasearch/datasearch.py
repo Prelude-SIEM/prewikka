@@ -202,7 +202,7 @@ class QueryParser(object):
     @classmethod
     def _lucene_escape(cls, value):
         if re.search(r'[/\s+\-!(){}[\]^"~*?\:\\]|&&|\|\|', value):
-            return '"%s"' % value.replace('"', '\\"')
+            return '"%s"' % re.sub(r'(["\\])', r'\\\1', value)
 
         return value
 
