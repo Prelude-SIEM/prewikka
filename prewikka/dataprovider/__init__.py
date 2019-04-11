@@ -23,7 +23,7 @@ import copy
 import itertools
 import time
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from enum import Enum
 
 from prewikka import compat, error, hookmanager, pluginmanager
@@ -144,6 +144,9 @@ class QueryResultsRow(CachingIterator):
         try:
             if type is datetime:
                 return to_datetime(value)
+
+            elif type is timedelta:
+                return timedelta(seconds=int(value))
 
             elif type is object:
                 return value
