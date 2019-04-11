@@ -228,6 +228,29 @@ def format_number(number, short=False, **kwargs):
     return babel.numbers.format_decimal(number, locale=translation.get_locale(), **kwargs)
 
 
+def format_value(value):
+    if value is None:
+        return _("n/a")
+
+    elif isinstance(value, (int, float)):
+        return format_number(value)
+
+    elif isinstance(value, datetime.datetime):
+        return format_datetime(value)
+
+    elif isinstance(value, datetime.timedelta):
+        # format_timedelta does not provide this granularity (days/hours/minutes)
+        hours, minutes = divmod(value.seconds / 60, 60)
+        return _("%(days)dd %(hours)dh %(minutes)d'") % {
+            "days": value.days,
+            "hours": hours,
+            "minutes": minutes
+        }
+
+    else:
+        return text_type(value) or _("n/a")
+
+
 def get_period_names(*args, **kwargs):
     return babel.dates.get_period_names(*args, locale=translation.get_locale(), **kwargs)
 

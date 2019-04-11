@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import collections
 import functools
 
-from prewikka import dataprovider, hookmanager, mainmenu, usergroup, utils
+from prewikka import dataprovider, hookmanager, localization, mainmenu, usergroup, utils
 from prewikka.dataprovider import Criterion
 from prewikka.renderer import RendererItem
 
@@ -141,7 +141,7 @@ class DiagramChart(GenericChart):
 
         for row in self._query(all_paths, all_criteria, limit=query.limit, type=query.datatype):
             value = row[0]
-            labels = [text_type(i) or _("n/a") for i in row[1:]]
+            labels = [localization.format_value(i) for i in row[1:]]
             label = labels if self.chart_type == "table" else ", ".join(labels)
             crit = functools.reduce(lambda x, y: x & y, (Criterion(path, '=', row[i + 1])
                                                          for i, path in enumerate(query.paths)))
@@ -185,7 +185,7 @@ class ChronologyChart(GenericChart):
 
         out = {}
         for i in res:
-            label = ", ".join((text_type(j) or _("n/a") for j in i[1:selection_index])) or self.title
+            label = ", ".join((localization.format_value(j) for j in i[1:selection_index])) or self.title
             tval = tuple((int(x) for x in i[selection_index:]))
             out.setdefault(label, {})[tval[:date_precision]] = i[0]
 
