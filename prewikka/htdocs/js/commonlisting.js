@@ -238,10 +238,19 @@ function CommonListing(elem, text, options, restored_parameters) {
         grid.ajax({ url: options.deleteLink, method: 'POST', success: grid.delete_rows });
     });
 
+    var reloader;
+    if ( options.reloadInterval ) {
+        reloader = AjaxReloader(function() {
+            grid.trigger("reload", {current: true});
+        }, options.reloadInterval);
+    }
+
     prewikka_resource_register({
         destroy: function() {
             grid.jqGrid("clearGridData", true);
             grid.jqGrid("GridDestroy");
+            if ( reloader )
+                reloader.destroy();
         },
         container: elem
     });

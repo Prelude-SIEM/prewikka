@@ -624,6 +624,37 @@ function DatetimePicker(input, date, options, delta)
 }
 
 
+function AjaxReloader(callback, interval) {
+    var that = {};
+    var timer;
+
+    function visibility_changed() {
+        if ( document.hidden )
+            that.stop();
+        else
+            that.start();
+    }
+
+    that.start = function() {
+        timer = setInterval(callback, interval * 1000);
+    };
+
+    that.stop = function() {
+        clearInterval(timer);
+    };
+
+    that.destroy = function() {
+        that.stop();
+        $(document).off("visibilitychange", visibility_changed);
+    };
+
+    $(document).on("visibilitychange", visibility_changed);
+    that.start();
+
+    return that;
+}
+
+
 
 function _resource_register(obj, target)
 {

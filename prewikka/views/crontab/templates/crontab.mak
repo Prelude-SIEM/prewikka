@@ -23,6 +23,7 @@ from prewikka.utils import html, json
         multiselect: true,
         data: ${ html.escapejs(data) },
         globalSearch: false,
+        reloadInterval: 10,
 
         rowattr: function(rd, cur, rowid) {
             var cl = "";
