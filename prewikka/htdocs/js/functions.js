@@ -474,45 +474,28 @@ function prewikka_grid(table, settings) {
 }
 
 
-function prewikka_autocomplete(field, options) {
-    field.autocomplete({
-        appendTo: $(field).closest("#main, .modal"),
-        minLength: 0,
-        autoFocus: true,
-        source: function(request, response) {
-            $.ajax({
-                url: options.url,
-                data: options.data_callback ? options.data_callback(request) : {term: request.term},
-                dataType: "json",
-                prewikka: { spinner: false, error: false },
-                success: function(data) {
-                    response(data);
-                    field.parent("div").toggleClass("has-error", !data.length);
-                    field.next().toggleClass("fa-close", !data.length);
-                    if ( options.submit ) options.submit.prop("disabled", $(".has-error").length);
-                },
-                error: function(xhr, status, error) {
-                    field.parent("div").addClass("has-error");
-                    field.next().addClass("fa-close");
-                    if ( options.submit ) options.submit.prop("disabled", true);
-                    var message = xhr.responseText ? JSON.parse(xhr.responseText).details : error || "Connection error";
-                    field.prop("title", message);
-                    response([]);
-                }
-            });
-        },
-        select: function() {
-            if ( options.submit ) options.submit.prop("disabled", $(".has-error").length);
-        }
-    })
-    .focus(function() {
-        $(this).autocomplete("search");
-    })
-    .blur(function() {
-        if ( options.allow_empty && $(this).val() == "" ) {
-            field.parent("div").removeClass("has-error");
-            field.next().removeClass("fa-close");
-            if ( options.submit ) options.submit.prop("disabled", $(".has-error").length);
+function prewikka_autocomplete(selector, options) {
+    options = options || {};
+    $(selector).select2_container({
+        allowClear: !!options.allow_empty,
+        placeholder: options.placeholder || "",
+        ajax: {
+            url: options.url,
+            dataType: "json",
+            data: function(params) {
+                return options.data_callback ? options.data_callback(params) : {term: params.term};
+            },
+            processResults: function(data) {
+                return {
+                    results: $.map(data, function(item) {
+                        if ( typeof item == "string" )
+                            return {text: item, id: item};
+                        else
+                            return {text: item.label, id: item.value};
+                    })
+                };
+            },
+            prewikka: {spinner: false, error: false}
         }
     });
 }
