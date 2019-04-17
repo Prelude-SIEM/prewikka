@@ -75,7 +75,7 @@ class _IDMEFProvider(DataProviderBase):
         if not operator.is_substring:
             return value
 
-        value = text_type(value).strip()
+        value = text_type(value)
 
         has_wildcard = utils.find_unescaped_characters(value, ["*"])
         if has_wildcard:
