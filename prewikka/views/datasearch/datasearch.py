@@ -450,7 +450,7 @@ class DataSearch(view.View):
         view.route("/%s/forensic/ajax_details" % self.name, self.ajax_details)
         view.route("/%s/forensic/ajax_infos" % self.name, self.ajax_infos)
         view.route("/%s/forensic/csv_download" % self.name, self.csv_download, methods=["POST"])
-        view.route("/%s/forensic" % self.name, self.forensic, menu=(section, tabs[0]), keywords=["listing"],
+        view.route("/%s/forensic" % self.name, self.forensic, menu=(section, tabs[0]), keywords=["listing", "inheritable"],
                    datatype=self.type, priority=1, help="#%sforensic" % self.type, methods=["POST", "GET"])
         view.route("/%s/dashboard" % self.name, self.dashboard, menu=(section, tabs[1]),
                    help="#%sdashboard" % self.type, methods=["POST", "GET"])

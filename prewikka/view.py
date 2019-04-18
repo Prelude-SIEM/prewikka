@@ -487,7 +487,8 @@ def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, de
 
 class ViewManager(registrar.DelayedRegistrar):
     def get(self, datatype=None, keywords=None):
-        return sorted(filter(lambda x: set(keywords or []).issubset(x.view_keywords), self._references.get(datatype, [])), key=lambda x: x.view_priority)
+        views = self._references.get(datatype, []) if datatype else self._views_endpoints.values()
+        return sorted(filter(lambda x: set(keywords or []).issubset(x.view_keywords), views), key=lambda x: x.view_priority)
 
     def get_view(self, endpoint, default=None):
         endpoint = endpoint.lower()
