@@ -1,6 +1,6 @@
 "use strict";
 
-function DataSearchPage(backend, criterion_config, criterion_config_default, separators, timeline_url)
+function DataSearchPage(backend, criterion_config, criterion_config_default, separators, timeline_url, common_paths)
 {
     var page = {};
     var escapeRegex = $.ui.autocomplete.escapeRegex;
@@ -422,7 +422,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         });
 
         $("#PopoverOption a.groupby_search").attr("href", prewikka_location().href + "?groupby[]=" + selected_field);
-        $("#PopoverOption .groupby_search span").text(selected_field);
+        $("#PopoverOption .groupby_search span").text(common_paths[selected_field] || selected_field);
         $("#PopoverOption").show();
 
         var oca_position = "bottom";

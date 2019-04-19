@@ -520,6 +520,7 @@ class DataSearch(view.View):
                                               limit=env.request.parameters["limit"],
                                               parent=self)
         dataset["extra_resources"] = self._extra_resources
+        dataset["common_paths"] = {path.split(".", 1)[-1]: _(label).lower() for label, path in env.dataprovider.get_common_paths(self.type, index=True)}
 
         return view.ViewResponse(dataset)
 

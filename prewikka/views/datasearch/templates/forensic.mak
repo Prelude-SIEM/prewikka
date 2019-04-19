@@ -24,7 +24,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
   var groupby = $(".form-control-select2");
   groupby.closest(".form-group").show();
   groupby.select2_container();
-  var page = DataSearchPage("${backend}", ${html.escapejs(criterion_config)}, ${html.escapejs(criterion_config_default)}, ${html.escapejs(separators)}, "${url_for('.ajax_timeline')}");
+  var page = DataSearchPage("${backend}", ${html.escapejs(criterion_config)}, ${html.escapejs(criterion_config_default)}, ${html.escapejs(separators)}, "${url_for('.ajax_timeline')}", ${html.escapejs(common_paths)});
 
   % if not search.groupby:
     <%
