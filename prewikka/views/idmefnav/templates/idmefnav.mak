@@ -12,7 +12,7 @@
     <h3>${ _("Children") }</h3>
 
     % for child in schema["childs"].keys():
-    <h4><a href="${ url_for('.', idmef_class=child) }">${ child }</a></h4>
+    <h4><a href="${ url_for('.render', idmef_class=child) }">${ child }</a></h4>
     % endfor
 % endif
 
@@ -22,7 +22,7 @@
     % for name, aggregate in schema["aggregates"].items():
     <h4>
         % if name in full_schema:
-        <a href="${ url_for('.', idmef_class=name) }">${ name } (${ aggregate.get("multiplicity") })</a>
+        <a href="${ url_for('.render', idmef_class=name) }">${ name } (${ aggregate.get("multiplicity") })</a>
         % else:
         ${ name } (${ aggregate.get("multiplicity") })
         % endif
@@ -38,7 +38,7 @@
     % for name, attribute in schema["attributes"].items():
     <h4>
         % if name in full_schema:
-        <a href="${ url_for('.', idmef_class=name) }">${ name } (${ attribute.get("multiplicity") })</a>
+        <a href="${ url_for('.render', idmef_class=name) }">${ name } (${ attribute.get("multiplicity") })</a>
         % else:
         ${ name } (${ attribute.get("multiplicity") })
         % endif
