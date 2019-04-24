@@ -25,7 +25,20 @@
               $(this).select2("close");
               return false;
           }
+      })
+      .on("select2:close", function() {
+          // Prevent tooltip from staying after closing the select
+          setTimeout(function() {
+              $(":focus").blur();
+          }, 1);
       });
+
+      // Handle the tooltip ourselves
+      $("#${root_id} .dropdown-filter .select2-container").tooltip({
+          title: "${_("Available filters")}",
+          container: "#main"
+      });
+      $("#${root_id} .dropdown-filter .select2-selection__rendered").removeAttr("title");
   </script>
 
   <div class="dropdown dropdown-fixed dropdown-filter">
