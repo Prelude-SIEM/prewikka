@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.1.0alpha2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-15 16:39+0100\n"
+"POT-Creation-Date: 2019-04-24 17:40+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: Alex Bochkin <ba@is-systems.org>\n"
 "Language-Team: Russian\n"
@@ -20,15 +20,15 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: prewikka/baseview.py:78 prewikka/usergroup.py:48
+#: prewikka/baseview.py:79 prewikka/usergroup.py:48
 msgid "Permission Denied"
 msgstr "Недостаточно прав"
 
-#: prewikka/baseview.py:78
+#: prewikka/baseview.py:79
 msgid "Missing permission to access the specified file"
 msgstr ""
 
-#: prewikka/config.py:37 prewikka/dataprovider/__init__.py:603
+#: prewikka/config.py:37 prewikka/dataprovider/__init__.py:606
 msgid "Configuration error"
 msgstr "Ошибка конфигурации"
 
@@ -230,6 +230,16 @@ msgstr "%H:%M"
 msgid "%H:%M:%S"
 msgstr "%H:%M:%S"
 
+#: prewikka/localization.py:233 prewikka/localization.py:251
+#: prewikka/renderer/__init__.py:62 prewikka/views/crontab/__init__.py:82
+msgid "n/a"
+msgstr ""
+
+#: prewikka/localization.py:244
+#, python-format
+msgid "%(days)dd %(hours)dh %(minutes)d'"
+msgstr ""
+
 #: prewikka/main.py:45
 msgid "Version Requirement error"
 msgstr "Ошибка соответствия версии"
@@ -396,11 +406,6 @@ msgid ""
 "required: %s"
 msgstr ""
 
-#: prewikka/statistics.py:144 prewikka/statistics.py:188
-#: prewikka/renderer/__init__.py:62 prewikka/views/crontab/__init__.py:82
-msgid "n/a"
-msgstr ""
-
 #: prewikka/usergroup.py:40
 #, python-format
 msgid "Access to view '%(view)s' forbidden. Required permissions: %(permissions)s"
@@ -439,12 +444,12 @@ msgstr "неверная временная зона"
 msgid "Invalid view"
 msgstr "Неверное отображение"
 
-#: prewikka/view.py:519
+#: prewikka/view.py:507
 #, python-format
 msgid "Method '%(method)s' is not allowed for view '%(view)s'"
 msgstr ""
 
-#: prewikka/view.py:523 prewikka/view.py:670
+#: prewikka/view.py:511 prewikka/view.py:637
 #, python-format
 msgid "View '%s' does not exist"
 msgstr "Отображение '%s' не существует"
@@ -517,12 +522,12 @@ msgstr "Не подстрока"
 msgid "Not substring (case-insensitive)"
 msgstr "Не подстрока (нечувствительная к регистру)"
 
-#: prewikka/dataprovider/__init__.py:90 prewikka/dataprovider/__init__.py:153
+#: prewikka/dataprovider/__init__.py:90 prewikka/dataprovider/__init__.py:156
 #, fuzzy
 msgid "Conversion error"
 msgstr "Ошибка конфигурации"
 
-#: prewikka/dataprovider/__init__.py:91 prewikka/dataprovider/__init__.py:154
+#: prewikka/dataprovider/__init__.py:91 prewikka/dataprovider/__init__.py:157
 #, python-format
 msgid "Value %(value)r cannot be converted to %(type)s"
 msgstr ""
@@ -552,16 +557,16 @@ msgstr ""
 msgid "Could not parse input"
 msgstr "Невозможно сохранить фильтр"
 
-#: prewikka/dataprovider/__init__.py:278
+#: prewikka/dataprovider/__init__.py:281
 msgid "Backend normalization error"
 msgstr "Ошибка нормализации на бэкенде"
 
-#: prewikka/dataprovider/__init__.py:593
+#: prewikka/dataprovider/__init__.py:596
 #, python-format
 msgid "No handler configured for '%s' datatype"
 msgstr "Не сконфигурирован обработчик для '%s' типа данных"
 
-#: prewikka/dataprovider/__init__.py:604
+#: prewikka/dataprovider/__init__.py:607
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
 msgstr "Только один менеджер может быть сконфигурирован для '%s' бэкенда"
@@ -832,7 +837,7 @@ msgstr ""
 
 #: prewikka/templates/error.mak:171 prewikka/templates/toplayout.mak:61
 #: prewikka/views/crontab/templates/cronjob.mak:122
-#: prewikka/views/filter/templates/filteredition.mak:106
+#: prewikka/views/filter/templates/filteredition.mak:122
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -1140,7 +1145,7 @@ msgstr "Имя"
 
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:155
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:191
-#: prewikka/views/filter/templates/filterlisting.mak:27
+#: prewikka/views/filter/templates/filterlisting.mak:28
 #: prewikka/views/idmefnav/templates/idmefnav.mak:56
 #: prewikka/views/messagesummary/messagesummary.py:746
 #: prewikka/views/messagesummary/messagesummary.py:752
@@ -1225,7 +1230,7 @@ msgid "Heartbeat analysis"
 msgstr "Анализ событий состояния"
 
 #: prewikka/views/agents/agents.py:130 prewikka/views/agents/agents.py:154
-#: prewikka/views/datasearch/idmef.py:158 prewikka/views/filter/filter.py:110
+#: prewikka/views/datasearch/idmef.py:158 prewikka/views/filter/filter.py:115
 #: prewikka/views/messagesummary/messagesummary.py:333
 msgid "IDMEF_VIEW"
 msgstr "IDMEF_VIEW (Просмотр IDMEF)"
@@ -1323,7 +1328,7 @@ msgstr "Удалить выбранные сообщения IDMEF?"
 
 #: prewikka/views/agents/templates/agents.mak:89
 #: prewikka/views/datasearch/idmef.py:195
-#: prewikka/views/filter/templates/filterlisting.mak:41
+#: prewikka/views/filter/templates/filterlisting.mak:42
 msgid "Delete"
 msgstr "Удалить"
 
@@ -1424,13 +1429,13 @@ msgid "Edit Job"
 msgstr ""
 
 #: prewikka/views/crontab/templates/cronjob.mak:112
-#: prewikka/views/filter/templates/filteredition.mak:69
+#: prewikka/views/filter/templates/filteredition.mak:73
 #: prewikka/views/usermanagement/templates/usersettings.mak:13
 msgid "Name:"
 msgstr "Имя:"
 
 #: prewikka/views/crontab/templates/cronjob.mak:123
-#: prewikka/views/filter/templates/filteredition.mak:107
+#: prewikka/views/filter/templates/filteredition.mak:123
 #: prewikka/views/usermanagement/templates/usersettings.mak:61
 msgid "Save"
 msgstr "Сохранить"
@@ -1541,7 +1546,7 @@ msgstr "Доска диаграмм"
 msgid "CSV export"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:621
+#: prewikka/views/datasearch/datasearch.py:622
 msgid "General"
 msgstr ""
 
@@ -1695,67 +1700,76 @@ msgstr "Счет"
 msgid "Filters management page"
 msgstr "Страница управления фильтрами"
 
-#: prewikka/views/filter/filter.py:122
+#: prewikka/views/filter/filter.py:127
 #: prewikka/views/usermanagement/usermanagement.py:18
 msgid "Preferences"
 msgstr "Преферанс"
 
-#: prewikka/views/filter/filter.py:122
+#: prewikka/views/filter/filter.py:127
 #: prewikka/views/filter/templates/filterlisting.mak:17
 msgid "Filters"
 msgstr "Фильтры"
 
-#: prewikka/views/filter/filter.py:133
-#: prewikka/views/filter/templates/filteredition.mak:62
+#: prewikka/views/filter/filter.py:138
+#: prewikka/views/filter/templates/filteredition.mak:66
 #, python-format
 msgid "Filter %s"
 msgstr "Фильтр %s"
 
-#: prewikka/views/filter/filter.py:203
+#: prewikka/views/filter/filter.py:213
 #, fuzzy
 msgid "Filter error"
 msgstr "отфильтровано"
 
-#: prewikka/views/filter/filter.py:203
+#: prewikka/views/filter/filter.py:213
 #, fuzzy, python-format
 msgid "Filter '%s' does not exist"
 msgstr "Отображение '%s' не существует"
 
-#: prewikka/views/filter/filter.py:239 prewikka/views/filter/filter.py:251
+#: prewikka/views/filter/filter.py:251 prewikka/views/filter/filter.py:263
 msgid "Could not save filter"
 msgstr "Невозможно сохранить фильтр"
 
-#: prewikka/views/filter/filter.py:239
+#: prewikka/views/filter/filter.py:251
 msgid "No name for this filter was provided"
 msgstr "Не введено имя фильтра"
 
-#: prewikka/views/filter/filter.py:251
+#: prewikka/views/filter/filter.py:263
 msgid "The filter name is already used by another filter"
 msgstr "Имя данного фильтра уже существует"
 
-#: prewikka/views/filter/templates/filteredition.mak:62
+#: prewikka/views/filter/templates/filteredition.mak:66
 #: prewikka/views/filter/templates/filterlisting.mak:17
-#: prewikka/views/filter/templates/menu.mak:20
+#: prewikka/views/filter/templates/menu.mak:48
 msgid "New filter"
 msgstr "Новый фильтр"
 
-#: prewikka/views/filter/templates/filteredition.mak:71
+#: prewikka/views/filter/templates/filteredition.mak:75
 msgid "Filter name"
 msgstr "Фильтровать по:"
 
-#: prewikka/views/filter/templates/filteredition.mak:76
+#: prewikka/views/filter/templates/filteredition.mak:80
+msgid "Category:"
+msgstr "Категория:"
+
+#: prewikka/views/filter/templates/filteredition.mak:92
 msgid "Description:"
 msgstr "Описание:"
 
-#: prewikka/views/filter/templates/filterlisting.mak:39
+#: prewikka/views/filter/templates/filterlisting.mak:24
+#: prewikka/views/messagesummary/messagesummary.py:751
+msgid "Category"
+msgstr "Категория"
+
+#: prewikka/views/filter/templates/filterlisting.mak:40
 msgid "Create"
 msgstr "Создать"
 
-#: prewikka/views/filter/templates/filterlisting.mak:40
+#: prewikka/views/filter/templates/filterlisting.mak:41
 msgid "Duplicate"
 msgstr "Дубликат"
 
-#: prewikka/views/filter/templates/filterlisting.mak:41
+#: prewikka/views/filter/templates/filterlisting.mak:42
 msgid "Delete the selected filters?"
 msgstr "Удалить выбранные фильтры?"
 
@@ -1763,14 +1777,18 @@ msgstr "Удалить выбранные фильтры?"
 msgid "Filter:"
 msgstr "Фильтр:"
 
-#: prewikka/views/filter/templates/menu.mak:10
+#: prewikka/views/filter/templates/menu.mak:38
 msgid "Available filters"
 msgstr "Доступные фильтры:"
 
-#: prewikka/views/filter/templates/menu.mak:12
-#: prewikka/views/filter/templates/menu.mak:18
+#: prewikka/views/filter/templates/menu.mak:46
 msgid "No filter"
 msgstr "Нет фильтра"
+
+#: prewikka/views/filter/templates/menu.mak:51
+#, fuzzy
+msgid "No category"
+msgstr "Категория"
 
 #: prewikka/views/filter/templates/widget.mak:7
 msgid "Select a path..."
@@ -2102,10 +2120,6 @@ msgstr "Важность"
 #: prewikka/views/messagesummary/messagesummary.py:742
 msgid "Completion"
 msgstr "Завершенность"
-
-#: prewikka/views/messagesummary/messagesummary.py:751
-msgid "Category"
-msgstr "Категория"
 
 #: prewikka/views/messagesummary/messagesummary.py:775
 msgid "User category"
