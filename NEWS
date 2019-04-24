@@ -1,3 +1,21 @@
+* 2019-04-24, prewikka-5.1.0alpha4:
+
+Author: Antoine Luong
+
+- Add a categorization for filters
+- Improve the 'Group by' label in DataSearch
+- Escape backslashes in Lucene search
+- Add localization.format_value()
+- Support the timedelta type in dataprovider
+- Use select2 in prewikka_autocomplete
+- Make the IDMEF substring operator consistent
+
+Author: Yoann Vandoorselaere
+
+- Deprecate the old view render system
+
+
+
 * 2019-03-26, prewikka-5.1.0alpha2:
 
 Author: Antoine Luong
