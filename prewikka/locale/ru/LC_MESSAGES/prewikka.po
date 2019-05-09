@@ -7,7 +7,7 @@
 # info@is-systems.org, 2016
 msgid ""
 msgstr ""
-"Project-Id-Version: Prewikka 5.1.0alpha4\n"
+"Project-Id-Version: Prewikka 5.1.0alpha5\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-04-24 17:40+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
