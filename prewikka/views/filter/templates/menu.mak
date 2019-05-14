@@ -8,14 +8,14 @@
   <script>
       $("#${root_id} select[name=filter]").select2_container({
           dropdownAutoWidth: true,
-          templateResult: function(obj) {
+          templateResult: function(obj, container) {
               if ( obj.element && obj.element.className == "no-filter" )
                   return $('<span><i class="fa fa-ban text-danger"></i> ' + _.escape(obj.text) + '</span>');
 
               if ( obj.element && obj.element.className == "new-filter" )
                   return $('<span><i class="fa fa-plus text-success"></i> ' + _.escape(obj.text) + '</span>');
 
-              return obj.text;
+              return $.fn.select2.defaults.defaults.templateResult(obj, container);
           }
       })
       .on("select2:selecting", function(e) {

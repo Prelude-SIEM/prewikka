@@ -79,6 +79,11 @@ $(function() {
   $.fn.select2.defaults.set("theme", "bootstrap");
   $.fn.select2.defaults.set("containerCssClass", ":all:");
   $.fn.select2.defaults.set("width", null);
+  $.fn.select2.defaults.set("templateResult", function(obj, container) {
+      if ( obj.element )
+          $(container).addClass($(obj.element).attr("class"));
+      return obj.text;
+  });
 
   $.fn.select2_container = function(options) {
       options = options || {};
