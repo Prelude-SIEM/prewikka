@@ -1,3 +1,11 @@
+* 2019-05-17, prewikka-5.1.0alpha6:
+
+Author: Antoine Luong
+
+- Propagate option classes to select2 items
+
+
+
 * 2019-05-10, prewikka-5.1.0alpha5:
 
 Author: Thomas Andrejak
