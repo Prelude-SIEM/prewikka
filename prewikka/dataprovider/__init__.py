@@ -473,6 +473,9 @@ class Criterion(json.JSONObject):
         if isinstance(value, (int, float)):
             return value
 
+        if isinstance(value, timedelta):
+            return int(value.total_seconds())
+
         if not isinstance(value, compat.STRING_TYPES):
             value = text_type(value)
 
