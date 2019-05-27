@@ -175,8 +175,8 @@ class FilterView(FilterPlugin, view.View):
         return self._filter_get_criteria_by_name(fname, ctype)
 
     @hookmanager.register("HOOK_FILTER_GET_CRITERIA")
-    def _filter_get_criteria_by_name(self, fname, ctype):
-        f = self._db.get_filter(env.request.user, fname)
+    def _filter_get_criteria_by_name(self, fname, ctype, user=None):
+        f = self._db.get_filter(user or env.request.user, fname)
         if not f:
             return
 
@@ -208,7 +208,7 @@ class FilterView(FilterPlugin, view.View):
         if not filter_name:
             return
 
-        c = self._filter_get_criteria_by_name(filter_name, query.datatype)
+        c = self._filter_get_criteria_by_name(filter_name, query.datatype, options.get("owner"))
         if not c:
             raise error.PrewikkaUserError(N_("Filter error"), N_("Filter '%s' does not exist", filter_name))
 

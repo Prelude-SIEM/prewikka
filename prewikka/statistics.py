@@ -109,6 +109,7 @@ class GenericChart(object):
             self._default_view = self._default_view[-1]
 
         list(hookmanager.trigger("HOOK_CHART_PREPARE", query, self.options))
+        self.options.pop("owner", None)
         all_criteria = self._menu.get_criteria() & query.criteria
 
         return all_paths, all_criteria
