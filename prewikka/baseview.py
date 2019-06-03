@@ -47,7 +47,7 @@ JS_FILES = (
     "prewikka/js/ajax.js",
     "prewikka/js/underscore-min.js",
     "prewikka/js/jquery-ui-timepicker-addon.min.js",
-    "prewikka/js/ui.multiselect.min.js",
+    "prewikka/js/ui.multiselect.js",
     "prewikka/js/jquery.jqgrid.min.js",
     "prewikka/js/commonlisting.js"
 )
@@ -166,7 +166,7 @@ class BaseView(view._View):
         _HEAD.update((resource.JSLink(link), True) for link in JS_FILES)
 
         # The jqgrid locale files use only two characters for identifying the language (e.g. pt_BR -> pt)
-        _HEAD[resource.JSLink("prewikka/js/locales/grid.locale-%s.min.js" % lang[:2])] = True
+        _HEAD[resource.JSLink("prewikka/js/locales/jqgrid/grid.locale-%s.js" % lang[:2])] = True
         _HEAD[resource.JSLink("prewikka/js/locales/select2/%s.js" % lang[:2])] = True
 
         for contents in filter(None, hookmanager.trigger("HOOK_LOAD_HEAD_CONTENT")):
