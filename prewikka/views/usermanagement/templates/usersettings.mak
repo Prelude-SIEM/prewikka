@@ -49,7 +49,7 @@
         <div class="form-group">
             <label for="inputUserTimezone" class="col-sm-2 control-label">${ _("Timezone:") }</label>
             <div class="col-sm-10">
-                <select id="inputUserTimezone" class="form-control" name="timezone">
+                <select id="inputUserTimezone" class="form-control form-control-select2" name="timezone">
                 % for tz in available_timezones:
                     <option value="${tz}" ${ selected(tz == timezone) }>${tz}</option>
                 % endfor

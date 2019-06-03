@@ -154,6 +154,7 @@ function _initialize_components(container) {
     $(container).find('[data-toggle="popover"]').popover();
     $(container).find('[data-title-url]').ajaxTooltip();
     $(container).find('[autofocus]').focus();
+    $(container).find('.form-control-select2').select2_container();
 }
 
 
@@ -161,6 +162,7 @@ function _destroy_components(container) {
     $(container).find('[data-toggle="tooltip"]').tooltip("destroy");
     $(container).find('[data-toggle="popover"]').popover("destroy");
     $(container).find('[data-title-url]').tooltip("destroy");
+    $(container).find('.form-control-select2').select2("destroy");
 }
 
 
