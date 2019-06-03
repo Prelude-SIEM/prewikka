@@ -83,7 +83,7 @@ class _IDMEFPlugin(DataProviderBackend):
         if not criteria and not env.dataprovider.guess_datatype(paths, default=None):
             criteria = "%s.messageid" % self.type
 
-        return IDMEFQueryResults(self._db.getValues(paths, criteria, bool(distinct), limit, offset))
+        return IDMEFQueryResults(self._db.getValues(paths, criteria, distinct, limit, offset))
 
     @usergroup.permissions_required(["IDMEF_ALTER"])
     def delete(self, criteria, paths):

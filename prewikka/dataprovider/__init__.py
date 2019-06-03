@@ -233,7 +233,7 @@ class DataProviderBackend(pluginmanager.PluginBase):
         @param criteria: Search criteria
         @type criteria: list
         @param distinct: Control whether duplicate entries should be removed (True) or kept (False)
-        @type distinct: int
+        @type distinct: bool
         @param limit: Maximum number of rows to retrieve. Note: the actual result may contain fewer entries
         @type limit: int
         @param offset: Number of entries to skip before retrieving matching rows
@@ -674,7 +674,7 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, criteria=criteria.compile(type))
 
-    def query(self, paths, criteria=None, distinct=0, limit=-1, offset=0, type=None, **kwargs):
+    def query(self, paths, criteria=None, distinct=False, limit=-1, offset=0, type=None, **kwargs):
         o = self._normalize(type, paths, criteria)
 
         start = time.time()
