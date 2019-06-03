@@ -53,7 +53,7 @@ class Schema(dict):
     def _data_load(self):
         for f in glob.glob("%s/yaml/*.yml" % self.folder):
             with io.open(f, 'r', encoding='utf-8') as stream:
-                yield yaml.load(stream)
+                yield yaml.safe_load(stream)
 
     @staticmethod
     def quote_val(val):

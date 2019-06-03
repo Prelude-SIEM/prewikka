@@ -65,7 +65,7 @@ class MenuManager(object):
 
         try:
             with open(filename, "r") as f:
-                self._menus = _SCHEMA(yaml.load(f))
+                self._menus = _SCHEMA(yaml.safe_load(f))
         except (IOError, yaml.error.YAMLError, voluptuous.Invalid) as e:
             raise error.PrewikkaUserError(N_("Menu error"), N_("The provided YAML menu is invalid"), details=e)
 
