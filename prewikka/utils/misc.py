@@ -27,7 +27,6 @@ import struct
 import sys
 import unicodedata
 
-from prewikka import compat
 from prewikka.utils.timeutil import now
 
 
@@ -117,18 +116,9 @@ def protocol_number_to_name(num):
     return None
 
 
-def name_to_path(name):
-    if not isinstance(name, compat.STRING_TYPES):
-        name = text_type(name)
-
-    return name.lower().replace(" ", "_")
-
-
-def find_unescaped_characters(value, characters=None):
+def find_unescaped_characters(value, characters):
     """Search for unescaped characters among *characters* in string *value*."""
     escaped = False
-    if not characters:
-        return False
 
     for char in value:
         if escaped:

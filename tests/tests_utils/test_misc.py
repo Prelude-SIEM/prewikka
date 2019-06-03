@@ -90,26 +90,14 @@ def test_protocol_number_to_name():
     assert not misc.protocol_number_to_name(300)
 
 
-def test_name_to_path():
-    """
-    Test `prewikka.utils.misc.name_to_path()`.
-    """
-    assert misc.name_to_path(None) == 'none'
-    assert misc.name_to_path('foo') == 'foo'
-    assert misc.name_to_path('foo bar') == 'foo_bar'
-    assert misc.name_to_path('foo_bar') == 'foo_bar'
-    assert misc.name_to_path(42) == '42'
-    assert misc.name_to_path(3.14) == '3.14'
-
-
 def test_find_unescaped_characters():
     """
     Test `prewikka.utils.misc.find_unescaped_characters()`.
     """
-    assert not misc.find_unescaped_characters('foo')
     assert misc.find_unescaped_characters('foo', 'o')
     assert not misc.find_unescaped_characters('foo', 'a')
     assert not misc.find_unescaped_characters('foo\\bar', 'b')
+    assert misc.find_unescaped_characters('foo\\\\bar', 'b')
 
 
 def test_split_unescaped_characters():
@@ -117,34 +105,19 @@ def test_split_unescaped_characters():
     Test `prewikka.utils.misc.split_unescaped_characters()`.
     """
     res = misc.split_unescaped_characters('foo', '')
-
-    assert next(res) == 'foo'
+    assert list(res) == ['foo']
 
     res = misc.split_unescaped_characters('foo bar', ' ')
+    assert list(res) == ['foo', 'bar']
 
-    assert next(res) == 'foo'
-    assert next(res) == 'bar'
+    res = misc.split_unescaped_characters('foobar', 'oa')
+    assert list(res) == ['f', '', 'b', 'r']
 
-    res = misc.split_unescaped_characters('foobar', 'o')
+    res = misc.split_unescaped_characters('foo\\;bar', ';')
+    assert list(res) == ['foo\\;bar']
 
-    assert next(res) == 'f'
-    assert next(res) == ''
-    assert next(res) == 'bar'
-
-    res = misc.split_unescaped_characters('foobar', 'oo')
-
-    assert next(res) == 'f'
-    assert next(res) == ''
-    assert next(res) == 'bar'
-
-    res = misc.split_unescaped_characters('foo\\bar', 'b')
-
-    assert next(res) == 'foo\\bar'
-
-    res = misc.split_unescaped_characters('foo;bar', [';'])
-
-    assert next(res) == 'foo'
-    assert next(res) == 'bar'
+    res = misc.split_unescaped_characters('foo\\\\;bar', ';')
+    assert list(res) == ['foo\\\\', 'bar']
 
 
 def test_soundex():
