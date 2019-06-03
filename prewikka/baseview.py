@@ -78,8 +78,8 @@ class BaseView(view._View):
         if user and user != env.request.user.name:
             raise error.PrewikkaUserError(_("Permission Denied"), message=_("Missing permission to access the specified file"), code=403)
 
-        fd = open(utils.mkdownload.get_filename(id, filename, user), "r")
-        filename = base64.urlsafe_b64decode(str(filename)).decode("utf8")
+        fd = open(utils.mkdownload.get_filename(id, filename, user), "rb")
+        filename = base64.urlsafe_b64decode(filename.encode("utf8")).decode("utf8")
 
         return response.PrewikkaDownloadResponse(fd, filename=filename, inline=inline)
 

@@ -140,7 +140,7 @@ class Session(pluginmanager.PluginBase):
         t = time.time()
 
         self._db.delete_expired_sessions(t - self._expiration)
-        sessionid = text_type(binascii.hexlify(os.urandom(16) + struct.pack(b">d", t)))
+        sessionid = binascii.hexlify(os.urandom(16) + struct.pack(b">d", t)).decode("utf8")
 
         self._db.create_session(sessionid, user, int(t))
         self.__set_session(request, sessionid)
