@@ -465,11 +465,6 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         };
 
         var orig = $("#datasearch_table").jqGrid('getGridParam', 'userData')[rowid].cell;
-
-        for ( var i in orig ) {
-            elem[i] = (orig[i] && orig[i].toValue) ? orig[i].toValue() : orig[i];
-        }
-
         if ( orig._criteria )
             elem["_criteria"] = JSON.stringify(orig._criteria);
 
