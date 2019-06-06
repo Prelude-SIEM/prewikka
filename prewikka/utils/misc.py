@@ -24,10 +24,10 @@ import os.path
 import re
 import struct
 import sys
-import time
 import unicodedata
 
 from prewikka import compat
+from prewikka.utils.timeutil import now
 
 
 port_dict = {}
@@ -74,7 +74,7 @@ def get_analyzer_status_from_latest_heartbeat(heartbeat, error_margin):
     if heartbeat.get("heartbeat_interval") is None:
         return "unknown", _("Unknown")
 
-    if time.time() - int(heartbeat.get("create_time")) > int(heartbeat.get("heartbeat_interval")) + error_margin:
+    if (now() - heartbeat["create_time"]).total_seconds() > heartbeat["heartbeat_interval"] + error_margin:
         return "missing", _("Missing")
 
     return "online", _("Online")

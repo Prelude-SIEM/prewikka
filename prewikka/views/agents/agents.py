@@ -20,7 +20,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pkg_resources
-import time
 
 from prewikka import hookmanager, localization, mainmenu, resource, template, utils, view, response
 from prewikka.dataprovider import Criterion
@@ -96,7 +95,7 @@ class Agents(view.View):
             if reqstatus and status not in reqstatus:
                 continue
 
-            delta = float(heartbeat.get("create_time")) - time.time()
+            delta = heartbeat.get("create_time") - utils.timeutil.now()
 
             analyzerid = heartbeat["analyzer(-1).analyzerid"]
             heartbeat_listing = url_for("HeartbeatDataSearch.forensic", criteria=Criterion("heartbeat.analyzer(-1).analyzerid", "==", analyzerid), _default=None)
@@ -154,7 +153,7 @@ class Agents(view.View):
     @view.route("/agents/analyze/<analyzerid>", permissions=[N_("IDMEF_VIEW")], help="#heartbeatanalyze")
     def analyze(self, analyzerid):
         analyzer, heartbeat = self._get_analyzer(analyzerid)
-        delta = float(heartbeat["create_time"]) - time.time()
+        delta = heartbeat["create_time"] - utils.timeutil.now()
         analyzer.last_heartbeat_time = localization.format_timedelta(delta, add_direction=True)
 
         analyzer.status = None
@@ -183,8 +182,8 @@ class Agents(view.View):
                     event = utils.AttrObj(time=cur.time_str, value=_("Unexpected sensor restart"), type="unexpected_restart")
 
             elif cur.status == "running":
-                delta = int(cur.time) - int(prev.time)
-                if abs(delta - cur.interval) > self._heartbeat_error_margin:
+                delta = cur.time - prev.time
+                if abs(delta.total_seconds() - cur.interval) > self._heartbeat_error_margin:
                     delta = localization.format_timedelta(delta, granularity="second")
                     event = utils.AttrObj(time=cur.time_str, value=_("Unexpected heartbeat interval: %(delta)s") % {'delta': delta}, type="abnormal_heartbeat_interval")
 
@@ -200,7 +199,7 @@ class Agents(view.View):
             analyzer.status, analyzer.status_meaning = \
                 utils.get_analyzer_status_from_latest_heartbeat(obj["heartbeat"], self._heartbeat_error_margin)
             if analyzer.status == "missing":
-                delta = time.time() - float(prev.time)
+                delta = utils.timeutil.now() - prev.time
                 analyzer.events.append(utils.AttrObj(time=prev.time_str, value=_("Sensor is down since %s") % localization.format_timedelta(delta), type="down"))
 
         if not analyzer.status:
@@ -222,4 +221,4 @@ class HeartbeatObject(object):
         self.status = heartbeat.get("additional_data('Analyzer status').data")[0]
         self.interval = heartbeat["heartbeat_interval"]
         self.time = heartbeat["create_time"]
-        self.time_str = localization.format_datetime(float(self.time))
+        self.time_str = localization.format_datetime(self.time)

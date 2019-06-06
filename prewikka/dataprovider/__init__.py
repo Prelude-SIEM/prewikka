@@ -190,7 +190,7 @@ class ResultObject(object):
 
     def _wrapobj(self, obj, curpath):
         if isinstance(obj, type(self._obj)):
-            return ResultObject(obj, curpath)
+            return self.__class__(obj, curpath)
 
         elif isinstance(obj, tuple):
             return CachingIterator((self._wrapobj(v, curpath[:-1] + ["%s(%d)" % (curpath[-1], i)]) for i, v in enumerate(obj)))

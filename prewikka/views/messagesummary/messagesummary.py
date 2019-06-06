@@ -25,7 +25,6 @@ import re
 import string
 import struct
 import urllib
-from datetime import datetime
 
 import pkg_resources
 from prewikka import hookmanager, localization, resolve, resource, template, utils, view
@@ -358,8 +357,8 @@ class MessageSummary(Table, view.View):
         if not dt:
             return None
 
-        agent_time = datetime.fromtimestamp(dt, utils.timeutil.tzoffset(None, dt.getGmtOffset()))
-        user_time = datetime.fromtimestamp(dt, env.request.user.timezone)
+        agent_time = dt
+        user_time = dt.astimezone(env.request.user.timezone)
 
         s = localization.format_datetime(user_time, format="medium")
         if agent_time.tzinfo.utcoffset(agent_time) != user_time.tzinfo.utcoffset(user_time):
