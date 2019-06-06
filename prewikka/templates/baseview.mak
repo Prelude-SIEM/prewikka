@@ -65,7 +65,8 @@ $(function() {
 
         $(document).on("submit", "body form", function(event) {
                 var form = this;
-                var data = $(this).serializeArray();
+                var multipart = $(this).attr("enctype") == "multipart/form-data";
+                var data = multipart ? new FormData(this) : $(this).serializeArray();
                 var orig = $($(this).data("clicked"));
 
                 if ( event.isDefaultPrevented() )
@@ -84,7 +85,7 @@ $(function() {
                         data.push({ name: orig.attr("name"), value: orig.val() });
                 }
 
-                prewikka_ajax({
+                var options = {
                         url: (orig && orig.attr("formAction")) || $(this).attr("action"),
                         type: (orig && orig.attr("formMethod")) || $(this).attr("method"),
                         data: data,
@@ -101,8 +102,12 @@ $(function() {
                         complete: function() {
                               $("form").trigger("submit-complete", [form, data]);
                         },
-
-                });
+                };
+                if ( multipart ) {
+                    options.processData = false;
+                    options.contentType = false;
+                }
+                prewikka_ajax(options);
 
                 return false;
         });

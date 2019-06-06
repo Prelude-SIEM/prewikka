@@ -16,6 +16,16 @@ else:
     Py3 = False
 
 
+def _decode(string, unquote=False):
+    if unquote:
+        string = unquote_plus(string)
+
+    if not Py3:
+        string = string.decode("utf8")
+
+    return string
+
+
 def parse_key_pair(keyval, unquote=False):
     keyval_splitted = keyval.split('=', 1)
     if len(keyval_splitted) == 1:
@@ -23,16 +33,12 @@ def parse_key_pair(keyval, unquote=False):
     else:
         key, val = keyval_splitted
 
+    return _decode(key, unquote), _decode(val, unquote)
+
+
+def build_struct(key, val):
     if key == '' or val == '':
         return {}
-
-    if unquote:
-        key = unquote_plus(key)
-        val = unquote_plus(val)
-
-    if not Py3:
-        key = key.decode("utf8")
-        val = val.decode("utf8")
 
     groups = re.findall(r"\[.*?\]", key)
     groups_joined = ''.join(groups)
@@ -67,20 +73,16 @@ def merge_two_structs(s1, s2):
 
 def merge_structs(structs):
     if len(structs) == 0:
-        return None
+        return {}
 
     return functools.reduce(lambda x, y: merge_two_structs(y, x), reversed(structs))
 
 
-def _unparam(jquery_params, unquote=True):
-    pair_strings = jquery_params.split('&')
-    key_pairs = [parse_key_pair(x, unquote) for x in pair_strings]
-    return merge_structs(key_pairs)
+def jquery_unparam(jquery_params, unquote=True, multipart=False):
+    if multipart:
+        params = [(_decode(k, unquote), v) for k, v in jquery_params]
+    else:
+        params = [parse_key_pair(x, unquote) for x in jquery_params.split('&')]
 
-
-def jquery_unparam_unquoted(jquery_params):
-    return _unparam(jquery_params, unquote=False)
-
-
-def jquery_unparam(jquery_params):
-    return _unparam(jquery_params, unquote=True)
+    structs = [build_struct(k, v) for k, v in params]
+    return merge_structs(structs)

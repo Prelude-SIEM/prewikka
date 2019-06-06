@@ -21,6 +21,7 @@
 from __future__ import absolute_import, division, print_function
 
 import abc
+import cgi
 import sys
 
 from prewikka import error
@@ -65,6 +66,17 @@ class Request(object):
 
         cookie = cookies.SimpleCookie(self.get_cookie())
         self.input_cookie = dict(cookie.items())
+
+    def _handle_multipart(self, **kwargs):
+        arguments = []
+        fs = cgi.FieldStorage(**kwargs)
+
+        for key in fs.keys():
+            value = fs[key]
+            for i, f in enumerate(value if isinstance(value, list) else [value]):
+                arguments.append((key, f if f.filename else f.value))
+
+        return arguments
 
     def add_cookie(self, param, value, expires=None, path="/", httponly=False):
         if not self._output_cookie:

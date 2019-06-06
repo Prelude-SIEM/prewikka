@@ -82,9 +82,14 @@ class WSGIRequest(request.Request):
         self.arguments = jquery_unparam(self._wsgi_get_str("QUERY_STRING"))
 
         if self.method in ('POST', 'PUT', 'PATCH'):
-            qs = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
-            self.body = qs.decode("utf8") if Py3 else qs
-            self.arguments.update(jquery_unparam(self.body))
+            multipart = environ.get('CONTENT_TYPE', "").startswith('multipart/form-data')
+            if multipart:
+                arg = self._handle_multipart(fp=environ['wsgi.input'], environ=environ)
+            else:
+                arg = environ['wsgi.input'].read(int(environ['CONTENT_LENGTH']))
+                self.body = arg = arg.decode("utf8") if Py3 else arg
+
+            self.arguments.update(jquery_unparam(arg, multipart=multipart))
 
         if self._environ.get("HTTP_X_REQUESTED_WITH", "") == "XMLHttpRequest":
             self.is_xhr = True
