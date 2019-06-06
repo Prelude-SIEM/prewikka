@@ -121,7 +121,7 @@ class BaseView(view._View):
         if not lang:
             lang = self._get_help_language(env.config.general.default_locale, "en")
 
-        return response.PrewikkaRedirectResponse(server.substitute(lang=lang, path=path))
+        return response.PrewikkaRedirectResponse(server.safe_substitute(lang=lang, path=path))
 
     @view.route("/logout")
     def logout(self):
