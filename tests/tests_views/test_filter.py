@@ -83,6 +83,7 @@ def filter_fixtures(request):
         'filter_obj_2': filter_obj_2,
         'filter_obj_3': filter_obj_3,
         'filter_obj_4': filter_obj_4,
+        'last_insert_id': env.db.get_last_insert_ident(),
         'criterion_list': [criterion_1, criterion_2, criterion_3, criterion_4]
     }
 
@@ -148,8 +149,8 @@ def test_edit_duplicate(filter_fixtures):
     """
     view = filter_fixtures.get('view')
 
-    filter_obj_1 = filter_fixtures.get('filter_obj_1')
-    env.request.parameters['duplicate'] = filter_obj_1.name
+    filter_id = filter_fixtures.get('last_insert_id')
+    env.request.parameters['duplicate'] = filter_id
 
     assert view.render()
 
@@ -161,8 +162,8 @@ def test_delete(filter_fixtures):
     """
     view = filter_fixtures.get('view')
 
-    filter_obj_1 = filter_fixtures.get('filter_obj_1')
-    env.request.parameters['id'] = [filter_obj_1.name]
+    filter_id = filter_fixtures.get('last_insert_id')
+    env.request.parameters['id'] = [filter_id]
     database = filter_fixtures.get('database')
     filter_count = len(filter_fixtures.get('criterion_list'))
 
