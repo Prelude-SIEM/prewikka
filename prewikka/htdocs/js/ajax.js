@@ -119,6 +119,7 @@ function _initialize_components(container) {
     $(container).find('[data-toggle="tooltip"]').tooltip();
     $(container).find('[data-toggle="popover"]').popover();
     $(container).find('[data-title-url]').ajaxTooltip();
+    $(container).find('[autofocus]').focus();
 }
 
 
