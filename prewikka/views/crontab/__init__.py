@@ -19,7 +19,6 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-import datetime
 import pkg_resources
 
 from prewikka import crontab, localization, resource, response, template, utils, version, view
@@ -63,7 +62,7 @@ class CrontabView(view.View):
     def list(self):
         dataset = template.PrewikkaTemplate(__name__, "templates/crontab.mak").dataset()
 
-        now = datetime.datetime.now(utils.timeutil.timezone("UTC"))
+        now = utils.timeutil.utcnow()
 
         dataset["data"] = []
         for i in sorted(crontab.list(), key=lambda x: _(x.name).lower()):
