@@ -81,14 +81,18 @@ class FilterDatabase(database.DatabaseHelper):
             if not ftype or ftype in criteria:
                 yield Filter(id_, name, description, criteria)
 
-    def get_filter(self, user, name):
-        rows = self.query("SELECT id, description, value FROM Prewikka_Filter "
-                          "WHERE userid = %s AND name = %s", user.id, name)
+    def get_filter(self, user, name=None, id_=None):
+        query = "SELECT id, name, description, value FROM Prewikka_Filter WHERE userid = %(user)s"
+        if name:
+            query += " AND name = %(name)s"
+        if id_:
+            query += " AND id = %(id)s"
 
+        rows = self.query(query, user=user.id, name=name, id=id_)
         if not rows:
             return None
 
-        id_, description, value = rows[0]
+        id_, name, description, value = rows[0]
         return Filter(id_, name, description, json.loads(value))
 
     def upsert_filter(self, user, filter_):
@@ -96,13 +100,14 @@ class FilterDatabase(database.DatabaseHelper):
         self.upsert("Prewikka_Filter", ("userid", "id", "name", "description", "value"), [values], pkey=("id",))
 
     @database.use_transaction
-    def delete_filter(self, user, name=None):
+    def delete_filter(self, user, name=None, id_=None):
         query = "SELECT id, name FROM Prewikka_Filter WHERE userid = %(user)s"
         if name:
             query += " AND name = %(name)s"
+        if id_:
+            query += " AND id = %(id)s"
 
-        rows = self.query(query, user=user.id, name=name)
-
+        rows = self.query(query, user=user.id, name=name, id=id_)
         if rows:
             self.query("DELETE FROM Prewikka_Filter WHERE id IN %s", (row[0] for row in rows))
 
@@ -130,7 +135,7 @@ class FilterView(FilterPlugin, view.View):
 
         for fltr in self._db.get_filters(env.request.user):
             elem = {
-                "id": fltr.name,
+                "id": fltr.id_,
                 "name": fltr.name,
                 "description": fltr.description,
                 "_link": url_for(".edit", name=fltr.name),
@@ -150,8 +155,8 @@ class FilterView(FilterPlugin, view.View):
     def _user_delete(self, user):
         self._filter_delete(user)
 
-    def _filter_delete(self, user, name=None):
-        for fid, fname in self._db.delete_filter(user, name):
+    def _filter_delete(self, user, name=None, id_=None):
+        for fid, fname in self._db.delete_filter(user, name, id_):
             list(hookmanager.trigger("HOOK_FILTER_DELETE", user, fname, fid))
 
     @hookmanager.register("HOOK_MAINMENU_PARAMETERS_REGISTER")
@@ -189,16 +194,15 @@ class FilterView(FilterPlugin, view.View):
     @view.route("/settings/filters/new", help="#filteredition")
     @view.route("/settings/filters/<name>/edit", help="#filteredition")
     def edit(self, name=None):
-        if "duplicate" in env.request.parameters:
-            name = env.request.parameters["duplicate"]
+        id_ = int(env.request.parameters["duplicate"]) if "duplicate" in env.request.parameters else None
 
         dataset = {
             "fltr": AttrObj(id_="", name="", description="", criteria={}),
             "types": list(self._get_types())
         }
 
-        if name:
-            dataset["fltr"] = self._db.get_filter(env.request.user, name)
+        if name or id_:
+            dataset["fltr"] = self._db.get_filter(env.request.user, name, id_)
             dataset["fltr"].criteria = dataset["fltr"].flatten_criteria()
 
         if "duplicate" in env.request.parameters:
@@ -208,8 +212,8 @@ class FilterView(FilterPlugin, view.View):
 
     @view.route("/settings/filters/delete", methods=["POST"])
     def delete(self):
-        for name in env.request.parameters.getlist("id[]"):
-            self._filter_delete(env.request.user, name)
+        for id_ in env.request.parameters.getlist("id[]", type=int):
+            self._filter_delete(env.request.user, id_=id_)
 
     @view.route("/settings/filters/save", methods=["POST"])
     def save(self):
@@ -225,7 +229,7 @@ class FilterView(FilterPlugin, view.View):
             (json.loads(c) for c in env.request.parameters.getlist("filter_criteria"))
         ))
 
-        filter_ = self._db.get_filter(env.request.user, filter_old_name)
+        filter_ = self._db.get_filter(env.request.user, filter_old_name) if filter_old_name else None
         filter_id = filter_.id_ if filter_ else None
 
         # Ensure the filter_name is not already used by this user
