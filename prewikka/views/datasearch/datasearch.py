@@ -436,7 +436,7 @@ class DataSearch(view.View):
         view.route("/%s/forensic" % self.name, self.forensic, menu=(section, tabs[0]), keywords=["listing"],
                    datatype=self.type, priority=1, help="#%sforensic" % self.type, methods=["POST", "GET"])
         view.route("/%s/dashboard" % self.name, self.dashboard, menu=(section, tabs[1]),
-                   help="#%sdashboard" % self.type, methods=["POST", "GET"])
+                   datatype=self.type, help="#%sdashboard" % self.type, methods=["POST", "GET"])
 
     def _set_common(self, dataset):
         view.View.render(self)
