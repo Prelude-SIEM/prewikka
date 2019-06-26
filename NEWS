@@ -1,3 +1,12 @@
+* 2019-06-26, prewikka-5.0.6:
+
+Author: Antoine Luong
+
+- Force datatype in aggregation pages
+- Fix serialization error with custom charts
+
+
+
 * 2019-06-12, prewikka-5.0.5:
 
 Author: Antoine Luong
