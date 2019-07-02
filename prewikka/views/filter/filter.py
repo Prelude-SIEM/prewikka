@@ -112,7 +112,6 @@ class FilterDatabase(database.DatabaseHelper):
 
 
 class FilterView(FilterPlugin, view.View):
-    view_permissions = [N_("IDMEF_VIEW")]
     plugin_htdocs = (("filter", pkg_resources.resource_filename(__name__, 'htdocs')),)
     _filter_menu_tmpl = template.PrewikkaTemplate(__name__, "templates/menu.mak")
 
