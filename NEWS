@@ -1,3 +1,12 @@
+* 2019-07-05, prewikka-5.0.7:
+
+Author: Antoine Luong
+
+- Correctly handle dates/bytes in Datasearch details
+- Restrict the operators for IDMEF byte data
+
+
+
 * 2019-06-26, prewikka-5.0.6:
 
 Author: Antoine Luong
