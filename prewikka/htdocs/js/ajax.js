@@ -42,6 +42,40 @@ $(function() {
         return that;
     }();
 
+    $.eventSourcePool = function() {
+        var that = {};
+
+        that.pool = [];
+        that.active = 0;
+
+        that.push = function(stream) {
+            that.active++;
+            stream._pool_index = that.pool.push(stream) - 1;
+        };
+
+        that.done = function(stream) {
+            if ( stream._pool_index == undefined )
+                return;
+
+            that.pool[stream._pool_index] = null;
+            if ( --that.active == 0 )
+                that.pool = [];
+        };
+
+        that.abortAll = function() {
+            $(that.pool).each(function(idx, stream) {
+                if ( stream ) {
+                    stream.close();
+                }
+            });
+
+            that.active = 0;
+            that.pool = [];
+        };
+
+        return that;
+    }();
+
     $.ajaxSetup({
         prewikka: { spinner: true,
                     error: true,
@@ -151,6 +185,7 @@ function prewikka_drawTab(data)
     if ( ! data.content )
         return;
 
+    $.eventSourcePool.abortAll();
     $.xhrPool.abortAll();
 
     /*
@@ -348,34 +383,33 @@ function prewikka_EventSource(config)
                 $("#prewikka-dialog-connection-error").modal();
 
             jsonStream.close();
-        };
-    }
-
-    if ( config['close'] == undefined ) {
-        config['close'] = function(e) {
-            jsonStream.close();
+            $.eventSourcePool.done(jsonStream);
         };
     }
 
     jsonStream.addEventListener('close', function(e) {
-        config["close"](e)
+        if ( config['close'] != undefined )
+            config["close"](e);
+
         jsonStream.close();
+        $.eventSourcePool.done(jsonStream);
     });
 
-    var decode_json = function(e) { return JSON.parse(e.data) };
+    var decode_json = function(e) { return JSON.parse(e.data); };
     if ( config['type'] != undefined && config['type'] != 'json' ) {
-        decode_json = function(e) { return e };
+        decode_json = function(e) { return e; };
     }
 
     for ( var ev in config['events'] ) {
         (function(_ev) {
-            jsonStream.addEventListener(_ev, function(e) { config['events'][_ev](decode_json(e)) });
+            jsonStream.addEventListener(_ev, function(e) { config['events'][_ev](decode_json(e)); });
         })(ev);
     }
 
-    jsonStream.onmessage = function(e) { config['message'](decode_json(e)) };
-    jsonStream.onerror = function(e) { config['error'](e) };
+    jsonStream.onmessage = function(e) { config['message'](decode_json(e)); };
+    jsonStream.onerror = function(e) { config['error'](e); };
 
+    $.eventSourcePool.push(jsonStream);
     return jsonStream;
 }
 
