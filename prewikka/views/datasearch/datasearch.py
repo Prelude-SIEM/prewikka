@@ -348,7 +348,7 @@ class QueryParser(object):
             if self._date_selection_index:
                 labels[-1] = labels[-1].strftime(step.unit_format)
 
-            yield RendererItem(value or "", ", ".join((text_type(x) or "" for x in labels)), link)
+            yield RendererItem(value or "", ", ".join((text_type(x) for x in labels)), link)
 
     def _query(self):
         return env.dataprovider.query(self._path, self.all_criteria, limit=self.limit, offset=self.offset, type=self.type)
