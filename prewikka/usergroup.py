@@ -30,6 +30,10 @@ ADMIN_LOGIN = "admin"
 _NAMEID_TBL = {}
 
 
+class UnknownNameIDError(KeyError):
+    pass
+
+
 class PermissionDeniedError(error.PrewikkaUserError):
     def __init__(self, permissions, view=None):
         if isinstance(permissions, compat.STRING_TYPES):
@@ -125,13 +129,25 @@ class NameID(object):
     def __str__(self):
         return self.name
 
+    def __repr__(self):
+        try:
+            name = self.name
+        except UnknownNameIDError:
+            return "%s(id=%s)" % (self.__class__.__name__, self.id)
+
+        return "%s(name=%s, id=%s)" % (self.__class__.__name__, name, self.id)
+
 
 class Group(NameID):
     def __init__(self, name=None, groupid=None):
         NameID.__init__(self, name, groupid)
 
     def _id2name(self, id):
-        return env.auth.get_group_by_id(id).name
+        group = env.auth.get_group_by_id(id)
+        if not group:
+            raise UnknownNameIDError(id)
+
+        return group.name
 
     def create(self):
         env.auth.create_group(self)
@@ -150,7 +166,11 @@ class User(NameID):
         NameID.__init__(self, login, userid)
 
     def _id2name(self, id):
-        return env.auth.get_user_by_id(id).name
+        user = env.auth.get_user_by_id(id)
+        if not user:
+            raise UnknownNameIDError(id)
+
+        return user.name
 
     @cache.request_memoize_property("user_permissions")
     def permissions(self):
