@@ -1,3 +1,43 @@
+* 2019-07-17, prewikka-5.1.0beta1:
+
+Author: Camille Gardet
+
+- Add EventSource pool
+- Support the upload of binary files
+
+Author: Antoine Luong
+
+- Evolutions
+
+    - Add an option for reloading grids periodically
+    - Support autofocus fields
+    - Stop passing the whole DataSearch row to ajax_infos
+    - Allow linking charts to user
+    - JS libraries upgrade
+    - Make the 'distinct' parameter a boolean in dataprovider
+
+- Bugfixes
+
+    - Avoid error with wrong help configuration
+    - Hide menus in case of missing permission
+    - Correctly handle dates/bytes in Datasearch details
+    - Restrict the operators for IDMEF byte data
+    - Remove IDMEF_VIEW requirement for filters
+    - Force datatype in aggregation pages
+    - Fix recursion of ResultObject subclasses
+    - Correctly handle timedeltas in criteria
+    - Use YAML safe_load() instead of load()
+
+Author: Francois Poirotte
+
+- YAML menu relative to main config file
+
+Author: Yoann Vandoorselaere
+
+- Implement usergroup.ACTIVE_PERMISSIONS
+
+
+
 * 2019-05-17, prewikka-5.1.0alpha6:
 
 Author: Antoine Luong
