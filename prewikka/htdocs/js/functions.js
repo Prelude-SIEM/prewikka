@@ -111,6 +111,10 @@ $(function() {
     $(this).data("bs.popover").inState.click = false;
   });
 
+  $(document).on("shown.bs.modal", ".modal", function() {
+    $(this).find('[autofocus]').focus();
+  });
+
   $(document).on("click", "#logout", function() {
     this.href = "logout?redirect=" + encodeURIComponent(location.href);
   });
