@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.1.0beta1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-17 19:57+0200\n"
+"POT-Creation-Date: 2019-07-23 18:40+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
@@ -268,12 +268,12 @@ msgstr ""
 "Impossible d'utiliser le mode '%(name)s' de type '%(type)s', veuillez "
 "contacter votre administrateur local."
 
-#: prewikka/main.py:191
+#: prewikka/main.py:192
 #, python-format
 msgid "Session '%s' does not accept any authentication module"
 msgstr "La session '%s' n'accepte pas de module d'authentification"
 
-#: prewikka/main.py:297
+#: prewikka/main.py:298
 #, python-format
 msgid "An unexpected condition happened while trying to load %s"
 msgstr "Une erreur inattendue s'est produite au chargement de %s"
@@ -544,7 +544,8 @@ msgstr "Erreur de syntaxe"
 msgid "Unknown path: %s"
 msgstr "Chemin inconnu : %s"
 
-#: prewikka/dataprovider/__init__.py:121
+#: prewikka/dataprovider/__init__.py:121 scripts/prewikka-cli:108
+#: scripts/prewikka-cli:117 scripts/prewikka-cli:128
 msgid "Could not parse input"
 msgstr "Impossible d'interpréter la saisie"
 
@@ -1060,15 +1061,23 @@ msgid "Apps: Renderer type"
 msgstr "Apps : Type de rendu"
 
 #: prewikka/views/aboutplugin/__init__.py:82
+msgid "list plugin: list installed plugins"
+msgstr "list plugin : lister les plugins installés"
+
+#: prewikka/views/aboutplugin/__init__.py:91
 msgid "Apps"
 msgstr "Apps"
 
-#: prewikka/views/aboutplugin/__init__.py:118
+#: prewikka/views/aboutplugin/__init__.py:120
+msgid "init plugin: initialize the plugin database schemas"
+msgstr "init plugin : initialiser les schémas de base de données des plugins"
+
+#: prewikka/views/aboutplugin/__init__.py:134
 #, python-format
 msgid "Applying %(module)s %(script)s..."
 msgstr "Application de %(module)s %(script)s..."
 
-#: prewikka/views/aboutplugin/__init__.py:128
+#: prewikka/views/aboutplugin/__init__.py:144
 msgid "All updates applied"
 msgstr "Toutes les mises à jour appliquées"
 
@@ -1668,40 +1677,40 @@ msgstr "Total"
 msgid "Filters management page"
 msgstr "Page de gestion des filtres"
 
-#: prewikka/views/filter/filter.py:126
+#: prewikka/views/filter/filter.py:131
 #: prewikka/views/usermanagement/usermanagement.py:18
 msgid "Preferences"
 msgstr "Préférences"
 
-#: prewikka/views/filter/filter.py:126
+#: prewikka/views/filter/filter.py:131
 #: prewikka/views/filter/templates/filterlisting.mak:17
 msgid "Filters"
 msgstr "Filtres"
 
-#: prewikka/views/filter/filter.py:137
+#: prewikka/views/filter/filter.py:142
 #: prewikka/views/filter/templates/filteredition.mak:66
 #, python-format
 msgid "Filter %s"
 msgstr "Filtre %s"
 
-#: prewikka/views/filter/filter.py:212
+#: prewikka/views/filter/filter.py:217
 msgid "Filter error"
 msgstr "Erreur de filtre"
 
-#: prewikka/views/filter/filter.py:212
+#: prewikka/views/filter/filter.py:217
 #, python-format
 msgid "Filter '%s' does not exist"
 msgstr "Le filtre '%s' n'existe pas"
 
-#: prewikka/views/filter/filter.py:250 prewikka/views/filter/filter.py:262
+#: prewikka/views/filter/filter.py:254 prewikka/views/filter/filter.py:266
 msgid "Could not save filter"
 msgstr "Impossible de sauvegarder le filtre"
 
-#: prewikka/views/filter/filter.py:250
+#: prewikka/views/filter/filter.py:254
 msgid "No name for this filter was provided"
 msgstr "Nom du filtre non renseigné"
 
-#: prewikka/views/filter/filter.py:262
+#: prewikka/views/filter/filter.py:266
 msgid "The filter name is already used by another filter"
 msgstr "Le nom du filtre est déjà utilisé par un autre filtre"
 
@@ -2317,10 +2326,73 @@ msgstr "Thème :"
 msgid "Timezone:"
 msgstr "Fuseau horaire :"
 
-#: scripts/prewikka-crontab:99 scripts/prewikka-httpd:93
+#: scripts/prewikka-cli:59
+msgid "Unknown command"
+msgstr "Commande inconnue"
+
+#: scripts/prewikka-cli:67
+#, python-format
+msgid "An unexpected error occurred: %s"
+msgstr "Une erreur inattendue s'est produite : %s"
+
+#: scripts/prewikka-cli:153
+msgid "Create an object of the specified type"
+msgstr "Créer un objet du type spécifié"
+
+#: scripts/prewikka-cli:156
+msgid "Delete an object of the specified type"
+msgstr "Supprimer un objet du type spécifié"
+
+#: scripts/prewikka-cli:159
+msgid "Import objects of the specified type from files"
+msgstr "Importer des objets du type spécifié à partir de fichiers"
+
+#: scripts/prewikka-cli:162
+msgid "Initialize Prewikka"
+msgstr "Initialiser Prewikka"
+
+#: scripts/prewikka-cli:165
+msgid "List objects of the specified type"
+msgstr "Lister les objets du type spécifié"
+
+#: scripts/prewikka-cli:168
+msgid "Update objects of the specified type"
+msgstr "Mettre à jour des objets du type spécifié"
+
+#: scripts/prewikka-cli:206
+msgid "Prewikka command-line tool"
+msgstr "Outil Prewikka en ligne de commande"
+
+#: scripts/prewikka-cli:207
+msgid "name of the user"
+msgstr "nom de l'utilisateur"
+
+#: scripts/prewikka-cli:208 scripts/prewikka-crontab:99
+#: scripts/prewikka-httpd:93
 #, python-format
 msgid "configuration file to use (default: %(default)s)"
 msgstr "fichier de configuration (défaut : %(default)s)"
+
+#: scripts/prewikka-cli:209
+msgid "command to execute"
+msgstr "commande à exécuter"
+
+#: scripts/prewikka-cli:210
+msgid "enable debugging output"
+msgstr "active la sortie de débogage"
+
+#: scripts/prewikka-cli:217
+msgid "prewikka-cli must be executed as the prewikka user"
+msgstr "prewikka-cli doit être exécuté en tant qu'utilisateur prewikka"
+
+#: scripts/prewikka-cli:242
+#, python-format
+msgid "Prewikka command-line tool (%s)"
+msgstr "Outil Prewikka en ligne de commande (%s)"
+
+#: scripts/prewikka-cli:243
+msgid "Type \"help\" or \"?\" to list commands"
+msgstr "Taper \"help\" ou \"?\" pour lister les commandes"
 
 #: scripts/prewikka-crontab:100
 msgid "run as a system daemon"
