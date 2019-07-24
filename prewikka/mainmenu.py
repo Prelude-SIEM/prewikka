@@ -224,11 +224,11 @@ class TimePeriod(object):
 
         if self.start:
             start = self.start.astimezone(utils.timeutil.timezone("UTC"))
-            criteria += Criterion("{backend}.{time_field}", ">=", start)
+            criteria += Criterion("{backend}.{end_time_field}", ">=", start)
 
         if self.end:
             end = self.end.astimezone(utils.timeutil.timezone("UTC"))
-            criteria += Criterion("{backend}.{time_field}", "<=", end)
+            criteria += Criterion("{backend}.{start_time_field}", "<=", end)
 
         return criteria
 

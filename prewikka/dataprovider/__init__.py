@@ -50,6 +50,8 @@ OPERATORS = {
     "!<>*": N_("Not substring (case-insensitive)")
 }
 
+COMPOSITE_TIME_FIELD = "_time_field"
+
 
 def PathInfo(path, value_type, operators=[], value_accept=[], type=None):
     assert(operators or type)
@@ -276,12 +278,15 @@ class DataProviderBase(pluginmanager.PluginBase):
     dataprovider_continuous = False
     TYPE_OPERATOR_MAPPING = {}
 
-    def __init__(self, time_field=None):
-        if time_field is None:
-            raise error.PrewikkaUserError(N_("Backend normalization error"), N_("Backend normalization error"))
-
+    def __init__(self, time_field):
         pluginmanager.PluginBase.__init__(self)
-        self._time_field = time_field
+
+        if isinstance(time_field, tuple):
+            self._time_field = COMPOSITE_TIME_FIELD
+            self._start_time_field, self._end_time_field = time_field
+        else:
+            self._time_field = time_field
+            self._start_time_field, self._end_time_field = time_field, time_field
 
     def post_load(self):
         pass
@@ -290,7 +295,12 @@ class DataProviderBase(pluginmanager.PluginBase):
         return []
 
     def format_path(self, path):
-        return path.format(backend=self.dataprovider_type, time_field=self._time_field)
+        return path.format(
+            backend=self.dataprovider_type,
+            time_field=self._time_field,
+            start_time_field=self._start_time_field,
+            end_time_field=self._end_time_field
+        )
 
     def format_paths(self, paths):
         return [self.format_path(path) for path in paths]
