@@ -218,12 +218,9 @@ class ResultObject(object):
         return self.get(key, default)
 
 
-class DataProviderBackend(pluginmanager.PluginBase):
+class DataProviderInstance(pluginmanager.PluginBase):
     type = None
     TYPE_OPERATOR_MAPPING = {}
-
-    def post_load(self):
-        pass
 
     def get_values(self, paths, criteria, distinct, limit, offset):
         """
@@ -270,6 +267,21 @@ class DataProviderBackend(pluginmanager.PluginBase):
 
     def _get_path_values(self, path):
         pass
+
+
+class DataProviderBackend(pluginmanager.PluginBase):
+    _instances = {}
+    _default_instance = None
+
+    def __init__(self):
+        pluginmanager.PluginBase.__init__(self)
+        self._default_instance = DataProviderInstance()
+
+    def post_load(self):
+        pass
+
+    def __getattr__(self, attr):
+        return getattr(self._default_instance, attr)
 
 
 class DataProviderBase(pluginmanager.PluginBase):

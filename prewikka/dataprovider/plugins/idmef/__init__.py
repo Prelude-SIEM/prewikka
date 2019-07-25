@@ -50,6 +50,7 @@ class _IDMEFPlugin(DataProviderBackend):
     plugin_copyright = version.__copyright__
 
     def __init__(self):
+        DataProviderBackend.__init__(self)
         try:
             self._db = idmefdatabase.IDMEFDatabase(env.config.idmef_database)
         except Exception as e:
