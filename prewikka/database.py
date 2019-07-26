@@ -578,6 +578,12 @@ class DatabaseCommon(object):
 
         return self._db.escape(data)
 
+    def escape_binary(self, data):
+        return self._db.escapeBinary(data)
+
+    def unescape_binary(self, data):
+        return self._db.unescapeBinary(data)
+
     def get_last_insert_ident(self):
         return self._db.getLastInsertIdent()
 
