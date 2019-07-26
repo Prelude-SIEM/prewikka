@@ -115,6 +115,11 @@ $(function() {
     $(this).find('[autofocus]').focus();
   });
 
+  $(document).on("change", ":file", function() {
+    var filename = $(this).val().replace(/.*[\\\/]/, "");
+    $(this).closest(".input-group-btn").siblings(":text").val(filename);
+  });
+
   $(document).on("click", "#logout", function() {
     this.href = "logout?redirect=" + encodeURIComponent(location.href);
   });
