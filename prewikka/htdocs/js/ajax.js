@@ -415,26 +415,30 @@ function prewikka_EventSource(config)
 
 
 
-function _update_parameters(data, location, method)
+function _update_parameters(data, location, method, options)
 {
     if ( ! location )
         location = prewikka_location().href;
 
-    return prewikka_ajax({ method: method,
-             url: location + "/ajax_parameters_update",
-             prewikka: { spinner: false },
-             data: data
-    });
+
+    var ajax_opts = {
+        method: method,
+        url: location + "/ajax_parameters_update",
+        prewikka: { spinner: false },
+        data: data
+    };
+
+    return prewikka_ajax(_mergedict(ajax_opts, options));
 }
 
 
-function prewikka_update_parameters(data, location)
+function prewikka_update_parameters(data, location, options)
 {
-    return _update_parameters(data, location, "PATCH");
+    return _update_parameters(data, location, "PATCH", options);
 }
 
 
-function prewikka_save_parameters(data, location)
+function prewikka_save_parameters(data, location, options)
 {
-    return _update_parameters(data, location, "PUT");
+    return _update_parameters(data, location, "PUT", options);
 }
