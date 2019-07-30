@@ -636,7 +636,15 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
          * Since we override the default form submit behavior,
          * we need to manually update the parameters so that the mainmenu is saved.
          */
-        prewikka_save_parameters($("#form_search").serializeArray());
+        prewikka_save_parameters(
+            $("#form_search").serializeArray(),
+            prewikka_location().href,
+            {
+                "complete": function() {
+                    $("#form_search").trigger("submit-complete");
+                }
+            }
+        );
     });
 
     $("#timeline").on('show.bs.collapse', function() {
