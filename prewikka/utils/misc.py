@@ -20,6 +20,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import os
 import os.path
 import re
 import struct
@@ -241,6 +242,17 @@ def path_sort_key(path):
     so that alert.source(10) comes after alert.source(2).
     """
     return [int(part) if part.isdigit() else part for part in re.split("(\d+)", path)]
+
+
+def get_file_size(fileobj):
+    """
+    Return the size (in bytes) of a file-like object (like StringIO).
+    """
+    position = fileobj.tell()
+    fileobj.seek(0, os.SEEK_END)
+    size = fileobj.tell()
+    fileobj.seek(position)
+    return size
 
 
 class CachingIterator(object):

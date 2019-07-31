@@ -23,6 +23,7 @@ Tests for `prewikka.utils.misc`.
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pytest
+import StringIO
 
 from prewikka.dataprovider import Criterion
 from prewikka.utils import misc, json
@@ -178,6 +179,15 @@ def test_path_sort_key():
     """
     paths = ["foo.bar", "foo.baz", "foo.bar(10).baz", "foo.bar(2).baz"]
     assert sorted(paths, key=misc.path_sort_key) == ["foo.bar", "foo.bar(2).baz", "foo.bar(10).baz", "foo.baz"]
+
+
+def test_get_file_size():
+    """
+    Test `prewikka.utils.misc.get_file_size()`.
+    """
+    fileobj = StringIO.StringIO()
+    fileobj.write("foobar")
+    assert misc.get_file_size(fileobj) == 6
 
 
 def test_caching_iterator():
