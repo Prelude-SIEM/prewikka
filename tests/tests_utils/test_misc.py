@@ -30,7 +30,7 @@ from tests.tests_views.utils import create_heartbeat, delete_heartbeat
 
 
 @misc.deprecated
-def fake_depreciated_function():
+def fake_deprecated_function():
     """
     Fake function used in tests.
     :return: 42
@@ -164,12 +164,20 @@ def test_hexdump():
     assert misc.hexdump('foobar') == '0000:    66 6f 6f 62 61 72                                  foobar\n'
 
 
-def test_depreciated():
+def test_deprecated():
     """
     Test `prewikka.utils.misc.deprecated()`.
     """
     # just call the function
-    assert fake_depreciated_function() == 42
+    assert fake_deprecated_function() == 42
+
+
+def test_path_sort_key():
+    """
+    Test `prewikka.utils.misc.path_sort_key()`.
+    """
+    paths = ["foo.bar", "foo.baz", "foo.bar(10).baz", "foo.bar(2).baz"]
+    assert sorted(paths, key=misc.path_sort_key) == ["foo.bar", "foo.bar(2).baz", "foo.bar(10).baz", "foo.baz"]
 
 
 def test_caching_iterator():
