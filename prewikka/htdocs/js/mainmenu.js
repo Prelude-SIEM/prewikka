@@ -67,15 +67,9 @@ function MainMenuInit(inline, start, end, date_format, url) {
         root.find(".refresh-value").text($(this).text());
         root.find(".main_menu_form_submit").removeClass("disabled");
 
-        var second_reload = parseInt($(this).data("value"));
-        if ( second_reload > 0 ) {
-            root.find("[name=auto_apply_value]").val(second_reload);
-            window.mainmenu.setTimeout(second_reload);
-            window.mainmenu.start();
-        } else {
-            root.find("[name=auto_apply_value]").val("");
-            window.mainmenu.stop();
-        }
+        var interval = parseInt($(this).data("value"));
+        root.find("[name=auto_apply_value]").val(interval);
+        window.mainmenu.set_interval(interval);
     });
 
     root.find(".timeline_quick_select a").on("click", function() {
@@ -99,64 +93,9 @@ function MainMenuInit(inline, start, end, date_format, url) {
 }
 
 
-function PageReloader(callback, second) {
-    var that = {}
-
-    that.second_reload = second;
-    that.elapsed = 0;
-    that.callback = callback;
-    that.callback_installed = false;
-    that.autorefresh_enabled = false;
-
-    that.__autoApplyCounter = function() {
-        that.started = false;
-
-        if ( that.autorefresh_enabled == false )
-            return;
-
-        if ( that.second_reload == 0 )
-            return that.__start();
-
-        that.elapsed += 1;
-
-        if ( that.elapsed != that.second_reload )
-            return that.__start();
-
-        else if ( that.elapsed == that.second_reload ) {
-            that.elapsed = 0;
-
-            if ( $.active == 0 )
-                that.callback();
-        }
-    };
-
-    that.__start = function() {
-        if ( that.autorefresh_enabled && ! that.started ) {
-            setTimeout($.proxy(that.__autoApplyCounter, this), 1000);
-            that.started = true;
-        }
-    };
-
-    that.start = function() {
-        that.autorefresh_enabled = true;
-        that.__start();
-    };
-
-    that.stop = function() {
-        that.autorefresh_enabled = false;
-    };
-
-    that.setTimeout = function(second) {
-        that.second_reload = second;
-    };
-
-    that.reset = function(timestr) {
-        that.elapsed = 0;
-    };
-
-    return that;
-};
-
-
-window.mainmenu = PageReloader(function() { $("#main_menu_ng").closest("form").submit() },
-                               parseInt($("#main_menu_ng [name=auto_apply_value]").val()));
+window.mainmenu = AjaxReloader(
+    function() {
+        if ( $.active == 0 ) $("#main_menu_ng").closest("form").submit();
+    },
+    parseInt($("#main_menu_ng [name=auto_apply_value]").val())
+);

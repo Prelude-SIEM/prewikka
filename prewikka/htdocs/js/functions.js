@@ -634,7 +634,7 @@ function DatetimePicker(input, date, options, delta)
 
 
 function AjaxReloader(callback, interval) {
-    var that = {};
+    var that = {interval: interval, running: false};
     var timer;
 
     function visibility_changed() {
@@ -644,11 +644,21 @@ function AjaxReloader(callback, interval) {
             that.start();
     }
 
+    that.set_interval = function(interval) {
+        that.stop();
+        that.interval = interval;
+        that.start();
+    };
+
     that.start = function() {
-        timer = setInterval(callback, interval * 1000);
+        if ( ! that.running && that.interval ) {
+            that.running = true;
+            timer = setInterval(callback, that.interval * 1000);
+        }
     };
 
     that.stop = function() {
+        that.running = false;
         clearInterval(timer);
     };
 

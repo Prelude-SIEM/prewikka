@@ -15,7 +15,7 @@
   % endif
 
 $LAB.script("prewikka/js/mainmenu.js").script("prewikka/js/moment.min.js").wait(function() {
-    window.mainmenu.reset();
+    window.mainmenu.stop();
 
   % if auto_apply_value > 0:
     window.mainmenu.start();
