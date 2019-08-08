@@ -30,6 +30,8 @@ function CommonListing(elem, text, options) {
     for ( i in options['colModel'] ) {
         if (! options['colModel'][i].formatter )
             options['colModel'][i].formatter = (i == 0) ? _backwardCompatibleFormatter : genericFormatter;
+        if (! options['colModel'][i].unformat )
+            options['colModel'][i].unformat = function(value, opts) { return value; };
     }
 
     options = _mergedict({
