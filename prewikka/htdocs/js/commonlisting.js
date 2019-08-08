@@ -3,13 +3,6 @@
 function CommonListing(elem, text, options, restored_parameters) {
     var dfd = $.Deferred();
 
-    function genericFormatter(value, opts, rowObj) {
-        if ( value )
-            return value.toHTML ? value.toHTML() : _.escape(value);
-        else
-            return "";
-    }
-
     function adaptColumns(options, saved_data) {
         var colModel = [];
         var columns = {};
@@ -31,11 +24,6 @@ function CommonListing(elem, text, options, restored_parameters) {
     }
 
     $(elem).addClass("commonlisting table table-striped").css("width", detectGridWidth($(elem)));
-
-    for ( var i in options['colModel'] ) {
-        if (! options['colModel'][i].formatter )
-            options['colModel'][i].formatter = genericFormatter;
-    }
 
     /*
      * In jqGrid, the height attribute is specific to the height of the data, not including header and footer.
@@ -59,6 +47,18 @@ function CommonListing(elem, text, options, restored_parameters) {
         hidegrid: false,
         viewrecords: true,
         globalSearch: false,
+        cmTemplate: {
+            title: false,
+            formatter: function(value, opts, rowObj) {
+                if ( value )
+                    return value.toHTML ? value.toHTML() : _.escape(value);
+                else
+                    return "";
+            },
+            unformat: function(value, opts) {
+                return value;
+            },
+        },
         onInitGrid: function() {
             if ( options.globalSearch ) {
                 $(".ui-jqgrid-titlebar").css("overflow", "auto")

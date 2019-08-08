@@ -730,8 +730,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
             selected_rows.push(grid[value]);
         });
 
-        // Only get the text without the HTML tags
-        data.push({"name": "datasearch_grid", "value": $("<div>").html(JSON.stringify(selected_rows)).text()});
+        data.push({"name": "datasearch_grid", "value": JSON.stringify(selected_rows)});
     });
 
     if ( $("#main #timeline").hasClass("in") )
