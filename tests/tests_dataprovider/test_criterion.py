@@ -119,6 +119,24 @@ def test_criterion_get_path():
     assert criterion.get_paths() == results
 
 
+def test_criterion_flatten():
+    """
+    Test `prewikka.dataprovider.Criterion.flatten()` method.
+    """
+    criterion_1 = Criterion('alert.messageid', '=', 'fakemessageid1')
+    criterion_2 = Criterion('alert.messageid', '=', 'fakemessageid2')
+    criterion_3 = Criterion('alert.messageid', '=', 'fakemessageid3')
+    criterion_4 = Criterion('alert.messageid', '=', 'fakemessageid4')
+    criterion = ((criterion_1 & criterion_2) & criterion_3) | criterion_4
+    flattened = criterion.flatten()
+
+    assert flattened.operator == CriterionOperator.OR
+    assert len(flattened.operands) == 2
+    assert flattened.operands[0].operator == CriterionOperator.AND
+    assert flattened.operands[0].operands == [criterion_1, criterion_2, criterion_3]
+    assert flattened.operands[1] == criterion_4
+
+
 def test_criterion_operations():
     """
     Test `prewikka.dataprovider.Criterion` operations.

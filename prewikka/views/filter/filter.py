@@ -30,24 +30,6 @@ from prewikka.utils.viewhelpers import GridParameters
 from . import FilterPlugin
 
 
-def _flatten(criterion):
-    if not criterion.operator.is_boolean:
-        return criterion
-
-    ret = AttrObj(operator=criterion.operator, operands=[])
-
-    left = _flatten(criterion.left)
-    right = _flatten(criterion.right)
-
-    for operand in (left, right):
-        if operand.operator == criterion.operator:
-            ret.operands += operand.operands
-        else:
-            ret.operands.append(operand)
-
-    return ret
-
-
 class Filter(object):
     def __init__(self, id_, name, category, description, criteria):
         self.id_ = id_
@@ -59,7 +41,7 @@ class Filter(object):
     def flatten_criteria(self):
         ret = {}
         for typ, criterion in self.criteria.items():
-            crit = _flatten(criterion)
+            crit = criterion.flatten()
             if not crit.operator.is_boolean:
                 crit = AttrObj(operator=CriterionOperator.AND, operands=[crit])
 

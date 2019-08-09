@@ -528,6 +528,20 @@ class Criterion(json.JSONObject):
 
         return [self]
 
+    def flatten(self):
+        if not self or not self.operator.is_boolean:
+            return self
+
+        ret = AttrObj(operator=self.operator, operands=[])
+
+        for operand in (self.left.flatten(), self.right.flatten()):
+            if operand.operator == self.operator:
+                ret.operands += operand.operands
+            else:
+                ret.operands.append(operand)
+
+        return ret
+
     def compile(self, type):
         base = env.dataprovider._type_handlers[type]
         return base.compile_criteria(self._compile(base))
