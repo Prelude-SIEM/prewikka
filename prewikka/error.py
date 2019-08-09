@@ -48,12 +48,13 @@ class PrewikkaError(PrewikkaException):
     name = N_("An unexpected condition happened")
     message = ""
     details = ""
+    output = ""
     code = 500
     log_priority = log.ERROR
     display_traceback = True
     errno = None
 
-    def __init__(self, message, name=None, details=None, log_priority=None, log_user=None, template=None, code=None):
+    def __init__(self, message, name=None, details=None, log_priority=None, log_user=None, template=None, code=None, output=None):
         if name is not None:
             self.name = name
 
@@ -72,13 +73,16 @@ class PrewikkaError(PrewikkaException):
         if log_priority:
             self.log_priority = log_priority
 
+        if output:
+            self.output = output
+
         self.traceback = self._get_traceback()
         self.log_user = log_user
 
     def _setup_template(self, template, ajax_error):
         dataset = template.dataset()
 
-        for i in ("name", "message", "details", "code", "traceback", "errno"):
+        for i in ("name", "message", "details", "code", "traceback", "errno", "output"):
             dataset[i] = getattr(self, i)
 
         dataset["is_ajax_error"] = ajax_error

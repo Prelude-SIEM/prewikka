@@ -128,7 +128,7 @@ def inherit(context):
   });
 </script>
 
-    <div class="modal-dialog ${ 'modal-lg' if traceback else '' }">
+    <div class="modal-dialog ${ 'modal-lg' if traceback or output else '' }">
 
       <div class="modal-content">
         <div class="modal-header ${ 'alert-warning' if code == 401 else 'alert-danger' }">
@@ -143,6 +143,11 @@ def inherit(context):
              <p>${_(message)}</p>
              % if details:
                    <p><b>${_("Error: {0}").format(_(details))}</b></p>
+             % endif
+
+             % if output:
+                   <br />
+                   <pre><samp>${ output }</samp></pre>
              % endif
 
              % if code != 401 and code >= 400 and code < 500:
