@@ -1,3 +1,14 @@
+* 2019-08-13, prewikka-4.1.12:
+
+Author: Antoine Luong
+
+- Fix possible error in correlation alert detail
+- Fix CommonListing unformatting
+- Use the filter ID in the listing
+- Do not duplicate filter when renaming it
+
+
+
 * 2018-06-22, prewikka-4.1.11:
 
 Author: Antoine Luong
