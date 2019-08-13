@@ -94,11 +94,11 @@ class PrewikkaCLI(cmd.Cmd):
         offset = len(path) - len(text)
         return [f[offset:] + (os.sep if os.path.isdir(f) else "") for f in glob.glob(path + "*")]
 
-    def complete_init(self, text, line, begidx, endidx):
-        return self._complete_command("init", line)
-
     def complete_list(self, text, line, begidx, endidx):
         return self._complete_command("list", line)
+
+    def complete_sync(self, text, line, begidx, endidx):
+        return self._complete_command("sync", line)
 
     def do_create(self, arg):
         try:
@@ -140,11 +140,11 @@ class PrewikkaCLI(cmd.Cmd):
 
         return self._do_command("import", category, files=files)
 
-    def do_init(self, arg):
-        return self._do_command("init", arg)
-
     def do_list(self, arg):
         return self._do_command("list", arg)
+
+    def do_sync(self, arg):
+        return self._do_command("sync", arg)
 
     def do_update(self, arg):
         return self._do_command("update", arg)
@@ -158,11 +158,11 @@ class PrewikkaCLI(cmd.Cmd):
     def help_import(self):
         return self._help_command("import", ["import <type> <files...>", _("Import objects of the specified type from files")])
 
-    def help_init(self):
-        return self._help_command("init", ["init <type>", _("Initialize Prewikka")])
-
     def help_list(self):
         return self._help_command("list", ["list <type>", _("List objects of the specified type")])
+
+    def help_sync(self):
+        return self._help_command("sync", ["sync <type>", _("Synchronize objects of the specified type")])
 
     def help_update(self):
         return self._help_command("update", ["update <type> <data>", _("Update objects of the specified type")])

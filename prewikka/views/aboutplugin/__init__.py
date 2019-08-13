@@ -117,7 +117,7 @@ class AboutPlugin(view.View):
     def update(self):
         self._update(env.request.web.send_stream)
 
-    @cli.register("init", "plugin", help=N_("init plugin: initialize the plugin database schemas"))
+    @cli.register("sync", "plugin", help=N_("sync plugin: initialize the plugin database schemas"))
     def _update_plugins(self):
         self._update(lambda *args, **kwargs: None)
 
