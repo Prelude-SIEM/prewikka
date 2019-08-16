@@ -78,6 +78,19 @@ def merge_structs(structs):
     return functools.reduce(lambda x, y: merge_two_structs(y, x), reversed(structs))
 
 
+def handle_indexes(s, toplevel=False):
+    if isinstance(s, list):
+        return [handle_indexes(item) for item in s]
+
+    if isinstance(s, dict):
+        if not toplevel and s and all(k.isdigit() for k in s.keys()):
+            return [handle_indexes(v) for k, v in sorted(s.items(), key=lambda x: int(x[0]))]
+        else:
+            return {k: handle_indexes(v) for k, v in s.items()}
+
+    return s
+
+
 def jquery_unparam(jquery_params, unquote=True, multipart=False):
     if multipart:
         params = [(_decode(k, unquote), v) for k, v in jquery_params]
@@ -85,4 +98,4 @@ def jquery_unparam(jquery_params, unquote=True, multipart=False):
         params = [parse_key_pair(x, unquote) for x in jquery_params.split('&')]
 
     structs = [build_struct(k, v) for k, v in params]
-    return merge_structs(structs)
+    return handle_indexes(merge_structs(structs), toplevel=True)
