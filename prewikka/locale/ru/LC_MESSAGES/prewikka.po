@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.1.0beta2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-07-23 18:40+0200\n"
+"POT-Creation-Date: 2019-08-16 18:11+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: Alex Bochkin <ba@is-systems.org>\n"
 "Language-Team: Russian\n"
@@ -28,7 +28,7 @@ msgstr "Недостаточно прав"
 msgid "Missing permission to access the specified file"
 msgstr ""
 
-#: prewikka/config.py:37 prewikka/dataprovider/__init__.py:609
+#: prewikka/config.py:37 prewikka/dataprovider/__init__.py:645
 msgid "Configuration error"
 msgstr "Ошибка конфигурации"
 
@@ -67,8 +67,8 @@ msgstr "Месячный"
 msgid "Yearly"
 msgstr "Годовой"
 
-#: prewikka/crontab.py:42 prewikka/mainmenu.py:297
-#: prewikka/templates/mainmenu.mak:91
+#: prewikka/crontab.py:42 prewikka/mainmenu.py:302
+#: prewikka/templates/mainmenu.mak:92
 msgid "Custom"
 msgstr "Настраиваемый"
 
@@ -173,12 +173,12 @@ msgid ""
 "%(version2)s"
 msgstr ""
 
-#: prewikka/database.py:835
+#: prewikka/database.py:841
 #, fuzzy
 msgid "Database configuration error"
 msgstr "Ошибка миграции базы данных"
 
-#: prewikka/database.py:835
+#: prewikka/database.py:841
 msgid "Only MySQL and PostgreSQL databases are supported at the moment"
 msgstr ""
 
@@ -186,11 +186,11 @@ msgstr ""
 msgid "An unexpected condition happened"
 msgstr ""
 
-#: prewikka/error.py:144
+#: prewikka/error.py:148
 msgid "Not implemented"
 msgstr ""
 
-#: prewikka/error.py:146
+#: prewikka/error.py:150
 msgid "Backend does not implement this operation"
 msgstr ""
 
@@ -255,7 +255,7 @@ msgid "Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher"
 msgstr "Prewikka %(vPre)s требует libpreludedb %(vLib)s или выше"
 
 #: prewikka/main.py:136 prewikka/main.py:149
-#: prewikka/dataprovider/plugins/idmef/__init__.py:56
+#: prewikka/dataprovider/plugins/idmef/__init__.py:57
 msgid "Initialization error"
 msgstr "Ошибка инициализации"
 
@@ -276,29 +276,41 @@ msgstr "Сессия '%s' не принимает ни одного модуля
 msgid "An unexpected condition happened while trying to load %s"
 msgstr ""
 
-#: prewikka/mainmenu.py:113
+#: prewikka/mainmenu.py:114
 #, python-format
 msgid "%S.%.6f"
 msgstr ""
 
-#: prewikka/mainmenu.py:114
+#: prewikka/mainmenu.py:115
 #, python-format
 msgid "%S.%.3f"
 msgstr ""
 
-#: prewikka/mainmenu.py:259
+#: prewikka/mainmenu.py:260
 msgid "Today"
 msgstr "Cегодня"
 
-#: prewikka/mainmenu.py:260
+#: prewikka/mainmenu.py:261
+msgid "Yesterday"
+msgstr "Вчера"
+
+#: prewikka/mainmenu.py:262
 msgid "This week"
 msgstr "Этой неделе"
 
-#: prewikka/mainmenu.py:261
+#: prewikka/mainmenu.py:263
+msgid "Last week"
+msgstr "Прошлая неделя"
+
+#: prewikka/mainmenu.py:264
 msgid "This month"
 msgstr "Этот месяц"
 
-#: prewikka/mainmenu.py:262 prewikka/mainmenu.py:263
+#: prewikka/mainmenu.py:265
+msgid "Last month"
+msgstr "Прошлый месяц"
+
+#: prewikka/mainmenu.py:266 prewikka/mainmenu.py:267
 #, python-format
 msgid "%d hour"
 msgid_plural "%d hours"
@@ -306,7 +318,7 @@ msgstr[0] "%d час"
 msgstr[1] "%d часа"
 msgstr[2] "%d часов"
 
-#: prewikka/mainmenu.py:264 prewikka/mainmenu.py:265
+#: prewikka/mainmenu.py:268 prewikka/mainmenu.py:269
 #, python-format
 msgid "%d day"
 msgid_plural "%d days"
@@ -314,7 +326,7 @@ msgstr[0] "%d день"
 msgstr[1] "%d дня"
 msgstr[2] "%d дней"
 
-#: prewikka/mainmenu.py:266
+#: prewikka/mainmenu.py:270
 #, python-format
 msgid "%d week"
 msgid_plural "%d weeks"
@@ -322,7 +334,7 @@ msgstr[0] "%d неделя"
 msgstr[1] "%d недели"
 msgstr[2] "%d недель"
 
-#: prewikka/mainmenu.py:267 prewikka/mainmenu.py:268
+#: prewikka/mainmenu.py:271 prewikka/mainmenu.py:272
 #, python-format
 msgid "%d month"
 msgid_plural "%d months"
@@ -330,7 +342,7 @@ msgstr[0] "%d месяц"
 msgstr[1] "%d месяца"
 msgstr[2] "%d месяцев"
 
-#: prewikka/mainmenu.py:269
+#: prewikka/mainmenu.py:273
 #, python-format
 msgid "%d year"
 msgid_plural "%d years"
@@ -338,7 +350,7 @@ msgstr[0] "%d год"
 msgstr[1] "%d года"
 msgstr[2] "%d лет"
 
-#: prewikka/mainmenu.py:273
+#: prewikka/mainmenu.py:277
 #, python-format
 msgid "%d second"
 msgid_plural "%d seconds"
@@ -346,7 +358,7 @@ msgstr[0] "%d секунда"
 msgstr[1] "%d секунды"
 msgstr[2] "%d секунд"
 
-#: prewikka/mainmenu.py:274 prewikka/mainmenu.py:275 prewikka/mainmenu.py:276
+#: prewikka/mainmenu.py:278 prewikka/mainmenu.py:279 prewikka/mainmenu.py:280
 #, python-format
 msgid "%d minute"
 msgid_plural "%d minutes"
@@ -354,11 +366,11 @@ msgstr[0] "%d минута"
 msgstr[1] "%d минуты"
 msgstr[2] "%d минут"
 
-#: prewikka/mainmenu.py:294 prewikka/templates/mainmenu.mak:61
+#: prewikka/mainmenu.py:299 prewikka/templates/mainmenu.mak:61
 msgid "Inactive"
 msgstr "Неактивный"
 
-#: prewikka/mainmenu.py:300 prewikka/templates/mainmenu.mak:88
+#: prewikka/mainmenu.py:305 prewikka/templates/mainmenu.mak:89
 msgid "None"
 msgstr "Никто"
 
@@ -522,49 +534,45 @@ msgstr "Не подстрока"
 msgid "Not substring (case-insensitive)"
 msgstr "Не подстрока (нечувствительная к регистру)"
 
-#: prewikka/dataprovider/__init__.py:90 prewikka/dataprovider/__init__.py:156
+#: prewikka/dataprovider/__init__.py:92 prewikka/dataprovider/__init__.py:158
 msgid "Conversion error"
 msgstr "Ошибка конвертации"
 
-#: prewikka/dataprovider/__init__.py:91 prewikka/dataprovider/__init__.py:157
+#: prewikka/dataprovider/__init__.py:93 prewikka/dataprovider/__init__.py:159
 #, python-format
 msgid "Value %(value)r cannot be converted to %(type)s"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:107
+#: prewikka/dataprovider/__init__.py:109
 msgid "Backend error"
 msgstr "Ошибка бэкэнда"
 
-#: prewikka/dataprovider/__init__.py:107
+#: prewikka/dataprovider/__init__.py:109
 #, fuzzy, python-format
 msgid "No backend available for '%s' datatype"
 msgstr "Не сконфигурирован обработчик для '%s' типа данных"
 
-#: prewikka/dataprovider/__init__.py:114 prewikka/dataprovider/__init__.py:121
+#: prewikka/dataprovider/__init__.py:116 prewikka/dataprovider/__init__.py:123
 msgid "Syntax error"
 msgstr "Ошибка синтаксиса"
 
-#: prewikka/dataprovider/__init__.py:114
+#: prewikka/dataprovider/__init__.py:116
 #, python-format
 msgid "Unknown path: %s"
 msgstr "Неизвестный путь: %s"
 
-#: prewikka/dataprovider/__init__.py:121 scripts/prewikka-cli:108
+#: prewikka/dataprovider/__init__.py:123 scripts/prewikka-cli:108
 #: scripts/prewikka-cli:117 scripts/prewikka-cli:128
 #, fuzzy
 msgid "Could not parse input"
 msgstr "Невозможно сохранить фильтр"
 
-#: prewikka/dataprovider/__init__.py:281
-msgid "Backend normalization error"
-msgstr "Ошибка нормализации на бэкенде"
-
-#: prewikka/dataprovider/__init__.py:599
+#: prewikka/dataprovider/__init__.py:635
 #, python-format
 msgid "No handler configured for '%s' datatype"
 msgstr "Не сконфигурирован обработчик для '%s' типа данных"
 
-#: prewikka/dataprovider/__init__.py:610
+#: prewikka/dataprovider/__init__.py:646
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
 msgstr "Только один менеджер может быть сконфигурирован для '%s' бэкенда"
@@ -658,12 +666,12 @@ msgid ""
 "backend"
 msgstr ""
 
-#: prewikka/dataprovider/plugins/idmef/__init__.py:96
+#: prewikka/dataprovider/plugins/idmef/__init__.py:97
 #, fuzzy
 msgid "Plugin for fetching IDMEF alerts from the Prelude database"
 msgstr "Плагин для получения событий IDMEF из базы данных Prelude"
 
-#: prewikka/dataprovider/plugins/idmef/__init__.py:110
+#: prewikka/dataprovider/plugins/idmef/__init__.py:111
 #, fuzzy
 msgid "Plugin for fetching IDMEF heartbeats from the Prelude database"
 msgstr "Плагин для получения событий IDMEF из базы данных Prelude"
@@ -711,7 +719,7 @@ msgid ""
 msgstr ""
 
 #: prewikka/plugins/warning/templates/warning.mak:30
-#: prewikka/templates/error.mak:166 prewikka/templates/toplayout.mak:62
+#: prewikka/templates/error.mak:171 prewikka/templates/toplayout.mak:62
 #: prewikka/templates/toplayout.mak:77 prewikka/templates/toplayout.mak:94
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:44
 msgid "OK"
@@ -819,38 +827,38 @@ msgstr "Скопировать в буфер обмена"
 msgid "Error: {0}"
 msgstr "Ошибка: {0}"
 
-#: prewikka/templates/error.mak:150
+#: prewikka/templates/error.mak:155
 msgid "This may be due to one or more of the following reasons:"
 msgstr "Это может случиться по следующим причинам:"
 
-#: prewikka/templates/error.mak:152
+#: prewikka/templates/error.mak:157
 msgid "You don't have the required permissions."
 msgstr ""
 
-#: prewikka/templates/error.mak:153
+#: prewikka/templates/error.mak:158
 #, python-format
 msgid "Required apps are disabled. See the %s page for more details."
 msgstr ""
 
-#: prewikka/templates/error.mak:171 prewikka/templates/toplayout.mak:61
+#: prewikka/templates/error.mak:176 prewikka/templates/toplayout.mak:61
 #: prewikka/views/crontab/templates/cronjob.mak:122
 #: prewikka/views/filter/templates/filteredition.mak:122
 msgid "Cancel"
 msgstr "Отменить"
 
-#: prewikka/templates/error.mak:172
+#: prewikka/templates/error.mak:177
 msgid "Sign in"
 msgstr ""
 
-#: prewikka/templates/error.mak:176
+#: prewikka/templates/error.mak:181
 msgid "Back"
 msgstr "Назад"
 
-#: prewikka/templates/error.mak:179
+#: prewikka/templates/error.mak:184
 msgid "Retry"
 msgstr "Повторная попытка"
 
-#: prewikka/templates/error.mak:181
+#: prewikka/templates/error.mak:186
 msgid "Redirect to main page"
 msgstr ""
 
@@ -862,35 +870,35 @@ msgstr "Обновить:"
 msgid "Update frequency of the current page"
 msgstr "Частота обновления текущей страницы"
 
-#: prewikka/templates/mainmenu.mak:75
+#: prewikka/templates/mainmenu.mak:76
 msgid "Period:"
 msgstr "Период:"
 
-#: prewikka/templates/mainmenu.mak:80
+#: prewikka/templates/mainmenu.mak:81
 msgid "Period to visualize"
 msgstr "Период для визуализации"
 
-#: prewikka/templates/mainmenu.mak:110
+#: prewikka/templates/mainmenu.mak:111
 msgid "Start:"
 msgstr "Нача́ло:"
 
-#: prewikka/templates/mainmenu.mak:116
+#: prewikka/templates/mainmenu.mak:117
 msgid "start"
 msgstr "нача́ло"
 
-#: prewikka/templates/mainmenu.mak:116
+#: prewikka/templates/mainmenu.mak:117
 msgid "Start date"
 msgstr "Дата начала"
 
-#: prewikka/templates/mainmenu.mak:122
+#: prewikka/templates/mainmenu.mak:123
 msgid "End:"
 msgstr "Конец:"
 
-#: prewikka/templates/mainmenu.mak:129
+#: prewikka/templates/mainmenu.mak:130
 msgid "end"
 msgstr "конец"
 
-#: prewikka/templates/mainmenu.mak:129
+#: prewikka/templates/mainmenu.mak:130
 msgid "End date"
 msgstr "Дата окончания"
 
@@ -1078,7 +1086,7 @@ msgid "Apps"
 msgstr "Плагины"
 
 #: prewikka/views/aboutplugin/__init__.py:120
-msgid "init plugin: initialize the plugin database schemas"
+msgid "sync plugin: initialize the plugin database schemas"
 msgstr ""
 
 #: prewikka/views/aboutplugin/__init__.py:134
@@ -1701,40 +1709,40 @@ msgstr "Счет"
 msgid "Filters management page"
 msgstr "Страница управления фильтрами"
 
-#: prewikka/views/filter/filter.py:131
+#: prewikka/views/filter/filter.py:113
 #: prewikka/views/usermanagement/usermanagement.py:18
 msgid "Preferences"
 msgstr "Преферанс"
 
-#: prewikka/views/filter/filter.py:131
+#: prewikka/views/filter/filter.py:113
 #: prewikka/views/filter/templates/filterlisting.mak:17
 msgid "Filters"
 msgstr "Фильтры"
 
-#: prewikka/views/filter/filter.py:142
+#: prewikka/views/filter/filter.py:124
 #: prewikka/views/filter/templates/filteredition.mak:66
 #, python-format
 msgid "Filter %s"
 msgstr "Фильтр %s"
 
-#: prewikka/views/filter/filter.py:217
+#: prewikka/views/filter/filter.py:199
 msgid "Filter error"
 msgstr "Ошибка фильтра"
 
-#: prewikka/views/filter/filter.py:217
+#: prewikka/views/filter/filter.py:199
 #, python-format
 msgid "Filter '%s' does not exist"
 msgstr "Фильтр '%s' не существует"
 
-#: prewikka/views/filter/filter.py:254 prewikka/views/filter/filter.py:266
+#: prewikka/views/filter/filter.py:236 prewikka/views/filter/filter.py:248
 msgid "Could not save filter"
 msgstr "Невозможно сохранить фильтр"
 
-#: prewikka/views/filter/filter.py:254
+#: prewikka/views/filter/filter.py:236
 msgid "No name for this filter was provided"
 msgstr "Не введено имя фильтра"
 
-#: prewikka/views/filter/filter.py:266
+#: prewikka/views/filter/filter.py:248
 msgid "The filter name is already used by another filter"
 msgstr "Имя данного фильтра уже существует"
 
@@ -2376,11 +2384,11 @@ msgid "Import objects of the specified type from files"
 msgstr ""
 
 #: scripts/prewikka-cli:162
-msgid "Initialize Prewikka"
+msgid "List objects of the specified type"
 msgstr ""
 
 #: scripts/prewikka-cli:165
-msgid "List objects of the specified type"
+msgid "Synchronize objects of the specified type"
 msgstr ""
 
 #: scripts/prewikka-cli:168
