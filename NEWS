@@ -1,3 +1,24 @@
+* 2019-08-16, prewikka-5.1.0beta3:
+
+Author: Antoine Luong
+
+- Handle integer-indexed elements in parameters
+- Rename the 'init' CLI command to 'sync'
+- Separate dataprovider backend and instance
+- Fix DataSearch exporting entries with chevrons
+- Fix mainmenu auto-refresh
+- Implement support for time-spanning data
+- Add past periods to the control menu
+- Add utilities for file inputs
+
+Author: Camille Gardet
+
+- Improve readability of errors
+- Use select2 for user timezone selection
+- Trigger the submit-complete event in Datasearch
+
+
+
 * 2019-07-23, prewikka-5.1.0beta2:
 
 Author: Antoine Luong
