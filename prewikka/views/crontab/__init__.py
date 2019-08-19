@@ -19,10 +19,11 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import datetime
 import pkg_resources
 
 from prewikka import crontab, localization, resource, response, template, utils, version, view
-from prewikka.utils.viewhelpers import GridParameters
+from prewikka.utils.viewhelpers import GridAjaxResponse, GridParameters
 
 
 class CrontabView(view.View):
@@ -61,11 +62,24 @@ class CrontabView(view.View):
     @view.route("/settings/scheduler", menu=(N_("Configuration"), N_("Scheduling")), help="#scheduling", parameters=GridParameters("cronjobs"))
     def list(self):
         dataset = template.PrewikkaTemplate(__name__, "templates/crontab.mak").dataset()
+        return dataset.render()
 
+    @view.route("/settings/scheduler/ajax_listing")
+    def ajax_listing(self):
         now = utils.timeutil.utcnow()
 
-        dataset["data"] = []
-        for i in sorted(crontab.list(), key=lambda x: _(x.name).lower()):
+        sort_index = env.request.parameters.get("sort_index", "name")
+        sort_order = env.request.parameters.get("sort_order", "asc")
+        sort_func = {
+            "name": lambda x: _(x.name).lower(),
+            "user": lambda x: text_type(x.user) if x.user else _("SYSTEM"),
+            "last": lambda x: x.base,
+            "next": lambda x: x.next_schedule - now if x.enabled else datetime.timedelta.max,
+        }
+        sort_key = sort_func.get(sort_index, sort_func["name"])
+
+        rows = []
+        for i in sorted(crontab.list(), key=sort_key, reverse=(sort_order == "desc")):
             if not i.enabled:
                 next = _("Disabled")
             else:
@@ -83,16 +97,14 @@ class CrontabView(view.View):
             if i.error:
                 last = resource.HTMLNode("a", _("Error"), _class="cronjob-error")
 
-            dataset["data"].append({
+            rows.append({
                 "id": i.id,
                 "name": resource.HTMLNode("a", _(i.name), href=url_for(".edit", id=i.id)),
                 "schedule": crontab.format_schedule(i.schedule),
                 "user": text_type(i.user) if i.user else _("SYSTEM"),
                 "last": last,
-                "last_date": i.base,
                 "next": next,
-                "next_date": i.next_schedule,
                 "error": i.error
             })
 
-        return dataset.render()
+        return GridAjaxResponse(rows, len(rows))

@@ -1,5 +1,5 @@
 <%!
-from prewikka.utils import html, json
+from prewikka.utils import html
 %>
 
 <script type="text/javascript">
@@ -15,14 +15,16 @@ from prewikka.utils import html, json
     var grid = CommonListing('table#cronjobs', {'title': "${_('Scheduled Jobs')}" }, {
         colModel: [
             {name: 'name', label: "${ _('Name') }", width: 10},
-            {name: 'schedule', label: "${ _('Schedule') }", width: 8},
+            {name: 'schedule', label: "${ _('Schedule') }", width: 8, sortable: false},
             {name: 'user', label: "${ _('User') }", width: 10},
-            {name: 'last', label: "${ _('Last execution') }", width: 10, search: false, sorttype: function(value, row) {return row.last_date;} },
-            {name: 'next', label: "${ _('Next execution') }", width: 10, search: false, sorttype: function(value, row) {return row.next_date;} },
+            {name: 'last', label: "${ _('Last execution') }", width: 10},
+            {name: 'next', label: "${ _('Next execution') }", width: 10},
         ],
-        multiselect: true,
-        data: ${ html.escapejs(data) },
-        globalSearch: false,
+        datatype: "json",
+        url: "${url_for('CrontabView.ajax_listing')}",
+        multiSort: false,
+        useSearchbar: true,
+        pager: false,
         reloadInterval: 10,
 
         rowattr: function(rd, cur, rowid) {
@@ -54,7 +56,7 @@ from prewikka.utils import html, json
         grid.ajax({ url: "${ url_for('.disable') }" });
     });
 
-    $(".cronjob-error").click(function(e) {
+    $("#cronjobs").on("click", ".cronjob-error", function(e) {
         $(".cronjob-error-dialog-" + $(".cronjob-error").index(this)).modal('show');
     });
 })();
