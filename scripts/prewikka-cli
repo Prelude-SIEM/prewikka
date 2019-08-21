@@ -67,8 +67,9 @@ class PrewikkaCLI(cmd.Cmd):
             print("*** %s" % _("An unexpected error occurred: %s") % e)
             return UNEXPECTED_ERROR
 
-        for elem in result or []:
-            print(elem)
+        if command == "list":
+            for elem in result:
+                print(elem)
 
         return 0
 
