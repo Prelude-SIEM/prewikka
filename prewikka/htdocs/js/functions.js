@@ -345,8 +345,16 @@ function prewikka_notification(data)
     $(notification).find(".fa").removeClass().addClass("fa fa-" + data.icon);
 
     $("#prewikka-notifications-container").append($(notification));
-    $(notification).fadeIn(0).delay(data.duration || 2000).fadeOut(1000, function() {
-        $(notification).detach();
+
+    if ( typeof(data.duration) === 'undefined' || data.duration === 0 )
+        data.duration = 2000;
+
+    $(notification).fadeIn(0, function() {
+        if ( data.duration > 0 ) {
+            $(this).delay(data.duration).fadeOut(1000, function() {
+                $(notification).detach();
+            });
+        }
     });
 }
 
