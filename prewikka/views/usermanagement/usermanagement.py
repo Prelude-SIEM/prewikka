@@ -49,8 +49,12 @@ class UserSettings(view.View):
         reload_type = ReloadEnum["none"]
         for param, reload in (("fullname", "none"), ("email", "none"), ("timezone", "view"), ("theme", "window"), ("language", "window")):
             value = env.request.parameters.get(param)
-            if value and value != user.get_property(param):
-                user.set_property(param, value)
+            if value != user.get_property(param):
+                if value:
+                    user.set_property(param, value)
+                else:
+                    user.del_property(param)
+
                 reload_type = max(reload_type, ReloadEnum[reload])
 
         if user == env.request.user:
