@@ -912,7 +912,11 @@ class AlertListing(MessageListing):
             'time_min': time_min,
             'time_max': time_max
         }
-        message.extra_link = filter(lambda x: x is not None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
+
+        if alert_list:
+            message.extra_link = filter(lambda x: x is not None, hookmanager.trigger("HOOK_MESSAGELISTING_EXTRA_LINK", param))
+        else:
+            message.extra_link = []
 
         result_count = 0
         for classification, severity, completion, count, messageid in res:
