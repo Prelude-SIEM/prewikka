@@ -132,6 +132,21 @@ class ConfigSection(collections.Mapping):
 
         raise ConfigValueError(value, name)
 
+    def get_size(self, name, default=0):
+        assert isinstance(default, int)
+
+        value = self.get(name)
+        if value is None:
+            return default
+
+        match = re.match(r'(\d+(?:\.\d+)?)([kMGT]?)B', value)
+        if not match:
+            raise ConfigValueError(value, name)
+
+        prefixes = ["", "k", "M", "G", "T"]
+
+        return int(float(match.group(1)) * 1024 ** prefixes.index(match.group(2)))
+
     def keys(self):
         return self._od.keys()
 
