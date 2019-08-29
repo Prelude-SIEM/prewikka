@@ -346,7 +346,7 @@ function prewikka_notification(data)
 
     $("#prewikka-notifications-container").append($(notification));
 
-    if ( typeof(data.duration) === 'undefined' || data.duration === 0 )
+    if ( ! data.duration )
         data.duration = 2000;
 
     $(notification).fadeIn(0, function() {
