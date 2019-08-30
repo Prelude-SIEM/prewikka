@@ -212,18 +212,20 @@ def format_timedelta(*args, **kwargs):
     return _format_timedelta(*args, locale=translation.get_locale(), **kwargs)
 
 
-def _abbreviate_number(number):
+def _abbreviate_number(number, binary=False):
+    thousand = 1024 if binary else 1000
+
     for unit in ['', 'K', 'M', 'G', 'T', 'P']:
-        if abs(number) < 1000 or unit == 'P':
+        if abs(number) < thousand or unit == 'P':
             format_ = None if isinstance(number, int) else "@@@"  # three significant digits
             return "%s%s" % (format_number(number, format=format_), unit)
 
-        number /= 1000.0
+        number /= thousand
 
 
-def format_number(number, short=False, **kwargs):
+def format_number(number, short=False, binary=False, **kwargs):
     if short:
-        return _abbreviate_number(number)
+        return _abbreviate_number(number, binary)
 
     return babel.numbers.format_decimal(number, locale=translation.get_locale(), **kwargs)
 
