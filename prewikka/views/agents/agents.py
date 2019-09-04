@@ -59,7 +59,11 @@ class Agents(view.View):
         val = agents["down"] if agents["down"].count else agents["up"]
         data = resource.HTMLNode("a", localization.format_number(val.count), title=val.title, _class="label " + val.label, href=url_for("Agents.agents", status=val.status, **parameters))
 
-        return utils.AttrObj(title=resource.HTMLNode("a", _("Agents"), href=url_for("Agents.agents", **parameters)), data=[data])
+        return utils.AttrObj(
+            name="agents",
+            title=resource.HTMLNode("a", _("Agents"), href=url_for("Agents.agents", **parameters)),
+            data=[data]
+        )
 
     def __init__(self):
         env.dataprovider.check_datatype("heartbeat")
