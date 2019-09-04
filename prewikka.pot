@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: prewikka 5.1.0beta3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-08-16 18:11+0200\n"
+"POT-Creation-Date: 2019-09-04 19:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: prewikka/baseview.py:79 prewikka/usergroup.py:48
+#: prewikka/baseview.py:79 prewikka/usergroup.py:52
 msgid "Permission Denied"
 msgstr ""
 
@@ -69,7 +69,7 @@ msgstr ""
 msgid "Custom"
 msgstr ""
 
-#: prewikka/crontab.py:43 prewikka/views/crontab/__init__.py:70
+#: prewikka/crontab.py:43 prewikka/views/crontab/__init__.py:84
 msgid "Disabled"
 msgstr ""
 
@@ -219,12 +219,12 @@ msgstr ""
 msgid "%H:%M:%S"
 msgstr ""
 
-#: prewikka/localization.py:233 prewikka/localization.py:251
-#: prewikka/renderer/__init__.py:62 prewikka/views/crontab/__init__.py:81
+#: prewikka/localization.py:235 prewikka/localization.py:253
+#: prewikka/renderer/__init__.py:62 prewikka/views/crontab/__init__.py:95
 msgid "n/a"
 msgstr ""
 
-#: prewikka/localization.py:244
+#: prewikka/localization.py:246
 #, python-format
 msgid "%(days)dd %(hours)dh %(minutes)d'"
 msgstr ""
@@ -399,17 +399,17 @@ msgid ""
 "required: %s"
 msgstr ""
 
-#: prewikka/usergroup.py:40
+#: prewikka/usergroup.py:44
 #, python-format
 msgid "Access to view '%(view)s' forbidden. Required permissions: %(permissions)s"
 msgstr ""
 
-#: prewikka/usergroup.py:43
+#: prewikka/usergroup.py:47
 #, python-format
 msgid "Access to view '%s' forbidden"
 msgstr ""
 
-#: prewikka/usergroup.py:46
+#: prewikka/usergroup.py:50
 #, python-format
 msgid "Required permissions: %s"
 msgstr ""
@@ -541,8 +541,8 @@ msgstr ""
 msgid "Unknown path: %s"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:123 scripts/prewikka-cli:108
-#: scripts/prewikka-cli:117 scripts/prewikka-cli:128
+#: prewikka/dataprovider/__init__.py:123 scripts/prewikka-cli:109
+#: scripts/prewikka-cli:118 scripts/prewikka-cli:129
 msgid "Could not parse input"
 msgstr ""
 
@@ -888,7 +888,7 @@ msgstr ""
 msgid "Offline"
 msgstr ""
 
-#: prewikka/utils/misc.py:75 prewikka/views/agents/agents.py:206
+#: prewikka/utils/misc.py:75 prewikka/views/agents/agents.py:210
 msgid "Unknown"
 msgstr ""
 
@@ -985,7 +985,7 @@ msgid "Plugin installation and activation management page"
 msgstr ""
 
 #: prewikka/views/aboutplugin/__init__.py:40
-#: prewikka/views/crontab/__init__.py:36
+#: prewikka/views/crontab/__init__.py:37
 msgid "USER_MANAGEMENT"
 msgstr ""
 
@@ -1148,77 +1148,77 @@ msgstr ""
 msgid "Agents status information page"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:62 prewikka/views/agents/agents.py:129
+#: prewikka/views/agents/agents.py:64 prewikka/views/agents/agents.py:133
 msgid "Agents"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:106
+#: prewikka/views/agents/agents.py:110
 msgid "Node name n/a"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:107
+#: prewikka/views/agents/agents.py:111
 msgid "OS version n/a"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:108
+#: prewikka/views/agents/agents.py:112
 msgid "OS type n/a"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:113
+#: prewikka/views/agents/agents.py:117
 msgid "Node location n/a"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:123
+#: prewikka/views/agents/agents.py:127
 msgid "Alert listing"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:124
+#: prewikka/views/agents/agents.py:128
 msgid "Heartbeat listing"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:125
+#: prewikka/views/agents/agents.py:129
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:12
 msgid "Heartbeat analysis"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:129 prewikka/views/agents/agents.py:153
+#: prewikka/views/agents/agents.py:133 prewikka/views/agents/agents.py:157
 #: prewikka/views/datasearch/idmef.py:158
 #: prewikka/views/messagesummary/messagesummary.py:332
 msgid "IDMEF_VIEW"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:129
+#: prewikka/views/agents/agents.py:133
 #: prewikka/views/datasearch/heartbeat.py:55
 msgid "Monitoring"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:138
+#: prewikka/views/agents/agents.py:142
 msgid "IDMEF_ALTER"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:180
+#: prewikka/views/agents/agents.py:184
 msgid "Normal sensor start"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:182
+#: prewikka/views/agents/agents.py:186
 msgid "Unexpected sensor restart"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:188
+#: prewikka/views/agents/agents.py:192
 #, python-format
 msgid "Unexpected heartbeat interval: %(delta)s"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:191
+#: prewikka/views/agents/agents.py:195
 msgid "Normal sensor stop"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:203
+#: prewikka/views/agents/agents.py:207
 #, python-format
 msgid "Sensor is down since %s"
 msgstr ""
 
-#: prewikka/views/agents/agents.py:212
+#: prewikka/views/agents/agents.py:216
 #, python-format
 msgid ""
 "No anomaly in the last %(count)d heartbeats (one heartbeat every "
@@ -1309,32 +1309,32 @@ msgstr ""
 msgid "Events"
 msgstr ""
 
-#: prewikka/views/crontab/__init__.py:29
+#: prewikka/views/crontab/__init__.py:30
 msgid "Scheduling management"
 msgstr ""
 
-#: prewikka/views/crontab/__init__.py:34
+#: prewikka/views/crontab/__init__.py:35
 msgid "Scheduled jobs management page"
 msgstr ""
 
-#: prewikka/views/crontab/__init__.py:61
+#: prewikka/views/crontab/__init__.py:62
 msgid "Configuration"
 msgstr ""
 
-#: prewikka/views/crontab/__init__.py:61
+#: prewikka/views/crontab/__init__.py:62
 msgid "Scheduling"
 msgstr ""
 
-#: prewikka/views/crontab/__init__.py:74
+#: prewikka/views/crontab/__init__.py:75 prewikka/views/crontab/__init__.py:104
+msgid "SYSTEM"
+msgstr ""
+
+#: prewikka/views/crontab/__init__.py:88
 msgid "Pending"
 msgstr ""
 
-#: prewikka/views/crontab/__init__.py:84
+#: prewikka/views/crontab/__init__.py:98
 msgid "Error"
-msgstr ""
-
-#: prewikka/views/crontab/__init__.py:90
-msgid "SYSTEM"
 msgstr ""
 
 #: prewikka/views/crontab/templates/cronjob.mak:54
@@ -1405,11 +1405,11 @@ msgstr ""
 msgid "Next execution"
 msgstr ""
 
-#: prewikka/views/crontab/templates/crontab.mak:67
+#: prewikka/views/crontab/templates/crontab.mak:69
 msgid "Disable"
 msgstr ""
 
-#: prewikka/views/crontab/templates/crontab.mak:68
+#: prewikka/views/crontab/templates/crontab.mak:70
 msgid "Enable"
 msgstr ""
 
@@ -2290,62 +2290,62 @@ msgstr ""
 msgid "An unexpected error occurred: %s"
 msgstr ""
 
-#: scripts/prewikka-cli:153
+#: scripts/prewikka-cli:154
 msgid "Create an object of the specified type"
 msgstr ""
 
-#: scripts/prewikka-cli:156
+#: scripts/prewikka-cli:157
 msgid "Delete an object of the specified type"
 msgstr ""
 
-#: scripts/prewikka-cli:159
+#: scripts/prewikka-cli:160
 msgid "Import objects of the specified type from files"
 msgstr ""
 
-#: scripts/prewikka-cli:162
+#: scripts/prewikka-cli:163
 msgid "List objects of the specified type"
 msgstr ""
 
-#: scripts/prewikka-cli:165
+#: scripts/prewikka-cli:166
 msgid "Synchronize objects of the specified type"
 msgstr ""
 
-#: scripts/prewikka-cli:168
+#: scripts/prewikka-cli:169
 msgid "Update objects of the specified type"
 msgstr ""
 
-#: scripts/prewikka-cli:206
+#: scripts/prewikka-cli:207
 msgid "Prewikka command-line tool"
 msgstr ""
 
-#: scripts/prewikka-cli:207
+#: scripts/prewikka-cli:208
 msgid "name of the user"
 msgstr ""
 
-#: scripts/prewikka-cli:208 scripts/prewikka-crontab:99
+#: scripts/prewikka-cli:209 scripts/prewikka-crontab:99
 #: scripts/prewikka-httpd:93
 #, python-format
 msgid "configuration file to use (default: %(default)s)"
 msgstr ""
 
-#: scripts/prewikka-cli:209
+#: scripts/prewikka-cli:210
 msgid "command to execute"
 msgstr ""
 
-#: scripts/prewikka-cli:210
+#: scripts/prewikka-cli:211
 msgid "enable debugging output"
 msgstr ""
 
-#: scripts/prewikka-cli:217
+#: scripts/prewikka-cli:218
 msgid "prewikka-cli must be executed as the prewikka user"
 msgstr ""
 
-#: scripts/prewikka-cli:242
+#: scripts/prewikka-cli:243
 #, python-format
 msgid "Prewikka command-line tool (%s)"
 msgstr ""
 
-#: scripts/prewikka-cli:243
+#: scripts/prewikka-cli:244
 msgid "Type \"help\" or \"?\" to list commands"
 msgstr ""
 
