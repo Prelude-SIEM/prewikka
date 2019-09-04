@@ -1,3 +1,20 @@
+* 2019-09-04, prewikka-5.1.0rc1:
+
+Author: Antoine Luong
+
+- Add an option to format numbers as bits
+- Support file sizes in configuration
+- Fix resetting user properties
+- Add __repr__ method for users/groups
+- Fix auto-reload of the Scheduling page
+- Ignore return value for non-list CLI commands
+
+Author: Camille Gardet
+
+- Negative duration makes notifications persistent
+
+
+
 * 2019-08-16, prewikka-5.1.0beta3:
 
 Author: Antoine Luong
