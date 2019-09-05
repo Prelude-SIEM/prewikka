@@ -103,8 +103,8 @@ class PrewikkaCLI(cmd.Cmd):
 
     def do_create(self, arg):
         try:
-            category, name, data = re.findall("^(\S+) (\S+)(?: '(.+)')?", arg)[0]
-            data = utils.json.loads(data) if data else None
+            category, name, data = re.findall("^(\S+) (\S+)(?: ({.*}))?$", arg)[0]
+            data = utils.json.loads(data) if data else {}
         except (IndexError, ValueError):
             print("*** %s" % _("Could not parse input"))
             return PARSE_ERROR
