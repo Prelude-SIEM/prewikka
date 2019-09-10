@@ -501,7 +501,7 @@ class Criterion(json.JSONObject):
         if not isinstance(value, compat.STRING_TYPES):
             value = text_type(value)
 
-        return "'%s'" % value.replace("\\", "\\\\").replace("'", "\\'")
+        return "'%s'" % value.replace("'", "\\'")
 
     def _criterion_to_string(self, path, operator, value):
         if value is None:

@@ -34,71 +34,55 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
     function quote(value)
     {
         if ( need_quotes(value) )
-            return '"' + value.replace(/(["\\])/g, '\\$1') + '"';
+            return '"' + value.replace(/(["])/g, '\\$1') + '"';
 
         return value;
     }
 
-    function _criterion(path, operator, value)
+    function criterion(path, opdef, value)
     {
-        if ( value == undefined )
-            value = "";
-
-        operator = criterion_config[criterion_config_default].operators[operator];
-
-        return eval(criterion_config[criterion_config_default].format);
-    }
-
-    function lucene_criterion(path, operator, value)
-    {
-        // We can't mix wildcards and quotes in Lucene
-        return _criterion(path, operator, (operator == "substr" && ! need_quotes(value)) ? value + "*" : quote(value));
-    }
-
-    function idmef_criterion(path, operator, value)
-    {
-        return _criterion(path, operator, quote(value));
-    }
-
-    function criterion(path, operator, value)
-    {
-        var ret;
-
-        if ( criterion_config_default == "criterion" )
-            ret = idmef_criterion(path, operator, value);
-        else
-            ret = lucene_criterion(path, operator, value);
-
-        return ret;
-    }
-
-    function lucene_criterion_regex(path, operator, value)
-    {
-        var ret;
-        var opstr = criterion_config[criterion_config_default].operators[operator];
+        var operator = criterion_config[criterion_config_default].operators[opdef];
 
         if ( value == undefined )
             value = "";
 
-        ret = escapeRegex(opstr + path + ":" + value);
+        value = _escape(opdef, value);
+        if ( need_quotes(value) )
+            value = quote(value)
 
-        if ( operator == "equal" || operator == "substr" )
+        else if ( (operator == "substr" || operator == "notsubstr") && criterion_config_default == "lucene" )
+                value += "*";
+
+        return criterion_config[criterion_config_default].format.formatUnicorn({path: path, operator: operator, value: value});
+    }
+
+    function lucene_criterion_regex(path, opdef, value)
+    {
+        var ret;
+        var operator = criterion_config[criterion_config_default].operators[opdef];
+
+        if ( value == undefined )
+            value = "";
+
+        ret = operator + path + ":" + _escape(opdef, escapeRegex(value.toString()));
+        if ( opdef == "equal" || opdef == "substr" )
             ret = "[^-]" + ret;
 
         return ret;
     }
 
-    function idmef_criterion_regex(path, operator, value)
+    function idmef_criterion_regex(path, opdef, value)
     {
+        var operator;
         if ( value == undefined )
             value = "";
 
         if ( operator )
-            operator = criterion_config[criterion_config_default].operators[operator];
+            operator = criterion_config[criterion_config_default].operators[opdef];
         else
             operator = "\\s*[=<>]+\\s*";
 
-        return escapeRegex(path) + operator + escapeRegex(value.toString());
+        return escapeRegex(path) + operator + _escape(opdef, escapeRegex(value.toString()));
     }
 
     function criterion_regex(path, operator, value)
@@ -137,11 +121,39 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         return $.trim(search);
     }
 
+    function _escape(operator, value)
+    {
+        var out = "";
+        var escaped = {'\0': '\\0', 0x07: '\\a', '\b': '\\b', '\f': '\\f', '\n': '\\n', '\r': '\\r', '\t': '\\t', '\v': '\\v'};
+
+        for ( var i = 0; i < value.length; ) {
+                var c = value.charAt(i);
+                var d = value.charCodeAt(i++);
+
+                if ( d in escaped )
+                        out += escaped[d];
+
+
+                else if ( (operator == "substr" || operator == "notsubstr") && (c == '*' || c == '?') )
+                        out += "\\" + c;
+
+                else if ( d > 31 && d < 127 )
+                        out += c;
+
+                else  {
+                        var x = d.toString(16)
+                        out += "\\x" + ((x.length == 1) ? "0" + x : x);
+                }
+        }
+
+        return out;
+    }
+
     function _add_to_input(field, operator, value, positive)
     {
-        value = String(value);
-
         var search;
+
+        value = String(value).replace('\\', '\\\\');
 
         if ( positive ) {
             search = sub_from_search(field, operator, null, false);
@@ -389,8 +401,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         var td = node.closest("td").first();
         var selected_field = node.closest("[data-field]");
         var selected_value = node.closest("[data-value]");
-        var next_char = node[0].nextSibling.nodeValue[0];
-        var selected_operator = separators.term.indexOf(next_char) === -1 ? "equal" : "substr";
+        var selected_operator = (node.text() == selected_field.text()) ? "equal" : "substr";
 
         selected_value = selected_value.length > 0 ? selected_value.data("value") : selvalue;
         selected_field = selected_field.data("field");

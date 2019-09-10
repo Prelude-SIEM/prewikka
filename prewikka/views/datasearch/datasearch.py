@@ -162,6 +162,10 @@ class QueryParser(object):
             self._paths.update((field, '%s%s' % (self.path_prefix, field)) for field in self._parent.all_fields)
             self._handle_order(orderby)
 
+        if self.query:
+            # Make sure to use printable characters in the search bar
+            self.query = "".join(chr(x) for x in bytearray(self.query.encode("unicode-escape")))
+
     def _prepare_groupby_query(self, groupby, orderby):
         self._paths["_aggregation"] = "count(1)"
 
@@ -385,7 +389,7 @@ class DataSearch(view.View):
     _extra_resources = []
 
     criterion_config["lucene"] = {
-        "format": 'operator + path + ":" + value',
+        "format": '{operator}{path}:{value}',
         "operators": {
             "equal": "",
             "notequal": "-",
@@ -396,7 +400,7 @@ class DataSearch(view.View):
         }
     }
     criterion_config["criterion"] = {
-        "format": 'path + " " + operator + " " + value',
+        "format": '{path} {operator} {value}',
         "operators": {
             "equal": "=",
             "notequal": "!=",
