@@ -446,9 +446,9 @@ class MessageSummary(Table, view.View):
 
         self.endTable()
 
-    def buildAnalyzerList(self, alert):
+    def buildAnalyzerList(self, msg):
         l = []
-        for analyzer in alert["analyzer"]:
+        for analyzer in msg["analyzer"]:
             l.insert(0, analyzer)
 
         l.pop(0)
@@ -469,7 +469,7 @@ class MessageSummary(Table, view.View):
         self.endTable()
         self.endSection()
 
-    def buildAdditionalData(self, alert, ignore=[], ignored={}, ip_options=[], tcp_options=[]):
+    def buildAdditionalData(self, msg, ptype, ignore=[], ignored={}, ip_options=[], tcp_options=[]):
         self.beginSection(_("Additional data"))
 
         self.beginTable()
@@ -477,7 +477,7 @@ class MessageSummary(Table, view.View):
         self.newTableCol(0, _("Value"), header=True)
 
         index = 1
-        for ad in alert["additional_data"]:
+        for ad in msg["additional_data"]:
             value = None
             meaning = ad["meaning"]
 
@@ -511,7 +511,7 @@ class MessageSummary(Table, view.View):
                     break
 
             links = resource.HTMLSource()
-            for obj in filter(None, hookmanager.trigger("HOOK_ALERTSUMMARY_MEANING_LINK", alert, meaning, value)):
+            for obj in filter(None, hookmanager.trigger("HOOK_%sSUMMARY_MEANING_LINK" % ptype.upper(), msg, meaning, value)):
                 links += obj
 
             if links:
@@ -1053,7 +1053,7 @@ class AlertSummary(TcpIpOptions, MessageSummary):
         tcp_options = []
 
         group = ip.field_list + tcp.field_list + udp.field_list + icmp.field_list + data.field_list
-        self.buildAdditionalData(alert, ignore=group, ignored=ignored_value, ip_options=ip_options, tcp_options=tcp_options)
+        self.buildAdditionalData(alert, "alert", ignore=group, ignored=ignored_value, ip_options=ip_options, tcp_options=tcp_options)
 
         if len(ignored_value.keys()) > 0:
             def blah(b):
@@ -1111,4 +1111,4 @@ class HeartbeatSummary(MessageSummary):
         self.endSection()
         self.endSection()
 
-        self.buildAdditionalData(heartbeat)
+        self.buildAdditionalData(heartbeat, "heartbeat")
