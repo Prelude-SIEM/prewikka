@@ -1,3 +1,17 @@
+* 2019-09-30, prewikka-5.0.8:
+
+Author: Antoine Luong
+
+- Fix resetting user properties
+- Fix DataSearch exporting entries with chevrons
+- Use the filter ID in the listing
+
+Author: Camille Gardet
+
+- Trigger the submit-complete event in Datasearch
+
+
+
 * 2019-07-05, prewikka-5.0.7:
 
 Author: Antoine Luong
