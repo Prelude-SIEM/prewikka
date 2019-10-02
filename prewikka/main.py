@@ -121,7 +121,7 @@ class Core(object):
 
     def _prewikka_init_if_needed(self):
         if self._prewikka_initialized is True:
-            return self._reload_plugin_if_needed()
+            return self.reload_plugin_if_needed()
 
         try:
             self._load_custom_theme()
@@ -206,7 +206,7 @@ class Core(object):
         env.renderer = renderer.RendererPluginManager(autoupdate=self.autoupdate)
         list(hookmanager.trigger("HOOK_PLUGINS_LOAD"))
 
-    def _reload_plugin_if_needed(self):
+    def reload_plugin_if_needed(self):
         if not env.db.has_plugin_changed():
             return
 
