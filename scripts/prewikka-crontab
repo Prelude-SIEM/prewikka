@@ -110,6 +110,6 @@ if __name__ == "__main__":
     signal.signal(signal.SIGTERM, _handle_signal)
 
     # Setup the environment
-    main.Core.from_config(options.config)
+    core = main.Core.from_config(options.config)
     env.request = FakeRequest()
-    crontab.run()
+    crontab.run(core)

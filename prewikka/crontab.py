@@ -84,6 +84,12 @@ class CronJob(object):
 
         self.next_schedule = self._cron.get_current(datetime.datetime)
 
+    def update(self, job):
+        # Update the current job data (following a modified schedule or a plugin reinitialization)
+        self.callback = job.callback
+        if job.schedule != self.schedule:
+            self.set_schedule(job.schedule)
+
     def _run(self):
         self._running = True
 
@@ -174,8 +180,8 @@ class Crontab(object):
         # Take schedule changes into account
         for job in self._joblist:
             for j in mainlist:
-                if j == job and j.schedule != job.schedule:
-                    job.set_schedule(j.schedule)
+                if j == job:
+                    job.update(j)
                     break
 
         return self._joblist
@@ -189,11 +195,13 @@ class Crontab(object):
 
         return (self._REFRESH - (now - first)).total_seconds()
 
-    def run(self):
+    def run(self, core):
         while True:
             next = self._run_jobs()
             if next > 0:
                 gevent.sleep(next)
+
+            core.reload_plugin_if_needed()
 
     def list(self, **kwargs):
         qs = env.db.kwargs2query(kwargs, prefix=" WHERE ")
