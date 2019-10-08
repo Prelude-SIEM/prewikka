@@ -1,3 +1,13 @@
+* 2019-10-08, prewikka-5.1.1:
+
+Author: Antoine Luong
+
+- Use the correct hook in heartbeat detail
+- Fix grouping errors with datasearch:update
+- Reload plugins if needed in prewikka-crontab
+
+
+
 * 2019-09-13, prewikka-5.1.0:
 
 Author: Antoine Luong
