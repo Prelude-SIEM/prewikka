@@ -500,7 +500,9 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         var pdata = $("#datasearch_table").getGridParam("postData") || {};
 
         $.each($("#form_search :input").serializeArray(), function(i, input) {
-            pdata[input.name] = input.value;
+            // Exclude groupby field since the goal is to reload the table
+            if ( input.name != "groupby[]" )
+                pdata[input.name] = input.value;
         });
 
         return pdata;
