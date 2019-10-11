@@ -56,10 +56,15 @@ class AlertFormatter(idmef.IDMEFFormatter):
 
 
 class AlertQueryParser(idmef.IDMEFQueryParser):
-    _sort_order = ["alert.create_time/order_desc"]
+    _default_sort_order = ["alert.create_time/order_desc"]
+
+    def __init__(self, query, parent, groupby=[], offset=0, limit=50):
+        idmef.IDMEFQueryParser.__init__(self, query, parent, groupby, offset, limit)
+        self._sort_order = []
 
     def add_order(self, field, order="asc"):
-        self._sort_order = ["alert.%s/order_%s" % (field, order)]
+        self._sort_order.append("alert.%s/order_%s" % (field, order))
+        return True
 
 
 class AlertDataSearch(idmef.IDMEFDataSearch):
@@ -93,8 +98,8 @@ class AlertDataSearch(idmef.IDMEFDataSearch):
     lucene_search_fields = ["classification", "source", "target", "analyzer(-1)"]
     _delete_confirm = N_("Delete the selected alerts?")
 
-    def _get_default_cells(self, obj):
-        cells = idmef.IDMEFDataSearch._get_default_cells(self, obj)
+    def _get_default_cells(self, obj, search):
+        cells = idmef.IDMEFDataSearch._get_default_cells(self, obj, search)
 
         severity = obj.get("alert.assessment.impact.severity")
         if severity:
