@@ -144,11 +144,13 @@ class IDMEFFormatter(datasearch.Formatter):
 
 class IDMEFQueryParser(datasearch.QueryParser):
     def _groupby_query(self):
-        return env.dataprovider.query(self._path, self.all_criteria, limit=self.limit, offset=self.offset, type=self.type)
+        return env.dataprovider.query(self.get_paths(), self.all_criteria, limit=self.limit, offset=self.offset, type=self.type)
 
     def _query(self):
+        order_by = self._sort_order or self._default_sort_order
+
         # FIXME: we could avoid performing two queries if libpreludedb supported CURSOR.
-        ret = env.dataprovider.get(self.all_criteria, limit=self.limit, offset=self.offset, type=self.type, order_by=self._sort_order)
+        ret = env.dataprovider.get(self.all_criteria, limit=self.limit, offset=self.offset, type=self.type, order_by=order_by)
         ret.total = env.dataprovider.query(["count(1)"], self.all_criteria, type=self.type)[0][0]
 
         return ret
@@ -157,8 +159,8 @@ class IDMEFQueryParser(datasearch.QueryParser):
 class IDMEFDataSearch(datasearch.DataSearch):
     view_permissions = [N_("IDMEF_VIEW")]
 
-    def _get_default_cells(self, obj):
-        cells = datasearch.DataSearch._get_default_cells(self, obj)
+    def _get_default_cells(self, obj, search):
+        cells = datasearch.DataSearch._get_default_cells(self, obj, search)
         cells["_criteria"] = dataprovider.Criterion("%s.messageid" % self.type, "=", obj["%s.messageid" % self.type])
         return cells
 

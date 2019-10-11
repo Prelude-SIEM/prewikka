@@ -139,7 +139,7 @@ class QueryParser(object):
     path_prefix = "{backend}."
 
     def _prepare_groupby_query(self, groupby):
-        self._path = ["count(1)"]
+        self._paths["_aggregation"] = "count(1)"
 
         groupby = set(groupby)
         ogroup = list(groupby - set(_TEMPORAL_VALUES))
@@ -148,21 +148,21 @@ class QueryParser(object):
 
         for field in ogroup:
             if field not in self._parent.path_translate:
-                self._path.append('%s%s/group_by' % (self.path_prefix, field))
+                self._paths[field] = '%s%s/group_by' % (self.path_prefix, field)
             else:
                 for i in self._parent.path_translate[field][0]:
-                    self._path.append('%s/group_by' % (i))
+                    self._paths[field] = '%s/group_by' % i
 
         if not tgroup:
-            self._path[0] = "count(1)/order_desc"
+            self._paths["_aggregation"] = "count(1)/order_desc"
             return
 
         if len(tgroup) > 1:
             raise error.PrewikkaUserError(N_("Time group error"), N_("Only one time unit can be specified in a groupby query"))
 
         self._time_group = tgroup[0]
-        self._date_selection_index = len(self._path)
-        self._path += self._time_selection(self._time_group)
+        self._date_selection_index = len(self._paths)
+        self._paths.update(("_time_unit_%d" % i, path) for i, path in enumerate(self._time_selection(self._time_group)))
 
     def __init__(self, query, parent, groupby=[], offset=0, limit=50):
         self.type = parent.type
@@ -171,7 +171,7 @@ class QueryParser(object):
         self.limit = limit
         self.groupby = []
         self._time_group = None
-        self._path = []
+        self._paths = collections.OrderedDict()
         self._result = None
         self._parent = parent
         self._date_selection_index = None
@@ -182,7 +182,7 @@ class QueryParser(object):
         if groupby:
             self._prepare_groupby_query(groupby)
         else:
-            self._path = ['%s%s' % (self.path_prefix, field) for field in self._parent.all_fields]
+            self._paths.update((field, '%s%s' % (self.path_prefix, field)) for field in self._parent.all_fields)
 
     def get_result(self):
         if self._result:
@@ -304,6 +304,12 @@ class QueryParser(object):
 
         return functools.reduce(lambda x, y: f(x, y), (Criterion(i, self._fix_operator(i, op), right) for i in paths))
 
+    def get_index(self, field):
+        return list(self._paths).index(field)
+
+    def get_paths(self):
+        return list(self._paths.values())
+
     def get_criteria(self, query):
         if not query:
             return Criterion()
@@ -327,15 +333,13 @@ class QueryParser(object):
         return selection
 
     def add_order(self, field, order="asc"):
-        if order not in ("asc, desc"):
-            return
+        if order not in ("asc", "desc"):
+            return False
 
-        try:
-            idx = self._path.index("{backend}.%s" % field)
-        except ValueError:
-            self._path.append("{backend}.%s/order_%s" % (field, order))
-        else:
-            self._path[idx] += "/order_%s" % order
+        self._paths.pop(field, None)
+        self._paths[field] = "{backend}.%s/order_%s" % (field, order)
+
+        return True
 
     def _diagram_data(self, cview, step):
         """Generator for the diagram chart"""
@@ -351,7 +355,7 @@ class QueryParser(object):
             yield RendererItem(value or "", ", ".join((text_type(x) for x in labels)), link)
 
     def _query(self):
-        return env.dataprovider.query(self._path, self.all_criteria, limit=self.limit, offset=self.offset, type=self.type)
+        return env.dataprovider.query(self.get_paths(), self.all_criteria, limit=self.limit, offset=self.offset, type=self.type)
 
     def _groupby_query(self):
         return self._query()
@@ -419,9 +423,6 @@ class DataSearch(view.View):
             pi.filterable = pi.type is not datetime.datetime
             pi.groupable = pi.type is not object
 
-            pi.column_index = self._column_index
-            self._column_index += 1
-
             cprop = self._get_column_property(field, pi)
             if cprop:
                 self.columns_properties[field] = cprop
@@ -430,7 +431,6 @@ class DataSearch(view.View):
         env.dataprovider.check_datatype(self.type)
 
         self._formatter = self.formatter(self.type)
-        self._column_index = 0
 
         self.all_fields = []
         self._main_fields = list(self.default_columns.keys())
@@ -532,13 +532,21 @@ class DataSearch(view.View):
         search = self.query_parser(query, groupby=env.request.parameters.get("groupby"),
                                    offset=(page - 1) * limit, limit=limit, parent=self)
 
-        field = env.request.parameters.get("sort_index")
-        order = env.request.parameters.get("sort_order")
-        if field in self.all_fields:
-            search.add_order(field, order)
-        elif field in self.path_translate:
-            search.add_order(self.path_translate[field][0][0].split(".", 1)[-1], order)
-        else:
+        # @HACK free-jqGrid messes the parameters badly when sorting on multiple columns simultaneously
+        sort_settings = "%s %s" % (env.request.parameters.get("sort_index", ""), env.request.parameters.get("sort_order", ""))
+        is_sorted = False
+        for sort_setting in sort_settings.split(','):
+            try:
+                field, order = sort_setting.split()
+            except ValueError:
+                pass
+            else:
+                if field in self.all_fields:
+                    is_sorted |= search.add_order(field, order)
+                elif field in self.path_translate:
+                    is_sorted |= search.add_order(self.path_translate[field][0][0].split(".", 1)[-1], order)
+
+        if not is_sorted:
             search.add_order(self.sort_path_default, "desc")
 
         return search
@@ -565,12 +573,13 @@ class DataSearch(view.View):
             <script type="text/javascript">%s</script>
             """ % (data["html"], data["script"] or "")))
 
-    def _get_default_cells(self, obj):
+    def _get_default_cells(self, obj, search):
         r = {}
 
         for fname, cprop in self.columns_properties.items():
             finfo = self.fields_info[fname]
-            r[fname] = self._formatter.format(finfo, obj, obj[finfo.column_index])
+            index = getattr(finfo, "column_index", search.get_index(fname))
+            r[fname] = self._formatter.format(finfo, obj, obj[index])
 
         return r
 
@@ -583,7 +592,7 @@ class DataSearch(view.View):
         extracol = list(filter(None, self._trigger_datasearch_hook("EXTRA_COLUMN")))
 
         for i, obj in enumerate(results):
-            cells = self._get_default_cells(obj)
+            cells = self._get_default_cells(obj, search)
             for prop, finfo, func in extracol:
                 if isinstance(obj, ResultObject):
                     ret = func(obj, extradata)
