@@ -99,7 +99,7 @@ class GenericChart(object):
             all_paths = ["%s/order_%s" % (query.aggregation, query.order)]
             all_paths += ["%s/group_by" % path for path in query.paths]
         else:
-            all_paths = ["{backend}.{time_field}/order_%s" % query.order] + query.paths
+            all_paths = ["{backend}.{start_time_field}/order_%s" % query.order] + query.paths
 
         if not query.datatype:
             query.datatype = env.dataprovider.guess_datatype(all_paths, query.criteria, default=None)
