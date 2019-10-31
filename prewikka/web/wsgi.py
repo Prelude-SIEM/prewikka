@@ -51,26 +51,6 @@ defined_status = {
 
 
 class WSGIRequest(request.Request):
-
-    def _wsgi_get_bytes(self, key, default=None):
-        value = self._environ.get(key, default)
-
-        # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
-        # decoded with ISO-8859-1. This is wrong for Prewikka where UTF-8 is the
-        # default. Re-encode to recover the original bytestring.
-        if value is not None:
-            return value.encode("ISO-8859-1") if Py3 else value
-
-    def _wsgi_get_unicode(self, key, default=None):
-        value = self._wsgi_get_bytes(key, default)
-        if value is not None:
-            return value.decode("utf8")
-
-    def _wsgi_get_str(self, key, default=None):
-        value = self._wsgi_get_bytes(key, default)
-        if value is not None:
-            return value.decode("utf8") if Py3 else value
-
     def __init__(self, environ, start_response):
         self._write = None
         self._environ = environ
@@ -97,6 +77,25 @@ class WSGIRequest(request.Request):
         # Force request type when client wait explicitly for "text/event-stream"
         if self._environ.get("HTTP_ACCEPT", "text/html") == "text/event-stream":
             self.is_stream = True
+
+    def _wsgi_get_bytes(self, key, default=None):
+        value = self._environ.get(key, default)
+
+        # Under Python 3, non-ASCII values in the WSGI environ are arbitrarily
+        # decoded with ISO-8859-1. This is wrong for Prewikka where UTF-8 is the
+        # default. Re-encode to recover the original bytestring.
+        if value is not None:
+            return value.encode("ISO-8859-1") if Py3 else value
+
+    def _wsgi_get_unicode(self, key, default=None):
+        value = self._wsgi_get_bytes(key, default)
+        if value is not None:
+            return value.decode("utf8")
+
+    def _wsgi_get_str(self, key, default=None):
+        value = self._wsgi_get_bytes(key, default)
+        if value is not None:
+            return value.decode("utf8") if Py3 else value
 
     def get_target_origin(self):
         return "%s://%s" % (self._environ.get("wsgi.url_scheme"), werkzeug.wsgi.get_host(self._environ))

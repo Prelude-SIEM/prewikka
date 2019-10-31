@@ -68,6 +68,19 @@ class PluginPreload(PluginBase):
 
 
 class PluginManager(object):
+    def __init__(self, entrypoint, autoupdate=False):
+        self.__instances = []
+        self.__dinstances = {}
+
+        loaded = {}
+        for value in env.all_plugins.values():
+            for name, plugin in value.items():
+                loaded[name] = not(plugin.error)
+
+        plugins = self.iter_plugins(entrypoint)
+        plist = [(p, False) for p in plugins]
+        self._load_plugin_list(plist, plugins, autoupdate, loaded, [])
+        env.all_plugins[entrypoint] = plugins
 
     def _add_plugin(self, plugin_class, autoupdate, name=None):
         plugin_class._handle_attributes(autoupdate)
@@ -187,20 +200,6 @@ class PluginManager(object):
                 return mname
 
         return True
-
-    def __init__(self, entrypoint, autoupdate=False):
-        self.__instances = []
-        self.__dinstances = {}
-
-        loaded = {}
-        for value in env.all_plugins.values():
-            for name, plugin in value.items():
-                loaded[name] = not(plugin.error)
-
-        plugins = self.iter_plugins(entrypoint)
-        plist = [(p, False) for p in plugins]
-        self._load_plugin_list(plist, plugins, autoupdate, loaded, [])
-        env.all_plugins[entrypoint] = plugins
 
     def keys(self):
         return self.__dinstances.keys()

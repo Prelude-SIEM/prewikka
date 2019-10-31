@@ -447,9 +447,6 @@ CriterionOperator = _CriterionEnum(
 
 
 class Criterion(json.JSONObject):
-    def _init(self, left, operator, right):
-        self.left, self.operator, self.right = left, operator, right
-
     def __init__(self, left=None, operator=None, right=None):
         json.JSONObject.__init__(self)
 
@@ -457,6 +454,9 @@ class Criterion(json.JSONObject):
             operator = CriterionOperator[operator]
 
         self._init(left, operator, right)
+
+    def _init(self, left, operator, right):
+        self.left, self.operator, self.right = left, operator, right
 
     def get_paths(self):
         res = set()

@@ -41,32 +41,6 @@ _core_cache_lock = Lock()
 
 
 class Core(object):
-    def _check_version(self):
-        error_type = _("Version Requirement error")
-        if not prelude.checkVersion(siteconfig.libprelude_required_version):
-            raise error.PrewikkaUserError(error_type,
-                                          N_("Prewikka %(vPre)s requires libprelude %(vLib)s or higher",
-                                             {'vPre': version.__version__, 'vLib': siteconfig.libprelude_required_version}))
-
-        elif not preludedb.checkVersion(siteconfig.libpreludedb_required_version):
-            raise error.PrewikkaUserError(error_type,
-                                          N_("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher",
-                                             {'vPre': version.__version__, 'vLib': siteconfig.libpreludedb_required_version}))
-
-    @staticmethod
-    def from_config(path=None, threaded=False, autoupdate=False):
-        global _core_cache
-        global _core_cache_lock
-
-        if not path:
-            path = siteconfig.conf_dir + "/prewikka.conf"
-
-        with _core_cache_lock:
-            if path not in _core_cache:
-                _core_cache[path] = Core(path, autoupdate)
-
-        return _core_cache[path]
-
     def __init__(self, filename=None, autoupdate=False):
         self.autoupdate = autoupdate
         env.auth = None  # In case of database error
@@ -106,6 +80,20 @@ class Core(object):
         except:
             pass
 
+    @staticmethod
+    def from_config(path=None, threaded=False, autoupdate=False):
+        global _core_cache
+        global _core_cache_lock
+
+        if not path:
+            path = siteconfig.conf_dir + "/prewikka.conf"
+
+        with _core_cache_lock:
+            if path not in _core_cache:
+                _core_cache[path] = Core(path, autoupdate)
+
+        return _core_cache[path]
+
     def _load_custom_theme(self):
         custom_theme = env.config.interface.get("custom_theme")
         if custom_theme is None:
@@ -142,6 +130,18 @@ class Core(object):
             env.log.log(self._prewikka_initialized.log_priority, text_type(self._prewikka_initialized))
             self._unregister_plugin_data()
             raise self._prewikka_initialized
+
+    def _check_version(self):
+        error_type = _("Version Requirement error")
+        if not prelude.checkVersion(siteconfig.libprelude_required_version):
+            raise error.PrewikkaUserError(error_type,
+                                          N_("Prewikka %(vPre)s requires libprelude %(vLib)s or higher",
+                                             {'vPre': version.__version__, 'vLib': siteconfig.libprelude_required_version}))
+
+        elif not preludedb.checkVersion(siteconfig.libpreludedb_required_version):
+            raise error.PrewikkaUserError(error_type,
+                                          N_("Prewikka %(vPre)s requires libpreludedb %(vLib)s or higher",
+                                             {'vPre': version.__version__, 'vLib': siteconfig.libpreludedb_required_version}))
 
     def _load_auth_or_session(self, typename, plugins, name, config=config.SectionRoot()):
         if name not in plugins:

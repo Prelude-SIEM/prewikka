@@ -293,14 +293,14 @@ class Parameters(dict):
 
 
 class GeneralParameters(Parameters):
-    def register(self):
-        Parameters.register(self)
-        mainmenu._register_parameters(self)
-
     def __init__(self, vobj, kw):
         # Only allow parameters saving if the view is a primary route (has a view_menu entry)
         Parameters.__init__(self, vobj, _save=bool(vobj.view_menu), **kw)
         self.normalize()
+
+    def register(self):
+        Parameters.register(self)
+        mainmenu._register_parameters(self)
 
 
 class ViewResponse(response.PrewikkaResponse):
@@ -343,21 +343,6 @@ class _ViewDescriptor(object):
 
     view_csrf_exempt = False
 
-    @property
-    def view_others_permissions(self):
-        return self.view_permissions
-
-    @view_others_permissions.setter
-    def view_others_permissions(self, permissions):
-        self.view_permissions = permissions
-
-    @classmethod
-    def _handle_attributes(cls, *args):
-        for permission in cls.view_permissions:
-            usergroup.ALL_PERMISSIONS.declare(permission)
-
-        pluginmanager.PluginBase._handle_attributes.__func__(cls, *args)
-
     def __init__(self, baseview=None):
         if baseview:
             self.view_base = baseview
@@ -375,6 +360,21 @@ class _ViewDescriptor(object):
         self.view_users = set(self.view_users)
         self.view_groups = set(self.view_groups)
         self.view_permissions = set(self.view_permissions)
+
+    @property
+    def view_others_permissions(self):
+        return self.view_permissions
+
+    @view_others_permissions.setter
+    def view_others_permissions(self, permissions):
+        self.view_permissions = permissions
+
+    @classmethod
+    def _handle_attributes(cls, *args):
+        for permission in cls.view_permissions:
+            usergroup.ALL_PERMISSIONS.declare(permission)
+
+        pluginmanager.PluginBase._handle_attributes.__func__(cls, *args)
 
     def _setup_dataset_default(self, dataset):
         dataset["document"] = utils.AttrObj()
@@ -446,9 +446,6 @@ class _ViewDescriptor(object):
 class _View(_ViewDescriptor, registrar.DelayedRegistrar):
     view_id = None
 
-    def render(self):
-        pass
-
     def __init__(self):
         if not self.view_id:
             self.view_id = self.__class__.__name__.lower()
@@ -458,6 +455,9 @@ class _View(_ViewDescriptor, registrar.DelayedRegistrar):
             registrar.DelayedRegistrar.__init__(self)
 
         _ViewDescriptor.__init__(self)
+
+    def render(self):
+        pass
 
     def make_parameters(self, _view_descriptor=None, criteria=None, **kwargs):
         values = {}
@@ -508,6 +508,24 @@ def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, la
 
 
 class ViewManager(registrar.DelayedRegistrar):
+    def __init__(self):
+        registrar.DelayedRegistrar.__init__(self)
+        self._init()
+
+        builtins.url_for = self.url_for
+
+    def _init(self):
+        _URL_ADAPTER_CACHE.clear()
+
+        self._references = {}
+        self._views_endpoints = {}
+
+        self._route_override = {}
+        for i in _ROUTE_OVERRIDE_TYPE:
+            self._route_override[i] = {}
+
+        self._rule_map = Map(converters={'list': ListConverter})
+
     def get(self, datatype=None, keywords=None):
         views = self._references.get(datatype, []) if datatype else self._views_endpoints.values()
         return sorted(filter(lambda x: set(keywords or []).issubset(x.view_keywords), views), key=lambda x: x.view_priority)
@@ -623,24 +641,6 @@ class ViewManager(registrar.DelayedRegistrar):
             ad = _URL_ADAPTER_CACHE[scname] = self._rule_map.bind("", scname)
 
         return ad
-
-    def _init(self):
-        _URL_ADAPTER_CACHE.clear()
-
-        self._references = {}
-        self._views_endpoints = {}
-
-        self._route_override = {}
-        for i in _ROUTE_OVERRIDE_TYPE:
-            self._route_override[i] = {}
-
-        self._rule_map = Map(converters={'list': ListConverter})
-
-    def __init__(self):
-        registrar.DelayedRegistrar.__init__(self)
-        self._init()
-
-        builtins.url_for = self.url_for
 
     def url_for(self, endpoint, _default=_SENTINEL, **kwargs):
         view = self.get_view(endpoint=endpoint)

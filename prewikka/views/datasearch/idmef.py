@@ -159,6 +159,17 @@ class IDMEFQueryParser(datasearch.QueryParser):
 class IDMEFDataSearch(datasearch.DataSearch):
     view_permissions = [N_("IDMEF_VIEW")]
 
+    def __init__(self, *args, **kwargs):
+        self._extra_table_fields = []
+
+        config = env.config.datasearch.get_instance_by_name(self.type)
+        if config:
+            self._extra_table_fields = [x.strip() for x in config.get("extra_fields").split(",")]
+
+        datasearch.DataSearch.__init__(self, *args, **kwargs)
+        view.route("/%s/delete" % self.type, method=self.delete, methods=["POST"], permissions=["IDMEF_ALTER"])
+        self.columns_properties["create_time"].width = 110
+
     def _get_default_cells(self, obj, search):
         cells = datasearch.DataSearch._get_default_cells(self, obj, search)
         cells["_criteria"] = dataprovider.Criterion("%s.messageid" % self.type, "=", obj["%s.messageid" % self.type])
@@ -178,17 +189,6 @@ class IDMEFDataSearch(datasearch.DataSearch):
         sortable = prelude.IDMEFPath(pi.path).getValueType() != prelude.IDMEFValue.TYPE_CLASS
 
         return datasearch.COLUMN_PROPERTIES(label=label, name=field, index=field, hidden=hidden, sortable=sortable)
-
-    def __init__(self, *args, **kwargs):
-        self._extra_table_fields = []
-
-        config = env.config.datasearch.get_instance_by_name(self.type)
-        if config:
-            self._extra_table_fields = [x.strip() for x in config.get("extra_fields").split(",")]
-
-        datasearch.DataSearch.__init__(self, *args, **kwargs)
-        view.route("/%s/delete" % self.type, method=self.delete, methods=["POST"], permissions=["IDMEF_ALTER"])
-        self.columns_properties["create_time"].width = 110
 
     def get_forensic_actions(self):
         ret = []

@@ -138,6 +138,26 @@ class Formatter(object):
 class QueryParser(object):
     path_prefix = "{backend}."
 
+    def __init__(self, query, parent, groupby=[], offset=0, limit=50):
+        self.type = parent.type
+        self.query = query
+        self.offset = offset
+        self.limit = limit
+        self.groupby = []
+        self._time_group = None
+        self._paths = collections.OrderedDict()
+        self._result = None
+        self._parent = parent
+        self._date_selection_index = None
+
+        self.criteria = self.get_criteria(query)
+        self.all_criteria = self.criteria + env.request.menu.get_criteria()
+
+        if groupby:
+            self._prepare_groupby_query(groupby)
+        else:
+            self._paths.update((field, '%s%s' % (self.path_prefix, field)) for field in self._parent.all_fields)
+
     def _prepare_groupby_query(self, groupby):
         self._paths["_aggregation"] = "count(1)"
 
@@ -163,26 +183,6 @@ class QueryParser(object):
         self._time_group = tgroup[0]
         self._date_selection_index = len(self._paths)
         self._paths.update(("_time_unit_%d" % i, path) for i, path in enumerate(self._time_selection(self._time_group)))
-
-    def __init__(self, query, parent, groupby=[], offset=0, limit=50):
-        self.type = parent.type
-        self.query = query
-        self.offset = offset
-        self.limit = limit
-        self.groupby = []
-        self._time_group = None
-        self._paths = collections.OrderedDict()
-        self._result = None
-        self._parent = parent
-        self._date_selection_index = None
-
-        self.criteria = self.get_criteria(query)
-        self.all_criteria = self.criteria + env.request.menu.get_criteria()
-
-        if groupby:
-            self._prepare_groupby_query(groupby)
-        else:
-            self._paths.update((field, '%s%s' % (self.path_prefix, field)) for field in self._parent.all_fields)
 
     def get_result(self):
         if self._result:
@@ -401,32 +401,6 @@ class DataSearch(view.View):
         }
     }
 
-    def _get_fields(self):
-        return env.dataprovider.get_paths(self.type)
-
-    def _get_column_property(self, field, pi):
-        pass
-
-    def _default_order(self, value):
-        try:
-            return self._main_fields.index(value)
-        except ValueError:
-            return 100
-
-    def _prepare_fields(self):
-        for field in sorted(self._get_fields(), key=self._default_order):
-            field = field.split(".", 1)[1]
-
-            self.all_fields.append(field)
-            self.fields_info[field] = pi = env.dataprovider.get_path_info("%s.%s" % (self.type, field))
-
-            pi.filterable = pi.type is not datetime.datetime
-            pi.groupable = pi.type is not object
-
-            cprop = self._get_column_property(field, pi)
-            if cprop:
-                self.columns_properties[field] = cprop
-
     def __init__(self):
         env.dataprovider.check_datatype(self.type)
 
@@ -454,6 +428,32 @@ class DataSearch(view.View):
                    datatype=self.type, priority=1, help="#%sforensic" % self.type, methods=["POST", "GET"])
         view.route("/%s/dashboard" % self.name, self.dashboard, menu=(section, tabs[1]),
                    datatype=self.type, help="#%sdashboard" % self.type, methods=["POST", "GET"])
+
+    def _get_fields(self):
+        return env.dataprovider.get_paths(self.type)
+
+    def _get_column_property(self, field, pi):
+        pass
+
+    def _default_order(self, value):
+        try:
+            return self._main_fields.index(value)
+        except ValueError:
+            return 100
+
+    def _prepare_fields(self):
+        for field in sorted(self._get_fields(), key=self._default_order):
+            field = field.split(".", 1)[1]
+
+            self.all_fields.append(field)
+            self.fields_info[field] = pi = env.dataprovider.get_path_info("%s.%s" % (self.type, field))
+
+            pi.filterable = pi.type is not datetime.datetime
+            pi.groupable = pi.type is not object
+
+            cprop = self._get_column_property(field, pi)
+            if cprop:
+                self.columns_properties[field] = cprop
 
     def _set_common(self, dataset):
         view.View.render(self)

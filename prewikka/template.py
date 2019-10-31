@@ -77,9 +77,6 @@ class _Dataset(collections.MutableMapping):
 
 
 class _PrewikkaTemplate(object):
-    def dataset(self, *args, **kwargs):
-        return _Dataset(self, *args, **kwargs)
-
     def __init__(self, *args):
         if len(args) == 2:
             self._name = pkg_resources.resource_filename(*args)
@@ -95,6 +92,9 @@ class _PrewikkaTemplate(object):
 
     def __json__(self):
         return self._template.render()
+
+    def dataset(self, *args, **kwargs):
+        return _Dataset(self, *args, **kwargs)
 
     def render(self, **kwargs):
         if self._error:

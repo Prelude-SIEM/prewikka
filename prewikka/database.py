@@ -267,6 +267,14 @@ class DatabaseHelper(object):
 
 
 class DatabaseUpdateHelper(DatabaseHelper):
+    def __init__(self, module_name, reqversion, reqbranch=None, enabled=True):
+        self._reqbranch = reqbranch
+        self._reqversion = reqversion
+        self._module_name = module_name.split(":")[0]
+        self._full_module_name = module_name
+        self._default_modinfo = ModuleInfo(None, None, enabled)
+        self._initialized = False
+
     def _init_version_attr(self):
         if self._initialized:
             return
@@ -277,14 +285,6 @@ class DatabaseUpdateHelper(DatabaseHelper):
         self._from_version = module.version
         self._need_enable = not(module.enabled)
         self._initialized = True
-
-    def __init__(self, module_name, reqversion, reqbranch=None, enabled=True):
-        self._reqbranch = reqbranch
-        self._reqversion = reqversion
-        self._module_name = module_name.split(":")[0]
-        self._full_module_name = module_name
-        self._default_modinfo = ModuleInfo(None, None, enabled)
-        self._initialized = False
 
     def check(self):
         self._init_version_attr()
@@ -455,6 +455,23 @@ class DatabaseCommon(object):
     __TRANSACTION_STATE_BEGIN = 1
     __TRANSACTION_STATE_QUERY = 2
 
+    @_fix_exception
+    def __init__(self, settings):
+        self.__ESCAPE_PREFILTER = {
+            bool: int,
+            datetime: lambda dt: self.escape(self.datetime(dt)),
+            "iterable": self._prefilter_iterate,
+        }
+
+        self._transaction_state = self.__TRANSACTION_STATE_NONE
+
+        stpl = tuple((k, v) for k, v in settings.items())
+        self._db = preludedb.SQL(settings)
+
+        self._version = self._db.getServerVersion()
+        self._dbhash = hash(stpl)
+        self._dbtype = settings["type"]
+
     def _get_prefilter(self, v):
         if not(isinstance(v, (text_type, bytes))) and isinstance(v, collections.Iterable):
             return self.__ESCAPE_PREFILTER["iterable"]
@@ -472,23 +489,6 @@ class DatabaseCommon(object):
             fmt = '(%s)'
 
         return fmt % ', '.join(tmp)
-
-    @_fix_exception
-    def __init__(self, settings):
-        self.__ESCAPE_PREFILTER = {
-            bool: int,
-            datetime: lambda dt: self.escape(self.datetime(dt)),
-            "iterable": self._prefilter_iterate,
-        }
-
-        self._transaction_state = self.__TRANSACTION_STATE_NONE
-
-        stpl = tuple((k, v) for k, v in settings.items())
-        self._db = preludedb.SQL(settings)
-
-        self._version = self._db.getServerVersion()
-        self._dbhash = hash(stpl)
-        self._dbtype = settings["type"]
 
     @staticmethod
     def parse_datetime(date):

@@ -48,6 +48,10 @@ class _cache(object):
 
 
 class Request(local):
+    def __init__(self):
+        local.__init__(self)
+        self._init(None)
+
     def _init(self, request):
         self.web = request
         self.user = None
@@ -77,10 +81,6 @@ class Request(local):
 
     def init(self, request):
         self._init(request)
-
-    def __init__(self):
-        local.__init__(self)
-        self._init(None)
 
 
 class FakeRequest(Request):
