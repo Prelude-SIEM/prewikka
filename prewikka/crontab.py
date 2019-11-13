@@ -60,7 +60,6 @@ class CronJob(object):
         self.id = id
         self.name = name
         self.user = user
-        self.schedule = schedule
         self.callback = func
         self.error = error
         self.ext_type = ext_type
@@ -73,6 +72,8 @@ class CronJob(object):
         self.set_schedule(schedule)
 
     def set_schedule(self, schedule):
+        self.schedule = schedule
+
         # Interpret the cronjob configuration as local time
         self._cron = croniter.croniter(schedule, datetime.datetime.now(utils.timeutil.tzlocal()))
 
@@ -87,6 +88,7 @@ class CronJob(object):
     def update(self, job):
         # Update the current job data (following a modified schedule or a plugin reinitialization)
         self.callback = job.callback
+        self.error = job.error
         if job.schedule != self.schedule:
             self.set_schedule(job.schedule)
 
@@ -137,15 +139,15 @@ class Crontab(object):
         hookmanager.register("HOOK_USER_DELETE", lambda user: self.delete(user=user))
 
     def _make_job(self, res):
-        err = func = None
         id, name, userid, schedule, ext_type, ext_id, base, runcnt, enabled, error_s = res
 
         func = self._plugin_callback.get(ext_type)
         if not func:
-            err = error.PrewikkaUserError(N_("Invalid job extension"), N_("Scheduled job with invalid extension type '%s'") % (ext_type))
-
-        if error_s and not(err):
+            err = error.PrewikkaUserError(N_("Invalid job extension"), N_("Scheduled job with invalid extension type '%s'", ext_type))
+        elif error_s:
             err = utils.json.loads(error_s)
+        else:
+            err = None
 
         if ext_id:
             ext_id = int(ext_id)

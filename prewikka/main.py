@@ -214,6 +214,7 @@ class Core(object):
         env.log.warning("plugins were activated: triggering reload")
         self._unregister_plugin_data()
         try:
+            history.init()
             self._load_plugins()
         finally:
             # Needed for Database object
