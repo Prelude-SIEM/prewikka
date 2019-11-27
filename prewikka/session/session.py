@@ -152,10 +152,14 @@ class Session(pluginmanager.PluginBase):
         if not(info) or not(info.login) or self.autologin:
             try:
                 login = self.__check_session(request)
-                return usergroup.User(login)
             except (SessionInvalid, SessionExpired):
                 if not self.autologin:
                     raise
+            else:
+                if not info or not info.login or login == info.login:
+                    return usergroup.User(login)
+                else:
+                    self.__delete_session(request)
 
         user = self.authenticate(request, info)
         self.__create_session(request, user)
