@@ -492,17 +492,18 @@ class View(_View, pluginmanager.PluginBase):
         pluginmanager.PluginBase.__init__(self)
 
 
-def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, label=None, defaults={}, endpoint=None, datatype=None, priority=0, keywords=set(), help=None, parameters=_SENTINEL):
+def route(path, method=_SENTINEL, methods=["GET"], permissions=[], menu=None, label=None, defaults={},
+          endpoint=None, datatype=None, priority=0, keywords=set(), help=None, parameters=_SENTINEL, csrf_exempt=False):
     usergroup.ALL_PERMISSIONS.declare(permissions)
 
     if method is not _SENTINEL:
         ret = env.viewmanager._add_route(path, method, methods=methods, permissions=permissions, menu=menu, label=label,
                                          defaults=defaults, endpoint=endpoint, datatype=datatype, priority=priority,
-                                         keywords=keywords, help=help, parameters=parameters)
+                                         keywords=keywords, help=help, parameters=parameters, csrf_exempt=csrf_exempt)
     else:
         ret = registrar.DelayedRegistrar.make_decorator("route", env.viewmanager._add_route, path, methods=methods, permissions=permissions,
                                                         menu=menu, label=label, defaults=defaults, endpoint=endpoint, datatype=datatype, keywords=keywords,
-                                                        priority=priority, help=help, parameters=parameters)
+                                                        priority=priority, help=help, parameters=parameters, csrf_exempt=csrf_exempt)
 
     return ret
 
@@ -594,7 +595,8 @@ class ViewManager(registrar.DelayedRegistrar):
         self._views_endpoints[view.view_endpoint] = view
         self._rule_map.add(rule)
 
-    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, label=None, defaults={}, endpoint=None, datatype=None, priority=0, keywords=set(), help=None, parameters=None):
+    def _add_route(self, path, method=None, methods=["GET"], permissions=[], menu=None, label=None, defaults={},
+                   endpoint=None, datatype=None, priority=0, keywords=set(), help=None, parameters=None, csrf_exempt=False):
         v = _ViewDescriptor(baseview=method.__self__)
 
         v.render = method
@@ -605,6 +607,7 @@ class ViewManager(registrar.DelayedRegistrar):
         v.view_datatype = datatype
         v.view_priority = priority
         v.view_keywords = set(keywords)
+        v.view_csrf_exempt = csrf_exempt
 
         if help:
             v.view_help = help
