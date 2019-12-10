@@ -104,6 +104,7 @@ if __name__ == "__main__":
     server = make_server(options.address, options.port, application, server_class=MyWSGIServer, handler_class=WSGIRequest)
     if options.key and options.cert:
         server.socket = ssl.wrap_socket(server.socket, keyfile=options.key, certfile=options.cert, server_side=True)
+        server.base_environ["HTTPS"] = "on"  # This is used by wsgiref to determine url_scheme
 
     for i in range(options.multiprocess - 1):
         p = multiprocessing.Process(target=server.serve_forever)
