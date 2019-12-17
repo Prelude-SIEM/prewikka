@@ -4,7 +4,7 @@
 # sebastien.tricaud@wengo.com, 2007.
 msgid ""
 msgstr ""
-"Project-Id-Version: Prewikka 4.1.13\n"
+"Project-Id-Version: Prewikka 4.1.14\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2019-08-13 18:48+0200\n"
 "PO-Revision-Date: 2018-05-18 11:45+0200\n"
