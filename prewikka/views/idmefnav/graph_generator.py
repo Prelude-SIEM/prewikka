@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2019 CS-SI. All Rights Reserved.
+# Copyright (C) 2016-2020 CS-SI. All Rights Reserved.
 # Author: Sélim Menouar <selim.menouar@c-s.fr>
 #
 # This file is part of the Prewikka program.

@@ -1,4 +1,4 @@
-# Copyright (C) 2018-2019 CS-SI. All Rights Reserved.
+# Copyright (C) 2018-2020 CS-SI. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoannv@gmail.com>
 #
 # The following code is derived from Django CSRF middleware.
