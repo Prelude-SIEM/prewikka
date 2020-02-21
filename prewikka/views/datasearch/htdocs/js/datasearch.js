@@ -262,6 +262,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         var endNode;
         var endPos;
         var textLen;
+        var textContent;
 
         // Do not change the selection when the popover is shown
         var visible = $("#PopoverOption").is(':visible');
@@ -289,14 +290,14 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         // Find the word's starting position
         find_start:
         while ( true ) {
-            for ( ; startPos > 0; startPos-- ) {
-                if ( separators.word.indexOf(startNode.textContent[startPos - 1]) > -1 ) {
+            for ( textContent = startNode.textContent; startPos > 0; startPos-- ) {
+                if ( separators.word.indexOf(textContent[startPos - 1]) > -1 ) {
                     break find_start;
                 }
             }
             if ( startNode.parentNode.previousSibling !== null ) {
                 startNode = startNode.parentNode.previousSibling.firstChild;
-                startPos = startNode.textContent.length;
+                startPos = startNode.length;
             } else {
                 break find_start;
             }
@@ -305,8 +306,8 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         // Find the word's ending position
         find_end:
         while ( true ) {
-            for ( textLen = endNode.length; endPos < textLen; endPos++ ) {
-                if ( separators.word.indexOf(endNode.textContent[endPos]) > -1 || separators.term.indexOf(endNode.textContent[endPos]) > -1 ) {
+            for ( textLen = endNode.length, textContent = endNode.textContent; endPos < textLen; endPos++ ) {
+                if ( separators.word.indexOf(textContent[endPos]) > -1 || separators.term.indexOf(textContent[endPos]) > -1 ) {
                     break find_end;
                 }
             }
