@@ -597,7 +597,7 @@ class DataSearch(view.View):
                 if isinstance(obj, ResultObject):
                     ret = func(obj, extradata)
                 else:
-                    ret = func({"%s.%s" % (self.type, f): v for f, v in zip(self.all_fields, obj)}, extradata)
+                    ret = func({env.dataprovider.format_path(f.split("/")[0], type=self.type): v for f, v in zip(search.get_paths(), obj)}, extradata)
 
                 if finfo:
                     cells[prop.name] = self._formatter.format(finfo, obj, ret)
