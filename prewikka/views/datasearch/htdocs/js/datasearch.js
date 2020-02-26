@@ -426,28 +426,39 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         $("#PopoverOption .groupby_search span").text(common_paths[selected_field] || selected_field);
         $("#PopoverOption").show();
 
-        var oca_position = "bottom";
         var popover = $("#PopoverOption .popover");
-        var top = offset.top + node.height();
-        var left = offset.left - popover.width() / 2 + node.width() / 2;
+        var top, left = offset.left - popover.width() / 2 + node.width() / 2;
 
         popover.find(".dropdown-submenu").removeClass("pull-left");
+        popover.removeClass("bottom top left right menu-left");
 
-        if ( offset.left + node.width() / 2 + popover.width() > window.innerWidth ) {
-            top -= popover.height() / 2 + node.height() / 2;
-            left = offset.left - popover.width();
-            oca_position = "left";
-            popover.find(".dropdown-submenu").addClass("pull-left");
-        } else if ( offset.left - node.width() / 2 - popover.width() / 2 < 0 ) {
-            top -= popover.height() / 2 + node.height() / 2;
+        if ( left < 0 ) {
+            /* Handle the case of a narrow column near the left side of the grid */
+            popover.addClass("right");
+            top = offset.top - popover.height() / 2 + node.height() / 2;
             left = offset.left + node.width();
-            oca_position = "right";
-        } else if ( offset.top + node.height() + popover.height() > window.innerHeight ) {
+        }
+        else if ( left + popover.width() > window.innerWidth ) {
+            /* Handle the case of a narrow column near the right side of the grid */
+            popover.addClass("left");
+            top = offset.top - popover.height() / 2 + node.height() / 2;
+            left = offset.left - popover.width();
+        }
+        /* Otherwise, expand the menu upwards or downwards, and the submenu
+         * leftwards or rightwards, according to where the most space is available */
+        else if ( window.innerHeight - (offset.top + node.height()) > offset.top ) {
+            popover.addClass("bottom");
+            top = offset.top + node.height();
+        }
+        else {
+            popover.addClass("top");
             top = offset.top - (node.height() / 2 + popover.height());
-            oca_position = "top";
+        }
+        if ( window.innerWidth - (offset.left + node.width()) < offset.left ) {
+            popover.addClass("menu-left");
+            popover.find(".dropdown-submenu").addClass("pull-left");
         }
 
-        popover.removeClass("bottom top right left").addClass(oca_position);
         $("#PopoverOption").css({"top": top, "left": left});
 
         /* Modify the "informations" content if empty */
@@ -677,11 +688,16 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
             hide_popover();
     });
 
-    $("#PopoverOption .dropdown-submenu").hover(function handlerIn() {
+    $("#PopoverOption .dropdown-submenu > a").hover(function() {
+        $(".dropdown-menu.panel").css({"display": ""});
         if ( $(this).offset().top + 500 > window.innerHeight )
-            $(this).find(".dropdown-menu").css({"top": "unset", "bottom": 0});
-    }, function handlerOut() {
-        $(this).find(".dropdown-menu").css({"top": "", "bottom": ""});
+            $(this).siblings(".dropdown-menu").css({"top": "unset", "bottom": 0});
+        else
+            $(this).siblings(".dropdown-menu").css({"top": "", "bottom": ""});
+    });
+
+    $("#PopoverOption").on("click", ".dropdown-menu.panel", function() {
+        $(this).css({"display": "block"});
     });
 
     var window_width = $(window).width();
