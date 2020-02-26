@@ -33,25 +33,26 @@ class _Cache(object):
         self._cached_func = func
         self._hits = self._misses = 0
 
-    def _set(self, args, value):
-        self._cache[args] = value
+    def _set(self, key, value):
+        self._cache[key] = value
         return value
 
-    def _get(self, *args):
+    def _get(self, *args, **kwargs):
+        key = (args, tuple(kwargs.items()))
         try:
-            value = self._cache.get(args, self._missing)
+            value = self._cache.get(key, self._missing)
             if value is not self._missing:
                 self._hits = self._hits + 1
                 return value
 
             self._misses = self._misses + 1
-            return self._set(args, self._cached_func(*args))
+            return self._set(key, self._cached_func(*args, **kwargs))
 
         except TypeError as e:
             # uncachable -- for instance, passing a list as an argument.
             # Better to not cache than to blow up entirely.
-            env.log.critical("request not cachable: %s(%s): %s" % (self._cached_func.__name__, repr(args), e))
-            return self._cached_func(*args)
+            env.log.critical("request not cachable: %s(%s): %s" % (self._cached_func.__name__, repr(key), e))
+            return self._cached_func(*args, **kwargs)
 
     def clear(self):
         self._cache.clear()
@@ -65,8 +66,8 @@ class _memoize(object):
         self.func = func
         self.cache_objname = name
 
-    def __call__(self, obj, *args):
-        return self._setup_cache(obj)._get(obj, *args)
+    def __call__(self, obj, *args, **kwargs):
+        return self._setup_cache(obj)._get(obj, *args, **kwargs)
 
     def _setup_cache(self, obj):
         cache = getattr(obj, self.cache_objname, None)

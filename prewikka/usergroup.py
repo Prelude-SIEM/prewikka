@@ -182,7 +182,7 @@ class User(NameID):
 
     def _permissions(self, permissions):
         self.permissions  # make sure the cache has been created
-        env.request.cache.user_permissions._set((self,), set(permissions))
+        env.request.cache.user_permissions._set(((self,), ()), set(permissions))
 
     # Support access to _permissions to modify object permission without backend modification.
     _permissions = property(permissions, _permissions)
@@ -205,7 +205,7 @@ class User(NameID):
 
     @configuration.setter
     def configuration(self, conf):
-        env.request.cache.user_configuration._set((self,), conf)
+        env.request.cache.user_configuration._set(((self,), ()), conf)
 
     @cache.request_memoize_property("user_timezone")
     def timezone(self):
