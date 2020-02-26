@@ -219,6 +219,7 @@
     display: none;
     position: fixed;
     word-wrap: break-word;
+    z-index: 100;
 }
 
 #datasearch #PopoverOption .popover {
@@ -250,7 +251,7 @@
     display: none;
 }
 
-#datasearch .popover.left .dropdown-submenu > a:before {
+#datasearch .popover.menu-left .dropdown-submenu > a:before {
     border-color: transparent;
     border-right-color: #ccc;
     border-style: solid;
@@ -259,16 +260,16 @@
     display: block;
     float: left;
     height: 0;
-    margin-right: -10px;
+    margin-left: -10px;
     margin-top: 5px;
     width: 0;
 }
 
-#datasearch .popover.left .dropdown-submenu > a:after {
+#datasearch .popover.menu-left .dropdown-submenu > a:after {
     all: unset;
 }
 
-#datasearch .popover.left .dropdown-submenu > a {
+#datasearch .popover.menu-left .dropdown-submenu > a {
     text-align: right;
 }
 
