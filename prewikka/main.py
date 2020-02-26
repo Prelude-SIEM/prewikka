@@ -235,7 +235,7 @@ class Core(object):
         endpath = webreq.path[len(pathkey) + 2:]
 
         mapping = env.htdocs_mapping.get(pathkey, None)
-        if not (mapping and endpath and endpath.find(".") != -1):
+        if not (mapping and endpath and "." in webreq.path_elements[-1]):
             # There is no mapping, or no path beyond the mapped portion was provided.
             # FIXME: .ext check is not clean: proper way to handle this would be to map statics
             # files to a /static base directory
