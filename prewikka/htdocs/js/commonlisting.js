@@ -145,6 +145,33 @@ function CommonListing(elem, text, options, restored_parameters) {
                 done: function(perm) {
                     if (perm) {
                         $(elem).jqGrid("remapColumns", perm, true);
+                        if ( $(elem).jqGrid("getGridParam", "forceFit") ) {
+                            /* Work around an issue with resizable columns not being updated
+                             * See https://github.com/free-jqgrid/jqGrid/issues/486 */
+                            var last_visible;
+                            var columns = {};
+                            $.each(options.colModel, function(i, col) {
+                                columns[col.name] = col;
+                            });
+                            var colModel = $(elem).jqGrid("getGridParam", "colModel");
+                            $.each(colModel, function(i, col) {
+                                if ( col.hidden == false && columns[col.name] ) {
+                                    last_visible = col;
+                                    col.resizable = columns[col.name].resizable;
+                                    if ( col.resizable == undefined )
+                                        col.resizable = true;
+                                }
+                            });
+                            last_visible.resizable = false;
+
+                            var headers = $(elem).closest(".ui-jqgrid").find("tr.ui-jqgrid-labels > th");
+                            var resize_handle = headers.find("span.ui-jqgrid-resize").first();
+                            headers.find("span.ui-jqgrid-resize").remove();
+                            headers.each(function(i, item) {
+                                if ( colModel[i].resizable )
+                                    $(item).prepend(resize_handle.clone());
+                            });
+                        }
                         resizeGrid();
                         saveGrid($(elem));
                     }
