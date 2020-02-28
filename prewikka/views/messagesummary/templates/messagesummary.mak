@@ -1,4 +1,6 @@
 <%!
+import json
+
 from datetime import datetime
 from prewikka.localization import format_datetime
 
@@ -78,7 +80,20 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
             $(this).closest(".panel-heading").siblings(".panel-body:first").slideToggle();
             return false;
         });
+        $("button.choice").on("click", function() {
+            var target = $(this).attr("data-target");
+            $(this).addClass("active").siblings().removeClass("active");
+            $("div.toggle-" + target).removeClass("hidden").siblings("div.toggle").addClass("hidden");
+        });
     </script>
+
+    % if message:
+    <div class="top-right-buttons">
+      <button type="button" class="btn btn-sm btn-default choice active" data-target="summary-html"><i class="fa fa-object-ungroup"></i> ${_("IDMEF")}</button>
+      <button type="button" class="btn btn-sm btn-default choice" data-target="summary-text"><i class="fa fa-paragraph"></i> ${_("Text")}</button>
+      <button type="button" class="btn btn-sm btn-default choice" data-target="summary-json"><i class="fa fa-code"></i> ${_("JSON")}</button>
+    </div>
+    % endif
 
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -86,7 +101,17 @@ entry_value_classes = ("section_alert_entry_value_normal", "section_alert_entry_
     </div>
 
     <div class="modal-body">
-      ${ display_node(sections) }
+      <div id="summary-html" class="toggle toggle-summary-html">
+        ${ display_node(sections) }
+      </div>
+      % if message:
+      <div id="summary-text" class="toggle toggle-summary-text hidden">
+        <pre>${ message.toString() }</pre>
+      </div>
+      <div id="summary-json" class="toggle toggle-summary-json hidden">
+        <pre>${ json.dumps(json.loads(message.toJSON()), indent=4) }</pre>
+      </div>
+      % endif
     </div>
 
     <div class="modal-footer">
