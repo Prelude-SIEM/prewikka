@@ -1006,8 +1006,10 @@ class AlertSummary(TcpIpOptions, MessageSummary):
     def render(self, analyzerid=None, messageid=None):
         MessageSummary.render(self)
 
-        alert = env.dataprovider.get(getUriCriteria("alert", analyzerid, messageid))[0]["alert"]
+        message = env.dataprovider.get(getUriCriteria("alert", analyzerid, messageid))[0]
+        alert = message["alert"]
 
+        env.request.dataset["message"] = message
         env.request.dataset["sections"] = []
 
         self.beginSection(self.getSectionName(alert))
@@ -1096,8 +1098,10 @@ class HeartbeatSummary(MessageSummary):
     def render(self, analyzerid=None, messageid=None):
         MessageSummary.render(self)
 
-        heartbeat = env.dataprovider.get(getUriCriteria("heartbeat", analyzerid, messageid))[0]["heartbeat"]
+        message = env.dataprovider.get(getUriCriteria("heartbeat", analyzerid, messageid))[0]
+        heartbeat = message["heartbeat"]
 
+        env.request.dataset["message"] = message
         env.request.dataset["sections"] = []
 
         self.beginSection(_("Heartbeat"))
