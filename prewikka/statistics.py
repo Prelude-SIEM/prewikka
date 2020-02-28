@@ -92,6 +92,9 @@ class GenericChart(object):
             parameters.update(period)
             self._menu = mainmenu.TimePeriod(dict(("timeline_%s" % k, v) for k, v in parameters.items()))
 
+            # We still want to apply other menu parameters (e.g. filters)
+            env.request.has_menu = True
+
     def _prepare_query(self, query):
         query.aggregation = query.aggregation or self.default_aggregation
 
