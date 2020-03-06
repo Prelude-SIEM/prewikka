@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-04 19:03+0200\n"
+"POT-Creation-Date: 2020-03-06 16:01+0100\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: Girard  <ure@free.fr>\n"
 "Language-Team: French\n"
@@ -72,37 +72,37 @@ msgstr "Personnalisé"
 msgid "Disabled"
 msgstr "Désactivé"
 
-#: prewikka/crontab.py:105
+#: prewikka/crontab.py:113
 msgid "Scheduled job execution failed"
 msgstr "Échec de l'exécution de la tâche planifiée"
 
-#: prewikka/crontab.py:139
+#: prewikka/crontab.py:146
 msgid "Invalid job extension"
 msgstr "Extension de tâche invalide"
 
-#: prewikka/crontab.py:139
+#: prewikka/crontab.py:146
 #, python-format
 msgid "Scheduled job with invalid extension type '%s'"
 msgstr "Tâche planifiée avec type d'extension invalide '%s'"
 
-#: prewikka/crontab.py:206
+#: prewikka/crontab.py:216
 msgid "Invalid CronJob"
 msgstr "Tâche planifiée invalide"
 
-#: prewikka/crontab.py:206
+#: prewikka/crontab.py:216
 #, python-format
 msgid "CronJob with id=%d cannot be found in database"
 msgstr "Tâche planifiée avec id=%d introuvable dans la base"
 
-#: prewikka/crontab.py:260
+#: prewikka/crontab.py:270
 msgid "Invalid schedule"
 msgstr "Planification invalide"
 
-#: prewikka/crontab.py:260
+#: prewikka/crontab.py:270
 msgid "The specified job schedule is invalid"
 msgstr "La planification spécifiée pour la tâche est invalide"
 
-#: prewikka/crontab.py:286
+#: prewikka/crontab.py:296
 #, python-format
 msgid "Custom (%s)"
 msgstr "Personnalisé (%s)"
@@ -273,7 +273,7 @@ msgstr ""
 msgid "Session '%s' does not accept any authentication module"
 msgstr "La session '%s' n'accepte pas de module d'authentification"
 
-#: prewikka/main.py:298
+#: prewikka/main.py:299
 #, python-format
 msgid "An unexpected condition happened while trying to load %s"
 msgstr "Une erreur inattendue s'est produite au chargement de %s"
@@ -593,11 +593,11 @@ msgstr "Fournit une API pour accéder aux alertes IDMEF"
 
 #: prewikka/dataprovider/idmef.py:142
 #: prewikka/views/agents/templates/agents.mak:83
-#: prewikka/views/datasearch/alert.py:75 prewikka/views/datasearch/alert.py:76
+#: prewikka/views/datasearch/alert.py:80 prewikka/views/datasearch/alert.py:81
 msgid "Alerts"
 msgstr "Alertes"
 
-#: prewikka/dataprovider/idmef.py:149 prewikka/views/datasearch/alert.py:88
+#: prewikka/dataprovider/idmef.py:149 prewikka/views/datasearch/alert.py:93
 #: prewikka/views/datasearch/threat.py:75
 msgid "Classification"
 msgstr "Classification"
@@ -770,7 +770,7 @@ msgstr ""
 "Votre session a expiré : veuillez vous réauthentifier pour continuer "
 "d'utiliser Prelude"
 
-#: prewikka/session/session.py:181
+#: prewikka/session/session.py:185
 msgid "Logged out"
 msgstr "Session terminée"
 
@@ -1023,7 +1023,7 @@ msgstr "Sites web"
 #: prewikka/views/about/templates/about.mak:67
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:132
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:71
-#: prewikka/views/messagesummary/templates/messagesummary.mak:93
+#: prewikka/views/messagesummary/templates/messagesummary.mak:118
 msgid "Close"
 msgstr "Fermer"
 
@@ -1231,7 +1231,7 @@ msgid "Heartbeat analysis"
 msgstr "Analyse des pulsations"
 
 #: prewikka/views/agents/agents.py:133 prewikka/views/agents/agents.py:157
-#: prewikka/views/datasearch/idmef.py:158
+#: prewikka/views/datasearch/idmef.py:160
 #: prewikka/views/messagesummary/messagesummary.py:332
 msgid "IDMEF_VIEW"
 msgstr "IDMEF VIEW"
@@ -1326,7 +1326,7 @@ msgid "Delete the selected IDMEF messages?"
 msgstr "Supprimer les messages IDMEF sélectionnés ?"
 
 #: prewikka/views/agents/templates/agents.mak:89
-#: prewikka/views/datasearch/idmef.py:195
+#: prewikka/views/datasearch/idmef.py:197
 #: prewikka/views/filter/templates/filterlisting.mak:42
 msgid "Delete"
 msgstr "Effacer"
@@ -1464,38 +1464,39 @@ msgstr "Désactiver"
 msgid "Enable"
 msgstr "Activer"
 
-#: prewikka/views/datasearch/alert.py:71
+#: prewikka/views/datasearch/alert.py:76
 msgid "Alert listing page"
 msgstr "Page des alertes"
 
-#: prewikka/views/datasearch/alert.py:76
+#: prewikka/views/datasearch/alert.py:81
 msgid "Aggregated alerts"
 msgstr "Alertes agrégées"
 
-#: prewikka/views/datasearch/alert.py:87
+#: prewikka/views/datasearch/alert.py:92
 #: prewikka/views/datasearch/heartbeat.py:63
 #: prewikka/views/datasearch/threat.py:74
 msgid "Date"
 msgstr "Date"
 
-#: prewikka/views/datasearch/alert.py:89 prewikka/views/datasearch/threat.py:76
+#: prewikka/views/datasearch/alert.py:94 prewikka/views/datasearch/threat.py:76
 msgid "Source"
 msgstr "Source"
 
-#: prewikka/views/datasearch/alert.py:90 prewikka/views/datasearch/threat.py:77
+#: prewikka/views/datasearch/alert.py:95 prewikka/views/datasearch/threat.py:77
 msgid "Target"
 msgstr "Cible"
 
-#: prewikka/views/datasearch/alert.py:91
+#: prewikka/views/datasearch/alert.py:96
 msgid "Analyzer"
 msgstr "Analyseur"
 
-#: prewikka/views/datasearch/alert.py:94
+#: prewikka/views/datasearch/alert.py:99
 msgid "Delete the selected alerts?"
 msgstr "Supprimer les alertes sélectionnées ?"
 
-#: prewikka/views/datasearch/alert.py:148
+#: prewikka/views/datasearch/alert.py:153
 #: prewikka/views/idmefnav/__init__.py:44
+#: prewikka/views/messagesummary/templates/messagesummary.mak:92
 msgid "IDMEF"
 msgstr "IDMEF"
 
@@ -1541,7 +1542,7 @@ msgstr "Tableau de bord"
 msgid "CSV export"
 msgstr "Export CSV"
 
-#: prewikka/views/datasearch/datasearch.py:622
+#: prewikka/views/datasearch/datasearch.py:631
 msgid "General"
 msgstr "Général"
 
@@ -1661,7 +1662,7 @@ msgid "New search"
 msgstr "Nouvelle recherche"
 
 #: prewikka/views/datasearch/templates/forensic.mak:231
-#: prewikka/views/messagesummary/messagesummary.py:1026
+#: prewikka/views/messagesummary/messagesummary.py:1028
 msgid "Actions"
 msgstr "Actions"
 
@@ -1915,8 +1916,8 @@ msgid "Analyzer Path (%d not shown)"
 msgstr "Chemin vers l'analyseur (%d non visibles)"
 
 #: prewikka/views/messagesummary/messagesummary.py:463
-#: prewikka/views/messagesummary/messagesummary.py:1035
-#: prewikka/views/messagesummary/messagesummary.py:1106
+#: prewikka/views/messagesummary/messagesummary.py:1037
+#: prewikka/views/messagesummary/messagesummary.py:1110
 #, python-format
 msgid "Analyzer #%d"
 msgstr "Analyseur #%d"
@@ -2039,7 +2040,7 @@ msgid "Ttime"
 msgstr "Temps"
 
 #: prewikka/views/messagesummary/messagesummary.py:595
-#: prewikka/views/messagesummary/messagesummary.py:1082
+#: prewikka/views/messagesummary/messagesummary.py:1084
 msgid "Payload"
 msgstr "Charge utile"
 
@@ -2081,6 +2082,7 @@ msgid "Linked Alerts"
 msgstr "Alertes liées"
 
 #: prewikka/views/messagesummary/messagesummary.py:708
+#: prewikka/views/messagesummary/templates/messagesummary.mak:93
 msgid "Text"
 msgstr "Texte"
 
@@ -2257,23 +2259,27 @@ msgstr "Alerte de débordement"
 msgid "Alert"
 msgstr "Alerte"
 
-#: prewikka/views/messagesummary/messagesummary.py:1018
+#: prewikka/views/messagesummary/messagesummary.py:1020
 msgid "MessageID"
 msgstr "MessageID"
 
-#: prewikka/views/messagesummary/messagesummary.py:1065
+#: prewikka/views/messagesummary/messagesummary.py:1067
 msgid "Network centric information"
 msgstr "Informations réseau"
 
-#: prewikka/views/messagesummary/messagesummary.py:1087
+#: prewikka/views/messagesummary/messagesummary.py:1089
 msgid "ASCII Payload"
 msgstr "Charge utile ASCII"
 
-#: prewikka/views/messagesummary/messagesummary.py:1103
+#: prewikka/views/messagesummary/messagesummary.py:1107
 msgid "Heartbeat"
 msgstr "Pulsation"
 
-#: prewikka/views/messagesummary/templates/messagesummary.mak:85
+#: prewikka/views/messagesummary/templates/messagesummary.mak:94
+msgid "JSON"
+msgstr "JSON"
+
+#: prewikka/views/messagesummary/templates/messagesummary.mak:100
 msgid "Summary"
 msgstr "Résumé"
 

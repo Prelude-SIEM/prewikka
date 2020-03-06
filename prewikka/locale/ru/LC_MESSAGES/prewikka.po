@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.1.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-04 19:03+0200\n"
+"POT-Creation-Date: 2020-03-06 16:01+0100\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: Alex Bochkin <ba@is-systems.org>\n"
 "Language-Team: Russian\n"
@@ -76,40 +76,40 @@ msgstr "Настраиваемый"
 msgid "Disabled"
 msgstr "Выключено"
 
-#: prewikka/crontab.py:105
+#: prewikka/crontab.py:113
 msgid "Scheduled job execution failed"
 msgstr ""
 
-#: prewikka/crontab.py:139
+#: prewikka/crontab.py:146
 #, fuzzy
 msgid "Invalid job extension"
 msgstr "Неверная сессия"
 
-#: prewikka/crontab.py:139
+#: prewikka/crontab.py:146
 #, python-format
 msgid "Scheduled job with invalid extension type '%s'"
 msgstr ""
 
-#: prewikka/crontab.py:206
+#: prewikka/crontab.py:216
 #, fuzzy
 msgid "Invalid CronJob"
 msgstr "Неверная сессия"
 
-#: prewikka/crontab.py:206
+#: prewikka/crontab.py:216
 #, python-format
 msgid "CronJob with id=%d cannot be found in database"
 msgstr ""
 
-#: prewikka/crontab.py:260
+#: prewikka/crontab.py:270
 #, fuzzy
 msgid "Invalid schedule"
 msgstr "Неверный пользователь"
 
-#: prewikka/crontab.py:260
+#: prewikka/crontab.py:270
 msgid "The specified job schedule is invalid"
 msgstr ""
 
-#: prewikka/crontab.py:286
+#: prewikka/crontab.py:296
 #, python-format
 msgid "Custom (%s)"
 msgstr "Настраиваемый (%s)"
@@ -271,7 +271,7 @@ msgstr ""
 msgid "Session '%s' does not accept any authentication module"
 msgstr "Сессия '%s' не принимает ни одного модуля аутентификации"
 
-#: prewikka/main.py:298
+#: prewikka/main.py:299
 #, python-format
 msgid "An unexpected condition happened while trying to load %s"
 msgstr ""
@@ -600,11 +600,11 @@ msgstr "Предоставляет API для получения событий 
 
 #: prewikka/dataprovider/idmef.py:142
 #: prewikka/views/agents/templates/agents.mak:83
-#: prewikka/views/datasearch/alert.py:75 prewikka/views/datasearch/alert.py:76
+#: prewikka/views/datasearch/alert.py:80 prewikka/views/datasearch/alert.py:81
 msgid "Alerts"
 msgstr "Сигналы тревоги"
 
-#: prewikka/dataprovider/idmef.py:149 prewikka/views/datasearch/alert.py:88
+#: prewikka/dataprovider/idmef.py:149 prewikka/views/datasearch/alert.py:93
 #: prewikka/views/datasearch/threat.py:75
 msgid "Classification"
 msgstr "Классификация"
@@ -779,7 +779,7 @@ msgstr "Время жизни сессии истекло"
 msgid "Your session has expired: please sign in again to continue using Prelude"
 msgstr ""
 
-#: prewikka/session/session.py:181
+#: prewikka/session/session.py:185
 msgid "Logged out"
 msgstr "Пользователь вышел из системы"
 
@@ -1032,7 +1032,7 @@ msgstr "Веб-сайты"
 #: prewikka/views/about/templates/about.mak:67
 #: prewikka/views/aboutplugin/templates/aboutplugin.mak:132
 #: prewikka/views/agents/templates/heartbeatanalyze.mak:71
-#: prewikka/views/messagesummary/templates/messagesummary.mak:93
+#: prewikka/views/messagesummary/templates/messagesummary.mak:118
 msgid "Close"
 msgstr "Закрыть"
 
@@ -1243,7 +1243,7 @@ msgid "Heartbeat analysis"
 msgstr "Анализ событий состояния"
 
 #: prewikka/views/agents/agents.py:133 prewikka/views/agents/agents.py:157
-#: prewikka/views/datasearch/idmef.py:158
+#: prewikka/views/datasearch/idmef.py:160
 #: prewikka/views/messagesummary/messagesummary.py:332
 msgid "IDMEF_VIEW"
 msgstr "IDMEF_VIEW (Просмотр IDMEF)"
@@ -1340,7 +1340,7 @@ msgid "Delete the selected IDMEF messages?"
 msgstr "Удалить выбранные сообщения IDMEF?"
 
 #: prewikka/views/agents/templates/agents.mak:89
-#: prewikka/views/datasearch/idmef.py:195
+#: prewikka/views/datasearch/idmef.py:197
 #: prewikka/views/filter/templates/filterlisting.mak:42
 msgid "Delete"
 msgstr "Удалить"
@@ -1479,40 +1479,41 @@ msgstr "Выключить"
 msgid "Enable"
 msgstr "Включить"
 
-#: prewikka/views/datasearch/alert.py:71
+#: prewikka/views/datasearch/alert.py:76
 #, fuzzy
 msgid "Alert listing page"
 msgstr "Список событий"
 
-#: prewikka/views/datasearch/alert.py:76
+#: prewikka/views/datasearch/alert.py:81
 #, fuzzy
 msgid "Aggregated alerts"
 msgstr "Событие корреляции"
 
-#: prewikka/views/datasearch/alert.py:87
+#: prewikka/views/datasearch/alert.py:92
 #: prewikka/views/datasearch/heartbeat.py:63
 #: prewikka/views/datasearch/threat.py:74
 msgid "Date"
 msgstr "Дата"
 
-#: prewikka/views/datasearch/alert.py:89 prewikka/views/datasearch/threat.py:76
+#: prewikka/views/datasearch/alert.py:94 prewikka/views/datasearch/threat.py:76
 msgid "Source"
 msgstr "Источник"
 
-#: prewikka/views/datasearch/alert.py:90 prewikka/views/datasearch/threat.py:77
+#: prewikka/views/datasearch/alert.py:95 prewikka/views/datasearch/threat.py:77
 msgid "Target"
 msgstr "Цель"
 
-#: prewikka/views/datasearch/alert.py:91
+#: prewikka/views/datasearch/alert.py:96
 msgid "Analyzer"
 msgstr "Анализатор"
 
-#: prewikka/views/datasearch/alert.py:94
+#: prewikka/views/datasearch/alert.py:99
 msgid "Delete the selected alerts?"
 msgstr "Удалить выбранные события?"
 
-#: prewikka/views/datasearch/alert.py:148
+#: prewikka/views/datasearch/alert.py:153
 #: prewikka/views/idmefnav/__init__.py:44
+#: prewikka/views/messagesummary/templates/messagesummary.mak:92
 msgid "IDMEF"
 msgstr "IDMEF"
 
@@ -1557,7 +1558,7 @@ msgstr "Доска диаграмм"
 msgid "CSV export"
 msgstr ""
 
-#: prewikka/views/datasearch/datasearch.py:622
+#: prewikka/views/datasearch/datasearch.py:631
 msgid "General"
 msgstr "Главная"
 
@@ -1684,7 +1685,7 @@ msgid "New search"
 msgstr "Новый поиск"
 
 #: prewikka/views/datasearch/templates/forensic.mak:231
-#: prewikka/views/messagesummary/messagesummary.py:1026
+#: prewikka/views/messagesummary/messagesummary.py:1028
 msgid "Actions"
 msgstr "Действие"
 
@@ -1942,8 +1943,8 @@ msgid "Analyzer Path (%d not shown)"
 msgstr "Путь анализатора (%d не показан)"
 
 #: prewikka/views/messagesummary/messagesummary.py:463
-#: prewikka/views/messagesummary/messagesummary.py:1035
-#: prewikka/views/messagesummary/messagesummary.py:1106
+#: prewikka/views/messagesummary/messagesummary.py:1037
+#: prewikka/views/messagesummary/messagesummary.py:1110
 #, python-format
 msgid "Analyzer #%d"
 msgstr "Анализатор #%d"
@@ -2066,7 +2067,7 @@ msgid "Ttime"
 msgstr ""
 
 #: prewikka/views/messagesummary/messagesummary.py:595
-#: prewikka/views/messagesummary/messagesummary.py:1082
+#: prewikka/views/messagesummary/messagesummary.py:1084
 msgid "Payload"
 msgstr "Полезная нагрузка"
 
@@ -2108,6 +2109,7 @@ msgid "Linked Alerts"
 msgstr "Связанноые события"
 
 #: prewikka/views/messagesummary/messagesummary.py:708
+#: prewikka/views/messagesummary/templates/messagesummary.mak:93
 msgid "Text"
 msgstr "Текст"
 
@@ -2284,23 +2286,27 @@ msgstr "Событие переполнения"
 msgid "Alert"
 msgstr "Событие"
 
-#: prewikka/views/messagesummary/messagesummary.py:1018
+#: prewikka/views/messagesummary/messagesummary.py:1020
 msgid "MessageID"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:1065
+#: prewikka/views/messagesummary/messagesummary.py:1067
 msgid "Network centric information"
 msgstr "Информация об учетной записи"
 
-#: prewikka/views/messagesummary/messagesummary.py:1087
+#: prewikka/views/messagesummary/messagesummary.py:1089
 msgid "ASCII Payload"
 msgstr ""
 
-#: prewikka/views/messagesummary/messagesummary.py:1103
+#: prewikka/views/messagesummary/messagesummary.py:1107
 msgid "Heartbeat"
 msgstr "события состояния"
 
-#: prewikka/views/messagesummary/templates/messagesummary.mak:85
+#: prewikka/views/messagesummary/templates/messagesummary.mak:94
+msgid "JSON"
+msgstr ""
+
+#: prewikka/views/messagesummary/templates/messagesummary.mak:100
 msgid "Summary"
 msgstr "Итого"
 
