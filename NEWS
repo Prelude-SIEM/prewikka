@@ -1,3 +1,15 @@
+* 2020-03-09, prewikka-5.1.5:
+
+Author: Antoine Luong
+
+- Add JSON and text representations in IDMEF details
+- Ensure filters are always applied in statistics
+- Tweak condition for static file detection
+- Fix selector width in control menu
+- Various DataSearch fixes
+
+
+
 * 2020-01-29, prewikka-5.1.4:
 
 Author: Antoine Luong
