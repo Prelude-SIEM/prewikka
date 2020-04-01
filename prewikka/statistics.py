@@ -177,11 +177,13 @@ class ChronologyChart(GenericChart):
     def _get_series(self, query, selection, date_precision):
         selection_index = len(query.paths) + 1
         all_paths, all_criteria = self._prepare_query(query)
+        series_order = []
 
         crit = Criterion()
         if query.limit > 0 and query.paths:
             for values in self._query(all_paths, all_criteria, limit=query.limit, type=query.datatype):
                 crit |= functools.reduce(lambda x, y: x & y, (Criterion(query.paths[i], "=", value) for i, value in enumerate(values[1:])))
+                series_order.append(tuple(values[1:]))
 
         res = []
         if query.limit != 0:
@@ -189,11 +191,19 @@ class ChronologyChart(GenericChart):
 
         out = {}
         for i in res:
-            label = ", ".join((localization.format_value(j) for j in i[1:selection_index])) or self.title
+            key = tuple(i[1:selection_index]) or self.title
             tval = tuple((int(x) for x in i[selection_index:]))
-            out.setdefault(label, {})[tval[:date_precision]] = i[0]
+            out.setdefault(key, {})[tval[:date_precision]] = i[0]
 
-        return out
+        if not series_order:
+            return out
+
+        out2 = collections.OrderedDict()
+        for i in series_order:
+            label = ", ".join((localization.format_value(j) for j in i))
+            out2[label] = out[i]
+
+        return out2
 
     def _ctime_as_timezone(self):
         if env.request.user.timezone.zone == "UTC":
