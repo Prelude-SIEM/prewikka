@@ -99,7 +99,7 @@ class Formatter(object):
     ignore_fields = frozenset()
 
     _converters = {
-        datetime.datetime: lambda f, r, o: resource.HTMLNode("span", format_datetime(o), **{"data-field": f.field})
+        datetime.datetime: lambda f, r, o: resource.HTMLNode("span", format_datetime(o), **{"data-field": f.field, "data-value": o})
     }
 
     def __init__(self, data_type):
