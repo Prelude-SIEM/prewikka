@@ -32,7 +32,8 @@ def test_compat_basestring():
     """
     from prewikka.compat import STRING_TYPES
 
-    assert STRING_TYPES == (basestring,)
+    assert isinstance(b"foo", STRING_TYPES)
+    assert isinstance(u"bar", STRING_TYPES)
 
 
 @pytest.mark.py3_only
@@ -42,4 +43,5 @@ def test_compat_str():
     """
     from prewikka.compat import STRING_TYPES
 
-    assert STRING_TYPES == (str,)
+    assert not isinstance(b"foo", STRING_TYPES)
+    assert isinstance(u"bar", STRING_TYPES)
