@@ -27,21 +27,22 @@ import voluptuous
 import yaml
 
 from prewikka import error, hookmanager
+from prewikka.compat import STRING_TYPES
 from prewikka.utils import cache
 
 
 _SCHEMA = voluptuous.Schema([{
-    "name": str,
-    "icon": str,
+    "name": STRING_TYPES,
+    "icon": STRING_TYPES,
     "default": bool,
     voluptuous.Required("categories", default=[]): [{
-        "name": str,
-        "icon": str,
+        "name": STRING_TYPES,
+        "icon": STRING_TYPES,
         voluptuous.Required("sections", default=[]): [{
-            voluptuous.Required("name"): str,
-            "icon": str,
-            voluptuous.Required("tabs", default=[]): [str],
-            "default_tab": str,
+            voluptuous.Required("name"): STRING_TYPES,
+            "icon": STRING_TYPES,
+            voluptuous.Required("tabs", default=[]): [STRING_TYPES],
+            "default_tab": STRING_TYPES,
             "expand": bool
         }]
     }]

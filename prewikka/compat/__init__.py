@@ -3,9 +3,9 @@ from __future__ import absolute_import, division, print_function
 import sys
 
 if sys.version_info[0] >= 3:
-    STRING_TYPES = str,
+    STRING_TYPES = str
 else:
-    STRING_TYPES = basestring,
+    STRING_TYPES = basestring
 
 
 def with_metaclass(meta, *bases):
