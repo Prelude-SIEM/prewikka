@@ -138,6 +138,7 @@ class AboutPlugin(view.View):
                     upscript.apply()
                 except Exception as e:
                     send_stream(json.dumps({"logs": "\n".join(html.escape(x) for x in upscript.query_logs), "error": html.escape(text_type(e))}), sync=True)
+                    break
                 else:
                     send_stream(json.dumps({"logs": "\n".join(html.escape(x) for x in upscript.query_logs), "success": True}), sync=True)
 
