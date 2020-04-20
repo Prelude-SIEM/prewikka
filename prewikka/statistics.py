@@ -28,9 +28,10 @@ from prewikka.renderer import RendererItem
 
 
 class Query(object):
+    KEYS = ("datatype", "path", "aggregate", "limit", "order", "criteria")
+
     def __init__(self, **kwargs):
-        keys = ["datatype", "path", "aggregate", "limit", "order", "criteria"]
-        datatype, path, aggregate, limit, order, criteria = [kwargs.get(i) for i in keys]
+        datatype, path, aggregate, limit, order, criteria = [kwargs.get(i) for i in self.KEYS]
 
         if isinstance(path, list):
             self.paths = path
