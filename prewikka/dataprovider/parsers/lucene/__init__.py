@@ -183,6 +183,10 @@ class CriteriaTransformer(CommonTransformer):
 
             ret = Criterion()
             for i in self._get_fields(parent_field):
+                if i.endswith(".exact"):
+                    i = i[:-6:]
+                    op = "=="
+
                 ret |= self._compile(i, op, value.value)
 
             return ret
