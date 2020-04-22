@@ -215,7 +215,7 @@ class QueryParser(object):
             if not value:
                 return "-%s:[* TO *]" % path
 
-            return "%s:%s" % (path, cls._lucene_escape(value))
+            return "%s.exact:%s" % (path, cls._lucene_escape(value))
 
         return text_type(Criterion(path, "==", value))
 
