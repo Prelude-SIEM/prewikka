@@ -17,40 +17,25 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """
-Tests for `prewikka.auth`.
+Tests for `prewikka.auth.auth`.
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import pytest
 
-from prewikka.auth.auth import AuthError, Auth
+from prewikka.auth.auth import Auth, AuthError
+from prewikka.config import ConfigSection
 from prewikka.error import NotImplementedError
-from prewikka.usergroup import User
-
-
-class FakeSession(object):
-    """
-    Fake class to emulate Session system, tests only.
-    """
-    template = None
-
-    def __init__(self, template):
-        self.template = template
-
-
-class FakeAuth(Auth):
-    """
-    Fake class to emulate Auth system, tests only.
-    """
-    pass
+from prewikka.session.session import Session
+from prewikka.usergroup import Group, User
 
 
 def test_autherror():
     """
     Test `prewikka.auth.auth.AuthError` error.
     """
-    session = FakeSession(None)
+    session = Session(ConfigSection(None))
     error = AuthError(session)
 
     with pytest.raises(AuthError):
@@ -61,70 +46,65 @@ def test_auth():
     """
     Test `prewikka.auth.auth.Auth` class.
     """
-    authentication = FakeAuth(None)
+    auth = Auth(ConfigSection(None))
+    user = User('john')
+    group = Group('grp')
 
     # _AuthUser()
-    assert not authentication.can_create_user()
-    assert not authentication.can_delete_user()
-    assert not authentication.can_set_password()
-    assert not authentication.can_manage_permissions()
+    assert not auth.can_create_user()
+    assert not auth.can_delete_user()
+    assert not auth.can_set_password()
+    assert not auth.can_manage_permissions()
+    assert not auth.get_user_list()
+    assert not auth.get_user_list('foo')
+
+    assert not auth.get_user_by_id(user.id)
+    auth.create_user(user)
+    assert auth.get_user_by_id(user.id)
+    auth.delete_user(user)
+    assert not auth.get_user_by_id(user.id)
 
     with pytest.raises(NotImplementedError):
-        assert not authentication.create_user('john')
+        auth.has_user(user)
+
+    assert not auth.get_user_permissions(user)
+    assert not auth.get_user_permissions(user, True)
+    assert not auth.get_user_permissions_from_groups(user)
 
     with pytest.raises(NotImplementedError):
-        assert not authentication.delete_user(User('john'))
-
-    assert not authentication.get_user_list()
-    assert not authentication.get_user_list('foo')
-
-    with pytest.raises(NotImplementedError):
-        authentication.get_user_by_id('john')
-
-    with pytest.raises(NotImplementedError):
-        authentication.has_user('john')
-
-    assert not authentication.get_user_permissions('john')
-    assert not authentication.get_user_permissions('john', True)
-    assert not authentication.get_user_permissions_from_groups('bar')
-
-    with pytest.raises(NotImplementedError):
-        authentication.set_user_permissions('john', 'fake-perms')
+        auth.set_user_permissions(user, ['FAKE_PERM'])
 
     # _AuthGroup
-    assert not authentication.can_create_group()
-    assert not authentication.can_delete_group()
-    assert not authentication.can_manage_group_members()
-    assert not authentication.can_manage_group_permissions()
-    assert not authentication.get_group_list()
-    assert not authentication.get_group_list('foo')
+    assert not auth.can_create_group()
+    assert not auth.can_delete_group()
+    assert not auth.can_manage_group_members()
+    assert not auth.can_manage_group_permissions()
+    assert not auth.get_group_list()
+    assert not auth.get_group_list('foo')
+
+    assert not auth.get_group_by_id(group.id)
+    auth.create_group(group)
+    assert auth.get_group_by_id(group.id)
+    auth.delete_group(group)
+    assert not auth.get_group_by_id(group.id)
 
     with pytest.raises(NotImplementedError):
-        authentication.get_group_by_id('grp')
+        auth.set_group_permissions(group, ['FAKE_PERM'])
+
+    assert not auth.get_group_permissions(group)
 
     with pytest.raises(NotImplementedError):
-        assert not authentication.create_group('grp')
+        auth.set_group_members(group, [user])
+
+    assert not auth.get_group_members(group)
 
     with pytest.raises(NotImplementedError):
-        assert not authentication.delete_group('grp')
+        auth.set_member_of(user, [group])
+
+    assert not auth.get_member_of(user)
 
     with pytest.raises(NotImplementedError):
-        authentication.set_group_permissions('grp', 'perms')
-
-    assert not authentication.get_group_permissions('grp')
+        auth.is_member_of(group, user)
 
     with pytest.raises(NotImplementedError):
-        authentication.set_group_members('grp', 'john')
-
-    assert not authentication.get_group_members('grp')
-
-    with pytest.raises(NotImplementedError):
-        authentication.set_member_of('john', 'grp')
-
-    assert not authentication.get_member_of('john, ')
-
-    with pytest.raises(NotImplementedError):
-        authentication.is_member_of('grp', 'john')
-
-    with pytest.raises(NotImplementedError):
-        authentication.has_group('grp')
+        auth.has_group(group)

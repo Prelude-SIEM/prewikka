@@ -75,6 +75,19 @@ class ChartJSTimePlugin(ChartJSRenderer):
         return self.generate_html(kwargs, options, opts, self._chart_type, link_mapping, True)
 
 
+class ChartJSTimelinePlugin(ChartJSTimePlugin):
+    """ ChartJS timeline plugin """
+
+    renderer_type = "timeline"
+    _chart_type = "line"
+
+    plugin_name = "ChartJS : Timeline"
+    plugin_description = N_("ChartJS Timeline renderer type")
+
+    def render(self, data, **kwargs):
+        return ChartJSTimePlugin.render(self, data, **kwargs)
+
+
 class ChartJSTimebarPlugin(ChartJSTimePlugin):
     """ ChartJS timebar plugin """
 

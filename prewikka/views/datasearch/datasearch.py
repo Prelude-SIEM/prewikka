@@ -61,6 +61,7 @@ class DataSearchParameters(view.Parameters):
         self.optional("query_mode", text_type, save=True)
         self.optional("editable", int, save=True)
         self.optional("condensed", int, save=True)
+        self.optional("expert", int, save=True)
         self.optional("jqgrid_params_datasearch_table", json.loads, default={}, persist=True)
 
 
@@ -376,6 +377,7 @@ class DataSearch(view.View):
     path_translate = {}
     default_columns = {}
     lucene_search_fields = []
+    expert_enabled = False
     _extra_resources = []
 
     criterion_config["lucene"] = {
@@ -521,6 +523,7 @@ class DataSearch(view.View):
                                               parent=self)
         dataset["extra_resources"] = self._extra_resources
         dataset["common_paths"] = {path.split(".", 1)[-1]: _(label).lower() for label, path in env.dataprovider.get_common_paths(self.type, index=True)}
+        dataset["expert_enabled"] = self.expert_enabled
 
         return view.ViewResponse(dataset)
 

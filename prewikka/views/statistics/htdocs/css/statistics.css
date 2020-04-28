@@ -1,0 +1,149 @@
+/* Filter button */
+.grid-stack-item-content a.filter {
+    display: none;
+}
+
+/*
+ * No scrollbar for the whole widget
+ * And narrow space between widgets
+ */
+.grid-stack > .grid-stack-item > .grid-stack-item-content {
+    overflow: hidden;
+    left: 2.5px;
+    right: 2.5px;
+}
+
+/*
+ * Allow scrollbars in the widget content,
+ * in case of a view/error as the content
+ */
+.scrollable, .panel-body > .error-dialog {
+    overflow: auto;
+    height: 100%;
+}
+
+/* Nice margins for embedded error modals */
+.panel-body > .error-dialog > .modal-dialog {
+    margin: 10px;
+}
+
+/*
+ * Add margin to the pills element
+ * in the form to add widget, creating
+ * a nice space between the form and the pills
+ */
+.modal-body > .nav-pills {
+    margin-bottom: 15px;
+}
+
+/* View Settings */
+#limit {
+    float: right;
+    margin-left: 10px;
+    width: 100px;
+    height: 25px;
+    padding: 5px;
+}
+
+/* Section name for grid */
+.grid-stack > legend.grid-stack-item {
+    padding: 0.4em;
+}
+
+/* Nice checkbox */
+.label-badge {
+    cursor: pointer;
+    font-weight: inherit;
+}
+
+.label-badge:hover {
+    cursor: pointer;
+    font-weight: inherit;
+    color:#555;
+    background-color:#f5f5f5
+}
+
+.label-edit > span > a:after {
+    color: #fff;
+}
+
+.checkbox-edit {
+    display: none;
+}
+
+.checkbox-edit:checked + .label-edit > span > a:after {
+    content: "\2714";
+}
+
+.checkbox-edit:checked + .label-edit > span {
+    background-color: #5cd85c;
+}
+
+.checkbox-edit + .label-edit > span > a:after {
+    content: "\2717";
+}
+
+.checkbox-edit + .label-edit > span {
+    background-color: #d9534f;
+}
+
+/* Remove hideous outlines on buttons */
+.btn-group > .btn:focus,
+.btn-group > .btn:active,
+.modal-body > .nav > li > a:focus,
+.modal-body > .nav > li > a:hover {
+    outline: none;
+}
+
+.panel-heading > .btn-group > .btn {
+    margin-left: 5px;
+}
+
+/* Remove jQuery-UI handles */
+.grid-stack-item > .ui-icon.ui-resizable-handle {
+    background-image: none;
+}
+/* Remove jQuery-UI 100% width which conflict with gridstack */
+.grid-stack-item > .ui-resizable-s {
+    width: auto;
+}
+
+.grid-stack .panel > .panel-heading {
+    height: 30px;
+    border: none;
+    padding: 5px 5px;
+}
+
+.grid-stack .panel-movable {
+    cursor: move;
+}
+
+.grid-stack .panel-title {
+    line-height: 22px;
+    position: absolute;
+    width: 100%;
+    text-align: center;
+}
+
+/* Modal inside widget */
+.wmodal {
+    position: absolute;
+    top: 40px;
+    bottom: 0px;
+    background-color: #dcdcdc;
+    overflow: auto;
+}
+
+.wtitle {
+    text-align: center;
+    font-weight: bold;
+    padding: 5px;
+}
+
+.wtext {
+    padding: 15px;
+}
+
+.wbutton {
+    text-align: center;
+}

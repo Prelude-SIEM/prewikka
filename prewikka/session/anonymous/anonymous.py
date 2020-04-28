@@ -19,10 +19,10 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-from prewikka import auth, session, usergroup, version
+from prewikka import auth, database, session, usergroup, version
 
 
-class AnonymousSession(auth.Auth, session.Session):
+class AnonymousSession(auth.Auth, session.Session, database.DatabaseHelper):
     plugin_name = "Anonymous authentication"
     plugin_author = version.__author__
     plugin_license = version.__license__
@@ -35,6 +35,11 @@ class AnonymousSession(auth.Auth, session.Session):
     def __init__(self, config):
         auth.Auth.__init__(self, config)
         session.Session.__init__(self, config)
+
+    def init(self, config):
+        user = usergroup.User("anonymous")
+        if not auth.Auth.get_user_by_id(self, user.id):
+            self.create_user(user)
 
     def get_user_permissions(self, user, ignore_group=False):
         return usergroup.ALL_PERMISSIONS

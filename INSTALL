@@ -29,6 +29,7 @@ Run requires:
 - python-gevent
 - python-lark-parser
 - python-mako >= 0.8.1
+- python-passlib >= 1.7
 - python-tz / pytz
 - python-voluptuous
 - python-werkzeug

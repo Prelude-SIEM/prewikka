@@ -90,8 +90,6 @@ class Session(pluginmanager.PluginBase):
         self._db = SessionDatabase()
         self._expiration = config.get_int('expiration', 60) * 60
 
-        hookmanager.register("HOOK_USER_DELETE", lambda user: self._db.delete_session(user=user))
-
     def __set_session(self, request, sessionid):
         request.add_cookie("sessionid", sessionid, expires=self._expiration * 3, httponly=True)
 

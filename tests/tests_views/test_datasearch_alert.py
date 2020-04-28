@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """
-Tests `prewikka.views.datasearch.threat`.
+Tests `prewikka.views.datasearch.alert`.
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -35,7 +35,7 @@ def datasearch_fixtures(request):
     """
     Fixture for datasearch tests.
 
-    :return: view for threats.
+    :return: view for alerts.
     :rtype: prewikka.view.View
     """
     backup_parameters = deepcopy(env.request.parameters)
@@ -59,37 +59,37 @@ def datasearch_fixtures(request):
     return view
 
 
-@pytest.mark.parametrize("datasearch_fixtures", ["ThreatDataSearch.forensic"], indirect=True)
-def test_threats(datasearch_fixtures):
+@pytest.mark.parametrize("datasearch_fixtures", ["AlertDataSearch.forensic"], indirect=True)
+def test_alerts(datasearch_fixtures):
     """
-    Test `prewikka.views.datasearch.threat.ThreatDataSearch` view.
-    """
-    view = datasearch_fixtures
-    view.render()
-
-
-@pytest.mark.parametrize("datasearch_fixtures", ["ThreatDataSearch.ajax_timeline"], indirect=True)
-def test_threats_timeline(datasearch_fixtures):
-    """
-    Test `prewikka.views.datasearch.threat.ThreatDataSearch` timeline.
+    Test `prewikka.views.datasearch.alert.AlertDataSearch` view.
     """
     view = datasearch_fixtures
     view.render()
 
 
-@pytest.mark.parametrize("datasearch_fixtures", ["ThreatDataSearch.ajax_table"], indirect=True)
-def test_threats_table(datasearch_fixtures):
+@pytest.mark.parametrize("datasearch_fixtures", ["AlertDataSearch.ajax_timeline"], indirect=True)
+def test_alerts_timeline(datasearch_fixtures):
     """
-    Test `prewikka.views.datasearch.threat.ThreatDataSearch` table.
+    Test `prewikka.views.datasearch.alert.AlertDataSearch` timeline.
     """
     view = datasearch_fixtures
     view.render()
 
 
-@pytest.mark.parametrize("datasearch_fixtures", ["ThreatDataSearch.ajax_details"], indirect=True)
-def test_threats_details(datasearch_fixtures):
+@pytest.mark.parametrize("datasearch_fixtures", ["AlertDataSearch.ajax_table"], indirect=True)
+def test_alerts_table(datasearch_fixtures):
     """
-    Test `prewikka.views.datasearch.threat.ThreatDataSearch` details.
+    Test `prewikka.views.datasearch.alert.AlertDataSearch` table.
+    """
+    view = datasearch_fixtures
+    view.render()
+
+
+@pytest.mark.parametrize("datasearch_fixtures", ["AlertDataSearch.ajax_details"], indirect=True)
+def test_alerts_details(datasearch_fixtures):
+    """
+    Test `prewikka.views.datasearch.alert.AlertDataSearch` details.
     """
     view = datasearch_fixtures
 
@@ -101,10 +101,10 @@ def test_threats_details(datasearch_fixtures):
         view.render()
 
 
-@pytest.mark.parametrize("datasearch_fixtures", ["ThreatDataSearch.ajax_infos"], indirect=True)
-def test_threats_infos(datasearch_fixtures):
+@pytest.mark.parametrize("datasearch_fixtures", ["AlertDataSearch.ajax_infos"], indirect=True)
+def test_alerts_infos(datasearch_fixtures):
     """
-    Test `prewikka.views.datasearch.threat.ThreatDataSearch` details.
+    Test `prewikka.views.datasearch.alert.AlertDataSearch` details.
     """
     view = datasearch_fixtures
 

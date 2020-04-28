@@ -70,7 +70,7 @@ def create_session(user, time_=None, session_id=None):
     """
     Create a session and save it in database.
 
-    :param rewikka.usergroup.User user: User for the session creation.
+    :param prewikka.usergroup.User user: User for the session creation.
     :param float time_: optional time.time() object.
     :param str session_id: optional session ID
     :return: the ID of the session.

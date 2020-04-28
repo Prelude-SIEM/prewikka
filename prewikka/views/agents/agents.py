@@ -30,7 +30,7 @@ class Agents(view.View):
     view_datatype = "heartbeat"
     plugin_htdocs = (("agents", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
-    @hookmanager.register("HOOK_SUMMARYWIDGET_DATA", _order=0)
+    @hookmanager.register("HOOK_RISKOVERVIEW_DATA", _order=0)
     def _set_agents_summary(self):
         results = env.dataprovider.query(["max(heartbeat.create_time)", "heartbeat.analyzer(-1).analyzerid/group_by"])
         if not results:

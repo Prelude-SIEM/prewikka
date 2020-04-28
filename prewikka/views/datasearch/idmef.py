@@ -38,7 +38,7 @@ class IDMEFHighLighter(datasearch.HighLighter):
 class IDMEFFormatter(datasearch.Formatter):
     highlighter = IDMEFHighLighter
 
-    def _format_time(self, root, obj, finfo):
+    def _format_time(self, finfo, root, obj):
         href = None
         if root["%s.messageid" % self.type]:
             href = url_for("%ssummary.render" % self.type, messageid=root["%s.messageid" % self.type], _default=None, **env.request.menu.get_parameters())
@@ -115,7 +115,7 @@ class IDMEFFormatter(datasearch.Formatter):
 
     def format(self, finfo, root, obj):
         if finfo.path in self._objects:
-            return self._objects[finfo.path](root, obj, finfo.path)
+            return self._objects[finfo.path](finfo, root, obj)
 
         try:
             cl = prelude.IDMEFClass(finfo.path)
@@ -158,6 +158,7 @@ class IDMEFQueryParser(datasearch.QueryParser):
 
 class IDMEFDataSearch(datasearch.DataSearch):
     view_permissions = [N_("IDMEF_VIEW")]
+    expert_enabled = True
 
     def __init__(self, *args, **kwargs):
         self._extra_table_fields = []

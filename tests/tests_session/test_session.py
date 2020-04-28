@@ -75,7 +75,7 @@ def test_session_db_create_():
     """
     Test `prewikka.session.session.SessionDatabase.create_session` method.
     """
-    user = User('admin')
+    user = User('anonymous')
     session_id = create_session(user)
     query = env.db.query('SELECT * from Prewikka_Session WHERE sessionid=\'%s\'' % session_id)
 
@@ -91,7 +91,7 @@ def test_session_db_update():
     Test `prewikka.session.session.SessionDatabase.update_session` method.
     """
     session_database = SessionDatabase()
-    user = User('admin')
+    user = User('anonymous')
     session_id = create_session(user)
     old_query = env.db.query('SELECT * from Prewikka_Session WHERE sessionid=\'%s\'' % session_id)
     time_ = time.time() + 3600  # add 3600s
@@ -116,7 +116,7 @@ def test_session_db_get():
     Test `prewikka.session.session.SessionDatabase.get_session` method.
     """
     session_database = SessionDatabase()
-    user = User('admin')
+    user = User('anonymous')
     session_id = create_session(user)
     query = env.db.query('SELECT * from Prewikka_Session WHERE sessionid=\'%s\'' % session_id)
 
@@ -140,7 +140,7 @@ def test_session_db_delete():
     Test `prewikka.session.session.SessionDatabase.delete_session` method.
     """
     session_database = SessionDatabase()
-    user = User('admin')
+    user = User('anonymous')
 
     # delete 1 session based on sessionid
     session_id = create_session(user)
@@ -227,7 +227,7 @@ def test_session_db_delete_expired_():
     Test `prewikka.session.session.SessionDatabase.delete_expired_sessions` method.
     """
     session_database = SessionDatabase()
-    user = User('admin')
+    user = User('anonymous')
     t_now = time.time()
     t_before = t_now - 3600
     t_after = t_now + 3600

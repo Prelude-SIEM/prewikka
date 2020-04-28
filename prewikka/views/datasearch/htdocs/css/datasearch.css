@@ -98,6 +98,18 @@
     white-space: nowrap;
 }
 
+#datasearch #datasearch_table .expert-mode {
+    display: none;
+}
+
+#datasearch #datasearch_table.table-expert .expert-mode {
+    display: block;
+}
+
+#datasearch #datasearch_table.table-expert .basic-mode {
+    display: none;
+}
+
 /* Subgrid details */
 
 #datasearch .tablediv {

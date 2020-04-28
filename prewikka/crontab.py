@@ -136,7 +136,6 @@ class Crontab(object):
         self._reinit()
         self._joblist = set()
         hookmanager.register("HOOK_PLUGINS_RELOAD", self._reinit)
-        hookmanager.register("HOOK_USER_DELETE", lambda user: self.delete(user=user))
 
     def _make_job(self, res):
         id, name, userid, schedule, ext_type, ext_id, base, runcnt, enabled, error_s = res

@@ -21,7 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 from hashlib import md5
 
-from prewikka import crontab, database, log, utils, hookmanager
+from prewikka import crontab, database, log, utils
 
 logger = log.get_logger(__name__)
 
@@ -71,10 +71,6 @@ class HistoryDatabase(database.DatabaseHelper):
         self.query("DELETE FROM Prewikka_History_Query" + self._where(query_hash=query_hash), user=user.id, query_hash=query_hash, form=form)
 
         logger.info("Query deleted: %s by %s on form %s", query or "all queries", user.name, form)
-
-    @hookmanager.register("HOOK_USER_DELETE")
-    def _clear_on_delete(self, user):
-        self.query("DELETE FROM Prewikka_History_Query " + self._where(query_hash=False, form=False), user=user.id)
 
     def _history_cron(self, job):
         config = env.config.cron.get_instance_by_name("search_history")

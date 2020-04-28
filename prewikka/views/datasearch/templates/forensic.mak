@@ -86,7 +86,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
             <label for="view-config-editable">
               <input type="checkbox" id="view-config-editable" ${ checked(env.request.parameters.get("editable")) } />
               <input type="hidden" name="editable" value="${env.request.parameters.get('editable')}" />
-              ${ _("Expert mode") }
+              ${ _("Action mode") }
             </label>
           </div>
           <div>
@@ -96,6 +96,15 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
               ${ _("Condensed mode") }
             </label>
           </div>
+          % if expert_enabled:
+          <div>
+            <label for="view-config-expert">
+              <input type="checkbox" id="view-config-expert" ${ checked(env.request.parameters.get("expert")) } />
+              <input type="hidden" name="expert" value="${env.request.parameters.get('expert')}" />
+              ${ _("Expert mode") }
+            </label>
+          </div>
+          % endif
           % endif
       </div>
   </div>

@@ -9,7 +9,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
     function lucene_need_quotes(value)
     {
         /*
-         * We add "/"" to the lucene escape characters as ELK interpret them as a regexp
+         * We add "/"" to the lucene escape characters as Elasticsearch interprets them as a regexp
          */
         return /[/\s+\-!(){}[\]^"~*?\:\\]|&&|\|\|/g.test(value);
     }
@@ -626,6 +626,10 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
     $("#view-config-condensed").change(function() {
         $("#datasearch_table").toggleClass("table-nowrap", $(this).prop("checked"));
         $("#form_search :input[name=condensed]").val($(this).prop("checked") ? 1 : 0);
+    }).change();
+
+    $("#view-config-expert").change(function() {
+        $("#datasearch_table").toggleClass("table-expert", $(this).prop("checked"));
     }).change();
 
     $("#datasearch_table").parents(".row").change("change", function () {

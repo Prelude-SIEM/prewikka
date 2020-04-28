@@ -27,8 +27,6 @@ from prewikka.dataprovider import CriterionOperator
 from prewikka.utils import AttrObj, json
 from prewikka.utils.viewhelpers import GridParameters
 
-from . import FilterPlugin
-
 
 class Filter(object):
     def __init__(self, id_, name, category, description, criteria):
@@ -98,7 +96,7 @@ class FilterDatabase(database.DatabaseHelper):
         return [row[0] for row in self.query(query, user=user.id)]
 
 
-class FilterView(FilterPlugin, view.View):
+class FilterView(view.View):
     plugin_htdocs = (("filter", pkg_resources.resource_filename(__name__, 'htdocs')),)
     _filter_menu_tmpl = template.PrewikkaTemplate(__name__, "templates/menu.mak")
 
@@ -135,10 +133,6 @@ class FilterView(FilterPlugin, view.View):
         dataset["columns"] = self._get_types()
 
         return template.PrewikkaTemplate(__name__, "templates/filterlisting.mak").render(**dataset)
-
-    @hookmanager.register("HOOK_USER_DELETE")
-    def _user_delete(self, user):
-        self._filter_delete(user)
 
     def _filter_delete(self, user, name=None, id_=None):
         for fid, fname in self._db.delete_filter(user, name, id_):

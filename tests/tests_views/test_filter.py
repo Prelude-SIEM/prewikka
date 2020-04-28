@@ -17,7 +17,7 @@
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 """
-Tests for `prewikka.views.filter`.
+Tests for `prewikka.plugins.filter`.
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -40,7 +40,7 @@ def filter_fixtures(request):
     :return: view for filter.
     :rtype: prewikka.view.View
     """
-    from prewikka.views.filter.filter import FilterDatabase, Filter  # prevent import error
+    from prewikka.plugins.filter.filter import FilterDatabase, Filter  # prevent import error
 
     view = load_view_for_fixtures(request.param)
     view.process_parameters()
@@ -91,7 +91,7 @@ def filter_fixtures(request):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.listing"], indirect=True)
 def test_filter_database(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterDatabase` class.
+    Test `prewikka.plugins.filter.filter.FilterDatabase` class.
 
     Only test methods not already tested in views tests below.
     """
@@ -107,7 +107,7 @@ def test_filter_database(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.listing"], indirect=True)
 def test_listing(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.listing` view.
+    Test `prewikka.plugins.filter.filter.FilterView.listing` view.
     """
     view = filter_fixtures.get('view')
 
@@ -117,7 +117,7 @@ def test_listing(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.edit"], indirect=True)
 def test_edit(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.edit` view.
+    Test `prewikka.plugins.filter.filter.FilterView.edit` view.
     """
     view = filter_fixtures.get('view')
 
@@ -127,7 +127,7 @@ def test_edit(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.edit"], indirect=True)
 def test_edit_with_name(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.edit` view.
+    Test `prewikka.plugins.filter.filter.FilterView.edit` view.
     """
     view = filter_fixtures.get('view')
 
@@ -145,7 +145,7 @@ def test_edit_with_name(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.edit"], indirect=True)
 def test_edit_duplicate(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.edit` view.
+    Test `prewikka.plugins.filter.filter.FilterView.edit` view.
     """
     view = filter_fixtures.get('view')
 
@@ -158,7 +158,7 @@ def test_edit_duplicate(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.delete"], indirect=True)
 def test_delete(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.delete` view.
+    Test `prewikka.plugins.filter.filter.FilterView.delete` view.
     """
     view = filter_fixtures.get('view')
 
@@ -175,7 +175,7 @@ def test_delete(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.save"], indirect=True)
 def test_save(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.save` view.
+    Test `prewikka.plugins.filter.filter.FilterView.save` view.
 
     save() without prior name (new filter)
     """
@@ -195,7 +195,7 @@ def test_save(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.save"], indirect=True)
 def test_save_without_name(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.save` view.
+    Test `prewikka.plugins.filter.filter.FilterView.save` view.
 
     save() without filter name specified.
     """
@@ -211,7 +211,7 @@ def test_save_without_name(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.save"], indirect=True)
 def test_save_rename(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.save` view.
+    Test `prewikka.plugins.filter.filter.FilterView.save` view.
 
     save() with a name change
     """
@@ -233,7 +233,7 @@ def test_save_rename(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.save"], indirect=True)
 def test_save_duplicated_name(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.save` view.
+    Test `prewikka.plugins.filter.filter.FilterView.save` view.
 
     save() with a duplicated name.
     """
@@ -251,7 +251,7 @@ def test_save_duplicated_name(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.save"], indirect=True)
 def test_save_update(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView.save` view.
+    Test `prewikka.plugins.filter.filter.FilterView.save` view.
 
     save() without changing the name.
     """
@@ -269,7 +269,7 @@ def test_save_update(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.listing"], indirect=True)
 def test_hook_user_delete(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView._user_delete` hook.
+    Test `prewikka.plugins.filter.filter.FilterView._user_delete` hook.
     """
     list(hookmanager.trigger('HOOK_USER_DELETE', env.request.user))
 
@@ -277,7 +277,7 @@ def test_hook_user_delete(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.listing"], indirect=True)
 def test_hook_filter_param_register(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView._filter_parameters_register` hook.
+    Test `prewikka.plugins.filter.filter.FilterView._filter_parameters_register` hook.
     """
     assert list(hookmanager.trigger('HOOK_MAINMENU_PARAMETERS_REGISTER', env.request.parameters))
 
@@ -285,7 +285,7 @@ def test_hook_filter_param_register(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.listing"], indirect=True)
 def test_hook_filter_get_criteria(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView._filter_get_criteria` hook.
+    Test `prewikka.plugins.filter.filter.FilterView._filter_get_criteria` hook.
     """
     # default
     assert list(hookmanager.trigger('HOOK_DATAPROVIDER_CRITERIA_PREPARE', 'alert'))
@@ -313,6 +313,6 @@ def test_hook_filter_get_criteria(filter_fixtures):
 @pytest.mark.parametrize("filter_fixtures", ["filterview.listing"], indirect=True)
 def test_filter_html_menu(filter_fixtures):
     """
-    Test `prewikka.views.filter.filter.FilterView._filter_html_menu` hook.
+    Test `prewikka.plugins.filter.filter.FilterView._filter_html_menu` hook.
     """
     assert list(hookmanager.trigger('HOOK_MAINMENU_EXTRA_CONTENT', 'alert', env.request.parameters, input_size="md"))

@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import abc
 
-from prewikka import log, pluginmanager
+from prewikka import database, log, pluginmanager, usergroup
 from prewikka.error import NotImplementedError, PrewikkaUserError
 
 
@@ -31,12 +31,12 @@ class AuthError(PrewikkaUserError):
         PrewikkaUserError.__init__(self, None, message, log_priority=log_priority, log_user=log_user, template=session.template)
 
 
-class _AuthUser(object):
+class _AuthUser(database.DatabaseHelper):
     def can_create_user(self):
-        return self.__class__.create_user != _AuthUser.create_user
+        return False
 
     def can_delete_user(self):
-        return self.__class__.delete_user != _AuthUser.delete_user
+        return False
 
     def can_set_password(self):
         return self.__class__.set_password != _AuthUser.set_password
@@ -44,21 +44,22 @@ class _AuthUser(object):
     def can_manage_permissions(self):
         return self.__class__.set_user_permissions != _AuthUser.set_user_permissions
 
-    @abc.abstractmethod
     def create_user(self, user):
-        raise NotImplementedError
+        self.query("INSERT INTO Prewikka_User (name, userid) VALUES (%s, %s)", user.name, user.id)
+        env.log.info("Created user \"%s\"" % user)
 
-    @abc.abstractmethod
     def delete_user(self, user):
-        raise NotImplementedError
+        name = user.name
+        self.query("DELETE FROM Prewikka_User WHERE userid = %s", user.id)
+        env.log.info("Deleted user \"%s\"" % name)
 
     @abc.abstractmethod
     def get_user_list(self, search=None):
         return []
 
-    @abc.abstractmethod
     def get_user_by_id(self, id_):
-        raise NotImplementedError
+        ret = self.query("SELECT name, userid FROM Prewikka_User WHERE userid = %s", id_)
+        return usergroup.User(*ret[0]) if ret else None
 
     @abc.abstractmethod
     def has_user(self, user):
@@ -86,10 +87,10 @@ class _AuthGroup(object):
         return self.__class__.get_group_by_id != _AuthGroup.get_group_by_id
 
     def can_create_group(self):
-        return self.__class__.create_group != _AuthGroup.create_group
+        return False
 
     def can_delete_group(self):
-        return self.__class__.delete_group != _AuthGroup.delete_group
+        return False
 
     def can_manage_group_members(self):
         return self.__class__.set_group_members != _AuthGroup.set_group_members
@@ -101,15 +102,17 @@ class _AuthGroup(object):
         return []
 
     def get_group_by_id(self, id_):
-        raise NotImplementedError
+        ret = self.query("SELECT name, groupid FROM Prewikka_Group WHERE groupid = %s", id_)
+        return usergroup.Group(*ret[0]) if ret else None
 
-    @abc.abstractmethod
     def create_group(self, group):
-        raise NotImplementedError
+        self.query("INSERT INTO Prewikka_Group (name, groupid) VALUES (%s, %s)", group.name, group.id)
+        env.log.info("Created group \"%s\"" % group)
 
-    @abc.abstractmethod
     def delete_group(self, group):
-        raise NotImplementedError
+        name = group.name
+        self.query("DELETE FROM Prewikka_Group WHERE groupid = %s", group.id)
+        env.log.info("Deleted group \"%s\"" % name)
 
     def set_group_permissions(self, group, permissions):
         raise NotImplementedError

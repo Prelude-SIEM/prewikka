@@ -3,7 +3,7 @@
     from prewikka.dataprovider import OPERATORS
 %>
 
-<%namespace file="/prewikka/views/filter/templates/widget.mak" import="init, condition, group"/>
+<%namespace file="/prewikka/plugins/filter/templates/widget.mak" import="init, condition, group"/>
 
 <%
     tooltips = {op: _(label) for op, label in OPERATORS.items()}

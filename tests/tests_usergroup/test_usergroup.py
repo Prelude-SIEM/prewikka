@@ -54,13 +54,14 @@ def test_group():
         Group()
 
     group1 = Group(name='foo')
-    group2 = Group(groupid='bar')
+    group2 = Group(name='bar')
 
+    group1.create()
     assert group1 != group2
     assert group1.name == 'foo'
+    assert group1 == Group(groupid=group1.id)
 
-    with pytest.raises(NotImplementedError):
-        assert group2.name != 'foo'
+    group1.delete()
 
 
 def test_permissions_required():
@@ -87,14 +88,12 @@ def test_user():
         User()
 
     user1 = User(login='foo')
-    user2 = User(userid='bar')
+    user2 = User(login='bar')
 
+    user1.create()
     assert user1 != user2
-    assert not user1 == user2
-    assert not user1 == None  # noqa
-
     assert user1.name == 'foo'
-    assert user2.name == 'anonymous'
+    assert user1 == User(userid=user1.id)
 
     # set permissions (not implemented)
     with pytest.raises(NotImplementedError):
@@ -183,3 +182,5 @@ def test_user():
 
     with pytest.raises(PermissionDeniedError):
         user1.check('perm1', '/agents/agents')
+
+    user1.delete()

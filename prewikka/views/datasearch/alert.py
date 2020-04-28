@@ -25,34 +25,66 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import collections
 import prelude
 
-from prewikka import resource, utils, version
+from prewikka import hookmanager, localization, resource, utils, version
+from prewikka.dataprovider import Criterion
 
+from .datasearch import COLUMN_PROPERTIES
 from . import idmef
 
 
 class AlertFormatter(idmef.IDMEFFormatter):
     def __init__(self, data_type):
         idmef.IDMEFFormatter.__init__(self, data_type)
-        self._objects = {"alert.create_time": self._format_time,
-                         "alert.classification": self._format_classification}
+        self._objects = {
+            "alert.create_time": self._format_time,
+            "alert.classification": self._format_classification,
+        }
 
-    def _format_classification(self, root, obj, finfo):
-        severity = root.get("alert.assessment.impact.severity")
-        severity = "impact_severity_%s" % severity if severity else ""
+    def format_value(self, field, value):
+        node = idmef.IDMEFFormatter.format_value(self, field, value)
+        if field != "assessment.impact.severity":
+            return node
 
-        r = resource.HTMLNode("ul", self._format_value(
+        classes = {"info": "btn-info", "low": "btn-success", "medium": "btn-warning", "high": "btn-danger"}
+        node._extra = {"_classes": classes.get(value, "btn-default")}
+        return node
+
+    def _format_classification(self, finfo, root, obj):
+        return resource.HTMLNode("ul", self._format_value(
             root.get("alert.classification"),
             prelude.IDMEFClass("alert.classification.text"),
-            _class=severity,
+            label=False,
             tooltip=root.get("alert.assessment.impact.description")
         ))
 
-        for i in ("alert.assessment", "alert.correlation_alert", "alert.tool_alert", "alert.overflow_alert"):
-            obj = root.get(i)
-            if obj:
-                r += self._format_object(root, obj, prelude.IDMEFClass(i))
+    def format(self, finfo, root, obj):
+        ret = idmef.IDMEFFormatter.format(self, finfo, root, obj)
+        if not ret:
+            return ret
 
-        return r
+        basic_fields = {
+            "alert.source": "alert.source(0).node.address(0).address",
+            "alert.target": "alert.target(0).node.address(0).address",
+            "alert.analyzer(-1)": "alert.analyzer(-1).name",
+        }
+
+        if finfo.path in basic_fields:
+            finfo = env.dataprovider.get_path_info(basic_fields[finfo.path])
+            obj = root.get(finfo.path)
+            simple_fmt = idmef.IDMEFFormatter.format(self, finfo, root, obj)
+            if "class" in ret.attrs:
+                ret.attrs["class"] += " expert-mode"
+            else:
+                ret.attrs["class"] = "expert-mode"
+
+            if "class" in simple_fmt.attrs:
+                simple_fmt.attrs["class"] += " basic-mode"
+            else:
+                simple_fmt.attrs["class"] = "basic-mode"
+
+            return ret + simple_fmt
+        else:
+            return ret
 
 
 class AlertQueryParser(idmef.IDMEFQueryParser):
@@ -89,6 +121,7 @@ class AlertDataSearch(idmef.IDMEFDataSearch):
                       "target": (("alert.target(*).node.name", "alert.target(*).node.address(*).address"), None),
                       "analyzer(-1)": (("alert.analyzer(-1).node.name", "alert.analyzer(-1).node.location", "alert.analyzer(-1).node.address(*).address"), None)}
     default_columns = collections.OrderedDict([
+        ("alert.assessment.impact.severity", N_("Severity")),
         ("alert.create_time", N_("Date")),
         ("alert.classification", N_("Classification")),
         ("alert.source", N_("Source")),
@@ -97,6 +130,10 @@ class AlertDataSearch(idmef.IDMEFDataSearch):
     ])
     lucene_search_fields = ["classification", "source", "target", "analyzer(-1)"]
     _delete_confirm = N_("Delete the selected alerts?")
+
+    def __init__(self, *args, **kwargs):
+        idmef.IDMEFDataSearch.__init__(self, *args, **kwargs)
+        self.columns_properties["assessment.impact.severity"].width = 50
 
     def _get_default_cells(self, obj, search):
         cells = idmef.IDMEFDataSearch._get_default_cells(self, obj, search)
@@ -151,3 +188,46 @@ class AlertDataSearch(idmef.IDMEFDataSearch):
                 return []
 
         return [("idmef", utils.AttrObj(label=_("IDMEF"), info=html))]
+
+    def _get_column_property(self, field, pi):
+        pi.column_index = pi.path
+
+        hidden = pi.path not in self._main_fields
+        if hidden and pi.path not in self._extra_table_fields:
+            return None
+
+        return COLUMN_PROPERTIES(label=self.default_columns.get('alert.%s' % field, field.capitalize()),
+                                 name=field,
+                                 index=field,
+                                 hidden=hidden,
+                                 sortable=True,
+                                 align="left" if pi.path == "alert.classification" else "center")
+
+    @hookmanager.register("HOOK_RISKOVERVIEW_DATA", _order=3)
+    def _set_alerts_summary(self):
+        severities = ["info", "low", "medium", "high"]
+        alerts = dict(env.dataprovider.query(
+            ["alert.assessment.impact.severity/group_by", "count(alert.messageid)"],
+            env.request.menu.get_criteria()
+        ))
+
+        labels = {
+            "info": utils.AttrObj(title=_("Minimal severity"), label="label-info"),
+            "low": utils.AttrObj(title=_("Low severity"), label="label-success"),
+            "medium": utils.AttrObj(title=_("Medium severity"), label="label-warning"),
+            "high": utils.AttrObj(title=_("High severity"), label="label-danger")
+        }
+
+        data = []
+        for i in reversed(severities):
+            data.append(
+                resource.HTMLNode("a", localization.format_number(alerts.get(i, 0), short=True),
+                                  title=labels[i].title, _class="label " + labels[i].label,
+                                  href=url_for("AlertDataSearch.forensic", criteria=Criterion("alert.assessment.impact.severity", "==", i)))
+            )
+
+        return utils.AttrObj(
+            name="alerts",
+            title=resource.HTMLNode("a", _("Alerts"), href=url_for("AlertDataSearch.forensic")),
+            data=data
+        )

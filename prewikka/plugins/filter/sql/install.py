@@ -19,7 +19,8 @@ CREATE TABLE Prewikka_Filter (
         name VARCHAR(64) NOT NULL,
         category VARCHAR(64) NULL,
         description TEXT NULL,
-        value TEXT NOT NULL
+        value TEXT NOT NULL,
+        FOREIGN KEY (userid) REFERENCES Prewikka_User(userid) ON DELETE CASCADE
 ) ENGINE=InnoDB;
 
 CREATE UNIQUE INDEX prewikka_filter_index_login_name ON Prewikka_Filter (userid, name);

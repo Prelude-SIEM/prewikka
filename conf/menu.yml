@@ -11,15 +11,30 @@
               tabs:
                   - Alerts
                   - Aggregated alerts
-            - name: Threats
-              default_tab: Threats
+- name: ANALYSE
+  icon: bar-chart
+  categories:
+      - sections:
+            - name: Statistics
               tabs:
-                  - Threats
-                  - Aggregated threats
+                  - Alerts
+- name: ARCHIVE
+  icon: database
+  categories:
+      - sections:
+            - name: Logs
+              tabs:
+                  - Logs
+                  - Aggregated logs
 - name: ADMIN
   icon: sliders
   categories:
       - sections:
+            - name: Access control
+              expand: true
+              tabs:
+                  - Users
+                  - Groups
             - name: Configuration
               expand: true
               tabs:

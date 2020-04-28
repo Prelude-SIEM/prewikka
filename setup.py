@@ -66,7 +66,7 @@ class MyDistribution(Distribution):
         except:
             pass
 
-        self.conf_files = []
+        self.conf_files = {}
         self.closed_source = os.path.exists("PKG-INFO")
         Distribution.__init__(self, attrs)
 
@@ -88,12 +88,14 @@ class my_install(install):
         return tmp
 
     def install_conf(self):
-        self.mkpath((self.root or "") + self.conf_prefix)
-        for file in self.distribution.conf_files:
-            dest = (self.root or "") + self.conf_prefix + "/" + os.path.basename(file)
-            if os.path.exists(dest):
-                dest += "-dist"
-            self.copy_file(file, dest)
+        self.mkpath((self.root or "") + self.conf_prefix + "/conf.d")
+        for dest_dir, patterns in self.distribution.conf_files.items():
+            for pattern in patterns:
+                for f in glob(pattern):
+                    dest = (self.root or "") + self.conf_prefix + "/" + dest_dir + "/" + os.path.basename(f)
+                    if os.path.exists(dest):
+                        dest += "-dist"
+                    self.copy_file(f, dest)
 
     def create_datadir(self):
         self.mkpath((self.root or "") + self.data_prefix)
@@ -232,38 +234,52 @@ setup(
         ],
         'prewikka.renderer.type': [
             'ChartJSBar = prewikka.renderer.chartjs.bar:ChartJSBarPlugin',
+            'ChartJSDoughnut = prewikka.renderer.chartjs.pie:ChartJSDoughnutPlugin',
+            'ChartJSPie = prewikka.renderer.chartjs.pie:ChartJSPiePlugin',
             'ChartJSTimebar = prewikka.renderer.chartjs.timeline:ChartJSTimebarPlugin',
+            'ChartJSTimeline = prewikka.renderer.chartjs.timeline:ChartJSTimelinePlugin',
         ],
         'prewikka.dataprovider.backend': [
+            'ElasticsearchLog = prewikka.dataprovider.plugins.log.elasticsearch:ElasticsearchLogPlugin',
             'IDMEFAlert = prewikka.dataprovider.plugins.idmef:IDMEFAlertPlugin',
             'IDMEFHeartbeat = prewikka.dataprovider.plugins.idmef:IDMEFHeartbeatPlugin',
         ],
         'prewikka.dataprovider.type': [
             'alert = prewikka.dataprovider.idmef:IDMEFAlertProvider',
             'heartbeat = prewikka.dataprovider.idmef:IDMEFHeartbeatProvider',
+            'log = prewikka.dataprovider.log:LogAPI',
         ],
-        'prewikka.plugins': [],
+        'prewikka.plugins': [
+        ],
+        'prewikka.auth': [
+            'DBAuth = prewikka.auth.dbauth:DBAuth',
+        ],
         'prewikka.session': [
             'Anonymous = prewikka.session.anonymous:AnonymousSession',
+            'LoginForm = prewikka.session.loginform:LoginFormSession',
         ],
-        'prewikka.auth': [],
         'prewikka.views': [
             'About = prewikka.views.about:About',
             'AboutPlugin = prewikka.views.aboutplugin:AboutPlugin',
             'AgentPlugin = prewikka.views.agents:AgentPlugin',
             'AlertDataSearch = prewikka.views.datasearch.alert:AlertDataSearch',
+            'AlertStats = prewikka.views.statistics.alertstats:AlertStats',
             'CrontabView = prewikka.views.crontab:CrontabView',
-            'FilterView = prewikka.views.filter.filter:FilterView',
+            'Custom = prewikka.views.custom:Custom',
+            'FilterPlugin = prewikka.plugins.filter:FilterPlugin',
             'HeartbeatDataSearch = prewikka.views.datasearch.heartbeat:HeartbeatDataSearch',
-            "IDMEFnav = prewikka.views.idmefnav:IDMEFNav",
+            'IDMEFnav = prewikka.views.idmefnav:IDMEFNav',
+            'LogDataSearch = prewikka.views.datasearch.log:LogDataSearch',
             'MessageSummary = prewikka.views.messagesummary:MessageSummary',
-            'ThreatDataSearch = prewikka.views.datasearch.threat:ThreatDataSearch',
+            'RiskOverview = prewikka.views.riskoverview:RiskOverview',
+            'Statistics = prewikka.views.statistics:Statistics',
             'UserManagement = prewikka.views.usermanagement:UserManagement',
             'Warning = prewikka.plugins.warning:Warning',
         ],
         'prewikka.updatedb': [
             'prewikka = prewikka.sql',
-            'prewikka.views.filter.filter = prewikka.views.filter.sql'
+            'prewikka.auth.dbauth = prewikka.auth.dbauth.sql',
+            'prewikka.plugins.filter = prewikka.plugins.filter.sql'
         ]
     },
     package_data={
@@ -283,30 +299,25 @@ setup(
             "sql/*.py",
             "templates/*.mak"
         ],
-        'prewikka.renderer.chartjs': [
-            "htdocs/js/*.js"
-        ],
-        'prewikka.views.about': [
-            "htdocs/css/*.css",
-            "htdocs/images/*.png"
-        ],
-        'prewikka.views.aboutplugin': [
-            "htdocs/css/*.css"
-        ],
-        "prewikka.views.idmefnav": [
-            "htdocs/yaml/*.yml",
-            "htdocs/graph/*",
-        ],
+        'prewikka.auth.dbauth': ["sql/*.py"],
+        'prewikka.renderer.chartjs': ["htdocs/js/*.js"],
+        'prewikka.session.loginform': ["htdocs/css/*.css"],
+        'prewikka.views.about': ["htdocs/css/*.css", "htdocs/images/*.png"],
+        'prewikka.views.aboutplugin': ["htdocs/css/*.css"],
+        "prewikka.views.idmefnav": ["htdocs/yaml/*.yml", "htdocs/graph/*"],
+        'prewikka.views.riskoverview': ["htdocs/js/*.js"],
+        'prewikka.views.statistics': ["htdocs/js/*.js", "htdocs/css/*.css"],
+        'prewikka.views.usermanagement': ["htdocs/js/*.js", "htdocs/css/*.css"],
     },
     scripts=[
         "scripts/prewikka-cli",
         "scripts/prewikka-crontab",
         "scripts/prewikka-httpd"
     ],
-    conf_files=[
-        "conf/prewikka.conf",
-        "conf/menu.yml"
-    ],
+    conf_files={
+        "": ["conf/prewikka.conf", "conf/menu.yml"],
+        "conf.d": ["conf/plugins/*.conf"]
+    },
     cmdclass={
         'build': build,
         'build_custom': build_custom,

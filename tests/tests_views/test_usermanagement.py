@@ -31,19 +31,19 @@ from prewikka.error import PrewikkaUserError
 from tests.utils.fixtures import load_view_for_fixtures
 
 
-def test_display():
+def test_my_account():
     """
-    Test `prewikka.views.usermanagement.display` view.
+    Test `prewikka.views.usermanagement.my_account` view.
     """
-    view = load_view_for_fixtures("usersettings.display")
+    view = load_view_for_fixtures("usersettings.my_account")
     view.render()
 
 
-def test_modify():
+def test_save():
     """
-    Test `prewikka.views.usermanagement.modify` view.
+    Test `prewikka.views.usermanagement.save` view.
     """
-    view = load_view_for_fixtures("usersettings.modify")
+    view = load_view_for_fixtures("usersettings.save")
     backup_parameters = deepcopy(env.request.parameters)
 
     # valid
@@ -53,7 +53,7 @@ def test_modify():
     }
     env.request.parameters = params
 
-    view.render()
+    view.render(name=env.request.user.name)
 
     # FIXME
     # valid with new email
@@ -68,7 +68,7 @@ def test_modify():
     params_email['theme'] = 'dark'
     env.request.parameters = params_email
 
-    view.render()
+    view.render(name=env.request.user.name)
 
     # FIXME
     # valid with different user
@@ -84,7 +84,7 @@ def test_modify():
         params_invalid['language'] = None
         env.request.parameters = params_invalid
 
-        view.render()
+        view.render(name=env.request.user.name)
 
     # invalid timezone
     with pytest.raises(PrewikkaUserError):
@@ -92,7 +92,7 @@ def test_modify():
         params_invalid['timezone'] = None
         env.request.parameters = params_invalid
 
-        view.render()
+        view.render(name=env.request.user.name)
 
     # clean
     env.request.parameters = backup_parameters
