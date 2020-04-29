@@ -1,3 +1,17 @@
+* 2020-04-29, prewikka-5.1.6:
+
+Author: Antoine Luong
+
+- Support exact Lucene queries
+- Pass menu parameters in IDMEF details
+- Fix widget normalization issues
+- Support non-ASCII characters in YAML menu
+- Fix multi-step migration process
+- Make colors more consistent across charts
+- Fix date filtering in DataSearch
+
+
+
 * 2020-03-09, prewikka-5.1.5:
 
 Author: Antoine Luong
