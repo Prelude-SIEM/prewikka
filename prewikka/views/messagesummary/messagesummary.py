@@ -24,7 +24,6 @@ import itertools
 import re
 import string
 import struct
-import urllib
 
 import pkg_resources
 from prewikka import hookmanager, localization, resolve, resource, template, utils, view
@@ -38,6 +37,13 @@ def getUriCriteria(ptype, analyzerid, messageid):
         criteria += Criterion("%s.analyzer.analyzerid" % ptype, "=", analyzerid)
 
     return criteria + Criterion("%s.messageid" % ptype, "=", messageid)
+
+
+def quote(string, **kwargs):
+    if string is None:
+        return string
+
+    return utils.url.quote(string.encode("utf-8"), **kwargs)
 
 
 class Table(object):
@@ -722,10 +728,10 @@ class AlertSummary(TcpIpOptions, MessageSummary):
 
             if env.enable_details:
                 if reference["origin"] in ("user-specific", "vendor-specific"):
-                    urlstr = "&url=" + urllib.quote(reference["url"], safe="")
+                    urlstr = "&url=" + quote(reference["url"], safe="")
                 else:
                     urlstr = ""
-                url = "%s?origin=%s&name=%s%s" % (env.reference_details_url, urllib.quote(reference["origin"]), urllib.quote(reference["name"]), urlstr)
+                url = "%s?origin=%s&name=%s%s" % (env.reference_details_url, quote(reference["origin"]), quote(reference["name"]), urlstr)
                 self.newTableCol(index, self.getUrlLink(reference["name"], url))
             else:
                 self.newTableCol(index, reference["name"])
