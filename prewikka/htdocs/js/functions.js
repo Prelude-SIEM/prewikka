@@ -500,6 +500,7 @@ function prewikka_autocomplete(selector, options) {
     options = options || {};
     $(selector).select2_container({
         allowClear: !!options.allow_empty,
+        dropdownAutoWidth: !!options.dropdownAutoWidth,
         placeholder: options.placeholder || "",
         ajax: {
             url: options.url,
