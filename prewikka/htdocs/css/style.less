@@ -242,6 +242,20 @@ p {
     label {
         display: none;
     }
+
+    /* Ease the transition between default select and select2 */
+    select {
+        padding-left: 6px;
+        padding-right: 18px;
+        line-height: 1.5;
+        appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+
+        option, optgroup {
+            width: 0;
+        }
+    }
 }
 
 .dropdown-header-custom {
