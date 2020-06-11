@@ -8,29 +8,28 @@ from prewikka import version
 
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h5 class="modal-title">${ _("Prelude version %s") % version.__version__ }</h5>
+      <h5 class="modal-title">${ _("Prelude SIEM version %s") % version.__version__ }</h5>
     </div>
 
     <div class="modal-body about">
-      <h5>${ _("Prelude is a SIEM (Security Information and Event Management)") }</h5>
+      <h5>${ _("Prelude SIEM is a \"Security Information and Event Management\" system") }</h5>
       <div class="software">
         <div class="col-sm-3">
           <img src="about/images/prelude-logo-400.png"/>
         </div>
         <p class="col-sm-9">
-          ${ _("{prelude} is a security management solution that collects, filters, normalizes, correlates, stores and archives data from various sources of your information system. Based on all this information Prelude can provide a global vision of your system's security level and thus prevent attacks, intrusions as well as viral infections.").format(prelude="<a href='http://www.prelude-siem.com'>Prelude</a>") | n }
+          ${ _("{prelude} is a security management solution that collects, filters, normalizes, correlates, stores and archives data from various sources of your information system. Based on all this information Prelude SIEM can provide a global vision of your system's security level and thus prevent attacks, intrusions as well as viral infections.").format(prelude="<a href='https://www.prelude-siem.com'>Prelude SIEM</a>") | n }
         </p>
       </div>
-      <p style="margin-top: 15px"><u>${ _("Prelude Team:")}</u> Gilles Lehmann, Thomas Andrejak, Fran&ccedil;ois Poirotte, Yoann Vandoorselaere, Antoine Luong, Song Tran, Camille Gardet, Abdel Elmili, Cl&eacute;mentine Bourdin, Enguerrand de Mauduit, Avinash Pardessy, Jean-Charles Rogez, S&eacute;lim Menouar, Louis-David Gabet.</p>
-      <p style="margin-top: 15px">${ _("Prelude OSS is an open-source project originally created by Yoann Vandoorselaere in 1998.") }</p>
 
-      <h5>${ _("Vigilo is a NMS (Network Management System)") }</h5>
+      <br/>
+      <h5>${ _("Vigilo NMS is a \"Network Monitoring System\"") }</h5>
       <div class="software">
         <div class="col-sm-3">
           <img src="about/images/vigilo-logo-400.png"/>
         </div>
         <p class="col-sm-9">
-          ${ _("{vigilo} is a complete monitoring and performance management solution capable of handling medium and large-scale systems (network - servers - applications) due to its distributed and modular architecture. Vigilo offers all the features required for performance supervision: states and alarms management, metrology, cartography, event correlation and reporting.").format(vigilo="<a href='http://www.vigilo-nms.com'>Vigilo</a>") | n}
+          ${ _("{vigilo} is a complete monitoring and performance management solution capable of handling medium and large-scale systems (network - servers - applications) due to its distributed and modular architecture. Vigilo NMS offers all the features required for performance supervision: states and alarms management, metrology, cartography, event correlation and reporting.").format(vigilo="<a href='https://www.vigilo-nms.com'>Vigilo NMS</a>") | n}
         </p>
       </div>
 
@@ -47,16 +46,15 @@ from prewikka import version
            <p><b>${ _("Fax:") }</b> +33 1 41 28 40 40</p>
         </div>
         <div>
-           <b>${ _("Office") }</b>
-           <p>22 avenue Galil&eacute;e</p>
-           <p>92350 Le Plessis-Robinson</p>
-           <p>France</p>
+           <b>${ _("Corporate") }</b>
+           <p><a href="https://www.prelude-siem.com">www.prelude-siem.com</a></p>
+           <p><a href="https://www.vigilo-nms.com">www.vigilo-nms.com</a></p>
+           <p><a href="https://www.c-s.fr">www.c-s.fr</a></p>
         </div>
         <div>
-           <b>${ _("Websites") }</b>
-           <p><a href="http://www.prelude-siem.com">www.prelude-siem.com</a></p>
-           <p><a href="http://www.vigilo-nms.com">www.vigilo-nms.com</a></p>
-           <p><a href="http://www.c-s.fr">www.c-s.fr</a></p>
+           <b>${ _("Community") }</b>
+           <p><a href="https://www.prelude-siem.org">www.prelude-siem.org</a></p>
+           <p><a href="https://www.vigilo-nms.org">www.vigilo-nms.org</a></p>
         </div>
 
         <p class="copyright">Copyright &copy; 2004-2020 CS Communication &amp; Syst&egrave;mes. All rights reserved.</p>
