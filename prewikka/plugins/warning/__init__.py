@@ -19,10 +19,12 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import pkg_resources
+
 from prewikka import hookmanager, resource, template, version, view
 
 
-# FIXME: this really is a plugin and not a view. Implement dependencies subsystem
+# FIXME: this really is a plugin and not a view. See #781
 
 class Warning(view.View):
     plugin_name = "Warning"
@@ -31,11 +33,12 @@ class Warning(view.View):
     plugin_version = version.__version__
     plugin_copyright = version.__copyright__
     plugin_description = N_("Prelude Warning message")
+    plugin_htdocs = (("warning", pkg_resources.resource_filename(__name__, 'htdocs')),)
 
     _template = template.PrewikkaTemplate(__name__, "templates/warning.mak")
 
     @hookmanager.register("HOOK_LOAD_BODY_CONTENT")
     def _toplayout_extra_content(self):
-        if not env.request.web.input_cookie.get("warning"):
+        if env.request.user and not env.request.web.input_cookie.get("warning"):
             env.request.web.add_cookie("warning", "warning", 365 * 24 * 60 * 60)
             return [resource.HTMLSource(self._template.render())]
