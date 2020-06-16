@@ -22,7 +22,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import collections
 import functools
 
-from prewikka import dataprovider, hookmanager, localization, mainmenu, usergroup, utils
+from prewikka import dataprovider, hookmanager, mainmenu, usergroup, utils
 from prewikka.dataprovider import Criterion
 from prewikka.renderer import RendererItem
 
@@ -137,20 +137,19 @@ class DiagramChart(GenericChart):
     default_aggregation = "count(1)"
 
     def _get_series(self, query):
-        for value, label, crit in self._get_categories(query):
+        for count, category, crit in self._get_categories(query):
             link = self._make_link(criteria=crit & query.criteria, **self._menu.get_parameters())
-            yield RendererItem(value, label, link)
+            yield RendererItem(count, category, link)
 
     def _get_categories(self, query):
         all_paths, all_criteria = self._prepare_query(query)
 
         for row in self._query(all_paths, all_criteria, limit=query.limit, type=query.datatype):
-            value = row[0]
-            labels = [localization.format_value(i) for i in row[1:]]
-            label = labels if self.chart_type == "table" else ", ".join(labels)
+            count = row[0]
+            category = tuple(row[1:])
             crit = functools.reduce(lambda x, y: x & y, (Criterion(path, '=', row[i + 1])
                                                          for i, path in enumerate(query.paths)))
-            yield value, label, crit
+            yield count, category, crit
 
     def get_data(self):
         if len(self.query) == 1:
@@ -160,11 +159,11 @@ class DiagramChart(GenericChart):
         subquery = self.query[1]
         base_criteria = subquery.criteria
         self.options["subtitle"] = []
-        for value, label, crit in self._get_categories(self.query[0]):
+        for count, category, crit in self._get_categories(self.query[0]):
             subquery.criteria = crit & base_criteria
-            subchart = DiagramChart(self.chart_type, label, [subquery], period=self.options.get("period"))
+            subchart = DiagramChart(self.chart_type, category, [subquery], period=self.options.get("period"))
             data.append(subchart.get_data()[0])
-            self.options["subtitle"].append(label)
+            self.options["subtitle"].append(category)
 
         return data
 
@@ -192,7 +191,7 @@ class ChronologyChart(GenericChart):
 
         out = {}
         for i in res:
-            key = tuple(i[1:selection_index]) or self.title
+            key = tuple(i[1:selection_index]) or (self.title,)
             tval = tuple((int(x) for x in i[selection_index:]))
             out.setdefault(key, {})[tval[:date_precision]] = i[0]
 
@@ -201,8 +200,7 @@ class ChronologyChart(GenericChart):
 
         out2 = collections.OrderedDict()
         for i in series_order:
-            label = ", ".join((localization.format_value(j) for j in i))
-            out2[label] = out[i]
+            out2[i] = out[i]
 
         return out2
 
@@ -262,7 +260,7 @@ class ChronologyChart(GenericChart):
 
         self.options["xlegend"] = legends
 
-        return [RendererItem(labels=name, values=value, links=links) for name, value in out.items()]
+        return [RendererItem(series=series, values=values, links=links) for series, values in out.items()]
 
     def _prepare_timeline(self):
         step = self._menu.get_step(self._number_of_points)
@@ -275,7 +273,7 @@ class ChronologyChart(GenericChart):
             for query in self.query:
                 series = self._get_series(query, selection, date_precision).get(self.title, {})
                 legend = query.aggregation.replace("(1)", "(%s)" % query.datatype)
-                data[legend] = series
+                data[(legend,)] = series
 
         if self.options.get("period"):
             # Do not allow zooming when the time period is defined

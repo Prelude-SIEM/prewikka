@@ -51,8 +51,8 @@ class ChartJSTimePlugin(ChartJSRenderer):
         rutils = RendererUtils(kwargs)
 
         for index, item in enumerate(data):
-            label = rutils.get_label(item.labels)
-            color = rutils.get_color(item.labels)
+            label = rutils.get_label(item.series)
+            color = rutils.get_color(item.series)
             options["datasets"].append({
                 "label": label,
                 "fill": ("-1" if index else "origin") if kwargs.get("stacked") else False,

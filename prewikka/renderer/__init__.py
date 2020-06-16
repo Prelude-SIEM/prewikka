@@ -21,7 +21,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 
 import uuid
 
-from prewikka import error, pluginmanager, resource
+from prewikka import error, localization, pluginmanager, resource
 from prewikka.utils import cache
 
 RED_STD = "E78D90"
@@ -45,13 +45,13 @@ class RendererNoDataException(RendererException):
 
 
 class RendererItem(object):
-    __slots__ = ["values", "labels", "links", "_tuple"]
+    __slots__ = ["values", "series", "links", "_tuple"]
 
-    def __init__(self, values=0, labels=None, links=None):
-        self._tuple = values, labels, links
+    def __init__(self, values=0, series=None, links=None):
+        self._tuple = values, series, links
 
         self.values = values
-        self.labels = labels
+        self.series = series
         self.links = links
 
     def __getitem__(self, i):
@@ -65,16 +65,16 @@ class RendererUtils(object):
         self._color_map_idx = 0
         self._color_map = options.get("names_and_colors")
 
-    def get_label(self, label):
-        if self._color_map:
-            return _(self._color_map.get(label, self._nexist_color)[0])
+    def get_label(self, series):
+        if self._color_map and len(series) == 1:
+            return _(self._color_map.get(series[0], self._nexist_color)[0])
 
-        return label
+        return ", ".join(localization.format_value(s) for s in series)
 
     @cache.request_memoize("renderer_color")
-    def get_color(self, label, onecolor=False):
-        if self._color_map:
-            color = self._color_map.get(label, self._nexist_color)[1]
+    def get_color(self, series, onecolor=False):
+        if self._color_map and len(series) == 1:
+            color = self._color_map.get(series[0], self._nexist_color)[1]
             if color:
                 return color
 

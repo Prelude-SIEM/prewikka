@@ -349,7 +349,7 @@ class QueryParser(object):
     def _diagram_data(self, cview, step):
         """Generator for the diagram chart"""
         for result in self.get_result():
-            value = result[0]
+            count = result[0]
             labels = result[1:]
 
             link = self.get_groupby_link(self.groupby, labels, step, cview=cview)
@@ -357,7 +357,7 @@ class QueryParser(object):
             if self._date_selection_index:
                 labels[-1] = labels[-1].strftime(step.unit_format)
 
-            yield RendererItem(value or "", ", ".join((text_type(x) for x in labels)), link)
+            yield RendererItem(count, tuple(labels), link)
 
     def _query(self):
         return env.dataprovider.query(self.get_paths(), self.all_criteria, limit=self.limit, offset=self.offset, type=self.type)

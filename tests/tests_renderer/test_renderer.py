@@ -57,17 +57,17 @@ def test_renderer_utils():
     """
     renderer_utils = RendererUtils({})
 
-    assert renderer_utils.get_label('foo') == 'foo'
-    assert renderer_utils.get_color('foo') == COLORS[0]
-    assert renderer_utils.get_color('bar') == COLORS[1]
+    assert renderer_utils.get_label(('foo',)) == 'foo'
+    assert renderer_utils.get_color(('foo',)) == COLORS[0]
+    assert renderer_utils.get_color(('bar',)) == COLORS[1]
 
     severity_color_map = {v.value: (v.label, v.color) for v in env.dataprovider.get_path_info("alert.assessment.impact.severity").value_accept}
     renderer_utils = RendererUtils({'names_and_colors': severity_color_map})
 
-    assert renderer_utils.get_label('high') == 'High'
-    assert renderer_utils.get_label('invalid') == 'n/a'
-    assert renderer_utils.get_color('high') == RED_STD
-    assert renderer_utils.get_color('invalid') == GRAY_STD
+    assert renderer_utils.get_label(('high',)) == 'High'
+    assert renderer_utils.get_label(('invalid',)) == 'n/a'
+    assert renderer_utils.get_color(('high',)) == RED_STD
+    assert renderer_utils.get_color(('invalid',)) == GRAY_STD
 
 
 def test_renderer_plugin_manager():

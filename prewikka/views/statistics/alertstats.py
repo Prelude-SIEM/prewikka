@@ -178,7 +178,7 @@ class ProtocolChart(statistics.DiagramChart):
             if linkview:
                 link = linkview[-1].make_url(criteria=criteria, **env.request.menu.get_parameters())
 
-            yield RendererItem(count, "%d (%s) / %s" % (port, service, protocol), link)
+            yield RendererItem(count, ("%d (%s) / %s" % (port, service, protocol),), link)
 
 
 class AlertStats(StaticStats):
