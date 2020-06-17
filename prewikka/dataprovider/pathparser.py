@@ -34,6 +34,8 @@ from . import grammar
 
 # This regex does not support strings with backslash escaping, i.e. field("a'b\"c").value
 STRING_INDEX_REGEX = r"""\((["'])((?:(?!\1).)+)\1\)"""
+INTEGER_INDEX_REGEX = r"\((\d+)\)"
+INDEX_REGEX = "%s|%s" % (STRING_INDEX_REGEX, INTEGER_INDEX_REGEX)
 
 
 class SelectionType(Enum):
@@ -198,7 +200,7 @@ class PathParser(DataProviderBase):
 
     @staticmethod
     def unindex_path(path):
-        return re.sub(STRING_INDEX_REGEX, "", path)
+        return re.sub(INDEX_REGEX, "", path)
 
     def _check_path(self, klass, attribute):
         # Handle functions without an actual path, eg. "count(1)".

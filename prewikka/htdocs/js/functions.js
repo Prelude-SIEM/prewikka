@@ -467,7 +467,7 @@ function prewikka_getRenderSize(container, options)
         else {
             size[1] = options.height;
             if ( ! size[1] )
-                size[1] = $("#_main_viewport").height();
+                size[1] = $("#_main_viewport").height() - $(parent).offset().top + $("#_main_viewport").offset().top;
         }
 
         document.body.style.overflow = overflow_backup;

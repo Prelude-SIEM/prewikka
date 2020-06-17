@@ -1,4 +1,3 @@
-<%namespace file="/prewikka/views/datasearch/templates/table.mak" import="GroupbyTable"/>
 <%!
   import itertools
   from prewikka import hookmanager, utils
@@ -26,7 +25,21 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
   groupby.select2_container();
   var page = DataSearchPage("${backend}", ${html.escapejs(criterion_config)}, ${html.escapejs(criterion_config_default)}, ${html.escapejs(separators)}, "${url_for('.ajax_timeline')}", ${html.escapejs(common_paths)});
 
-  % if not search.groupby:
+  % if search.groupby:
+    var columns = {
+        'model': [
+            % for field in search.groupby:
+            {name: "${ field }", label: "${ _(common_paths.get(field, field)) }", align: "center"},
+            % endfor
+            {name: "_aggregation", label: "${ _('Count') }", align: "center"},
+        ]
+    };
+
+    $(document).ready(function() {
+        page.groupby('#datasearch_groupby_table', columns, "${url_for('.ajax_groupby')}", {limit: ${html.escapejs(search.limit)}});
+    });
+
+  % else:
     <%
       for i in columns_properties:
          columns_properties[i].label = _(columns_properties[i].label)
@@ -128,7 +141,7 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
     </div>
 
     <div class="col-md-3">
-      <div class="form-group" style="display: none;">
+      <div id="datasearch_groupby" class="form-group" style="display: none;">
         <div class="input-group">
           <span class="input-group-addon">${ _("Group by") }</span>
           <select class="form-control form-control-select2" multiple name="groupby[]" data-placeholder="${ _("Select your field") }">
@@ -157,10 +170,10 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
 % if search.groupby:
 <div class="row">
    <% chart = search.diagram(cview=".forensic") %>
-   <div class="col-md-4">
-       ${ GroupbyTable(search) }
+   <div class="col-md-6">
+       <table class="table table-striped commonlisting" id="datasearch_groupby_table"></table>
    </div>
-   <div class="col-md-8">
+   <div class="col-md-6">
        ${ chart['html'] }
        <script type="text/javascript">
          ${ chart['script'] }

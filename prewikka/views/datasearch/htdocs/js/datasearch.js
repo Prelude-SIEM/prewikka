@@ -184,7 +184,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
 
     function update_datasearch()
     {
-        set_postdata();
+        set_postdata("#datasearch_table", false);
 
         $("#datasearch_table").trigger("reloadGrid");
         render_timeline(true);
@@ -423,7 +423,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         });
 
         $("#PopoverOption a.groupby_search").attr("href", prewikka_location().href + "?groupby[]=" + selected_field);
-        $("#PopoverOption .groupby_search span").text(common_paths[selected_field] || selected_field);
+        $("#PopoverOption .groupby_search span").text((common_paths[selected_field] || selected_field).toLowerCase());
         $("#PopoverOption").show();
 
         var popover = $("#PopoverOption .popover");
@@ -508,13 +508,18 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         });
     }
 
-    function set_postdata() {
-        var pdata = $("#datasearch_table").getGridParam("postData") || {};
+    function set_postdata(elem, include_groupby) {
+        var pdata = $(elem).getGridParam("postData") || {};
+        if ( include_groupby ) pdata["groupby[]"] = [];
 
         $.each($("#form_search :input").serializeArray(), function(i, input) {
-            // Exclude groupby field since the goal is to reload the table
-            if ( input.name != "groupby[]" )
+            if ( input.name == "groupby[]" ) {
+                // For the listing, we exclude groupby field since the goal is to reload the table
+                if ( include_groupby ) pdata[input.name].push(input.value);
+            }
+            else {
                 pdata[input.name] = input.value;
+            }
         });
 
         return pdata;
@@ -524,8 +529,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
         CommonListing(elem, {}, {
             datatype: "json",
             url: url,
-            postData: set_postdata(),
-            colNames: columns.names,
+            postData: set_postdata(elem, false),
             colModel: columns.model,
             rowattr: function(row, data, id) {
                 if ( data._classes )
@@ -579,6 +583,23 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
                 });
             }
         }, jqgrid_params);
+    };
+
+    page.groupby = function(elem, columns, url, jqgrid_params) {
+        prewikka_grid(elem, {
+            datatype: "json",
+            colModel: columns.model,
+            url: url,
+            rowNum: jqgrid_params.limit,
+            pager: true,
+            pgtext: "Page {0} of unknown",
+            postData: set_postdata(elem, true),
+            loadComplete: function() {
+                _resizeGrid($(elem));
+            },
+            loadError: null,  // This prevents an error row from appearing in the grid
+            cmTemplate: $.jgrid.cmTemplate.html,
+        });
     };
 
     /* Custom event to update datasearch */

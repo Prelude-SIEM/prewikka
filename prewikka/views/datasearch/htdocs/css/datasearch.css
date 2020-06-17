@@ -332,3 +332,20 @@
 #datasearch .oca-infos .nav > li > a {
     padding: 5px 15px;
 }
+
+#datasearch_groupby .select2-selection {
+    height: 20px;
+}
+
+#datasearch_groupby ul.select2-selection__rendered > li {
+    float: none;
+    display: inline-block;
+}
+
+#datasearch_groupby ul.select2-selection__rendered {
+    text-overflow: clip;
+}
+
+#datasearch_groupby ul.select2-selection__rendered:hover {
+    overflow: auto;
+}

@@ -38,9 +38,6 @@ class HeartbeatFormatter(idmef.IDMEFFormatter):
 class HeartbeatQueryParser(idmef.IDMEFQueryParser):
     _sort_order = ["heartbeat.create_time/order_desc"]
 
-    def add_order(self, field, order="asc"):
-        self._sort_order = ["heartbeat.%s/order_%s" % (field, order)]
-
 
 class HeartbeatDataSearch(idmef.IDMEFDataSearch):
     plugin_name = "DataSearch: Heartbeats"

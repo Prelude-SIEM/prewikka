@@ -416,6 +416,9 @@ class ElasticsearchQuery(object):
         self._set_paths_func(paths, group_by)
         self._final_order = sorted(self._final_order, key=lambda x: x.idx)
 
+        if group_by and self.offset:
+            self._add_offset()
+
     def _set_criteria_op(self, typ, criteria, query):
         for term in (criteria.left, criteria.right):
             if not term:
@@ -493,6 +496,14 @@ class ElasticsearchQuery(object):
         query, index = self._get_aggs_last_index(None, 1)
         query["aggs"] = self._format_aggregate(field.field, "terms", index, field.order)
 
+    def _add_offset(self):
+        self._query["aggs"]["internal_1"]["aggs"]["bucket_truncate"] = {
+            "bucket_sort": {
+                "from": self.offset,
+                "size": self.limit
+            }
+        }
+
     def _format_aggregate(self, field, func, index=1, order=None):
         if field in _TIME_GROUPBY:
             func = "time"
@@ -547,7 +558,7 @@ class ElasticsearchQuery(object):
         return {
             "terms": {
                 "field": self._mapping.to_es_keyword(field),
-                "size": self.limit,
+                "size": 10000,
                 "order": {
                     "_count": order or "desc"
                 }

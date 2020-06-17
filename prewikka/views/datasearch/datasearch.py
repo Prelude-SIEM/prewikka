@@ -35,8 +35,9 @@ import re
 from prewikka.utils import json
 from prewikka import error, history, hookmanager, mainmenu, resource, response, template, utils, view
 from prewikka.dataprovider import Criterion, ResultObject
+from prewikka.dataprovider.pathparser import PathParser
 from prewikka.dataprovider.parsers import criteria, lucene
-from prewikka.localization import format_datetime
+from prewikka.localization import format_datetime, format_timedelta
 from prewikka.renderer import RendererItem
 from prewikka.statistics import ChronologyChart, DiagramChart, Query
 
@@ -139,12 +140,13 @@ class Formatter(object):
 class QueryParser(object):
     path_prefix = "{backend}."
 
-    def __init__(self, query, parent, groupby=[], offset=0, limit=50):
+    def __init__(self, query, parent, groupby=[], orderby=[], offset=0, limit=50):
         self.type = parent.type
         self.query = query
         self.offset = offset
         self.limit = limit
         self.groupby = []
+        self._sort_order = ["%s.%s/order_%s" % (self.type, field, order) for field, order in orderby]
         self._time_group = None
         self._paths = collections.OrderedDict()
         self._result = None
@@ -155,11 +157,12 @@ class QueryParser(object):
         self.all_criteria = self.criteria + env.request.menu.get_criteria()
 
         if groupby:
-            self._prepare_groupby_query(groupby)
+            self._prepare_groupby_query(groupby, orderby)
         else:
             self._paths.update((field, '%s%s' % (self.path_prefix, field)) for field in self._parent.all_fields)
+            self._handle_order(orderby)
 
-    def _prepare_groupby_query(self, groupby):
+    def _prepare_groupby_query(self, groupby, orderby):
         self._paths["_aggregation"] = "count(1)"
 
         groupby = set(groupby)
@@ -174,8 +177,9 @@ class QueryParser(object):
                 for i in self._parent.path_translate[field][0]:
                     self._paths[field] = '%s/group_by' % i
 
+        self._handle_order(orderby)
+
         if not tgroup:
-            self._paths["_aggregation"] = "count(1)/order_desc"
             return
 
         if len(tgroup) > 1:
@@ -184,6 +188,12 @@ class QueryParser(object):
         self._time_group = tgroup[0]
         self._date_selection_index = len(self._paths)
         self._paths.update(("_time_unit_%d" % i, path) for i, path in enumerate(self._time_selection(self._time_group)))
+
+    def _handle_order(self, orderby):
+        for field, order in orderby:
+            path = self._paths.pop(field, "%s%s" % (self.path_prefix, field))
+            separator = "," if "/" in path else "/"
+            self._paths[field] = "%s%sorder_%s" % (path, separator, order)
 
     def get_result(self):
         if self._result:
@@ -306,6 +316,9 @@ class QueryParser(object):
         return functools.reduce(lambda x, y: f(x, y), (Criterion(i, self._fix_operator(i, op), right) for i in paths))
 
     def get_index(self, field):
+        if field in _TEMPORAL_VALUES:
+            return self._date_selection_index
+
         return list(self._paths).index(field)
 
     def get_paths(self):
@@ -332,15 +345,6 @@ class QueryParser(object):
             selection += ["timezone({backend}.{time_field}, '%s'):%s/order_asc,group_by" % (env.request.user.timezone, mainmenu.TimeUnit(unit).dbunit)]
 
         return selection
-
-    def add_order(self, field, order="asc"):
-        if order not in ("asc", "desc"):
-            return False
-
-        self._paths.pop(field, None)
-        self._paths[field] = "{backend}.%s/order_%s" % (field, order)
-
-        return True
 
     def _diagram_data(self, cview, step):
         """Generator for the diagram chart"""
@@ -425,6 +429,7 @@ class DataSearch(view.View):
         view.route("/%s/forensic/ajax_table" % self.name, self.ajax_table)
         view.route("/%s/forensic/ajax_details" % self.name, self.ajax_details)
         view.route("/%s/forensic/ajax_infos" % self.name, self.ajax_infos)
+        view.route("/%s/forensic/ajax_groupby" % self.name, self.ajax_groupby)
         view.route("/%s/forensic/csv_download" % self.name, self.csv_download, methods=["POST"])
         view.route("/%s/forensic" % self.name, self.forensic, menu=(section, tabs[0]), keywords=["listing", "inheritable"],
                    datatype=self.type, priority=1, help="#%sforensic" % self.type, methods=["POST", "GET"])
@@ -522,7 +527,7 @@ class DataSearch(view.View):
                                               limit=env.request.parameters["limit"],
                                               parent=self)
         dataset["extra_resources"] = self._extra_resources
-        dataset["common_paths"] = {path.split(".", 1)[-1]: _(label).lower() for label, path in env.dataprovider.get_common_paths(self.type, index=True)}
+        dataset["common_paths"] = {path.split(".", 1)[-1]: _(label) for label, path in env.dataprovider.get_common_paths(self.type, index=True)}
         dataset["expert_enabled"] = self.expert_enabled
 
         return view.ViewResponse(dataset)
@@ -532,27 +537,29 @@ class DataSearch(view.View):
         if query:
             history.save(env.request.user, "%s_form_search" % self.type, query)
 
-        search = self.query_parser(query, groupby=env.request.parameters.get("groupby"),
-                                   offset=(page - 1) * limit, limit=limit, parent=self)
+        groupby = env.request.parameters.get("groupby")
+        orderby = []
 
         # @HACK free-jqGrid messes the parameters badly when sorting on multiple columns simultaneously
         sort_settings = "%s %s" % (env.request.parameters.get("sort_index", ""), env.request.parameters.get("sort_order", ""))
-        is_sorted = False
         for sort_setting in sort_settings.split(','):
             try:
                 field, order = sort_setting.split()
             except ValueError:
                 pass
             else:
-                if field in self.all_fields:
-                    is_sorted |= search.add_order(field, order)
+                if order not in ("asc", "desc"):
+                    pass
                 elif field in self.path_translate:
-                    is_sorted |= search.add_order(self.path_translate[field][0][0].split(".", 1)[-1], order)
+                    orderby.append((self.path_translate[field][0][0].split(".", 1)[-1], order))
+                elif field == "_aggregation" or PathParser._unindex_path(field) in self.all_fields:
+                    orderby.append((field, order))
 
-        if not is_sorted:
-            search.add_order(self.sort_path_default, "desc")
+        if not orderby:
+            orderby.append(("_aggregation" if groupby else self.sort_path_default, "desc"))
 
-        return search
+        return self.query_parser(query, groupby=groupby, orderby=orderby,
+                                 offset=(page - 1) * limit, limit=limit, parent=self)
 
     def csv_download(self):
         grid = utils.json.loads(env.request.parameters["datasearch_grid"], object_pairs_hook=collections.OrderedDict)
@@ -638,6 +645,39 @@ class DataSearch(view.View):
             infos[category] = data
 
         return response.PrewikkaResponse({"infos": infos})
+
+    def ajax_groupby(self):
+        limit = int(env.request.parameters["limit"])
+        page = int(env.request.parameters.get("page", 1))
+
+        search = self._prepare(page, limit)
+        step = search.get_step()
+        results = search.get_result()
+        resrows = []
+
+        # We need to reorder results according to what is expected
+        permutation = [search.get_index(f) for f in ["_aggregation"] + search.groupby]
+
+        for i, result in enumerate(results):
+            values = [result[permutation[idx]] for idx in range(len(result))]
+
+            cells = {}
+            for idx, group in enumerate(search.groupby):
+                label = values[idx + 1]
+                if isinstance(label, datetime.datetime):
+                    label = label.strftime(step.unit_format)
+                elif isinstance(label, datetime.timedelta):
+                    label = format_timedelta(label)
+
+                link = search.get_groupby_link([group], [values[idx + 1]], step, cview='.forensic')
+                cells[group] = resource.HTMLNode("a", label, href=link)
+
+            link = search.get_groupby_link(search.groupby, values[1:], step, cview='.forensic')
+            cells["_aggregation"] = resource.HTMLNode("a", values[0], href=link)
+            resrows.append({"id": text_type(i), "cell": cells})
+
+        total = (page if len(resrows) < limit else page + 1) * limit
+        return utils.viewhelpers.GridAjaxResponse(resrows, total).add_html_content(mainmenu.HTMLMainMenu(update=True))
 
 
 class ResultDatetimeIterator(object):

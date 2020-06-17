@@ -90,14 +90,6 @@ class AlertFormatter(idmef.IDMEFFormatter):
 class AlertQueryParser(idmef.IDMEFQueryParser):
     _default_sort_order = ["alert.create_time/order_desc"]
 
-    def __init__(self, query, parent, groupby=[], offset=0, limit=50):
-        idmef.IDMEFQueryParser.__init__(self, query, parent, groupby, offset, limit)
-        self._sort_order = []
-
-    def add_order(self, field, order="asc"):
-        self._sort_order.append("alert.%s/order_%s" % (field, order))
-        return True
-
 
 class AlertDataSearch(idmef.IDMEFDataSearch):
     plugin_name = "DataSearch: Alerts"

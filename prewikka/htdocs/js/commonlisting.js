@@ -48,18 +48,7 @@ function CommonListing(elem, text, options, restored_parameters) {
         viewrecords: true,
         globalSearch: false,
         useSearchbar: false,
-        cmTemplate: {
-            title: false,
-            formatter: function(value, opts, rowObj) {
-                if ( value )
-                    return value.toHTML ? value.toHTML() : _.escape(value);
-                else
-                    return "";
-            },
-            unformat: function(value, opts) {
-                return value;
-            },
-        },
+        cmTemplate: $.jgrid.cmTemplate.html,
         onInitGrid: function() {
             if ( options.globalSearch ) {
                 $(".ui-jqgrid-titlebar").css("overflow", "auto")
@@ -423,6 +412,22 @@ $.extend($.jgrid.cellattr, {
     default_cellattr: function(rowId, value, rowObj) {
         if ( value && value.extra && value.extra["_classes"] )
             return ' class="' + value.extra["_classes"] + '"';
+    }
+});
+
+$.jgrid.cmTemplate = $.jgrid.cmTemplate || {};
+$.extend($.jgrid.cmTemplate, {
+    html: {
+        title: false,
+        formatter: function(value, opts, rowObj) {
+            if ( value )
+                return value.toHTML ? value.toHTML() : _.escape(value);
+            else
+                return "";
+        },
+        unformat: function(value, opts) {
+            return value;
+        },
     }
 });
 
