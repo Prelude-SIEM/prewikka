@@ -27,6 +27,10 @@ function _get_condition_criterion(selector) {
     return Criterion(values[0], values[1], values[2] || null);
 }
 
+function unindex_path(path) {
+    return path.replace(/\([^)]+\)/g, "");
+}
+
 function FilterEdition(selector, default_paths, all_paths, operators, enums, tooltips) {
 
     var that = this;
@@ -38,9 +42,19 @@ function FilterEdition(selector, default_paths, all_paths, operators, enums, too
     }
 
     this.init_condition = function(select) {
+        var type = select.closest(".filter-edition").data("type");
+
         select.select2_container({
-            width: "300px"
+            width: "300px",
+            tags: true,
+            createTag: function(params) {
+                if ( operators[type][unindex_path(params.term)] )
+                    return {id: params.term, text: params.term};
+                else
+                    return null;
+            }
         });
+
         that.init_operators(select);
         that.init_autocomplete(select);
     }
@@ -49,7 +63,7 @@ function FilterEdition(selector, default_paths, all_paths, operators, enums, too
         var type = select.closest(".filter-edition").data("type");
         var ul = select.parent().siblings(".operator").children("ul").empty();
         var opdiv = $(ul).siblings("div[data-toggle=dropdown]");
-        var oplist = operators[type][select.val()];
+        var oplist = operators[type][unindex_path(select.val())];
 
         $.each(oplist, function(index, operator) {
             $("<li>").append($("<a>", {

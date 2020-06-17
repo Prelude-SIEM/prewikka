@@ -18,6 +18,9 @@
                         <option value="${path}" ${selected(path == field)}>${path}</option>
                         % endfor
                     </optgroup>
+                    % if field and field not in kwargs.get("all_paths", []) and field not in kwargs.get("default_paths", {}).values():
+                    <option value="${field}" selected>${field}</option>
+                    % endif
                 </select>
             </div>
             <div class="input-group-addon dropdown dropdown-fixed operator">
