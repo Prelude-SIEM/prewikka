@@ -134,7 +134,7 @@ class PluginManager(object):
                     continue
 
                 for mod in module_map.get(j, []):
-                    plist.pop(mod)
+                    plist.pop(mod, None)
 
         return plist
 
