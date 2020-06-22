@@ -1,3 +1,45 @@
+* 2020-06-19, prewikka-5.2.0beta1:
+
+Author: Prelude Team
+
+- Add new plugins
+
+    - Local DB authentication
+    - Dataprovider and view for logs
+    - Statistics pages
+    - Risk overview
+    - External website embedding
+
+Author: Antoine Luong
+
+- Evolutions
+
+    - Improve DataSearch aggregation page
+    - Add JSON and text representations in IDMEF details
+    - Support multi-column sorting in DataSearch
+
+- Bugfixes
+
+    - Fix possible error with deprecated plugins
+    - Reduce FOUC effect in control menu
+    - Support non-ASCII characters in YAML menu
+    - Fix multi-step migration process
+    - Make colors more consistent across charts
+    - Fix various issues in DataSearch
+    - Ensure filters are always applied in statistics
+    - Reauthenticate users in case of login mismatch
+    - Fix a scheduling issue after updating apps
+    - Use the correct hook in heartbeat detail
+    - Reload plugins if needed in prewikka-crontab
+
+Author: Yoann Vandoorselaere
+
+- Ability to disable session redirection mechanism
+- CSRF verification fail when prewikka-httpd use https
+- Ability to disable CSRF protection for specific route
+
+
+
 * 2019-09-13, prewikka-5.1.0:
 
 Author: Antoine Luong
