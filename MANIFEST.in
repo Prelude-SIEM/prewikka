@@ -5,7 +5,8 @@ include NEWS
 include README
 include INSTALL
 include prewikka.pot
-include conf/*.conf
+include conf/prewikka.conf
+include conf/plugins/*.conf
 include conf/menu.yml
 include themes/*.less
 include scripts/prewikka.wsgi
