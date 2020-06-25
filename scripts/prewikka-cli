@@ -46,12 +46,13 @@ class PrewikkaCLI(cmd.Cmd):
     prompt = "(prewikka-cli) "
     _interactive = False
 
-    def _complete_command(self, command, line):
+    def _complete_command(self, command, text, line):
         if len(line.split(" ")) != 2:
             return
 
         last_term = line.split(" ")[-1]
-        return [category for category in cli.get(command) if category.startswith(last_term)]
+        offset = len(last_term) - len(text)
+        return [category[offset:] for category in cli.get(command) if category.startswith(last_term)]
 
     def _do_command(self, command, category, *args, **kwargs):
         c = cli.get(command).get(category)
@@ -89,24 +90,24 @@ class PrewikkaCLI(cmd.Cmd):
         return c[-1].get(option)
 
     def complete_create(self, text, line, begidx, endidx):
-        return self._complete_command("create", line)
+        return self._complete_command("create", text, line)
 
     def complete_delete(self, text, line, begidx, endidx):
-        return self._complete_command("delete", line)
+        return self._complete_command("delete", text, line)
 
     def complete_import(self, text, line, begidx, endidx):
         if len(line.split(" ")) < 3:
-            return self._complete_command("import", line)
+            return self._complete_command("import", text, line)
 
         path = line.split(" ")[-1]
         offset = len(path) - len(text)
         return [f[offset:] + (os.sep if os.path.isdir(f) else "") for f in glob.glob(path + "*")]
 
     def complete_list(self, text, line, begidx, endidx):
-        return self._complete_command("list", line)
+        return self._complete_command("list", text, line)
 
     def complete_sync(self, text, line, begidx, endidx):
-        return self._complete_command("sync", line)
+        return self._complete_command("sync", text, line)
 
     def do_create(self, arg):
         try:
