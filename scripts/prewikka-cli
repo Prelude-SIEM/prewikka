@@ -59,7 +59,7 @@ class PrewikkaCLI(cmd.Cmd):
             print("*** %s" % _("Unknown command"))
             return COMMAND_ERROR
 
-        method, permissions, help = c
+        method, permissions, help, options = c
         env.request.user.check(permissions)
         try:
             result = method(*args, **kwargs)
@@ -75,11 +75,18 @@ class PrewikkaCLI(cmd.Cmd):
 
     def _help_command(self, command, description):
         additional_help = []
-        for category, (method, permissions, help) in sorted(cli.get(command).items()):
+        for category, (method, permissions, help, options) in sorted(cli.get(command).items()):
             if help:
                 additional_help.append(_(help))
 
         print("\n".join(description + [" - %s" % h for h in additional_help]))
+
+    def _get_option(self, command, category, option):
+        c = cli.get(command).get(category)
+        if not c:
+            return None
+
+        return c[-1].get(option)
 
     def complete_create(self, text, line, begidx, endidx):
         return self._complete_command("create", line)
@@ -130,10 +137,11 @@ class PrewikkaCLI(cmd.Cmd):
             return PARSE_ERROR
 
         files = []
+        mode = "rb" if self._get_option("import", category, "mode") == "binary" else "r"
 
         for pattern in filenames:
             for path in glob.glob(pattern):
-                with io.open(path) as f:
+                with io.open(path, mode) as f:
                     files.append({
                         "name": os.path.basename(f.name),
                         "data": f.read()

@@ -26,19 +26,19 @@ class CLIManager(object):
     def __init__(self):
         self._commands = {}
 
-    def _register(self, command, category, method, permissions, help):
+    def _register(self, command, category, method, permissions, help, **options):
         d = self._commands.setdefault(command, {})
         if category not in d:
             # Avoid replacing methods by the ones from children classes
-            d[category] = (method, permissions, help)
+            d[category] = (method, permissions, help, options)
 
-    def register(self, command, category, method=None, permissions=[], help=None):
+    def register(self, command, category, method=None, permissions=[], help=None, **options):
         usergroup.ALL_PERMISSIONS.declare(permissions)
 
         if method:
-            self._register(command, category, method, permissions, help)
+            self._register(command, category, method, permissions, help, **options)
         else:
-            return registrar.DelayedRegistrar.make_decorator("cli", self._register, command, category, permissions=permissions, help=help)
+            return registrar.DelayedRegistrar.make_decorator("cli", self._register, command, category, permissions=permissions, help=help, **options)
 
     def unregister(self, command=None, category=None):
         if command and category:
