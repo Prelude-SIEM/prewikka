@@ -197,7 +197,7 @@ class ChronologyChart(GenericChart):
             out.setdefault(key, {})[tval[:date_precision]] = i[0]
 
         if not series_order:
-            return out
+            return {", ".join((localization.format_value(j) for j in k)): v for k, v in out.items()}
 
         out2 = collections.OrderedDict()
         for i in series_order:
