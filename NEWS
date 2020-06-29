@@ -1,3 +1,14 @@
+* 2020-06-29, prewikka-5.1.7:
+
+Author: Antoine Luong
+
+- Allow indexed paths in filters
+- Fix TypeError in statistics
+- Fix encoding issue with enable_details
+- Reduce FOUC effect in control menu
+
+
+
 * 2020-04-29, prewikka-5.1.6:
 
 Author: Antoine Luong
