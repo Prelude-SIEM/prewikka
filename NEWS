@@ -1,3 +1,19 @@
+* 2020-06-30, prewikka-5.2.0beta2:
+
+Author: Antoine Luong
+
+- Allow indexed paths in filters
+- Tweak the label handling in statistics
+- Fix completion in prewikka-cli
+- Allow binary file import in prewikka-cli
+- Update INSTALL and MANIFEST
+
+Author: Yoann Vandoorselaere
+
+- Properly handle escaped character in query
+
+
+
 * 2020-06-19, prewikka-5.2.0beta1:
 
 Author: Prelude Team
