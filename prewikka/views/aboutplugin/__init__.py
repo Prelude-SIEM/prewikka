@@ -19,6 +19,7 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import collections
 import itertools
 import json
 import pkg_resources
@@ -39,8 +40,8 @@ class AboutPlugin(view.View):
 
     view_permissions = [N_("USER_MANAGEMENT")]
 
-    _all_plugins = ((N_("Apps: View"), "prewikka.views"),
-                    (N_("Apps: API"), "prewikka.plugins"),
+    _all_plugins = ((N_("Apps: API"), "prewikka.plugins"),
+                    (N_("Apps: View"), "prewikka.views"),
                     (N_("Apps: Dataprovider backend"), "prewikka.dataprovider.backend"),
                     (N_("Apps: Dataprovider type"), "prewikka.dataprovider.type"),
                     (N_("Apps: Authentication"), "prewikka.auth"),
@@ -73,7 +74,7 @@ class AboutPlugin(view.View):
         # This is a temporary fix.
         env.db.modinfos_cache.clear()
 
-        data = utils.AttrObj(installed={}, maintenance={}, maintenance_total=0)
+        data = utils.AttrObj(installed=collections.OrderedDict(), maintenance=collections.OrderedDict(), maintenance_total=0)
         for catname, plugin in self._iter_plugin():
             self._add_plugin_info(data, catname, plugin)
 

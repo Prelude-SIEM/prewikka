@@ -19,8 +19,9 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
-
+import collections
 import pkg_resources
+
 from prewikka import database, error, log, registrar
 from prewikka.localization import translation
 
@@ -80,7 +81,7 @@ class PluginManager(object):
         plugins = self.iter_plugins(entrypoint)
         plist = [(p, False) for p in plugins]
         self._load_plugin_list(plist, plugins, autoupdate, loaded, [])
-        env.all_plugins[entrypoint] = plugins
+        env.all_plugins[entrypoint] = collections.OrderedDict((name, plugins[name]) for name in loaded if name in plugins)
 
     def _add_plugin(self, plugin_class, autoupdate, name=None):
         plugin_class._handle_attributes(autoupdate)
