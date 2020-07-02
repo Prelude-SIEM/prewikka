@@ -87,6 +87,7 @@ var Dashboard = function(options) {
 
     $('#confirm-init').on('click', function() {
         load_widgets(default_charts, true);
+        set_edit_mode(editable);
     });
 
     $('#confirm-reset').on('click', function() {
