@@ -713,7 +713,16 @@ class DataProviderManager(pluginmanager.PluginManager):
 
         return AttrObj(type=type, paths=paths, parsed_paths=parsed_paths, paths_types=paths_types, criteria=criteria.compile(type))
 
+    @staticmethod
+    def _check_limit_offset(limit, offset):
+        if limit < -1 or limit > 2**31 - 1:
+            raise DataProviderError("Limit parameter out of bounds")
+
+        if offset < 0 or offset > 2**31 - 1:
+            raise DataProviderError("Offset parameter out of bounds")
+
     def query(self, paths, criteria=None, distinct=False, limit=-1, offset=0, type=None, **kwargs):
+        self._check_limit_offset(limit, offset)
         o = self._normalize(type, paths, criteria)
 
         start = time.time()
@@ -729,6 +738,7 @@ class DataProviderManager(pluginmanager.PluginManager):
         return self._backends[type].get_by_id(id_)
 
     def get(self, criteria=None, order_by=["{backend}.{time_field}/order_desc"], limit=-1, offset=0, type=None):
+        self._check_limit_offset(limit, offset)
         o = self._normalize(type, order_by, criteria)
         return self._backends[o.type].get(o.criteria, o.paths, limit, offset)
 

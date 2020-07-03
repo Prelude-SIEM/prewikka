@@ -39,7 +39,7 @@ body, body.modal-open {
 
 <div class="prewikka-view-config collapse">
   <p class="list-group-item">
-    <input id="limit" name="limit" type="number" min="-1" value="${ limit }" class="form-control input-sm" />
+    <input id="limit" name="limit" type="number" min="-1" max="${ 2**31-1 }" value="${ limit }" class="form-control input-sm" />
     <label for="limit">${ _("Limit") }</label>
   </p>
 
