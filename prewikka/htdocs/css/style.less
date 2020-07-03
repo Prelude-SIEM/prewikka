@@ -502,36 +502,22 @@ div.footer-left-buttons {
 /*
  * popup
  */
-.popup_menu {
-    a, span {
-     position: relative;
+.popup-menu {
+    background-color: @active-background;
+    a {
       display: block;
       padding: 10px 15px;
-      background-color: #FFF;
-      border: 1px solid #DDD;
-      color: #555;
+      border-bottom: 2px solid #DDD;
+      color: @active-text;
     }
-    span {
-      opacity: 0.65;
+    a:last-child {
+      border-bottom: none;
     }
     a:hover {
       background-color: #f5f5f5;
+      color: #555;
       text-decoration: none;
     }
-
-    font-size: 14px;
-    font-style: normal;
-    font-weight: 400;
-    line-height: 1.42857;
-    border: 2px solid #787878;
-    border-radius: 4px;
-    background: @active-background;
-    z-index: 1;
-    display: none;
-    position: absolute;
-    margin: 0px;
-    _width: 150px;
-    text-align: left;
 }
 
 .table tbody tr td {
@@ -877,6 +863,13 @@ svg text {
 
     .popover-title {
         color: #333;
+    }
+
+    &.popover-menu {
+        z-index: 1;
+        .popover-content {
+            padding: 0;
+        }
     }
 
     &.top .arrow::after {

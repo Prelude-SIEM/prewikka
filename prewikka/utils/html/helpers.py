@@ -22,6 +22,9 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from prewikka import csrf, resource
 
 
+POPOVER_HTML = '<div class="popover popover-menu" role="tooltip"><div class="arrow"></div><div class="popover-content"></div></div>'
+
+
 def csrftoken():
     return resource.HTMLSource('<input type="hidden" name="%s" value="%s" />' % (csrf.CSRF_POST_KEY, csrf.get_token(env.request.web)))
 

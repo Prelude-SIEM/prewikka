@@ -26,8 +26,6 @@ String.prototype.formatUnicorn = String.prototype.formatUnicorn || function () {
 
 
 $(function() {
-  var $cache = null;
-  var $cachef = null;
 
   $.fn.serializeObject = function() {
       var data = {};
@@ -38,21 +36,6 @@ $(function() {
 
       return data;
   }
-
-  $.fn.popupUnique = function(animshow, animhide) {
-        if ( $cache && this.is(':visible') ) {
-                $cachef($cache);
-                $cache = null;
-        } else {
-                animshow(this);
-                if ( $cache )
-                        $cachef($cache);
-                $cachef = animhide;
-                $cache = this;
-        }
-
-        return false;
-  };
 
   $.fn.check = function(mode){
         return this.each(function() { this.checked = mode; } );
@@ -116,10 +99,6 @@ $(function() {
           url: prewikka_location().href,
           prewikka: {target: PrewikkaAjaxTarget.TAB}
       });
-  });
-
-  $(document).on("click", ".popup_menu_toggle", function(){
-    $(this).next().popupUnique(function(data){data.show('fast'); data.css('display','block')}, function(data){data.hide('fast')});
   });
 
   $(document).on("show.bs.popover", '[data-toggle="popover"]', function() {
@@ -235,31 +214,6 @@ $(function() {
 
   $(document).on('show.bs.dropdown', '.modal-content:visible .dropdown-fixed', function() {
       _position_dropdown($(this), ".dropdown-menu");
-  });
-
-  $(document).on('click', '.popup_menu_dynamic', function() {
-      $(this).removeClass("popup_menu_dynamic");
-
-      if ( ! $(this).data("popup-url") )
-          return;
-
-      var popup_menu = $(this).next(".popup_menu");
-      popup_menu.append($("<span>", {
-        "class": "popup_menu_loading",
-        "text": "Loading..."
-      }));
-
-      prewikka_ajax({
-          prewikka: { spinner: false },
-          type: "GET",
-          url: $(this).data("popup-url"),
-          success: function(data) {
-              popup_menu.find(".popup_menu_loading").remove();
-              $.each(data, function(i, node) {
-                  popup_menu.append(node.toHTML());
-              });
-          }
-      });
   });
 
   $(document).on('click', '.prewikka-notification .close', function() {

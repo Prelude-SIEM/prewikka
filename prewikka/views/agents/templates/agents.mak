@@ -1,5 +1,6 @@
 <%!
 from prewikka.utils import html, json
+from prewikka.utils.html.helpers import POPOVER_HTML
 %>
 
 <link rel="stylesheet" type="text/css" href="agents/css/agents.css">
@@ -13,11 +14,17 @@ from prewikka.utils import html, json
 
     function nameFormatter(cellValue, opts, rowObj) {
         var div = $("<div>");
-        $("<a>", {"class": "popup_menu_toggle"}).text(cellValue).appendTo(div);
-        var span = $("<span>", {"class": "popup_menu"}).appendTo(div);
+        var span = $("<span>", {"class": "popup-menu"});
         $.each(rowObj.links, function(index, elem) {
             $(span).append(elem.toHTML());
         });
+        $("<a>", {
+            "data-toggle": "popover",
+            "data-placement": "bottom",
+            "data-html": "true",
+            "data-content": span[0].outerHTML,
+            "data-template": ${ html.escapejs(POPOVER_HTML) }
+        }).text(cellValue).appendTo(div);
         return div.html();
     };
 

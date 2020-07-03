@@ -29,6 +29,7 @@ import pkg_resources
 from prewikka import hookmanager, localization, resolve, resource, template, utils, view
 from prewikka.dataprovider import Criterion
 from prewikka.utils import html
+from prewikka.utils.html.helpers import POPOVER_HTML
 
 
 def getUriCriteria(ptype, analyzerid, messageid):
@@ -521,7 +522,13 @@ class MessageSummary(Table, view.View):
                 links += obj
 
             if links:
-                meaning = resource.HTMLSource("<a class='popup_menu_toggle'>%s</a><span class='popup_menu'>%s</span>") % (meaning, links)
+                meaning = resource.HTMLNode("a", meaning, **{
+                    "data-toggle": "popover",
+                    "data-placement": "bottom",
+                    "data-html": "true",
+                    "data-content": '<span class="popup-menu">%s</span>' % links,
+                    "data-template": POPOVER_HTML,
+                })
 
             if meaning not in ignored:
                 self.newTableCol(index, resource.HTMLSource(meaning or "Data content"))
