@@ -57,14 +57,25 @@ class AlertFormatter(idmef.IDMEFFormatter):
             tooltip=root.get("alert.assessment.impact.description")
         ))
 
+    def _get_best_path(self, root, field):
+        for nidx, node in enumerate(root.get("%s(*).node" % field)):
+            for aidx, addr in enumerate(node.get("address(*)")):
+                if addr.get("category") in ("unknown", "ipv4-addr", "ipv6-addr") and addr.get("address"):
+                    return "%s(%d).node.address(%d).address" % (field, nidx, aidx)
+
+            if node.get("name"):
+                return "%s(%d).node.name" % (field, nidx)
+
+        return "%s(0).node.address(0).address" % field
+
     def format(self, finfo, root, obj):
         ret = idmef.IDMEFFormatter.format(self, finfo, root, obj)
         if not ret:
             return ret
 
         basic_fields = {
-            "alert.source": "alert.source(0).node.address(0).address",
-            "alert.target": "alert.target(0).node.address(0).address",
+            "alert.source": self._get_best_path(root, "alert.source"),
+            "alert.target": self._get_best_path(root, "alert.target"),
             "alert.analyzer(-1)": "alert.analyzer(-1).name",
         }
 
