@@ -88,7 +88,7 @@ class Request(object):
 
         self._output_cookie[param] = value
 
-        if expires:
+        if expires is not None:
             self._output_cookie[param]["expires"] = expires
 
         if path:
