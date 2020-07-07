@@ -192,7 +192,7 @@ class ChronologyChart(GenericChart):
 
         out = {}
         for i in res:
-            key = tuple(i[1:selection_index]) or self.title
+            key = tuple(i[1:selection_index]) or (self.title,)
             tval = tuple((int(x) for x in i[selection_index:]))
             out.setdefault(key, {})[tval[:date_precision]] = i[0]
 
