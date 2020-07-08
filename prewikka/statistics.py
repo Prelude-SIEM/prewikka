@@ -271,7 +271,7 @@ class ChronologyChart(GenericChart):
         else:
             data = collections.OrderedDict()
             for query in self.query:
-                series = self._get_series(query, selection, date_precision).get(self.title, {})
+                series = self._get_series(query, selection, date_precision).get((self.title,), {})
                 legend = query.aggregation.replace("(1)", "(%s)" % query.datatype)
                 data[(legend,)] = series
 
