@@ -108,9 +108,6 @@ class ElasticsearchInstance(dataprovider.DataProviderInstance):
         self.type = config.es_type
         self._client = ElasticsearchClient(name, config)
 
-        # Check if Elasticsearch instance is available
-        self._client.query([], [], 1)
-
     def get_values(self, paths, criteria, distinct, limit, offset, highlight=None):
         env.request.user.check("%s_VIEW" % self.type.upper())
 
@@ -126,7 +123,7 @@ class ElasticsearchInstance(dataprovider.DataProviderInstance):
 class ElasticsearchClient(object):
     def __init__(self, name, conf):
         self._type = conf.es_type
-        self._host = conf.es_url
+        self._host = conf.es_url.rstrip("/")
         self._user = conf.get("es_user")
         self._password = conf.get("es_pass", "")
         self._cert = conf.get("es_cert")
@@ -134,11 +131,17 @@ class ElasticsearchClient(object):
         self._cacert = conf.get("es_cacert")
         self._session = requests.Session()
         self._session.headers["content-type"] = "application/json"
+
+        # Check if Elasticsearch instance is available
+        req = self._request(self._host.rsplit("/", 1)[0], method="GET").json()
+        self._version = tuple(int(i) for i in req["version"]["number"].split("."))
         self._mapping = ElasticsearchMap(self._type, conf, self.get_mapping())
 
     def request(self, path, data="", method="POST", **kwargs):
         """ Make a request and return the result """
+        return self._request(self._host + path, data, method, **kwargs)
 
+    def _request(self, url, data="", method="POST", **kwargs):
         try:
             if self._user:
                 kwargs['auth'] = (self._user, self._password)
@@ -150,11 +153,14 @@ class ElasticsearchClient(object):
                 else:
                     kwargs['cert'] = self._cert
 
-            result = self._session.request(method, self._host + path, data=data, **kwargs)
+            result = self._session.request(method, url, data=data, **kwargs)
         except requests.exceptions.RequestException as err:
             raise error.PrewikkaUserError(N_("Request error"), err)
 
-        json_result = result.json()
+        try:
+            json_result = result.json()
+        except ValueError as err:
+            raise error.PrewikkaUserError(N_("Request error"), err)
 
         if result.status_code == 200:
             # When searching multiple indices, some can fail returning
@@ -163,7 +169,7 @@ class ElasticsearchClient(object):
             # we raise an error.
             # When the internal ticket #3842 will be answered and closed,
             # review the purpose of this code.
-            if path != "/_search":
+            if not url.endswith("/_search"):
                 return result
 
             shards = json_result["_shards"]
@@ -171,6 +177,7 @@ class ElasticsearchClient(object):
             if shards["total"] - shards.get("skipped", 0) - shards["failed"] == 0:
                 err = shards["failures"][0]["reason"]["reason"]
 
+                # FIXME #3733 Remove when cursors are implemented?
                 if "Result window is too large" in err:
                     err = N_("Cannot further browse results. Please use a more specific filter.")
 
@@ -189,16 +196,13 @@ class ElasticsearchClient(object):
             r = r.get("root_cause")
             if parse_except:
                 err = N_("Malformed query.")
+            elif r and "Result window is too large" in r[0]["reason"]:
+                # FIXME #3733 Remove when cursors are implemented?
+                err = N_("Cannot further browse results. Please use a more specific filter.")
             elif r:
                 err = N_("Request error with HTTP code %d. Reason: %s", (result.status_code, r[0]["reason"]))
             else:
                 err = N_("Request error with HTTP code %d. Unknown reason", result.status_code)
-
-        # Remove when cursors are implemented and/or upgrade to elasticsearch 7+
-        elif result.status_code == 500:
-            r = json_result.get("error", {}).get("root_cause")
-            if r and "Result window is too large" in r[0]["reason"]:
-                err = N_("Cannot further browse results. Please use a more specific filter.")
 
         raise error.PrewikkaUserError(N_("Request error"), err)
 
@@ -215,8 +219,10 @@ class ElasticsearchClient(object):
         if root is None:
             try:
                 req = next(iter(self.request('/', method="GET").json().values()))
-                root = next(iter(req["mappings"].values()))["properties"]
-                self._version = req["settings"]["index"]["version"]["created"][0]
+                if self._version < (7,):
+                    root = next(iter(req["mappings"].values()))["properties"]
+                else:
+                    root = req["mappings"]["properties"]
             except (IndexError, KeyError):
                 raise error.PrewikkaUserError(N_("Invalid configuration"),
                                               N_("The specified Elasticsearch index does not exist"))
@@ -224,14 +230,9 @@ class ElasticsearchClient(object):
         if prefix:
             prefix += "."
 
-        map_vers = {"2": ("index", "not_analyzed"), "5": ("type", "keyword")}
-        for key, map_ver in map_vers.items():
-            if self._version <= key:
-                break
-
         for key, value in root.items():
             mapping[prefix + key] = AttrObj(type=value.get("type"),
-                                            keyword=value.get(map_ver[0]) == map_ver[1])
+                                            keyword=value.get("type") == "keyword")
 
             if "fields" in value:
                 self.get_mapping(value["fields"], mapping, prefix + key)
@@ -288,7 +289,8 @@ class ElasticsearchQuery(object):
             "sort": [],
             "query": self._init_query_criteria(),
             "aggs": {},
-            "highlight": dict(self.highlight) if self.highlight else {}
+            "highlight": dict(self.highlight) if self.highlight else {},
+            "track_total_hits": True,
         }
 
         self.extract_list = []
@@ -644,6 +646,9 @@ class ElasticsearchResult(object):
         self._limit = limit
 
         self.total_result = result.get("hits", {}).get("total", 0)
+        if isinstance(self.total_result, dict):
+            # For Elasticsearch >= 7
+            self.total_result = self.total_result["value"]
 
         self.api_results = dataprovider.QueryResults(self._get_rows())
         self.api_results.total = self.total_result
