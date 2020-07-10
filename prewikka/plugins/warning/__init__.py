@@ -41,4 +41,4 @@ class Warning(view.View):
     def _toplayout_extra_content(self):
         if env.request.user and not env.request.web.input_cookie.get("warning"):
             env.request.web.add_cookie("warning", "warning", 365 * 24 * 60 * 60)
-            return [resource.HTMLSource(self._template.render())]
+            return next(hookmanager.trigger("HOOK_WARNING_CONTENT"), [resource.HTMLSource(self._template.render())])
