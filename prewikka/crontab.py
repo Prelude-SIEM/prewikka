@@ -131,6 +131,7 @@ class Crontab(object):
 
     def _reinit(self):
         self._plugin_callback = {}
+        self._formatters = {}
 
     def __init__(self):
         self._reinit()
@@ -279,12 +280,17 @@ class Crontab(object):
         else:
             return registrar.DelayedRegistrar.make_decorator("crontab", self.schedule, ext_type, name, schedule, enabled=enabled)
 
-    def setup(self, ext_type, _regfunc=None):
+    def setup(self, ext_type, _regfunc=None, formatter=None):
         if _regfunc:
             assert not(ext_type in self._plugin_callback)
             self._plugin_callback[ext_type] = _regfunc
+            self._formatters[ext_type] = formatter
         else:
-            return registrar.DelayedRegistrar.make_decorator("crontab", self.setup, ext_type)
+            return registrar.DelayedRegistrar.make_decorator("crontab", self.setup, ext_type, formatter=formatter)
+
+    def format(self, ext_type, name):
+        formatter = self._formatters.get(ext_type)
+        return N_(formatter, name) if formatter else name
 
 
 def format_schedule(x):
@@ -322,4 +328,5 @@ update = crontab.update
 delete = crontab.delete
 schedule = crontab.schedule
 setup = crontab.setup
+format = crontab.format
 update_from_parameters = crontab.update_from_parameters

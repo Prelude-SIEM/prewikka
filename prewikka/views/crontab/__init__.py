@@ -71,7 +71,7 @@ class CrontabView(view.View):
         sort_index = env.request.parameters.get("sort_index", "name")
         sort_order = env.request.parameters.get("sort_order", "asc")
         sort_func = {
-            "name": lambda x: _(x.name).lower(),
+            "name": lambda x: _(crontab.format(x.ext_type, x.name)).lower(),
             "user": lambda x: text_type(x.user) if x.user else _("SYSTEM"),
             "last": lambda x: x.base,
             "next": lambda x: x.next_schedule - now if x.enabled else datetime.timedelta.max,
@@ -99,7 +99,7 @@ class CrontabView(view.View):
 
             rows.append({
                 "id": i.id,
-                "name": resource.HTMLNode("a", _(i.name), href=url_for(".edit", id=i.id)),
+                "name": resource.HTMLNode("a", _(crontab.format(i.ext_type, i.name)), href=url_for(".edit", id=i.id)),
                 "schedule": crontab.format_schedule(i.schedule),
                 "user": text_type(i.user) if i.user else _("SYSTEM"),
                 "last": last,
