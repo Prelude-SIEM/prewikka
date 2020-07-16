@@ -48,7 +48,7 @@ class CrontabView(view.View):
 
     @view.route("/settings/scheduler/<int:id>/save", methods=["POST"])
     def save(self, id=None):
-        crontab.update_from_parameters(id, env.request.parameters)
+        crontab.update_from_parameters(id)
         return response.PrewikkaResponse({"type": "reload", "target": "view"})
 
     @view.route("/settings/scheduler/<int:id>/edit")

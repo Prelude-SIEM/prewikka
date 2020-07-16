@@ -257,11 +257,8 @@ class Crontab(object):
     def add(self, name, schedule, user=None, ext_type=None, ext_id=None, enabled=True):
         return self.update(None, name=name, schedule=schedule, user=user, ext_type=ext_type, ext_id=ext_id, enabled=enabled)
 
-    def update_from_parameters(self, id, parameters=None, delete_disabled=False, **kwargs):
-        if parameters is None:
-            parameters = env.request.parameters
-
-        schedule = parameters.get("quick-schedule")
+    def update_from_parameters(self, id, delete_disabled=False, **kwargs):
+        schedule = env.request.parameters.get("quick-schedule")
         if schedule != "disabled":
             kwargs["schedule"] = schedule
             try:
@@ -272,7 +269,7 @@ class Crontab(object):
         elif delete_disabled:
             return crontab.delete(id=id, **kwargs)
 
-        crontab.update(id, name=parameters["name"], enabled=int(schedule != "disabled"), **kwargs)
+        crontab.update(id, enabled=int(schedule != "disabled"), **kwargs)
 
     def schedule(self, ext_type, name, schedule, _regfunc=None, enabled=True):
         if _regfunc:

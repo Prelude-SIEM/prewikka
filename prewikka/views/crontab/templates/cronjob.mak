@@ -111,7 +111,7 @@ DEFAULT_OPTION = "0 * * * *"
       <div class="form-group">
         <label for="job-name" class="col-sm-2 control-label">${ _("Name:") }</label>
         <div class="col-sm-10">
-          <input class="form-control" type="text" name="name" value="${job.name}" placeholder="${ _("Name") }"/>
+          <input class="form-control" type="text" value="${_(crontab.format(job.ext_type, job.name))}" disabled/>
         </div>
       </div>
 
