@@ -83,12 +83,15 @@ class PluginManager(object):
         self._load_plugin_list(plist, plugins, autoupdate, loaded, [])
         env.all_plugins[entrypoint] = collections.OrderedDict((name, plugins[name]) for name in loaded if name in plugins)
 
+        env.pluginmanager[entrypoint] = self
+
     def _add_plugin(self, plugin_class, autoupdate, name=None):
         plugin_class._handle_attributes(autoupdate)
         self[name or plugin_class.__name__] = plugin_class
 
     @staticmethod
     def initialize_plugin(plugin_class):
+        plugin_class.error = None
         try:
             return plugin_class()
         except error.PrewikkaUserError as e:
@@ -99,6 +102,21 @@ class PluginManager(object):
             plugin_class.error = e
             logger.exception("%s: plugin loading failed: %s", plugin_class.__name__, e)
             raise
+
+    def load(self, reloading=False):
+        for plugin_class in self:
+            if reloading and not plugin_class.error:
+                continue
+
+            try:
+                p = self.initialize_plugin(plugin_class)
+            except Exception:
+                pass
+            else:
+                self._init_callback(p)
+
+    def _init_callback(self, plugin):
+        pass
 
     @staticmethod
     def iter_plugins(entrypoint):
@@ -217,3 +235,8 @@ class PluginManager(object):
 
     def __contains__(self, item):
         return item in self.__dinstances
+
+
+class SimplePluginManager(PluginManager):
+    def _init_callback(self, plugin):
+        env.plugins[type(plugin).__name__] = plugin

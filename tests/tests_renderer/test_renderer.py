@@ -78,6 +78,7 @@ def test_renderer_plugin_manager():
     env.all_plugins = {}
 
     renderer = RendererPluginManager()
+    renderer.load()
 
     assert set(renderer.get_types()) == set(["bar", "doughnut", "pie", "timebar", "timeline"])
     assert renderer.has_backend("chartjs")

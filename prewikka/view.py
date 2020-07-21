@@ -627,11 +627,7 @@ class ViewManager(registrar.DelayedRegistrar):
         self._init()
         self.get_baseview()
 
-        for view_class in pluginmanager.PluginManager("prewikka.views", autoupdate):
-            try:
-                pluginmanager.PluginManager.initialize_plugin(view_class)
-            except Exception:
-                continue
+        pluginmanager.PluginManager("prewikka.views", autoupdate).load()
 
     @property
     def url_adapter(self):

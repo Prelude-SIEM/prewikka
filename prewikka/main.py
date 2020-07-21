@@ -23,6 +23,7 @@ import errno
 import gc
 import os
 import socket
+import time
 
 import pkg_resources
 import prelude
@@ -74,6 +75,8 @@ class Core(object):
         env.viewmanager = view.ViewManager()
         env.htdocs_mapping.update((("prewikka", pkg_resources.resource_filename(__name__, 'htdocs')),))
 
+        self._reload_time = None
+        self._reload_count = 0
         try:
             self._prewikka_initialized = False
             self._prewikka_init_if_needed()
@@ -162,19 +165,16 @@ class Core(object):
         usergroup.ACTIVE_PERMISSIONS = usergroup.Permissions()
 
     def _load_plugins(self):
+        env.pluginmanager = {}
         env.all_plugins = {}
 
         env.menumanager = menu.MenuManager()
         env.dataprovider = dataprovider.DataProviderManager(autoupdate=self.autoupdate)
-        env.dataprovider.load(autoupdate=self.autoupdate)
+        env.dataprovider.load()
         env.linkmanager = link.LinkManager()
 
         env.plugins = {}
-        for i in pluginmanager.PluginManager("prewikka.plugins", autoupdate=self.autoupdate):
-            try:
-                env.plugins[i.__name__] = pluginmanager.PluginManager.initialize_plugin(i)
-            except error.PrewikkaUserError:
-                pass
+        pluginmanager.SimplePluginManager("prewikka.plugins", autoupdate=self.autoupdate).load()
 
         # Load views before auth/session to find all permissions
         env.viewmanager.load_views(autoupdate=self.autoupdate)
@@ -204,21 +204,28 @@ class Core(object):
             env.auth = env.session
 
         env.renderer = renderer.RendererPluginManager(autoupdate=self.autoupdate)
+        env.renderer.load()
         list(hookmanager.trigger("HOOK_PLUGINS_LOAD"))
 
     def reload_plugin_if_needed(self):
-        if not env.db.has_plugin_changed():
-            return
+        if env.db.has_plugin_changed():
+            # Some changes happened, and every process has to reload the plugin configuration
+            env.log.warning("plugins were activated: triggering reload")
+            self._unregister_plugin_data()
+            try:
+                history.init()
+                self._load_plugins()
+            finally:
+                # Needed for Database object
+                gc.collect()
 
-        # Some changes happened, and every process has to reload the plugin configuration
-        env.log.warning("plugins were activated: triggering reload")
-        self._unregister_plugin_data()
-        try:
-            history.init()
-            self._load_plugins()
-        finally:
-            # Needed for Database object
-            gc.collect()
+        elif self._reload_count < 10 and (not self._reload_time or time.time() > self._reload_time + 30 * 2**self._reload_count):
+            # Reload plugins in error
+            self._reload_time = time.time()
+            self._reload_count += 1
+
+            for entrypoint in ("prewikka.dataprovider.type", "prewikka.plugins", "prewikka.views"):
+                env.pluginmanager[entrypoint].load(reloading=True)
 
     def _redirect_default(self, request):
         if env.menumanager.default_endpoint:

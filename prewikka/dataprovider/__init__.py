@@ -615,12 +615,16 @@ class Criterion(json.JSONObject):
 class DataProviderManager(pluginmanager.PluginManager):
     def __init__(self, autoupdate=False):
         pluginmanager.PluginManager.__init__(self, "prewikka.dataprovider.type", autoupdate=autoupdate)
+        pluginmanager.PluginManager("prewikka.dataprovider.backend", autoupdate=autoupdate)
 
         self._type_handlers = {}
         self._backends = {}
 
-    def load(self, autoupdate=False):
+    def load(self, reloading=False):
         for k in self.keys():
+            if reloading and not self[k].error:
+                continue
+
             try:
                 p = self.initialize_plugin(self[k])
             except Exception:
@@ -629,7 +633,9 @@ class DataProviderManager(pluginmanager.PluginManager):
             p.dataprovider_type = k
             self._type_handlers[k] = p
 
-        for plugin in pluginmanager.PluginManager("prewikka.dataprovider.backend", autoupdate=autoupdate):
+        for plugin in env.pluginmanager["prewikka.dataprovider.backend"]:
+            if reloading and not plugin.error:
+                continue
 
             if plugin.type not in self._type_handlers:
                 plugin.error = N_("No handler configured for '%s' datatype", plugin.type)

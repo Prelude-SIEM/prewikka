@@ -101,16 +101,12 @@ class RendererPluginManager(pluginmanager.PluginManager):
             self._default_backends[typ] = backend
 
         self._renderer = {}
-        for i in self:
-            try:
-                p = self.initialize_plugin(i)
-            except Exception:
-                continue
 
-            self._renderer.setdefault(i.renderer_backend, {})[i.renderer_type] = p
+    def _init_callback(self, plugin):
+        self._renderer.setdefault(plugin.renderer_backend, {})[plugin.renderer_type] = plugin
 
-            if i.renderer_type not in self._default_backends:
-                self._default_backends[i.renderer_type] = i.renderer_backend
+        if plugin.renderer_type not in self._default_backends:
+            self._default_backends[plugin.renderer_type] = plugin.renderer_backend
 
     def get_types(self):
         return self._default_backends.keys()
