@@ -6,7 +6,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 import datetime
 import prelude
 
-from prewikka import crontab, renderer, utils, version
+from prewikka import crontab, hookmanager, renderer, utils, version
 from prewikka.dataprovider import DataProviderBase, Criterion, CriterionOperator, ParserError, PathValue, InvalidPathError
 
 
@@ -174,7 +174,8 @@ class IDMEFAlertProvider(_IDMEFProvider):
         if not criteria:
             return
 
-        env.dataprovider.delete(criteria, type="alert")
+        if not list(hookmanager.trigger("HOOK_CRON_DELETE", criteria, "alert")):
+            env.dataprovider.delete(criteria, type="alert")
 
 
 class IDMEFHeartbeatProvider(_IDMEFProvider):
@@ -196,4 +197,6 @@ class IDMEFHeartbeatProvider(_IDMEFProvider):
             return
 
         criteria = Criterion("heartbeat.create_time", "<", utils.timeutil.utcnow() - datetime.timedelta(days=days))
-        env.dataprovider.delete(criteria, type="heartbeat")
+
+        if not list(hookmanager.trigger("HOOK_CRON_DELETE", criteria, "heartbeat")):
+            env.dataprovider.delete(criteria, type="heartbeat")
