@@ -8,6 +8,8 @@
   categories:
       - sections:
             - name: Alerts
+              default_tab: Alerts
+              expand: true
               tabs:
                   - Alerts
                   - Aggregated alerts
@@ -23,6 +25,7 @@
   categories:
       - sections:
             - name: Logs
+              expand: true
               tabs:
                   - Logs
                   - Aggregated logs
@@ -40,6 +43,7 @@
               tabs:
                   - Scheduling
             - name: Preferences
+              expand: true
               tabs:
                   - My account
                   - Filters
