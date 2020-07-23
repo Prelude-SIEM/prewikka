@@ -217,7 +217,7 @@ class PrewikkaCoverage(Command):
 
 setup(
     name="prewikka",
-    version="5.2.0beta2",
+    version="5.2.0rc1",
     maintainer="Prelude Team",
     maintainer_email="support.prelude@c-s.fr",
     url="http://www.prelude-siem.com",

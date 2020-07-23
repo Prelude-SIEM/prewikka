@@ -1,3 +1,27 @@
+* 2020-07-23, prewikka-5.2.0rc1:
+
+Author: Antoine Luong
+
+- Evolutions
+
+    - Add a system for reloading failed plugins
+    - Minor improvements of scheduled tasks
+    - Compatibility with Elasticsearch 7
+    - Use Bootstrap popovers for context links
+
+- Bugfixes
+
+    - Set explicit bounds for number inputs
+    - Fix cookie deletion
+    - Reload the DataSearch timeline after deletion
+    - Update database schemas in proper order
+
+Author: Thomas Andrejak
+
+- Alert board: Try to find a value for source and target
+
+
+
 * 2020-06-30, prewikka-5.2.0beta2:
 
 Author: Antoine Luong

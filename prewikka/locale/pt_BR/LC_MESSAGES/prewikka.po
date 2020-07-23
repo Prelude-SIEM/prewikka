@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Prewikka 5.2.0beta2\n"
+"Project-Id-Version: Prewikka 5.2.0rc1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2020-06-22 14:23+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
