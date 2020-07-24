@@ -59,6 +59,9 @@ class AlertFormatter(idmef.IDMEFFormatter):
 
     def _get_best_path(self, root, field):
         for nidx, node in enumerate(root.get("%s(*).node" % field)):
+            if node is None:
+                continue
+
             for aidx, addr in enumerate(node.get("address(*)")):
                 if addr.get("category") in ("unknown", "ipv4-addr", "ipv6-addr") and addr.get("address"):
                     return "%s(%d).node.address(%d).address" % (field, nidx, aidx)
