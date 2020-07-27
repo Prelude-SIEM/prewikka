@@ -621,6 +621,8 @@ class DataProviderManager(pluginmanager.PluginManager):
         self._backends = {}
 
     def load(self, reloading=False):
+        loaded = set()
+
         for k in self.keys():
             if reloading and not self[k].error:
                 continue
@@ -632,6 +634,7 @@ class DataProviderManager(pluginmanager.PluginManager):
 
             p.dataprovider_type = k
             self._type_handlers[k] = p
+            loaded.add(p)
 
         for plugin in env.pluginmanager["prewikka.dataprovider.backend"]:
             if reloading and not plugin.error:
@@ -652,12 +655,15 @@ class DataProviderManager(pluginmanager.PluginManager):
                                               N_("Only one manager should be configured for '%s' backend", p.type))
 
             self._backends[p.type] = p
+            loaded.add(p)
 
         for p in self._type_handlers.values():
-            p.post_load()
+            if p in loaded:
+                p.post_load()
 
         for p in self._backends.values():
-            p.post_load()
+            if p in loaded:
+                p.post_load()
 
     @staticmethod
     def _parse_path(path):
