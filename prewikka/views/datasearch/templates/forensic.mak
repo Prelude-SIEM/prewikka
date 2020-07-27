@@ -41,12 +41,15 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
 
   % else:
     <%
-      for i in columns_properties:
-         columns_properties[i].label = _(columns_properties[i].label)
+      model = []
+      for prop in columns_properties.values():
+          prop = utils.AttrObj(**prop)
+          prop.label = _(prop.label)
+          model.append(prop)
     %>
 
     var columns = {
-        'model': ${ html.escapejs(list(columns_properties.values())) },
+        'model': ${ html.escapejs(model) },
         'subgrid': true
     };
 

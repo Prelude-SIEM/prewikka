@@ -23,7 +23,6 @@
 from __future__ import absolute_import, division, print_function, unicode_literals
 
 import collections
-import copy
 import csv
 import datetime
 import functools
@@ -472,10 +471,17 @@ class DataSearch(view.View):
         dataset["backend"] = self.type
         dataset["limit"] = env.request.parameters["limit"]
 
-        # Deepcopy is necessary because the forensic template updates the object values
-        dataset["columns_properties"] = colsprop = copy.deepcopy(self.columns_properties)
+        dataset["columns_properties"] = columns = collections.OrderedDict()
+        right_columns = []
         for prop, finfo, func in filter(None, self._trigger_datasearch_hook("EXTRA_COLUMN")):
-            colsprop[prop.label] = COLUMN_PROPERTIES(**dict(prop))
+            if prop.position == "left":
+                columns[prop.label] = COLUMN_PROPERTIES(**prop)
+            else:
+                right_columns.append(prop)
+
+        columns.update(self.columns_properties)
+        for prop in right_columns:
+            columns[prop.label] = COLUMN_PROPERTIES(**prop)
 
         dataset["separators"] = self._formatter.highlighter.get_separators()
         dataset["criterion_config"] = self.criterion_config
