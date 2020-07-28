@@ -227,6 +227,8 @@ class Core(object):
             for entrypoint in ("prewikka.dataprovider.type", "prewikka.plugins", "prewikka.views"):
                 env.pluginmanager[entrypoint].load(reloading=True)
 
+            list(hookmanager.trigger("HOOK_PLUGINS_PARTIAL_RELOAD"))
+
     def _redirect_default(self, request):
         if env.menumanager.default_endpoint:
             url = url_for(env.menumanager.default_endpoint)
