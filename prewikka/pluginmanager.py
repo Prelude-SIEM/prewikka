@@ -73,7 +73,7 @@ class PluginManager(object):
         self.__instances = []
         self.__dinstances = {}
 
-        loaded = {}
+        loaded = collections.OrderedDict()
         for value in env.all_plugins.values():
             for name, plugin in value.items():
                 loaded[name] = not(plugin.error)
