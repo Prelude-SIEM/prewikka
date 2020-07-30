@@ -562,7 +562,7 @@ class DataSearch(view.View):
                     pass
                 elif field in self.path_translate:
                     orderby.append((self.path_translate[field][0][0].split(".", 1)[-1], order))
-                elif field == "_aggregation" or PathParser._unindex_path(field) in self.all_fields:
+                elif field == "_aggregation" or PathParser.unindex_path(field) in self.all_fields:
                     orderby.append((field, order))
 
         if not orderby:
