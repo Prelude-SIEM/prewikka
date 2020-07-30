@@ -146,16 +146,29 @@ class PluginManager(object):
             module_map.setdefault(plugin_class.__module__, {})[plugin_class.full_module_name] = True
 
             for j in plugin_class.plugin_deprecate:
-                ignore[j] = True
+                PluginManager._deprecate_plugin(j, ignore, plist, module_map)
 
-                ret = plist.pop(j, None)
-                if ret:
-                    continue
-
-                for mod in module_map.get(j, []):
-                    plist.pop(mod, None)
+        # Deprecate plugins depending on deprecated plugins
+        while True:
+            for plugin_class in plist.values():
+                if any(p in ignore or p.split(":", 1)[0] in ignore for p in plugin_class.plugin_require):
+                    PluginManager._deprecate_plugin(plugin_class.full_module_name, ignore, plist, module_map)
+                    break
+            else:
+                break
 
         return plist
+
+    @staticmethod
+    def _deprecate_plugin(plugin, ignore, plist, module_map):
+        ignore[plugin] = True
+
+        ret = plist.pop(plugin, None)
+        if ret:
+            return
+
+        for mod in module_map.get(plugin, []):
+            plist.pop(mod, None)
 
     def _handle_preload(self, plugin_class, autoupdate):
         plugin_class._handle_attributes(autoupdate)
