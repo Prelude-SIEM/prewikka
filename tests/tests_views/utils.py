@@ -1,4 +1,4 @@
-# Copyright (C) 2018-2020 CS-SI. All Rights Reserved.
+# Copyright (C) 2018-2020 CS GROUP - France. All Rights Reserved.
 #
 # This file is part of the Prewikka program.
 #
@@ -50,7 +50,7 @@ def create_heartbeat(heartbeat_id, heartbeat_date=None, heartbeat_interval=600, 
     idmef.set('heartbeat.heartbeat_interval', heartbeat_interval)
     idmef.set('heartbeat.analyzer(0).analyzerid', analyzer_id)
     idmef.set('heartbeat.analyzer(0).name', 'prelude-testing')
-    idmef.set('heartbeat.analyzer(0).manufacturer', 'http://www.prelude-siem.com')
+    idmef.set('heartbeat.analyzer(0).manufacturer', 'https://www.prelude-siem.com')
     idmef.set('heartbeat.analyzer(0).node.name', 'testing.prelude')
     idmef.set('heartbeat.additional_data(0).meaning', 'Analyzer status')
     idmef.set('heartbeat.additional_data(0).data', status)
@@ -90,7 +90,7 @@ def create_alert(alert_id):
     idmef.set('alert.messageid', alert_id)
     idmef.set('alert.analyzer(0).analyzerid', alert_id.replace('-', ''))
     idmef.set('alert.analyzer(0).name', 'prelude-testing')
-    idmef.set('alert.analyzer(0).manufacturer', 'http://www.prelude-siem.com')
+    idmef.set('alert.analyzer(0).manufacturer', 'https://www.prelude-siem.com')
     idmef.set('alert.analyzer(0).node.name', 'testing.prelude')
 
     return idmef

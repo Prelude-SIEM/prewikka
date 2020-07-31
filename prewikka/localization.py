@@ -1,5 +1,5 @@
 # coding=UTF-8
-# Copyright (C) 2007-2020 CS-SI. All Rights Reserved.
+# Copyright (C) 2007-2020 CS GROUP - France. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoannv@gmail.com>
 #
 # This file is part of the Prewikka program.

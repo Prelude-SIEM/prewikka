@@ -18,7 +18,7 @@
         <br><br>
         <span style="font-weight: bold; color: red">${ _("Prelude OSS is the open-source version of Prelude SIEM") }</span>
         <br><br>
-        ${ Markup(_("This OSS version has <span style='font-weight: bold'>lower performance</span> and <span style='font-weight: bold'>less <a href='%s'>features</a></span> than the commercial version.")) % "http://www.prelude-siem.com/en/prelude-siem-en/" }
+        ${ Markup(_("This OSS version has <span style='font-weight: bold'>lower performance</span> and <span style='font-weight: bold'>less <a href='%s'>features</a></span> than the commercial version.")) % "https://www.prelude-siem.com/en/prelude-siem-en/" }
         <br>${ _("It is intended for tests and small environments, and should not be used in critical environments.") }
 
         <br><br>

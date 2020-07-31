@@ -1,4 +1,4 @@
-# Copyright (C) 2004-2020 CS-SI. All Rights Reserved.
+# Copyright (C) 2004-2020 CS GROUP - France. All Rights Reserved.
 # Author: Yoann Vandoorselaere <yoannv@gmail.com>
 # Author: Nicolas Delon <nicolas.delon@prelude-ids.com>
 #

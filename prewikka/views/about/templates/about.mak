@@ -35,13 +35,13 @@ from prewikka import version
 
       <br/>
       <p>
-        ${ _("Prelude SIEM and Vigilo NMS are being developed by the %s company, designer, integrator and operator of mission critical systems.") % ("<a href='http://www.c-s.fr'>CS</a>") | n}
+        ${ _("Prelude SIEM and Vigilo NMS are being developed by the %s company, designer, integrator and operator of mission critical systems.") % ("<a href='http://www.csgroup.eu'>CS GROUP</a>") | n}
       </p>
 
       <div class="about_contact" class="panel">
         <div>
            <b>${ _("Contact") }</b>
-           <p><a href="mailto:contact.prelude@c-s.fr">contact.prelude@c-s.fr</a></p>
+           <p><a href="mailto:contact.prelude@csgroup.eu">contact.prelude@csgroup.eu</a></p>
            <p><b>${ _("Phone:") }</b> +33 1 41 28 40 00</p>
            <p><b>${ _("Fax:") }</b> +33 1 41 28 40 40</p>
         </div>
@@ -49,7 +49,7 @@ from prewikka import version
            <b>${ _("Corporate") }</b>
            <p><a href="https://www.prelude-siem.com">www.prelude-siem.com</a></p>
            <p><a href="https://www.vigilo-nms.com">www.vigilo-nms.com</a></p>
-           <p><a href="https://www.c-s.fr">www.c-s.fr</a></p>
+           <p><a href="http://www.csgroup.eu">www.csgroup.eu</a></p>
         </div>
         <div>
            <b>${ _("Community") }</b>
@@ -57,7 +57,7 @@ from prewikka import version
            <p><a href="https://www.vigilo-nms.org">www.vigilo-nms.org</a></p>
         </div>
 
-        <p class="copyright">Copyright &copy; 2004-2020 CS Communication &amp; Syst&egrave;mes. All rights reserved.</p>
+        <p class="copyright">Copyright &copy; 2004-2020 CS GROUP - France. All rights reserved.</p>
       </div>
     </div>
 

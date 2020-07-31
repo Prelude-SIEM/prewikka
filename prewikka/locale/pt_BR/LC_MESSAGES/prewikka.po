@@ -1,5 +1,5 @@
 # Brazilian Portuguese Translation for Prewikka
-# Copyright (C) 2007-2020 CS-SI
+# Copyright (C) 2007-2020 CS GROUP - France
 # This file is distributed under the same license as the prewikka package.
 # edeunix@edeunix.com, 2007.
 #

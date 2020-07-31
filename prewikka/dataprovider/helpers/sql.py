@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Copyright (C) 2016-2020 CS-SI. All Rights Reserved.
+# Copyright (C) 2016-2020 CS GROUP - France. All Rights Reserved.
 # Author: Abdel ELMILI <abdel.elmili@c-s.fr>
 # Author: François POIROTTE <francois.poirotte@c-s.fr>
 #
