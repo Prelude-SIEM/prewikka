@@ -77,18 +77,30 @@ class _Function(_SelectionObject):
                 if r:
                     return r
 
+    def set_path(self, path):
+        for i in self.args:
+            if isinstance(i, _Path) or isinstance(i, _Function):
+                r = i.set_path(path)
+                if r:
+                    return r
+        return False
+
 
 class _Path(_SelectionObject):
     _rtype = None
     type = SelectionType.PATH
 
     def __init__(self, name):
-        self.path = name
-        self.klass, self.name = name.rsplit(".", 1)
+        self.set_path(name)
         self.rtype = None
 
     def __str__(self):
         return self.path
+
+    def set_path(self, path):
+        self.path = path
+        self.klass, self.name = path.rsplit(".", 1)
+        return True
 
 
 class _Constant(_SelectionObject):
@@ -115,6 +127,9 @@ class SelectionObject(object):
             return self.object
         else:
             return self.object.get_path()
+
+    def set_path(self, path):
+        return self.object.set_path(path)
 
 
 class _SelectionTransformer(CommonTransformer):

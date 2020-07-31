@@ -460,7 +460,8 @@ class SQLBuilder(object):
                 outer_paths.append(p)
             elif p.get_path().name == COMPOSITE_TIME_FIELD:
                 # Composite time field with extract
-                outer_paths.append(SelectionObject(_Path("_intervals.start"), extract=p.extract, commands=p.commands))
+                p.set_path("_intervals.start")
+                outer_paths.append(p)
                 if not step or _TIME_UNITS[p.extract] > _TIME_UNITS[step]:
                     step = p.extract
             else:
