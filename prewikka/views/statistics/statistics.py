@@ -19,6 +19,8 @@
 
 from __future__ import absolute_import, division, print_function, unicode_literals
 
+import collections
+
 from prewikka import error, hookmanager, localization, mainmenu, resource, statistics, template, view
 from prewikka.statistics import Query
 from prewikka.utils import json
@@ -58,6 +60,10 @@ class Widget(dict):
 
     def to_db(self):
         return json.dumps({k: v for k, v in self.items() if k not in self._ignored and v is not None})
+
+    @staticmethod
+    def get_categories():
+        return collections.OrderedDict(hookmanager.trigger("HOOK_WIDGET_CATEGORIES"))
 
 
 def chart_class(cls):
@@ -167,6 +173,16 @@ class StaticStats(GenericStats):
 
     def _load_widget(self):
         widget = Widget(env.request.parameters["widget"])
+
+        categories = Widget.get_categories()
+        if categories:
+            if widget["category"] not in categories:
+                raise error.PrewikkaUserError(N_("Invalid widget"), N_("The widget category does not exist"))
+
+            data = categories[widget["category"]].prepare_render(widget)
+            if data:
+                return data
+
         data = self._get_graph(widget)
 
         if widget.get("period") and widget["category"] != "chronology":
