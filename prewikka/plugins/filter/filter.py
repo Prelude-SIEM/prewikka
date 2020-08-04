@@ -207,6 +207,9 @@ class FilterView(view.View):
 
         if name or id_:
             dataset["fltr"] = self._db.get_filter(env.request.user, name, id_)
+            if not dataset["fltr"]:
+                raise error.PrewikkaUserError(N_("Filter error"), N_("Filter '%s' does not exist", name or id_))
+
             dataset["fltr"].criteria = dataset["fltr"].flatten_criteria()
 
         if "duplicate" in env.request.parameters:
