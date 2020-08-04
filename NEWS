@@ -1,3 +1,24 @@
+* 2020-08-04, prewikka-5.2.0rc2:
+
+Author: Antoine Luong
+
+- Evolutions
+
+    - Deprecate apps requiring deprecated apps
+    - Change company name
+    - Add HOOK_WIDGET_CATEGORIES and HOOK_PLUGINS_PARTIAL_RELOAD
+    - Add position to HOOK_DATASEARCH_EXTRA_COLUMN
+
+- Bugfixes
+
+    - Fix timezone being ignored in CTE query
+    - Add missing fix for plugin ordering
+    - Fix method name
+    - Fix dataprovider reloading
+    - Fix formatting in source/target column
+
+
+
 * 2020-07-23, prewikka-5.2.0rc1:
 
 Author: Antoine Luong
