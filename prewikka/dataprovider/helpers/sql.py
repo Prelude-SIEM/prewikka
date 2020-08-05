@@ -460,8 +460,9 @@ class SQLBuilder(object):
                 outer_paths.append(p)
             elif p.get_path().name == COMPOSITE_TIME_FIELD:
                 # Composite time field with extract
-                p.set_path("_intervals.start")
-                outer_paths.append(p)
+                copied = copy.deepcopy(p)
+                copied.set_path("_intervals.start")
+                outer_paths.append(copied)
                 if not step or _TIME_UNITS[p.extract] > _TIME_UNITS[step]:
                     step = p.extract
             else:
@@ -469,9 +470,7 @@ class SQLBuilder(object):
                 inner_paths.append(SelectionObject(p.get_path()))
                 # Use aliases for the outer query
                 copied = copy.deepcopy(p)
-                copied.get_path().name = "c%d" % index
-                copied.get_path().path = "_main.c%d" % index
-                copied.get_path().klass = "_main"
+                copied.set_path("_main.c%d" % index)
                 outer_paths.append(copied)
                 index += 1
 
