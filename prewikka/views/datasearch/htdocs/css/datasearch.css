@@ -18,6 +18,11 @@
     width: 100%;
 }
 
+#datasearch .timeline-toggle > i::after {
+    /* Non-breaking space */
+    content: "\a0";
+}
+
 /* Search bar */
 
 #datasearch .row .form-group {

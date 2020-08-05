@@ -187,14 +187,15 @@ $LAB.script("datasearch/js/datasearch.js").wait(function() {
   <div class="row">
     <div class="col-md-12">
       <div class="panel panel-default">
+        <% timeline = env.request.parameters.get('timeline') %>
         <div class="panel-heading">
           <h4 class="panel-title">
-            <a data-toggle="collapse" href="#timeline">${ _("Timeline") }</a>
+            <a data-toggle="collapse" href="#timeline" class="timeline-toggle"><i class="fa ${'fa-minus' if timeline else 'fa-plus' }"></i>${ _("Timeline") }</a>
           </h4>
         </div>
-        <div id="timeline" class="panel-collapse collapse ${'in' if env.request.parameters.get('timeline') else ''}">
+        <div id="timeline" class="panel-collapse collapse ${'in' if timeline else ''}">
           <div>
-            <input type="hidden" name="timeline" value="${ env.request.parameters.get('timeline') }"/>
+            <input type="hidden" name="timeline" value="${ timeline }"/>
             <div id="timeline_results" class="prewikka-resources-container"></div>
           </div>
         </div>

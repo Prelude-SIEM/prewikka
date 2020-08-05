@@ -701,6 +701,7 @@ function DataSearchPage(backend, criterion_config, criterion_config_default, sep
     $("#timeline").on('shown.bs.collapse hidden.bs.collapse', function() {
         var shown = $("#timeline").hasClass("collapse in");
 
+        $(".timeline-toggle > i").toggleClass("fa-minus", shown).toggleClass("fa-plus", !shown);
         $("#timeline input").attr("value", (shown) ? "1" : "0");
         prewikka_update_parameters($("#form_search :input:not(.mainmenu)").serializeArray());
 
