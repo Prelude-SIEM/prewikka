@@ -135,6 +135,10 @@ class ElasticsearchClient(object):
         # Check if Elasticsearch instance is available
         req = self._request(self._host.rsplit("/", 1)[0], method="GET").json()
         self._version = tuple(int(i) for i in req["version"]["number"].split("."))
+        if self._version < (5,):
+            raise error.PrewikkaUserError(N_("Invalid configuration"),
+                                          N_("Elasticsearch version %s is not supported.", req["version"]["number"]))
+
         self._mapping = ElasticsearchMap(self._type, conf, self.get_mapping())
 
     def request(self, path, data="", method="POST", **kwargs):
