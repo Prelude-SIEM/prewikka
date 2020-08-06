@@ -219,9 +219,9 @@ class UserSettings(SettingsCommon):
     def _getMembers(self, obj):
         return env.auth.get_member_of(obj)
 
-    @view.route("/settings/users/<name>/save", methods=["POST"])
+    @view.route("/settings/users/<path:name>/save", methods=["POST"])
     @use_transaction
-    def save(self, name=None):
+    def save(self, name):
         user = usergroup.User(name)
         modify_self = env.request.user == user
 
@@ -291,11 +291,14 @@ class UserSettings(SettingsCommon):
     def create(self):
         login = env.request.parameters.get("name")
         if not login:
-            raise error.PrewikkaUserError(None, N_("Username required"))
+            raise error.PrewikkaUserError(N_("Could not create user"), N_("Username required"))
+
+        if login.startswith("/"):
+            raise error.PrewikkaUserError(N_("Could not create user"), N_("Username cannot start with a slash"))
 
         user = usergroup.User(login)
         if env.auth.has_user(user):
-            raise error.PrewikkaUserError(None, N_("User %s already exists", login))
+            raise error.PrewikkaUserError(N_("Could not create user"), N_("User %s already exists", login))
 
         user.create()
         self.save(login)
@@ -356,8 +359,8 @@ class GroupSettings(SettingsCommon):
     def _getMembers(self, obj):
         return env.auth.get_group_members(obj)
 
-    @view.route("/settings/groups/<name>/save", methods=["POST"], permissions=["GROUP_MANAGEMENT"])
-    def save(self, name=None):
+    @view.route("/settings/groups/<path:name>/save", methods=["POST"], permissions=["GROUP_MANAGEMENT"])
+    def save(self, name):
         group = usergroup.Group(name)
         list(hookmanager.trigger("HOOK_GROUPMANAGEMENT_GROUP_MODIFY", group))
 
@@ -378,7 +381,7 @@ class GroupSettings(SettingsCommon):
 
         return response.PrewikkaResponse({"type": "reload", "target": ".commonlisting"})
 
-    @view.route("/settings/groups/<name>/edit", permissions=["GROUP_MANAGEMENT"])
+    @view.route("/settings/groups/<path:name>/edit", permissions=["GROUP_MANAGEMENT"])
     @view.route("/settings/groups/edit", permissions=["GROUP_MANAGEMENT"])
     def edit(self, name=None, widget=True):
         group = None
@@ -409,11 +412,14 @@ class GroupSettings(SettingsCommon):
     def create(self):
         group_name = env.request.parameters.get("name")
         if not group_name:
-            raise error.PrewikkaUserError(None, N_("No group name provided"))
+            raise error.PrewikkaUserError(N_("Could not create group"), N_("No group name provided"))
+
+        if group_name.startswith("/"):
+            raise error.PrewikkaUserError(N_("Could not create group"), N_("Group name cannot start with a slash"))
 
         group = usergroup.Group(group_name)
         if env.auth.has_group(group):
-            raise error.PrewikkaUserError(None, N_("Group %s already exists", group_name))
+            raise error.PrewikkaUserError(N_("Could not create group"), N_("Group %s already exists", group_name))
 
         group.create()
         return self.save(group_name)

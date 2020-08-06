@@ -72,8 +72,8 @@ class BaseView(view._View):
 
     @view.route("/download/<int:id>/<filename>")
     @view.route("/download/<int:id>/<filename>/inline", defaults={"inline": True})
-    @view.route("/download/<user>/<int:id>/<filename>")
-    @view.route("/download/<user>/<int:id>/<filename>/inline", defaults={"inline": True})
+    @view.route("/download/<path:user>/<int:id>/<filename>")
+    @view.route("/download/<path:user>/<int:id>/<filename>/inline", defaults={"inline": True})
     def download(self, user=None, id=None, filename=None, inline=False):
         if user and user != env.request.user.name:
             raise error.PrewikkaUserError(_("Permission Denied"), message=_("Missing permission to access the specified file"), code=403)

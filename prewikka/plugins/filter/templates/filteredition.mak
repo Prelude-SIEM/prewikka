@@ -59,7 +59,7 @@
     });
     </script>
 
-    <form class="filter-form" action="${url_for('FilterView.save')}" method="post">
+    <form class="filter-form" action="${url_for('FilterView.save', name=fltr.name)}" method="post">
 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -123,7 +123,6 @@
         <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> ${ _("Save") }</button>
       </div>
 
-      <input type="hidden" name="filter_old_name" value="${fltr.name}">
     </form>
 
 

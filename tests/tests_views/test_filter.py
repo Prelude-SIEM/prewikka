@@ -217,14 +217,13 @@ def test_save_rename(filter_fixtures):
     """
     view = filter_fixtures.get('view')
 
-    env.request.parameters['filter_old_name'] = 'Test filter 1'
     env.request.parameters['filter_name'] = 'New name'
     env.request.parameters['types'] = ['heartbeat', 'alert']
     env.request.parameters['criteria'] = filter_fixtures.get('criterion_list')
     database = filter_fixtures.get('database')
     filter_count = len(filter_fixtures.get('criterion_list'))
 
-    assert view.render()
+    assert view.render(name='Test filter 1')
 
     # ensure the filter is edited and not duplicated
     assert len(list(database.get_filters(env.request.user))) == filter_count
@@ -259,11 +258,10 @@ def test_save_update(filter_fixtures):
 
     filter_obj_1 = filter_fixtures.get('filter_obj_1')
     env.request.parameters['filter_name'] = filter_obj_1.name
-    env.request.parameters['filter_old_name'] = filter_obj_1.name
     env.request.parameters['types'] = ['heartbeat', 'alert']
     env.request.parameters['criteria'] = filter_fixtures.get('criterion_list')
 
-    assert view.render()
+    assert view.render(name=filter_obj_1.name)
 
 
 @pytest.mark.parametrize("filter_fixtures", ["filterview.listing"], indirect=True)

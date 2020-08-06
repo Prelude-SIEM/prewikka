@@ -195,12 +195,12 @@ class FilterView(view.View):
         query.criteria &= c
 
     @view.route("/settings/filters/new", help="#filteredition")
-    @view.route("/settings/filters/<name>/edit", help="#filteredition")
+    @view.route("/settings/filters/<path:name>/edit", help="#filteredition")
     def edit(self, name=None):
         id_ = env.request.parameters.get("duplicate", type=int)
 
         dataset = {
-            "fltr": AttrObj(id_="", name="", category="", description="", criteria={}),
+            "fltr": AttrObj(id_=None, name=None, category=None, description=None, criteria={}),
             "categories": self._db.get_categories(env.request.user),
             "types": list(self._get_types())
         }
@@ -220,25 +220,27 @@ class FilterView(view.View):
             self._filter_delete(env.request.user, id_=id_)
 
     @view.route("/settings/filters/save", methods=["POST"])
-    def save(self):
-        name = env.request.parameters.get("filter_name")
-        old_name = env.request.parameters.get("filter_old_name")
+    @view.route("/settings/filters/<path:name>/save", methods=["POST"])
+    def save(self, name=None):
+        new_name = env.request.parameters.get("filter_name")
         category = env.request.parameters.get("filter_category")
         description = env.request.parameters.get("filter_description")
 
-        if not name:
+        if not new_name:
             raise error.PrewikkaUserError(N_("Could not save filter"), N_("No name for this filter was provided"))
+        elif new_name.startswith("/"):
+            raise error.PrewikkaUserError(N_("Could not save filter"), N_("The filter name cannot start with a slash"))
 
         criteria = dict(zip(
             env.request.parameters.getlist("filter_types"),
             (json.loads(c) for c in env.request.parameters.getlist("filter_criteria"))
         ))
 
-        filter_ = self._db.get_filter(env.request.user, old_name) if old_name else None
+        filter_ = self._db.get_filter(env.request.user, name) if name else None
         filter_id = filter_.id_ if filter_ else None
 
         # Ensure the filter name is not already used by this user
-        if name != old_name and self._db.get_filter(env.request.user, name):
+        if new_name != name and self._db.get_filter(env.request.user, new_name):
             raise error.PrewikkaUserError(N_("Could not save filter"), N_("The filter name is already used by another filter"))
 
         # Do not erase filter components if the dataprovider failed to load
@@ -248,6 +250,6 @@ class FilterView(view.View):
             criteria = new_criteria
 
         criteria = dict((k, v) for k, v in criteria.items() if v is not None)
-        self._db.upsert_filter(env.request.user, Filter(filter_id, name, category, description, criteria))
+        self._db.upsert_filter(env.request.user, Filter(filter_id, new_name, category, description, criteria))
 
-        return response.PrewikkaResponse({"type": "reload", "target": "#main_menu_ng", "options": {"filter": name}})
+        return response.PrewikkaResponse({"type": "reload", "target": "#main_menu_ng", "options": {"filter": new_name}})
