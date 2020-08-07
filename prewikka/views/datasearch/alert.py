@@ -71,6 +71,17 @@ class AlertFormatter(idmef.IDMEFFormatter):
 
         return "%s(0).node.address(0).address" % field
 
+    @classmethod
+    def _add_class_to_node(cls, node, klass):
+        if not node.tag:
+            for child in node.childs:
+                cls._add_class_to_node(child, klass)
+
+        elif "class" in node.attrs:
+            node.attrs["class"] += " " + klass
+        else:
+            node.attrs["class"] = klass
+
     def format(self, finfo, root, obj):
         ret = idmef.IDMEFFormatter.format(self, finfo, root, obj)
         if not ret:
@@ -86,15 +97,9 @@ class AlertFormatter(idmef.IDMEFFormatter):
             finfo = env.dataprovider.get_path_info(basic_fields[finfo.path])
             obj = root.get(finfo.path)
             simple_fmt = idmef.IDMEFFormatter.format(self, finfo, root, obj)
-            if "class" in ret.attrs:
-                ret.attrs["class"] += " expert-mode"
-            else:
-                ret.attrs["class"] = "expert-mode"
 
-            if "class" in simple_fmt.attrs:
-                simple_fmt.attrs["class"] += " basic-mode"
-            else:
-                simple_fmt.attrs["class"] = "basic-mode"
+            self._add_class_to_node(ret, "expert-mode")
+            self._add_class_to_node(simple_fmt, "basic-mode")
 
             return ret + simple_fmt
         else:
