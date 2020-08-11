@@ -179,7 +179,7 @@ class IDMEFAlertProvider(_IDMEFProvider):
         criteria = Criterion()
         age = int(config.get("age", 0))
         now = utils.timeutil.utcnow()
-        for severity in ("info", "low", "medium", "high"):
+        for severity in (None, "info", "low", "medium", "high"):
             days = int(config.get(severity, age))
             if days < 1:
                 continue
