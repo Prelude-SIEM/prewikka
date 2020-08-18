@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.2.0rc2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-04 13:35+0200\n"
+"POT-Creation-Date: 2020-08-18 16:16+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: Carlo Anez <carlo.anez@siscotec.com>\n"
 "Language-Team: Spanish\n"
@@ -21,8 +21,8 @@ msgstr ""
 #: prewikka/views/usermanagement/usermanagement.py:112
 #: prewikka/views/usermanagement/usermanagement.py:142
 #: prewikka/views/usermanagement/usermanagement.py:232
-#: prewikka/views/usermanagement/usermanagement.py:324
-#: prewikka/views/usermanagement/usermanagement.py:395
+#: prewikka/views/usermanagement/usermanagement.py:327
+#: prewikka/views/usermanagement/usermanagement.py:398
 msgid "Permission Denied"
 msgstr "Permiso Denegado"
 
@@ -31,7 +31,7 @@ msgid "Missing permission to access the specified file"
 msgstr ""
 
 #: prewikka/config.py:37 prewikka/dataprovider/__init__.py:654
-#: prewikka/dataprovider/helpers/elasticsearch.py:901
+#: prewikka/dataprovider/helpers/elasticsearch.py:905
 #, fuzzy
 msgid "Configuration error"
 msgstr "Alerta de correlación"
@@ -606,14 +606,14 @@ msgstr ""
 
 #: prewikka/dataprovider/idmef.py:158
 #: prewikka/views/agents/templates/agents.mak:90
-#: prewikka/views/datasearch/alert.py:118
-#: prewikka/views/datasearch/alert.py:119
-#: prewikka/views/datasearch/alert.py:237
+#: prewikka/views/datasearch/alert.py:123
+#: prewikka/views/datasearch/alert.py:124
+#: prewikka/views/datasearch/alert.py:242
 #: prewikka/views/statistics/alertstats.py:382
 msgid "Alerts"
 msgstr "Alertas"
 
-#: prewikka/dataprovider/idmef.py:165 prewikka/views/datasearch/alert.py:132
+#: prewikka/dataprovider/idmef.py:165 prewikka/views/datasearch/alert.py:137
 msgid "Classification"
 msgstr "Clasificación"
 
@@ -696,8 +696,9 @@ msgid "Extraction is supported only for date fields"
 msgstr ""
 
 #: prewikka/dataprovider/helpers/elasticsearch.py:88
-#: prewikka/dataprovider/helpers/elasticsearch.py:227
-#: prewikka/dataprovider/helpers/elasticsearch.py:873
+#: prewikka/dataprovider/helpers/elasticsearch.py:139
+#: prewikka/dataprovider/helpers/elasticsearch.py:231
+#: prewikka/dataprovider/helpers/elasticsearch.py:877
 #, fuzzy
 msgid "Invalid configuration"
 msgstr "Configuración"
@@ -716,62 +717,67 @@ msgstr "Configuración"
 msgid "Could not find a valid configuration for Elasticsearch %s type."
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:158
-#: prewikka/dataprovider/helpers/elasticsearch.py:163
-#: prewikka/dataprovider/helpers/elasticsearch.py:184
-#: prewikka/dataprovider/helpers/elasticsearch.py:207
+#: prewikka/dataprovider/helpers/elasticsearch.py:140
+#, python-format
+msgid "Elasticsearch version %s is not supported."
+msgstr ""
+
+#: prewikka/dataprovider/helpers/elasticsearch.py:162
+#: prewikka/dataprovider/helpers/elasticsearch.py:167
+#: prewikka/dataprovider/helpers/elasticsearch.py:188
+#: prewikka/dataprovider/helpers/elasticsearch.py:211
 #, fuzzy
 msgid "Request error"
 msgstr "Alerta de correlación"
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:182
-#: prewikka/dataprovider/helpers/elasticsearch.py:201
+#: prewikka/dataprovider/helpers/elasticsearch.py:186
+#: prewikka/dataprovider/helpers/elasticsearch.py:205
 msgid "Cannot further browse results. Please use a more specific filter."
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:188
+#: prewikka/dataprovider/helpers/elasticsearch.py:192
 #, python-format
 msgid "Request error with HTTP code %d."
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:198
+#: prewikka/dataprovider/helpers/elasticsearch.py:202
 msgid "Malformed query."
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:203
+#: prewikka/dataprovider/helpers/elasticsearch.py:207
 #, python-format
 msgid "Request error with HTTP code %d. Reason: %s"
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:205
+#: prewikka/dataprovider/helpers/elasticsearch.py:209
 #, python-format
 msgid "Request error with HTTP code %d. Unknown reason"
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:228
+#: prewikka/dataprovider/helpers/elasticsearch.py:232
 msgid "The specified Elasticsearch index does not exist"
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:458
+#: prewikka/dataprovider/helpers/elasticsearch.py:462
 msgid "Elasticsearch database operator error"
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:459
+#: prewikka/dataprovider/helpers/elasticsearch.py:463
 #, python-format
 msgid ""
 "The operator '%s' that you try to use is not supported by Prelude for the"
 " field '%s'."
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:471
+#: prewikka/dataprovider/helpers/elasticsearch.py:475
 msgid "Only one _raw_query path can be specified for the selection"
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:471
+#: prewikka/dataprovider/helpers/elasticsearch.py:475
 msgid "Elasticsearch database path selection error"
 msgstr ""
 
-#: prewikka/dataprovider/helpers/elasticsearch.py:902
+#: prewikka/dataprovider/helpers/elasticsearch.py:906
 msgid "In your Elasticsearch instance, fields mapping is not well configured."
 msgstr ""
 
@@ -813,7 +819,7 @@ msgid "Filters management page"
 msgstr "Filtrar por agente"
 
 #: prewikka/plugins/filter/filter.py:111
-#: prewikka/views/usermanagement/usermanagement.py:304
+#: prewikka/views/usermanagement/usermanagement.py:307
 msgid "Preferences"
 msgstr "Preferencias"
 
@@ -828,24 +834,29 @@ msgstr "Filtros"
 msgid "Filter %s"
 msgstr "Filtro %s"
 
-#: prewikka/plugins/filter/filter.py:193
+#: prewikka/plugins/filter/filter.py:193 prewikka/plugins/filter/filter.py:211
 msgid "Filter error"
 msgstr "Error de filtro"
 
-#: prewikka/plugins/filter/filter.py:193
+#: prewikka/plugins/filter/filter.py:193 prewikka/plugins/filter/filter.py:211
 #, python-format
 msgid "Filter '%s' does not exist"
 msgstr ""
 
-#: prewikka/plugins/filter/filter.py:230 prewikka/plugins/filter/filter.py:242
+#: prewikka/plugins/filter/filter.py:233 prewikka/plugins/filter/filter.py:235
+#: prewikka/plugins/filter/filter.py:247
 msgid "Could not save filter"
 msgstr ""
 
-#: prewikka/plugins/filter/filter.py:230
+#: prewikka/plugins/filter/filter.py:233
 msgid "No name for this filter was provided"
 msgstr ""
 
-#: prewikka/plugins/filter/filter.py:242
+#: prewikka/plugins/filter/filter.py:235
+msgid "The filter name cannot start with a slash"
+msgstr ""
+
+#: prewikka/plugins/filter/filter.py:247
 msgid "The filter name is already used by another filter"
 msgstr ""
 
@@ -1769,63 +1780,63 @@ msgstr ""
 msgid "A URL should be defined for each tab"
 msgstr ""
 
-#: prewikka/views/datasearch/alert.py:114
+#: prewikka/views/datasearch/alert.py:119
 #, fuzzy
 msgid "Alert listing page"
 msgstr "Lista de alertas"
 
-#: prewikka/views/datasearch/alert.py:119
+#: prewikka/views/datasearch/alert.py:124
 msgid "Aggregated alerts"
 msgstr "Alertas agregadas"
 
-#: prewikka/views/datasearch/alert.py:130
+#: prewikka/views/datasearch/alert.py:135
 #: prewikka/views/messagesummary/messagesummary.py:751
 msgid "Severity"
 msgstr "Severidad"
 
-#: prewikka/views/datasearch/alert.py:131
+#: prewikka/views/datasearch/alert.py:136
 #: prewikka/views/datasearch/heartbeat.py:60
 #: prewikka/views/datasearch/log.py:57
 msgid "Date"
 msgstr "Fecha"
 
-#: prewikka/views/datasearch/alert.py:133
+#: prewikka/views/datasearch/alert.py:138
 msgid "Source"
 msgstr "Origen"
 
-#: prewikka/views/datasearch/alert.py:134
+#: prewikka/views/datasearch/alert.py:139
 msgid "Target"
 msgstr "Destino"
 
-#: prewikka/views/datasearch/alert.py:135
+#: prewikka/views/datasearch/alert.py:140
 msgid "Analyzer"
 msgstr "Analizador"
 
-#: prewikka/views/datasearch/alert.py:138
+#: prewikka/views/datasearch/alert.py:143
 msgid "Delete the selected alerts?"
 msgstr ""
 
-#: prewikka/views/datasearch/alert.py:196
+#: prewikka/views/datasearch/alert.py:201
 #: prewikka/views/idmefnav/__init__.py:45
 #: prewikka/views/messagesummary/templates/messagesummary.mak:92
 msgid "IDMEF"
 msgstr "IDMEF"
 
-#: prewikka/views/datasearch/alert.py:221
+#: prewikka/views/datasearch/alert.py:226
 msgid "Minimal severity"
 msgstr ""
 
-#: prewikka/views/datasearch/alert.py:222
+#: prewikka/views/datasearch/alert.py:227
 #, fuzzy
 msgid "Low severity"
 msgstr "Severidad"
 
-#: prewikka/views/datasearch/alert.py:223
+#: prewikka/views/datasearch/alert.py:228
 #, fuzzy
 msgid "Medium severity"
 msgstr "Severidad"
 
-#: prewikka/views/datasearch/alert.py:224
+#: prewikka/views/datasearch/alert.py:229
 #, fuzzy
 msgid "High severity"
 msgstr "Severidad"
@@ -1942,12 +1953,12 @@ msgid "Group by %s"
 msgstr "Agrupar por %s"
 
 #: prewikka/views/datasearch/templates/details.mak:30
-#: prewikka/views/datasearch/templates/forensic.mak:244
+#: prewikka/views/datasearch/templates/forensic.mak:245
 msgid "Add to search"
 msgstr "Añadir a la búsqueda"
 
 #: prewikka/views/datasearch/templates/details.mak:31
-#: prewikka/views/datasearch/templates/forensic.mak:245
+#: prewikka/views/datasearch/templates/forensic.mak:246
 msgid "Exclude from search"
 msgstr "Excluir de la búsqueda"
 
@@ -1991,7 +2002,7 @@ msgid "Search mode"
 msgstr ""
 
 #: prewikka/views/datasearch/templates/forensic.mak:137
-#: prewikka/views/datasearch/templates/forensic.mak:242
+#: prewikka/views/datasearch/templates/forensic.mak:243
 msgid "Search"
 msgstr "Buscar"
 
@@ -2000,7 +2011,7 @@ msgid "Reset search"
 msgstr "Reiniciar búsqueda"
 
 #: prewikka/views/datasearch/templates/forensic.mak:149
-#: prewikka/views/datasearch/templates/forensic.mak:247
+#: prewikka/views/datasearch/templates/forensic.mak:248
 msgid "Group by"
 msgstr "Agrupar por"
 
@@ -2018,22 +2029,22 @@ msgstr "valor"
 msgid "%s fields"
 msgstr ""
 
-#: prewikka/views/datasearch/templates/forensic.mak:192
+#: prewikka/views/datasearch/templates/forensic.mak:193
 #: prewikka/views/statistics/alertstats.py:50
 #, fuzzy
 msgid "Timeline"
 msgstr "Hora"
 
-#: prewikka/views/datasearch/templates/forensic.mak:246
+#: prewikka/views/datasearch/templates/forensic.mak:247
 msgid "New search"
 msgstr "Nueva búsqueda"
 
-#: prewikka/views/datasearch/templates/forensic.mak:256
+#: prewikka/views/datasearch/templates/forensic.mak:257
 #: prewikka/views/messagesummary/messagesummary.py:1041
 msgid "Actions"
 msgstr "Acciones"
 
-#: prewikka/views/datasearch/templates/forensic.mak:269
+#: prewikka/views/datasearch/templates/forensic.mak:270
 msgid "Informations"
 msgstr "Informationes"
 
@@ -2853,41 +2864,63 @@ msgid "Invalid password specified"
 msgstr ""
 
 #: prewikka/views/usermanagement/usermanagement.py:294
+#: prewikka/views/usermanagement/usermanagement.py:297
+#: prewikka/views/usermanagement/usermanagement.py:301
+#, fuzzy
+msgid "Could not create user"
+msgstr "Crear usuario"
+
+#: prewikka/views/usermanagement/usermanagement.py:294
 msgid "Username required"
 msgstr ""
 
-#: prewikka/views/usermanagement/usermanagement.py:298
+#: prewikka/views/usermanagement/usermanagement.py:297
+msgid "Username cannot start with a slash"
+msgstr ""
+
+#: prewikka/views/usermanagement/usermanagement.py:301
 #, python-format
 msgid "User %s already exists"
 msgstr ""
 
-#: prewikka/views/usermanagement/usermanagement.py:304
+#: prewikka/views/usermanagement/usermanagement.py:307
 msgid "My account"
 msgstr "Mi cuenta"
 
-#: prewikka/views/usermanagement/usermanagement.py:321
+#: prewikka/views/usermanagement/usermanagement.py:324
 #, fuzzy
 msgid "Invalid User"
 msgstr "Idioma:"
 
-#: prewikka/views/usermanagement/usermanagement.py:321
+#: prewikka/views/usermanagement/usermanagement.py:324
 #, python-format
 msgid "Requested user '%s' does not exist"
 msgstr ""
 
-#: prewikka/views/usermanagement/usermanagement.py:324
+#: prewikka/views/usermanagement/usermanagement.py:327
 msgid "Access denied to other users settings"
 msgstr ""
 
-#: prewikka/views/usermanagement/usermanagement.py:395
+#: prewikka/views/usermanagement/usermanagement.py:398
 msgid "Access denied to group settings"
 msgstr ""
 
-#: prewikka/views/usermanagement/usermanagement.py:412
+#: prewikka/views/usermanagement/usermanagement.py:415
+#: prewikka/views/usermanagement/usermanagement.py:418
+#: prewikka/views/usermanagement/usermanagement.py:422
+#, fuzzy
+msgid "Could not create group"
+msgstr "Crear grupo"
+
+#: prewikka/views/usermanagement/usermanagement.py:415
 msgid "No group name provided"
 msgstr ""
 
-#: prewikka/views/usermanagement/usermanagement.py:416
+#: prewikka/views/usermanagement/usermanagement.py:418
+msgid "Group name cannot start with a slash"
+msgstr ""
+
+#: prewikka/views/usermanagement/usermanagement.py:422
 #, python-format
 msgid "Group %s already exists"
 msgstr ""
