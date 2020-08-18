@@ -1,3 +1,17 @@
+* 2020-08-18, prewikka-5.2.0rc3:
+
+Author: Antoine Luong
+
+- Allow periodic deletion of no-severity alerts
+- Improve error handling in filter edition
+- Fix rendering of Alerts expert mode
+- Handle slashes in object names
+- Add icon for DataSearch timeline toggle
+- Raise an error for unsupported ES versions
+- Make sure to copy the path in SQLBuilder
+
+
+
 * 2020-08-04, prewikka-5.2.0rc2:
 
 Author: Antoine Luong
