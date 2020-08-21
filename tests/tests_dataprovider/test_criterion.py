@@ -136,6 +136,13 @@ def test_criterion_flatten():
     assert flattened.operands[0].operands == [criterion_1, criterion_2, criterion_3]
     assert flattened.operands[1] == criterion_4
 
+    criterion = Criterion(None, '!', Criterion(None, '!', Criterion(None, '!', criterion_1)))
+    flattened = criterion.flatten()
+
+    assert flattened.operator == CriterionOperator.NOT
+    assert len(flattened.operands) == 1
+    assert flattened.operands[0] == criterion_1
+
 
 def test_criterion_operations():
     """

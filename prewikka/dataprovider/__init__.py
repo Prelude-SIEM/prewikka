@@ -544,6 +544,13 @@ class Criterion(json.JSONObject):
         if not self or not self.operator.is_boolean:
             return self
 
+        if self.operator == CriterionOperator.NOT:
+            operand = self.right.flatten()
+            if operand.operator == self.operator:
+                return operand.operands[0]
+            else:
+                return AttrObj(operator=self.operator, operands=[operand])
+
         ret = AttrObj(operator=self.operator, operands=[])
 
         for operand in (self.left.flatten(), self.right.flatten()):
