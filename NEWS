@@ -1,3 +1,11 @@
+* 2020-09-09, prewikka-5.2.0:
+
+Author: Antoine Luong
+
+- Handle NOT in Criterion.flatten()
+
+
+
 * 2020-08-18, prewikka-5.2.0rc3:
 
 Author: Antoine Luong

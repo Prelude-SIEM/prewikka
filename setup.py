@@ -35,8 +35,8 @@ from distutils.dep_util import newer
 from distutils.command.build import build as _build
 
 
-LIBPRELUDE_REQUIRED_VERSION = "5.1.0"
-LIBPRELUDEDB_REQUIRED_VERSION = "5.1.0"
+LIBPRELUDE_REQUIRED_VERSION = "5.2.0"
+LIBPRELUDEDB_REQUIRED_VERSION = "5.2.0"
 
 
 def init_siteconfig(conf_prefix, data_prefix):
@@ -217,7 +217,7 @@ class PrewikkaCoverage(Command):
 
 setup(
     name="prewikka",
-    version="5.2.0rc3",
+    version="5.2.0",
     maintainer="Prelude Team",
     maintainer_email="support.prelude@csgroup.eu",
     url="https://www.prelude-siem.com",
