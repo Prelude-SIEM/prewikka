@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Prewikka 5.2.0rc3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2020-08-18 16:16+0200\n"
+"POT-Creation-Date: 2020-09-09 12:22+0200\n"
 "PO-Revision-Date: 2018-02-09 12:07+0100\n"
 "Last-Translator: Edelberto Franco Silva <edeunix@edeunix.com>\n"
 "Language-Team: Portuguese\n"
@@ -30,7 +30,7 @@ msgstr "Permissão Negada"
 msgid "Missing permission to access the specified file"
 msgstr ""
 
-#: prewikka/config.py:37 prewikka/dataprovider/__init__.py:654
+#: prewikka/config.py:37 prewikka/dataprovider/__init__.py:661
 #: prewikka/dataprovider/helpers/elasticsearch.py:905
 msgid "Configuration error"
 msgstr ""
@@ -570,12 +570,12 @@ msgstr ""
 msgid "Could not parse input"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:644
+#: prewikka/dataprovider/__init__.py:651
 #, python-format
 msgid "No handler configured for '%s' datatype"
 msgstr ""
 
-#: prewikka/dataprovider/__init__.py:655
+#: prewikka/dataprovider/__init__.py:662
 #, python-format
 msgid "Only one manager should be configured for '%s' backend"
 msgstr ""
